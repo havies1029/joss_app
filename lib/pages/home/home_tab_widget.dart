@@ -13,13 +13,13 @@ class HomeTabWidget extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(title: const Text('JPS Insurance Broker')),
+        appBar: AppBar(
+          title: const Text(
+            'JPS Insurance Broker',
+          ),
+        ),
         body: const TabBarView(
-          children: [
-            ReportTab(),
-            HomeTab(),
-            SettingsTab(),
-          ],
+          children: [ReportTab(), HomeTab(), SettingsTab()],
         ),
         bottomNavigationBar: Material(
           // beri latar agar indikator & label terlihat
@@ -42,5 +42,3 @@ class HomeTabWidget extends StatelessWidget {
     );
   }
 }
-
-

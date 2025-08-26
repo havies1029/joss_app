@@ -77,19 +77,27 @@ flutter:
     - assets/images/vector-13.png
     - assets/images/vector-14.png
     - assets/images/vector-15.png
+
   fonts:
-    - family: HeeboBold
+    - family: Delm-Regular
       fonts:
-        - asset: assets/fonts/Heebo-Bold.ttf
-    - family: HeeboMedium
+        - asset: assets/fonts/Delm-Regular.ttf
+          weight: 400
+    - family: Delm
       fonts:
-        - asset: assets/fonts/Heebo-Medium.ttf
-    - family: Roboto-Bold
-      fonts:
-        - asset: assets/fonts/Roboto-Bold.ttf
-    - family: Roboto-Medium
-      fonts:
-        - asset: assets/fonts/Roboto-Medium.ttf
-    - family: Roboto-Regular
-      fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf  
+        - asset: assets/fonts/Delm-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Delm-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Delm-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Delm-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Delm-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Delm-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Delm-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Delm-Black.ttf
+          weight: 900
