@@ -46,7 +46,7 @@ dependencies:
   string_validator: ^1.0.2  
   timelines_plus: ^1.0.3
   uuid: ^4.5.1
-
+  mobile_chat_flutter: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +77,11 @@ flutter:
     - assets/images/vector-13.png
     - assets/images/vector-14.png
     - assets/images/vector-15.png
+    - assets/images/background_gradient.png
+    - assets/icons/jps_logo.svg
+    - assets/icons/notification.png
+    - assets/icons/logo_jps_no_background.png
+
   fonts:
     - family: HeeboBold
       fonts:
