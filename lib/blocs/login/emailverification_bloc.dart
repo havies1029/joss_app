@@ -60,9 +60,13 @@ class EmailVerificationBloc
 
         authenticationBloc.add(UserAuthenticated(user: user));
       } else if (infoData[0] == '2') {
+        // Mulai proses OTP
+        AppData.isInOtpProcess = true;
+
         event.record.requestId = infoData[1];
-        authenticationBloc
-            .add(RequirePinEmailVerification(email: event.record.email));
+        authenticationBloc.add(
+          RequirePinEmailVerification(email: event.record.email),
+        );
       }
     } else if (returnData.data.isNotEmpty) {
       List<String> infoData = returnData.data.split(";");

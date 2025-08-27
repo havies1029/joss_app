@@ -9,6 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// import '../../pages/base/base_page.dart';
+import '../home/home_bloc.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -16,6 +20,7 @@ part 'authentication_state.dart';
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final UserRepository userRepository;
+  bool isSwitchingToClient = false;
 
   AuthenticationBloc({required this.userRepository})
       : super(AuthenticationUnauthenticated()) {
@@ -49,9 +54,14 @@ class AuthenticationBloc
     });
   }
 
-  Future<void> _onAppStarted(
-      AppStarted event, Emitter<AuthenticationState> emit) async {
+  Future<void> _onAppStarted(AppStarted event, Emitter<AuthenticationState> emit) async {
     debugPrint("_onAppStarted");
+
+    // ⛔ Cegah jika sedang dalam proses OTP
+    if (AppData.isInOtpProcess) {
+      debugPrint("⛔ Lewati _onAppStarted karena sedang dalam proses OTP");
+      return;
+    }
 
     emit(AuthenticationPreCheckHasToken());
     String token = await userRepository.getToken();
@@ -64,17 +74,13 @@ class AuthenticationBloc
       AppData.user = user;
       AppData.userToken = token;
 
-      //emit(AuthenticatioTokenAuthenticated(user: user));
       emit(AuthenticationAuthenticated(
           user: user, authenticatedFrom: "login_token"));
-
-      //debugPrint("hasToken ? yes -> ${AppData.userToken}");
     } else {
-      //debugPrint("hasToken ? no");
       emit(AuthenticationUnauthenticated());
-      //debugPrint("hasToken ? no -> proceed");
     }
   }
+
 
   Future<void> _onLoggedIn(
       LoggedIn event, Emitter<AuthenticationState> emit) async {
@@ -82,10 +88,49 @@ class AuthenticationBloc
 
     emit(AuthenticationLoading());
 
-    //emit(AuthenticationClientAuthenticated(user: event.user));
+    // 🧼 Bersihin lastPageType supaya gak restore halaman lama
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lastPageType');
+
+    // Emit ke state authenticated
     emit(AuthenticationAuthenticated(
-        user: event.user, authenticatedFrom: "login_client"));
+      user: event.user,
+      authenticatedFrom: "login_client",
+    ));
   }
+
+  // Future<void> _onLoggedOut(
+  //     LoggedOut event,
+  //     Emitter<AuthenticationState> emit,
+  //     ) async {
+  //   emit(AuthenticationLoading());
+  //   await userRepository.deleteToken(id: 0);
+  //
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('lastPageType', PageType.home.name);
+  //
+  //   // Tunggu HomeBloc ke HomePageActive, tapi kasih timeout agar tidak deadlock
+  //   final completer = Completer<void>();
+  //   late final StreamSubscription sub;
+  //   sub = event.homeBloc.stream.listen((s) {
+  //     if (s is HomePageActive) {
+  //       sub.cancel();
+  //       if (!completer.isCompleted) completer.complete();
+  //     }
+  //   });
+  //   event.homeBloc.add(ResetToHomeEvent());
+  //
+  //   // Timeout 500ms supaya tetap jalan kalau event telat
+  //   await Future.any([
+  //     completer.future,
+  //     Future.delayed(const Duration(milliseconds: 500)),
+  //   ]).whenComplete(() {
+  //     sub.cancel();
+  //   });
+  //
+  //   // Setelah tree stabil → emit Unauthenticated
+  //   emit(AuthenticationUnauthenticated());
+  // }
 
   Future<void> _onLoggedOut(
       LoggedOut event, Emitter<AuthenticationState> emit) async {
@@ -94,11 +139,13 @@ class AuthenticationBloc
     emit(AuthenticationUnauthenticated());
   }
 
-  Future<void> _onRequirePinEmailVerification(RequirePinEmailVerification event,
+  Future<void> _onRequirePinEmailVerification(
+      RequirePinEmailVerification event,
       Emitter<AuthenticationState> emit) async {
-    emit(AuthenticationLoading());
+    debugPrint("✅ emit AuthenticationRequirePinEmailVerification (no loading)");
     emit(AuthenticationRequirePinEmailVerification(email: event.email));
   }
+
 
   Future<void> _onUserAuthenticated(
       UserAuthenticated event, Emitter<AuthenticationState> emit) async {

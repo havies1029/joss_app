@@ -10,10 +10,30 @@ class AuthenticationUninitialized extends AuthenticationState {}
 class AuthenticationAuthenticated extends AuthenticationState {
   final User user;
   final String authenticatedFrom;
-  AuthenticationAuthenticated({required this.user, required this.authenticatedFrom});
+  final bool isSwitchingToClient;
+
+  AuthenticationAuthenticated({
+    required this.user,
+    required this.authenticatedFrom,
+    this.isSwitchingToClient = false,
+  });
+
+  AuthenticationAuthenticated copyWith({
+    User? user,
+    String? authenticatedFrom,
+    bool? isSwitchingToClient,
+  }) {
+    return AuthenticationAuthenticated(
+      user: user ?? this.user,
+      authenticatedFrom: authenticatedFrom ?? this.authenticatedFrom,
+      isSwitchingToClient: isSwitchingToClient ?? this.isSwitchingToClient,
+    );
+  }
+
   @override
-  List<Object> get props => [user, authenticatedFrom];
+  List<Object> get props => [user, authenticatedFrom, isSwitchingToClient];
 }
+
 
 class AuthenticationGoogleUserAuthenticated extends AuthenticationState {
   final GoogleSignInAccount user;

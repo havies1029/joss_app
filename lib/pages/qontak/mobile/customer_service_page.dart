@@ -38,10 +38,8 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-
       // ❌ body kosong, hapus text placeholder
       body: const SizedBox.shrink(),
-
       // ✅ FAB untuk buka halaman chat
       floatingActionButton:  FloatingActionButton(
         onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('chat'),
