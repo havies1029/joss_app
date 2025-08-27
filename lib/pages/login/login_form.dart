@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 
+import '../../blocs/authentication/authentication_bloc.dart';
+import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../blocs/networkconnection/network_bloc.dart';
+import '../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../blocs/user_profile/user_profile_cubit.dart';
 import '../../common/constants.dart';
 import 'package:joss_app/widgets/header_section.dart';
 
@@ -192,6 +196,7 @@ class _LoginFormState extends State<LoginForm>
               );
             }
           },
+
         ),
 
         BlocListener<LoginBloc, LoginState>(
@@ -200,6 +205,57 @@ class _LoginFormState extends State<LoginForm>
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Username atau Password Anda salah!"),
               );
+            }
+          },
+        ),
+
+        // 1) Saat user berhasil ter-autentikasi, minta data rekan
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (prev, curr) => curr is AuthenticationAuthenticated,
+          listener: (context, state) {
+            final s = state as AuthenticationAuthenticated;
+            if (s.user.custType == 'C') {
+              context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
+              debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
+            }
+          },
+        ),
+
+        // 2) Log setiap kali Rekan state berubah → cek apakah loaded & apa namanya
+        BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
+          listener: (context, s) {
+            debugPrint('[Rekan] isLoaded=${s.isLoaded} '
+                'nama=${s.record?.rekanNama} id=${s.record?.mrekan1Id}');
+          },
+        ),
+
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (p, c) => c is AuthenticationAuthenticated,
+          listener: (context, s) {
+            final a = s as AuthenticationAuthenticated;
+            if (a.user.custType == 'C') {
+              // kalau belum kamu lakukan di tempat lain
+              context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
+            }
+            // 🔥 trigger download foto (sekali)
+            final fotoState = context.read<ProfileDownloadFotoBloc>().state;
+            if (fotoState is! ProfileDownloadFotoLoading &&
+                fotoState is! ProfileDownloadFotoLoaded) {
+              context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
+              debugPrint('[Foto] LoadSecureImage() dipanggil');
+            }
+          },
+        ),
+
+        BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+          listenWhen: (p, c) => c is ProfileDownloadFotoLoaded,
+          listener: (context, state) {
+            final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
+            if (bytes.isNotEmpty) {
+              context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+              debugPrint('[Foto] bytes=${bytes.length} -> set ke UserProfileCubit');
+            } else {
+              debugPrint('[Foto] bytes kosong, skip setProfile()');
             }
           },
         ),

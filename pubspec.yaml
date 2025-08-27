@@ -47,6 +47,8 @@ dependencies:
   timelines_plus: ^1.0.3
   uuid: ^4.5.1
   mobile_chat_flutter: ^1.0.2
+  hydrated_bloc: ^10.1.1
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:
