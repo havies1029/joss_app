@@ -3,7 +3,7 @@ import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
 import 'package:joss_app/models/combobox/combommvmerk_model.dart';
 import 'package:joss_app/models/combobox/combommvtipe_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
-import 'package:joss_app/models/combobox/combormatauang_model.dart';
+// import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/combobox/combomwarna_model.dart';
 
 class SppamvCrudModel {

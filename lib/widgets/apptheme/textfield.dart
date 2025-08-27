@@ -43,14 +43,12 @@ class appTextField extends StatelessWidget {
       keyboardType: keyboardType,
       onTap: onTap,
       cursorColor: primaryLightColor,
-      style: TextStyle(
-        color: primaryLightColor,
-      ),
+      style: customInputStyle(context, color: primaryLightColor),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: labelInputStyle(context),
+        labelStyle: customInputStyle(context),
         hintText: hint,
-        hintStyle: inputHintStyle(context),
+        hintStyle: customInputStyle(context, color: sGrey),
         filled: true,
         fillColor: pGrey,
         contentPadding: const EdgeInsets.symmetric(
@@ -77,7 +75,10 @@ class appTextField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: Colors.red),
         ),
-        errorStyle: errorTextStyle(context),
+        errorStyle: TextStyle(
+          color: pRed,
+          fontSize: getResponsiveFont(context, 15),
+        ),
         suffixIcon: suffixIcon,
       ),
       validator: validator,
@@ -85,18 +86,12 @@ class appTextField extends StatelessWidget {
 
     // Jika ada custom height, bungkus dengan SizedBox
     if (height != null) {
-      textField = SizedBox(
-        height: height,
-        child: textField,
-      );
+      textField = SizedBox(height: height, child: textField);
     }
 
     // Jika ada padding, bungkus dengan Padding
     if (padding != null) {
-      return Padding(
-        padding: padding!,
-        child: textField,
-      );
+      return Padding(padding: padding!, child: textField);
     }
 
     return textField;

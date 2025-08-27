@@ -1,10 +1,10 @@
 import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
-import 'package:joss_app/models/combobox/combombiindemnityojk_model.dart';
+// import 'package:joss_app/models/combobox/combombiindemnityojk_model.dart';
 import 'package:joss_app/models/combobox/combomtarifojkbanjirpar_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
 import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 import 'package:joss_app/models/combobox/comborkonstruksiojk_model.dart';
-import 'package:joss_app/models/combobox/combormatauang_model.dart';
+// import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/combobox/comborokupasi_model.dart';
 
 class SppaparCrudModel {

@@ -130,6 +130,46 @@ class _LoginFormState extends State<LoginForm>
     );
   }
 
+  // void _handleGmailRegisterForMobile(BuildContext context) async {
+  //   try {
+  //     GoogleSignInAccount? user;
+  //
+  //     if (kIsWeb) {
+  //       user = await _googleSignIn.signIn();
+  //     } else {
+  //       user = await _googleSignIn.signInSilently();
+  //       user ??= await _googleSignIn.signIn();
+  //     }
+  //
+  //     // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
+  //
+  //     if (user != null && context.mounted) {
+  //       // 🔒 Simpan email & display name ke AuthLocalCubit
+  //       final authLocalCubit = context.read<AuthLocalCubit>();
+  //       authLocalCubit.setLastLoginEmail(user.email);
+  //       authLocalCubit.setGoogleDisplayName(user.displayName);
+  //
+  //       // ⛳ Kirim ke EmailVerificationBloc
+  //       context.read<EmailVerificationBloc>().add(
+  //         EmailVerificationTambahEvent(
+  //           record: EmailVerificationModel(
+  //             email: user.email,
+  //             requestFrom: 'google',
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //
+  //   } catch (e) {
+  //     debugPrint('[GMAIL] ERROR: $e');
+  //     if (context.mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Login Google gagal: $e')),
+  //       );
+  //     }
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -182,18 +222,31 @@ class _LoginFormState extends State<LoginForm>
                           const HeaderSection(),
                           const SizedBox(height: 10),
                           // Tambahkan teks "Login" di atas kalimat Terms and Privacy
-                          Text("Login", style: heading1Style(context)),
+                          Text("Login", style: headingStyle(context)),
                           SizedBox(height: headerSpacing),
                           // RichText untuk menampilkan kalimat Terms and Privacy Policy
                           RichText(
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               text: "By signing in you are agreeing to\n",
-                              style: labelStyle(context),
+                              style: customInputStyle(
+                                context,
+                                color: primaryLightColor,
+                                fontWeight: FontWeight.w400,
+                              ),
                               children: [
-                                TextSpan(
-                                  text: "our Terms and Privacy Policy",
-                                  style: linkStyle(context),
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.baseline,
+                                  baseline: TextBaseline.alphabetic,
+                                  child: HoverableText(
+                                    text: "Our Terms and Privacy Policy",
+                                    onTap: () {
+                                    },
+                                    styleBuilder: (isHovering) => customInputStyle(
+                                      context,
+                                      color: isHovering ? primaryColor : pBlue
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -238,7 +291,10 @@ class _LoginFormState extends State<LoginForm>
                                         Flexible(
                                           child: Text(
                                             "Ingat Kata Sandi",
-                                            style: labelStyle(context),
+                                            style: customInputStyle(
+                                              context,
+                                              color: primaryLightColor,
+                                            ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -251,9 +307,18 @@ class _LoginFormState extends State<LoginForm>
                                   onPressed: () {
                                     // Implementasi fungsi forgot password dapat dilakukan di sini
                                   },
-                                  child: Text(
-                                    "Lupa Kata Sandi",
-                                    style: linkActionStyle(context),
+                                  child: HoverableText(
+                                    text: 'Lupa Kata Sandi',
+                                    onTap: () {},
+                                    styleBuilder:
+                                        (isHovering) => customInputStyle(
+                                          context,
+                                          color:
+                                              isHovering
+                                                  ? pBlue
+                                                  : primaryColor
+                                        ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -261,6 +326,15 @@ class _LoginFormState extends State<LoginForm>
                           ),
                           SizedBox(height: fieldSpacing),
                           _buildSignInButton(),
+
+                          // SizedBox(height: fieldSpacing),
+                          // pIsMobile
+                          //     ? appButtons.iconLeft(
+                          //   text: 'Daftar Menggunakan Gmail',
+                          //   icon: 'assets/icons/google-icon.svg',
+                          //   onPressed: () => _handleGmailRegisterForMobile(context),
+                          // )
+                          //     : const CachedGoogleSigninButton(),
                         ],
                       ),
                     ),

@@ -9,10 +9,18 @@ import 'package:joss_app/common/size_config.dart';
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';
 part '../widgets/apptheme/snackbar.dart';
+part '../widgets/apptheme/textstyles.dart';
 
 /// Device/Platform Utils
 bool get pIsMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);
 bool get pIsWeb => kIsWeb;
+
+/// Device/Platform Utils
+bool isMobile(BuildContext ctx) => MediaQuery.of(ctx).size.width < 650;
+bool isTablet(BuildContext ctx) =>
+    MediaQuery.of(ctx).size.width >= 650 &&
+    MediaQuery.of(ctx).size.width < 1000;
+bool isDesktop(BuildContext ctx) => MediaQuery.of(ctx).size.width >= 1000;
 
 /// Color Palette
 const Color primaryColor = Color(0xFFEF7A28);
@@ -36,7 +44,7 @@ const LinearGradient primaryGradientColor = LinearGradient(
 );
 
 /// Padding & Spacing
-const double hPadding = 20.0;
+const double hPadding = 10.0;
 const double vPadding = 20.0;
 const double cardBorderRadius = 10.0;
 const double checkboxBorderRadius = 4.0;
@@ -44,47 +52,6 @@ const double defaultElevation = 3.0;
 const double headerSpacing = 30.0;
 const double fieldSpacing = 20.0;
 const double buttonHeight = 41.0;
-
-/// Responsive Font Size
-double getResponsiveFont(BuildContext context, double base) {
-  // Responsive: mobile (1x), tablet (1.15x), desktop (1.25x)
-  double width = MediaQuery.of(context).size.width;
-  if (width >= 1000) return base * 1.22; // desktop
-  if (width >= 650) return base * 1.12; // tablet
-  return base;
-}
-
-/// Text Styles
-TextStyle heading1Style(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 30), color: primaryLightColor);
-
-TextStyle inputHintStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 18), color: sGrey);
-
-TextStyle linkStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 18), color: pBlue);
-
-TextStyle linkActionStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 18), color: primaryColor);
-
-TextStyle labelInputStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 18), color: primaryColor);
-
-TextStyle labelStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 18), color: primaryLightColor);
-
-TextStyle bodyStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 14), color: primaryLightColor);
-
-TextStyle captionStyle(BuildContext ctx) => TextStyle(
-  fontSize: getResponsiveFont(ctx, 12),
-  color: primaryLightColor.withOpacity(0.7),
-);
-
-TextStyle errorTextStyle(BuildContext ctx) => TextStyle(
-  color: pRed,
-  fontSize: getResponsiveFont(ctx, 15)
-);
 
 const defaultDuration = Duration(milliseconds: 250);
 
