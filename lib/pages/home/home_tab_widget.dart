@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/testpage/testpage0.dart';
 import 'package:joss_app/pages/testpage/testpage1.dart';
 import 'package:joss_app/pages/testpage/testpage2.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
+import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../blocs/user_profile/user_profile_cubit.dart';
+import '../../common/constants.dart';
 import '../heropage/mobile/heropage.dart';
 import '../qontak/mobile/customer_service_page.dart';
 
@@ -17,85 +22,136 @@ class HomeTabWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        extendBody: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.dark, // atau Brightness.light sesuai tema
-          ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // JPS Logo
-              Image.asset(
-                'assets/icons/logo_jps_no_background.png',
-                height: 42,
-                width: 120,
+      child: Builder( // <-- pakai Builder biar dapat context yg tepat
+        builder: (context) {
+          // 🔹 Seed SEKALI setelah frame pertama
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            // Seed FOTO: kalau sudah Loaded sebelum listener terpasang
+            final fotoState = context.read<ProfileDownloadFotoBloc>().state;
+            final currentBytes = context.read<UserProfileCubit>().state.fotoBytes;
+
+            if (fotoState is ProfileDownloadFotoLoaded) {
+              if (currentBytes == null || currentBytes.isEmpty) {
+                context.read<UserProfileCubit>()
+                    .setProfile(fotoBytes: fotoState.imageBytes);
+                debugPrint('[SeedFoto] setProfile len=${fotoState.imageBytes.length}');
+              }
+            } else if (fotoState is! ProfileDownloadFotoLoading) {
+              // belum pernah load → trigger sekarang
+              context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
+              debugPrint('[Foto] LoadSecureImage() dipanggil dari seed');
+            }
+
+            // Seed NAMA: kalau MRekan1 udah loaded
+            final rekanState = context.read<MRekan1CrudBloc>().state;
+            final currentName = context.read<UserProfileCubit>().state.nama;
+            final nama = rekanState.record?.rekanNama?.trim();
+
+            if (rekanState.isLoaded &&
+                (currentName == null || currentName.isEmpty) &&
+                (nama != null && nama.isNotEmpty)) {
+              context.read<UserProfileCubit>().setProfile(nama: nama);
+              debugPrint('[SeedNama] $nama');
+            }
+          });
+
+          return MultiBlocListener(
+            listeners: [
+              // 🔊 Nama dari MRekan1
+              BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
+                listenWhen: (prev, curr) =>
+                curr.isLoaded && (prev.record?.rekanNama != curr.record?.rekanNama),
+                listener: (context, state) {
+                  final nama = state.record?.rekanNama?.trim();
+                  if (nama != null && nama.isNotEmpty) {
+                    context.read<UserProfileCubit>().setProfile(nama: nama);
+                    debugPrint('[ListenerNama] $nama');
+                  }
+                },
               ),
-              // Notification Bell with Badge
-              Stack(
-                children: [
-                  Image.asset(
-                    'assets/icons/notification.png',
-                    height: 39,
-                    width: 40,
-                  ),
-                  // Notification badge (red dot with "2+")
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: const Text(
-                        '2+',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
+
+              // 🖼️ Foto dari ProfileDownloadFotoBloc
+              BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
+                listener: (context, state) {
+                  final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
+                  if (bytes.isNotEmpty) {
+                    context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+                    debugPrint('[ListenerFoto] setProfile len=${bytes.length}');
+                  } else {
+                    debugPrint('[ListenerFoto] bytes kosong, skip');
+                  }
+                },
               ),
             ],
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        body: const TabBarView(
-          children: [
-            HeroPage(),
-            ReportTab(),
-            CustomerServicePage(),
-            SettingsTab(),
-          ],
-        ),
-        bottomNavigationBar: Material(
-          color: const Color(0xFF121212),
-          child: const SafeArea(
-            top: false,
-            child: RoundedEndsTabBar(),
-          ),
-        ),
+            child: Scaffold(
+              extendBodyBehindAppBar: true,
+              extendBody: true,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: Brightness.dark,
+                ),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Image.asset('assets/icons/logo_jps_no_background.png', height: 42, width: 120),
+                    Stack(
+                      children: [
+                        Image.asset('assets/icons/notification.png', height: 39, width: 40),
+                        Positioned(
+                          right: 0, top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10)),
+                            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                            child: const Text('2+', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              backgroundColor: Colors.transparent,
+              body: const TabBarView(
+                children: [
+                  HeroPage(),
+                  ReportTab(),
+                  CustomerServicePage(),
+                  SettingsTab(),
+                ],
+              ),
+              bottomNavigationBar: SafeArea(
+                top: false,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(cardBorderRadius),
+                    topRight: Radius.circular(cardBorderRadius),
+                  ),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: primaryBlackColor,
+                      border: Border(
+                        top: BorderSide(color: Colors.grey, width: 2),
+                      ),
+                    ),
+                    child: const RoundedEndsTabBar(),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 }
+
 
 class CurvedTopIndicator extends Decoration {
   final Color color;
@@ -106,7 +162,7 @@ class CurvedTopIndicator extends Decoration {
 
   const CurvedTopIndicator({
     required this.color,
-    this.thickness = 3,
+    this.thickness = 4,
     this.cornerRadius = 10,
     this.curveLeft = false,
     this.curveRight = false,
@@ -206,7 +262,7 @@ class _RoundedEndsTabBarState extends State<RoundedEndsTabBar> {
   @override
   Widget build(BuildContext context) {
     final idx = _controller?.index ?? 0;
-    final len = _controller?.length ?? 3;
+    final len = _controller?.length ?? 4;
 
     return TabBar(
       tabs: const [
@@ -215,13 +271,13 @@ class _RoundedEndsTabBarState extends State<RoundedEndsTabBar> {
         Tab(icon: Icon(Icons.pie_chart), text: 'Bantuan'),
         Tab(icon: Icon(Icons.settings), text: 'Profil Anda'),
       ],
-      labelColor: const Color(0xFFEFA728),
+      labelColor: primaryColor,
       unselectedLabelColor: const Color(0xFF666666),
       indicatorSize: TabBarIndicatorSize.tab,
       // indikator: garis atas dengan arc di kiri/kanan sesuai posisi
       indicator: CurvedTopIndicator(
-        color: const Color(0xFFEFA728),
-        thickness: 3,
+        color: primaryColor,
+        thickness: 4,
         cornerRadius: 10,              // <- ini radius lengkungnya
         curveLeft: idx == 0,           // aktifin arc kiri jika tab pertama
         curveRight: idx == len - 1,    // aktifin arc kanan jika tab terakhir

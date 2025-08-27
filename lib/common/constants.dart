@@ -45,6 +45,10 @@ const double headerSpacing = 30.0;
 const double fieldSpacing = 20.0;
 const double buttonHeight = 41.0;
 
+/// Padding & Spacing for HomePage
+const double cardBorderRadiusForHome = 20.0;
+const double cardInsideBorderRadiusForHome = 16.0;
+
 /// Responsive Font Size
 double getResponsiveFont(BuildContext context, double base) {
   // Responsive: mobile (1x), tablet (1.15x), desktop (1.25x)
