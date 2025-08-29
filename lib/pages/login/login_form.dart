@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
+import 'package:joss_app/pages/login/welcome_header.dart';
 
 import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
@@ -9,6 +10,8 @@ import '../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../blocs/user_profile/user_profile_cubit.dart';
 import '../../common/constants.dart';
 import 'package:joss_app/widgets/header_section.dart';
+
+import '../base/base_background.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -176,6 +179,7 @@ class _LoginFormState extends State<LoginForm>
 
   @override
   Widget build(BuildContext context) {
+
     return MultiBlocListener(
       listeners: [
         BlocListener<NetworkBloc, NetworkState>(
@@ -196,7 +200,6 @@ class _LoginFormState extends State<LoginForm>
               );
             }
           },
-
         ),
 
         BlocListener<LoginBloc, LoginState>(
@@ -263,140 +266,141 @@ class _LoginFormState extends State<LoginForm>
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
           return ((state is LoginInitial) || (state is LoginFailure))
-              ? SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Center(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(hPadding),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          const SizedBox(height: 70),
-                          // Tampilkan HeaderSection
-                          const HeaderSection(),
-                          const SizedBox(height: 10),
-                          // Tambahkan teks "Login" di atas kalimat Terms and Privacy
-                          Text("Login", style: headingStyle(context)),
-                          SizedBox(height: headerSpacing),
-                          // RichText untuk menampilkan kalimat Terms and Privacy Policy
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              text: "By signing in you are agreeing to\n",
-                              style: customInputStyle(
-                                context,
-                                color: primaryLightColor,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              children: [
-                                WidgetSpan(
-                                  alignment: PlaceholderAlignment.baseline,
-                                  baseline: TextBaseline.alphabetic,
-                                  child: HoverableText(
-                                    text: "Our Terms and Privacy Policy",
-                                    onTap: () {
-                                    },
-                                    styleBuilder: (isHovering) => customInputStyle(
-                                      context,
-                                      color: isHovering ? primaryColor : pBlue
-                                    ),
-                                  ),
-                                ),
-                              ],
+              ? Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      // Header Section
+                      Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/icons/logo_jps_no_background.png',
+                              height: isDesktop(context)
+                                  ? 56
+                                  : isTablet(context)
+                                  ? 48
+                                  : 42,
+                              width: isDesktop(context)
+                                  ? 180
+                                  : isTablet(context)
+                                  ? 140
+                                  : 120,
                             ),
-                          ),
-                          SizedBox(height: headerSpacing),
-                          _buildEmailField(hPadding),
-                          SizedBox(height: fieldSpacing),
-                          _buildPasswordField(hPadding),
-                          SizedBox(height: fieldSpacing),
-                          // Ubah Row agar tidak overflow (dengan Expanded/Flexible)
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: hPadding),
-                            child: Row(
-                              children: [
-                                // Bagian Remember Password bisa meluas sesuai sisa space
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _rememberPassword = !_rememberPassword;
-                                      });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Checkbox(
-                                          value: _rememberPassword,
-                                          activeColor: primaryColor,
-                                          checkColor: primaryLightColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              checkboxBorderRadius,
-                                            ),
-                                          ),
-                                          onChanged:
-                                              (value) => setState(
-                                                () =>
-                                                    _rememberPassword =
-                                                        value ?? false,
-                                              ),
-                                        ),
-                                        // Agar teks tidak meluber, bungkus dengan Flexible
-                                        Flexible(
-                                          child: Text(
-                                            "Ingat Kata Sandi",
-                                            style: customInputStyle(
-                                              context,
-                                              color: primaryLightColor,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                // Tombol Forgot Password tetap di ujung kanan
-                                TextButton(
-                                  onPressed: () {
-                                    // Implementasi fungsi forgot password dapat dilakukan di sini
-                                  },
-                                  child: HoverableText(
-                                    text: 'Lupa Kata Sandi',
-                                    onTap: () {},
-                                    styleBuilder:
-                                        (isHovering) => customInputStyle(
-                                          context,
-                                          color:
-                                              isHovering
-                                                  ? pBlue
-                                                  : primaryColor
-                                        ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: fieldSpacing),
-                          _buildSignInButton(),
-
-                          // SizedBox(height: fieldSpacing),
-                          // pIsMobile
-                          //     ? appButtons.iconLeft(
-                          //   text: 'Daftar Menggunakan Gmail',
-                          //   icon: 'assets/icons/google-icon.svg',
-                          //   onPressed: () => _handleGmailRegisterForMobile(context),
-                          // )
-                          //     : const CachedGoogleSigninButton(),
-                        ],
+                            WelcomeHeader(),
+                          ],
+                        ),
                       ),
-                    ),
+
+                      // Card Section yang akan mengambil sisa ruang
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border(
+                              top: BorderSide(
+                                color: primaryColor,
+                                width: 4.0,
+                              ),
+                            ),
+                          ),
+                          child: Card(
+                            elevation: 0,
+                            margin: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              padding: EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  _buildEmailField(0),
+                                  SizedBox(height: fieldSpacing),
+                                  _buildPasswordField(0),
+                                  SizedBox(height: fieldSpacing),
+                                  // Row dengan checkbox dan forgot password
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _rememberPassword = !_rememberPassword;
+                                            });
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Checkbox(
+                                                value: _rememberPassword,
+                                                activeColor: primaryColor,
+                                                checkColor: primaryLightColor,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(
+                                                    checkboxBorderRadius,
+                                                  ),
+                                                ),
+                                                onChanged: (value) => setState(
+                                                      () => _rememberPassword = value ?? false,
+                                                ),
+                                              ),
+                                              Flexible(
+                                                child: Text(
+                                                  "Ingat Kata Sandi",
+                                                  style: customInputStyle(
+                                                    context,
+                                                    color: primaryLightColor,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Implementasi fungsi forgot password
+                                        },
+                                        child: HoverableText(
+                                          text: 'Lupa Kata Sandi',
+                                          onTap: () {},
+                                          styleBuilder: (isHovering) => customInputStyle(
+                                              context,
+                                              color: isHovering ? pBlue : primaryColor
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: fieldSpacing),
+                                  _buildSignInButton(),
+                                  // Sisa ruang akan diisi oleh Card background
+                                  Spacer(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              )
+              ),
+            ),
+          )
               : const Center(child: CircularProgressIndicator());
         },
       ),
@@ -441,38 +445,38 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    // Nilai responsif berdasarkan ukuran layar
     final screenHeight = MediaQuery.of(context).size.height;
     final verticalPadding = screenHeight * 0.03;
     final headerSpacing = screenHeight * 0.025;
-    // Deteksi apakah keyboard terbuka
-    // final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      backgroundColor: primaryBlackColor, // ⬅️ kasih warna dasar hitam
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  top: verticalPadding,
-                  bottom: verticalPadding,
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: headerSpacing),
-                      _buildDesignLoginForm(),
-                    ],
+        child: BaseBackground(
+          backgroundAsset: "assets/images/background_gradient.png", // bisa custom
+          fadeHeight: 300,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: headerSpacing),
+                        _buildDesignLoginForm(),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
 }

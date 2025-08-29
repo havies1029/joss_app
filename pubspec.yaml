@@ -83,6 +83,13 @@ flutter:
     - assets/icons/jps_logo.svg
     - assets/icons/notification.png
     - assets/icons/logo_jps_no_background.png
+    - assets/icons/cari-asuransi-1.svg
+    - assets/icons/lapor-klaim-2.svg
+    - assets/icons/aset-3.svg
+    - assets/icons/polis-4.svg
+    - assets/icons/beli-polis-5.svg
+    - assets/icons/klaim-6.svg
+    - assets/icons/tagihan-pembayaran-7.svg
 
   fonts:
     - family: Delm-Regular

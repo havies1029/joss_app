@@ -37,6 +37,9 @@ const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
 const Color pRed = Color(0xFFFF0000);
 
+const Color kategoriYellow = Color(0xFFFFC107);
+const Color kategoriCream  = Color(0xFFFFFDD8);
+
 const LinearGradient primaryGradientColor = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
@@ -52,6 +55,8 @@ const double defaultElevation = 3.0;
 const double headerSpacing = 30.0;
 const double fieldSpacing = 20.0;
 const double buttonHeight = 41.0;
+
+const double hPaddingForCard = 20.0;
 
 const defaultDuration = Duration(milliseconds: 250);
 
@@ -88,3 +93,45 @@ OutlineInputBorder outlineInputBorder() {
 enum ListStatus { initial, success, failure }
 
 const kAnimationDuration = Duration(milliseconds: 200);
+
+/// Gradient Warna Oranye Smooth
+
+/// Horizontal (gelap → terang)
+const LinearGradient orangeSmoothGradientHorizontal = LinearGradient(
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+  colors: [
+    Color(0xFFEF7A28), // gelap (orange tua)
+    Color(0xFFFFCDA9), // terang (peach)
+  ],
+);
+
+/// Vertical (terang → gelap)
+const LinearGradient orangeSmoothGradientVertical = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFFFFCDA9), // terang di atas
+    Color(0xFFEF7A28), // gelap di bawah
+  ],
+);
+
+/// Horizontal (gelap -> terang)
+const LinearGradient blackFadeGradientHorizontal = LinearGradient(
+  begin: Alignment.centerRight,
+  end: Alignment.centerLeft,
+  colors: [
+    Color(0x00181818), // kanan transparan (0%)
+    Color(0xFF181818), // kiri gelap (100%)
+  ],
+);
+
+/// Gradient Hitam Transparan (Kiri → Kanan, terang → gelap)
+const LinearGradient blackFadeGradientHorizontalReversed = LinearGradient(
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+  colors: [
+    Color(0x00181818), // kiri transparan (0%)
+    Color(0xFF181818), // kanan gelap (100%)
+  ],
+);

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/heropage/mobile/widget/carouse_menu_widget.dart';
 
 import '../../../common/constants.dart';
 import '../../base/base_background.dart';
-import 'hero_card_widget.dart';
+import 'widget/hero_card_widget.dart';
 
 // ⬇️ tambahkan import cubit-nya
 import 'package:joss_app/blocs/user_profile/user_profile_cubit.dart';
+
+import 'widget/list_menu_widget.dart';
 
 class HeroPage extends StatelessWidget {
   const HeroPage({super.key});
@@ -39,7 +42,7 @@ class HeroPage extends StatelessWidget {
                     userName: displayName,
                     imageBytes: bytes,                 // ⬅️ jika null → widget pakai placeholder
                     // userImage: tidak perlu, biarkan widget fallback ke placeholder
-                    premiumAmount: 'Rp 4.500.000',     // dummy OK
+                    premiumAmount: '4.500.000',     // dummy OK
                     polisCount: 21,                     // dummy OK
                     onDetailTap: () => debugPrint('Detail tapped'),
                     onNasabahTap: () => debugPrint('Nasabah tapped'),
@@ -49,7 +52,13 @@ class HeroPage extends StatelessWidget {
 
               const SizedBox(height: vPadding),
 
-                // konten lain...
+              const ListMenuWidget(),
+
+              const SizedBox(height: vPadding),
+
+              const CarouselMenuWidget(),
+
+              const SizedBox(height: vPadding),
               ],
             ),
           ),
