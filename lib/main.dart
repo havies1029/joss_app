@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/pages/profilepage/mobile/profile/profile_page.dart';
+import 'package:joss_app/pages/profilepage/mobile/profile/form_section/rekan_pajak.dart';
+import 'package:joss_app/repositories/gen_profile/mrekanpajakcrud_repository.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -31,6 +32,8 @@ import 'package:joss_app/repositories/login/change_password_repository.dart';
 import 'package:joss_app/repositories/profile/userfoto_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
+
+import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +72,7 @@ Future<void> main() async {
         BlocProvider(create: (_) => MRekan1ListBloc()),
         BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
         BlocProvider(create: (_) => MRekanContactListBloc()),
+        BlocProvider(create: (_) => MRekanPajakCrudBloc(repository: MRekanPajakCrudRepository())),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
       ],
       child: MultiBlocListener(
@@ -167,7 +171,7 @@ class _App extends StatelessWidget {
             return HomeTabWidget(userRepository: userRepository);
           }
           if (state is AuthenticationUnauthenticated) {
-            return const ProfilePage();
+            return const LoginClient();
           }
           return const LoadingIndicator();
         },

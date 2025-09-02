@@ -94,38 +94,33 @@ class _RekanContactState extends State<RekanContact> {
         // final lastEmail = authLocal.lastLoginEmail?.trim() ?? '';
         // // print("🧩 DEBUG rekan1Bloc data:");
         // debugPrint("🧩 DEBUG lastEmail dari AuthLocalCubit: $lastEmail");
-        // // print("   - Telepon: ${rekan1?.telepon}");
+        // print("   - Telepon: ${rekan1?.telepon}");
 
         final isStateKosong = state.record == null;
         final isSemuaKosong = state.record?.email.isEmpty != false &&
             state.record?.telp.isEmpty != false &&
             state.record?.alamat1.isEmpty != false;
 
-        // if (state.isLoaded && !_hasInitializedFields) {
-        //   if (!isStateKosong && !isSemuaKosong) {
-        //     // ✅ Utama: dari Contact
-        //     fieldAlamat1Controller.text = state.record!.alamat1;
-        //     fieldEmailController.text = state.record!.email;
-        //     fieldTelpController.text = state.record!.telp;
-        //     fieldComboMKota = state.record!.comboMKota;
-        //     fieldComboMPropinsi = state.record!.comboMPropinsi;
-        //     fieldComboRKodepos = state.record!.comboRKodepos;
-        //   } else if (lastEmail.isNotEmpty) {
-        //     // ✅ Fallback: dari AuthLocalCubit
-        //     fieldEmailController.text = lastEmail;
-        //   } else if (rekan1 != null) {
-        //     // ✅ Fallback terakhir: dari MRekan1
-        //     fieldEmailController.text = rekan1.email ?? '';
-        //     fieldTelpController.text = rekan1.telepon ?? '';
-        //   }
-        //   _hasInitializedFields = true;
-        // }
-        fieldAlamat1Controller.text = state.record!.alamat1;
-        fieldEmailController.text = state.record!.email;
-        fieldTelpController.text = state.record!.telp;
-        fieldComboMKota = state.record!.comboMKota;
-        fieldComboMPropinsi = state.record!.comboMPropinsi;
-        fieldComboRKodepos = state.record!.comboRKodepos;
+        if (state.isLoaded && !_hasInitializedFields) {
+          if (!isStateKosong && !isSemuaKosong) {
+            // ✅ Utama: dari Contact
+            fieldAlamat1Controller.text = state.record!.alamat1;
+            fieldEmailController.text = state.record!.email;
+            fieldTelpController.text = state.record!.telp;
+            fieldComboMKota = state.record!.comboMKota;
+            fieldComboMPropinsi = state.record!.comboMPropinsi;
+            fieldComboRKodepos = state.record!.comboRKodepos;
+          // } else if (lastEmail.isNotEmpty) {
+          //   // ✅ Fallback: dari AuthLocalCubit
+          //   fieldEmailController.text = lastEmail;
+          //
+          } else if (rekan1 != null) {
+            // ✅ Fallback terakhir: dari MRekan1
+            fieldEmailController.text = rekan1.email ?? '';
+            fieldTelpController.text = rekan1.telepon ?? '';
+          }
+          _hasInitializedFields = true;
+        }
       },
       builder: (context, state) {
         return _buildFormUI();

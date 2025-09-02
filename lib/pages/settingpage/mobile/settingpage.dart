@@ -10,6 +10,8 @@ import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../login/mobile/user/widget/popup_user_widget.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_pajak.dart';
+import '../../profilepage/mobile/profile/profile_page.dart';
 
 
 const List<String> scopes = <String>[
@@ -40,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return CircleAvatar(
       radius: 30,
       backgroundColor: primaryColor,
-      child: Text(initials, style: TextStyle(color: Colors.white, fontSize: getResponsiveFont(context, 20), fontWeight: FontWeight.w700)),
+      child: Text(initials, style: TextStyle(color: Colors.black, fontSize: getResponsiveFont(context, 20), fontWeight: FontWeight.w700)),
     );
   }
 
@@ -56,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SnackBar(
         content: Text(
           message,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: primaryColor,
         behavior: SnackBarBehavior.floating,
@@ -244,10 +246,53 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   child: Column(
                     children: [
+                      // _buildMenuItem(
+                      //   icon: Icons.person_outline,
+                      //   title: 'Kelola Profil',
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => const ProfilePage(), // ⬅️ buka ProfilePage
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                       _buildMenuItem(
-                        icon: Icons.person_outline,
-                        title: 'Kelola Profil',
-                        onTap: () => _showSnackBar('Kelola Profil diklik'),
+                        icon: Icons.info_outline,
+                        title: 'Informasi Klien',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MRekanPajakFormBody(viewMode: 'tambah', recordId: '',),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        icon: Icons.location_on_outlined,
+                        title: 'Kontak & Alamat',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfilePage(),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        icon: Icons.account_balance_outlined,
+                        title: 'Rekening Bank',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfilePage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildDivider(),
                       _buildMenuItem(
@@ -372,7 +417,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Icon(
               icon,
-              color: iconColor ?? Colors.white,
+              color: iconColor ?? Colors.black,
               size: 24,
             ),
             const SizedBox(width: 15),
@@ -380,7 +425,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: titleColor ?? Colors.white,
+                  color: titleColor ?? Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
