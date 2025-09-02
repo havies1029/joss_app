@@ -36,6 +36,8 @@ const Color hintGrey = Color(0xFFBCBCBC);
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
 const Color pRed = Color(0xFFFF0000);
+const Color pDarkRed = Color(0xFFDC1C1C);
+
 
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream  = Color(0xFFFFFDD8);
@@ -134,4 +136,15 @@ const LinearGradient blackFadeGradientHorizontalReversed = LinearGradient(
     Color(0x00181818), // kiri transparan (0%)
     Color(0xFF181818), // kanan gelap (100%)
   ],
+);
+
+/// Gradient Oranye → Hitam (Vertikal, atas → bawah)
+const LinearGradient orangeToBlackGradientVertical = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFFEF7A28), // oranye di atas
+    Color(0xFF121212), // hitam di bawah
+  ],
+  stops: [0.0, 1.0],
 );

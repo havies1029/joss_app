@@ -1,38 +1,63 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 
-import '../../blocs/authentication/authentication_bloc.dart';
-import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../blocs/networkconnection/network_bloc.dart';
-import '../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../blocs/user_profile/user_profile_cubit.dart';
-import '../../common/constants.dart';
-import 'package:joss_app/widgets/header_section.dart';
+import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../blocs/login/emailverification_bloc.dart';
+import '../../../../blocs/networkconnection/network_bloc.dart';
+import '../../../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../common/app_data.dart';
+import '../../../../common/constants.dart';
 
-import '../base/base_background.dart';
+import '../../../../models/login/emailverification_model.dart';
+import '../../../../widgets/google/google_signin_button_stub.dart';
+import '../../../base/base_background_firstpage.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+const List<String> scopes = <String>[
+  'email',
+];
+
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: scopes,
+  clientId: kIsWeb ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com' : null,
+  serverClientId: kIsWeb ? null : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
+);
+
+class CachedGoogleSigninButton extends StatelessWidget {
+  const CachedGoogleSigninButton({super.key});
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  Widget build(BuildContext context) {
+    // debugPrint('✅ Rendered CachedGoogleSigninButton sekali');
+    return googleSigninButton();
+  }
 }
 
-class _LoginFormState extends State<LoginForm>
+class LoginFormUser extends StatefulWidget {
+  const LoginFormUser({super.key});
+
+  @override
+  State<LoginFormUser> createState() => _LoginFormUserState();
+}
+
+class _LoginFormUserState extends State<LoginFormUser>
     with SingleTickerProviderStateMixin {
+  late final Widget _cachedGoogleButton;
   // Controller untuk input field
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  String? _emailError;
   // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // Untuk animasi
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
-
-  bool _isPasswordVisible = false;
+  bool _isHoveringGmail = false;
   bool _rememberPassword = false; // Variabel untuk checkbox Remember Password
 
   @override
@@ -42,15 +67,27 @@ class _LoginFormState extends State<LoginForm>
       vsync: this,
       duration: defaultDuration,
     );
+    _googleSignIn.onCurrentUserChanged
+        .listen((GoogleSignInAccount? account) async {
+      if (account != null && context.mounted) {
+        context.read<EmailVerificationBloc>().add(
+          EmailVerificationTambahEvent(
+            record: EmailVerificationModel(
+              email: account.email,
+              requestFrom: 'google',
+            ),
+          ),
+        );
+      }
+    });
+    // _googleSignIn.signInSilently();
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
+    _emailController.dispose();
     _animationController.dispose();
     _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -60,7 +97,7 @@ class _LoginFormState extends State<LoginForm>
     return appTextField(
       label: "Email",
       hint: "Masukkan email",
-      controller: _usernameController,
+      controller: _emailController,
       focusNode: _emailFocusNode,
       keyboardType: TextInputType.emailAddress,
       padding: EdgeInsets.symmetric(horizontal: hPadding),
@@ -79,38 +116,6 @@ class _LoginFormState extends State<LoginForm>
     );
   }
 
-  Widget _buildPasswordField(double hPadding) {
-    return appTextField(
-      label: "Password",
-      hint: "Masukkan password",
-      controller: _passwordController,
-      focusNode: _passwordFocusNode,
-      obscureText: !_isPasswordVisible, // Gunakan state dari parent
-      padding: EdgeInsets.symmetric(horizontal: hPadding),
-      suffixIcon: IconButton(
-        icon: Icon(
-          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-          color: sGrey,
-          size: 22,
-        ),
-        onPressed:
-            () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kPassNullError;
-        }
-        if (value.length < 6) {
-          return kShortPassError;
-        }
-        return null;
-      },
-      onTap: () {
-        _animationController.forward(from: 0);
-      },
-    );
-  }
-
   Widget _buildSignInButton() {
     return appButtons.primary(
       text: "Masuk",
@@ -120,22 +125,43 @@ class _LoginFormState extends State<LoginForm>
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           _animationController.forward(from: 0);
-          onLoginButtonPressed();
+          onRegisterButtonPressed();
         }
       },
     );
   }
 
-  // Fungsi untuk memicu event login
-  void onLoginButtonPressed() {
-    BlocProvider.of<LoginBloc>(context).add(
-      LoginButtonPressed(
-        email: _usernameController.text,
-        password: _passwordController.text,
-        rememberMe: _rememberPassword,
-      ),
+// Fungsi untuk memicu event register email
+  void onRegisterButtonPressed() {
+    final email = _emailController.text.trim();
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+    String? error;
+    if (email.isEmpty) {
+      error = 'Email tidak boleh kosong';
+    } else if (!emailRegex.hasMatch(email)) {
+      error = 'Format email tidak valid';
+    }
+
+    if (error != null) {
+      setState(() => _emailError = error);
+      return;
+    }
+
+    // ✅ Clear error
+    setState(() => _emailError = null);
+
+    // ✅ Trigger ke EmailVerificationBloc (untuk proses verifikasi / register)
+    final record = EmailVerificationModel(
+      email: email,
+      requestFrom: 'email',
+    );
+
+    context.read<EmailVerificationBloc>().add(
+      EmailVerificationTambahEvent(record: record),
     );
   }
+
 
   // void _handleGmailRegisterForMobile(BuildContext context) async {
   //   try {
@@ -182,83 +208,12 @@ class _LoginFormState extends State<LoginForm>
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<NetworkBloc, NetworkState>(
-          listener: (context, state) {
-            if (state is NetworkFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(
-                  "You're not Connected to Internet",
-                  icon: Icons.signal_wifi_off,
-                ),
-              );
-            } else if (state is NetworkSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                successSnackBar(
-                  "You're Connected to Internet",
-                  icon: Icons.wifi,
-                ),
-              );
-            }
-          },
-        ),
-
         BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Username atau Password Anda salah!"),
               );
-            }
-          },
-        ),
-
-        // 1) Saat user berhasil ter-autentikasi, minta data rekan
-        BlocListener<AuthenticationBloc, AuthenticationState>(
-          listenWhen: (prev, curr) => curr is AuthenticationAuthenticated,
-          listener: (context, state) {
-            final s = state as AuthenticationAuthenticated;
-            if (s.user.custType == 'C') {
-              context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
-              debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
-            }
-          },
-        ),
-
-        // 2) Log setiap kali Rekan state berubah → cek apakah loaded & apa namanya
-        BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
-          listener: (context, s) {
-            debugPrint('[Rekan] isLoaded=${s.isLoaded} '
-                'nama=${s.record?.rekanNama} id=${s.record?.mrekan1Id}');
-          },
-        ),
-
-        BlocListener<AuthenticationBloc, AuthenticationState>(
-          listenWhen: (p, c) => c is AuthenticationAuthenticated,
-          listener: (context, s) {
-            final a = s as AuthenticationAuthenticated;
-            if (a.user.custType == 'C') {
-              // kalau belum kamu lakukan di tempat lain
-              context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
-            }
-            // 🔥 trigger download foto (sekali)
-            final fotoState = context.read<ProfileDownloadFotoBloc>().state;
-            if (fotoState is! ProfileDownloadFotoLoading &&
-                fotoState is! ProfileDownloadFotoLoaded) {
-              context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
-              debugPrint('[Foto] LoadSecureImage() dipanggil');
-            }
-          },
-        ),
-
-        BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-          listenWhen: (p, c) => c is ProfileDownloadFotoLoaded,
-          listener: (context, state) {
-            final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
-            if (bytes.isNotEmpty) {
-              context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
-              debugPrint('[Foto] bytes=${bytes.length} -> set ke UserProfileCubit');
-            } else {
-              debugPrint('[Foto] bytes kosong, skip setProfile()');
             }
           },
         ),
@@ -328,8 +283,6 @@ class _LoginFormState extends State<LoginForm>
                                 children: [
                                   _buildEmailField(0),
                                   SizedBox(height: fieldSpacing),
-                                  _buildPasswordField(0),
-                                  SizedBox(height: fieldSpacing),
                                   // Row dengan checkbox dan forgot password
                                   Row(
                                     children: [
@@ -355,38 +308,28 @@ class _LoginFormState extends State<LoginForm>
                                                       () => _rememberPassword = value ?? false,
                                                 ),
                                               ),
-                                              Flexible(
-                                                child: Text(
-                                                  "Ingat Kata Sandi",
-                                                  style: customInputStyle(
-                                                    context,
-                                                    color: primaryLightColor,
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          // Implementasi fungsi forgot password
-                                        },
-                                        child: HoverableText(
-                                          text: 'Lupa Kata Sandi',
-                                          onTap: () {},
-                                          styleBuilder: (isHovering) => customInputStyle(
-                                              context,
-                                              color: isHovering ? pBlue : primaryColor
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
                                   ),
                                   SizedBox(height: fieldSpacing),
                                   _buildSignInButton(),
+                                  SizedBox(height: fieldSpacing),
+
+                                  // Tombol Google
+                                  AppData.kIsWeb
+                                      ? const CachedGoogleSigninButton()
+                                      : _buildIconButton(
+                                    text: 'Daftar Menggunakan Gmail',
+                                    iconPath: 'assets/icons/google-icon.svg',
+                                    isHovering: _isHoveringGmail,
+                                    onHover: (hovering) =>
+                                        setState(() => _isHoveringGmail = hovering),
+                                    onPressed: () => _handleGmailRegisterForMobile(context),
+                                  ),
+
                                   // Sisa ruang akan diisi oleh Card background
                                   Spacer(),
                                 ],
@@ -406,77 +349,107 @@ class _LoginFormState extends State<LoginForm>
       ),
     );
   }
-}
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  void _handleGmailRegisterForMobile(BuildContext context) async {
+    try {
+      GoogleSignInAccount? user;
 
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
+      if (kIsWeb) {
+        user = await _googleSignIn.signIn();
+      } else {
+        user = await _googleSignIn.signInSilently();
+        user ??= await _googleSignIn.signIn();
+      }
 
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
+      // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: defaultDuration,
-      vsync: this,
-    );
+      if (user != null && context.mounted) {
+        // 🔒 Simpan email & display name ke AuthLocalCubi
+
+        // ⛳ Kirim ke EmailVerificationBloc
+        context.read<EmailVerificationBloc>().add(
+          EmailVerificationTambahEvent(
+            record: EmailVerificationModel(
+              email: user.email,
+              requestFrom: 'google',
+            ),
+          ),
+        );
+      }
+
+    } catch (e) {
+      debugPrint('[GMAIL] ERROR: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login Google gagal: $e')),
+        );
+      }
+    }
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
-  }
-
-  // Widget yang mengandung LoginForm
-  Widget _buildDesignLoginForm() {
-    return const LoginForm();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final verticalPadding = screenHeight * 0.03;
-    final headerSpacing = screenHeight * 0.025;
-
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor, // ⬅️ kasih warna dasar hitam
-      body: SafeArea(
-        child: BaseBackground(
-          backgroundAsset: "assets/images/background_gradient.png", // bisa custom
-          fadeHeight: 300,
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(height: headerSpacing),
-                        _buildDesignLoginForm(),
-                      ],
+  Widget _buildIconButton({
+    required String text,
+    required String iconPath,
+    required bool isHovering,
+    required Function(bool) onHover,
+    required VoidCallback onPressed,
+  }) {
+    return MouseRegion(
+      onEnter: (_) => onHover(true),
+      onExit: (_) => onHover(false),
+      child: GestureDetector(
+        onTap: onPressed,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: double.infinity,
+          height: 40,
+          decoration: BoxDecoration(
+            color: isHovering ? Colors.grey.shade100 : Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: isHovering ? Colors.grey.shade400 : Colors.grey.shade300,
+              width: 1,
+            ),
+            boxShadow: isHovering
+                ? [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              )
+            ]
+                : [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 3,
+                offset: const Offset(0, 2),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(iconPath, width: 24, height: 24),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: Color(0xFF91C050),
+                      fontSize: getResponsiveFont(context, 15),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
 }
+
+

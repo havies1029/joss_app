@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class BaseBackground extends StatelessWidget {
+class BaseBackgroundFirstPage extends StatelessWidget {
   final Widget child;
   final double fadeHeight;
   final String backgroundAsset;
 
-  const BaseBackground({
+  const BaseBackgroundFirstPage({
     super.key,
     required this.child,
     this.fadeHeight = 300, // default tinggi fade

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/heropage/mobile/widget/carouse_menu_widget.dart';
 
 import '../../../common/constants.dart';
-import '../../base/base_background.dart';
+import '../../base/base_background_firstpage.dart';
 import 'widget/hero_card_widget.dart';
 
 // ⬇️ tambahkan import cubit-nya
@@ -18,7 +18,7 @@ class HeroPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryBlackColor,
-      body: BaseBackground(
+      body: BaseBackgroundFirstPage(
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(

@@ -90,6 +90,9 @@ flutter:
     - assets/icons/beli-polis-5.svg
     - assets/icons/klaim-6.svg
     - assets/icons/tagihan-pembayaran-7.svg
+    - assets/images/start-1.svg
+    - assets/images/start-2.svg
+    - assets/images/start-3.svg
 
   fonts:
     - family: Delm-Regular
