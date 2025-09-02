@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../common/constants.dart';
 import '../../../base/base_background_firstpage.dart';
+import '../../../base/base_background_sidepage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -45,19 +46,52 @@ class _ProfilePageState extends State<ProfilePage>
       resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor, // ⬅️ kasih warna dasar hitam
       body: SafeArea(
-        child: BaseBackgroundFirstPage(
+        child: BaseBackgroundSidePage(
           backgroundAsset: "assets/images/background_gradient.png", // bisa custom
           fadeHeight: 300,
+          title: 'Profile Page',
           child: Column(
             children: [
               Expanded(
                 child: SingleChildScrollView(
                   child: Center(
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         SizedBox(height: headerSpacing),
 
+                        Container(
+                          decoration: BoxDecoration(
+                            color: secondaryBlackColor,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border(
+                              top: BorderSide(
+                                color: primaryColor,
+                                width: 4.0,
+                              ),
+                            ),
+                          ),
+                          child: Card(
+                            color: secondaryBlackColor,
+                            elevation: 0,
+                            margin: EdgeInsets.zero, // ⬅️ hilangin margin bawaan Card
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text("Full width Card", style: TextStyle(color: Colors.white)),
+                                  SizedBox(height: 8),
+                                  Text("Sekarang hitamnya nempel ke sisi kiri kanan.",
+                                      style: TextStyle(color: Colors.white70)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

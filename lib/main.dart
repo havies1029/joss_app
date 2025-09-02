@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
+import 'package:joss_app/pages/profilepage/mobile/profile/profile_page.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -166,7 +167,7 @@ class _App extends StatelessWidget {
             return HomeTabWidget(userRepository: userRepository);
           }
           if (state is AuthenticationUnauthenticated) {
-            return const LoginClient();
+            return const ProfilePage();
           }
           return const LoadingIndicator();
         },
