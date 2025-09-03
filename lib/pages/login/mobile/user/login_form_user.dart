@@ -117,7 +117,7 @@ class _LoginFormUserState extends State<LoginFormUser>
   }
 
   Widget _buildSignInButton() {
-    return appButtons.primary(
+    return AppButton.primary(
       text: "Masuk",
       width: double.infinity,
       height: buttonHeight,

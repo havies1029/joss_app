@@ -1,26 +1,16 @@
 import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
-import '../../login/mobile/user/widget/popup_user_widget.dart';
+import '../widgets/logout_popup.dart';
+import 'package:joss_app/pages/settingpage/widgets/ubah_password_popup.dart';
 
-
-const List<String> scopes = <String>[
-  'email',
-];
-
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: scopes,
-  clientId: kIsWeb ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com' : null,
-  serverClientId: kIsWeb ? null : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
-);
+const List<String> scopes = <String>['email'];
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -35,64 +25,20 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildAvatar(Uint8List? bytes, String initials) {
     if (bytes != null && bytes.isNotEmpty) {
-      return CircleAvatar(radius: 30, backgroundImage: MemoryImage(bytes));
+      return CircleAvatar(radius: 23, backgroundImage: MemoryImage(bytes));
     }
     return CircleAvatar(
-      radius: 30,
+      radius: 23,
       backgroundColor: primaryColor,
-      child: Text(initials, style: TextStyle(color: Colors.white, fontSize: getResponsiveFont(context, 20), fontWeight: FontWeight.w700)),
+      child: Text(initials, style: headingStyle(context, fontSize: 20)),
     );
   }
 
   String _initialsFromName(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
     final first = parts.isNotEmpty ? parts.first[0] : '';
-    final last  = parts.length > 1 ? parts.last[0]  : '';
+    final last = parts.length > 1 ? parts.last[0] : '';
     return (first + last).toUpperCase();
-  }
-
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white),
-        ),
-        backgroundColor: primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-        ),
-        margin: const EdgeInsets.all(hPadding),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  Future<void> _confirmLogout(BuildContext context) async {
-    try {
-      // Kalau ada animasi overlay
-      // await _animationController.reverse();
-      // await _overlayController.reverse();
-    } catch (_) {}
-
-    if (!context.mounted) return;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        await _googleSignIn.signOut(); // Logout Google
-      } catch (e) {
-        debugPrint("Google SignOut error: $e");
-      }
-
-      // Trigger logout ke AuthenticationBloc
-      context.read<AuthenticationBloc>().add(
-        LoggedOut(),
-      );
-    });
-
-    // Tutup popup atau navigasi balik
-    // Navigator.of(context).pop();
   }
 
   @override
@@ -100,46 +46,54 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor: primaryBlackColor,
       body: BaseBackgroundFirstPage(
-        backgroundAsset: "assets/images/background_gradient.png",
-        fadeHeight: 300,
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(hPadding),
+            padding: const EdgeInsets.symmetric(
+              horizontal: hPadding * 2.5,
+              vertical: vPadding,
+            ),
             child: Column(
               children: [
-                // ================== PROFILE SECTION ==================
                 BlocBuilder<UserProfileCubit, UserProfileState>(
                   buildWhen: (prev, curr) {
-                    final nameChanged  = prev.nama    != curr.nama;
-                    final emailChanged = prev.email   != curr.email;
-                    final telpChanged  = prev.telepon != curr.telepon;
+                    final nameChanged = prev.nama != curr.nama;
+                    final emailChanged = prev.email != curr.email;
+                    final telpChanged = prev.telepon != curr.telepon;
 
                     // bandingkan perubahan bytes (tanpa deep-compare)
                     final bytesChanged =
                         (prev.fotoBytes == null && curr.fotoBytes != null) ||
-                            (prev.fotoBytes != null && curr.fotoBytes == null) ||
-                            (prev.fotoBytes != null &&
-                                curr.fotoBytes != null &&
-                                prev.fotoBytes!.lengthInBytes != curr.fotoBytes!.lengthInBytes);
+                        (prev.fotoBytes != null && curr.fotoBytes == null) ||
+                        (prev.fotoBytes != null &&
+                            curr.fotoBytes != null &&
+                            prev.fotoBytes!.lengthInBytes !=
+                                curr.fotoBytes!.lengthInBytes);
 
-                    return nameChanged || emailChanged || telpChanged || bytesChanged;
+                    return nameChanged ||
+                        emailChanged ||
+                        telpChanged ||
+                        bytesChanged;
                   },
                   builder: (context, state) {
-                    final nama = (state.nama?.trim().isNotEmpty ?? false)
-                        ? state.nama!.trim()
-                        : 'Pengguna';
-                    final email = (state.email?.trim().isNotEmpty ?? false)
-                        ? state.email!.trim()
-                        : null;
-                    final telepon = (state.telepon?.trim().isNotEmpty ?? false)
-                        ? state.telepon!.trim()
-                        : null;
-                    final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
-                        ? state.fotoBytes
-                        : null;
+                    final nama =
+                        (state.nama?.trim().isNotEmpty ?? false)
+                            ? state.nama!.trim()
+                            : 'Pengguna';
+                    final email =
+                        (state.email?.trim().isNotEmpty ?? false)
+                            ? state.email!.trim()
+                            : null;
+                    final telepon =
+                        (state.telepon?.trim().isNotEmpty ?? false)
+                            ? state.telepon!.trim()
+                            : null;
+                    final foto =
+                        (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
+                            ? state.fotoBytes
+                            : null;
 
                     return Container(
-                      padding: const EdgeInsets.all(1), // Padding untuk border
+                      padding: const EdgeInsets.all(1),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(cardBorderRadius),
                         gradient: LinearGradient(
@@ -147,41 +101,41 @@ class _SettingsPageState extends State<SettingsPage> {
                           end: Alignment.bottomCenter,
                           colors: [
                             primaryColor,
-                            primaryColor.withOpacity(0.0), // Pudar ke transparent
+                            primaryColor.withOpacity(0.6),
+                            primaryColor.withOpacity(0.4),
+                            primaryColor.withOpacity(0.2),
+                            Colors.transparent,
                           ],
-                          stops: const [0.0, 1.0],
+                          stops: const [0.0, 0.5, 0.75, 0.9, 1.0],
                         ),
                       ),
                       child: Container(
-                        padding: const EdgeInsets.all(hPaddingForCard),
+                        padding: const EdgeInsets.all(hPadding + 6),
                         decoration: BoxDecoration(
                           color: pGrey,
-                          borderRadius: BorderRadius.circular(cardBorderRadius - 2),
+                          borderRadius: BorderRadius.circular(
+                            cardBorderRadius - 1.5,
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildAvatar(foto, _initialsFromName(nama)),
-                            const SizedBox(width: 15),
+                            const SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Nama
                                   Text(
                                     nama,
-                                    style: TextStyle(
-                                      color: primaryLightColor,
-                                      fontSize: getResponsiveFont(context, 22),
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: headingStyle(context, fontSize: 22),
                                   ),
                                   const SizedBox(height: 4),
 
                                   // Role/subtitle (opsional)
                                   Text(
                                     'Nasabah Biasa',
-                                    style: TextStyle(color: primaryLightColor, fontSize: getResponsiveFont(context, 18)),
+                                    style: bodyTextStyle(context),
                                   ),
 
                                   const SizedBox(height: 4),
@@ -190,12 +144,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                   if (email != null)
                                     Row(
                                       children: [
-                                        const Icon(Icons.email, color: primaryLightColor, size: 16),
-                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.email,
+                                          color: primaryLightColor,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 5),
                                         Flexible(
                                           child: Text(
                                             email,
-                                            style: TextStyle(color: primaryLightColor, fontSize: getResponsiveFont(context, 16)),
+                                            style: bodyTextStyle(
+                                              context,
+                                              fontSize: 16,
+                                            ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -207,12 +168,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        const Icon(Icons.phone, color: primaryLightColor, size: 16),
-                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.phone,
+                                          color: primaryLightColor,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 5),
                                         Flexible(
                                           child: Text(
                                             telepon,
-                                            style: TextStyle(color: primaryLightColor, fontSize: getResponsiveFont(context, 16)),
+                                            style: bodyTextStyle(
+                                              context,
+                                              fontSize: 16,
+                                            ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -228,8 +196,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
-                // ================== END PROFILE SECTION ==================
 
+                // ================== END PROFILE SECTION ==================
                 const SizedBox(height: vPadding),
 
                 // Menu Items
@@ -237,24 +205,35 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(
                     color: pGrey,
                     borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(
-                      color: sGrey,   // pakai warna abu-abu dari constant
-                      width: 1.0,     // ketebalan border
-                    ),
+                    border: Border.all(color: sGrey),
                   ),
                   child: Column(
                     children: [
                       _buildMenuItem(
                         icon: Icons.person_outline,
                         title: 'Kelola Profil',
-                        onTap: () => _showSnackBar('Kelola Profil diklik'),
+                        onTap: () => successSnackBar('Kelola Profil diklik'),
                       ),
                       _buildDivider(),
                       _buildMenuItem(
                         icon: Icons.lock_outline,
                         title: 'Ubah Password',
                         onTap: () {
-
+                          UbahPassword.show(context);
+                          if (pIsMobile) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const UbahPasswordPage(),
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) => const UbahPassword(),
+                            );
+                          }
                         },
                       ),
                     ],
@@ -267,23 +246,24 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(
                     color: pGrey,
                     borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(
-                      color: sGrey,   // pakai warna abu-abu dari constant
-                      width: 1.0,     // ketebalan border
-                    ),
+                    border: Border.all(color: sGrey),
                   ),
                   child: Column(
                     children: [
                       _buildMenuItem(
                         icon: Icons.local_shipping_outlined,
                         title: 'Syarat dan Ketentuan',
-                        onTap: () => _showSnackBar('Syarat dan Ketentuan diklik'),
+                        onTap:
+                            () =>
+                                successSnackBar('Syarat dan Ketentuan diklik'),
                       ),
                       _buildDivider(),
                       _buildMenuItem(
                         icon: Icons.favorite_border,
                         title: 'Kebijakan dan Privasi',
-                        onTap: () => _showSnackBar('Kebijakan dan Privasi diklik'),
+                        onTap:
+                            () =>
+                                successSnackBar('Kebijakan dan Privasi diklik'),
                       ),
                     ],
                   ),
@@ -296,10 +276,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(
                     color: pGrey,
                     borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(
-                      color: sGrey,   // pakai warna abu-abu dari constant
-                      width: 1.0,     // ketebalan border
-                    ),
+                    border: Border.all(color: sGrey),
                   ),
                   child: Column(
                     children: [
@@ -308,7 +285,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         value: emailNotification,
                         onChanged: (value) {
                           setState(() => emailNotification = value);
-                          _showSnackBar('Email Notifikasi ${value ? 'diaktifkan' : 'dinonaktifkan'}');
+                          successSnackBar(
+                            'Email Notifikasi ${value ? 'diaktifkan' : 'dinonaktifkan'}',
+                          );
                         },
                       ),
                       // _buildDivider(),
@@ -317,7 +296,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         value: darkMode,
                         onChanged: (value) {
                           setState(() => darkMode = value);
-                          _showSnackBar('Mode Gelap ${value ? 'diaktifkan' : 'dinonaktifkan'}');
+                          successSnackBar(
+                            'Mode Gelap ${value ? 'diaktifkan' : 'dinonaktifkan'}',
+                          );
                         },
                       ),
                     ],
@@ -331,17 +312,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(
                     color: pGrey,
                     borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(
-                      color: sGrey,   // pakai warna abu-abu dari constant
-                      width: 1.0,     // ketebalan border
-                    ),
+                    border: Border.all(color: sGrey),
                   ),
                   child: _buildMenuItem(
                     icon: Icons.logout,
                     title: 'Keluar',
                     titleColor: pDarkRed,
                     iconColor: pRed,
-                    onTap: () => _confirmLogout(context),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => const LogoutConfirmationPopup(),
+                      );
+                    },
                   ),
                 ),
 
@@ -354,8 +338,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-
-
   Widget _buildMenuItem({
     required IconData icon,
     required String title,
@@ -367,30 +349,21 @@ class _SettingsPageState extends State<SettingsPage> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Padding(
-        padding: const EdgeInsets.all(hPaddingForCard),
+        padding: const EdgeInsets.symmetric(
+          horizontal: vPadding,
+          vertical: hPadding,
+        ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: iconColor ?? Colors.white,
-              size: 24,
-            ),
-            const SizedBox(width: 15),
+            Icon(icon, color: iconColor ?? Colors.white, size: 24),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  color: titleColor ?? Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: bodyTextStyle(context).copyWith(color: titleColor),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: primaryLightColor,
-              size: 18,
-            ),
+            Icon(Icons.arrow_forward_ios, color: primaryLightColor, size: 18),
           ],
         ),
       ),
@@ -403,19 +376,13 @@ class _SettingsPageState extends State<SettingsPage> {
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
-      padding: const EdgeInsets.all(cardBorderRadius),
+      padding: const EdgeInsets.symmetric(
+        horizontal: vPadding,
+        vertical: hPadding,
+      ),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                color: primaryLightColor,
-                fontSize:  getResponsiveFont(context, 18),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+          Expanded(child: Text(title, style: bodyTextStyle(context))),
           Switch(
             value: value,
             onChanged: onChanged,

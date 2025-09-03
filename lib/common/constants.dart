@@ -5,11 +5,22 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:joss_app/common/size_config.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';
 part '../widgets/apptheme/snackbar.dart';
 part '../widgets/apptheme/textstyles.dart';
+
+final GoogleSignIn googleSignIn = GoogleSignIn(
+  scopes: const ['email'],
+  clientId: kIsWeb
+      ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com'
+      : null,
+  serverClientId: kIsWeb
+      ? null
+      : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
+);
 
 /// Device/Platform Utils
 bool get pIsMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);
@@ -36,6 +47,7 @@ const Color hintGrey = Color(0xFFBCBCBC);
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
 const Color pRed = Color(0xFFFF0000);
+const Color pGreen = Color(0xFF4BB34B);
 const Color pDarkRed = Color(0xFFDC1C1C);
 
 

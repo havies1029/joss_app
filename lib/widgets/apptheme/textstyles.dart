@@ -1,6 +1,5 @@
 part of '../../common/constants.dart';
 
-
 /// Responsive Font Size
 double getResponsiveFont(BuildContext context, double base) {
   if (isDesktop(context)) return base * 1.22;
@@ -8,24 +7,32 @@ double getResponsiveFont(BuildContext context, double base) {
   return base;
 }
 
-/// Text Styles
-TextStyle headingStyle(BuildContext ctx) =>
-    TextStyle(fontSize: getResponsiveFont(ctx, 30), color: primaryLightColor);
+/// Textstyles
+TextStyle headingStyle(BuildContext ctx, {double fontSize = 30}) => TextStyle(
+  fontSize: getResponsiveFont(ctx, fontSize),
+  color: primaryLightColor,
+  fontWeight: FontWeight.w500,
+  height: 1
+);
 
-TextStyle customInputStyle(
-    BuildContext ctx, {
-      double fontSize = 18,
-      Color color = primaryColor,
-      TextDecoration decoration = TextDecoration.none,
-      FontWeight? fontWeight,
-    }) {
-  return TextStyle(
-    fontSize: getResponsiveFont(ctx, fontSize),
-    color: color,
-    decoration: decoration,
-    fontWeight: fontWeight,
-  );
-}
+TextStyle inputTextStyle(BuildContext ctx, {Color? color}) => TextStyle(
+  fontSize: getResponsiveFont(ctx, 18),
+  color: color ?? primaryColor,
+  fontWeight: FontWeight.w400,
+  height: 1
+);
+
+TextStyle bodyTextStyle(
+  BuildContext ctx, {
+  double fontSize = 18,
+  TextDecoration decoration = TextDecoration.none,
+}) => TextStyle(
+  fontSize: getResponsiveFont(ctx, fontSize),
+  color: primaryLightColor,
+  fontWeight: FontWeight.w400,
+  decoration: decoration,
+  height: 1
+);
 
 class HoverableText extends StatefulWidget {
   final String text;
@@ -67,4 +74,3 @@ class _HoverableTextState extends State<HoverableText> {
     );
   }
 }
-

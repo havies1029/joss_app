@@ -1,10 +1,11 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/constants.dart';
+import '../../../../repositories/user/user_repository.dart';
 import '../../../base/base_background_firstpage.dart';
 import '../../../base/base_background_sidepage.dart';
+import '../../../home/home_tab_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -41,13 +42,26 @@ class _ProfilePageState extends State<ProfilePage>
     final screenHeight = MediaQuery.of(context).size.height;
     final verticalPadding = screenHeight * 0.03;
     final headerSpacing = screenHeight * 0.025;
+    final userRepository = UserRepository();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor, // ⬅️ kasih warna dasar hitam
+      backgroundColor: primaryBlackColor,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
+        child: const Icon(Icons.home),
+        onPressed: () {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => HomeTabWidget(userRepository: userRepository),
+            ),
+                (route) => false, // Hapus semua page, langsung ke home
+          );
+        },
+      ),// ⬅️ kasih warna dasar hitam
       body: SafeArea(
         child: BaseBackgroundSidePage(
-          backgroundAsset: "assets/images/background_gradient.png", // bisa custom
+          backgroundAsset: "assets/images/background_gradient.png",
           fadeHeight: 300,
           title: 'Profile Page',
           child: Column(
@@ -59,7 +73,6 @@ class _ProfilePageState extends State<ProfilePage>
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         SizedBox(height: headerSpacing),
-
                         Container(
                           decoration: BoxDecoration(
                             color: secondaryBlackColor,
@@ -74,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage>
                           child: Card(
                             color: secondaryBlackColor,
                             elevation: 0,
-                            margin: EdgeInsets.zero, // ⬅️ hilangin margin bawaan Card
+                            margin: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),

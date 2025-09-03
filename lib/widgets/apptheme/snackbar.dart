@@ -59,5 +59,5 @@ SnackBar successSnackBar(String message, {IconData? icon}) => appSnackBar(
 SnackBar infoSnackBar(String message, {IconData? icon}) => appSnackBar(
   message: message,
   icon: icon ?? Icons.info_outline,
-  backgroundColor: pBlue,
+  backgroundColor: pGrey,
 );

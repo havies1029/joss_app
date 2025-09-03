@@ -17,6 +17,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     required this.authenticationBloc,
   }) : super(LoginInitial()) {
     on<LoginButtonPressed>(_onLoginButtonPressed);
+    on<LoginReset>((event, emit) => emit(LoginInitial()));
     //on<PinVerified>(_onPinVerified);
   }
 
@@ -49,3 +50,4 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 }
+

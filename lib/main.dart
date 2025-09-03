@@ -32,13 +32,18 @@ import 'package:joss_app/repositories/profile/userfoto_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
 
+import 'blocs/gallery/galleryeventcari_bloc.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path),
+    storageDirectory:
+        kIsWeb
+            ? HydratedStorageDirectory.web
+            : HydratedStorageDirectory(
+              (await getApplicationDocumentsDirectory()).path,
+            ),
   );
 
   final userRepository = UserRepository();
@@ -47,37 +52,62 @@ Future<void> main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => AuthenticationBloc(userRepository: userRepository)..add(AppStarted()),
+          create:
+              (_) =>
+                  AuthenticationBloc(userRepository: userRepository)
+                    ..add(AppStarted()),
         ),
         BlocProvider(
-          create: (ctx) => LoginBloc(
-            authenticationBloc: ctx.read<AuthenticationBloc>(),
-            userRepository: userRepository,
-          ),
+          create:
+              (ctx) => LoginBloc(
+                authenticationBloc: ctx.read<AuthenticationBloc>(),
+                userRepository: userRepository,
+              ),
         ),
         BlocProvider(
-          create: (ctx) => EmailVerificationBloc(
-            repository: EmailVerificationRepository(),
-            authenticationBloc: ctx.read<AuthenticationBloc>(),
-          ),
+          create:
+              (ctx) => EmailVerificationBloc(
+                repository: EmailVerificationRepository(),
+                authenticationBloc: ctx.read<AuthenticationBloc>(),
+              ),
         ),
-        BlocProvider(create: (_) => ChangePasswordBloc(repository: ChangePasswordRepository())),
+        BlocProvider(
+          create:
+              (_) => ChangePasswordBloc(repository: ChangePasswordRepository()),
+        ),
         BlocProvider(create: (_) => NetworkBloc()..add(NetworkObserve())),
         BlocProvider(create: (_) => ProfileUploadFotoBloc()),
-        BlocProvider(create: (_) => ProfileDownloadFotoBloc(repository: UserFotoRepository())),
-        BlocProvider(create: (_) => MRekan1CrudBloc(repository: MRekan1CrudRepository())),
+        BlocProvider(
+          create:
+              (_) => ProfileDownloadFotoBloc(repository: UserFotoRepository()),
+        ),
+        BlocProvider(
+          create: (_) => MRekan1CrudBloc(repository: MRekan1CrudRepository()),
+        ),
         BlocProvider(create: (_) => MRekan1ListBloc()),
-        BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
+        BlocProvider(
+          create:
+              (_) => MRekanContactCrudBloc(
+                repository: MRekanContactCrudRepository(),
+              ),
+        ),
         BlocProvider(create: (_) => MRekanContactListBloc()),
-        BlocProvider(create: (_) => UserProfileCubit()), // hydrated
+        BlocProvider(create: (_) => UserProfileCubit()),
+        BlocProvider(
+          create:
+              (_) =>
+                  GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent()),
+        ),
       ],
       child: MultiBlocListener(
         listeners: [
           // Debug listener untuk Rekan
           BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
             listener: (context, s) {
-              debugPrint('[Rekan] isLoaded=${s.isLoaded} '
-                  'nama=${s.record?.rekanNama} id=${s.record?.mrekan1Id}');
+              debugPrint(
+                '[Rekan] isLoaded=${s.isLoaded} '
+                'nama=${s.record?.rekanNama} id=${s.record?.mrekan1Id}',
+              );
             },
           ),
 
@@ -89,11 +119,17 @@ Future<void> main() async {
 
               if (state is NetworkFailure) {
                 messenger.showSnackBar(
-                  errorSnackBar("You're not Connected to Internet", icon: Icons.signal_wifi_off),
+                  errorSnackBar(
+                    "You're not Connected to Internet",
+                    icon: Icons.signal_wifi_off,
+                  ),
                 );
               } else if (state is NetworkSuccess) {
                 messenger.showSnackBar(
-                  successSnackBar("You're Connected to Internet", icon: Icons.wifi),
+                  successSnackBar(
+                    "You're Connected to Internet",
+                    icon: Icons.wifi,
+                  ),
                 );
               }
             },
@@ -101,20 +137,35 @@ Future<void> main() async {
 
           // 🔑 Authentication listener
           BlocListener<AuthenticationBloc, AuthenticationState>(
-            listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
             listener: (context, state) {
-              final s = state as AuthenticationAuthenticated;
-              if (s.user.custType == 'C') {
-                context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
-                debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
-              }
+              debugPrint(
+                "🔑 [AUTH_STATE_CHANGE] New state: ${state.runtimeType}",
+              );
 
-              // trigger foto profil sekali
-              final fotoState = context.read<ProfileDownloadFotoBloc>().state;
-              if (fotoState is! ProfileDownloadFotoLoading &&
-                  fotoState is! ProfileDownloadFotoLoaded) {
-                context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
-                debugPrint('[Foto] LoadSecureImage() dipanggil');
+              if (state is AuthenticationAuthenticated) {
+                final s = state as AuthenticationAuthenticated;
+                if (s.user.custType == 'C') {
+                  context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
+                  debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
+                }
+
+                // trigger foto profil sekali
+                final fotoState = context.read<ProfileDownloadFotoBloc>().state;
+                if (fotoState is! ProfileDownloadFotoLoading &&
+                    fotoState is! ProfileDownloadFotoLoaded) {
+                  context.read<ProfileDownloadFotoBloc>().add(
+                    LoadSecureImage(),
+                  );
+                  debugPrint('[Foto] LoadSecureImage() dipanggil');
+                }
+              } else if (state is AuthenticationUnauthenticated) {
+                debugPrint(
+                  "🔑 [AUTH_STATE_CHANGE] User unauthenticated - should show login",
+                );
+              } else if (state is AuthenticationLoading) {
+                debugPrint("🔑 [AUTH_STATE_CHANGE] Authentication loading...");
+              } else {
+                debugPrint("🔑 [AUTH_STATE_CHANGE] Unknown state: $state");
               }
             },
           ),
@@ -126,7 +177,9 @@ Future<void> main() async {
               final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
               if (bytes.isNotEmpty) {
                 context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
-                debugPrint('[Foto] bytes=${bytes.length} -> set ke UserProfileCubit');
+                debugPrint(
+                  '[Foto] bytes=${bytes.length} -> set ke UserProfileCubit',
+                );
               } else {
                 debugPrint('[Foto] bytes kosong, skip setProfile()');
               }
@@ -167,7 +220,7 @@ class _App extends StatelessWidget {
             return HomeTabWidget(userRepository: userRepository);
           }
           if (state is AuthenticationUnauthenticated) {
-            return const ProfilePage();
+            return const LoginClient();
           }
           return const LoadingIndicator();
         },

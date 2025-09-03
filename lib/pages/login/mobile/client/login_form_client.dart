@@ -41,6 +41,7 @@ class _LoginFormClientState extends State<LoginFormClient>
       vsync: this,
       duration: defaultDuration,
     );
+    Future.microtask(() => context.read<LoginBloc>().add(LoginReset()));
   }
 
   @override
@@ -111,7 +112,7 @@ class _LoginFormClientState extends State<LoginFormClient>
   }
 
   Widget _buildSignInButton() {
-    return appButtons.primary(
+    return AppButton.primary(
       text: "Masuk",
       width: double.infinity,
       height: buttonHeight,
@@ -178,7 +179,6 @@ class _LoginFormClientState extends State<LoginFormClient>
 
   @override
   Widget build(BuildContext context) {
-
     return MultiBlocListener(
       listeners: [
         BlocListener<LoginBloc, LoginState>(
@@ -195,140 +195,154 @@ class _LoginFormClientState extends State<LoginFormClient>
         builder: (context, state) {
           return ((state is LoginInitial) || (state is LoginFailure))
               ? Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // Header Section
-                      Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/icons/logo_jps_no_background.png',
-                              height: isDesktop(context)
-                                  ? 56
-                                  : isTablet(context)
-                                  ? 48
-                                  : 42,
-                              width: isDesktop(context)
-                                  ? 180
-                                  : isTablet(context)
-                                  ? 140
-                                  : 120,
-                            ),
-                            WelcomeHeader(),
-                          ],
-                        ),
-                      ),
-
-                      // Card Section yang akan mengambil sisa ruang
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border(
-                              top: BorderSide(
-                                color: primaryColor,
-                                width: 4.0,
-                              ),
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          // Header Section
+                          Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset(
+                                  'assets/icons/logo_jps_no_background.png',
+                                  height:
+                                      isDesktop(context)
+                                          ? 56
+                                          : isTablet(context)
+                                          ? 48
+                                          : 42,
+                                  width:
+                                      isDesktop(context)
+                                          ? 180
+                                          : isTablet(context)
+                                          ? 140
+                                          : 120,
+                                ),
+                                WelcomeHeader(),
+                              ],
                             ),
                           ),
-                          child: Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+
+                          // Card Section yang akan mengambil sisa ruang
+                          Expanded(
                             child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  _buildEmailField(0),
-                                  SizedBox(height: fieldSpacing),
-                                  _buildPasswordField(0),
-                                  SizedBox(height: fieldSpacing),
-                                  // Row dengan checkbox dan forgot password
-                                  Row(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border(
+                                  top: BorderSide(
+                                    color: primaryColor,
+                                    width: 4.0,
+                                  ),
+                                ),
+                              ),
+                              child: Card(
+                                elevation: 0,
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  padding: EdgeInsets.all(20),
+                                  child: Column(
                                     children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _rememberPassword = !_rememberPassword;
-                                            });
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Checkbox(
-                                                value: _rememberPassword,
-                                                activeColor: primaryColor,
-                                                checkColor: primaryLightColor,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                    checkboxBorderRadius,
+                                      _buildEmailField(0),
+                                      SizedBox(height: fieldSpacing),
+                                      _buildPasswordField(0),
+                                      SizedBox(height: fieldSpacing),
+                                      // Row dengan checkbox dan forgot password
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _rememberPassword =
+                                                      !_rememberPassword;
+                                                });
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  Checkbox(
+                                                    value: _rememberPassword,
+                                                    activeColor: primaryColor,
+                                                    checkColor:
+                                                        primaryLightColor,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            checkboxBorderRadius,
+                                                          ),
+                                                    ),
+                                                    onChanged:
+                                                        (value) => setState(
+                                                          () =>
+                                                              _rememberPassword =
+                                                                  value ??
+                                                                  false,
+                                                        ),
                                                   ),
-                                                ),
-                                                onChanged: (value) => setState(
-                                                      () => _rememberPassword = value ?? false,
-                                                ),
-                                              ),
-                                              Flexible(
-                                                child: Text(
-                                                  "Ingat Kata Sandi",
-                                                  style: customInputStyle(
-                                                    context,
-                                                    color: primaryLightColor,
+                                                  Flexible(
+                                                    child: Text(
+                                                      "Ingat Kata Sandi",
+                                                      style: bodyTextStyle(
+                                                        context,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          // Implementasi fungsi forgot password
-                                        },
-                                        child: HoverableText(
-                                          text: 'Lupa Kata Sandi',
-                                          onTap: () {},
-                                          styleBuilder: (isHovering) => customInputStyle(
-                                              context,
-                                              color: isHovering ? pBlue : primaryColor
+                                          TextButton(
+                                            onPressed: () {
+                                              // Implementasi fungsi forgot password
+                                            },
+                                            child: HoverableText(
+                                              text: 'Lupa Kata Sandi',
+                                              onTap: () {},
+                                              styleBuilder:
+                                                  (isHovering) =>
+                                                      inputTextStyle(
+                                                        context,
+                                                        color:
+                                                            isHovering
+                                                                ? pBlue
+                                                                : primaryColor,
+                                                      ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        ],
                                       ),
+                                      SizedBox(height: fieldSpacing),
+                                      _buildSignInButton(),
+                                      // Sisa ruang akan diisi oleh Card background
+                                      Spacer(),
                                     ],
                                   ),
-                                  SizedBox(height: fieldSpacing),
-                                  _buildSignInButton(),
-                                  // Sisa ruang akan diisi oleh Card background
-                                  Spacer(),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          )
+              )
               : const Center(child: CircularProgressIndicator());
         },
       ),

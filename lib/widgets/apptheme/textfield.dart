@@ -43,12 +43,12 @@ class appTextField extends StatelessWidget {
       keyboardType: keyboardType,
       onTap: onTap,
       cursorColor: primaryLightColor,
-      style: customInputStyle(context, color: primaryLightColor),
+      style: bodyTextStyle(context),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: customInputStyle(context),
+        labelStyle: inputTextStyle(context),
         hintText: hint,
-        hintStyle: customInputStyle(context, color: sGrey),
+        hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: pGrey,
         contentPadding: const EdgeInsets.symmetric(

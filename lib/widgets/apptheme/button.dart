@@ -9,7 +9,7 @@ enum ButtonLayoutType {
   iconBottom,
 }
 
-class appButtons extends StatelessWidget {
+class AppButton extends StatelessWidget {
   final String? text;
   final Widget? icon;
   final VoidCallback? onPressed;
@@ -22,6 +22,7 @@ class appButtons extends StatelessWidget {
   final EdgeInsets? padding;
   final Color? backgroundColor;
   final Color? textColor;
+  final Color? iconColor;
   final double? borderRadius;
   final double? elevation;
   final BorderSide? borderSide;
@@ -29,8 +30,9 @@ class appButtons extends StatelessWidget {
   final double iconTextSpacing;
   final bool isSquare;
   final double? squareSize;
+  final bool isOutlined;
 
-  const appButtons({
+  const AppButton({
     super.key,
     this.text,
     this.icon,
@@ -44,6 +46,7 @@ class appButtons extends StatelessWidget {
     this.padding,
     this.backgroundColor,
     this.textColor,
+    this.iconColor,
     this.borderRadius,
     this.elevation,
     this.borderSide,
@@ -51,13 +54,18 @@ class appButtons extends StatelessWidget {
     this.iconTextSpacing = 8.0,
     this.isSquare = false,
     this.squareSize,
+    this.isOutlined = false,
   }) : assert(
-  text != null || icon != null,
-  'Either text or icon must be provided',
-  );
+         text != null || icon != null,
+         'AppButton: Either text or icon must be provided',
+       );
 
-  // Factory untuk button biasa (text only)
-  factory appButtons.primary({
+  // =========================
+  //     FACTORY METHODS
+  // =========================
+
+  /// Primary Button
+  factory AppButton.primary({
     required String text,
     VoidCallback? onPressed,
     double? width,
@@ -65,8 +73,13 @@ class appButtons extends StatelessWidget {
     bool isLoading = false,
     bool hasAnimation = true,
     EdgeInsets? padding,
+    TextStyle? textStyle,
+    Color? backgroundColor,
+    Color? textColor,
+    double? borderRadius,
+    double? elevation,
   }) {
-    return appButtons(
+    return AppButton(
       text: text,
       onPressed: onPressed,
       width: width,
@@ -75,11 +88,50 @@ class appButtons extends StatelessWidget {
       hasAnimation: hasAnimation,
       padding: padding,
       layoutType: ButtonLayoutType.textOnly,
+      textStyle: textStyle,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      isOutlined: false,
     );
   }
 
-  // Factory untuk icon button persegi
-  factory appButtons.iconSquare({
+  /// Outlined/Secondary Button
+  factory AppButton.secondary({
+    required String text,
+    VoidCallback? onPressed,
+    double? width,
+    double? height,
+    bool isLoading = false,
+    bool hasAnimation = true,
+    EdgeInsets? padding,
+    TextStyle? textStyle,
+    Color? borderColor,
+    double? borderRadius,
+  }) {
+    return AppButton(
+      text: text,
+      onPressed: onPressed,
+      width: width,
+      height: height,
+      isLoading: isLoading,
+      hasAnimation: hasAnimation,
+      padding: padding,
+      layoutType: ButtonLayoutType.textOnly,
+      textStyle: textStyle,
+      backgroundColor: Colors.transparent,
+      textColor: borderColor ?? primaryColor,
+      iconColor: borderColor ?? primaryColor,
+      borderSide: BorderSide(color: borderColor ?? primaryColor, width: 1.5),
+      borderRadius: borderRadius,
+      elevation: 0,
+      isOutlined: true,
+    );
+  }
+
+  /// Icon-only (Square)
+  factory AppButton.iconSquare({
     required Widget icon,
     VoidCallback? onPressed,
     double? size,
@@ -88,23 +140,27 @@ class appButtons extends StatelessWidget {
     EdgeInsets? padding,
     Color? backgroundColor,
     Color? iconColor,
+    double? borderRadius,
+    double? elevation,
   }) {
-    return appButtons(
+    return AppButton(
       icon: icon,
       onPressed: onPressed,
       isLoading: isLoading,
       hasAnimation: hasAnimation,
       padding: padding,
       backgroundColor: backgroundColor,
-      textColor: iconColor,
+      iconColor: iconColor,
       layoutType: ButtonLayoutType.iconOnly,
       isSquare: true,
       squareSize: size,
+      borderRadius: borderRadius,
+      elevation: elevation,
     );
   }
 
-  // Factory untuk button dengan icon di atas text (seperti di gambar)
-  factory appButtons.iconTop({
+  /// Icon Top
+  factory AppButton.iconTop({
     required String text,
     required Widget icon,
     VoidCallback? onPressed,
@@ -115,11 +171,13 @@ class appButtons extends StatelessWidget {
     EdgeInsets? padding,
     Color? backgroundColor,
     Color? textColor,
+    Color? iconColor,
     double iconTextSpacing = 8.0,
-    bool isSquare = false,
-    double? squareSize,
+    double? borderRadius,
+    double? elevation,
+    TextStyle? textStyle,
   }) {
-    return appButtons(
+    return AppButton(
       text: text,
       icon: icon,
       onPressed: onPressed,
@@ -130,15 +188,17 @@ class appButtons extends StatelessWidget {
       padding: padding,
       backgroundColor: backgroundColor,
       textColor: textColor,
+      iconColor: iconColor,
       layoutType: ButtonLayoutType.iconTop,
       iconTextSpacing: iconTextSpacing,
-      isSquare: isSquare,
-      squareSize: squareSize,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      textStyle: textStyle,
     );
   }
 
-  // Factory untuk button dengan icon di samping
-  factory appButtons.iconLeft({
+  /// Icon Left
+  factory AppButton.iconLeft({
     required String text,
     required Widget icon,
     VoidCallback? onPressed,
@@ -147,9 +207,15 @@ class appButtons extends StatelessWidget {
     bool isLoading = false,
     bool hasAnimation = true,
     EdgeInsets? padding,
+    Color? backgroundColor,
+    Color? textColor,
+    Color? iconColor,
     double iconTextSpacing = 8.0,
+    double? borderRadius,
+    double? elevation,
+    TextStyle? textStyle,
   }) {
-    return appButtons(
+    return AppButton(
       text: text,
       icon: icon,
       onPressed: onPressed,
@@ -158,96 +224,127 @@ class appButtons extends StatelessWidget {
       isLoading: isLoading,
       hasAnimation: hasAnimation,
       padding: padding,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      iconColor: iconColor,
       layoutType: ButtonLayoutType.iconLeft,
       iconTextSpacing: iconTextSpacing,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      textStyle: textStyle,
     );
   }
 
-  // Factory untuk secondary button (outline)
-  factory appButtons.secondary({
-    required String text,
-    VoidCallback? onPressed,
-    double? width,
-    double? height,
-    bool isLoading = false,
-    bool hasAnimation = true,
-    EdgeInsets? padding,
-  }) {
-    return appButtons(
-      text: text,
-      onPressed: onPressed,
-      width: width,
-      height: height,
-      isLoading: isLoading,
-      hasAnimation: hasAnimation,
-      padding: padding,
-      backgroundColor: Colors.transparent,
-      textColor: primaryColor,
-      borderSide: BorderSide(color: primaryColor, width: 1.5),
-      elevation: 0,
-      layoutType: ButtonLayoutType.textOnly,
-    );
-  }
+  // ================
+  //     BUILD
+  // ================
 
   @override
   Widget build(BuildContext context) {
-    // Tentukan ukuran button
     double? finalWidth = width;
     double? finalHeight = height;
-
     if (isSquare) {
       final size = squareSize ?? buttonHeight;
       finalWidth = size;
       finalHeight = size;
     }
 
-    // Build button style
-    ButtonStyle buttonStyle = style ?? ElevatedButton.styleFrom(
-      backgroundColor: backgroundColor ?? primaryColor,
-      foregroundColor: textColor ?? primaryLightColor,
-      maximumSize: Size(
-          finalWidth ?? double.infinity,
-          finalHeight ?? buttonHeight
-      ),
-      minimumSize: Size(
-          finalWidth ?? (isSquare ? (squareSize ?? buttonHeight) : 0),
-          finalHeight ?? buttonHeight
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(borderRadius ?? cardBorderRadius),
-        ),
-        side: borderSide ?? BorderSide.none,
-      ),
-      elevation: elevation ?? 0,
-      padding: padding ?? EdgeInsets.symmetric(
-        horizontal: isSquare ? 8 : 16,
-        vertical: isSquare ? 8 : 10,
-      ),
-    );
+    // If user supplies style, use it *directly* (no merge)
+    final bool useOutlined = isOutlined;
+    final ButtonStyle? baseStyle =
+        style ??
+        (useOutlined
+            ? OutlinedButton.styleFrom(
+              foregroundColor: textColor ?? primaryColor,
+              side: borderSide ?? BorderSide(color: primaryColor),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(borderRadius ?? cardBorderRadius),
+                ),
+              ),
+              padding:
+                  padding ??
+                  EdgeInsets.symmetric(
+                    horizontal: isSquare ? 8 : 16,
+                    vertical: isSquare ? 8 : 10,
+                  ),
+              minimumSize: Size(
+                finalWidth ?? (isSquare ? (squareSize ?? buttonHeight) : 0),
+                finalHeight ?? buttonHeight,
+              ),
+              maximumSize: Size(
+                finalWidth ?? double.infinity,
+                finalHeight ?? buttonHeight,
+              ),
+              elevation: elevation ?? 0,
+            )
+            : ElevatedButton.styleFrom(
+              backgroundColor: backgroundColor ?? primaryColor,
+              foregroundColor: textColor ?? primaryLightColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(borderRadius ?? cardBorderRadius),
+                ),
+                side: borderSide ?? BorderSide.none,
+              ),
+              padding:
+                  padding ??
+                  EdgeInsets.symmetric(
+                    horizontal: isSquare ? 8 : 16,
+                    vertical: isSquare ? 8 : 10,
+                  ),
+              minimumSize: Size(
+                finalWidth ?? (isSquare ? (squareSize ?? buttonHeight) : 0),
+                finalHeight ?? buttonHeight,
+              ),
+              maximumSize: Size(
+                finalWidth ?? double.infinity,
+                finalHeight ?? buttonHeight,
+              ),
+              elevation: elevation ?? 0,
+            ));
 
     // Build text style
-    TextStyle finalTextStyle = textStyle ?? TextStyle(
-      color: textColor ?? primaryLightColor,
-      fontWeight: FontWeight.w500,
-      fontSize: getResponsiveFont(context, isSquare ? 12 : 18),
+    final TextStyle finalTextStyle =
+        textStyle ??
+        TextStyle(
+          color: textColor ?? (useOutlined ? primaryColor : primaryLightColor),
+          fontWeight: FontWeight.w600,
+          fontSize: getResponsiveFont(context, isSquare ? 13 : 17),
+        );
+
+    // Build button content
+    final Widget buttonContent = _ButtonContent(
+      layoutType: layoutType,
+      text: text,
+      icon: icon,
+      isLoading: isLoading,
+      iconColor:
+          iconColor ??
+          textColor ??
+          (useOutlined ? primaryColor : primaryLightColor),
+      textStyle: finalTextStyle,
+      iconTextSpacing: iconTextSpacing,
     );
 
-    // Build button content berdasarkan layout type
-    Widget buttonContent = _buildContent(finalTextStyle);
-
-    // Build button
     Widget button = SizedBox(
       width: finalWidth,
       height: finalHeight,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: buttonStyle,
-        child: buttonContent,
-      ),
+      child:
+          useOutlined
+              ? OutlinedButton(
+                onPressed: isLoading ? null : onPressed,
+                style: baseStyle,
+                child: buttonContent,
+              )
+              : ElevatedButton(
+                onPressed: isLoading ? null : onPressed,
+                style: baseStyle,
+                child: buttonContent,
+              ),
     );
 
-    // Apply animation if enabled
+    // Animation
     if (hasAnimation) {
       return button.animate(
         effects: [
@@ -259,70 +356,102 @@ class appButtons extends StatelessWidget {
         ],
       );
     }
-
     return button;
   }
+}
 
-  Widget _buildContent(TextStyle textStyle) {
+/// Widget builder untuk konten button (reusable, lebih clean!)
+class _ButtonContent extends StatelessWidget {
+  final ButtonLayoutType layoutType;
+  final String? text;
+  final Widget? icon;
+  final bool isLoading;
+  final Color iconColor;
+  final TextStyle textStyle;
+  final double iconTextSpacing;
+
+  const _ButtonContent({
+    required this.layoutType,
+    required this.text,
+    required this.icon,
+    required this.isLoading,
+    required this.iconColor,
+    required this.textStyle,
+    required this.iconTextSpacing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     if (isLoading) {
       return SizedBox(
-        height: 20,
-        width: 20,
+        height: 22,
+        width: 22,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            textColor ?? primaryLightColor,
-          ),
+          valueColor: AlwaysStoppedAnimation<Color>(iconColor),
         ),
       );
     }
-
     switch (layoutType) {
       case ButtonLayoutType.textOnly:
-        return Text(text ?? '', style: textStyle);
-
+        return Text(
+          text ?? '',
+          style: textStyle,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
+        );
       case ButtonLayoutType.iconOnly:
-        return icon ?? const SizedBox.shrink();
-
+        return _iconWidget();
       case ButtonLayoutType.iconLeft:
         return Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            icon ?? const SizedBox.shrink(),
+            _iconWidget(),
             SizedBox(width: iconTextSpacing),
-            Text(text ?? '', style: textStyle),
+            Flexible(
+              child: Text(
+                text ?? '',
+                style: textStyle,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
           ],
         );
-
       case ButtonLayoutType.iconRight:
         return Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(text ?? '', style: textStyle),
+            Flexible(
+              child: Text(
+                text ?? '',
+                style: textStyle,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
             SizedBox(width: iconTextSpacing),
-            icon ?? const SizedBox.shrink(),
+            _iconWidget(),
           ],
         );
-
       case ButtonLayoutType.iconTop:
         return Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            icon ?? const SizedBox.shrink(),
+            _iconWidget(),
             SizedBox(height: iconTextSpacing),
             Text(
               text ?? '',
               style: textStyle,
               textAlign: TextAlign.center,
-              maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
           ],
         );
-
       case ButtonLayoutType.iconBottom:
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -332,11 +461,21 @@ class appButtons extends StatelessWidget {
               text ?? '',
               style: textStyle,
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
             SizedBox(height: iconTextSpacing),
-            icon ?? const SizedBox.shrink(),
+            _iconWidget(),
           ],
         );
     }
+  }
+
+  Widget _iconWidget() {
+    if (icon == null) return const SizedBox.shrink();
+    return IconTheme(
+      data: IconThemeData(color: iconColor, size: 22),
+      child: icon!,
+    );
   }
 }
