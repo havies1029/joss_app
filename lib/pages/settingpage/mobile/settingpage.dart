@@ -10,6 +10,10 @@ import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../login/mobile/user/widget/popup_user_widget.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_bank.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_contact.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_general_cmp.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_general_idv.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_pajak.dart';
 import '../../profilepage/mobile/profile/profile_page.dart';
 
@@ -42,7 +46,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return CircleAvatar(
       radius: 30,
       backgroundColor: primaryColor,
-      child: Text(initials, style: TextStyle(color: Colors.black, fontSize: getResponsiveFont(context, 20), fontWeight: FontWeight.w700)),
+      child: Text(initials, style: TextStyle(color: Colors.white, fontSize: getResponsiveFont(context, 20), fontWeight: FontWeight.w700)),
     );
   }
 
@@ -58,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SnackBar(
         content: Text(
           message,
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: primaryColor,
         behavior: SnackBarBehavior.floating,
@@ -262,14 +266,26 @@ class _SettingsPageState extends State<SettingsPage> {
                         icon: Icons.info_outline,
                         title: 'Informasi Klien',
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MRekanPajakFormBody(viewMode: 'tambah', recordId: '',),
-                            ),
-                          );
+                          final mjnsclientId = context.read<UserProfileCubit>().state.mjnsclientId;
+
+                          if (mjnsclientId == '10') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MRekanGeneralIdvCrudFormPage(),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MRekanGeneralCmpCrudFormPage(),
+                              ),
+                            );
+                          }
                         },
                       ),
+
                       _buildMenuItem(
                         icon: Icons.location_on_outlined,
                         title: 'Kontak & Alamat',
@@ -277,7 +293,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ProfilePage(),
+                              builder: (context) => const MRekanContactCrudFormPage(),
                             ),
                           );
                         },
@@ -289,7 +305,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ProfilePage(),
+                              builder: (context) => const MRekanBankCrudFormPage(viewMode: 'tambah', recordId: '',),
                             ),
                           );
                         },
@@ -417,7 +433,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Icon(
               icon,
-              color: iconColor ?? Colors.black,
+              color: iconColor ?? Colors.white,
               size: 24,
             ),
             const SizedBox(width: 15),
@@ -425,7 +441,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: titleColor ?? Colors.black,
+                  color: titleColor ?? Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),

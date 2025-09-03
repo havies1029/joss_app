@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 
 import '../../common/constants.dart';
 
-class WelcomeHeader extends StatelessWidget {
-  const WelcomeHeader({super.key});
+class WelcomeHeaderRegister extends StatelessWidget {
+  const WelcomeHeaderRegister({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class WelcomeHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Selamat Datang Kembali!",
+                "Baru di JPS?",
                 style: TextStyle(
                   fontSize: isDesktop(context)
                       ? 28
@@ -30,7 +30,7 @@ class WelcomeHeader extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               const Text(
-                "👋",
+                "🎉",
                 style: TextStyle(fontSize: 22),
               ),
             ],
@@ -40,7 +40,7 @@ class WelcomeHeader extends StatelessWidget {
 
           // Subtitle
           Text(
-            "Yuk masuk, semua polis & klaimmu siap diakses.",
+            "Yuk, buat akun dan mulai proteksi hidupmu.",
             style: TextStyle(
               fontSize: isDesktop(context)
                   ? 18

@@ -63,9 +63,13 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           listener: (context, state) {
             final nama = state.record?.rekanNama?.trim();
             final mrekan1Id = state.record?.mrekan1Id;
+            final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 
             if (nama != null && nama.isNotEmpty) {
-              context.read<UserProfileCubit>().setProfile(nama: nama);
+              context.read<UserProfileCubit>().setProfile(
+                nama: nama,
+                mjnsclientId: mjnsclientId, // 👈 simpan juga
+              );
             }
 
             if (mrekan1Id != null && mrekan1Id.isNotEmpty) {

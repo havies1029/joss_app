@@ -2,8 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/profilepage/mobile/profile/form_section/rekan_pajak.dart';
+import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
+import 'package:joss_app/repositories/gen_profile/mrekanbankcrud_repository.dart';
+import 'package:joss_app/repositories/gen_profile/mrekangeneralcmpcrud_repository.dart';
+import 'package:joss_app/repositories/gen_profile/mrekangeneralidvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpajakcrud_repository.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -33,6 +38,8 @@ import 'package:joss_app/repositories/profile/userfoto_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
 
+import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
+import 'blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 
 Future<void> main() async {
@@ -73,6 +80,9 @@ Future<void> main() async {
         BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
         BlocProvider(create: (_) => MRekanContactListBloc()),
         BlocProvider(create: (_) => MRekanPajakCrudBloc(repository: MRekanPajakCrudRepository())),
+        BlocProvider(create: (_) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository())),
+        BlocProvider(create: (_) => MRekanGeneralIdvCrudBloc(repository: MRekanGeneralIdvCrudRepository())),
+        BlocProvider(create: (_) => MRekanGeneralCmpCrudBloc(repository: MRekanGeneralCmpCrudRepository())),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
       ],
       child: MultiBlocListener(
@@ -176,6 +186,39 @@ class _App extends StatelessWidget {
           return const LoadingIndicator();
         },
       ),
+      // home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      //   builder: (context, state) {
+      //     if (state is AuthenticationAuthenticated) {
+      //       return HomeTabWidget(userRepository: userRepository);
+      //     }
+      //     if (state is AuthenticationUnauthenticated) {
+      //       return const LoginClient();
+      //     }
+      //     if (state is AuthenticationRequireLoginClient) {
+      //       return const LoginClient(); // atau bikin LoginClientPage khusus
+      //     }
+      //     if (state is AuthenticationRequireRegisterClient) {
+      //       return const RegisterClientPage();
+      //     }
+      //     if (state is AuthenticationForgotPassword) {
+      //       return const ForgotPasswordPage();
+      //     }
+      //     if (state is AuthenticationRequirePinHPVerification) {
+      //       return OtpHpPage(hp: state.hpno);
+      //     }
+      //     if (state is AuthenticationRequirePinEmailVerification) {
+      //       return OtpEmailPage(email: state.email);
+      //     }
+      //     if (state is AuthenticationPhonePinVerified) {
+      //       // contoh: paksa logout lalu balik ke login
+      //       context.read<AuthenticationBloc>().add(LoggedOut());
+      //       return const LoginClient();
+      //     }
+      //
+      //     // default → loading
+      //     return const LoadingIndicator();
+      //   },
+      // ),
     );
   }
 }

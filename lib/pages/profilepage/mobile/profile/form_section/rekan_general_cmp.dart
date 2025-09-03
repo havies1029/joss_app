@@ -1,5 +1,7 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekangeneralcmpcrud_model.dart';
@@ -8,319 +10,346 @@ import 'package:joss_app/widgets/combobox/combombentukcst_widget.dart';
 import 'package:joss_app/models/combobox/combombidang_model.dart';
 import 'package:joss_app/widgets/combobox/combombidang_widget.dart';
 
-class RekanGeneralCmp extends StatefulWidget {
-  const RekanGeneralCmp({super.key});
+import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
+import '../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../helper/image_uploader.dart';
+import '../../../../../widgets/form_error.dart';
+import '../../../../base/base_background_sidepage.dart';
+
+class MRekanGeneralCmpCrudFormPage extends StatefulWidget {
+  const MRekanGeneralCmpCrudFormPage({super.key});
 
   @override
-  State<RekanGeneralCmp> createState() => _RekanGeneralCmpState();
+  MRekanGeneralCmpCrudFormPageFormState createState() =>
+      MRekanGeneralCmpCrudFormPageFormState();
 }
 
-class _RekanGeneralCmpState extends State<RekanGeneralCmp> {
+class MRekanGeneralCmpCrudFormPageFormState
+    extends State<MRekanGeneralCmpCrudFormPage> {
+  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   final _formKey = GlobalKey<FormState>();
-  late MRekanGeneralCmpCrudBloc bloc;
-
-  final TextEditingController fieldRekanNamaController = TextEditingController();
-  ComboMBentukCstModel? fieldComboMBentukCst;
-  ComboMBidangModel? fieldComboMBidang;
-
-  bool isEditingSection = false;
   final List<String> errors = [];
+  ComboMBentukCstModel? fieldComboMBentukCst;
+  final comboMBentukCstKey =
+  GlobalKey<DropdownSearchState<ComboMBentukCstModel>>();
+  ComboMBidangModel? fieldComboMBidang;
+  final comboMBidangKey = GlobalKey<DropdownSearchState<ComboMBidangModel>>();
+  var fieldRekanNamaController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      bloc.add(MRekanGeneralCmpCrudLihatEvent());
+    Future.delayed(const Duration(milliseconds: 500), () {
+      loadData();
     });
   }
 
   @override
-  void dispose() {
-    fieldRekanNamaController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    bloc = BlocProvider.of<MRekanGeneralCmpCrudBloc>(context);
+    // init bloc contact
+    mRekanGeneralCmpCrudBloc = BlocProvider.of<MRekanGeneralCmpCrudBloc>(context);
 
-    return BlocConsumer<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
-      listener: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          fieldRekanNamaController.text = state.record?.rekanNama ?? '';
-          fieldComboMBentukCst = state.comboMBentukCst;
-          fieldComboMBidang = state.comboMBidang;
-        }
-      },
-      builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: _buildFormUI(),
-        );
-      },
-    );
-  }
-  Widget _buildFormUI() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+    final screenHeight = MediaQuery.of(context).size.height;
+    final headerSpacing = screenHeight * 0.025;
+
+    // Avatar sizing (biar gampang tuning)
+    const double avatarRadius = 50;
+    const double avatarRingPadding = 3;
+    const double avatarBorderWidth = 2;
+
+    // Ruang di atas konten untuk avatar (radius + margin)
+    const double contentTopPadding = 120;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: primaryBlackColor,
+      body: SafeArea(
+        child: BaseBackgroundSidePage(
+          backgroundAsset: "assets/images/background_gradient.png",
+          fadeHeight: 300,
+          title: 'Informasi Klien',
+          child: Column(
             children: [
-              const Expanded(
-                child: Text(
-                  "Informasi Perusahaan :",
-                  style: TextStyle(fontSize: 17.5, fontWeight: FontWeight.bold),
+              SizedBox(height: headerSpacing * 4),
+              // di parent Column pastikan dibungkus Expanded ya:
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(                // ⬅️ hanya atas
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: secondaryBlackColor, // panel hitamnya di sini
+                      borderRadius: BorderRadius.only(                // ⬅️ hanya atas
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                      border: const Border(
+                        top: BorderSide(color: primaryColor, width: 4.0),
+                      ),
+                    ),
+                    child: Stack(
+                      alignment: Alignment.topCenter,
+                      children: [
+                        // --- FORM stretch sampai bawah + tetap bisa scroll ---
+                        CustomScrollView(
+                          physics: const NeverScrollableScrollPhysics(), // ⬅️ matiin scroll gesture
+                          slivers: [
+                            SliverPadding(
+                              padding: EdgeInsets.fromLTRB(
+                                16,
+                                contentTopPadding, // ruang buat avatar
+                                16,
+                                24 + MediaQuery.of(context).viewInsets.bottom, // aman dari keyboard
+                              ),
+                              sliver: SliverFillRemaining(
+                                hasScrollBody: false, // ⬅️ ini yang bikin "stretch"
+                                child: BlocConsumer<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                                  listener: (context, state) {
+                                    if (state.isLoaded) {
+                                      if (state.record != null) {
+                                        fieldRekanNamaController.text = state.record?.rekanNama ?? "";
+                                      }
+                                      fieldComboMBentukCst = state.comboMBentukCst;
+                                      fieldComboMBidang = state.comboMBidang;
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    return Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          const SizedBox(height: 10),
+
+                                          // Heading + subheading
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: fieldSpacing), // 20.0 dari constants
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start, // mulai dari start
+                                              children: [
+                                                Text(
+                                                  "Informasi Perusahaan",
+                                                  textAlign: TextAlign.start,
+                                                  style: TextStyle(
+                                                    fontSize: getResponsiveFont(context, 22),
+                                                    fontWeight: FontWeight.w600,
+                                                    color: primaryLightColor,     // warna brand dari constants
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Lengkapi identitas dasar Anda dengan benar.",
+                                                  style: TextStyle(
+                                                    fontSize: getResponsiveFont(context, 16),          // lebih kecil dari judul
+                                                    fontWeight: FontWeight.w400,
+                                                    color: sGrey,         // teks sekunder dari constants
+                                                    height: 1.3,             // biar terbaca nyaman
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          // Fields
+                                          buildFieldRekanNama(),
+                                          const SizedBox(height: vPadding),
+                                          buildFieldMbentukcstId(),
+                                          const SizedBox(height: vPadding),
+                                          buildFieldMbidangId(),
+
+                                          const SizedBox(height: 25),
+                                          FormError(errors: errors, key: null),
+
+                                          const SizedBox(height: 16),
+                                          appButton(
+                                            text: "Submit",
+                                            onPressed: onSaveForm,
+                                            width: MediaQuery.of(context).size.width * 0.3,
+                                          ),
+
+                                          const Spacer(), // ⬅️ dorong konten biar panel tetap nempel bawah saat konten pendek
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // --- Avatar tetap di atas tengah ---
+                        Positioned(
+                          top: 16,
+                          child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                            buildWhen: (prev, curr) =>
+                            (prev.fotoBytes?.lengthInBytes ?? -1) != (curr.fotoBytes?.lengthInBytes ?? -1),
+                            builder: (context, state) {
+                              final imageBytes = state.fotoBytes;
+                              return InkResponse(
+                                onTap: () => ImageUploader.pickAndUpload(context),
+                                containedInkWell: true,
+                                customBorder: const CircleBorder(),
+                                radius: avatarRadius + 14,
+                                child: Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(avatarRingPadding),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: primaryBlackColor,
+                                        border: Border.all(color: sGrey, width: avatarBorderWidth),
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: avatarRadius,
+                                        backgroundColor: secondaryBlackColor,
+                                        backgroundImage: (imageBytes != null && imageBytes.isNotEmpty)
+                                            ? MemoryImage(imageBytes)
+                                            : null,
+                                        child: (imageBytes == null || imageBytes.isEmpty)
+                                            ? const Icon(Icons.person, color: Colors.white, size: 48)
+                                            : null,
+                                      ),
+                                    ),
+                                    const Positioned(
+                                      bottom: 4,
+                                      right: 4,
+                                      child: IgnorePointer(
+                                        ignoring: true,
+                                        child: CircleAvatar(
+                                          radius: 18,
+                                          backgroundColor: Colors.black87,
+                                          child: Icon(Icons.camera_alt, color: Color(0xffff6101), size: 18),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  isEditingSection ? Icons.check : Icons.edit,
-                  color: isEditingSection ? null : Colors.red,
-                ),
-                tooltip: isEditingSection ? "Simpan" : "Ubah",
-                onPressed: () {
-                  if (isEditingSection) {
-                    onSaveForm();
-                  } else {
-                    setState(() => isEditingSection = true);
-                  }
-                },
               ),
             ],
           ),
-          const SizedBox(height: 12),
-
-          _buildLabelText("Nama Badan Usaha", isRequired: true),
-          const SizedBox(height: 6),
-          _buildTextField(
-            controller: fieldRekanNamaController,
-            hintText: "Masukkan nama perusahaan",
-          ),
-          if (fieldRekanNamaController.text.trim().isEmpty && isEditingSection)
-            const Padding(
-              padding: EdgeInsets.only(top: 4),
-              child: Text(
-                "Nama perusahaan wajib dipilih",
-                style: TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ),
-
-          const SizedBox(height: 12),
-          _buildLabelText("Bentuk Badan Usaha", isRequired: true),
-          const SizedBox(height: 6),
-          _buildStyledDropdown(
-            child: isEditingSection
-                ? buildFieldComboMBentukCst(
-              labelText: 'Pilih',
-              initItem: fieldComboMBentukCst,
-              onChangedCallback: (value) {
-                if (value != null) {
-                  fieldComboMBentukCst = value;
-                  bloc.add(ComboMBentukCstChangedEvent(comboMBentukCst: value));
-                  removeError("Field bentuk usaha tidak boleh kosong.");
-                }
-              },
-              onSaveCallback: (value) {
-                if (value != null) fieldComboMBentukCst = value;
-              },
-              validatorCallback: (value) {
-                if (value == null) addError("Field bentuk usaha tidak boleh kosong.");
-              },
-              comboKey: null,
-            )
-                : _buildDisabledDropdown(
-              text: fieldComboMBentukCst?.bentukNama ?? 'Belum diisi',
-            ),
-          ),
-          if (fieldComboMBentukCst == null && isEditingSection)
-            const Padding(
-              padding: EdgeInsets.only(top: 4),
-              child: Text(
-                "Badan usaha wajib dipilih",
-                style: TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ),
-
-          const SizedBox(height: 12),
-          _buildLabelText("Bidang Usaha", isRequired: true),
-          const SizedBox(height: 6),
-          _buildStyledDropdown(
-            child: isEditingSection
-                ? buildFieldComboMBidang(
-              labelText: 'Pilih',
-              initItem: fieldComboMBidang,
-              onChangedCallback: (value) {
-                if (value != null) {
-                  fieldComboMBidang = value;
-                  bloc.add(ComboMBidangChangedEvent(comboMBidang: value));
-                  removeError("Field bidang usaha tidak boleh kosong.");
-                }
-              },
-              onSaveCallback: (value) {
-                if (value != null) fieldComboMBidang = value;
-              },
-              validatorCallback: (value) {
-                if (value == null) addError("Field bidang usaha tidak boleh kosong.");
-              },
-              comboKey: null,
-            )
-                : _buildDisabledDropdown(
-              text: fieldComboMBidang?.bidangNama ?? 'Belum diisi',
-            ),
-          ),
-          if (fieldComboMBidang == null && isEditingSection)
-            const Padding(
-              padding: EdgeInsets.only(top: 4),
-              child: Text(
-                "Bidang usaha wajib dipilih",
-                style: TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ),
-
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildLabelText(String text, {bool isRequired = false}) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            text,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-          if (isRequired)
-            const Padding(
-              padding: EdgeInsets.only(left: 4),
-              child: Text(
-                '*',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-        ],
-      ),
+  void loadData() {
+    mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+  }
+
+  Widget buildFieldMbentukcstId() {
+    return buildFieldComboMBentukCst(
+      comboKey: comboMBentukCstKey,
+      labelText: 'mbentukcstId',
+      initItem: fieldComboMBentukCst,
+      onChangedCallback: (value) {
+        if (value != null) {
+          removeError(error: "Field ComboMBentukCst tidak boleh kosong.");
+          mRekanGeneralCmpCrudBloc
+              .add(ComboMBentukCstChangedEvent(comboMBentukCst: value));
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          fieldComboMBentukCst = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          addError(error: "Field ComboMBentukCst tidak boleh kosong.");
+        }
+      },
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType keyboardType = TextInputType.text,
-    int? maxLines = 1,
-  }) {
+  Widget buildFieldMbidangId() {
+    return buildFieldComboMBidang(
+      comboKey: comboMBidangKey,
+      labelText: 'mbidangId',
+      initItem: fieldComboMBidang,
+      onChangedCallback: (value) {
+        if (value != null) {
+          removeError(error: "Field ComboMBidang tidak boleh kosong.");
+          mRekanGeneralCmpCrudBloc
+              .add(ComboMBidangChangedEvent(comboMBidang: value));
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          fieldComboMBidang = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          addError(error: "Field ComboMBidang tidak boleh kosong.");
+        }
+      },
+    );
+  }
+
+  Widget buildFieldRekanNama() {
     return TextFormField(
-      controller: controller,
-      readOnly: !isEditingSection,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(fontFamily: 'Satoshi', fontSize: 14, color: Colors.grey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade400, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade400, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue.shade400, width: 1.5),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        filled: true,
-        fillColor: isEditingSection ? Colors.white : Colors.grey.shade50,
-        alignLabelWithHint: true,
-        isDense: true,
-      ),
-      style: const TextStyle(fontFamily: 'Satoshi', fontSize: 14, height: 1.3),
-      textAlignVertical: TextAlignVertical.top,
+      keyboardType: TextInputType.multiline,
+      minLines: 1,
+      maxLines: 3,
+      controller: fieldRekanNamaController,
+      style: const TextStyle(color: primaryLightColor), // isi teks putih
+      decoration: customInputDecoration("rekanNama"),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kStringNullError);
+        }
+        fieldRekanNamaController.text = value;
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          addError("Field nama badan usaha tidak boleh kosong.");
+          addError(error: kStringNullError);
           return "";
         }
         return null;
       },
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError("Field nama badan usaha tidak boleh kosong.");
-        }
-      },
-    );
-  }
-
-  Widget _buildStyledDropdown({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildDisabledDropdown({required String text}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(fontFamily: 'Satoshi', fontSize: 14, color: Colors.black87),
-      ),
     );
   }
 
   void onSaveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
-      final record = MRekanGeneralCmpCrudModel(
-        rekanNama: fieldRekanNamaController.text,
+      MRekanGeneralCmpCrudModel record = MRekanGeneralCmpCrudModel(
         mbentukcstId: fieldComboMBentukCst?.mbentukcstId,
         mbidangId: fieldComboMBidang?.mbidangId,
+        rekanNama: fieldRekanNamaController.text,
       );
 
-      bloc.add(MRekanGeneralCmpCrudUbahEvent(record: record));
-
-      setState(() => isEditingSection = false);
+      mRekanGeneralCmpCrudBloc
+          .add(MRekanGeneralCmpCrudUbahEvent(record: record));
     }
   }
 
-  void addError(String error) {
+  void addError({required String error}) {
     if (!errors.contains(error)) {
-      setState(() => errors.add(error));
+      setState(() {
+        errors.add(error);
+      });
     }
   }
 
-  void removeError(String error) {
+  void removeError({required String error}) {
     if (errors.contains(error)) {
-      setState(() => errors.remove(error));
+      setState(() {
+        errors.remove(error);
+      });
     }
   }
 }
