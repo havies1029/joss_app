@@ -9,6 +9,13 @@ import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 import '../widgets/logout_popup.dart';
 import 'package:joss_app/pages/settingpage/widgets/ubah_password_popup.dart';
+import '../../login/mobile/user/widget/popup_user_widget.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_bank.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_contact.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_general_cmp.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_general_idv.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_pajak.dart';
+import '../../profilepage/mobile/profile/profile_page.dart';
 
 const List<String> scopes = <String>['email'];
 
@@ -54,6 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             child: Column(
               children: [
+                // ================== PROFILE SECTION ==================
                 BlocBuilder<UserProfileCubit, UserProfileState>(
                   buildWhen: (prev, curr) {
                     final nameChanged = prev.nama != curr.nama;
@@ -209,10 +217,78 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   child: Column(
                     children: [
+                      // _buildMenuItem(
+                      //   icon: Icons.person_outline,
+                      //   title: 'Kelola Profil',
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => const ProfilePage(), // ⬅️ buka ProfilePage
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                       _buildMenuItem(
-                        icon: Icons.person_outline,
-                        title: 'Kelola Profil',
-                        onTap: () => successSnackBar('Kelola Profil diklik'),
+                        icon: Icons.info_outline,
+                        title: 'Informasi Klien',
+                        onTap: () {
+                          final mjnsclientId =
+                              context
+                                  .read<UserProfileCubit>()
+                                  .state
+                                  .mjnsclientId;
+
+                          if (mjnsclientId == '10') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const MRekanGeneralIdvCrudFormPage(),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const MRekanGeneralCmpCrudFormPage(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      _buildMenuItem(
+                        icon: Icons.location_on_outlined,
+                        title: 'Kontak & Alamat',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      const MRekanContactCrudFormPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildMenuItem(
+                        icon: Icons.account_balance_outlined,
+                        title: 'Rekening Bank',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const MRekanBankCrudFormPage(
+                                    viewMode: 'tambah',
+                                    recordId: '',
+                                  ),
+                            ),
+                          );
+                        },
                       ),
                       _buildDivider(),
                       _buildMenuItem(

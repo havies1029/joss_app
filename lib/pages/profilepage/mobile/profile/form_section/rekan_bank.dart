@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
@@ -10,343 +11,387 @@ import 'package:joss_app/models/combobox/combombank_model.dart';
 import 'package:joss_app/widgets/combobox/combombank_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-class RekanBank extends StatefulWidget {
-  final String? initialRecordId;
+import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
+import '../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../helper/image_uploader.dart';
+import '../../../../../widgets/form_error.dart';
+import '../../../../base/base_background_sidepage.dart';
 
-  const RekanBank({super.key, this.initialRecordId});
+
+class MRekanBankCrudFormPage extends StatefulWidget {
+  final String viewMode;
+  final String recordId;
+
+  const MRekanBankCrudFormPage({super.key, required this.viewMode, required this.recordId});
 
   @override
-  RekanBankState createState() => RekanBankState();
+  MRekanBankCrudFormPageFormState createState() => MRekanBankCrudFormPageFormState();
 }
 
-class RekanBankState extends State<RekanBank> {
+class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   late MRekanBankCrudBloc mRekanBankCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
-
-  final fieldMrekan1IdController = TextEditingController();
-  final fieldRekNamaController = TextEditingController();
-  final fieldRekNoController = TextEditingController();
-
-  final comboMBankKey = GlobalKey<DropdownSearchState<ComboMBankModel>>();
   ComboMBankModel? fieldComboMBank;
-
-  bool isEditingSection = false;
+  final comboMBankKey = GlobalKey<DropdownSearchState<ComboMBankModel>>();
+  var fieldMrekan1IdController = TextEditingController();
+  var fieldRekNamaController = TextEditingController();
+  var fieldRekNoController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(Duration.zero, () {
-      mRekanBankCrudBloc = context.read<MRekanBankCrudBloc>();
-      mRekanBankCrudBloc = context.read<MRekanBankCrudBloc>();
-      final rekan1State = context.read<MRekan1CrudBloc>().state;
-
-      final defaultRekanId = rekan1State.record?.mrekan1Id ?? '';
-      final rekanNama = rekan1State.record?.rekanNama ?? 'lenomind1@gmail.com';
-
-      fieldMrekan1IdController.text = defaultRekanId;
-
-      final idToLoad = widget.initialRecordId ?? rekanNama;
-
-      // Contoh log (opsional)
-      // debugPrint('[initState] Rekan ID: $defaultRekanId');
-      // debugPrint('[initState] Rekan Nama: $rekanNama');
-      // debugPrint('[initState] idToLoad: $idToLoad');
-
-      if (idToLoad.isNotEmpty) {
-        // debugPrint("📨 Kirim LihatEvent manual dengan ID: $idToLoad");
-        mRekanBankCrudBloc.add(MRekanBankCrudLihatEvent(recordId: idToLoad));
-      } else {
-        // debugPrint("⚠️ Tidak kirim LihatEvent karena initialRecordId kosong");
-      }
+    Future.delayed(const Duration(milliseconds: 500), () {
+      loadData();
     });
-
-  }
-
-
-  @override
-  void dispose() {
-    fieldMrekan1IdController.dispose();
-    fieldRekNamaController.dispose();
-    fieldRekNoController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<MRekanBankCrudBloc, MRekanBankCrudState>(
-      listener: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          fieldMrekan1IdController.text = state.record!.mrekan1Id;
-          fieldRekNamaController.text = state.record!.rekNama;
-          fieldRekNoController.text = state.record!.rekNo;
-          fieldComboMBank = state.record!.comboMBank;
-        }
+    // init bloc contact
+    mRekanBankCrudBloc = BlocProvider.of<MRekanBankCrudBloc>(context);
 
-        // ⏱ REFRESH ulang data jika sudah disimpan
-        if (state.isSaved) {
-          final currentId = state.record?.mrekanbankId;
-          if (currentId != null && currentId.isNotEmpty) {
-            // debugPrint("🔁 Refresh ulang setelah simpan, id: $currentId");
-            context.read<MRekanBankCrudBloc>().add(MRekanBankCrudLihatEvent(recordId: currentId));
+    final screenHeight = MediaQuery.of(context).size.height;
+    final headerSpacing = screenHeight * 0.025;
 
-            // ⛔️ Cegah loop: reset status setelah trigger
-            Future.delayed(Duration(milliseconds: 100), () {
-              context.read<MRekanBankCrudBloc>().add(MRekanBankCrudResetStatusEvent());
-            });
-          }
-        }
-      },
-      builder: (context, state) {
-        return Container(
-          color: Colors.white,
-          padding: const EdgeInsets.all(12),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        "Informasi Rekening :",
-                        style: TextStyle(fontSize: 17.5, fontWeight: FontWeight.bold),
+    // Avatar sizing (biar gampang tuning)
+    const double avatarRadius = 50;
+    const double avatarRingPadding = 3;
+    const double avatarBorderWidth = 2;
+
+    // Ruang di atas konten untuk avatar (radius + margin)
+    const double contentTopPadding = 120;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: primaryBlackColor,
+      body: SafeArea(
+        child: BaseBackgroundSidePage(
+          backgroundAsset: "assets/images/background_gradient.png",
+          fadeHeight: 300,
+          title: 'Rekening Bank',
+          child: Column(
+            children: [
+              SizedBox(height: headerSpacing * 4),
+              // di parent Column pastikan dibungkus Expanded ya:
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(                // ⬅️ hanya atas
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: secondaryBlackColor, // panel hitamnya di sini
+                      borderRadius: BorderRadius.only(                // ⬅️ hanya atas
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                      border: const Border(
+                        top: BorderSide(color: primaryColor, width: 4.0),
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(
-                        isEditingSection ? Icons.check : Icons.edit,
-                        color: isEditingSection ? null : Colors.red, // merah hanya saat edit mode = false
-                      ),
-                      onPressed: () {
-                        if (isEditingSection) {
-                          onSaveForm(state);
-                        } else {
-                          setState(() => isEditingSection = true);
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                    child: Stack(
+                      alignment: Alignment.topCenter,
+                      children: [
+                        // --- FORM stretch sampai bawah + tetap bisa scroll ---
+                        CustomScrollView(
+                          physics: const NeverScrollableScrollPhysics(), // ⬅️ matiin scroll gesture
+                          slivers: [
+                            SliverPadding(
+                              padding: EdgeInsets.fromLTRB(
+                                16,
+                                contentTopPadding, // ruang buat avatar
+                                16,
+                                24 + MediaQuery.of(context).viewInsets.bottom, // aman dari keyboard
+                              ),
+                              sliver: SliverFillRemaining(
+                                hasScrollBody: false, // ⬅️ ini yang bikin "stretch"
+                                child: BlocConsumer<MRekanBankCrudBloc, MRekanBankCrudState>(
+                                  listener: (context, state) {
+                                    if (state.isLoaded) {
+                                      if (state.record != null) {
+                                        fieldMrekan1IdController.text = state.record!.mrekan1Id;
+                                        fieldRekNamaController.text = state.record!.rekNama;
+                                        fieldRekNoController.text = state.record!.rekNo;
+                                      }
+                                      fieldComboMBank = state.comboMBank;
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    return Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          const SizedBox(height: 10),
 
-                const SizedBox(height: 12),
+                                          // Heading + subheading
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: fieldSpacing),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Rekening Bank",
+                                                  style: TextStyle(
+                                                    fontSize: getResponsiveFont(context, 22),
+                                                    fontWeight: FontWeight.w600,
+                                                    color: primaryLightColor,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Lengkapi data rekening untuk pencairan klaim.",
+                                                  style: TextStyle(
+                                                    fontSize: getResponsiveFont(context, 16),
+                                                    fontWeight: FontWeight.w400,
+                                                    color: sGrey,
+                                                    height: 1.3,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
 
-                _buildLabel("Rekening Bank", isRequired: true),
-                _buildStyledDropdown(
-                  child: isEditingSection
-                      ? buildFieldComboMBank(
-                    comboKey: comboMBankKey,
-                    labelText: "Pilih Bank",
-                    initItem: fieldComboMBank,
-                    onChangedCallback: (value) {
-                      if (value != null) {
-                        setState(() => fieldComboMBank = value);
-                        context.read<MRekanBankCrudBloc>().add(ComboMBankChangedEvent(comboMBank: value));
-                        removeError("Bank wajib dipilih");
-                      }
-                    },
-                    onSaveCallback: (value) => fieldComboMBank = value,
-                    validatorCallback: (value) {
-                      if (value == null) addError("Bank wajib dipilih");
-                    },
-                  )
-                      : _buildDisabledDropdown(fieldComboMBank?.bankNama ?? "Belum diisi"),
-                ),
-                if (fieldComboMBank == null && isEditingSection)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4),
-                    child: Text(
-                      "Bank wajib dipilih.",
-                      style: TextStyle(color: Colors.red, fontSize: 12),
+                                          // Fields
+                                          buildFieldMbankId(),
+                                          const SizedBox(height: vPadding),
+                                          buildFieldMrekan1Id(),
+                                          const SizedBox(height: vPadding),
+                                          buildFieldRekNama(),
+                                          const SizedBox(height: vPadding),
+                                          buildFieldRekNo(),
+
+                                          const SizedBox(height: 25),
+                                          FormError(errors: errors, key: null),
+
+                                          const SizedBox(height: 16),
+                                          appButton(
+                                            text: "Submit",
+                                            onPressed: onSaveForm,
+                                            width: MediaQuery.of(context).size.width * 0.3,
+                                          ),
+
+                                          const Spacer(), // ⬅️ dorong konten biar panel tetap nempel bawah saat konten pendek
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // --- Avatar tetap di atas tengah ---
+                        Positioned(
+                          top: 16,
+                          child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                            buildWhen: (prev, curr) =>
+                            (prev.fotoBytes?.lengthInBytes ?? -1) != (curr.fotoBytes?.lengthInBytes ?? -1),
+                            builder: (context, state) {
+                              final imageBytes = state.fotoBytes;
+                              return InkResponse(
+                                onTap: () => ImageUploader.pickAndUpload(context),
+                                containedInkWell: true,
+                                customBorder: const CircleBorder(),
+                                radius: avatarRadius + 14,
+                                child: Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(avatarRingPadding),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: primaryBlackColor,
+                                        border: Border.all(color: sGrey, width: avatarBorderWidth),
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: avatarRadius,
+                                        backgroundColor: secondaryBlackColor,
+                                        backgroundImage: (imageBytes != null && imageBytes.isNotEmpty)
+                                            ? MemoryImage(imageBytes)
+                                            : null,
+                                        child: (imageBytes == null || imageBytes.isEmpty)
+                                            ? const Icon(Icons.person, color: Colors.white, size: 48)
+                                            : null,
+                                      ),
+                                    ),
+                                    const Positioned(
+                                      bottom: 4,
+                                      right: 4,
+                                      child: IgnorePointer(
+                                        ignoring: true,
+                                        child: CircleAvatar(
+                                          radius: 18,
+                                          backgroundColor: Colors.black87,
+                                          child: Icon(Icons.camera_alt, color: Color(0xffff6101), size: 18),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-
-                _buildLabel("Nama Rekening", isRequired: true),
-                _buildTextField(
-                  controller: fieldRekNamaController,
-                  hintText: "Masukkan nama pemilik rekening",
-                  maxLines: 2,
-                  errorKey: "Nama rekening wajib dpilih",
-                ),
-                if (fieldRekNamaController.text.trim().isEmpty && isEditingSection)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4),
-                    child: Text(
-                      "Nama rekening wajib dpilih",
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                  ),
-
-                _buildLabel("No. Rekening", isRequired: true),
-                _buildTextField(
-                  controller: fieldRekNoController,
-                  hintText: "Masukkan nomor rekening",
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  errorKey: "Nomor rekening wajib dipilih",
-                ),
-                if (fieldRekNoController.text.trim().isEmpty && isEditingSection)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4),
-                    child: Text(
-                      "Nomor rekening wajib dipilih",
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                  ),
-
-
-                // if (errors.isNotEmpty)
-                //   Padding(
-                //     padding: const EdgeInsets.only(top: 12),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: errors
-                //           .map((e) => Text(e, style: const TextStyle(color: Colors.red, fontSize: 12)))
-                //           .toList(),
-                //     ),
-                //   ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildLabel(String text, {bool isRequired = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 6),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            text,
-            style: const TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-          if (isRequired)
-            const Padding(
-              padding: EdgeInsets.only(left: 4),
-              child: Text(
-                '*',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
 
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType keyboardType = TextInputType.text,
-    List<TextInputFormatter>? inputFormatters,
-    int? maxLines,
-    required String errorKey,
-  }) {
+  void loadData() {
+    if (widget.viewMode == "ubah") {
+      mRekanBankCrudBloc.add(
+          MRekanBankCrudLihatEvent(recordId: widget.recordId));
+    }
+  }
+
+  Widget buildFieldMbankId(){
+    return buildFieldComboMBank(
+      comboKey: comboMBankKey,
+      labelText: 'mbankId',
+      initItem: fieldComboMBank,
+      onChangedCallback: (value) {
+        if (value != null) {
+          removeError(
+              error: "Field ComboMBank tidak boleh kosong.");
+          mRekanBankCrudBloc.add(ComboMBankChangedEvent(comboMBank: value));
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          fieldComboMBank = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          addError(
+              error: "Field ComboMBank tidak boleh kosong.");
+        }
+      },
+    );
+  }
+
+  Widget buildFieldMrekan1Id(){
     return TextFormField(
-      controller: controller,
-      readOnly: !isEditingSection,
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      maxLines: maxLines ?? 1,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(fontFamily: 'Satoshi', fontSize: 14, color: Colors.grey),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade400)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.blue.shade400)),
-        disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        filled: true,
-        fillColor: isEditingSection ? Colors.white : Colors.grey.shade50,
-        isDense: true,
-      ),
-      style: const TextStyle(fontFamily: 'Satoshi', fontSize: 14),
+      controller: fieldMrekan1IdController,
+      style: const TextStyle(color: primaryLightColor), // isi teks putih
+      decoration: customInputDecoration("MRekan1Id"),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kStringNullError);
+        }
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          addError(errorKey);
+          addError(error: kStringNullError);
           return "";
         }
         return null;
       },
-        onChanged: (value) {
-          if (value != null) {
-            setState(() => fieldComboMBank = value as ComboMBankModel?);
-          }
+    );
+  }
+
+  Widget buildFieldRekNama(){
+    return TextFormField(
+      keyboardType: TextInputType.multiline,
+      minLines: 1,
+      maxLines: 3,
+      controller: fieldRekNamaController,
+      style: const TextStyle(color: primaryLightColor), // isi teks putih
+      decoration: customInputDecoration("rekNama"),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kStringNullError);
         }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kStringNullError);
+          return "";
+        }
+        return null;
+      },
     );
   }
 
-  Widget _buildStyledDropdown({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      child: child,
+  Widget buildFieldRekNo(){
+    return TextFormField(
+      controller: fieldRekNoController,
+      style: const TextStyle(color: primaryLightColor), // isi teks putih
+      decoration: customInputDecoration("rekNo"),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kStringNullError);
+        }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kStringNullError);
+          return "";
+        }
+        return null;
+      },
     );
   }
 
-  Widget _buildDisabledDropdown(String text) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(text, style: const TextStyle(fontFamily: 'Satoshi', fontSize: 14, color: Colors.black87)),
-    );
+  void _dismissDialog() {
+    Navigator.pop(context);
   }
 
-  void onSaveForm(MRekanBankCrudState state) {
+  void onSaveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final isNew = state.record == null || state.record!.mrekanbankId.isEmpty;
-
-      final record = MRekanBankCrudModel(
-        mrekan1Id: context.read<MRekan1CrudBloc>().state.record?.mrekan1Id ?? '',
-        mrekanbankId: isNew ? '' : state.record!.mrekanbankId,
+      MRekanBankCrudModel record = MRekanBankCrudModel(
+        mbankId: fieldComboMBank?.mbankId,
+        mrekan1Id: fieldMrekan1IdController.text,
+        mrekanbankId: '',
         rekNama: fieldRekNamaController.text,
         rekNo: fieldRekNoController.text,
-        mbankId: fieldComboMBank?.mbankId ?? '',
-        comboMBank: fieldComboMBank,
       );
 
+      print("📝 [onSaveForm] View Mode: ${widget.viewMode}");
+      print("📤 [onSaveForm] Data yang akan dikirim: ${record.toJson()}");
 
-      print("✅ mrekan1Id yang dikirim: '${record.mrekan1Id}' (${record.mrekan1Id.runtimeType})");
-      print("📤 Full JSON: ${record.toJson()}");
+      if (widget.viewMode == "tambah") {
+        mRekanBankCrudBloc.add(MRekanBankCrudTambahEvent(record: record));
+      } else if (widget.viewMode == "ubah") {
+        record.mrekanbankId = mRekanBankCrudBloc.state.record!.mrekanbankId;
+        print("✏️ [onSaveForm] ID untuk ubah: ${record.mrekanbankId}");
+        mRekanBankCrudBloc.add(MRekanBankCrudUbahEvent(record: record));
+      }
 
-      mRekanBankCrudBloc.add(MRekanBankCrudUbahEvent(record: record));
-
-      setState(() => isEditingSection = false);
+      _dismissDialog();
+    } else {
+      print("❌ [onSaveForm] Validasi form gagal.");
     }
   }
 
-  void addError(String error) {
-    if (!errors.contains(error)) {
-      setState(() => errors.add(error));
+  void addError({required String error}) {
+    if (!errors.contains(error)){
+      setState(() {
+        errors.add(error);
+      });
     }
   }
 
-  void removeError(String error) {
-    if (errors.contains(error)) {
-      setState(() => errors.remove(error));
+  void removeError({required String error}) {
+    if (errors.contains(error)){
+      setState(() {
+        errors.remove(error);
+      });
     }
   }
 }

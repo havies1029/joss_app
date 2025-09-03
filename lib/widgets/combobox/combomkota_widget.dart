@@ -3,10 +3,12 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/models/combobox/combomkota_model.dart';
 import 'package:joss_app/repositories/combobox/combomkota_repository.dart';
 
+import '../../common/constants.dart';
+
 DropdownSearch<ComboMKotaModel> buildFieldComboMKota({
 	required String labelText,
 	GlobalKey<DropdownSearchState<ComboMKotaModel>>? comboKey,
-	ComboMKotaModel? initItem,  
+	ComboMKotaModel? initItem,
   required String propinsiId,
 	Function(ComboMKotaModel?)? onChangedCallback,
 	required Function(ComboMKotaModel?) onSaveCallback,
@@ -14,7 +16,7 @@ DropdownSearch<ComboMKotaModel> buildFieldComboMKota({
 	}) {
 	return DropdownSearch<ComboMKotaModel>(
 		key: comboKey,
-		selectedItem: initItem,    
+		selectedItem: initItem,
 		decoratorProps: DropDownDecoratorProps(
 			decoration: InputDecoration(
 				hintText: '...',
@@ -25,13 +27,41 @@ DropdownSearch<ComboMKotaModel> buildFieldComboMKota({
 				return ComboMKotaRepository().getComboMKota(propinsiId);
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
-			popupProps: const PopupPropsMultiSelection.modalBottomSheet(
-				disableFilter: false,
-				showSelectedItems: true,
-				showSearchBox: false,
-				itemBuilder: itemBuilderComboMKota,
+		popupProps: PopupPropsMultiSelection.modalBottomSheet(
+			disableFilter: false,
+			showSelectedItems: true,
+			showSearchBox: true,
+			itemBuilder: itemBuilderComboMKota,
+
+			// 🔎 styling kotak filter
+			searchFieldProps: TextFieldProps(
+				style: const TextStyle(color: Colors.black),      // teks hitam
+				cursorColor: Colors.black,
+				decoration: InputDecoration(
+					hintText: 'Cari provinsi…',
+					hintStyle: const TextStyle(color: Colors.black54),
+					filled: true,
+					fillColor: Colors.white,                        // background putih biar kontras
+					prefixIcon: const Icon(Icons.search, color: Colors.black),
+					contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+					enabledBorder: OutlineInputBorder(
+						borderRadius: BorderRadius.circular(10),
+						borderSide: const BorderSide(color: Colors.black), // border hitam
+					),
+					focusedBorder: OutlineInputBorder(
+						borderRadius: BorderRadius.circular(10),
+						borderSide: const BorderSide(color: Colors.black, width: 1.5), // border hitam tebal saat fokus
+					),
+				),
 			),
-			compareFn: (item, sItem) => item.mkotaId == sItem.mkotaId,
+
+			// opsional: warna background sheet popup
+			modalBottomSheetProps: const ModalBottomSheetProps(
+				backgroundColor: Colors.white,
+			),
+		),
+
+		compareFn: (item, sItem) => item.mkotaId == sItem.mkotaId,
 			itemAsString: (item) {
 				return item.kotaDesc;
 			},
@@ -68,7 +98,12 @@ Widget itemBuilderComboMKota(
 			),
 		child: ListTile(
 			selected: isSelected,
-			title: Text(item.kotaDesc),
+			title: Text(
+				item.kotaDesc,
+				style: TextStyle(
+					color: isSelected ? primaryColor : Colors.black,
+				),
+			),
 		),
 	);
 }

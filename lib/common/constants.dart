@@ -160,3 +160,83 @@ const LinearGradient orangeToBlackGradientVertical = LinearGradient(
   ],
   stops: [0.0, 1.0],
 );
+
+InputDecoration customInputDecoration(String label) {
+  return InputDecoration(
+    labelText: label,
+    labelStyle: const TextStyle(
+      color: primaryColor, // label oranye
+      fontWeight: FontWeight.w500,
+    ),
+    filled: true,
+    fillColor: sGrey, // background field abu-abu
+    hintStyle: const TextStyle(color: hintGrey),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      borderSide: const BorderSide(color: sGrey, width: 1),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      borderSide: const BorderSide(color: primaryColor, width: 1.5),
+    ),
+  );
+}
+
+InputDecoration customDropdownDecoration(String label) {
+  return InputDecoration(
+    labelText: label,
+    labelStyle: const TextStyle(
+      color: primaryColor, // label oranye
+      fontWeight: FontWeight.w500,
+    ),
+    filled: true,
+    fillColor: sGrey, // background field abu-abu
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      borderSide: const BorderSide(color: sGrey, width: 1),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      borderSide: const BorderSide(color: primaryColor, width: 1.5),
+    ),
+  );
+}
+
+Widget appButton({
+  required String text,
+  required VoidCallback onPressed,
+  double? width,
+  double height = 56,
+  Color backgroundColor = primaryColor,
+  Color textColor = primaryLightColor,
+  double borderRadius = cardBorderRadius,
+  double fontSize = 14,
+  FontWeight fontWeight = FontWeight.w600,
+  EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 16),
+}) {
+  return SizedBox(
+    width: width,
+    height: height,
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        elevation: 0,
+        padding: padding,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+        ),
+      ),
+    ),
+  );
+}

@@ -3,6 +3,8 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/models/combobox/combombank_model.dart';
 import 'package:joss_app/repositories/combobox/combombank_repository.dart';
 
+import '../../common/constants.dart';
+
 DropdownSearch<ComboMBankModel> buildFieldComboMBank({
 	required String labelText,
 	GlobalKey<DropdownSearchState<ComboMBankModel>>? comboKey,
@@ -24,11 +26,39 @@ DropdownSearch<ComboMBankModel> buildFieldComboMBank({
 				return ComboMBankRepository().getComboMBank();
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
-			popupProps: PopupProps.modalBottomSheet(
-				showSearchBox: false,
-				showSelectedItems: true,
-				itemBuilder: itemBuilderComboMBank,
+		popupProps: PopupPropsMultiSelection.modalBottomSheet(
+			disableFilter: false,
+			showSelectedItems: true,
+			showSearchBox: true,
+			itemBuilder: itemBuilderComboMBank,
+
+			// 🔎 styling kotak filter
+			searchFieldProps: TextFieldProps(
+				style: const TextStyle(color: Colors.black),      // teks hitam
+				cursorColor: Colors.black,
+				decoration: InputDecoration(
+					hintText: 'Cari provinsi…',
+					hintStyle: const TextStyle(color: Colors.black54),
+					filled: true,
+					fillColor: Colors.white,                        // background putih biar kontras
+					prefixIcon: const Icon(Icons.search, color: Colors.black),
+					contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+					enabledBorder: OutlineInputBorder(
+						borderRadius: BorderRadius.circular(10),
+						borderSide: const BorderSide(color: Colors.black), // border hitam
+					),
+					focusedBorder: OutlineInputBorder(
+						borderRadius: BorderRadius.circular(10),
+						borderSide: const BorderSide(color: Colors.black, width: 1.5), // border hitam tebal saat fokus
+					),
+				),
 			),
+
+			// opsional: warna background sheet popup
+			modalBottomSheetProps: const ModalBottomSheetProps(
+				backgroundColor: Colors.white,
+			),
+		),
 		compareFn: (item, sItem) => item.mbankId == sItem.mbankId,
 			itemAsString: (item) {
 				return item.bankNama;
@@ -66,7 +96,12 @@ Widget itemBuilderComboMBank(
 			),
 		child: ListTile(
 			selected: isSelected,
-			title: Text(item.bankNama),
+			title: Text(
+				item.bankNama,
+				style: TextStyle(
+					color: isSelected ? primaryColor : Colors.black, // ✅ di sini warna teks item
+				),
+			),
 		),
 	);
 }

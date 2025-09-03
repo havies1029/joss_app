@@ -1,11 +1,16 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
+import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../repositories/user/user_repository.dart';
 import '../../../base/base_background_firstpage.dart';
 import '../../../base/base_background_sidepage.dart';
 import '../../../home/home_tab_widget.dart';
+import 'package:joss_app/blocs/user_profile/user_profile_cubit.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -19,6 +24,32 @@ class _ProfilePageState extends State<ProfilePage>
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+  Future<void> _pickAndUpload(BuildContext context) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        requestFullMetadata: false,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 88,
+      );
+      if (picked == null) return;
+
+      final bytes = await picked.readAsBytes();
+      final fileName = picked.name;
+
+      // trigger upload
+      context.read<ProfileUploadFotoBloc>().add(UploadProfilePicture(bytes, fileName));
+
+      // optimistic UI
+      context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal memilih foto: $e')),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -36,29 +67,15 @@ class _ProfilePageState extends State<ProfilePage>
     _passwordFocusNode.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final verticalPadding = screenHeight * 0.03;
     final headerSpacing = screenHeight * 0.025;
-    final userRepository = UserRepository();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.home),
-        onPressed: () {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => HomeTabWidget(userRepository: userRepository),
-            ),
-                (route) => false, // Hapus semua page, langsung ke home
-          );
-        },
-      ),// ⬅️ kasih warna dasar hitam
       body: SafeArea(
         child: BaseBackgroundSidePage(
           backgroundAsset: "assets/images/background_gradient.png",
@@ -68,45 +85,123 @@ class _ProfilePageState extends State<ProfilePage>
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(height: headerSpacing),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: secondaryBlackColor,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border(
-                              top: BorderSide(
-                                color: primaryColor,
-                                width: 4.0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: headerSpacing),
+
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          // 🔹 Container hitam + border oranye full width
+                          // 🔁 REPLACE blok Stack lama mulai dari "Stack(" sampai penutupnya
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: secondaryBlackColor,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border(
+                                top: BorderSide(color: primaryColor, width: 4.0),
                               ),
                             ),
-                          ),
-                          child: Card(
-                            color: secondaryBlackColor,
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text("Full width Card", style: TextStyle(color: Colors.white)),
-                                  SizedBox(height: 8),
-                                  Text("Sekarang hitamnya nempel ke sisi kiri kanan.",
-                                      style: TextStyle(color: Colors.white70)),
+                            child: Card(
+                              color: secondaryBlackColor,
+                              elevation: 0,
+                              margin: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              clipBehavior: Clip.antiAlias, // ⬅️ pastikan isi tetap di dalam card
+                              child: Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  // ⬇️ Konten card (beri ruang di atas untuk avatar)
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(16, 96, 16, 16),
+                                    child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                                      buildWhen: (prev, curr) {
+                                        final p = prev.fotoBytes?.lengthInBytes ?? -1;
+                                        final c = curr.fotoBytes?.lengthInBytes ?? -1;
+                                        return p != c;
+                                      },
+                                      builder: (context, state) {
+                                        return const Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(height: 16), // ruang bawah avatar
+                                            // (Nama/field lain di sini kalau perlu)
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+
+                                  // 🔹 Avatar di DALAM card, posisi tengah-atas
+                                  Positioned(
+                                    top: 16,
+                                    child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                                      buildWhen: (prev, curr) {
+                                        final p = prev.fotoBytes?.lengthInBytes ?? -1;
+                                        final c = curr.fotoBytes?.lengthInBytes ?? -1;
+                                        return p != c;
+                                      },
+                                      builder: (context, state) {
+                                        final imageBytes = state.fotoBytes;
+
+                                        // 👇 Tap di area avatar (besar) langsung pick & upload
+                                        return InkResponse(
+                                          onTap: () => _pickAndUpload(context),
+                                          containedInkWell: true,
+                                          customBorder: const CircleBorder(),
+                                          radius: 64,
+                                          child: Stack(
+                                            alignment: Alignment.bottomRight,
+                                            children: [
+                                              // ring kecil supaya tegas
+                                              Container(
+                                                padding: const EdgeInsets.all(3),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: primaryBlackColor,
+                                                  border: Border.all(color: sGrey, width: 2),
+                                                ),
+                                                child: CircleAvatar(
+                                                  radius: 50,
+                                                  backgroundColor: secondaryBlackColor,
+                                                  backgroundImage: (imageBytes != null && imageBytes.isNotEmpty)
+                                                      ? MemoryImage(imageBytes)
+                                                      : null,
+                                                  child: (imageBytes == null || imageBytes.isEmpty)
+                                                      ? const Icon(Icons.person, color: Colors.white, size: 48)
+                                                      : null,
+                                                ),
+                                              ),
+
+                                              // 📷 Ikon kamera tetap tampil, tapi non-klik (petunjuk visual)
+                                              Positioned(
+                                                bottom: 4,
+                                                right: 4,
+                                                child: IgnorePointer(
+                                                  ignoring: true, // <-- bikin ikon ini purely dekoratif
+                                                  child: CircleAvatar(
+                                                    radius: 18,
+                                                    backgroundColor: Colors.black87,
+                                                    child: Icon(Icons.camera_alt, color: primaryColor, size: 18),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
-import 'package:joss_app/pages/login/welcome_header.dart';
+import 'package:joss_app/pages/login/welcome_header_login.dart';
 
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
@@ -41,7 +41,6 @@ class _LoginFormClientState extends State<LoginFormClient>
       vsync: this,
       duration: defaultDuration,
     );
-    Future.microtask(() => context.read<LoginBloc>().add(LoginReset()));
   }
 
   @override
@@ -227,7 +226,7 @@ class _LoginFormClientState extends State<LoginFormClient>
                                           ? 140
                                           : 120,
                                 ),
-                                WelcomeHeader(),
+                                WelcomeHeaderLogin(),
                               ],
                             ),
                           ),
