@@ -47,12 +47,14 @@ import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.d
 
 import 'blocs/gallery/galleryeventcari_bloc.dart';
 
+import 'blocs/gallery/gallerymembercari_bloc.dart';
 import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
+import 'blocs/gen_review/reviewcari_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -113,6 +115,10 @@ Future<void> main() async {
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
+        BlocProvider(create: (_) => UserProfileCubit()),
+        BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
+        BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
+        BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
         BlocProvider(create: (_) => RegUserProfileCubit()),
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
       ],

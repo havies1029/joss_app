@@ -181,16 +181,6 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
 
                       // styling JPS
                       backgroundColor: primaryColor,
-                      textColor: Colors.white,
-                      iconColor: Colors.white,
-                      borderRadius: cardBorderRadius,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 16), // tinggi diatur oleh SizedBox
-                      textStyle: bodyTextStyle(context).copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontSize: getResponsiveFont(context, 22),
-                        height: 1.1,
-                      ),
                       iconTextSpacing: 10,
                     ),
                   ),
@@ -385,15 +375,6 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                         icon: Icon(isNew ? Icons.close : Icons.delete_outline, size: 18),
                         onPressed: onDelete,
                         backgroundColor: Colors.transparent,
-                        textColor: isNew ? primaryLightColor : pRed,
-                        iconColor:  isNew ? primaryLightColor : pRed,
-                        elevation: 0,
-                        borderRadius: 10,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                        textStyle: bodyTextStyle(context).copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
                       )
 
                   ),

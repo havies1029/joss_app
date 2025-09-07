@@ -49,6 +49,7 @@ dependencies:
   mobile_chat_flutter: ^1.0.2
   hydrated_bloc: ^10.1.1
   dio: ^5.4.0
+  fl_chart: ^0.66.0
 
 dev_dependencies:
   flutter_test:
