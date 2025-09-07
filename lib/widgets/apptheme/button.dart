@@ -22,7 +22,6 @@ class AppButton extends StatelessWidget {
   final EdgeInsets? padding;
   final Color? backgroundColor;
   final Color? textColor;
-  final Color? iconColor;
   final double? borderRadius;
   final double? elevation;
   final BorderSide? borderSide;
@@ -46,7 +45,6 @@ class AppButton extends StatelessWidget {
     this.padding,
     this.backgroundColor,
     this.textColor,
-    this.iconColor,
     this.borderRadius,
     this.elevation,
     this.borderSide,
@@ -64,7 +62,7 @@ class AppButton extends StatelessWidget {
   //     FACTORY METHODS
   // =========================
 
-  /// Primary Button
+  /// Primary Button (Text Only)
   factory AppButton.primary({
     required String text,
     VoidCallback? onPressed,
@@ -72,12 +70,7 @@ class AppButton extends StatelessWidget {
     double? height,
     bool isLoading = false,
     bool hasAnimation = true,
-    EdgeInsets? padding,
-    TextStyle? textStyle,
     Color? backgroundColor,
-    Color? textColor,
-    double? borderRadius,
-    double? elevation,
   }) {
     return AppButton(
       text: text,
@@ -86,18 +79,13 @@ class AppButton extends StatelessWidget {
       height: height,
       isLoading: isLoading,
       hasAnimation: hasAnimation,
-      padding: padding,
       layoutType: ButtonLayoutType.textOnly,
-      textStyle: textStyle,
       backgroundColor: backgroundColor,
-      textColor: textColor,
-      borderRadius: borderRadius,
-      elevation: elevation,
       isOutlined: false,
     );
   }
 
-  /// Outlined/Secondary Button
+  /// Secondary Button (Text Only - Outlined)
   factory AppButton.secondary({
     required String text,
     VoidCallback? onPressed,
@@ -105,10 +93,7 @@ class AppButton extends StatelessWidget {
     double? height,
     bool isLoading = false,
     bool hasAnimation = true,
-    EdgeInsets? padding,
-    TextStyle? textStyle,
     Color? borderColor,
-    double? borderRadius,
   }) {
     return AppButton(
       text: text,
@@ -117,87 +102,35 @@ class AppButton extends StatelessWidget {
       height: height,
       isLoading: isLoading,
       hasAnimation: hasAnimation,
-      padding: padding,
       layoutType: ButtonLayoutType.textOnly,
-      textStyle: textStyle,
       backgroundColor: Colors.transparent,
-      textColor: borderColor ?? primaryColor,
-      iconColor: borderColor ?? primaryColor,
       borderSide: BorderSide(color: borderColor ?? primaryColor, width: 1.5),
-      borderRadius: borderRadius,
-      elevation: 0,
       isOutlined: true,
     );
   }
 
-  /// Icon-only (Square)
-  factory AppButton.iconSquare({
+  /// Icon Only Button (Square)
+  factory AppButton.icon({
     required Widget icon,
     VoidCallback? onPressed,
     double? size,
     bool isLoading = false,
     bool hasAnimation = true,
-    EdgeInsets? padding,
     Color? backgroundColor,
-    Color? iconColor,
-    double? borderRadius,
-    double? elevation,
   }) {
     return AppButton(
       icon: icon,
       onPressed: onPressed,
       isLoading: isLoading,
       hasAnimation: hasAnimation,
-      padding: padding,
       backgroundColor: backgroundColor,
-      iconColor: iconColor,
       layoutType: ButtonLayoutType.iconOnly,
       isSquare: true,
       squareSize: size,
-      borderRadius: borderRadius,
-      elevation: elevation,
     );
   }
 
-  /// Icon Top
-  factory AppButton.iconTop({
-    required String text,
-    required Widget icon,
-    VoidCallback? onPressed,
-    double? width,
-    double? height,
-    bool isLoading = false,
-    bool hasAnimation = true,
-    EdgeInsets? padding,
-    Color? backgroundColor,
-    Color? textColor,
-    Color? iconColor,
-    double iconTextSpacing = 8.0,
-    double? borderRadius,
-    double? elevation,
-    TextStyle? textStyle,
-  }) {
-    return AppButton(
-      text: text,
-      icon: icon,
-      onPressed: onPressed,
-      width: width,
-      height: height,
-      isLoading: isLoading,
-      hasAnimation: hasAnimation,
-      padding: padding,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
-      iconColor: iconColor,
-      layoutType: ButtonLayoutType.iconTop,
-      iconTextSpacing: iconTextSpacing,
-      borderRadius: borderRadius,
-      elevation: elevation,
-      textStyle: textStyle,
-    );
-  }
-
-  /// Icon Left
+  /// Icon Left Layout
   factory AppButton.iconLeft({
     required String text,
     required Widget icon,
@@ -206,13 +139,86 @@ class AppButton extends StatelessWidget {
     double? height,
     bool isLoading = false,
     bool hasAnimation = true,
-    EdgeInsets? padding,
     Color? backgroundColor,
-    Color? textColor,
-    Color? iconColor,
     double iconTextSpacing = 8.0,
-    double? borderRadius,
-    double? elevation,
+  }) {
+    return AppButton(
+      text: text,
+      icon: icon,
+      onPressed: onPressed,
+      width: width,
+      height: height,
+      isLoading: isLoading,
+      hasAnimation: hasAnimation,
+      backgroundColor: backgroundColor,
+      layoutType: ButtonLayoutType.iconLeft,
+      iconTextSpacing: iconTextSpacing,
+    );
+  }
+
+  /// Icon Right Layout
+  factory AppButton.iconRight({
+    required String text,
+    required Widget icon,
+    VoidCallback? onPressed,
+    double? width,
+    double? height,
+    bool isLoading = false,
+    bool hasAnimation = true,
+    Color? backgroundColor,
+    double iconTextSpacing = 8.0,
+  }) {
+    return AppButton(
+      text: text,
+      icon: icon,
+      onPressed: onPressed,
+      width: width,
+      height: height,
+      isLoading: isLoading,
+      hasAnimation: hasAnimation,
+      backgroundColor: backgroundColor,
+      layoutType: ButtonLayoutType.iconRight,
+      iconTextSpacing: iconTextSpacing,
+    );
+  }
+
+  /// Icon Top Layout
+  factory AppButton.iconTop({
+    required String text,
+    required Widget icon,
+    VoidCallback? onPressed,
+    double? width,
+    double? height,
+    bool isLoading = false,
+    bool hasAnimation = true,
+    Color? backgroundColor,
+    double iconTextSpacing = 8.0,
+  }) {
+    return AppButton(
+      text: text,
+      icon: icon,
+      onPressed: onPressed,
+      width: width,
+      height: height,
+      isLoading: isLoading,
+      hasAnimation: hasAnimation,
+      backgroundColor: backgroundColor,
+      layoutType: ButtonLayoutType.iconTop,
+      iconTextSpacing: iconTextSpacing,
+    );
+  }
+
+  /// Icon Bottom Layout
+  factory AppButton.iconBottom({
+    required String text,
+    required Widget icon,
+    VoidCallback? onPressed,
+    double? width,
+    double? height,
+    bool isLoading = false,
+    bool hasAnimation = true,
+    Color? backgroundColor,
+    double iconTextSpacing = 8.0,
     TextStyle? textStyle,
   }) {
     return AppButton(
@@ -223,14 +229,9 @@ class AppButton extends StatelessWidget {
       height: height,
       isLoading: isLoading,
       hasAnimation: hasAnimation,
-      padding: padding,
       backgroundColor: backgroundColor,
-      textColor: textColor,
-      iconColor: iconColor,
-      layoutType: ButtonLayoutType.iconLeft,
+      layoutType: ButtonLayoutType.iconBottom,
       iconTextSpacing: iconTextSpacing,
-      borderRadius: borderRadius,
-      elevation: elevation,
       textStyle: textStyle,
     );
   }
@@ -249,25 +250,28 @@ class AppButton extends StatelessWidget {
       finalHeight = size;
     }
 
+    // Default styling values
+    final Color defaultBackgroundColor = backgroundColor ?? primaryColor;
+    final double defaultBorderRadius = borderRadius ?? cardBorderRadius;
+    final EdgeInsets defaultPadding =
+        padding ?? EdgeInsets.symmetric(horizontal: hPadding, vertical: 10);
+    final double defaultElevation = elevation ?? 0;
+    final TextStyle defaultTextStyle = textStyle ?? bodyTextStyle(context);
+
     // If user supplies style, use it *directly* (no merge)
     final bool useOutlined = isOutlined;
     final ButtonStyle? baseStyle =
         style ??
         (useOutlined
             ? OutlinedButton.styleFrom(
-              foregroundColor: textColor ?? primaryColor,
+              foregroundColor: defaultTextStyle.color,
               side: borderSide ?? BorderSide(color: primaryColor),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(borderRadius ?? cardBorderRadius),
+                  Radius.circular(defaultBorderRadius),
                 ),
               ),
-              padding:
-                  padding ??
-                  EdgeInsets.symmetric(
-                    horizontal: isSquare ? 8 : 16,
-                    vertical: isSquare ? 8 : 10,
-                  ),
+              padding: isSquare ? EdgeInsets.all(8) : defaultPadding,
               minimumSize: Size(
                 finalWidth ?? (isSquare ? (squareSize ?? buttonHeight) : 0),
                 finalHeight ?? buttonHeight,
@@ -276,23 +280,18 @@ class AppButton extends StatelessWidget {
                 finalWidth ?? double.infinity,
                 finalHeight ?? buttonHeight,
               ),
-              elevation: elevation ?? 0,
+              elevation: defaultElevation,
             )
             : ElevatedButton.styleFrom(
-              backgroundColor: backgroundColor ?? primaryColor,
-              foregroundColor: textColor ?? primaryLightColor,
+              backgroundColor: defaultBackgroundColor,
+              foregroundColor: defaultTextStyle.color,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(borderRadius ?? cardBorderRadius),
+                  Radius.circular(defaultBorderRadius),
                 ),
                 side: borderSide ?? BorderSide.none,
               ),
-              padding:
-                  padding ??
-                  EdgeInsets.symmetric(
-                    horizontal: isSquare ? 8 : 16,
-                    vertical: isSquare ? 8 : 10,
-                  ),
+              padding: isSquare ? EdgeInsets.all(8) : defaultPadding,
               minimumSize: Size(
                 finalWidth ?? (isSquare ? (squareSize ?? buttonHeight) : 0),
                 finalHeight ?? buttonHeight,
@@ -301,17 +300,13 @@ class AppButton extends StatelessWidget {
                 finalWidth ?? double.infinity,
                 finalHeight ?? buttonHeight,
               ),
-              elevation: elevation ?? 0,
+              elevation: defaultElevation,
             ));
 
-    // Build text style
-    final TextStyle finalTextStyle =
-        textStyle ??
-        TextStyle(
-          color: textColor ?? (useOutlined ? primaryColor : primaryLightColor),
-          fontWeight: FontWeight.w600,
-          fontSize: getResponsiveFont(context, isSquare ? 13 : 17),
-        );
+    // Icon color follows text color from textStyle
+    final Color finalIconColor =
+        defaultTextStyle.color ??
+        (useOutlined ? primaryColor : primaryLightColor);
 
     // Build button content
     final Widget buttonContent = _ButtonContent(
@@ -319,11 +314,8 @@ class AppButton extends StatelessWidget {
       text: text,
       icon: icon,
       isLoading: isLoading,
-      iconColor:
-          iconColor ??
-          textColor ??
-          (useOutlined ? primaryColor : primaryLightColor),
-      textStyle: finalTextStyle,
+      iconColor: finalIconColor,
+      textStyle: defaultTextStyle,
       iconTextSpacing: iconTextSpacing,
     );
 

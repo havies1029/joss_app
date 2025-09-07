@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
 import 'package:joss_app/pages/testpage/testpage1.dart';
 import 'package:joss_app/pages/testpage/testpage2.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
@@ -35,7 +36,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
     super.initState();
     pages = [
       const HeroPage(),
-      const ReportTab(),
+      const LiterasiPage(),
       const CustomerServicePage(),
       const SettingsPage(),
     ];

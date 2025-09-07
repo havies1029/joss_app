@@ -169,7 +169,6 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                       onPressed: () {
                         // TODO: aksi klik button
                       },
-                      padding: const EdgeInsets.all(hPadding),
                     ),
                   ],
                 ],
