@@ -17,6 +17,7 @@ import 'package:joss_app/widgets/combobox/comborkodepos_widget.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';

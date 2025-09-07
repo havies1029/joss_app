@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
+import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../models/login/emailverification_model.dart';
 import '../../../../../repositories/user/user_repository.dart';
 import '../../../../base/base_background_firstpage.dart';
 import '../../../../home/home_tab_widget.dart';
 
 class PopupUserWidget extends StatefulWidget {
-  final String phoneNumber;
+  final String email;
 
   const PopupUserWidget({
     super.key,
-    required this.phoneNumber,
+    required this.email,
   });
 
   @override
@@ -109,36 +112,45 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
         setState(() => _isResendAvailable = true);
         timer.cancel();
 
-        // 🔥 Auto redirect ke HomeTabWidget
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => HomeTabWidget(userRepository: UserRepository()),
-            ),
-          );
-        });
+        // // 🔥 Auto redirect ke HomeTabWidget
+        // Future.delayed(const Duration(seconds: 1), () {
+        //   Navigator.of(context).pushReplacement(
+        //     MaterialPageRoute(
+        //       builder: (_) => HomeTabWidget(userRepository: UserRepository()),
+        //     ),
+        //   );
+        // });
       }
     });
   }
 
 
   void _resendOtp() {
+    String otp = _otpControllers.map((c) => c.text).join();
     setState(() {
       _remainingTime = 59;
       _isResendAvailable = false;
     });
     _startTimer();
 
+    // Kirim event ke BLoC untuk request OTP baru
+    context.read<EmailVerificationBloc>().add(
+      ValidasiPinEmailEvent(
+        record: EmailVerificationModel(email: widget.email, pin: otp),
+      ),
+    );
+
     HapticFeedback.lightImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Kode OTP telah dikirim ulang'),
+        content: const Text('Kode OTP telah dikirim ulang ke email'),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
+
 
   void _onOtpChanged(String value, int index) {
     if (value.isNotEmpty && index < 5) {
@@ -153,21 +165,33 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   void _verifyOtp() {
     String otp = _otpControllers.map((c) => c.text).join();
 
-    HapticFeedback.mediumImpact();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation(primaryColor), // pakai constant
+    // HapticFeedback.mediumImpact();
+    // showDialog(
+    //   context: context,
+    //   barrierDismissible: false,
+    //   builder: (_) => const Center(
+    //     child: CircularProgressIndicator(
+    //       valueColor: AlwaysStoppedAnimation(primaryColor), // pakai constant
+    //     ),
+    //   ),
+    // );
+
+    if (otp.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mohon isi semua kode OTP'),
+          backgroundColor: Colors.red,
         ),
+      );
+      return;
+    }
+    //Navigator.of(context).pop();
+
+    context.read<EmailVerificationBloc>().add(
+      ValidasiPinEmailEvent(
+        record: EmailVerificationModel(email: widget.email, pin: otp),
       ),
     );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pop();
-      debugPrint("✅ OTP Verified: $otp");
-    });
   }
 
   void _shakeOtpFields() {
@@ -282,9 +306,9 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                     children: [
                                       const TextSpan(
                                           text:
-                                          'Kami sudah mengirim kode OTP ke nomor\n'),
+                                          'Kami sudah mengirim kode OTP ke\n'),
                                       TextSpan(
-                                        text: widget.phoneNumber,
+                                        text: widget.email,
                                         style: const TextStyle(
                                           color: primaryColor,
                                           fontWeight: FontWeight.w600,

@@ -18,6 +18,7 @@ import '../../../../common/constants.dart';
 import '../../../../models/login/emailverification_model.dart';
 import '../../../../widgets/google/google_signin_button_stub.dart';
 import '../../../base/base_background_firstpage.dart';
+import '../client/login_client_page.dart';
 
 const List<String> scopes = <String>[
   'email',
@@ -308,6 +309,16 @@ class _LoginFormUserState extends State<LoginFormUser>
                                                       () => _rememberPassword = value ?? false,
                                                 ),
                                               ),
+                                              Flexible(
+                                                child: Text(
+                                                  "Ingat Kata Sandi",
+                                                  style: bodyTextStyle(
+                                                    context,
+                                                  ),
+                                                  overflow:
+                                                  TextOverflow.ellipsis,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -317,7 +328,34 @@ class _LoginFormUserState extends State<LoginFormUser>
                                   SizedBox(height: fieldSpacing),
                                   _buildSignInButton(),
                                   SizedBox(height: fieldSpacing),
-
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Divider(
+                                          color: Colors.white24,
+                                          thickness: 1,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                        child: Text(
+                                          "atau",
+                                          style: TextStyle(
+                                            fontSize: getResponsiveFont(context, 18),
+                                            color: Colors.white70,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Divider(
+                                          color: Colors.white24,
+                                          thickness: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: fieldSpacing),
                                   // Tombol Google
                                   AppData.kIsWeb
                                       ? const CachedGoogleSigninButton()
@@ -332,6 +370,36 @@ class _LoginFormUserState extends State<LoginFormUser>
 
                                   // Sisa ruang akan diisi oleh Card background
                                   Spacer(),
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Belum Punya Akun? ",
+                                        style: TextStyle(
+                                          fontSize: getResponsiveFont(context, 18),
+                                          color: Colors.white70, // warna teks abu
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (_) => LoginClient()));
+                                        },
+                                        child: Text(
+                                          "Masuk Sebagai Klien",
+                                          style: TextStyle(
+                                            fontSize: getResponsiveFont(context, 18),
+                                            fontWeight: FontWeight.w600,
+                                            color: primaryColor, // warna brand dari constants
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  // 🔽 Divider spacing
+                                  SizedBox(height: fieldSpacing),
+
                                 ],
                               ),
                             ),

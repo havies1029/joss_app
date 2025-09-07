@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 
-import '../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../../blocs/networkconnection/network_bloc.dart';
-import '../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
 
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../widgets/combobox/combomjnsclient_widget.dart';
-import '../../../base/base_background_firstpage.dart';
+import '../../../login/mobile/client/widget/popup_client_widget.dart';
 import '../../welcome_header_register.dart';
 
 class RegisterFormClient extends StatefulWidget {
@@ -27,26 +22,23 @@ class RegisterFormClient extends StatefulWidget {
 class _RegisterFormClientState extends State<RegisterFormClient>
     with SingleTickerProviderStateMixin {
 
-  // String? _selectedRole;
   String _selectedChoice = '';
   ComboMJnsclientModel? fieldComboJnsClient;
   late FocusNode _roleDropdownFocusNode;
+
   // Controller untuk input field
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _teleponController = TextEditingController();
   final TextEditingController _konfirmasipasswordController = TextEditingController();
-  final TextEditingController _dropdownController = TextEditingController();
 
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   final FocusNode _teleponFocusNode = FocusNode();
   final FocusNode _konfirmasipasswordFocusNode = FocusNode();
-  final FocusNode _dropdownFocusNode = FocusNode();
 
   bool _isPasswordVisible = false;
-  bool _rememberPassword = false; // Variabel untuk checkbox Remember Password
 
   // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -73,7 +65,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
     _passwordController.dispose();
     _teleponController.dispose();
     _konfirmasipasswordController.dispose();
-    // _dropdownController.dispose();
 
     _animationController.dispose();
 
@@ -81,7 +72,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
     _passwordFocusNode.dispose();
     _teleponFocusNode.dispose();
     _konfirmasipasswordFocusNode.dispose();
-    // _dropdownFocusNode.dispose();
     _roleDropdownFocusNode.dispose();
     super.dispose();
   }
@@ -132,7 +122,8 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       hint: "Masukkan password",
       controller: _passwordController,
       focusNode: _passwordFocusNode,
-      obscureText: !_isPasswordVisible, // Gunakan state dari parent
+      obscureText: !_isPasswordVisible,
+      // Gunakan state dari parent
       padding: EdgeInsets.symmetric(horizontal: hPadding),
       suffixIcon: IconButton(
         icon: Icon(
@@ -207,91 +198,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       },
     );
   }
-  // Widget _buildRoleDropdownField(double hPadding) {
-  //   return Padding(
-  //     padding: EdgeInsets.symmetric(horizontal: hPadding),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         // Label
-  //         // const Text(
-  //         //   "Sebagai",
-  //         //   style: TextStyle(
-  //         //     color: Colors.white,
-  //         //     fontSize: 14,
-  //         //     fontWeight: FontWeight.w500,
-  //         //   ),
-  //         // ),
-  //         // const SizedBox(height: 8),
-  //
-  //         // Dropdown Field
-  //         Container(
-  //           decoration: BoxDecoration(
-  //             color: secondaryBlackColor,
-  //             borderRadius: BorderRadius.circular(8),
-  //             border: Border.all(
-  //               color: _roleDropdownFocusNode.hasFocus ? primaryColor : sGrey,
-  //               width: _roleDropdownFocusNode.hasFocus ? 2 : 1,
-  //             ),
-  //           ),
-  //           child: DropdownButtonFormField<String>(
-  //             focusNode: _roleDropdownFocusNode,
-  //             decoration: const InputDecoration(
-  //               hintText: "Pilih jenis klien",
-  //               hintStyle: TextStyle(
-  //                 color: sGrey,
-  //                 fontSize: 14,
-  //               ),
-  //               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  //               border: InputBorder.none,
-  //               enabledBorder: InputBorder.none,
-  //               focusedBorder: InputBorder.none,
-  //               errorBorder: InputBorder.none,
-  //               focusedErrorBorder: InputBorder.none,
-  //             ),
-  //             dropdownColor: secondaryBlackColor,
-  //             icon: const Icon(
-  //               Icons.keyboard_arrow_down,
-  //               color: sGrey,
-  //               size: 24,
-  //             ),
-  //             style: const TextStyle(
-  //               color: Colors.white,
-  //               fontSize: 14,
-  //               fontWeight: FontWeight.w400,
-  //             ),
-  //             value: _selectedRole, // Gunakan variable untuk menyimpan value
-  //             items: const [
-  //               DropdownMenuItem(
-  //                 value: "Individu",
-  //                 child: Text("Individu"),
-  //               ),
-  //               DropdownMenuItem(
-  //                 value: "Perusahaan",
-  //                 child: Text("Perusahaan"),
-  //               ),
-  //             ],
-  //             validator: (value) {
-  //               if (value == null || value.isEmpty) {
-  //                 return "Silakan pilih jenis klien";
-  //               }
-  //               return null;
-  //             },
-  //             onChanged: (value) {
-  //               setState(() {
-  //                 _selectedRole = value;
-  //                 _dropdownController.text = value ?? "";
-  //               });
-  //             },
-  //             onTap: () {
-  //               _animationController.forward(from: 0);
-  //             },
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget buildFieldJenisClient() {
     return buildFieldComboMJnsclient(
@@ -299,35 +205,15 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       initItem: fieldComboJnsClient,
       onChangedCallback: (value) {
         if (value != null) {
-          //fieldComboJnsClient = value;
+          fieldComboJnsClient = value;
           _selectedChoice = value.mjnsclientId;
+          setState(() {});
         }
       },
       onSaveCallback: (value) {},
     );
   }
 
-// Tambahkan variable dan focus node ini di class state Anda:
-// String? _selectedRole;
-// late FocusNode _roleDropdownFocusNode;
-
-// Dan di initState():
-// @override
-// void initState() {
-//   super.initState();
-//   _roleDropdownFocusNode = FocusNode();
-//   _roleDropdownFocusNode.addListener(() {
-//     setState(() {});
-//   });
-// }
-
-// Dan di dispose():
-// @override
-// void dispose() {
-//   _roleDropdownFocusNode.dispose();
-//   super.dispose();
-// }
-  // Fungsi untuk memicu event login
   void onRegisterButtonPressed() {
     RegUserModel record = RegUserModel(
       userNama: AppData.user.username ?? "",
@@ -343,9 +229,158 @@ class _RegisterFormClientState extends State<RegisterFormClient>
     );
   }
 
+  /*
+  bool _isSubmitting = false;
+
+// fungsi debug + validation + confirm + send
+  Future<void> onRegisterButtonPressed() async {
+    final name = _nameController.text.trim();
+    final phone = _teleponController.text.trim();
+    final password = _passwordController.text;
+    // kalau lo pakai controller konfirmasi yang namanya beda, sesuaikan.
+    final confirmPassword = _konfirmasipasswordController?.text ?? '';
+    final jnsClientId = _selectedChoice ?? '';
+
+    // cepat block double submit
+    if (_isSubmitting) return;
+
+    // --- VALIDATIONS ---
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nama tidak boleh kosong'))
+      );
+      return;
+    }
+
+    if (jnsClientId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pilih jenis client dulu'))
+      );
+      return;
+    }
+
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Telepon tidak boleh kosong'))
+      );
+      return;
+    }
+
+    // simple phone regex: +62... or digits only, 6-15 digits
+    final phoneReg = RegExp(r'^\+?[0-9]{6,15}$');
+    if (!phoneReg.hasMatch(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Format nomor telepon tidak valid'))
+      );
+      return;
+    }
+
+    if (password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password tidak boleh kosong'))
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password minimal 6 karakter'))
+      );
+      return;
+    }
+
+    // cek konfirmasi (opsional kalau lo memang punya field konfirmasi)
+    if (confirmPassword.isNotEmpty && password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password dan konfirmasi tidak cocok'))
+      );
+      return;
+    }
+
+    // cek email di AppData (kalau butuh)
+    final userEmail = AppData.user.email ?? '';
+    if (userEmail.isEmpty) {
+      // hanya peringatan, bukan block; kalau lo mau block: return after snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Warning: email user kosong (will send empty).'))
+      );
+    }
+
+    // --- BUILD MODEL ---
+    final record = RegUserModel(
+      userNama: AppData.user.username ?? "",
+      personalNama: name,
+      telepon: phone,
+      password: password,
+      jnsClientId: jnsClientId,
+      email: userEmail,
+    );
+
+    // --- DEBUG PRINT (aman) ---
+    // jangan print password di production; cuma untuk debug dev environment.
+    debugPrint('=== RegUserModel preview ===');
+    debugPrint('userNama: ${record.userNama}');
+    debugPrint('personalNama: ${record.personalNama}');
+    debugPrint('telepon: ${record.telepon}');
+    debugPrint('jnsClientId: ${record.jnsClientId}');
+    debugPrint('email: ${record.email}');
+    debugPrint('password: ${'*' * (record.password?.length ?? 0)} (masked)');
+
+    // --- CONFIRM DIALOG ---
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Konfirmasi Registrasi'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Nama: ${record.personalNama}'),
+            const SizedBox(height: 6),
+            Text('Telepon: ${record.telepon}'),
+            const SizedBox(height: 6),
+            Text('Jenis Client: ${record.jnsClientId}'),
+            const SizedBox(height: 6),
+            Text('Email: ${record.email.isEmpty ? "<kosong>" : record.email}'),
+            const SizedBox(height: 6),
+            Text('Password: ${'*' * (record.password?.length ?? 0)}'),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
+          ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Kirim')),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      // user batal
+      return;
+    }
+
+    // --- SEND EVENT (set submitting flag supaya gak double submit) ---
+    setState(() => _isSubmitting = true);
+
+    try {
+      context.read<RegUserBloc>().add(RegUserTambahEvent(record: record));
+
+      // optional: langsung tunjukin feedback loading sementara bloc menangani proses
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Mengirim registrasi...'))
+      );
+
+      // note: _isSubmitting tetap true sampai bloc listener (RegUserSuccess/Failure) reset it.
+      // Pastikan di BlocListener lo reset _isSubmitting = false setelah success/failure.
+    } catch (e, st) {
+      debugPrint('onRegisterButtonPressed error: $e\n$st');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal kirim: $e'))
+      );
+      setState(() => _isSubmitting = false);
+    }
+  }*/
   @override
   Widget build(BuildContext context) {
-
     return MultiBlocListener(
       listeners: [
         BlocListener<LoginBloc, LoginState>(
@@ -358,98 +393,171 @@ class _RegisterFormClientState extends State<RegisterFormClient>
           },
         ),
       ],
-      child: BlocBuilder<LoginBloc, LoginState>(
-        builder: (context, state) {
-          return ((state is LoginInitial) || (state is LoginFailure))
-              ? Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
+      child: BlocConsumer<RegUserBloc, RegUserState>(
+        listener: (context, state) {
+          if (state.hasFailure && state.errors.isNotEmpty) {
+            final error = state.errors.first;
+            if (error.toLowerCase().contains('telepon')) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(error),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
                 ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // Header Section
-                      Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/icons/logo_jps_no_background.png',
-                              height: isDesktop(context)
-                                  ? 56
-                                  : isTablet(context)
-                                  ? 48
-                                  : 42,
-                              width: isDesktop(context)
-                                  ? 180
-                                  : isTablet(context)
-                                  ? 140
-                                  : 120,
-                            ),
-                            WelcomeHeaderRegister(),
-                          ],
-                        ),
-                      ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(error),
+                  backgroundColor: Colors.orange,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          }
+        },
+        builder: (context, regState) {
+          // Keep LoginBloc reactivity by nesting a BlocBuilder for LoginBloc
+          return BlocBuilder<LoginBloc, LoginState>(
+            builder: (context, loginState) {
+              final showForm = (loginState is LoginInitial) ||
+                  (loginState is LoginFailure);
 
-                      // Card Section yang akan mengambil sisa ruang
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border(
-                              top: BorderSide(
-                                color: primaryColor,
-                                width: 4.0,
-                              ),
+              if (!showForm) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final isSaving = regState.isSaving;
+
+              return Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery
+                          .of(context)
+                          .size
+                          .height,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          // Header Section
+                          Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset(
+                                  'assets/icons/logo_jps_no_background.png',
+                                  height: isDesktop(context)
+                                      ? 56
+                                      : isTablet(context)
+                                      ? 48
+                                      : 42,
+                                  width: isDesktop(context)
+                                      ? 180
+                                      : isTablet(context)
+                                      ? 140
+                                      : 120,
+                                ),
+                                WelcomeHeaderRegister(),
+                              ],
                             ),
                           ),
-                          child: Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+
+                          // Card Section yang akan mengambil sisa ruang
+                          Expanded(
                             child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                children: [
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border(
+                                  top: BorderSide(
+                                    color: primaryColor,
+                                    width: 4.0,
+                                  ),
+                                ),
+                              ),
+                              child: Card(
+                                elevation: 0,
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  padding: EdgeInsets.all(20),
+                                  child: Column(
+                                    children: [
+                                      _buildNameField(0),
+                                      SizedBox(height: fieldSpacing),
+                                      _buildTeleponField(0),
+                                      SizedBox(height: fieldSpacing),
+                                      _buildPasswordField(0),
+                                      SizedBox(height: fieldSpacing),
+                                      _buildPasswordConfirmationField(0),
+                                      SizedBox(height: fieldSpacing),
+                                      buildFieldJenisClient(),
+                                      SizedBox(height: fieldSpacing),
 
-                                  _buildNameField(0),
-                                  SizedBox(height: fieldSpacing),
-                                  _buildTeleponField(0),
-                                  SizedBox(height: fieldSpacing),
-                                  _buildPasswordField(0),
-                                  SizedBox(height: fieldSpacing),
-                                  _buildPasswordConfirmationField(0),
-                                  // Row dengan checkbox dan forgot password
-                                  SizedBox(height: fieldSpacing),
-                                  buildFieldJenisClient(),
+                                      // Replace _buildSignUpButton with inlined button so we can pass isLoading
+                                      AppButton.primary(
+                                        text: isSaving
+                                            ? "Mengirim..."
+                                            : "Submit",
+                                        width: double.infinity,
+                                        height: buttonHeight,
+                                        isLoading: isSaving,
+                                        onPressed: isSaving
+                                            ? null
+                                            : () {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            _animationController.forward(
+                                                from: 0);
+                                            // dispatch event
+                                            final record = RegUserModel(
+                                              userNama: AppData.user.username ??
+                                                  "",
+                                              personalNama: _nameController.text
+                                                  .trim(),
+                                              telepon: _teleponController.text
+                                                  .trim(),
+                                              password: _passwordController
+                                                  .text,
+                                              jnsClientId: _selectedChoice,
+                                              email: AppData.user.email ?? "",
+                                            );
+                                            debugPrint(
+                                                'Dispatching RegUserTambahEvent: ${record
+                                                    .personalNama}, telepon=${record
+                                                    .telepon}');
+                                            context.read<RegUserBloc>().add(
+                                                RegUserTambahEvent(
+                                                    record: record));
+                                          }
+                                        },
+                                      ),
 
-                                  SizedBox(height: fieldSpacing),
-                                  _buildSignUpButton(),
-                                  // Sisa ruang akan diisi oleh Card background
-                                  Spacer(),
-                                ],
+                                      // Sisa ruang akan diisi oleh Card background
+                                      Spacer(),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          )
-              : const Center(child: CircularProgressIndicator());
+              );
+            },
+          );
         },
       ),
     );

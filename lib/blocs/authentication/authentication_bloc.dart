@@ -42,9 +42,7 @@ class AuthenticationBloc
     on<RequireRegisterClient>((event, emit) {
       emit(AuthenticationRequireRegisterClient());
     });
-    on<RequirePinHPVerification>((event, emit) {
-      emit(AuthenticationRequirePinHPVerification(hpno: event.hpno));
-    });
+    on<RequirePinHPVerification>(_onRequirePinHPVerification);
     on<PhonePinVerified>((event, emit) {
       emit(AuthenticationPhonePinVerified());
     });
@@ -145,7 +143,12 @@ class AuthenticationBloc
     debugPrint("✅ emit AuthenticationRequirePinEmailVerification (no loading)");
     emit(AuthenticationRequirePinEmailVerification(email: event.email));
   }
-
+  Future<void> _onRequirePinHPVerification(
+      RequirePinHPVerification event,
+      Emitter<AuthenticationState> emit) async {
+    debugPrint("✅ emit AuthenticationRequirePinHPVerification (no loading)");
+    emit(AuthenticationRequirePinHPVerification(hpno: event.hpno));
+  }
 
   Future<void> _onUserAuthenticated(
       UserAuthenticated event, Emitter<AuthenticationState> emit) async {

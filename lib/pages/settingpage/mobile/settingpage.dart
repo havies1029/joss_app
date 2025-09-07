@@ -4,9 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
+import '../../../blocs/reguser_profile/reguser_profile_state.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
+import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic.dart';
+import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic_crud_body.dart';
+import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic_list_body.dart';
 import '../widgets/logout_popup.dart';
 import 'package:joss_app/pages/settingpage/widgets/ubah_password_popup.dart';
 import '../../login/mobile/user/widget/popup_user_widget.dart';
@@ -30,6 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool emailNotification = true;
   bool darkMode = true;
 
+
   Widget _buildAvatar(Uint8List? bytes, String initials) {
     if (bytes != null && bytes.isNotEmpty) {
       return CircleAvatar(radius: 23, backgroundImage: MemoryImage(bytes));
@@ -48,6 +56,91 @@ class _SettingsPageState extends State<SettingsPage> {
     return (first + last).toUpperCase();
   }
 
+  Widget _buildProfileCard({
+    required BuildContext context,
+    required String nama,
+    String? email,
+    String? telepon,
+    Uint8List? foto,
+    required String subtitle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            primaryColor,
+            primaryColor.withOpacity(0.6),
+            primaryColor.withOpacity(0.4),
+            primaryColor.withOpacity(0.2),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.5, 0.75, 0.9, 1.0],
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(hPadding + 6),
+        decoration: BoxDecoration(
+          color: pGrey,
+          borderRadius: BorderRadius.circular(cardBorderRadius - 1.5),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAvatar(foto, _initialsFromName(nama)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(nama, style: headingStyle(context, fontSize: 22)),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: bodyTextStyle(context)),
+                  const SizedBox(height: 4),
+                  if (email != null) ...[
+                    Row(
+                      children: [
+                        const Icon(Icons.email, color: primaryLightColor, size: 16),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            email,
+                            style: bodyTextStyle(context, fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (telepon != null) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.phone, color: primaryLightColor, size: 16),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            telepon,
+                            style: bodyTextStyle(context, fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,261 +155,208 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               children: [
                 // ================== PROFILE SECTION ==================
-                BlocBuilder<UserProfileCubit, UserProfileState>(
-                  buildWhen: (prev, curr) {
-                    final nameChanged = prev.nama != curr.nama;
-                    final emailChanged = prev.email != curr.email;
-                    final telpChanged = prev.telepon != curr.telepon;
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, authState) {
+                    final custType = authState is AuthenticationAuthenticated
+                        ? authState.user.custType
+                        : '';
 
-                    // bandingkan perubahan bytes (tanpa deep-compare)
-                    final bytesChanged =
-                        (prev.fotoBytes == null && curr.fotoBytes != null) ||
-                        (prev.fotoBytes != null && curr.fotoBytes == null) ||
-                        (prev.fotoBytes != null &&
-                            curr.fotoBytes != null &&
-                            prev.fotoBytes!.lengthInBytes !=
-                                curr.fotoBytes!.lengthInBytes);
+                    if (custType == 'C') {
+                      // 🔹 Client → ambil dari UserProfileCubit
+                      return BlocBuilder<UserProfileCubit, UserProfileState>(
+                        buildWhen: (prev, curr) {
+                          final nameChanged = prev.nama != curr.nama;
+                          final emailChanged = prev.email != curr.email;
+                          final telpChanged = prev.telepon != curr.telepon;
+                          final bytesChanged =
+                              (prev.fotoBytes == null && curr.fotoBytes != null) ||
+                                  (prev.fotoBytes != null && curr.fotoBytes == null) ||
+                                  (prev.fotoBytes != null &&
+                                      curr.fotoBytes != null &&
+                                      prev.fotoBytes!.lengthInBytes !=
+                                          curr.fotoBytes!.lengthInBytes);
 
-                    return nameChanged ||
-                        emailChanged ||
-                        telpChanged ||
-                        bytesChanged;
-                  },
-                  builder: (context, state) {
-                    final nama =
-                        (state.nama?.trim().isNotEmpty ?? false)
-                            ? state.nama!.trim()
-                            : 'Pengguna';
-                    final email =
-                        (state.email?.trim().isNotEmpty ?? false)
-                            ? state.email!.trim()
-                            : null;
-                    final telepon =
-                        (state.telepon?.trim().isNotEmpty ?? false)
-                            ? state.telepon!.trim()
-                            : null;
-                    final foto =
-                        (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
-                            ? state.fotoBytes
-                            : null;
+                          return nameChanged || emailChanged || telpChanged || bytesChanged;
+                        },
+                        builder: (context, state) {
+                          final nama = (state.nama?.trim().isNotEmpty ?? false)
+                              ? state.nama!.trim()
+                              : 'Pengguna';
+                          final email =
+                          (state.email?.trim().isNotEmpty ?? false) ? state.email!.trim() : null;
+                          final telepon = (state.telepon?.trim().isNotEmpty ?? false)
+                              ? state.telepon!.trim()
+                              : null;
+                          final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
+                              ? state.fotoBytes
+                              : null;
 
-                    return Container(
-                      padding: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(cardBorderRadius),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            primaryColor,
-                            primaryColor.withOpacity(0.6),
-                            primaryColor.withOpacity(0.4),
-                            primaryColor.withOpacity(0.2),
-                            Colors.transparent,
-                          ],
-                          stops: const [0.0, 0.5, 0.75, 0.9, 1.0],
-                        ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(hPadding + 6),
-                        decoration: BoxDecoration(
-                          color: pGrey,
-                          borderRadius: BorderRadius.circular(
-                            cardBorderRadius - 1.5,
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildAvatar(foto, _initialsFromName(nama)),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    nama,
-                                    style: headingStyle(context, fontSize: 22),
-                                  ),
-                                  const SizedBox(height: 4),
+                          return _buildProfileCard(
+                            context: context,
+                            nama: nama,
+                            email: email,
+                            telepon: telepon,
+                            foto: foto,
+                            subtitle: "Klien JPS",
+                          );
+                        },
+                      );
+                    } else if (custType == 'U') {
+                      // 🔹 User baru → ambil dari RegUserProfileCubit
+                      return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
+                        buildWhen: (prev, curr) =>
+                        prev.email != curr.email,
+                        builder: (context, state) {
+                          final nama = (state.email.trim().isNotEmpty)
+                              ? state.email.trim()
+                              : 'Pengguna Baru';
+                          // final email =
+                          // (state.email.trim().isNotEmpty) ? state.email.trim() : null;
 
-                                  // Role/subtitle (opsional)
-                                  Text(
-                                    'Nasabah Biasa',
-                                    style: bodyTextStyle(context),
-                                  ),
+                          return _buildProfileCard(
+                            context: context,
+                            nama: nama,
+                            foto: null, // RegUserProfileCubit belum simpan foto
+                            subtitle: "User Baru",
+                          );
+                        },
+                      );
+                    }
 
-                                  const SizedBox(height: 4),
-
-                                  // Email (jika ada)
-                                  if (email != null)
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.email,
-                                          color: primaryLightColor,
-                                          size: 16,
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Flexible(
-                                          child: Text(
-                                            email,
-                                            style: bodyTextStyle(
-                                              context,
-                                              fontSize: 16,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-                                  // Telepon (jika ada)
-                                  if (telepon != null) ...[
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.phone,
-                                          color: primaryLightColor,
-                                          size: 16,
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Flexible(
-                                          child: Text(
-                                            telepon,
-                                            style: bodyTextStyle(
-                                              context,
-                                              fontSize: 16,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    return _buildProfileCard(
+                      context: context,
+                      nama: "Guest",
+                      foto: null,
+                      subtitle: "Nasabah biasa",
                     );
                   },
                 ),
 
+
                 // ================== END PROFILE SECTION ==================
                 const SizedBox(height: vPadding),
 
-                // Menu Items
-                Container(
-                  decoration: BoxDecoration(
-                    color: pGrey,
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(color: sGrey),
-                  ),
-                  child: Column(
-                    children: [
-                      // _buildMenuItem(
-                      //   icon: Icons.person_outline,
-                      //   title: 'Kelola Profil',
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => const ProfilePage(), // ⬅️ buka ProfilePage
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
-                      _buildMenuItem(
-                        icon: Icons.info_outline,
-                        title: 'Informasi Klien',
-                        onTap: () {
-                          final mjnsclientId =
-                              context
-                                  .read<UserProfileCubit>()
-                                  .state
-                                  .mjnsclientId;
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, authState) {
+                    final custType = authState is AuthenticationAuthenticated
+                        ? authState.user.custType
+                        : '';
 
-                          if (mjnsclientId == '10') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MRekanGeneralIdvCrudFormPage(),
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MRekanGeneralCmpCrudFormPage(),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      _buildMenuItem(
-                        icon: Icons.location_on_outlined,
-                        title: 'Kontak & Alamat',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      const MRekanContactCrudFormPage(),
+                    if (custType == 'C') {
+                      return Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: pGrey,
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              border: Border.all(color: sGrey),
                             ),
-                          );
-                        },
-                      ),
-                      _buildMenuItem(
-                        icon: Icons.account_balance_outlined,
-                        title: 'Rekening Bank',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const MRekanBankCrudFormPage(
-                                    viewMode: 'tambah',
-                                    recordId: '',
-                                  ),
+                            child: Column(
+                              children: [
+                                _buildMenuItem(
+                                  icon: Icons.info_outline,
+                                  title: 'Informasi Klien',
+                                  onTap: () {
+                                    final mjnsclientId =
+                                        context.read<UserProfileCubit>().state.mjnsclientId;
+
+                                    if (mjnsclientId == '10') {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                          const MRekanGeneralIdvCrudFormPage(),
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                          const MRekanGeneralCmpCrudFormPage(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                                _buildMenuItem(
+                                  icon: Icons.location_on_outlined,
+                                  title: 'Kontak & Alamat',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                        const MRekanContactCrudFormPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                _buildMenuItem(
+                                  icon: Icons.account_balance_outlined,
+                                  title: 'Rekening Bank',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const MRekanBankCrudFormPage(
+                                          viewMode: 'tambah',
+                                          recordId: '',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                // _buildMenuItem(
+                                //   icon: Icons.account_balance_outlined,
+                                //   title: 'Informasi PIC',
+                                //   onTap: () {
+                                //     Navigator.push(
+                                //       context,
+                                //       MaterialPageRoute(
+                                //         builder: (context) => const MRekanPicInlineEditorList(
+                                //           // viewMode: 'tambah',
+                                //           // recordId: '',
+                                //         ),
+                                //       ),
+                                //     );
+                                //   },
+                                // ),
+                                _buildDivider(),
+                                _buildMenuItem(
+                                  icon: Icons.lock_outline,
+                                  title: 'Ubah Password',
+                                  onTap: () {
+                                    UbahPassword.show(context);
+                                    if (pIsMobile) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const UbahPasswordPage(),
+                                        ),
+                                      );
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: true,
+                                        builder: (context) => const UbahPassword(),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      ),
-                      _buildDivider(),
-                      _buildMenuItem(
-                        icon: Icons.lock_outline,
-                        title: 'Ubah Password',
-                        onTap: () {
-                          UbahPassword.show(context);
-                          if (pIsMobile) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const UbahPasswordPage(),
-                              ),
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) => const UbahPassword(),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+                          ),
+                          const SizedBox(height: vPadding),
+                        ],
+                      );
+                    }
+
+                    // Kalau bukan custType C → return widget kosong
+                    return const SizedBox.shrink();
+                  },
                 ),
 
-                const SizedBox(height: vPadding),
 
                 Container(
                   decoration: BoxDecoration(
@@ -326,6 +366,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   child: Column(
                     children: [
+                      _buildMenuItem(
+                        icon: Icons.account_balance_outlined,
+                        title: 'Informasi PIC',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MRekanPicInlineEditorList(
+                                // viewMode: 'tambah',
+                                // recordId: '',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       _buildMenuItem(
                         icon: Icons.local_shipping_outlined,
                         title: 'Syarat dan Ketentuan',

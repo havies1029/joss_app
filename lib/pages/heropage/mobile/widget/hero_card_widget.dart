@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../register/mobile/client/register_client_page.dart';
+
 class HeroCardWidget extends StatefulWidget {
   final String userName;
   final Uint8List? imageBytes;
@@ -157,21 +159,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                     ),
                   ),
                   // Button daftar klien
-                  if (widget.custType == 'C') ...[
-                    const SizedBox(width: 10),
-                    AppButton.iconLeft(
-                      text: 'Daftar Klien',
-                      icon: SvgPicture.asset(
-                        'assets/icons/premium.svg',
-                        width: 18,
-                        height: 18,
-                      ),
-                      onPressed: () {
-                        // TODO: aksi klik button
-                      },
-                      padding: const EdgeInsets.all(hPadding),
-                    ),
-                  ],
+
                 ],
               ),
             ],

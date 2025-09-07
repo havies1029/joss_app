@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
+import '../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../common/constants.dart';
 import '../../../../repositories/user/user_repository.dart';
 import '../../../base/base_background_firstpage.dart';

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
+import '../../../../../blocs/login/emailverification_bloc.dart';
+import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../models/login/emailverification_model.dart';
+import '../../../../../models/reguser/reguser_model.dart';
 import '../../../../../repositories/user/user_repository.dart';
 import '../../../../base/base_background_firstpage.dart';
 import '../../../../home/home_tab_widget.dart';
@@ -110,19 +115,21 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
         timer.cancel();
 
         // 🔥 Auto redirect ke HomeTabWidget
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => HomeTabWidget(userRepository: UserRepository()),
-            ),
-          );
-        });
+        // Future.delayed(const Duration(seconds: 1), () {
+        //   Navigator.of(context).pushReplacement(
+        //     MaterialPageRoute(
+        //       builder: (_) => HomeTabWidget(userRepository: UserRepository()),
+        //     ),
+        //   );
+        // });
       }
     });
   }
 
 
   void _resendOtp() {
+    String otp = _otpControllers.map((c) => c.text).join();
+
     setState(() {
       _remainingTime = 59;
       _isResendAvailable = false;
@@ -136,6 +143,15 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+
+    RegUserModel? record = context.read<RegUserBloc>().state.record;
+    record?.kodePin = otp;
+
+    context.read<RegUserBloc>().add(
+      ValidasiPinHPEvent(
+          record: record!
       ),
     );
   }
@@ -153,21 +169,36 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
   void _verifyOtp() {
     String otp = _otpControllers.map((c) => c.text).join();
 
-    HapticFeedback.mediumImpact();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation(primaryColor), // pakai constant
+    // HapticFeedback.mediumImpact();
+    // showDialog(
+    //   context: context,
+    //   barrierDismissible: false,
+    //   builder: (_) => const Center(
+    //     child: CircularProgressIndicator(
+    //       valueColor: AlwaysStoppedAnimation(primaryColor), // pakai constant
+    //     ),
+    //   ),
+    // );
+
+    if (otp.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mohon isi semua kode OTP'),
+          backgroundColor: Colors.red,
         ),
+      );
+      return;
+    }
+    //Navigator.of(context).pop();
+
+    RegUserModel? record = context.read<RegUserBloc>().state.record;
+    record?.kodePin = otp;
+
+    context.read<RegUserBloc>().add(
+      ValidasiPinHPEvent(
+          record: record!
       ),
     );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pop();
-      debugPrint("✅ OTP Verified: $otp");
-    });
   }
 
   void _shakeOtpFields() {
@@ -282,7 +313,7 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
                                     children: [
                                       const TextSpan(
                                           text:
-                                          'Kami sudah mengirim kode OTP ke nomor\n'),
+                                          'Kami sudah mengirim kode OTP ke\n'),
                                       TextSpan(
                                         text: widget.phoneNumber,
                                         style: const TextStyle(

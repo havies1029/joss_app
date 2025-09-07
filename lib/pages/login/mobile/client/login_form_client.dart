@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
+import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/welcome_header_login.dart';
 
 import '../../../../blocs/authentication/authentication_bloc.dart';
@@ -41,6 +42,7 @@ class _LoginFormClientState extends State<LoginFormClient>
       vsync: this,
       duration: defaultDuration,
     );
+    Future.microtask(() => context.read<LoginBloc>().add(LoginReset()));
   }
 
   @override
@@ -329,7 +331,38 @@ class _LoginFormClientState extends State<LoginFormClient>
                                       SizedBox(height: fieldSpacing),
                                       _buildSignInButton(),
                                       // Sisa ruang akan diisi oleh Card background
+                                      // Sisa ruang akan diisi oleh Card background
                                       Spacer(),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Belum Punya Akun? ",
+                                            style: TextStyle(
+                                              fontSize: getResponsiveFont(context, 18),
+                                              color: Colors.white70, // warna teks abu
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(context, MaterialPageRoute(builder: (_) => LoginUser()));
+                                            },
+                                            child: Text(
+                                              "Masuk Sebagai Pengguna",
+                                              style: TextStyle(
+                                                fontSize: getResponsiveFont(context, 18),
+                                                fontWeight: FontWeight.w600,
+                                                color: primaryColor, // warna brand dari constants
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      // 🔽 Divider spacing
+                                      SizedBox(height: fieldSpacing),
+
                                     ],
                                   ),
                                 ),

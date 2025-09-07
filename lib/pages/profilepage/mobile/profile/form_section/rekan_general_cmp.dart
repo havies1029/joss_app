@@ -12,6 +12,7 @@ import 'package:joss_app/widgets/combobox/combombidang_widget.dart';
 
 import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../widgets/form_error.dart';

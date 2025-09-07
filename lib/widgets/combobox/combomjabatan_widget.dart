@@ -3,6 +3,8 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 
+import '../../common/constants.dart';
+
 DropdownSearch<ComboMJabatanModel> buildFieldComboMJabatan({
 	required String labelText,
 	GlobalKey<DropdownSearchState<ComboMJabatanModel>>? comboKey,
@@ -24,12 +26,39 @@ DropdownSearch<ComboMJabatanModel> buildFieldComboMJabatan({
 				return ComboMJabatanRepository().getComboMJabatan();
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
-			popupProps: const PopupPropsMultiSelection.modalBottomSheet(
-				disableFilter: false,
-				showSelectedItems: true,
-				showSearchBox: false,
-				itemBuilder: itemBuilderComboMJabatan,
+		popupProps: PopupPropsMultiSelection.modalBottomSheet(
+			disableFilter: false,
+			showSelectedItems: true,
+			showSearchBox: true,
+			itemBuilder: itemBuilderComboMJabatan,
+
+			// 🔎 styling kotak filter
+			searchFieldProps: TextFieldProps(
+				style: const TextStyle(color: Colors.black),      // teks hitam
+				cursorColor: Colors.black,
+				decoration: InputDecoration(
+					hintText: 'Cari provinsi…',
+					hintStyle: const TextStyle(color: Colors.black54),
+					filled: true,
+					fillColor: Colors.white,                        // background putih biar kontras
+					prefixIcon: const Icon(Icons.search, color: Colors.black),
+					contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+					enabledBorder: OutlineInputBorder(
+						borderRadius: BorderRadius.circular(10),
+						borderSide: const BorderSide(color: Colors.black), // border hitam
+					),
+					focusedBorder: OutlineInputBorder(
+						borderRadius: BorderRadius.circular(10),
+						borderSide: const BorderSide(color: Colors.black, width: 1.5), // border hitam tebal saat fokus
+					),
+				),
 			),
+
+			// opsional: warna background sheet popup
+			modalBottomSheetProps: const ModalBottomSheetProps(
+				backgroundColor: Colors.white,
+			),
+		),
 			compareFn: (item, sItem) => item.mjabatanId == sItem.mjabatanId,
 			itemAsString: (item) {
 				return item.jabatanDesc;
@@ -67,7 +96,9 @@ Widget itemBuilderComboMJabatan(
 			),
 		child: ListTile(
 			selected: isSelected,
-			title: Text(item.jabatanDesc),
+			title: Text(item.jabatanDesc, style: TextStyle(
+				color: isSelected ? primaryColor : Colors.black, // ✅ di sini warna teks item
+			),),
 		),
 	);
 }

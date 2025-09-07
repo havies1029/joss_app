@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/testpage/testpage1.dart';
-import 'package:joss_app/pages/testpage/testpage2.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
 import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
-import '../../blocs/gen_profile/mrekancontactlist_bloc.dart';
+import '../../blocs/login/emailverification_bloc.dart';
 import '../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../blocs/user_profile/user_profile_cubit.dart';
 import '../../common/constants.dart';
-import '../../models/gen_profile/mrekancontactlist_model.dart';
 import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
 import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
@@ -55,8 +54,6 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
             }
           },
         ),
-
-// Listener Nama (dari MRekan1)
         BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
           listenWhen: (prev, curr) =>
           curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
@@ -80,22 +77,19 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           },
         ),
 
-// Listener Contact Detail
-        BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
+        BlocListener<EmailVerificationBloc, EmailVerificationState>(
           listenWhen: (prev, curr) =>
-          curr.isLoaded && prev.record != curr.record,
+          prev.record != curr.record && curr.record != null && !curr.hasFailure,
           listener: (context, state) {
-            final email = state.record?.email?.trim() ?? '';
-            final telepon = state.record?.telp?.trim() ?? '';
-
-            if (email.isNotEmpty || telepon.isNotEmpty) {
-              context.read<UserProfileCubit>().setProfile(
-                email: email,
-                telepon: telepon,
+            final record = state.record!;
+            if (record.email.isNotEmpty) {
+              context.read<RegUserProfileCubit>().setProfile(
+                email: record.email,
               );
             }
           },
         ),
+
       ],
       child: !pIsWeb
           ? Scaffold(
