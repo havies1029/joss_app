@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/literasi/mobile/artikel_page.dart';
+import 'package:joss_app/pages/literasi/mobile/artikel/artikel_page.dart';
 import 'package:joss_app/pages/literasi/mobile/tentang_jps_page.dart';
 import 'package:joss_app/pages/literasi/mobile/testimoni_page.dart';
 import 'package:joss_app/common/constants.dart';
@@ -68,7 +68,7 @@ class LiterasiAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Text(
                   label,
                   style: bodyTextStyle(context).copyWith(
-                    color: isSelected ? primaryColor : pGrey,
+                    color: isSelected ? primaryColor : primaryLightColor,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -100,7 +100,7 @@ class LiterasiPage extends StatefulWidget {
 class _LiterasiPageState extends State<LiterasiPage> {
   int selectedIndex = 0;
 
-  final List<Widget> pages = [TentangJPSPage(), ArtikelPage(), TestimoniPage()];
+  final List<Widget> pages = [TentangJPSPage(), ArtikelPage(constraints: const BoxConstraints()), TestimoniPage()];
 
   @override
   Widget build(BuildContext context) {

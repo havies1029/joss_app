@@ -311,7 +311,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                               ),
                                               Flexible(
                                                 child: Text(
-                                                  "Ingat Kata Sandi",
+                                                  "Ingat Login",
                                                   style: bodyTextStyle(
                                                     context,
                                                   ),

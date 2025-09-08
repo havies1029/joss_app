@@ -327,21 +327,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                   icon: Icons.lock_outline,
                                   title: 'Ubah Password',
                                   onTap: () {
-                                    UbahPassword.show(context);
-                                    if (pIsMobile) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const UbahPasswordPage(),
-                                        ),
-                                      );
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        barrierDismissible: true,
-                                        builder: (context) => const UbahPassword(),
-                                      );
-                                    }
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const UbahPasswordPage(),
+                                      ),
+                                    );
                                   },
                                 ),
                               ],

@@ -7,7 +7,12 @@ import '../blocs/gen_review/reviewcari_bloc.dart';
 import '../models/gen_review/reviewcari_model.dart';
 
 class TestimonialSection extends StatefulWidget {
-  const TestimonialSection({super.key});
+  final bool isPageMode; // Parameter untuk menentukan mode tampilan
+
+  const TestimonialSection({
+    super.key,
+    this.isPageMode = false, // Default sebagai widget mode
+  });
 
   @override
   State<TestimonialSection> createState() => TestimonialSectionState();
@@ -16,6 +21,7 @@ class TestimonialSection extends StatefulWidget {
 class TestimonialSectionState extends State<TestimonialSection> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  int _displayedItems = 10; // Jumlah items yang ditampilkan di page mode
 
   @override
   void initState() {
@@ -27,6 +33,13 @@ class TestimonialSectionState extends State<TestimonialSection> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _loadMoreItems(int totalItems) {
+    setState(() {
+      _displayedItems =
+      (_displayedItems + 10 > totalItems) ? totalItems : _displayedItems + 10;
+    });
   }
 
   @override
@@ -54,16 +67,31 @@ class TestimonialSectionState extends State<TestimonialSection> {
 
               final items = state.items;
 
-              return Column(
+              return widget.isPageMode
+                  ? SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildHeader(isMobile),
+                    const SizedBox(height: 16),
+                    _buildGridView(items, isMobile, isTablet),
+                    SizedBox(height: 20.0),
+                    if (_displayedItems < items.length)
+                      _buildLoadMoreButton(items.length),
+                  ],
+                ),
+              )
+                  : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildHeader(isMobile),
-                  SizedBox(height: 16),
-                  _buildTestimonialCards(items, isMobile, isTablet),
+                  const SizedBox(height: 16),
+                  _buildCarouselView(items, isMobile, isTablet),
                   SizedBox(height: isMobile ? 10.0 : 15.0),
                   _buildNavigationControls(isMobile, isTablet, items),
                 ],
               );
+
             },
           ),
         ),
@@ -94,6 +122,32 @@ class TestimonialSectionState extends State<TestimonialSection> {
     );
   }
 
+  // Grid view untuk page mode
+  Widget _buildGridView(List<ReviewCariModel> items, bool isMobile, bool isTablet) {
+    final itemsToShow = items.take(_displayedItems).toList();
+    final int crossAxisCount = isMobile ? 1 : (isTablet ? 2 : 3);
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: isMobile ? 1.7 : 1.6,
+      ),
+      itemCount: itemsToShow.length,
+      itemBuilder: (context, index) {
+        return _buildTestimonialCard(itemsToShow[index], isMobile);
+      },
+    );
+  }
+
+  // Carousel view untuk widget mode
+  Widget _buildCarouselView(List<ReviewCariModel> items, bool isMobile, bool isTablet) {
+    return _buildTestimonialCards(items, isMobile, isTablet);
+  }
+
   Widget _buildStarRating(double rating, double size) {
     int fullStars = rating.floor();
     double decimal = rating - fullStars;
@@ -121,10 +175,10 @@ class TestimonialSectionState extends State<TestimonialSection> {
   }
 
   Widget _buildTestimonialCards(
-    List<ReviewCariModel> items,
-    bool isMobile,
-    bool isTablet,
-  ) {
+      List<ReviewCariModel> items,
+      bool isMobile,
+      bool isTablet,
+      ) {
     final int itemsPerPage = isMobile ? 1 : (isTablet ? 2 : 3);
     final totalPages = (items.length / itemsPerPage).ceil();
 
@@ -137,9 +191,9 @@ class TestimonialSectionState extends State<TestimonialSection> {
         itemBuilder: (context, pageIndex) {
           final startIndex = pageIndex * itemsPerPage;
           final endIndex =
-              (startIndex + itemsPerPage > items.length)
-                  ? items.length
-                  : startIndex + itemsPerPage;
+          (startIndex + itemsPerPage > items.length)
+              ? items.length
+              : startIndex + itemsPerPage;
 
           return Row(
             children: [
@@ -151,7 +205,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
               if (endIndex - startIndex < itemsPerPage)
                 ...List.generate(
                   itemsPerPage - (endIndex - startIndex),
-                  (_) => const Expanded(child: SizedBox()),
+                      (_) => const Expanded(child: SizedBox()),
                 ),
             ],
           );
@@ -162,7 +216,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
 
   Widget _buildTestimonialCard(ReviewCariModel item, bool isMobile) {
     return Container(
-      margin: const EdgeInsets.only(right: hPadding),
+      margin: widget.isPageMode ? EdgeInsets.zero : const EdgeInsets.only(right: hPadding),
       padding: const EdgeInsets.only(right: 25, left: 25, top: 20, bottom: 35),
       decoration: BoxDecoration(
         color: pGrey,
@@ -248,7 +302,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
           const SizedBox(height: 15),
           // Quote testimonial
           Expanded(
-            child: Text('“${item.komentar}”', style: bodyTextStyle(context)),
+            child: Text('"${item.komentar}"', style: bodyTextStyle(context)),
           ),
         ],
       ),
@@ -256,13 +310,13 @@ class TestimonialSectionState extends State<TestimonialSection> {
   }
 
   Widget _buildNavigationControls(
-    bool isMobile,
-    bool isTablet,
-    List<ReviewCariModel> items,
-  ) {
+      bool isMobile,
+      bool isTablet,
+      List<ReviewCariModel> items,
+      ) {
     if (items.isEmpty) return const SizedBox.shrink();
 
-    final int itemsPerPage = 1;
+    final int itemsPerPage = isMobile ? 1 : (isTablet ? 2 : 3);
     final totalPages = (items.length / itemsPerPage).ceil();
 
     return Row(
@@ -270,12 +324,12 @@ class TestimonialSectionState extends State<TestimonialSection> {
       children: [
         ElevatedButton(
           onPressed:
-              _currentPage > 0
-                  ? () => _pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  )
-                  : null,
+          _currentPage > 0
+              ? () => _pageController.previousPage(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          )
+              : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             shape: RoundedRectangleBorder(
@@ -290,12 +344,12 @@ class TestimonialSectionState extends State<TestimonialSection> {
         const SizedBox(width: 10),
         ElevatedButton(
           onPressed:
-              _currentPage < totalPages - 1
-                  ? () => _pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  )
-                  : null,
+          _currentPage < totalPages - 1
+              ? () => _pageController.nextPage(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          )
+              : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             shape: RoundedRectangleBorder(
@@ -308,6 +362,30 @@ class TestimonialSectionState extends State<TestimonialSection> {
           child: SvgPicture.asset('assets/icons/arrow_right.svg', height: 16),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoadMoreButton(int totalItems) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 8),
+      child: ElevatedButton(
+        onPressed: () => _loadMoreItems(totalItems),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        child: Text(
+          'Lihat Lebih Banyak',
+          style: bodyTextStyle(context, fontSize: 16).copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
     );
   }
 }

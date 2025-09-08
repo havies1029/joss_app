@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../widgets/testimoni_widget.dart';
+
 class TestimoniPage extends StatelessWidget {
   const TestimoniPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("Konten Testimoni"));
-    // Implementasi konten testimoni full di sini
+    return TestimonialSection(isPageMode: true);
   }
 }
