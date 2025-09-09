@@ -182,7 +182,6 @@ InputDecoration customInputDecoration(String label) {
     ),
   );
 }
-
 InputDecoration customDropdownDecoration(String label) {
   return InputDecoration(
     labelText: label,
@@ -193,13 +192,41 @@ InputDecoration customDropdownDecoration(String label) {
     filled: true,
     fillColor: sGrey, // background field abu-abu
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+
+    // Border normal/tidak aktif - menggunakan sGrey
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-      borderSide: const BorderSide(color: sGrey, width: 1),
+      borderSide: const BorderSide(
+        color: sGrey, // border abu-abu saat tidak aktif
+        width: 1.0,
+      ),
     ),
+
+    // Border aktif/fokus - menggunakan primaryColor dengan ketebalan lebih
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-      borderSide: const BorderSide(color: primaryColor, width: 1.5),
+      borderSide: const BorderSide(
+        color: primaryColor, // border primary color saat aktif
+        width: 2.0, // border lebih tebal saat aktif
+      ),
+    ),
+
+    // Border saat error (opsional)
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      borderSide: const BorderSide(
+        color: Colors.red,
+        width: 1.0,
+      ),
+    ),
+
+    // Border saat error dan fokus (opsional)
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      borderSide: const BorderSide(
+        color: Colors.red,
+        width: 2.0,
+      ),
     ),
   );
 }

@@ -1,6 +1,13 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart';
+
+import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
+import '../../../blocs/user_profile/user_profile_cubit.dart';
 
 class CustomerServicePage extends StatefulWidget {
   const CustomerServicePage({super.key});
@@ -12,69 +19,106 @@ class CustomerServicePage extends StatefulWidget {
 class _CustomerServicePageState extends State<CustomerServicePage> {
   String? _lastUserId;
   String? _lastDisplayName;
-  bool _initInFlight = false;
+  bool _opened = false;
 
-  bool get isMobile =>
-      !kIsWeb &&
-          (defaultTargetPlatform == TargetPlatform.android ||
-              defaultTargetPlatform == TargetPlatform.iOS);
+  bool get isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _initChatIfNeeded();
+
+    // Auto-open chat setelah frame pertama
+    if (!_opened && isMobile) {
+      _opened = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushNamed(context, 'chat');
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF181818),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF181818),
-        elevation: 0,
-        title: const Text(
-          'Customer Service',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listener: (_, __) => _initChatIfNeeded(),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
+          listenWhen: (prev, curr) =>
+          prev.record?.rekanNama != curr.record?.rekanNama,
+          listener: (_, __) => _initChatIfNeeded(),
+        ),
+      ],
+      child: const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(), // loading sementara
+        ),
       ),
-      // ❌ body kosong, hapus text placeholder
-      body: const SizedBox.shrink(),
-      // ✅ FAB untuk buka halaman chat
-      floatingActionButton:  FloatingActionButton(
-        onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('chat'),
-        child: const Icon(Icons.chat),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-
   Future<void> _initChatIfNeeded() async {
-    if (_initInFlight) return;
-    _initInFlight = true;
-    try {
-      if (!isMobile) return; // kalau SDK cuma dukung mobile
+    if (!isMobile) return;
 
-      const userId = "dummy-user-123";
-      const displayName = "Dummy Guest";
+    final displayName = await _getDisplayName(context);
+    final userId = _getUserId(context);
 
-      if (_lastUserId == userId && _lastDisplayName == displayName) return;
+    if (_lastUserId != userId || _lastDisplayName != displayName) {
+      debugPrint('[CustomerServicePage] Init: userId=$userId, name=$displayName');
 
-      MobileChatInitialization.init(
-        "_zGBGl1xg9V1ZQJVZNyFJg",
-        "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
-        "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE",
-        userId,
-        displayName,
-      );
-
-      _lastUserId = userId;
-      _lastDisplayName = displayName;
-    } catch (e, st) {
-      debugPrint('[CustomerServicePage] init error: $e\n$st');
-    } finally {
-      _initInFlight = false;
+      try {
+        MobileChatInitialization.init(
+          "_zGBGl1xg9V1ZQJVZNyFJg", // TODO: pindahin ke env/config
+          "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
+          "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE",
+          userId,
+          displayName,
+        );
+        _lastUserId = userId;
+        _lastDisplayName = displayName;
+      } catch (e) {
+        debugPrint('[CustomerServicePage] init failed: $e');
+      }
     }
+  }
+
+  Future<String> _getDisplayName(BuildContext context) async {
+    final authState = context.read<AuthenticationBloc>().state;
+
+    if (authState is AuthenticationAuthenticated) {
+      final custType = authState.user.custType;
+
+      if (custType == 'C') {
+        // 🔹 Client → ambil dari UserProfileCubit
+        final profileState = context.read<UserProfileCubit>().state;
+        final nama = profileState.nama?.trim();
+        if (nama != null && nama.isNotEmpty) {
+          return nama;
+        }
+        return 'Client User'; // default kalau kosong
+      } else if (custType == 'U') {
+        // 🔹 User baru → ambil dari RegUserProfileCubit
+        final regState = context.read<RegUserProfileCubit>().state;
+        if (regState.email.isNotEmpty) {
+          return regState.email;
+        }
+        return 'New User'; // default kalau email kosong
+      }
+    }
+
+    // 🔹 Default (belum login / state lain)
+    return 'Guest';
+  }
+
+
+  String _getUserId(BuildContext context) {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is AuthenticationAuthenticated &&
+        authState.user.id != null) {
+      return authState.user.id.toString();
+    }
+    return 'guest-${DateTime.now().millisecondsSinceEpoch}';
   }
 }

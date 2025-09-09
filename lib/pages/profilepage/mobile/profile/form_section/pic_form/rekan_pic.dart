@@ -120,11 +120,84 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // === LIST EDITABLE ===
+
+                const SizedBox(height: 10),
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, fieldSpacing),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Informasi PIC",
+                        style: TextStyle(
+                          fontSize: getResponsiveFont(context, 22),
+                          fontWeight: FontWeight.w600,
+                          color: primaryLightColor,
+                        ),
+                      ),
+                      Text(
+                        "Data penanggung jawab utama perusahaan.",
+                        style: TextStyle(
+                          fontSize: getResponsiveFont(context, 16),
+                          color: sGrey,
+                          height: 1.3,
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center, // ⬅️ ini kuncinya
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              "Maksimal 3 PIC yang bisa di tambahkan.",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                color: primaryColor,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+
+                    ],
+                  ),
+                ),
+
+                // const SizedBox(height: 10),
+
+                // if (state.items.isEmpty)
+                //   const Padding(
+                //     padding: EdgeInsets.symmetric(vertical: 8),
+                //     child: Center(child: Text('Belum ada data PIC')),
+                //   )
+                // else
+                //   ListView.separated(
+                //     shrinkWrap: true,
+                //     physics: const NeverScrollableScrollPhysics(),
+                //     itemCount: state.items.length,
+                //     separatorBuilder: (_, __) => const SizedBox(height: 12),
+                //     itemBuilder: (ctx, idx) {
+                //       final item = state.items[idx];
+                //       final ctrls = _rowCtrls[item.mrekanpicId]!;
+                //       return _buildEditorRowCard(
+                //         title: 'Edit PIC',
+                //         ctrls: ctrls,
+                //         isNew: false,
+                //         onSave: () => _saveExisting(item.mrekanpicId, ctrls),
+                //         onDelete: () => _confirmDelete(item.mrekanpicId),
+                //       );
+                //     },
+                //   ),
+
                 if (state.items.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Center(child: Text('Belum ada data PIC')),
-                  )
+                  const SizedBox.shrink() // ⬅️ kalau kosong, nggak render apa-apa
                 else
                   ListView.separated(
                     shrinkWrap: true,
@@ -143,10 +216,6 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                       );
                     },
                   ),
-
-                const SizedBox(height: 16),
-                const Divider(height: 1),
-                const SizedBox(height: 12),
 
                 // === BUTTON TAMBAH / FORM TAMBAH ===
                 AnimatedSwitcher(
@@ -346,7 +415,15 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
   }) {
     return Card(
       key: key,
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: hPadding),
+      color: pGrey,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(cardBorderRadius), // ⬅️ radius pakai constant
+        side: const BorderSide(
+          color: sGrey, // ⬅️ border warna sGrey
+          width: 1.0,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
@@ -358,92 +435,93 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
               // Header + actions
               Row(
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  Text(
+                    title,
+                    style: TextStyle(fontSize: getResponsiveFont(context, 20), fontWeight: FontWeight.w700),
+                  ),
                   const Spacer(),
-                  ElevatedButton.icon(
+
+                  // === Tombol SIMPAN (centang) ===
+                  ElevatedButton(
                     onPressed: onSave,
-                    icon: isSaving
-                        ? const SizedBox(
-                        height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.save),
-                    label: Text(
-                      isNew ? 'Simpan' : 'Simpan',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
+                    child: isSaving
+                        ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                        : const Icon(Icons.check, color: Colors.white), // ⬅️ hanya ikon centang
                   ),
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
-                      onPressed: onDelete,
-                      // icon: Icon(isNew ? Icons.close : Icons.delete_outline),
-                      label: AppButton.iconLeft(
-                        text: isNew ? 'Batal' : 'Hapus',
-                        icon: Icon(isNew ? Icons.close : Icons.delete_outline, size: 18),
-                        onPressed: onDelete,
-                        backgroundColor: Colors.transparent,
-                        textColor: isNew ? primaryLightColor : pRed,
-                        iconColor:  isNew ? primaryLightColor : pRed,
-                        elevation: 0,
-                        borderRadius: 10,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                        textStyle: bodyTextStyle(context).copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                      )
 
+                  const SizedBox(width: 8),
+
+                  // === Tombol BATAL (X) / HAPUS (tong sampah) ===
+                  OutlinedButton(
+                    onPressed: onDelete,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: isNew ? primaryLightColor : pRed),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                    ),
+                    child: Icon(
+                      isNew ? Icons.close : Icons.delete, // ⬅️ X untuk batal, 🗑️ untuk hapus
+                      color: isNew ? primaryLightColor : pRed,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 12),
 
               // Nama
-              const Text('Nama PIC'),
+              Text('Nama PIC', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
               TextFormField(
                 controller: ctrls.nama,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
+                decoration: customInputDecoration('Nama PIC').copyWith(
                   hintText: 'Masukkan nama',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Nama tidak boleh kosong' : null,
               ),
+
               const SizedBox(height: 12),
 
               // Email
-              const Text('Email'),
+              Text('Email', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
               TextFormField(
                 controller: ctrls.email,
                 keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
+                decoration: customInputDecoration('Email').copyWith(
                   hintText: 'Masukkan email',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Email tidak boleh kosong' : null,
               ),
               const SizedBox(height: 12),
 
               // HP
-              const Text('No. HP'),
+              Text('No. HP', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
               TextFormField(
                 controller: ctrls.hp,
                 keyboardType: TextInputType.phone,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]'))],
-                decoration: const InputDecoration(
+                decoration: customInputDecoration('No. HP').copyWith(
                   hintText: 'Masukkan nomor HP',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'No. HP tidak boleh kosong' : null,
               ),
+
               const SizedBox(height: 12),
 
               // Jabatan
-              const Text('Jabatan'),
+              Text('Jabatan', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
               FormField<ComboMJabatanModel>(
                 validator: (_) => ctrls.jabatan == null ? 'Jabatan harus dipilih' : null,
                 builder: (ffState) {

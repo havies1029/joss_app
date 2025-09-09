@@ -27,61 +27,61 @@ class HeroPage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, authState) {
-                    final custType = authState is AuthenticationAuthenticated
-                        ? authState.user.custType
-                        : '';
+                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                    builder: (context, authState) {
+                      final custType = authState is AuthenticationAuthenticated
+                          ? authState.user.custType
+                          : '';
 
-                    if (custType == 'C') {
-// 🔹 Client → ambil dari UserProfileCubit
-                      return BlocBuilder<UserProfileCubit, UserProfileState>(
-                        buildWhen: (prev, curr) =>
-                        prev.nama != curr.nama || prev.fotoBytes != curr.fotoBytes,
-                        builder: (context, profileState) {
-                          final displayName =
-                          (profileState.nama?.trim().isNotEmpty ?? false)
-                              ? profileState.nama!.trim()
-                              : 'Client User'; // default kalau masih kosong
+                      if (custType == 'C') {
+  // 🔹 Client → ambil dari UserProfileCubit
+                        return BlocBuilder<UserProfileCubit, UserProfileState>(
+                          buildWhen: (prev, curr) =>
+                          prev.nama != curr.nama || prev.fotoBytes != curr.fotoBytes,
+                          builder: (context, profileState) {
+                            final displayName =
+                            (profileState.nama?.trim().isNotEmpty ?? false)
+                                ? profileState.nama!.trim()
+                                : 'Client User'; // default kalau masih kosong
 
-                          final bytes = (profileState.fotoBytes != null &&
-                              profileState.fotoBytes!.isNotEmpty)
-                              ? profileState.fotoBytes
-                              : null; // default kalau belum ada foto
+                            final bytes = (profileState.fotoBytes != null &&
+                                profileState.fotoBytes!.isNotEmpty)
+                                ? profileState.fotoBytes
+                                : null; // default kalau belum ada foto
 
-                          return _buildHeroContent(
-                            displayName: displayName,
-                            custType: custType,
-                            bytes: bytes,
-                          );
-                        },
+                            return _buildHeroContent(
+                              displayName: displayName,
+                              custType: custType,
+                              bytes: bytes,
+                            );
+                          },
+                        );
+                      } else if (custType == 'U') {
+  // 🔹 User baru → ambil dari RegUserProfileCubit
+                        return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
+                          buildWhen: (prev, curr) => prev.email != curr.email,
+                          builder: (context, regState) {
+                            final displayName = regState.email.isNotEmpty
+                                ? regState.email
+                                : 'New User'; // default kalau email kosong
+
+                            return _buildHeroContent(
+                              displayName: displayName,
+                              custType: custType,
+                              bytes: null, // user baru belum ada foto
+                            );
+                          },
+                        );
+                      }
+
+  // 🔹 Default (belum login / state lain) → render placeholder juga
+                      return _buildHeroContent(
+                        displayName: 'Guest', // fallback
+                        custType: '',
+                        bytes: null,
                       );
-                    } else if (custType == 'U') {
-// 🔹 User baru → ambil dari RegUserProfileCubit
-                      return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
-                        buildWhen: (prev, curr) => prev.email != curr.email,
-                        builder: (context, regState) {
-                          final displayName = regState.email.isNotEmpty
-                              ? regState.email
-                              : 'New User'; // default kalau email kosong
-
-                          return _buildHeroContent(
-                            displayName: displayName,
-                            custType: custType,
-                            bytes: null, // user baru belum ada foto
-                          );
-                        },
-                      );
-                    }
-
-// 🔹 Default (belum login / state lain) → render placeholder juga
-                    return _buildHeroContent(
-                      displayName: 'Guest', // fallback
-                      custType: '',
-                      bytes: null,
-                    );
-                  },
-                ),
+                    },
+                  ),
               ],
             ),
           ),
