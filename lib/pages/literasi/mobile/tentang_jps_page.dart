@@ -70,36 +70,40 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
           const SizedBox(height: 1),
           // Chips horizontal
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            color: secondaryBlackColor,
+            padding: const EdgeInsets.only(left: 15),
             child: SizedBox(
               height: 56,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: sections.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (ctx, i) => ChoiceChip(
-                  label: Text(sections[i], style: bodyTextStyle(context)),
-                  selected: selectedChip == i,
-                  selectedColor: primaryColor,
-                  backgroundColor: pGrey,
-                  showCheckmark: false,
-                  side: BorderSide.none,
-                  onSelected: (val) {
-                    setState(() => selectedChip = i);
-                    scrollToSection(sections[i]);
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                  ),
-                  labelPadding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                ),
+                itemBuilder:
+                    (ctx, i) => ChoiceChip(
+                      label: Text(
+                        sections[i],
+                        style: bodyTextStyle(context, fontSize: 16),
+                      ),
+                      selected: selectedChip == i,
+                      selectedColor: primaryColor,
+                      backgroundColor: pGrey,
+                      showCheckmark: false,
+                      side: BorderSide.none,
+                      onSelected: (val) {
+                        setState(() => selectedChip = i);
+                        scrollToSection(sections[i]);
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(cardBorderRadius),
+                      ),
+                      labelPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                    ),
               ),
             ),
           ),
+          kDivider,
           Expanded(
             child: SingleChildScrollView(
               controller: _scrollController,
@@ -112,7 +116,10 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
                       child: TentangCardWidget(),
                     ),
                     const SizedBox(height: 40),
-                    Container(key: sectionKeys['Peran'], child: PeranJPSWidget()),
+                    Container(
+                      key: sectionKeys['Peran'],
+                      child: PeranJPSWidget(),
+                    ),
                     const SizedBox(height: 40),
                     Container(
                       key: sectionKeys['Pencapaian'],
@@ -141,7 +148,10 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
                       child: TestimonialSection(),
                     ),
                     const SizedBox(height: 40),
-                    Container(key: sectionKeys['Klien'], child: ClientSection()),
+                    Container(
+                      key: sectionKeys['Klien'],
+                      child: ClientSection(),
+                    ),
                   ],
                 ),
               ),

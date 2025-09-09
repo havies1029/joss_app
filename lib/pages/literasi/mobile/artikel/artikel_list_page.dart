@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/gen_berita/berita1cari_bloc.dart';
 import '../../../../blocs/gen_berita/beritakecilcari_bloc.dart';
 import '../../../../blocs/gen_berita/beritalaincari_bloc.dart';
@@ -8,6 +7,7 @@ import '../../../../blocs/gen_berita/berita2cari_bloc.dart';
 import '../../../../blocs/gen_berita/berita3cari_bloc.dart';
 import '../../../../blocs/local_prefs/article_selection_cubit.dart';
 
+import '../../../../common/constants.dart';
 import 'artikel_detail_page.dart';
 import '../../widgets/artikel_card.dart';
 
@@ -36,7 +36,6 @@ class ArtikelListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -47,23 +46,27 @@ class ArtikelListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   sectionTitleBar(context, 'Cerita Besar'),
-                  const SizedBox(height: 25),
+                  kDivider,
                   ...state1.items.map(
-                    (artikel) => ArticleCardWidget(
-                      title: artikel.judul ?? '-',
+                        (artikel) => ArticleCardWidget.bigNews(
+                      judul: artikel.judul ?? '-',
+                      subjudul: artikel.sumber,
                       onTap: () => _goToDetail(context, artikel),
-                      accentColor: const Color(0xFF2E7D32),
-                      icon: Icons.article_rounded,
                       imageUrl: artikel.gambar,
-                      date:
-                          artikel.tglTerbit?.toString().split(' ').first ?? "",
+                      lamaBaca:
+                      (artikel.lamaBaca != null)
+                          ? "${artikel.lamaBaca} min"
+                          : null,
+                      tglTerbit:
+                      artikel.tglTerbit?.toString().split(' ').first ??
+                          "",
                     ),
                   ),
                 ],
               );
             },
           ),
-
+          Container(height: 27, color: primaryBlackColor),
           // SIDE ARTICLES
           BlocBuilder<BeritaKecilCariBloc, BeritaKecilCariState>(
             builder: (context, state2) {
@@ -71,23 +74,27 @@ class ArtikelListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   sectionTitleBar(context, 'Cerita Lainnya'),
-                  const SizedBox(height: 25),
+                  kDivider,
                   ...state2.items.map(
-                    (artikel) => ArticleCardWidget(
-                      title: artikel.judul ?? '-',
+                        (artikel) => ArticleCardWidget.otherArticle(
+                      judul: artikel.judul ?? '-',
+                      subjudul: artikel.sumber,
                       onTap: () => _goToDetail(context, artikel),
-                      accentColor: const Color(0xFF2E7D32),
-                      icon: Icons.article_rounded,
-                      imageUrl: artikel.gambar, // <= ini penting!
-                      date:
-                          artikel.tglTerbit?.toString().split(' ').first ?? "",
+                      imageUrl: artikel.gambar,
+                      lamaBaca:
+                      (artikel.lamaBaca != null)
+                          ? "${artikel.lamaBaca} min"
+                          : null,
+                      tglTerbit:
+                      artikel.tglTerbit?.toString().split(' ').first ??
+                          "",
                     ),
                   ),
                 ],
               );
             },
           ),
-
+          Container(height: 27, color: primaryBlackColor),
           // SIDEBAR ARTICLES
           BlocBuilder<BeritaLainCariBloc, BeritaLainCariState>(
             builder: (context, state3) {
@@ -95,16 +102,20 @@ class ArtikelListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   sectionTitleBar(context, 'Artikel Lainnya'),
-                  const SizedBox(height: 25),
+                  kDivider,
                   ...state3.items.map(
-                    (artikel) => ArticleCardWidget(
-                      title: artikel.judul ?? '-',
+                        (artikel) => ArticleCardWidget.otherArticle(
+                      judul: artikel.judul ?? '-',
+                      subjudul: artikel.sumber,
                       onTap: () => _goToDetail(context, artikel),
-                      accentColor: const Color(0xFF2E7D32),
-                      icon: Icons.article_rounded,
-                      imageUrl: artikel.gambar, // <= ini penting!
-                      date:
-                          artikel.tglTerbit?.toString().split(' ').first ?? "",
+                      imageUrl: artikel.gambar,
+                      lamaBaca:
+                      (artikel.lamaBaca != null)
+                          ? "${artikel.lamaBaca} min"
+                          : null,
+                      tglTerbit:
+                      artikel.tglTerbit?.toString().split(' ').first ??
+                          "",
                     ),
                   ),
                 ],
@@ -113,7 +124,7 @@ class ArtikelListPage extends StatelessWidget {
           ),
 
           // Footer spacing
-          const SizedBox(height: 32),
+          const SizedBox(height: 30),
         ],
       ),
     );

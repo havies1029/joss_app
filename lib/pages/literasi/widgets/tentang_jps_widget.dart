@@ -23,12 +23,18 @@ class _TentangCardWidgetState extends State<TentangCardWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Image.asset(
-          "assets/images/jps_header_literasi.png",
-          fit: BoxFit.cover,
-          height: 132,
-          width: double.infinity,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(
+            15,
+          ),
+          child: Image.asset(
+            "assets/images/jps_header_literasi.png",
+            fit: BoxFit.cover,
+            height: 132,
+            width: double.infinity,
+          ),
         ),
+
         const SizedBox(height: 18),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

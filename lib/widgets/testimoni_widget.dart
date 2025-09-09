@@ -7,11 +7,10 @@ import '../blocs/gen_review/reviewcari_bloc.dart';
 import '../models/gen_review/reviewcari_model.dart';
 
 class TestimonialSection extends StatefulWidget {
-  final bool isPageMode; // Parameter untuk menentukan mode tampilan
-
+  final bool isPageMode;
   const TestimonialSection({
     super.key,
-    this.isPageMode = false, // Default sebagai widget mode
+    this.isPageMode = false,
   });
 
   @override
@@ -21,7 +20,7 @@ class TestimonialSection extends StatefulWidget {
 class TestimonialSectionState extends State<TestimonialSection> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  int _displayedItems = 10; // Jumlah items yang ditampilkan di page mode
+  int _displayedItems = 10;
 
   @override
   void initState() {
@@ -44,17 +43,13 @@ class TestimonialSectionState extends State<TestimonialSection> {
 
   @override
   Widget build(BuildContext context) {
-    final double maxWidth = MediaQuery.of(context).size.width;
-    final bool isMobile = maxWidth < 768;
-    final bool isTablet = maxWidth >= 768 && maxWidth < 1024;
-    final double cardMaxWidth = maxWidth > 1200 ? 1200 : maxWidth * 0.9;
-
     return Container(
+      color: secondaryBlackColor,
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: maxWidth > 1200 ? 105 : 20.0),
+      padding: widget.isPageMode ? EdgeInsets.all(15) : EdgeInsets.all(0),
       child: Center(
         child: Container(
-          width: cardMaxWidth,
+          width: 360,
           child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
             builder: (context, state) {
               if (state.status == ListStatus.initial) {
@@ -70,12 +65,10 @@ class TestimonialSectionState extends State<TestimonialSection> {
               return widget.isPageMode
                   ? SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(isMobile),
-                    const SizedBox(height: 16),
-                    _buildGridView(items, isMobile, isTablet),
-                    SizedBox(height: 20.0),
+                    _buildHeader(context),
+                    _buildGridView(context, items),
                     if (_displayedItems < items.length)
                       _buildLoadMoreButton(items.length),
                   ],
@@ -84,14 +77,13 @@ class TestimonialSectionState extends State<TestimonialSection> {
                   : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildHeader(isMobile),
+                  _buildHeader(context),
                   const SizedBox(height: 16),
-                  _buildCarouselView(items, isMobile, isTablet),
-                  SizedBox(height: isMobile ? 10.0 : 15.0),
-                  _buildNavigationControls(isMobile, isTablet, items),
+                  _buildCarouselView(context, items),
+                  SizedBox(height: isMobile(context) ? 10.0 : 15.0),
+                  _buildNavigationControls(context, items),
                 ],
               );
-
             },
           ),
         ),
@@ -99,7 +91,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
     );
   }
 
-  Widget _buildHeader(bool isMobile) {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,10 +114,13 @@ class TestimonialSectionState extends State<TestimonialSection> {
     );
   }
 
-  // Grid view untuk page mode
-  Widget _buildGridView(List<ReviewCariModel> items, bool isMobile, bool isTablet) {
+  /// Grid view untuk page mode
+  Widget _buildGridView(BuildContext context, List<ReviewCariModel> items) {
+    final mobile = isMobile(context);
+    final tablet = isTablet(context);
+
     final itemsToShow = items.take(_displayedItems).toList();
-    final int crossAxisCount = isMobile ? 1 : (isTablet ? 2 : 3);
+    final int crossAxisCount = mobile ? 1 : (tablet ? 2 : 3);
 
     return GridView.builder(
       shrinkWrap: true,
@@ -134,18 +129,18 @@ class TestimonialSectionState extends State<TestimonialSection> {
         crossAxisCount: crossAxisCount,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: isMobile ? 1.7 : 1.6,
+        childAspectRatio: mobile ? 1.7 : 1.6,
       ),
       itemCount: itemsToShow.length,
       itemBuilder: (context, index) {
-        return _buildTestimonialCard(itemsToShow[index], isMobile);
+        return _buildTestimonialCard(context, itemsToShow[index]);
       },
     );
   }
 
-  // Carousel view untuk widget mode
-  Widget _buildCarouselView(List<ReviewCariModel> items, bool isMobile, bool isTablet) {
-    return _buildTestimonialCards(items, isMobile, isTablet);
+  /// Carousel view untuk widget mode
+  Widget _buildCarouselView(BuildContext context, List<ReviewCariModel> items) {
+    return _buildTestimonialCards(context, items);
   }
 
   Widget _buildStarRating(double rating, double size) {
@@ -174,16 +169,15 @@ class TestimonialSectionState extends State<TestimonialSection> {
     );
   }
 
-  Widget _buildTestimonialCards(
-      List<ReviewCariModel> items,
-      bool isMobile,
-      bool isTablet,
-      ) {
-    final int itemsPerPage = isMobile ? 1 : (isTablet ? 2 : 3);
+  Widget _buildTestimonialCards(BuildContext context, List<ReviewCariModel> items) {
+    final mobile = isMobile(context);
+    final tablet = isTablet(context);
+
+    final int itemsPerPage = mobile ? 1 : (tablet ? 2 : 3);
     final totalPages = (items.length / itemsPerPage).ceil();
 
     return SizedBox(
-      height: isMobile ? 210.37 : 210.37,
+      height: 210.37,
       child: PageView.builder(
         controller: _pageController,
         onPageChanged: (int page) => setState(() => _currentPage = page),
@@ -198,7 +192,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
           return Row(
             children: [
               for (int i = startIndex; i < endIndex; i++) ...[
-                Expanded(child: _buildTestimonialCard(items[i], isMobile)),
+                Expanded(child: _buildTestimonialCard(context, items[i])),
                 if (i < endIndex - 1) const SizedBox(width: 16),
               ],
               // Add empty spaces for incomplete rows to maintain layout
@@ -214,9 +208,8 @@ class TestimonialSectionState extends State<TestimonialSection> {
     );
   }
 
-  Widget _buildTestimonialCard(ReviewCariModel item, bool isMobile) {
+  Widget _buildTestimonialCard(BuildContext context, ReviewCariModel item) {
     return Container(
-      margin: widget.isPageMode ? EdgeInsets.zero : const EdgeInsets.only(right: hPadding),
       padding: const EdgeInsets.only(right: 25, left: 25, top: 20, bottom: 35),
       decoration: BoxDecoration(
         color: pGrey,
@@ -248,7 +241,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
                       Text(
                         ' /${item.skala.toStringAsFixed(0)}',
                         style: const TextStyle(
-                          color: primaryLightColor,
+                          color: hintGrey,
                           fontSize: 14,
                         ),
                       ),
@@ -309,14 +302,13 @@ class TestimonialSectionState extends State<TestimonialSection> {
     );
   }
 
-  Widget _buildNavigationControls(
-      bool isMobile,
-      bool isTablet,
-      List<ReviewCariModel> items,
-      ) {
+  Widget _buildNavigationControls(BuildContext context, List<ReviewCariModel> items) {
     if (items.isEmpty) return const SizedBox.shrink();
 
-    final int itemsPerPage = isMobile ? 1 : (isTablet ? 2 : 3);
+    final mobile = isMobile(context);
+    final tablet = isTablet(context);
+
+    final int itemsPerPage = mobile ? 1 : (tablet ? 2 : 3);
     final totalPages = (items.length / itemsPerPage).ceil();
 
     return Row(
@@ -336,7 +328,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
               borderRadius: BorderRadius.circular(5),
             ),
             elevation: 0,
-            minimumSize: Size(isMobile ? 36 : 40, isMobile ? 36 : 40),
+            minimumSize: Size(mobile ? 36 : 40, mobile ? 36 : 40),
             padding: EdgeInsets.zero,
           ),
           child: SvgPicture.asset('assets/icons/arrow_left.svg', height: 16),
@@ -356,7 +348,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
               borderRadius: BorderRadius.circular(5),
             ),
             elevation: 0,
-            minimumSize: Size(isMobile ? 36 : 40, isMobile ? 36 : 40),
+            minimumSize: Size(mobile ? 36 : 40, mobile ? 36 : 40),
             padding: EdgeInsets.zero,
           ),
           child: SvgPicture.asset('assets/icons/arrow_right.svg', height: 16),

@@ -81,13 +81,13 @@ class _ClientSectionState extends State<ClientSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _SocmedIcon('assets/icons/instagram.svg', isMobile),
+              SocmedIcon('assets/icons/instagram.svg', isMobile),
               const SizedBox(width: 15),
-              _SocmedIcon('assets/icons/tiktok.svg', isMobile),
+              SocmedIcon('assets/icons/tiktok.svg', isMobile),
               const SizedBox(width: 15),
-              _SocmedIcon('assets/icons/linkedin.svg', isMobile),
+              SocmedIcon('assets/icons/linkedin.svg', isMobile),
               const SizedBox(width: 15),
-              _SocmedIcon('assets/icons/facebook.svg', isMobile),
+              SocmedIcon('assets/icons/facebook.svg', isMobile),
             ],
           ),
         ],
@@ -104,13 +104,16 @@ class _ClientLogoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double cardWidth = isMobile ? 72 : 95;
+    final double cardHeight = isMobile ? 42 : 60;
+
     return Container(
-      width: isMobile ? 106 : 95,
-      height: isMobile ? 58 : 60,
+      width: cardWidth,
+      height: cardHeight,
       padding: EdgeInsets.all(1),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(color: primaryColor),
+        border: Border.all(color: primaryColor, width: 1),
         color: primaryLightColor,
       ),
       child: ClipRRect(
@@ -122,7 +125,7 @@ class _ClientLogoCard extends StatelessWidget {
               (c, e, s) => Icon(
                 Icons.error,
                 color: Colors.grey,
-                size: isMobile ? 24 : 32,
+                size: isMobile ? 18 : 32,
               ),
         ),
       ),
@@ -130,7 +133,7 @@ class _ClientLogoCard extends StatelessWidget {
   }
 }
 
-Widget _SocmedIcon(String assetPath, bool isMobile) => Container(
+Widget SocmedIcon(String assetPath, bool isMobile) => Container(
   width: isMobile ? 40 : 48,
   height: isMobile ? 40 : 48,
   padding: const EdgeInsets.all(2),

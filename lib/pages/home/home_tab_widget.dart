@@ -92,24 +92,9 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
         ),
 
       ],
-      child: !pIsWeb
-          ? Scaffold(
-        extendBody: true,
-        body: Column(
-          children: [
-            web_nav.WebNavbar(
-              currentIndex: selectedIndex,
-              onTap: (idx) => setState(() => selectedIndex = idx),
-            ),
-            Expanded(
-              child: IndexedStack(index: selectedIndex, children: pages),
-            ),
-          ],
-        ),
-      )
-          : Scaffold(
+      child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: MobileTopNavigationBar(context: context),
+        appBar: MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
         body: pages[selectedIndex],
         bottomNavigationBar: Material(
           color: primaryBlackColor,

@@ -23,61 +23,66 @@ class CompanyProfileCard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 0),
         Center(
-          child: SafeArea(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 18),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              decoration: BoxDecoration(
-                color: pGrey,
-                borderRadius: BorderRadius.circular(cardBorderRadius),
-                border: Border.all(color: sGrey),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/employee_shield.svg',
-                    height: 40,
-                  ),
-                  RichText(
-                    text: TextSpan(
-                      style: bodyTextStyle(
-                        context,
-                        fontSize: 24,
-                      ).copyWith(fontFamily: "Delm-Regular"),
-                      children: [
-                        const TextSpan(text: 'Company '),
-                        TextSpan(
-                          text: 'Profile',
-                          style: TextStyle(color: primaryColor),
-                        ),
-                      ],
+          child: Transform.translate(
+            offset: const Offset(0, -50),
+            child: SafeArea(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: pGrey,
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  border: Border.all(color: sGrey),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/employee_shield.svg',
+                      height: 40,
                     ),
-                  ),
-                  // Subjudul
-                  Text(
-                    'Semua tentang JPS dalam satu dokumen.',
-                    style: bodyTextStyle(
-                      context,
-                      fontSize: 16,
-                    ).copyWith(color: hintGrey),
-                  ),
-                  const SizedBox(height: 12),
-                  // Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: AppButton.iconLeft(
-                      text: 'Unduh Sekarang',
-                      onPressed: onDownload ?? () {},
-                      icon: SvgPicture.asset(
-                        'assets/icons/download.svg',
-                        height: 18,
+                    RichText(
+                      text: TextSpan(
+                        style: bodyTextStyle(
+                          context,
+                          fontSize: 24,
+                        ).copyWith(fontFamily: "Delm-Regular"),
+                        children: [
+                          const TextSpan(text: 'Company '),
+                          TextSpan(
+                            text: 'Profile',
+                            style: TextStyle(color: primaryColor),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                    // Subjudul
+                    Text(
+                      'Semua tentang JPS dalam satu dokumen.',
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: 16,
+                      ).copyWith(color: hintGrey),
+                    ),
+                    const SizedBox(height: 12),
+                    // Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppButton.iconLeft(
+                        text: 'Unduh Sekarang',
+                        onPressed: onDownload ?? () {},
+                        icon: SvgPicture.asset(
+                          'assets/icons/download.svg',
+                          height: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

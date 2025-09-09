@@ -307,21 +307,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                     );
                                   },
                                 ),
-                                // _buildMenuItem(
-                                //   icon: Icons.account_balance_outlined,
-                                //   title: 'Informasi PIC',
-                                //   onTap: () {
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(
-                                //         builder: (context) => const MRekanPicInlineEditorList(
-                                //           // viewMode: 'tambah',
-                                //           // recordId: '',
-                                //         ),
-                                //       ),
-                                //     );
-                                //   },
-                                // ),
+                                _buildMenuItem(
+                                  icon: Icons.account_balance_outlined,
+                                  title: 'Informasi PIC',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const MRekanPicInlineEditorList(
+                                          // viewMode: 'tambah',
+                                          // recordId: '',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                                 _buildDivider(),
                                 _buildMenuItem(
                                   icon: Icons.lock_outline,
@@ -357,21 +357,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   child: Column(
                     children: [
-                      _buildMenuItem(
-                        icon: Icons.account_balance_outlined,
-                        title: 'Informasi PIC',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MRekanPicInlineEditorList(
-                                // viewMode: 'tambah',
-                                // recordId: '',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      // _buildMenuItem(
+                      //   icon: Icons.account_balance_outlined,
+                      //   title: 'Informasi PIC',
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => const MRekanPicInlineEditorList(
+                      //           // viewMode: 'tambah',
+                      //           // recordId: '',
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                       _buildMenuItem(
                         icon: Icons.local_shipping_outlined,
                         title: 'Syarat dan Ketentuan',
