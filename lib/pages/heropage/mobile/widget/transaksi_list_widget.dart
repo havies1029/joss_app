@@ -70,8 +70,6 @@ class TransaksiListWidget extends StatelessWidget {
                 // TODO: Aksi lihat semua
               },
               width: double.infinity,
-              hasAnimation: false,
-              textStyle: bodyTextStyle(context, fontSize: 20),
             ),
           ),
         ],

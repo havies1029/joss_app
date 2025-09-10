@@ -49,6 +49,7 @@ dependencies:
   mobile_chat_flutter: ^1.0.2
   hydrated_bloc: ^10.1.1
   dio: ^5.4.0
+  fl_chart: ^0.66.0
 
 dev_dependencies:
   flutter_test:
@@ -93,6 +94,10 @@ flutter:
     - assets/images/start-1.svg
     - assets/images/start-2.svg
     - assets/images/start-3.svg
+    - assets/icons/instagram.svg
+    - assets/icons/tiktok.svg
+    - assets/icons/linkedin.svg
+    - assets/icons/facebook.svg
 
   fonts:
     - family: Delm-Regular

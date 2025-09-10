@@ -42,12 +42,13 @@ const Color secondaryBlackColor = Color(0xFF181818);
 
 const Color pGrey = Color(0xFF292929);
 const Color sGrey = Color(0xFF4E4E4E);
+const Color unselectedColor = Color(0xFF666666);
 const Color hintGrey = Color(0xFFBCBCBC);
 
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
 const Color pRed = Color(0xFFFF0000);
-const Color pGreen = Color(0xFF4BB34B);
+const Color pGreen = Color(0xFF90DE24);
 const Color pDarkRed = Color(0xFFDC1C1C);
 
 
@@ -108,7 +109,13 @@ enum ListStatus { initial, success, failure }
 
 const kAnimationDuration = Duration(milliseconds: 200);
 
-/// Gradient Warna Oranye Smooth
+const Widget kDivider = Divider(
+  height: 1,
+  thickness: 1,
+  color: pGrey,
+  indent: 0,
+  endIndent: 0,
+);
 
 /// Horizontal (gelap → terang)
 const LinearGradient orangeSmoothGradientHorizontal = LinearGradient(
@@ -160,7 +167,6 @@ const LinearGradient orangeToBlackGradientVertical = LinearGradient(
   ],
   stops: [0.0, 1.0],
 );
-
 InputDecoration customInputDecoration(String label) {
   return InputDecoration(
     labelText: label,

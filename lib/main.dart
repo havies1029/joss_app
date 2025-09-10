@@ -44,15 +44,25 @@ import 'package:joss_app/repositories/login/change_password_repository.dart';
 import 'package:joss_app/repositories/profile/userfoto_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'blocs/gallery/galleryeventcari_bloc.dart';
 
+import 'blocs/gallery/gallerymembercari_bloc.dart';
+import 'blocs/gen_berita/berita1cari_bloc.dart';
+import 'blocs/gen_berita/berita2cari_bloc.dart';
+import 'blocs/gen_berita/berita3cari_bloc.dart';
+import 'blocs/gen_berita/beritakecilcari_bloc.dart';
+import 'blocs/gen_berita/beritalaincari_bloc.dart';
 import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
+import 'blocs/local_prefs/article_selection_cubit.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
+import 'blocs/gen_review/reviewcari_bloc.dart';
+import 'helper/app_prefs.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,7 +77,8 @@ Future<void> main() async {
   );
 
   final userRepository = UserRepository();
-
+  final prefs = await SharedPreferences.getInstance();
+  final appPrefs = AppPrefs(prefs);
   runApp(
     MultiBlocProvider(
       providers: [
@@ -113,8 +124,27 @@ Future<void> main() async {
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
+        BlocProvider(create: (_) => UserProfileCubit()),
+        BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
+        BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
+        BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
         BlocProvider(create: (_) => RegUserProfileCubit()),
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
+        BlocProvider(
+          create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1)),
+        ),
+        BlocProvider(
+          create: (_) => BeritaKecilCariBloc()..add(RefreshBeritaKecilCariEvent(2)),
+        ),
+        BlocProvider(
+          create: (_) => BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3)),
+        ),
+
+        BlocProvider(create: (_) => Berita2CariBloc()),
+        BlocProvider(create: (_) => Berita3CariBloc()),
+        BlocProvider<ArticleSelectionCubit>(
+          create: (_) => ArticleSelectionCubit(appPrefs),
+        ),
       ],
       child: MultiBlocListener(
         listeners: [

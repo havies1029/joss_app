@@ -13,7 +13,7 @@ class MobileBottomNavigationBar extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   static const double _height = 64;
-  static const double _thickness = 3;
+  static const double _thickness = 1.5;
 
   // Daftar menu default JPS
   static const List<NavBarItem> _defaultItems = [

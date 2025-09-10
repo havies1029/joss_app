@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
 import 'package:joss_app/pages/testpage/testpage1.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
@@ -34,7 +35,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
     super.initState();
     pages = [
       const HeroPage(),
-      const ReportTab(),
+      const LiterasiPage(),
       const CustomerServicePage(),
       const SettingsPage(),
     ];
@@ -91,24 +92,9 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
         ),
 
       ],
-      child: !pIsWeb
-          ? Scaffold(
-        extendBody: true,
-        body: Column(
-          children: [
-            web_nav.WebNavbar(
-              currentIndex: selectedIndex,
-              onTap: (idx) => setState(() => selectedIndex = idx),
-            ),
-            Expanded(
-              child: IndexedStack(index: selectedIndex, children: pages),
-            ),
-          ],
-        ),
-      )
-          : Scaffold(
+      child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: MobileTopNavigationBar(context: context),
+        appBar: MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
         body: pages[selectedIndex],
         bottomNavigationBar: Material(
           color: primaryBlackColor,

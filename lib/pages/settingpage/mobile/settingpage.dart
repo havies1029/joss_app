@@ -308,7 +308,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   },
                                 ),
                                 _buildMenuItem(
-                                  icon: Icons.account_balance_outlined,
+                                  icon: Icons.contact_phone_outlined,
                                   title: 'Informasi PIC',
                                   onTap: () {
                                     Navigator.push(
@@ -323,27 +323,27 @@ class _SettingsPageState extends State<SettingsPage> {
                                   },
                                 ),
                                 _buildDivider(),
-                                _buildMenuItem(
-                                  icon: Icons.lock_outline,
-                                  title: 'Ubah Password',
-                                  onTap: () {
-                                    UbahPassword.show(context);
-                                    if (pIsMobile) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const UbahPasswordPage(),
-                                        ),
-                                      );
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        barrierDismissible: true,
-                                        builder: (context) => const UbahPassword(),
-                                      );
-                                    }
-                                  },
-                                ),
+                                // _buildMenuItem(
+                                //   icon: Icons.lock_outline,
+                                //   title: 'Ubah Password',
+                                //   onTap: () {
+                                //     UbahPassword.show(context);
+                                //     if (pIsMobile) {
+                                //       Navigator.push(
+                                //         context,
+                                //         MaterialPageRoute(
+                                //           builder: (_) => const UbahPasswordPage(),
+                                //         ),
+                                //       );
+                                //     } else {
+                                //       showDialog(
+                                //         context: context,
+                                //         barrierDismissible: true,
+                                //         builder: (context) => const UbahPassword(),
+                                //       );
+                                //     }
+                                //   },
+                                // ),
                               ],
                             ),
                           ),

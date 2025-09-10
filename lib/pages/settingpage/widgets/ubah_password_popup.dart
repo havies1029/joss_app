@@ -4,177 +4,14 @@ import 'package:joss_app/blocs/login/change_password_bloc.dart';
 import 'package:joss_app/models/authentication/change_password_model.dart';
 import 'package:joss_app/common/constants.dart';
 
-class UbahPassword extends StatefulWidget {
-  const UbahPassword({Key? key}) : super(key: key);
+const Color fieldBgColor = Color(0xFF181818);
+const Color borderColor = Color(0xFF484848);
+const Color fieldTextColor = Colors.white;
+const Color labelColor = Colors.white70;
+const Color hintColor = Colors.white38;
+const Color errorColor = Color(0xFFFF5A5A);
+const Color activeColor = primaryColor; // #EF7A28
 
-  @override
-  State<UbahPassword> createState() => _UbahPasswordState();
-
-  /// Helper untuk buka UbahPassword (panggil dari mana saja)
-  static Future show(BuildContext context) {
-    if (pIsMobile) {
-      // Buka sebagai PAGE PENUH di mobile
-      return Navigator.push(context,
-          MaterialPageRoute(builder: (ctx) => const UbahPasswordPage())
-      );
-    } else {
-      // Web/Desktop: Modal dialog
-      return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => const UbahPassword(),
-      );
-    }
-  }
-}
-
-class _UbahPasswordState extends State<UbahPassword> with TickerProviderStateMixin {
-  final _oldPasswordController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
-  bool _showOld = false;
-  bool _showNew = false;
-  bool _showConfirm = false;
-  bool _isHovering = false;
-
-  String? _oldPasswordError;
-  String? _newPasswordError;
-  String? _confirmPasswordError;
-
-  late ChangePasswordBloc _bloc;
-  late AnimationController _animCtrl;
-  late Animation<double> _scaleAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc = context.read<ChangePasswordBloc>();
-    _animCtrl = AnimationController(
-      duration: const Duration(milliseconds: 280),
-      vsync: this,
-    );
-    _scaleAnim = Tween<double>(begin: 0.95, end: 1).animate(
-      CurvedAnimation(parent: _animCtrl, curve: Curves.elasticOut),
-    );
-    _animCtrl.forward();
-  }
-
-  @override
-  void dispose() {
-    _animCtrl.dispose();
-    _oldPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    setState(() {
-      _oldPasswordError = null;
-      _newPasswordError = null;
-      _confirmPasswordError = null;
-    });
-
-    final oldPwd = _oldPasswordController.text.trim();
-    final newPwd = _newPasswordController.text.trim();
-    final confirmPwd = _confirmPasswordController.text.trim();
-
-    bool hasError = false;
-
-    if (oldPwd.isEmpty) {
-      _oldPasswordError = 'Password lama tidak boleh kosong';
-      hasError = true;
-    }
-    if (newPwd.isEmpty) {
-      _newPasswordError = 'Password baru tidak boleh kosong';
-      hasError = true;
-    }
-    if (confirmPwd.isEmpty) {
-      _confirmPasswordError = 'Ulangi password baru';
-      hasError = true;
-    } else if (!hasError && newPwd != confirmPwd) {
-      _confirmPasswordError = 'Password baru & konfirmasi tidak sama';
-      hasError = true;
-    }
-
-    if (hasError) {
-      setState(() {});
-      return;
-    }
-
-    final model = ChangePasswordModel(oldPassword: oldPwd, newPassword: newPwd);
-    _bloc.add(UserChangePasswordEvent(pswd: model));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocConsumer<ChangePasswordBloc, ChangePasswordState>(
-      listener: (context, state) {
-        if (state.isSaved) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.hasFailure
-                    ? "Password lama salah."
-                    : "Password berhasil diubah.",
-              ),
-              backgroundColor: state.hasFailure ? Colors.red : primaryColor,
-            ),
-          );
-          if (!state.hasFailure) Navigator.of(context).pop();
-
-          _oldPasswordController.clear();
-          _newPasswordController.clear();
-          _confirmPasswordController.clear();
-        }
-      },
-      builder: (context, state) {
-        // --- POPUP only (web/desktop) ---
-        return Scaffold(
-          backgroundColor: Colors.black.withOpacity(0.55),
-          body: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => Navigator.of(context).pop(),
-            child: Center(
-              child: AnimatedBuilder(
-                animation: _scaleAnim,
-                builder: (ctx, child) => Transform.scale(
-                  scale: _scaleAnim.value,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: _UbahPasswordForm(
-                      oldPasswordController: _oldPasswordController,
-                      newPasswordController: _newPasswordController,
-                      confirmPasswordController: _confirmPasswordController,
-                      oldPasswordError: _oldPasswordError,
-                      newPasswordError: _newPasswordError,
-                      confirmPasswordError: _confirmPasswordError,
-                      showOld: _showOld,
-                      showNew: _showNew,
-                      showConfirm: _showConfirm,
-                      isHovering: _isHovering,
-                      onOldToggle: () => setState(() => _showOld = !_showOld),
-                      onNewToggle: () => setState(() => _showNew = !_showNew),
-                      onConfirmToggle: () => setState(() => _showConfirm = !_showConfirm),
-                      onSubmit: _submit,
-                      onHoverChanged: (v) => setState(() => _isHovering = v),
-                      closeOnTap: () => Navigator.of(context).pop(),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// =======================
-/// PAGE PENUH (mobile)!!!
-/// =======================
 class UbahPasswordPage extends StatefulWidget {
   const UbahPasswordPage({Key? key}) : super(key: key);
 
@@ -190,7 +27,6 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
   bool _showOld = false;
   bool _showNew = false;
   bool _showConfirm = false;
-  bool _isHovering = false;
 
   String? _oldPasswordError;
   String? _newPasswordError;
@@ -273,40 +109,157 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
         }
       },
       builder: (context, state) {
-        // --- FULL PAGE mobile ---
         return Scaffold(
+          backgroundColor: primaryBlackColor,
           appBar: AppBar(
-            backgroundColor: primaryColor,
+            backgroundColor: primaryBlackColor,
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.white),
             title: const Text(
-              "Ubah Password",
+              "Ubah Kata Sandi",
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
+            centerTitle: true,
           ),
-          backgroundColor: Colors.white,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: _UbahPasswordForm(
-                oldPasswordController: _oldPasswordController,
-                newPasswordController: _newPasswordController,
-                confirmPasswordController: _confirmPasswordController,
-                oldPasswordError: _oldPasswordError,
-                newPasswordError: _newPasswordError,
-                confirmPasswordError: _confirmPasswordError,
-                showOld: _showOld,
-                showNew: _showNew,
-                showConfirm: _showConfirm,
-                isHovering: _isHovering,
-                onOldToggle: () => setState(() => _showOld = !_showOld),
-                onNewToggle: () => setState(() => _showNew = !_showNew),
-                onConfirmToggle: () => setState(() => _showConfirm = !_showConfirm),
-                onSubmit: _submit,
-                onHoverChanged: (v) => setState(() => _isHovering = v),
-                closeOnTap: null,
-                showLogo: true,
-                asPage: true,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Card Section
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: fieldBgColor,
+                        border: Border.all(color: borderColor, width: 1.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 22,
+                        horizontal: 18,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          CustomTextField(
+                            controller: _oldPasswordController,
+                            label: "Kata Sandi Lama",
+                            errorText: _oldPasswordError,
+                            obscureText: !_showOld,
+                            onToggle: () =>
+                                setState(() => _showOld = !_showOld),
+                          ),
+                          const SizedBox(height: 16),
+
+                          CustomTextField(
+                            controller: _newPasswordController,
+                            label: "Kata Sandi Baru",
+                            errorText: _newPasswordError,
+                            obscureText: !_showNew,
+                            onToggle: () =>
+                                setState(() => _showNew = !_showNew),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: _PasswordRequirementRow(
+                              password: _newPasswordController.text,
+                            ),
+                          ),
+
+                          CustomTextField(
+                            controller: _confirmPasswordController,
+                            label: "Ulangi Kata Sandi",
+                            errorText: _confirmPasswordError,
+                            obscureText: !_showConfirm,
+                            onToggle: () =>
+                                setState(() => _showConfirm = !_showConfirm),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Security info
+                          Container(
+                            margin: const EdgeInsets.only(top: 8, bottom: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.lock,
+                                    color: hintColor, size: 18),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Jaga keamanan akunmu! Jangan gunakan kata sandi yang sama di banyak layanan.',
+                                    style: TextStyle(
+                                      color: hintColor,
+                                      fontSize: 13.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+
+                    // BUTTON SIMPAN
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: activeColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        onPressed: _submit,
+                        child: const Text(
+                          "Simpan Perubahan",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            letterSpacing: 0.2,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    // BUTTON LUPA KATA SANDI
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF232323),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          // TODO: Implement forgot password logic
+                        },
+                        child: const Text(
+                          "Lupa Kata Sandi?",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -316,282 +269,126 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
   }
 }
 
-/// =============
-/// UI Form logic (bisa share untuk dialog & page)
-/// =============
-class _UbahPasswordForm extends StatelessWidget {
-  final TextEditingController oldPasswordController;
-  final TextEditingController newPasswordController;
-  final TextEditingController confirmPasswordController;
-  final String? oldPasswordError;
-  final String? newPasswordError;
-  final String? confirmPasswordError;
-  final bool showOld;
-  final bool showNew;
-  final bool showConfirm;
-  final bool isHovering;
-  final VoidCallback onOldToggle;
-  final VoidCallback onNewToggle;
-  final VoidCallback onConfirmToggle;
-  final VoidCallback onSubmit;
-  final ValueChanged<bool> onHoverChanged;
-  final VoidCallback? closeOnTap;
-  final bool showLogo;
-  final bool asPage;
+// ======= CUSTOM FIELD ========
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final String? errorText;
+  final bool obscureText;
+  final VoidCallback? onToggle;
 
-  const _UbahPasswordForm({
+  const CustomTextField({
     Key? key,
-    required this.oldPasswordController,
-    required this.newPasswordController,
-    required this.confirmPasswordController,
-    required this.oldPasswordError,
-    required this.newPasswordError,
-    required this.confirmPasswordError,
-    required this.showOld,
-    required this.showNew,
-    required this.showConfirm,
-    required this.isHovering,
-    required this.onOldToggle,
-    required this.onNewToggle,
-    required this.onConfirmToggle,
-    required this.onSubmit,
-    required this.onHoverChanged,
-    this.closeOnTap,
-    this.showLogo = true,
-    this.asPage = false,
+    required this.controller,
+    required this.label,
+    this.errorText,
+    this.obscureText = false,
+    this.onToggle,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Web: ada close
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (!asPage) // header popup
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-            decoration: BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(cardBorderRadius * 1.8),
-                topRight: Radius.circular(cardBorderRadius * 1.8),
-              ),
-            ),
-            child: Row(
-              children: [
-                if (closeOnTap != null)
-                  GestureDetector(
-                    onTap: closeOnTap,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.20),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 20),
-                    ),
-                  ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Text(
-                    "Ubah Password",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(
+        color: fieldTextColor,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      cursorColor: activeColor,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: fieldBgColor,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        labelText: label,
+        labelStyle: const TextStyle(
+          color: labelColor,
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: borderColor, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: activeColor, width: 1.7),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: errorColor, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: errorColor, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        hintText: label,
+        hintStyle: const TextStyle(color: hintColor, fontWeight: FontWeight.w400),
+        suffixIcon: onToggle != null
+            ? IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            color: hintColor,
+            size: 22,
           ),
-        // --- Logo & Title
-        if (showLogo) ...[
-          const SizedBox(height: 22),
-          SizedBox(
-            width: 122,
-            height: 44,
-            child: Image(
-              image: AssetImage('assets/images/JPS.png'),
-              fit: BoxFit.contain,
-            ),
-          ),
-        ],
-        const SizedBox(height: 12),
-        Text(
-          'Silakan masukkan password lama & password baru.',
-          style: TextStyle(
-            fontSize: 15,
-            color: primaryBlackColor,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
+          onPressed: onToggle,
+        )
+            : null,
+        errorText: errorText,
+        errorStyle: const TextStyle(
+          color: errorColor,
+          fontWeight: FontWeight.w500,
+          fontSize: 13,
         ),
-        const SizedBox(height: 7),
-        Text(
-          'Pastikan password baru mudah diingat dan tidak sama dengan sebelumnya.',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black54,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 28),
-
-        // Fields
-        _PasswordField(
-          controller: oldPasswordController,
-          hintText: "Password Lama",
-          errorText: oldPasswordError,
-          obscure: !showOld,
-          onToggle: onOldToggle,
-        ),
-        const SizedBox(height: 18),
-
-        _PasswordField(
-          controller: newPasswordController,
-          hintText: "Password Baru",
-          errorText: newPasswordError,
-          obscure: !showNew,
-          onToggle: onNewToggle,
-        ),
-        const SizedBox(height: 18),
-
-        _PasswordField(
-          controller: confirmPasswordController,
-          hintText: "Ulangi Password Baru",
-          errorText: confirmPasswordError,
-          obscure: !showConfirm,
-          onToggle: onConfirmToggle,
-        ),
-        const SizedBox(height: 32),
-
-        MouseRegion(
-          onEnter: (_) => onHoverChanged(true),
-          onExit: (_) => onHoverChanged(false),
-          child: GestureDetector(
-            onTap: onSubmit,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              width: double.infinity,
-              height: 42,
-              decoration: BoxDecoration(
-                color: isHovering ? primaryColor.withOpacity(0.93) : primaryColor,
-                borderRadius: BorderRadius.circular(7),
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.14),
-                    blurRadius: 9,
-                    offset: const Offset(0, 4),
-                  )
-                ],
-              ),
-              child: const Center(
-                child: Text(
-                  "Simpan",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
+      ),
     );
   }
 }
 
-class _PasswordField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hintText;
-  final bool obscure;
-  final VoidCallback onToggle;
-  final String? errorText;
+// ======= PASSWORD REQUIREMENTS =======
+class _PasswordRequirementRow extends StatelessWidget {
+  final String password;
+  const _PasswordRequirementRow({required this.password});
 
-  const _PasswordField({
-    super.key,
-    required this.controller,
-    required this.hintText,
-    required this.obscure,
-    required this.onToggle,
-    this.errorText,
-  });
+  bool get _min8 => password.length >= 8;
+  bool get _upper => password.contains(RegExp(r'[A-Z]'));
+  bool get _digit => password.contains(RegExp(r'\d'));
+  bool get _symbol => password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-\\/\[\]=+]'));
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    TextStyle style(bool active) => TextStyle(
+      fontSize: 13.7,
+      color: active ? activeColor : hintColor,
+      fontWeight: FontWeight.w500,
+    );
+
+    Widget item(bool checked, String text) => Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(7),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.08),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: TextField(
-            controller: controller,
-            obscureText: obscure,
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 15,
-              ),
-              isDense: true,
-              filled: true,
-              fillColor: Colors.grey.shade50,
-              constraints: const BoxConstraints(maxHeight: 44),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(6)),
-                borderSide: BorderSide(color: primaryColor, width: 1.7),
-              ),
-              errorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(6)),
-                borderSide: BorderSide(color: Colors.red, width: 1.2),
-              ),
-              focusedErrorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(6)),
-                borderSide: BorderSide(color: Colors.red, width: 1.3),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  obscure ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey.shade600,
-                ),
-                onPressed: onToggle,
-              ),
-            ),
-          ),
+        Icon(
+          checked ? Icons.check_circle : Icons.radio_button_unchecked,
+          size: 15,
+          color: checked ? activeColor : hintColor,
         ),
-        if (errorText != null) ...[
-          const SizedBox(height: 5),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Text(
-              errorText!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
-        ],
+        SizedBox(width: 4),
+        Text(text, style: style(checked)),
       ],
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        spacing: 14,
+        runSpacing: 8,
+        children: [
+          item(_min8, "Minimal 8 Karakter"),
+          item(_upper, "Ada Huruf Besar"),
+          item(_digit, "Ada Angka"),
+          item(_symbol, "Ada Simbol"),
+        ],
+      ),
     );
   }
 }

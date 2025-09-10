@@ -28,26 +28,22 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: hPadding * 2.5,
-        vertical: vPadding,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: vPadding),
       decoration: BoxDecoration(color: secondaryBlackColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 8),
-          _buildCarousel(context),
-        ],
+        children: [_buildHeader(), _buildCarousel(context)],
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Text(
-      'Yuk, mulai klaim sekarang!',
-      style: headingStyle(context).copyWith(fontSize: 20),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: hPadding * 2.5),
+      child: Text(
+        'Yuk, mulai klaim sekarang!',
+        style: headingStyle(context).copyWith(fontSize: 20),
+      ),
     );
   }
 
