@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
@@ -108,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         Flexible(
                           child: Text(
                             email,
-                            style: bodyTextStyle(context, fontSize: 16),
+                            style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -149,10 +150,10 @@ class _SettingsPageState extends State<SettingsPage> {
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
-              horizontal: hPadding * 2.5,
-              vertical: vPadding,
+              horizontal: hPadding * 1.5
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ================== PROFILE SECTION ==================
                 BlocBuilder<AuthenticationBloc, AuthenticationState>(
@@ -232,10 +233,38 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
 
-
-                // ================== END PROFILE SECTION ==================
                 const SizedBox(height: vPadding),
 
+                Text('Akun', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
+                const SizedBox(height: 6),
+                Container(
+                  decoration: BoxDecoration(
+                    color: pGrey,
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    border: Border.all(color: sGrey),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildMenuItem(
+                        svgAsset: 'assets/icons/ubah_pass.svg',
+                        title: 'Ubah Password',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const UbahPasswordPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: vPadding),
+
+                Text('Informasi', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
+                const SizedBox(height: 6),
                 BlocBuilder<AuthenticationBloc, AuthenticationState>(
                   builder: (context, authState) {
                     final custType = authState is AuthenticationAuthenticated
@@ -254,7 +283,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             child: Column(
                               children: [
                                 _buildMenuItem(
-                                  icon: Icons.info_outline,
+                                  svgAsset: 'assets/icons/informasi_klien.svg',
                                   title: 'Informasi Klien',
                                   onTap: () {
                                     final mjnsclientId =
@@ -279,8 +308,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     }
                                   },
                                 ),
+                                sDivider,
                                 _buildMenuItem(
-                                  icon: Icons.location_on_outlined,
+                                  svgAsset: 'assets/icons/location.svg',
                                   title: 'Kontak & Alamat',
                                   onTap: () {
                                     Navigator.push(
@@ -292,8 +322,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     );
                                   },
                                 ),
+                                sDivider,
                                 _buildMenuItem(
-                                  icon: Icons.account_balance_outlined,
+                                  svgAsset: 'assets/icons/bank.svg',
                                   title: 'Rekening Bank',
                                   onTap: () {
                                     Navigator.push(
@@ -307,8 +338,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     );
                                   },
                                 ),
+                                sDivider,
                                 _buildMenuItem(
-                                  icon: Icons.account_balance_outlined,
+                                  svgAsset: 'assets/icons/pic.svg',
                                   title: 'Informasi PIC',
                                   onTap: () {
                                     Navigator.push(
@@ -318,19 +350,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                           // viewMode: 'tambah',
                                           // recordId: '',
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                _buildDivider(),
-                                _buildMenuItem(
-                                  icon: Icons.lock_outline,
-                                  title: 'Ubah Password',
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const UbahPasswordPage(),
                                       ),
                                     );
                                   },
@@ -348,7 +367,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
 
-
+                Text('Syarat dan Ketentuan', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
+                const SizedBox(height: 6),
                 Container(
                   decoration: BoxDecoration(
                     color: pGrey,
@@ -357,31 +377,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   child: Column(
                     children: [
-                      // _buildMenuItem(
-                      //   icon: Icons.account_balance_outlined,
-                      //   title: 'Informasi PIC',
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => const MRekanPicInlineEditorList(
-                      //           // viewMode: 'tambah',
-                      //           // recordId: '',
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
                       _buildMenuItem(
-                        icon: Icons.local_shipping_outlined,
+                        svgAsset: 'assets/icons/sk.svg',
                         title: 'Syarat dan Ketentuan',
                         onTap:
                             () =>
                                 successSnackBar('Syarat dan Ketentuan diklik'),
                       ),
-                      _buildDivider(),
+                      sDivider,
                       _buildMenuItem(
-                        icon: Icons.favorite_border,
+                        svgAsset:'assets/icons/shield.svg',
                         title: 'Kebijakan dan Privasi',
                         onTap:
                             () =>
@@ -393,6 +398,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 const SizedBox(height: vPadding),
 
+                Text('Lainnnya', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
+                const SizedBox(height: 6),
                 // Toggle Settings
                 Container(
                   decoration: BoxDecoration(
@@ -412,23 +419,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           );
                         },
                       ),
-                      // _buildDivider(),
-                      _buildSwitchItem(
-                        title: 'Mode Gelap',
-                        value: darkMode,
-                        onChanged: (value) {
-                          setState(() => darkMode = value);
-                          successSnackBar(
-                            'Mode Gelap ${value ? 'diaktifkan' : 'dinonaktifkan'}',
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: vPadding),
 
+                Text('Keluar', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
+                const SizedBox(height: 6),
                 // Logout Button
                 Container(
                   decoration: BoxDecoration(
@@ -437,10 +435,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     border: Border.all(color: sGrey),
                   ),
                   child: _buildMenuItem(
-                    icon: Icons.logout,
+                    svgAsset: 'assets/icons/logout.svg',
                     title: 'Keluar',
                     titleColor: pDarkRed,
-                    iconColor: pRed,
+                    showForwardsvgAsset: false,
+                    svgAssetColor: pRed,
                     onTap: () {
                       showDialog(
                         context: context,
@@ -461,11 +460,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildMenuItem({
-    required IconData icon,
+    required String svgAsset,
     required String title,
     required VoidCallback onTap,
     Color? titleColor,
-    Color? iconColor,
+    Color? svgAssetColor,
+    bool showForwardsvgAsset = true,
   }) {
     return InkWell(
       onTap: onTap,
@@ -477,7 +477,14 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: iconColor ?? Colors.white, size: 24),
+            SvgPicture.asset(
+              svgAsset,
+              width: 20,
+              height: 20,
+              colorFilter: svgAssetColor != null
+                  ? ColorFilter.mode(svgAssetColor, BlendMode.srcIn)
+                  : null,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -485,7 +492,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: bodyTextStyle(context).copyWith(color: titleColor),
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: primaryLightColor, size: 18),
+            if (showForwardsvgAsset)
+              Icon(Icons.arrow_forward_ios, color: primaryLightColor, size: 18),
           ],
         ),
       ),
@@ -496,35 +504,28 @@ class _SettingsPageState extends State<SettingsPage> {
     required String title,
     required bool value,
     required ValueChanged<bool> onChanged,
+    double switchScale = 0.75,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: vPadding,
-        vertical: hPadding,
+        horizontal: vPadding
       ),
       child: Row(
         children: [
           Expanded(child: Text(title, style: bodyTextStyle(context))),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: primaryLightColor,
-            activeTrackColor: pBlue,
-            inactiveThumbColor: primaryLightColor,
-            inactiveTrackColor: pGrey,
+          Transform.scale(
+            scale: switchScale,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: primaryLightColor,
+              activeTrackColor: pBlue,
+              inactiveThumbColor: primaryLightColor,
+              inactiveTrackColor: pGrey,
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Divider(
-      color: sGrey,
-      height: 1,
-      thickness: 1,
-      indent: hPaddingForCard,
-      endIndent: hPaddingForCard,
     );
   }
 }

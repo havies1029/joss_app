@@ -39,7 +39,7 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: hPadding * 2.5),
+      padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
       child: Text(
         'Yuk, mulai klaim sekarang!',
         style: headingStyle(context).copyWith(fontSize: 20),
