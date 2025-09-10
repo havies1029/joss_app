@@ -48,7 +48,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: hPadding),
+      margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(cardBorderRadius * 2),
         gradient: LinearGradient(

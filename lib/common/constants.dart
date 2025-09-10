@@ -14,12 +14,14 @@ part '../widgets/apptheme/textstyles.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: const ['email'],
-  clientId: kIsWeb
-      ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com'
-      : null,
-  serverClientId: kIsWeb
-      ? null
-      : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
+  clientId:
+      kIsWeb
+          ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com'
+          : null,
+  serverClientId:
+      kIsWeb
+          ? null
+          : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
 );
 
 /// Device/Platform Utils
@@ -51,9 +53,8 @@ const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
 const Color pDarkRed = Color(0xFFDC1C1C);
 
-
 const Color kategoriYellow = Color(0xFFFFC107);
-const Color kategoriCream  = Color(0xFFFFFDD8);
+const Color kategoriCream = Color(0xFFFFFDD8);
 
 const LinearGradient primaryGradientColor = LinearGradient(
   begin: Alignment.topLeft,
@@ -109,12 +110,13 @@ enum ListStatus { initial, success, failure }
 
 const kAnimationDuration = Duration(milliseconds: 200);
 
-const Widget kDivider = Divider(
+/// Divider
+const Widget kDivider = Divider(height: 1, color: pGrey);
+const Widget sDivider = Divider(
   height: 1,
-  thickness: 1,
-  color: pGrey,
-  indent: 0,
-  endIndent: 0,
+  color: sGrey,
+  indent: 20,
+  endIndent: 20,
 );
 
 /// Horizontal (gelap → terang)
@@ -265,10 +267,7 @@ Widget appButton({
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-        ),
+        style: TextStyle(fontSize: fontSize, fontWeight: fontWeight),
       ),
     ),
   );

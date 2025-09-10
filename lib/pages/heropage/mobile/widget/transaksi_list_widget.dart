@@ -9,7 +9,7 @@ class TransaksiListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: hPadding * 2.5,
+        horizontal: hPadding * 1.5,
         vertical: vPadding,
       ),
       decoration: BoxDecoration(color: secondaryBlackColor),

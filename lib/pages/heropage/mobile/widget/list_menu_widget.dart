@@ -17,7 +17,7 @@ class ListMenuWidget extends StatelessWidget {
         if (custType != 'C')
         // 🔹 PERUBAHAN: Hilangkan padding vertical agar menempel
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: _buildDaftarKlienButton(context),
           ),
 
@@ -35,7 +35,7 @@ class ListMenuWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -167,7 +167,7 @@ class ListMenuWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: SizedBox(
-        height: 130,
+        height: 145,
         child: Stack(
           children: [
             ListView.builder(
@@ -299,6 +299,7 @@ class ListMenuWidget extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: hPadding)
           ],
         ),
       ),
