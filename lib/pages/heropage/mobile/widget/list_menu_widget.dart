@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../gen_klaim/klaim1list_main.dart';
+import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
@@ -220,7 +222,41 @@ class ListMenuWidget extends StatelessWidget {
     final isActive = isClient || isAlwaysActive;
 
     return GestureDetector(
-      onTap: isActive ? () => debugPrint('${item.title} tapped') : null,
+      onTap: isActive
+          ? () {
+        switch (item.title) {
+          case 'Cari Asuransi':
+            Navigator.pushNamed(context, '/cariAsuransi');
+            break;
+          case 'Lapor \nKlaim':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const KlaimMainPage(),
+              ),
+            );
+            break;
+          case 'Aset':
+            Navigator.pushNamed(context, '/aset');
+            break;
+          case 'Polis':
+            Navigator.pushNamed(context, '/polis');
+            break;
+          case 'Beli Polis':
+            Navigator.pushNamed(context, '/beliPolis');
+            break;
+          case 'Klaim':
+            Navigator.pushNamed(context, '/klaim');
+            break;
+          case 'Tagihan Pembayaran':
+            Navigator.pushNamed(context, '/tagihan');
+            break;
+          default:
+            debugPrint('Menu ${item.title} belum ada action');
+        }
+      }
+          : null,
+
       child: Opacity(
         opacity: isActive ? 1.0 : 0.4, // nonaktif jadi pudar
         child: Column(

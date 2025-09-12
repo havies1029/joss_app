@@ -1,0 +1,73 @@
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:joss_app/pages/gen_klaim/mobile/widget/rekan_klaim.dart';
+import 'package:joss_app/pages/gen_klaim/mobile/widget/klaim_card_widget.dart';
+import 'dart:typed_data';
+import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
+import '../../../../blocs/user_profile/user_profile_state.dart';
+import '../../../../common/constants.dart';
+import '../../../../repositories/user/user_repository.dart';
+import 'package:joss_app/blocs/user_profile/user_profile_cubit.dart';
+
+import '../../base/base_background_sidepage.dart';
+
+class KlaimMainPage extends StatefulWidget {
+  const KlaimMainPage({super.key});
+
+  @override
+  _KlaimMainPageState createState() => _KlaimMainPageState();
+}
+
+class _KlaimMainPageState extends State<KlaimMainPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: defaultDuration,
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final headerSpacing = screenHeight * 0.025;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: primaryBlackColor,
+      body: SafeArea(
+        child: BaseBackgroundSidePage(
+          backgroundAsset: "assets/images/background_gradient.png",
+          fadeHeight: 300,
+          title: 'Klaim',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: const [
+              KlaimCardWidget(),
+              SizedBox(height: 12),
+              Expanded(child: Klaim1InlineEditorList()),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+}

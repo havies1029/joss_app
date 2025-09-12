@@ -6,6 +6,7 @@ class UserProfileCubit extends HydratedCubit<UserProfileState> {
   UserProfileCubit() : super(const UserProfileState());
 
   void setProfile({
+    String? mrekan1Id,
     String? nama,
     String? email,
     String? telepon,
@@ -13,6 +14,7 @@ class UserProfileCubit extends HydratedCubit<UserProfileState> {
     String? mjnsclientId,
   }) {
     emit(state.copyWith(
+      mrekan1Id : mrekan1Id,
       nama: nama,
       email: email,
       telepon: telepon,

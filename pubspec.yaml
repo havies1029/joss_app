@@ -50,6 +50,7 @@ dependencies:
   hydrated_bloc: ^10.1.1
   dio: ^5.4.0
   fl_chart: ^0.66.0
+  flutter_speed_dial: ^7.0.0
 
 dev_dependencies:
   flutter_test:
@@ -176,6 +177,7 @@ flutter:
     - assets/icons/tiktok.svg
     - assets/icons/linkedin.svg
     - assets/icons/facebook.svg
+    - assets/icons/shield2.svg
 
   fonts:
     - family: Delm-Regular

@@ -12,6 +12,7 @@ import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
+import '../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic.dart';
 import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic_crud_body.dart';
 import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic_list_body.dart';
@@ -150,7 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
-              horizontal: hPadding * 1.5
+                horizontal: hPadding * 1.5
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,15 +383,30 @@ class _SettingsPageState extends State<SettingsPage> {
                         title: 'Syarat dan Ketentuan',
                         onTap:
                             () =>
-                                successSnackBar('Syarat dan Ketentuan diklik'),
+                            successSnackBar('Syarat dan Ketentuan diklik'),
                       ),
+                      // _buildMenuItem(
+                      //   svgAsset: 'assets/icons/pic.svg',
+                      //   title: 'Informasi PIC',
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => const KlaimMainPage(
+                      //           // viewMode: 'tambah',
+                      //           // recordId: '',
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                       sDivider,
                       _buildMenuItem(
                         svgAsset:'assets/icons/shield.svg',
-                        title: 'Kebijakan dan Privasi',
+                        title: 'Kebijaan dan Privasi',
                         onTap:
                             () =>
-                                successSnackBar('Kebijakan dan Privasi diklik'),
+                            successSnackBar('Kebijakan dan Privasi diklik'),
                       ),
                     ],
                   ),
@@ -508,7 +524,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: vPadding
+          horizontal: vPadding
       ),
       child: Row(
         children: [

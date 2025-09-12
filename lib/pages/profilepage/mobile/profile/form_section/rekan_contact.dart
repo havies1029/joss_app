@@ -19,6 +19,8 @@ import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
+import '../../../../../repositories/combobox/combompropinsi_repository.dart';
+import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -365,6 +367,51 @@ class MRekanContactCrudFormPageFormState
       },
     );
   }
+  //
+  // Widget buildFieldMpropinsiId() {
+  //   return ReusableComboBox<ComboMPropinsiModel>(
+  //     labelText: "Pilih Provinsi",
+  //     searchHintText: "Cari nama Provinsi...",
+  //     comboKey: comboMPropinsiKey,
+  //     initItem: fieldComboMPropinsi,
+  //     dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(),
+  //     displayText: (item) => item.propinsiNama,
+  //     compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
+  //     onChangedCallback: (value) {
+  //       if (value != null) {
+  //         removeError(error: "Field ComboMBank tidak boleh kosong.");
+  //         mRekanContactCrudBloc.add(ComboMPropinsiChangedEvent(comboMPropinsi: value));
+  //       }
+  //     },
+  //     onSaveCallback: (value) {
+  //       if (value != null) {
+  //         fieldComboMPropinsi = value;
+  //       }
+  //     },
+  //     validatorCallback: (value) {
+  //       if (value == null) {
+  //         addError(error: "Field ComboMBank tidak boleh kosong.");
+  //         return "Field ComboMBank tidak boleh kosong.";
+  //       }
+  //       return null;
+  //     },
+  //     // Optional styling:
+  //     showClearButton: true,
+  //     customItemBuilder:
+  //         (context, item, isSelected, isDisabled) => Container(
+  //       margin: const EdgeInsets.symmetric(horizontal: 8),
+  //       decoration:
+  //       !isSelected
+  //           ? null
+  //           : BoxDecoration(
+  //         border: Border.all(color: Theme.of(context).primaryColor),
+  //         borderRadius: BorderRadius.circular(5),
+  //         color: Colors.white,
+  //       ),
+  //       child: ListTile(selected: isSelected, title: Text(item.propinsiNama)),
+  //     ),
+  //   );
+  // }
 
   Widget buildFieldRkodeposId() {
     return buildFieldComboRKodepos(

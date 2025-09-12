@@ -15,6 +15,9 @@ import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
+import '../../../../../repositories/combobox/combombentukcst_repository.dart';
+import '../../../../../repositories/combobox/combombidang_repository.dart';
+import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -250,16 +253,44 @@ class MRekanGeneralCmpCrudFormPageFormState
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
   }
 
+  // Widget buildFieldMbentukcstId() {
+  //   return buildFieldComboMBentukCst(
+  //     comboKey: comboMBentukCstKey,
+  //     labelText: 'Bentuk',
+  //     initItem: fieldComboMBentukCst,
+  //     onChangedCallback: (value) {
+  //       if (value != null) {
+  //         removeError(error: "Field ComboMBentukCst tidak boleh kosong.");
+  //         mRekanGeneralCmpCrudBloc
+  //             .add(ComboMBentukCstChangedEvent(comboMBentukCst: value));
+  //       }
+  //     },
+  //     onSaveCallback: (value) {
+  //       if (value != null) {
+  //         fieldComboMBentukCst = value;
+  //       }
+  //     },
+  //     validatorCallback: (value) {
+  //       if (value == null) {
+  //         addError(error: "Field ComboMBentukCst tidak boleh kosong.");
+  //       }
+  //     },
+  //   );
+  // }
+
   Widget buildFieldMbentukcstId() {
-    return buildFieldComboMBentukCst(
+    return ReusableComboBox<ComboMBentukCstModel>(
+      labelText: "Pilih jenis badan usaha",
+      searchHintText: "Cari jenis badan usaha...",
       comboKey: comboMBentukCstKey,
-      labelText: 'mbentukcstId',
       initItem: fieldComboMBentukCst,
+      dataLoader: () => ComboMBentukCstRepository().getComboMBentukCst(),
+      displayText: (item) => item.bentukNama,
+      compareItems: (a, b) => a.mbentukcstId == b.mbentukcstId,
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: "Field ComboMBentukCst tidak boleh kosong.");
-          mRekanGeneralCmpCrudBloc
-              .add(ComboMBentukCstChangedEvent(comboMBentukCst: value));
+          mRekanGeneralCmpCrudBloc.add(ComboMBentukCstChangedEvent(comboMBentukCst: value));
         }
       },
       onSaveCallback: (value) {
@@ -270,21 +301,66 @@ class MRekanGeneralCmpCrudFormPageFormState
       validatorCallback: (value) {
         if (value == null) {
           addError(error: "Field ComboMBentukCst tidak boleh kosong.");
+          return "Field ComboMBentukCst tidak boleh kosong.";
         }
+        return null;
       },
+      // Optional styling:
+      showClearButton: true,
+      customItemBuilder:
+          (context, item, isSelected, isDisabled) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration:
+        !isSelected
+            ? null
+            : BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.white,
+        ),
+        child: ListTile(selected: isSelected, title: Text(item.bentukNama)),
+      ),
     );
   }
 
+  // Widget buildFieldMbidangId() {
+  //   return buildFieldComboMBidang(
+  //     comboKey: comboMBidangKey,
+  //     labelText: 'mbidangId',
+  //     initItem: fieldComboMBidang,
+  //     onChangedCallback: (value) {
+  //       if (value != null) {
+  //         removeError(error: "Field ComboMBidang tidak boleh kosong.");
+  //         mRekanGeneralCmpCrudBloc
+  //             .add(ComboMBidangChangedEvent(comboMBidang: value));
+  //       }
+  //     },
+  //     onSaveCallback: (value) {
+  //       if (value != null) {
+  //         fieldComboMBidang = value;
+  //       }
+  //     },
+  //     validatorCallback: (value) {
+  //       if (value == null) {
+  //         addError(error: "Field ComboMBidang tidak boleh kosong.");
+  //       }
+  //     },
+  //   );
+  // }
+
   Widget buildFieldMbidangId() {
-    return buildFieldComboMBidang(
+    return ReusableComboBox<ComboMBidangModel>(
+      labelText: "Pilih jenis badan usaha",
+      searchHintText: "Cari jenis badan usaha...",
       comboKey: comboMBidangKey,
-      labelText: 'mbidangId',
       initItem: fieldComboMBidang,
+      dataLoader: () => ComboMBidangRepository().getComboMBidang(),
+      displayText: (item) => item.bidangNama,
+      compareItems: (a, b) => a.mbidangId == b.mbidangId,
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: "Field ComboMBidang tidak boleh kosong.");
-          mRekanGeneralCmpCrudBloc
-              .add(ComboMBidangChangedEvent(comboMBidang: value));
+          mRekanGeneralCmpCrudBloc.add(ComboMBidangChangedEvent(comboMBidang: value));
         }
       },
       onSaveCallback: (value) {
@@ -295,8 +371,25 @@ class MRekanGeneralCmpCrudFormPageFormState
       validatorCallback: (value) {
         if (value == null) {
           addError(error: "Field ComboMBidang tidak boleh kosong.");
+          return "Field ComboMBidang tidak boleh kosong.";
         }
+        return null;
       },
+      // Optional styling:
+      showClearButton: true,
+      customItemBuilder:
+          (context, item, isSelected, isDisabled) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration:
+        !isSelected
+            ? null
+            : BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.white,
+        ),
+        child: ListTile(selected: isSelected, title: Text(item.bidangNama)),
+      ),
     );
   }
 

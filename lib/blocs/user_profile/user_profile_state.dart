@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 class UserProfileState {
+  final String? mrekan1Id;
   final String? nama;
   final Uint8List? fotoBytes;
   final String? email;
@@ -8,6 +9,7 @@ class UserProfileState {
   final String? mjnsclientId;
 
   const UserProfileState({
+    this.mrekan1Id,
     this.nama,
     this.fotoBytes,
     this.email,
@@ -16,6 +18,7 @@ class UserProfileState {
   });
 
   UserProfileState copyWith({
+    String? mrekan1Id,
     String? nama,
     Uint8List? fotoBytes,
     String? email,
@@ -23,6 +26,7 @@ class UserProfileState {
     String? mjnsclientId,
   }) {
     return UserProfileState(
+      mrekan1Id : mrekan1Id ?? this.mrekan1Id,
       nama: nama ?? this.nama,
       fotoBytes: fotoBytes ?? this.fotoBytes,
       email: email ?? this.email,
@@ -33,6 +37,7 @@ class UserProfileState {
 
   Map<String, dynamic> toJson() {
     return {
+      'mrekan1Id': mrekan1Id,
       'nama': nama,
       'fotoBytes': fotoBytes != null ? fotoBytes!.toList() : null,
       'email': email,
@@ -43,6 +48,7 @@ class UserProfileState {
 
   factory UserProfileState.fromJson(Map<String, dynamic> json) {
     return UserProfileState(
+      mrekan1Id: json['mrekan1Id'] as String?,
       nama: json['nama'] as String?,
       fotoBytes: json['fotoBytes'] != null
           ? Uint8List.fromList(List<int>.from(json['fotoBytes']))

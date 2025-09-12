@@ -16,6 +16,9 @@ import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
+import '../../../../../repositories/combobox/combomjnskel_repository.dart';
+import '../../../../../repositories/combobox/combompekerjaan_repository.dart';
+import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -34,8 +37,8 @@ class MRekanGeneralIdvCrudFormPageFormState
   final List<String> errors = [];
   ComboMPekerjaanModel? fieldComboMPekerjaan;
   ComboMJnskelModel? fieldComboMJnskel;
-  final comboMPekerjaanKey =
-  GlobalKey<DropdownSearchState<ComboMPekerjaanModel>>();
+  final comboMPekerjaanKey = GlobalKey<DropdownSearchState<ComboMPekerjaanModel>>();
+  final comboMJnsKelKey = GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
   var fieldRekanNamaController = TextEditingController();
 
   @override
@@ -270,16 +273,44 @@ class MRekanGeneralIdvCrudFormPageFormState
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
   }
 
+  // Widget buildFieldMpekerjaanId() {
+  //   return buildFieldComboMPekerjaan(
+  //     comboKey: comboMPekerjaanKey,
+  //     labelText: 'mpekerjaanId',
+  //     initItem: fieldComboMPekerjaan,
+  //     onChangedCallback: (value) {
+  //       if (value != null) {
+  //         removeError(error: "Field ComboMPekerjaan tidak boleh kosong.");
+  //         mRekanGeneralIdvCrudBloc
+  //             .add(ComboMPekerjaanChangedEvent(comboMPekerjaan: value));
+  //       }
+  //     },
+  //     onSaveCallback: (value) {
+  //       if (value != null) {
+  //         fieldComboMPekerjaan = value;
+  //       }
+  //     },
+  //     validatorCallback: (value) {
+  //       if (value == null) {
+  //         addError(error: "Field ComboMPekerjaan tidak boleh kosong.");
+  //       }
+  //     },
+  //   );
+  // }
+
   Widget buildFieldMpekerjaanId() {
-    return buildFieldComboMPekerjaan(
+    return ReusableComboBox<ComboMPekerjaanModel>(
+      labelText: "Pilih jenis pekerjaan",
+      searchHintText: "Cari jenis pekerjaan...",
       comboKey: comboMPekerjaanKey,
-      labelText: 'mpekerjaanId',
       initItem: fieldComboMPekerjaan,
+      dataLoader: () => ComboMPekerjaanRepository().getComboMPekerjaan(),
+      displayText: (item) => item.kerjaNama,
+      compareItems: (a, b) => a.mpekerjaanId == b.mpekerjaanId,
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: "Field ComboMPekerjaan tidak boleh kosong.");
-          mRekanGeneralIdvCrudBloc
-              .add(ComboMPekerjaanChangedEvent(comboMPekerjaan: value));
+          mRekanGeneralIdvCrudBloc.add(ComboMPekerjaanChangedEvent(comboMPekerjaan: value));
         }
       },
       onSaveCallback: (value) {
@@ -290,20 +321,65 @@ class MRekanGeneralIdvCrudFormPageFormState
       validatorCallback: (value) {
         if (value == null) {
           addError(error: "Field ComboMPekerjaan tidak boleh kosong.");
+          return "Field ComboMPekerjaan tidak boleh kosong.";
         }
+        return null;
       },
+      // Optional styling:
+      showClearButton: true,
+      customItemBuilder:
+          (context, item, isSelected, isDisabled) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration:
+        !isSelected
+            ? null
+            : BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.white,
+        ),
+        child: ListTile(selected: isSelected, title: Text(item.kerjaNama)),
+      ),
     );
   }
 
+  // Widget buildFieldMJnsKel() {
+  //   return buildFieldComboMJnskel(
+  //     labelText: 'Jenis Kelamin',
+  //     initItem: fieldComboMJnskel,
+  //     onChangedCallback: (value) {
+  //       if (value != null) {
+  //         removeError(error: "Field fieldComboMJnskel tidak boleh kosong.");
+  //         mRekanGeneralIdvCrudBloc
+  //             .add(ComboMJnskelChangedEvent(comboMJnskel: value));
+  //       }
+  //     },
+  //     onSaveCallback: (value) {
+  //       if (value != null) {
+  //         fieldComboMJnskel = value;
+  //       }
+  //     },
+  //     validatorCallback: (value) {
+  //       if (value == null) {
+  //         addError(error: "Field fieldComboMJnskel tidak boleh kosong.");
+  //       }
+  //     },
+  //   );
+  // }
+
   Widget buildFieldMJnsKel() {
-    return buildFieldComboMJnskel(
-      labelText: 'Jenis Kelamin',
+    return ReusableComboBox<ComboMJnskelModel>(
+      labelText: "Pilih jenis kelamin",
+      searchHintText: "Cari jenis kelamin...",
+      comboKey: comboMJnsKelKey,
       initItem: fieldComboMJnskel,
+      dataLoader: () => ComboMJnskelRepository().getComboMJnskel(),
+      displayText: (item) => item.jenisDesc,
+      compareItems: (a, b) => a.mjnskelId == b.mjnskelId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(error: "Field fieldComboMJnskel tidak boleh kosong.");
-          mRekanGeneralIdvCrudBloc
-              .add(ComboMJnskelChangedEvent(comboMJnskel: value));
+          removeError(error: "Field ComboMJnskel tidak boleh kosong.");
+          mRekanGeneralIdvCrudBloc.add(ComboMJnskelChangedEvent(comboMJnskel: value));
         }
       },
       onSaveCallback: (value) {
@@ -313,9 +389,26 @@ class MRekanGeneralIdvCrudFormPageFormState
       },
       validatorCallback: (value) {
         if (value == null) {
-          addError(error: "Field fieldComboMJnskel tidak boleh kosong.");
+          addError(error: "Field ComboMJnskel tidak boleh kosong.");
+          return "Field ComboMJnskel tidak boleh kosong.";
         }
+        return null;
       },
+      // Optional styling:
+      showClearButton: true,
+      customItemBuilder:
+          (context, item, isSelected, isDisabled) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration:
+        !isSelected
+            ? null
+            : BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.white,
+        ),
+        child: ListTile(selected: isSelected, title: Text(item.jenisDesc)),
+      ),
     );
   }
 

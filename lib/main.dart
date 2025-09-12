@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
@@ -10,6 +11,8 @@ import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/popup_user_widget.dart';
 import 'package:joss_app/pages/profilepage/mobile/profile/form_section/rekan_pajak.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
+import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
+import 'package:joss_app/repositories/gen_klaim/klaim2crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanbankcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekangeneralcmpcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekangeneralidvcrud_repository.dart';
@@ -54,6 +57,10 @@ import 'blocs/gen_berita/berita2cari_bloc.dart';
 import 'blocs/gen_berita/berita3cari_bloc.dart';
 import 'blocs/gen_berita/beritakecilcari_bloc.dart';
 import 'blocs/gen_berita/beritalaincari_bloc.dart';
+import 'blocs/gen_klaim/klaim1crud_bloc.dart';
+import 'blocs/gen_klaim/klaim1list_bloc.dart';
+import 'blocs/gen_klaim/klaim2crud_bloc.dart';
+import 'blocs/gen_klaim/klaim2list_bloc.dart';
 import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
@@ -145,6 +152,24 @@ Future<void> main() async {
         BlocProvider<ArticleSelectionCubit>(
           create: (_) => ArticleSelectionCubit(appPrefs),
         ),
+        BlocProvider<Klaim1ListBloc>(
+            create: (context) =>
+                Klaim1ListBloc()),
+        BlocProvider<Klaim2ListBloc>(
+            create: (context) =>
+                Klaim2ListBloc()),
+        BlocProvider<MRekanBankListBloc>(
+            create: (context) =>
+                MRekanBankListBloc()),
+        BlocProvider<MRekanBankCrudBloc>(
+          create: (context) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository()),
+        ),
+        BlocProvider<Klaim1CrudBloc>(
+          create: (context) => Klaim1CrudBloc(repository: Klaim1CrudRepository()),
+        ),
+        BlocProvider<Klaim2CrudBloc>(
+          create: (context) => Klaim2CrudBloc(repository: Klaim2CrudRepository()),
+        ),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -159,6 +184,7 @@ Future<void> main() async {
 
               if (nama != null && nama.isNotEmpty) {
                 context.read<UserProfileCubit>().setProfile(
+                  mrekan1Id : mrekan1Id,
                   nama: nama,
                   mjnsclientId: mjnsclientId, // 👈 simpan juga
                 );

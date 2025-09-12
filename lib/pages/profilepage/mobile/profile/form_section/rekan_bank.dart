@@ -16,6 +16,8 @@ import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
+import '../../../../../repositories/combobox/combombank_repository.dart';
+import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -159,7 +161,16 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                                           // Fields
                                           buildFieldMbankId(),
                                           const SizedBox(height: vPadding),
-                                          buildFieldMrekan1Id(),
+                                          BlocListener<UserProfileCubit, UserProfileState>(
+                                            listenWhen: (prev, curr) => prev.mrekan1Id != curr.mrekan1Id,
+                                            listener: (context, state) {
+                                              final next = state.mrekan1Id ?? '';
+                                              if (fieldMrekan1IdController.text != next) {
+                                                fieldMrekan1IdController.text = next;
+                                              }
+                                            },
+                                            child: buildFieldMrekan1Id(),
+                                          ),
                                           const SizedBox(height: vPadding),
                                           buildFieldRekNama(),
                                           const SizedBox(height: vPadding),
@@ -256,17 +267,48 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       mRekanBankCrudBloc.add(
           MRekanBankCrudLihatEvent(recordId: widget.recordId));
     }
+    final profile = context.read<UserProfileCubit>().state;
+    fieldMrekan1IdController.text = profile.mrekan1Id ?? '';
   }
 
-  Widget buildFieldMbankId(){
-    return buildFieldComboMBank(
+  // Widget buildFieldMbankId(){
+  //   return buildFieldComboMBank(
+  //     comboKey: comboMBankKey,
+  //     labelText: 'mbankId',
+  //     initItem: fieldComboMBank,
+  //     onChangedCallback: (value) {
+  //       if (value != null) {
+  //         removeError(
+  //             error: "Field ComboMBank tidak boleh kosong.");
+  //         mRekanBankCrudBloc.add(ComboMBankChangedEvent(comboMBank: value));
+  //       }
+  //     },
+  //     onSaveCallback: (value) {
+  //       if (value != null) {
+  //         fieldComboMBank = value;
+  //       }
+  //     },
+  //     validatorCallback: (value) {
+  //       if (value == null) {
+  //         addError(
+  //             error: "Field ComboMBank tidak boleh kosong.");
+  //       }
+  //     },
+  //   );
+  // }
+
+  Widget buildFieldMbankId() {
+    return ReusableComboBox<ComboMBankModel>(
+      labelText: "Pilih Bank",
+      searchHintText: "Cari nama bank...",
       comboKey: comboMBankKey,
-      labelText: 'mbankId',
       initItem: fieldComboMBank,
+      dataLoader: () => ComboMBankRepository().getComboMBank(),
+      displayText: (item) => item.bankNama,
+      compareItems: (a, b) => a.mbankId == b.mbankId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(
-              error: "Field ComboMBank tidak boleh kosong.");
+          removeError(error: "Field ComboMBank tidak boleh kosong.");
           mRekanBankCrudBloc.add(ComboMBankChangedEvent(comboMBank: value));
         }
       },
@@ -277,32 +319,55 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       },
       validatorCallback: (value) {
         if (value == null) {
-          addError(
-              error: "Field ComboMBank tidak boleh kosong.");
+          addError(error: "Field ComboMBank tidak boleh kosong.");
+          return "Field ComboMBank tidak boleh kosong.";
         }
+        return null;
       },
+      // Optional styling:
+      showClearButton: true,
+      customItemBuilder:
+          (context, item, isSelected, isDisabled) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration:
+        !isSelected
+            ? null
+            : BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.white,
+        ),
+        child: ListTile(selected: isSelected, title: Text(item.bankNama)),
+      ),
     );
   }
 
-  Widget buildFieldMrekan1Id(){
+  Widget buildFieldMrekan1Id() {
     return TextFormField(
       controller: fieldMrekan1IdController,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("MRekan1Id"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
-        }
-      },
+      readOnly: true,                // ga bisa diedit
+      showCursor: false,             // ga ada kursor
+      enableInteractiveSelection: false, // ga bisa select/copy (kalau mau bisa copy, set true)
+      style: const TextStyle(color: primaryLightColor),
+      textInputAction: TextInputAction.none,
+      decoration: customInputDecoration("MRekan1Id").copyWith(
+        suffixIcon: const Icon(Icons.lock_outline, size: 18),
+      ),
+
+      // non-editable, jadi onChanged ga perlu
+      // onChanged: ...
+
+      // tetap validasi biar form tau wajib ada nilainyas
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        if ((value == null) || value.isEmpty) {
           addError(error: kStringNullError);
-          return "";
+          return ""; // biar error text di bawah decoration, sesuai pattern lo
         }
         return null;
       },
     );
   }
+
 
   Widget buildFieldRekNama(){
     return TextFormField(
