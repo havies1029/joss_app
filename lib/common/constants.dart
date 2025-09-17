@@ -42,6 +42,7 @@ const Color primaryLightColor = Color(0xFFF7F7F7);
 const Color primaryBlackColor = Color(0xFF121212);
 const Color secondaryBlackColor = Color(0xFF181818);
 
+const Color formGrey = Color(0xFF333333);
 const Color pGrey = Color(0xFF292929);
 const Color sGrey = Color(0xFF4E4E4E);
 const Color unselectedColor = Color(0xFF666666);
@@ -63,7 +64,7 @@ const LinearGradient primaryGradientColor = LinearGradient(
 );
 
 /// Padding & Spacing
-const double hPadding = 10.0;
+  const double hPadding = 10.0;
 const double vPadding = 20.0;
 const double cardBorderRadius = 10.0;
 const double checkboxBorderRadius = 4.0;

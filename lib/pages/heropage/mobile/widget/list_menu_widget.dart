@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../asset_management/mobile/asset_management_page.dart';
+import '../../../gen_aset_dashboard/asetdashboardcari_main.dart';
+import '../../../gen_aset_ringkasan/asetringkasancari_main.dart';
 import '../../../gen_klaim/klaim1list_main.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
+import '../../../gen_status_aset/statusasetcari_main.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
@@ -237,7 +241,11 @@ class ListMenuWidget extends StatelessWidget {
             );
             break;
           case 'Aset':
-            Navigator.pushNamed(context, '/aset');
+            Navigator.push(
+              context,MaterialPageRoute(
+                builder: (_) => const AssetManagementPage(),
+              ),
+            );
             break;
           case 'Polis':
             Navigator.pushNamed(context, '/polis');

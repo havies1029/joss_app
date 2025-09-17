@@ -1,17 +1,10 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:joss_app/pages/gen_klaim/mobile/widget/rekan_klaim.dart';
-import 'package:joss_app/pages/gen_klaim/mobile/widget/klaim_card_widget.dart';
-import 'dart:typed_data';
-import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
-import '../../../../blocs/user_profile/user_profile_state.dart';
+import 'package:joss_app/pages/gen_klaim/mobile/widget/klaim1_inline_editor_page.dart';
 import '../../../../common/constants.dart';
-import '../../../../repositories/user/user_repository.dart';
-import 'package:joss_app/blocs/user_profile/user_profile_cubit.dart';
 
+import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_sidepage.dart';
 
 class KlaimMainPage extends StatefulWidget {
@@ -60,9 +53,14 @@ class _KlaimMainPageState extends State<KlaimMainPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: const [
-              KlaimCardWidget(),
+              HeaderCard(
+                iconPath: "assets/icons/shield2.svg",
+                title: "Klaim",
+                subtitle:
+                "Ajukan klaim Anda dengan mudah dan cepat sesuai ketentuan polis yang berlaku.",
+              ),
               SizedBox(height: 12),
-              Expanded(child: Klaim1InlineEditorList()),
+              Expanded(child: Klaim1InlineEditorPage()),
             ],
           ),
         ),

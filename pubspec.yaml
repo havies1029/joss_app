@@ -178,6 +178,10 @@ flutter:
     - assets/icons/linkedin.svg
     - assets/icons/facebook.svg
     - assets/icons/shield2.svg
+    - assets/icons/correct.svg
+    - assets/icons/clock.svg
+    - assets/icons/exit.svg
+    - assets/icons/calender.svg
 
   fonts:
     - family: Delm-Regular

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
@@ -12,19 +11,13 @@ import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
-import '../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic.dart';
-import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic_crud_body.dart';
-import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic_list_body.dart';
+import '../../test_bank/mrekanbanklist_main.dart';
 import '../widgets/logout_popup.dart';
-import 'package:joss_app/pages/settingpage/widgets/ubah_password_popup.dart';
-import '../../login/mobile/user/widget/popup_user_widget.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_bank.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_contact.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_general_cmp.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_general_idv.dart';
-import '../../profilepage/mobile/profile/form_section/rekan_pajak.dart';
-import '../../profilepage/mobile/profile/profile_page.dart';
 
 const List<String> scopes = <String>['email'];
 
@@ -253,7 +246,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const UbahPasswordPage(),
+                              builder: (_) => const MRekanBankListMainPage(),
                             ),
                           );
                         },

@@ -26,39 +26,39 @@ DropdownSearch<ComboMPropinsiModel> buildFieldComboMPropinsi({
 				return ComboMPropinsiRepository().getComboMPropinsi(filter);
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
-		popupProps: PopupPropsMultiSelection.modalBottomSheet(
-			disableFilter: false,
-			showSelectedItems: true,
-			showSearchBox: true,
-			itemBuilder: itemBuilderComboMPropinsi,
+			popupProps: PopupPropsMultiSelection.modalBottomSheet(
+				disableFilter: false,
+				showSelectedItems: true,
+				showSearchBox: true,
+				itemBuilder: itemBuilderComboMPropinsi,
 
-			// 🔎 styling kotak filter
-			searchFieldProps: TextFieldProps(
-				style: const TextStyle(color: Colors.black),      // teks hitam
-				cursorColor: Colors.black,
-				decoration: InputDecoration(
-					hintText: 'Cari provinsi…',
-					hintStyle: const TextStyle(color: Colors.black54),
-					filled: true,
-					fillColor: Colors.white,                        // background putih biar kontras
-					prefixIcon: const Icon(Icons.search, color: Colors.black),
-					contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-					enabledBorder: OutlineInputBorder(
-						borderRadius: BorderRadius.circular(10),
-						borderSide: const BorderSide(color: Colors.black), // border hitam
-					),
-					focusedBorder: OutlineInputBorder(
-						borderRadius: BorderRadius.circular(10),
-						borderSide: const BorderSide(color: Colors.black, width: 1.5), // border hitam tebal saat fokus
+				// 🔎 styling kotak filter
+				searchFieldProps: TextFieldProps(
+					style: const TextStyle(color: Colors.black),      // teks hitam
+					cursorColor: Colors.black,
+					decoration: InputDecoration(
+						hintText: 'Cari provinsi…',
+						hintStyle: const TextStyle(color: Colors.black54),
+						filled: true,
+						fillColor: Colors.white,                        // background putih biar kontras
+						prefixIcon: const Icon(Icons.search, color: Colors.black),
+						contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+						enabledBorder: OutlineInputBorder(
+							borderRadius: BorderRadius.circular(10),
+							borderSide: const BorderSide(color: Colors.black), // border hitam
+						),
+						focusedBorder: OutlineInputBorder(
+							borderRadius: BorderRadius.circular(10),
+							borderSide: const BorderSide(color: Colors.black, width: 1.5), // border hitam tebal saat fokus
+						),
 					),
 				),
-			),
 
-			// opsional: warna background sheet popup
-			modalBottomSheetProps: const ModalBottomSheetProps(
-				backgroundColor: Colors.white,
+				// opsional: warna background sheet popup
+				modalBottomSheetProps: const ModalBottomSheetProps(
+					backgroundColor: Colors.white,
+				),
 			),
-		),
 
 		compareFn: (item, sItem) => item.mpropinsiId == sItem.mpropinsiId,
 			itemAsString: (item) {

@@ -5,9 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/gen_klaim/klaim1list_bloc.dart';
 import 'package:joss_app/blocs/gen_klaim/klaim1crud_bloc.dart';
-import 'package:joss_app/models/gen_klaim/klaim1crud_model.dart';
+import 'package:joss_app/pages/gen_klaim/mobile/widget/klaim2list_timeline.dart';
 
-import '../../klaim2list_main.dart';
 import 'klaim1_add_form_card.dart';
 import 'klaim1_list_editor.dart';
 
@@ -90,7 +89,7 @@ class _Klaim1InlineEditorPageState extends State<Klaim1InlineEditorPage> {
                 context.read<Klaim1CrudBloc>().add(Klaim1CrudHapusEvent(recordId: id));
               },
               onView: (id) {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => Klaim2ListMainPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => Klaim2ListTimeline(klaim1Id: id,)));
               },
             ),
 

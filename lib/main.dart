@@ -52,6 +52,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/gallery/galleryeventcari_bloc.dart';
 
 import 'blocs/gallery/gallerymembercari_bloc.dart';
+import 'blocs/gen_aset_dashboard/asetdashboardcari_bloc.dart';
+import 'blocs/gen_aset_health/asethealthcari_bloc.dart';
+import 'blocs/gen_aset_mv/asetmvcari_bloc.dart';
+import 'blocs/gen_aset_par/asetparcari_bloc.dart';
+import 'blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
 import 'blocs/gen_berita/berita1cari_bloc.dart';
 import 'blocs/gen_berita/berita2cari_bloc.dart';
 import 'blocs/gen_berita/berita3cari_bloc.dart';
@@ -60,7 +65,8 @@ import 'blocs/gen_berita/beritalaincari_bloc.dart';
 import 'blocs/gen_klaim/klaim1crud_bloc.dart';
 import 'blocs/gen_klaim/klaim1list_bloc.dart';
 import 'blocs/gen_klaim/klaim2crud_bloc.dart';
-import 'blocs/gen_klaim/klaim2list_bloc.dart';
+import 'blocs/gen_status_aset/statusasetcari_bloc.dart';
+import 'blocs/klaim/klaim2list_bloc.dart';
 import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
@@ -170,6 +176,15 @@ Future<void> main() async {
         BlocProvider<Klaim2CrudBloc>(
           create: (context) => Klaim2CrudBloc(repository: Klaim2CrudRepository()),
         ),
+        BlocProvider(create: (context) => StatusAsetCariBloc()),
+        BlocProvider<AsetRingkasanCariBloc>(create: (context) => AsetRingkasanCariBloc()),
+        BlocProvider<AsetParCariBloc>(
+            create: (context) => AsetParCariBloc()),
+        BlocProvider<AsetMvCariBloc>(
+            create: (context) => AsetMvCariBloc()),
+        BlocProvider<AsetHealthCariBloc>(
+            create: (context) => AsetHealthCariBloc()),
+        BlocProvider<AsetDashboardCariBloc>(create: (context) => AsetDashboardCariBloc()),
       ],
       child: MultiBlocListener(
         listeners: [
