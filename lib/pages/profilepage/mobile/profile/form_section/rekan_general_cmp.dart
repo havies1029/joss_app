@@ -17,7 +17,6 @@ import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combombentukcst_repository.dart';
 import '../../../../../repositories/combobox/combombidang_repository.dart';
-import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -131,7 +130,7 @@ class MRekanGeneralCmpCrudFormPageFormState
 
                                           // Heading + subheading
                                           Padding(
-                                            padding: const EdgeInsets.only(bottom: fieldSpacing), // 20.0 dari constants
+                                            padding: const EdgeInsets.only(bottom: 20), // 20.0 dari constants
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start, // mulai dari start
                                               children: [
@@ -168,7 +167,7 @@ class MRekanGeneralCmpCrudFormPageFormState
                                           FormError(errors: errors, key: null),
 
                                           const SizedBox(height: 16),
-                                          appButton(
+                                          AppButton.primary(
                                             text: "Submit",
                                             onPressed: onSaveForm,
                                             width: MediaQuery.of(context).size.width * 0.3,
@@ -394,19 +393,11 @@ class MRekanGeneralCmpCrudFormPageFormState
   }
 
   Widget buildFieldRekanNama() {
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 3,
+    return appTextField(
+      label: "rekanNama",
       controller: fieldRekanNamaController,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("rekanNama"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
-        }
-        fieldRekanNamaController.text = value;
-      },
+      keyboardType: TextInputType.multiline,
+      maxLines: 3,
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);

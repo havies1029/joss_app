@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
@@ -142,11 +143,8 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
 
     HapticFeedback.lightImpact();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Kode OTP telah dikirim ulang ke email'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      successSnackBar(
+        'Kode OTP telah dikirim ulang ke email',
       ),
     );
   }
@@ -231,8 +229,6 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
       backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundFirstPage(
-          backgroundAsset: "assets/images/background_gradient.png",
-          fadeHeight: 300,
           child: Column(
             children: [
               Expanded(
@@ -244,176 +240,111 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                       child: Column(
                         children: [
                           SizedBox(height: topSpacing),
-
                           Container(
-                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: primaryBlackColor,
-                              borderRadius: BorderRadius.circular(20),
-                              border: const Border(
-                                top: BorderSide(
-                                  color: primaryColor,
-                                  width: 4.0,
-                                ),
+                              gradient: cardBorderGradient,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
                               ),
                             ),
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                SizedBox(height: screenHeight * 0.04),
-
-                                // 🔒 Icon
-                                ScaleTransition(
-                                  scale: _scaleAnimation,
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: primaryColor.withOpacity(0.3),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(Icons.lock_outline,
-                                        size: 40, color: Colors.white),
-                                  ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: vPadding * 2, horizontal: hPadding * 1.5),
+                              margin: const EdgeInsets.all(1),
+                              decoration: BoxDecoration(
+                                color: secondaryBlackColor,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
                                 ),
-
-                                const SizedBox(height: 24),
-                                const Text(
-                                  'Verifikasi OTP',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                              ),
+                              child: Column(
+                                children: [
+                                  // SizedBox(height: screenHeight * 0.04),
+                                  // Icon
+                                  SvgPicture.asset(
+                                    "assets/icons/otp_icon.svg",
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                RichText(
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                      height: 1.5,
-                                    ),
+                                  const SizedBox(height: 24),
+                                  Text(
+                                    'Verifikasi OTP',
+                                    style: headingStyle(context, fontSize: 25),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Column(
                                     children: [
-                                      const TextSpan(
-                                          text:
-                                          'Kami sudah mengirim kode OTP ke\n'),
-                                      TextSpan(
-                                        text: widget.email,
-                                        style: const TextStyle(
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                      Text("Kami sudah mengirim kode OTP ke nomor", style: bodyTextStyle(context, fontSize: 20)),
+                                      Text(
+                                        widget.email, style: bodyTextStyle(context, fontSize: 20).copyWith(color: primaryColor)
                                       ),
                                     ],
                                   ),
-                                ),
 
-                                const SizedBox(height: 40),
+                                  const SizedBox(height: 16),
 
-                                // 🔢 OTP Fields with shake (pakai sin)
-                                AnimatedBuilder(
-                                  animation: _shakeAnimation,
-                                  builder: (_, child) {
-                                    return Transform.translate(
-                                      offset: Offset(
-                                        math.sin(_shakeAnimation.value) * 8,
-                                        0,
+                                  // ⏱ Timer / Resend
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: _isResendAvailable
+                                        ? GestureDetector(
+                                      onTap: _resendOtp,
+                                      child: Text(
+                                        'Kirim ulang kode',
+                                        style: bodyTextStyle(context
+                                        ).copyWith(color: primaryColor),
                                       ),
-                                      child: child,
-                                    );
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(
-                                        6, (i) => _buildOtpField(i)),
-                                  ),
-                                ),
-
-                                const SizedBox(height: 24),
-
-                                // ⏱ Timer / Resend
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 300),
-                                  child: _isResendAvailable
-                                      ? GestureDetector(
-                                    onTap: _resendOtp,
-                                    child: const Text(
-                                      'Kirim ulang kode',
-                                      style: TextStyle(
-                                        color: primaryColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  )
-                                      : Text(
-                                    _formatTime(_remainingTime),
-                                    style: const TextStyle(
-                                      color: pRed, // pakai constant
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                    )
+                                        : Text(
+                                      _formatTime(_remainingTime),
+                                      style: bodyTextStyle(context
+                                      ).copyWith(color: pRed),
                                     ),
                                   ),
-                                ),
 
+                                  const SizedBox(height: 16),
 
-                                const SizedBox(height: 32),
-                                const Text(
-                                  'Silakan masukkan kode di atas untuk melanjutkan.',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white60),
-                                  textAlign: TextAlign.center,
-                                ),
-
-                                const SizedBox(height: 40),
-
-                                // 🚀 Continue button
-                                ScaleTransition(
-                                  scale: _scaleAnimation,
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    height: 56,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        String otp = _otpControllers
-                                            .map((c) => c.text)
-                                            .join();
-                                        if (otp.length == 6) {
-                                          _verifyOtp();
-                                        } else {
-                                          _shakeOtpFields();
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: primaryColor,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(16)),
-                                      ),
-                                      child: const Text(
-                                        'Lanjut',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
+                                  // 🔢 OTP Fields
+                                  AnimatedBuilder(
+                                    animation: _shakeAnimation,
+                                    builder: (_, child) {
+                                      return Transform.translate(
+                                        offset: Offset(
+                                          math.sin(_shakeAnimation.value) * 8,
+                                          0,
                                         ),
-                                      ),
+                                        child: child,
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                      children: List.generate(
+                                          6, (i) => _buildOtpField(i)),
                                     ),
                                   ),
-                                ),
-                              ],
+
+                                  const SizedBox(height: 18),
+                                  Text(
+                                    'Silakan masukkan kode di atas untuk melanjutkan.',
+                                    style: bodyTextStyle(context).copyWith(color: hintGrey),
+                                    textAlign: TextAlign.center,
+                                  ),
+
+                                  const SizedBox(height: 18),
+
+                                  AppButton.primary(
+                                    text: "Lanjut",
+                                    onPressed: () {
+                                      String otp = _otpControllers.map((c) => c.text).join();
+                                      if (otp.length == 6) {
+                                        _verifyOtp();
+                                      } else {
+                                        _shakeOtpFields();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -431,21 +362,20 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
 
   Widget _buildOtpField(int i) {
     return Container(
-      width: 45,
-      height: 56,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: Colors.grey[800],
-        borderRadius: BorderRadius.circular(12),
+        color: pGrey,
+        borderRadius: BorderRadius.circular(checkboxBorderRadius),
         border: Border.all(
-          color: _focusNodes[i].hasFocus ? primaryColor : Colors.grey[700]!,
-          width: 2,
+          color: _focusNodes[i].hasFocus ? primaryColor : sGrey,
         ),
       ),
       child: TextField(
         controller: _otpControllers[i],
         focusNode: _focusNodes[i],
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
             fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         keyboardType: TextInputType.number,
         maxLength: 1,

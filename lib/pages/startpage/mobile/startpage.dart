@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/common/size_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../common/constants.dart';
 
 class StartScreen extends StatefulWidget {
-  const StartScreen({Key? key}) : super(key: key);
+  final VoidCallback? onCompleted; // Tambahkan callback
+  const StartScreen({Key? key, this.onCompleted}) : super(key: key);
 
   @override
   State<StartScreen> createState() => _StartScreenState();
@@ -30,7 +31,8 @@ class _StartScreenState extends State<StartScreen> {
     OnboardingData(
       image: 'assets/images/start-3.svg',
       title: 'Didampingi Broker Terpercaya',
-      subtitle: 'Dapatkan pendampingan langsung dari broker berlisensi dan terpercaya.',
+      subtitle:
+          'Dapatkan pendampingan langsung dari broker berlisensi dan terpercaya.',
     ),
   ];
 
@@ -69,10 +71,14 @@ class _StartScreenState extends State<StartScreen> {
     });
   }
 
-  void _onGetStarted() {
-    // Navigate to main app or login screen
-    // Navigator.pushReplacementNamed(context, '/login');
-    Navigator.of(context).pop(); // Temporary for demo
+  void _onGetStarted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('seenOnboarding', true);
+
+    // Panggil callback untuk notify main.dart
+    if (widget.onCompleted != null) {
+      widget.onCompleted!();
+    }
   }
 
   @override
@@ -80,109 +86,117 @@ class _StartScreenState extends State<StartScreen> {
     SizeConfig().init(context);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              primaryColor,
-              primaryBlackColor,
-            ],
-            stops: [0.0, 0.4],
-          ),
-        ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Skip Button
-              _buildSkipButton(),
-
-              // Page Indicator
-              _buildPageIndicator(),
-
-              // Content
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  itemCount: _onboardingData.length,
-                  itemBuilder: (context, index) {
-                    return _buildOnboardingPage(_onboardingData[index]);
-                  },
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: getProportionateScreenWidth(hPadding),
+              vertical: getProportionateScreenHeight(10),
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildPageIndicator(),
+                  ),
                 ),
-              ),
-
-              // Bottom Button
-              _buildBottomButton(),
-
-              SizedBox(height: getProportionateScreenHeight(40)),
-            ],
+                const SizedBox(width: 18),
+                _buildSkipButton(),
+              ],
+            ),
           ),
         ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          // Background dengan fade
+          SizedBox.expand(
+            child: ShaderMask(
+              shaderCallback: (Rect rect) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.white, Colors.transparent],
+                  stops: [0.0, 1.0],
+                ).createShader(rect);
+              },
+              blendMode: BlendMode.dstIn,
+              child: Image.asset(
+                "assets/images/background_gradient.png",
+                fit: BoxFit.fitWidth,
+                alignment: Alignment.topCenter,
+              ),
+            ),
+          ),
+
+          // Konten onboarding
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: _onPageChanged,
+                    itemCount: _onboardingData.length,
+                    itemBuilder: (context, index) {
+                      return _buildOnboardingPage(_onboardingData[index]);
+                    },
+                  ),
+                ),
+                _buildBottomButton(),
+                SizedBox(height: getProportionateScreenHeight(40)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSkipButton() {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: getProportionateScreenHeight(20),
-        right: getProportionateScreenWidth(hPadding),
-      ),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: TextButton(
-          onPressed: _skipToEnd,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Skip',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: getProportionateScreenWidth(16),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(width: getProportionateScreenWidth(5)),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.white,
-                size: getProportionateScreenWidth(14),
-              ),
-            ],
-          ),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: _skipToEnd,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Skip', style: headingStyle(context, fontSize: 20)),
+            SizedBox(width: getProportionateScreenWidth(5)),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: getProportionateScreenWidth(14),
+              color: primaryLightColor,
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildPageIndicator() {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: getProportionateScreenHeight(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(
-          _onboardingData.length,
-              (index) => AnimatedContainer(
-            duration: defaultDuration,
-            margin: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenWidth(4),
-            ),
-            height: getProportionateScreenHeight(8),
-            width: _currentIndex == index
-                ? getProportionateScreenWidth(40)
-                : getProportionateScreenWidth(8),
-            decoration: BoxDecoration(
-              color: _currentIndex == index
-                  ? Colors.white
-                  : Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ).animate().fadeIn(duration: 300.ms).slideX(),
+    return Row(
+      children: List.generate(
+        _onboardingData.length,
+        (index) => Expanded(
+          child:
+              AnimatedContainer(
+                duration: defaultDuration,
+                margin: EdgeInsets.symmetric(
+                  horizontal: getProportionateScreenWidth(5),
+                ),
+                height: getProportionateScreenHeight(8),
+                decoration: BoxDecoration(
+                  color:
+                      _currentIndex == index
+                          ? primaryColor
+                          : primaryLightColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ).animate().fadeIn(duration: 300.ms).slideX(),
         ),
       ),
     );
@@ -200,10 +214,10 @@ class _StartScreenState extends State<StartScreen> {
             flex: 3,
             child: Center(
               child: SvgPicture.asset(
-                data.image,
-                height: getProportionateScreenHeight(250),
-                fit: BoxFit.contain,
-              )
+                    data.image,
+                    height: getProportionateScreenHeight(250),
+                    fit: BoxFit.contain,
+                  )
                   .animate()
                   .fadeIn(duration: 600.ms)
                   .scale(begin: const Offset(0.8, 0.8), duration: 600.ms),
@@ -218,15 +232,10 @@ class _StartScreenState extends State<StartScreen> {
               children: [
                 // Title
                 Text(
-                  data.title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: getProportionateScreenWidth(24),
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
-                  textAlign: TextAlign.center,
-                )
+                      data.title,
+                      style: headingStyle(context),
+                      textAlign: TextAlign.center,
+                    )
                     .animate()
                     .fadeIn(delay: 200.ms, duration: 500.ms)
                     .slideY(begin: 0.3),
@@ -239,14 +248,13 @@ class _StartScreenState extends State<StartScreen> {
                     horizontal: getProportionateScreenWidth(20),
                   ),
                   child: Text(
-                    data.subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: getProportionateScreenWidth(16),
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
+                        data.subtitle,
+                        style: headingStyle(
+                          context,
+                          fontSize: 20,
+                        ).copyWith(color: hintGrey),
+                        textAlign: TextAlign.center,
+                      )
                       .animate()
                       .fadeIn(delay: 400.ms, duration: 500.ms)
                       .slideY(begin: 0.3),
@@ -264,59 +272,23 @@ class _StartScreenState extends State<StartScreen> {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: getProportionateScreenWidth(hPaddingForCard),
+        horizontal: getProportionateScreenWidth(hPadding * 1.5),
         vertical: getProportionateScreenHeight(10),
       ),
       child: AnimatedSwitcher(
         duration: defaultDuration,
-        child: SizedBox(
-          key: ValueKey(isLastPage),
-          width: double.infinity,
-          height: getProportionateScreenHeight(buttonHeight),
-          child: ElevatedButton(
-            onPressed: isLastPage ? _onGetStarted : _nextPage,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              elevation: defaultElevation,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  getProportionateScreenWidth(cardBorderRadius),
-                ),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  isLastPage ? 'Selesai' : 'Selanjutnya',
-                  style: TextStyle(
-                    fontSize: getProportionateScreenWidth(16),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (!isLastPage) ...[
-                  SizedBox(width: getProportionateScreenWidth(8)),
-                  Icon(
+        child:
+            isLastPage
+                ? AppButton.primary(text: 'Selesai', onPressed: _onGetStarted)
+                : AppButton.iconRight(
+                  text: 'Selanjutnya',
+                  icon: Icon(
                     Icons.arrow_forward_ios,
                     size: getProportionateScreenWidth(14),
+                    color: Colors.white,
                   ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomIndicator() {
-    return Container(
-      width: getProportionateScreenWidth(134),
-      height: getProportionateScreenHeight(5),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(2.5),
+                  onPressed: _nextPage,
+                ),
       ),
     );
   }

@@ -46,7 +46,7 @@ class ArtikelListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   sectionTitleBar(context, 'Cerita Besar'),
-                  kDivider,
+                  kDivider(),
                   ...state1.items.map(
                         (artikel) => ArticleCardWidget.bigNews(
                       judul: artikel.judul ?? '-',
@@ -74,7 +74,7 @@ class ArtikelListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   sectionTitleBar(context, 'Cerita Lainnya'),
-                  kDivider,
+                  kDivider(),
                   ...state2.items.map(
                         (artikel) => ArticleCardWidget.otherArticle(
                       judul: artikel.judul ?? '-',
@@ -102,7 +102,7 @@ class ArtikelListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   sectionTitleBar(context, 'Artikel Lainnya'),
-                  kDivider,
+                  kDivider(),
                   ...state3.items.map(
                         (artikel) => ArticleCardWidget.otherArticle(
                       judul: artikel.judul ?? '-',

@@ -20,7 +20,6 @@ import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
-import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -141,7 +140,7 @@ class MRekanContactCrudFormPageFormState
 
                                           // Heading + subheading
                                           Padding(
-                                            padding: const EdgeInsets.only(bottom: fieldSpacing), // 20.0 dari constants
+                                            padding: const EdgeInsets.only(bottom: 20), // 20.0 dari constants
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start, // mulai dari start
                                               children: [
@@ -184,7 +183,7 @@ class MRekanContactCrudFormPageFormState
                                           FormError(errors: errors, key: null),
 
                                           const SizedBox(height: 16),
-                                          appButton(
+                                          AppButton.primary(
                                             text: "Submit",
                                             onPressed: onSaveForm,
                                             width: MediaQuery.of(context).size.width * 0.3,
@@ -269,19 +268,29 @@ class MRekanContactCrudFormPageFormState
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
   }
 
-  Widget buildFieldAlamat1() {
-    return TextFormField(
+  // No. Telp Perusahaan
+  Widget buildFieldTelp() {
+    return appTextField(
+      label: "No. Telp Perusahaan",
+      controller: fieldTelpController,
       keyboardType: TextInputType.multiline,
-      minLines: 1,
       maxLines: 3,
-      controller: fieldAlamat1Controller,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("Alamat"), // 👈 pakai helper
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kStringNullError);
+          return "";
         }
+        return null;
       },
+    );
+  }
+
+  Widget buildFieldAlamat1() {
+    return appTextField(
+      label: "Alamat",
+      controller: fieldAlamat1Controller,
+      keyboardType: TextInputType.multiline,
+      maxLines: 3,
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);
@@ -293,21 +302,19 @@ class MRekanContactCrudFormPageFormState
   }
 
   Widget buildFieldEmail() {
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 3,
+    return appTextField(
+      label: "Email",
       controller: fieldEmailController,
-      style: const TextStyle(color: primaryLightColor),
-      decoration: customInputDecoration("Email"), // 👈 pakai helper
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
-        }
-      },
+      keyboardType: TextInputType.emailAddress,
+      maxLines: 1, // biasanya email cukup 1 baris
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);
+          return "";
+        }
+        // bisa tambahin regex simple validasi email
+        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+          addError(error: "Format email tidak valid");
           return "";
         }
         return null;
@@ -439,28 +446,7 @@ class MRekanContactCrudFormPageFormState
     );
   }
 
-  Widget buildFieldTelp() {
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 3,
-      controller: fieldTelpController,
-      style: const TextStyle(color: primaryLightColor),
-      decoration: customInputDecoration("No. Telp Perusahaan"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
-        }
-      },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          addError(error: kStringNullError);
-          return "";
-        }
-        return null;
-      },
-    );
-  }
+
 
   void onSaveForm() {
     if (_formKey.currentState!.validate()) {

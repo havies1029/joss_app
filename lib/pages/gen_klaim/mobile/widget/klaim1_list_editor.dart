@@ -175,8 +175,20 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                       const SizedBox(height: 12),
 
                       _twoCol(
-                        _fieldText(context, 'Nama Tertanggung', ctrls.insuredName, 'Nama Tertanggung'),
-                        _fieldText(context, 'Lokasi Kejadian', ctrls.kejadianLokasi, 'Lokasi Kejadian'),
+                        appTextField(
+                          label: "Nama Tertanggung",
+                          hint: "Masukkan Nama Tertanggung",
+                          controller: ctrls.insuredName,
+                          textInputAction: TextInputAction.next,
+                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Tidak boleh kosong' : null,
+                        ),
+                        appTextField(
+                          label: "Lokasi Kejadian",
+                          hint: "Masukkan Lokasi Kejadian",
+                          controller: ctrls.kejadianLokasi,
+                          textInputAction: TextInputAction.next,
+                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Tidak boleh kosong' : null,
+                        ),
                       ),
 
                       const SizedBox(height: 12),
@@ -253,47 +265,21 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
     }
   }
 
-  Widget _fieldText(BuildContext context, String label, TextEditingController c, String hint) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-        TextFormField(
-          controller: c,
-          decoration: customInputDecoration(label).copyWith(labelText: label, hintText: 'Masukkan $hint'),
-          validator: (v) => (v == null || v.trim().isEmpty) ? 'Tidak boleh kosong' : null,
-          textInputAction: TextInputAction.next,
-        ),
-      ],
-    );
-  }
-
   Widget _fieldTanggal(_RowCtrls ctrls) {
     final last = (ctrls.kejadianTgl != null && ctrls.kejadianTgl!.isAfter(_today)) ? ctrls.kejadianTgl! : _today;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Tanggal Kejadian', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-        DateTimeFormField(
-          initialValue: ctrls.kejadianTgl ?? _today,
-          mode: DateTimeFieldPickerMode.date,
-          dateFormat: DateFormat('yyyy-MM-dd'),
-          firstDate: DateTime(2000, 1, 1),
-          lastDate: last,
-          decoration: customInputDecoration('Tanggal Kejadian').copyWith(
-            labelText: 'Tanggal Kejadian',
-            hintText: 'Pilih tanggal',
-            suffixIcon: const Icon(Icons.event),
-          ),
-          validator: (dt) => (dt == null) ? 'Tanggal harus diisi' : null,
-          onChanged: (dt) {
-            setState(() {
-              ctrls.kejadianTgl = DateTime(dt!.year, dt.month, dt.day);
-            });
-          },
-        ),
-      ],
+    return AppDateField(
+      label: 'Tanggal Kejadian',
+      hint: 'Pilih tanggal',
+      initialValue: ctrls.kejadianTgl ?? _today,
+      firstDate: DateTime(2000, 1, 1),
+      lastDate: last,
+      validator: (dt) => (dt == null) ? 'Tanggal harus diisi' : null,
+      onChanged: (dt) {
+        setState(() {
+          ctrls.kejadianTgl = DateTime(dt!.year, dt.month, dt.day);
+        });
+      },
     );
   }
 
@@ -306,14 +292,15 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
           children: [
             Expanded(
               flex: 2,
-              child: TextFormField(
+              child: appTextField(
+                label: "Jumlah Klaim",
+                hint: "cth: 10.000.000",
                 controller: ctrls.klaimAmount,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsFormatterId()],
-                decoration: customInputDecoration('Jumlah Klaim').copyWith(
-                  labelText: 'Jumlah Klaim',
-                  hintText: 'cth: 10.000.000',
-                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  ThousandsFormatterId(),
+                ],
                 validator: (v) {
                   final raw = v?.replaceAll('.', '').replaceAll(',', '') ?? '';
                   if (raw.isEmpty) return 'Tidak boleh kosong';

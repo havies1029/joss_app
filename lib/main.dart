@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/login/mobile/client/widget/popup_client_widget.dart';
@@ -11,6 +12,7 @@ import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/popup_user_widget.dart';
 import 'package:joss_app/pages/profilepage/mobile/profile/form_section/rekan_pajak.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
+import 'package:joss_app/pages/startpage/mobile/startpage.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim2crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanbankcrud_repository.dart';
@@ -92,6 +94,8 @@ Future<void> main() async {
   final userRepository = UserRepository();
   final prefs = await SharedPreferences.getInstance();
   final appPrefs = AppPrefs(prefs);
+  final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -158,6 +162,7 @@ Future<void> main() async {
         BlocProvider<ArticleSelectionCubit>(
           create: (_) => ArticleSelectionCubit(appPrefs),
         ),
+        BlocProvider(create: (_) => TrslogCariBloc()),
         BlocProvider<Klaim1ListBloc>(
             create: (context) =>
                 Klaim1ListBloc()),
@@ -295,15 +300,38 @@ Future<void> main() async {
             },
           ),
         ],
-        child: _App(userRepository: userRepository),
+        child: _App(
+          userRepository: userRepository,
+          seenOnboarding: seenOnboarding,
+        ),
       ),
     ),
   );
 }
 
-class _App extends StatelessWidget {
+class _App extends StatefulWidget {
   final UserRepository userRepository;
-  const _App({super.key, required this.userRepository});
+  final bool seenOnboarding;
+  const _App({super.key, required this.userRepository, required this.seenOnboarding});
+
+  @override
+  State<_App> createState() => _AppState();
+}
+
+class _AppState extends State<_App> {
+  late bool _showOnboarding;
+
+  @override
+  void initState() {
+    super.initState();
+    _showOnboarding = !widget.seenOnboarding;
+  }
+
+  void _onOnboardingCompleted() {
+    setState(() {
+      _showOnboarding = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -323,18 +351,9 @@ class _App extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      // home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      //   builder: (context, state) {
-      //     if (state is AuthenticationAuthenticated) {
-      //       return HomeTabWidget(userRepository: userRepository);
-      //     }
-      //     if (state is AuthenticationUnauthenticated) {
-      //       return const LoginClient();
-      //     }
-      //     return const LoadingIndicator();
-      //   },
-      // ),
-      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      home: _showOnboarding
+          ? StartScreen(onCompleted: _onOnboardingCompleted)
+          : BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           if (state is AuthenticationAuthenticated) {
             // ✅ Tutup semua popup
@@ -365,9 +384,8 @@ class _App extends StatelessWidget {
               // tambahin field lain kalau ada di RegUserProfileCubit
             );
 
-
             // ✅ Setelah data Cubit keisi → load HomeTabWidget
-            return HomeTabWidget(userRepository: userRepository);
+            return HomeTabWidget(userRepository: widget.userRepository);
           }
 
           if (state is AuthenticationUnauthenticated) {

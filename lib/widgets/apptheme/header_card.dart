@@ -22,12 +22,12 @@ class HeaderCard extends StatelessWidget {
         vertical: hPadding,
       ),
       decoration: BoxDecoration(
-        gradient: orangeToBlackGradientVertical, // border gradient
+        gradient: primaryBlackGradient,
         borderRadius: BorderRadius.circular(cardBorderRadius),
       ),
       child: Container(
         padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.all(1), // ketebalan border gradient
+        margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: pGrey,
           borderRadius: BorderRadius.circular(cardBorderRadius - 2),

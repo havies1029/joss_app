@@ -238,8 +238,6 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
       backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundFirstPage(
-          backgroundAsset: "assets/images/background_gradient.png",
-          fadeHeight: 300,
           child: Column(
             children: [
               Expanded(

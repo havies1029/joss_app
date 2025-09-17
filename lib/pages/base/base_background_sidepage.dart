@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../common/constants.dart';
 
@@ -21,35 +22,31 @@ class BaseBackgroundSidePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // dasar hitam
+      backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: Column(
           children: [
-            // 🔹 Header Hitam
+            // Header
             Container(
               height: 56,
-              color: primaryBlackColor, // pakai constant
-              padding: const EdgeInsets.symmetric(horizontal: hPaddingForCard),
+              color: primaryBlackColor,
+              padding: const EdgeInsets.symmetric(horizontal: hPadding*2),
               child: Stack(
                 children: [
-                  // 🔙 Tombol back di kiri
+                  // Tombol back di kiri
                   Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
                       onTap: onBack ?? () => Navigator.pop(context),
-                      child: const Icon(Icons.arrow_back, color: primaryLightColor),
+                      child: SvgPicture.asset("assets/icons/arrow_back.svg"),
                     ),
                   ),
 
-                  // 🔹 Title di tengah
+                  // Title
                   Center(
                     child: Text(
                       title,
-                      style: TextStyle(
-                        color: primaryLightColor,   // pakai constant
-                        fontSize: getResponsiveFont(context, 20),               // bisa ganti ke constant kalau ada
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: headingStyle(context, fontSize: 20),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -57,7 +54,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
               ),
             ),
 
-            // 🔹 Background + Konten
+            // Background + konten
             Expanded(
               child: LayoutBuilder(
                 builder: (context, c) {
@@ -75,7 +72,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
                               return const LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [Colors.white, Colors.transparent],
+                                colors: [primaryLightColor, Colors.transparent],
                                 stops: [0.0, 1.0],
                               ).createShader(rect);
                             },
@@ -89,7 +86,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
                         ),
                       ),
 
-                      // Konten bebas
+                      // Konten
                       child,
                     ],
                   );
@@ -111,10 +108,7 @@ class KelolaProfilPage extends StatelessWidget {
     return BaseBackgroundSidePage(
       title: "Kelola Profil",
       child: Center(
-        child: Text(
-          "Konten di sini",
-          style: TextStyle(color: Colors.white),
-        ),
+        child: Text("Konten di sini", style: bodyTextStyle(context)),
       ),
     );
   }

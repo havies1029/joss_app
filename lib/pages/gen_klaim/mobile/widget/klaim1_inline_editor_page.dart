@@ -66,7 +66,7 @@ class _Klaim1InlineEditorPageState extends State<Klaim1InlineEditorPage> {
           children: [
             // Header
             Padding(
-              padding: EdgeInsets.only(bottom: fieldSpacing),
+              padding: EdgeInsets.only(bottom: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -1,16 +1,21 @@
 library constants;
 
+import 'package:date_field/date_field.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:joss_app/common/size_config.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';
 part '../widgets/apptheme/snackbar.dart';
 part '../widgets/apptheme/textstyles.dart';
+part '../widgets/apptheme/dropdown.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: const ['email'],
@@ -35,6 +40,31 @@ bool isTablet(BuildContext ctx) =>
     MediaQuery.of(ctx).size.width < 1000;
 bool isDesktop(BuildContext ctx) => MediaQuery.of(ctx).size.width >= 1000;
 
+class SizeConfig {
+  static MediaQueryData? _mediaQueryData;
+  static double? screenWidth;
+  static double? screenHeight;
+  static double? defaultSize;
+  static Orientation? orientation;
+
+  void init(BuildContext context) {
+    _mediaQueryData = MediaQuery.of(context);
+    screenWidth = _mediaQueryData?.size.width;
+    screenHeight = _mediaQueryData?.size.height;
+    orientation = _mediaQueryData?.orientation;
+  }
+}
+
+double getProportionateScreenHeight(double inputHeight) {
+  double screenHeight = SizeConfig.screenHeight!;
+  return (inputHeight / 812.0) * screenHeight;
+}
+
+double getProportionateScreenWidth(double inputWidth) {
+  double screenWidth = SizeConfig.screenWidth!;
+  return (inputWidth / 375.0) * screenWidth;
+}
+
 /// Color Palette
 const Color primaryColor = Color(0xFFEF7A28);
 const Color primaryLightColor = Color(0xFFF7F7F7);
@@ -45,8 +75,8 @@ const Color secondaryBlackColor = Color(0xFF181818);
 const Color formGrey = Color(0xFF333333);
 const Color pGrey = Color(0xFF292929);
 const Color sGrey = Color(0xFF4E4E4E);
-const Color unselectedColor = Color(0xFF666666);
 const Color hintGrey = Color(0xFFBCBCBC);
+const Color unselectedColor = Color(0xFF666666);
 
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
@@ -57,23 +87,13 @@ const Color pDarkRed = Color(0xFFDC1C1C);
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
 
-const LinearGradient primaryGradientColor = LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: [primaryBlackColor, primaryColor],
-);
-
 /// Padding & Spacing
   const double hPadding = 10.0;
 const double vPadding = 20.0;
 const double cardBorderRadius = 10.0;
 const double checkboxBorderRadius = 4.0;
 const double defaultElevation = 3.0;
-const double headerSpacing = 30.0;
-const double fieldSpacing = 20.0;
 const double buttonHeight = 41.0;
-
-const double hPaddingForCard = 20.0;
 
 const defaultDuration = Duration(milliseconds: 250);
 
@@ -91,28 +111,12 @@ const String kPhoneNumberNullError = "Please Enter your phone number";
 const String kAddressNullError = "Please Enter your address";
 const String kStringNullError = "Please enter some text";
 
-final otpInputDecoration = InputDecoration(
-  contentPadding: EdgeInsets.symmetric(
-    vertical: getProportionateScreenWidth(15),
-  ),
-  border: outlineInputBorder(),
-  focusedBorder: outlineInputBorder(),
-  enabledBorder: outlineInputBorder(),
-);
-
-OutlineInputBorder outlineInputBorder() {
-  return OutlineInputBorder(
-    borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
-    borderSide: const BorderSide(color: primaryLightColor),
-  );
-}
-
 enum ListStatus { initial, success, failure }
 
 const kAnimationDuration = Duration(milliseconds: 200);
 
 /// Divider
-const Widget kDivider = Divider(height: 1, color: pGrey);
+Widget kDivider({Color? color}) => Divider(height: 1, color: color ?? pGrey);
 const Widget sDivider = Divider(
   height: 1,
   color: sGrey,
@@ -120,156 +124,52 @@ const Widget sDivider = Divider(
   endIndent: 20,
 );
 
-/// Horizontal (gelap → terang)
-const LinearGradient orangeSmoothGradientHorizontal = LinearGradient(
-  begin: Alignment.centerLeft,
-  end: Alignment.centerRight,
-  colors: [
-    Color(0xFFEF7A28), // gelap (orange tua)
-    Color(0xFFFFCDA9), // terang (peach)
-  ],
+/// Gradient
+const LinearGradient primaryGradientColor = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [primaryBlackColor, primaryColor],
 );
 
-/// Vertical (terang → gelap)
-const LinearGradient orangeSmoothGradientVertical = LinearGradient(
+const LinearGradient primaryBlackGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [primaryColor, primaryBlackColor],
+);
+
+const LinearGradient cardBorderGradient = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
   colors: [
-    Color(0xFFFFCDA9), // terang di atas
-    Color(0xFFEF7A28), // gelap di bawah
+    primaryColor,
+    primaryBlackColor,
+    primaryBlackColor,
+    primaryBlackColor,
+    primaryBlackColor,
+    primaryBlackColor,
+    primaryBlackColor,
+    primaryBlackColor,
   ],
+  stops: [0.0, 0.05, 0.2, 0.4, 0.6, 0.75, 0.9, 1.0],
 );
 
-/// Horizontal (gelap -> terang)
+// Horizontal (gelap → terang)
+const LinearGradient primaryBadgeGradient = LinearGradient(
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+  colors: [primaryColor, Color(0xFFFFCDA9)],
+);
+
+// Gradient untuk menu
 const LinearGradient blackFadeGradientHorizontal = LinearGradient(
   begin: Alignment.centerRight,
   end: Alignment.centerLeft,
-  colors: [
-    Color(0x00181818), // kanan transparan (0%)
-    Color(0xFF181818), // kiri gelap (100%)
-  ],
+  colors: [Color(0x00181818), Color(0xFF181818)],
 );
 
-/// Gradient Hitam Transparan (Kiri → Kanan, terang → gelap)
+// Gradient untuk menu
 const LinearGradient blackFadeGradientHorizontalReversed = LinearGradient(
   begin: Alignment.centerLeft,
   end: Alignment.centerRight,
-  colors: [
-    Color(0x00181818), // kiri transparan (0%)
-    Color(0xFF181818), // kanan gelap (100%)
-  ],
+  colors: [Color(0x00181818), Color(0xFF181818)],
 );
-
-/// Gradient Oranye → Hitam (Vertikal, atas → bawah)
-const LinearGradient orangeToBlackGradientVertical = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: [
-    Color(0xFFEF7A28), // oranye di atas
-    Color(0xFF121212), // hitam di bawah
-  ],
-  stops: [0.0, 1.0],
-);
-InputDecoration customInputDecoration(String label) {
-  return InputDecoration(
-    labelText: label,
-    labelStyle: const TextStyle(
-      color: primaryColor, // label oranye
-      fontWeight: FontWeight.w500,
-    ),
-    filled: true,
-    fillColor: sGrey, // background field abu-abu
-    hintStyle: const TextStyle(color: hintGrey),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      borderSide: const BorderSide(color: sGrey, width: 1),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      borderSide: const BorderSide(color: primaryColor, width: 1.5),
-    ),
-  );
-}
-InputDecoration customDropdownDecoration(String label) {
-  return InputDecoration(
-    labelText: label,
-    labelStyle: const TextStyle(
-      color: primaryColor, // label oranye
-      fontWeight: FontWeight.w500,
-    ),
-    filled: true,
-    fillColor: sGrey, // background field abu-abu
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
-    // Border normal/tidak aktif - menggunakan sGrey
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-      borderSide: const BorderSide(
-        color: sGrey, // border abu-abu saat tidak aktif
-        width: 1.0,
-      ),
-    ),
-
-    // Border aktif/fokus - menggunakan primaryColor dengan ketebalan lebih
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-      borderSide: const BorderSide(
-        color: primaryColor, // border primary color saat aktif
-        width: 2.0, // border lebih tebal saat aktif
-      ),
-    ),
-
-    // Border saat error (opsional)
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-      borderSide: const BorderSide(
-        color: Colors.red,
-        width: 1.0,
-      ),
-    ),
-
-    // Border saat error dan fokus (opsional)
-    focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-      borderSide: const BorderSide(
-        color: Colors.red,
-        width: 2.0,
-      ),
-    ),
-  );
-}
-
-Widget appButton({
-  required String text,
-  required VoidCallback onPressed,
-  double? width,
-  double height = 56,
-  Color backgroundColor = primaryColor,
-  Color textColor = primaryLightColor,
-  double borderRadius = cardBorderRadius,
-  double fontSize = 14,
-  FontWeight fontWeight = FontWeight.w600,
-  EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 16),
-}) {
-  return SizedBox(
-    width: width,
-    height: height,
-    child: ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: textColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        elevation: 0,
-        padding: padding,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: fontSize, fontWeight: fontWeight),
-      ),
-    ),
-  );
-}

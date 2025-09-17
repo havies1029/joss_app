@@ -139,7 +139,7 @@ class MRekanPajakCrudFormPageFormState extends State<MRekanPajakCrudFormPage> {
                                                   const SizedBox(height: 10),
 
                                                   Padding(
-                                                    padding: const EdgeInsets.only(bottom: fieldSpacing), // 20.0 dari constants
+                                                    padding: const EdgeInsets.only(bottom: 20), // 20.0 dari constants
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start, // mulai dari start
                                                       children: [
@@ -182,7 +182,7 @@ class MRekanPajakCrudFormPageFormState extends State<MRekanPajakCrudFormPage> {
                                                   FormError(errors: errors, key: null),
 
                                                   const SizedBox(height: 16),
-                                                  appButton(
+                                                  AppButton.primary(
                                                     text: "Submit",
                                                     onPressed: onSaveForm,
                                                     width: MediaQuery.of(context).size.width * 0.3,
@@ -275,29 +275,6 @@ class MRekanPajakCrudFormPageFormState extends State<MRekanPajakCrudFormPage> {
     }
   }
 
-  Widget buildFieldAlamat1(){
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 3,
-      controller: fieldAlamat1Controller,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("Alamat"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
-        }
-      },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          addError(error: kStringNullError);
-          return "";
-        }
-        return null;
-      },
-    );
-  }
-
   Widget buildFieldMkotaId(){
     return buildFieldComboMKota(
       comboKey: comboMKotaKey,
@@ -356,16 +333,28 @@ class MRekanPajakCrudFormPageFormState extends State<MRekanPajakCrudFormPage> {
     );
   }
 
-  Widget buildFieldNpwpNo(){
-    return TextFormField(
-      controller: fieldNpwpNoController,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("No Npwp"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
+  // Alamat
+  Widget buildFieldAlamat1() {
+    return appTextField(
+      label: "Alamat",
+      controller: fieldAlamat1Controller,
+      keyboardType: TextInputType.multiline,
+      maxLines: 3,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kStringNullError);
+          return "";
         }
+        return null;
       },
+    );
+  }
+
+// No NPWP
+  Widget buildFieldNpwpNo() {
+    return appTextField(
+      label: "No NPWP",
+      controller: fieldNpwpNoController,
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);

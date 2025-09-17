@@ -8,10 +8,11 @@ import '../../../gen_aset_ringkasan/asetringkasancari_main.dart';
 import '../../../gen_klaim/klaim1list_main.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_status_aset/statusasetcari_main.dart';
+import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
-  final String custType; // 👈 tambahin ini
+  final String custType;
 
   const ListMenuWidget({super.key, required this.custType});
 
@@ -19,19 +20,16 @@ class ListMenuWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // 🔹 Button Daftar Klien di luar container utama
         if (custType != 'C')
-        // 🔹 PERUBAHAN: Hilangkan padding vertical agar menempel
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: _buildDaftarKlienButton(context),
           ),
 
-        // 🔹 Container utama untuk menu
+        // Container utama untuk menu
         Container(
           decoration: BoxDecoration(
             color: secondaryBlackColor,
-            // 🔹 OPSIONAL: Tambahkan radius bawah jika diperlukan
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(cardBorderRadius),
               bottomRight: Radius.circular(cardBorderRadius),
@@ -41,7 +39,10 @@ class ListMenuWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 15,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -70,6 +71,7 @@ class ListMenuWidget extends StatelessWidget {
       ],
     );
   }
+
   Widget _buildDaftarKlienButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -81,85 +83,60 @@ class ListMenuWidget extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: orangeSmoothGradientHorizontal,
+          gradient: primaryBadgeGradient,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(cardBorderRadius),
             topRight: Radius.circular(cardBorderRadius),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: IntrinsicHeight(
           child: Row(
-              children: [
-                // 🔹 Daftar Klien (pakai border kanan sebagai pemisah)
-                // 🔹 Daftar Klien (pakai border kanan bawah radius)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.4),
-                        width: 1,
-                      ),
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(cardBorderRadius), // 🔹 radius bawah kanan
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white.withOpacity(0.4),
+                      width: 1,
                     ),
                   ),
-                  clipBehavior: Clip.antiAlias, // supaya radius kepotong rapi
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(cardBorderRadius),
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Row(
+                  children: [
+                    Icon(Icons.star, color: pYellow, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Daftar Klien',
+                      style: headingStyle(context, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.star, color: pYellow, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Daftar Klien',
-                        style: TextStyle(
-                          color: primaryLightColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Text('Mudah dan Cepat!', style: bodyTextStyle(context)),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: primaryLightColor,
+                        size: 20,
                       ),
                     ],
                   ),
                 ),
-
-
-                // 🔹 Mudah dan Cepat
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.access_time,
-                                color: primaryLightColor, size: 16),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Mudah dan Cepat!',
-                              style: TextStyle(
-                                color: primaryLightColor,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Icon(Icons.arrow_forward_ios,
-                            color: primaryLightColor, size: 16),
-                      ],
-                    ),
-                  ),
-                ),
-              ]
-
+              ),
+            ],
           ),
         ),
       ),
@@ -226,44 +203,22 @@ class ListMenuWidget extends StatelessWidget {
     final isActive = isClient || isAlwaysActive;
 
     return GestureDetector(
-      onTap: isActive
-          ? () {
-        switch (item.title) {
-          case 'Cari Asuransi':
-            Navigator.pushNamed(context, '/cariAsuransi');
-            break;
-          case 'Lapor \nKlaim':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const KlaimMainPage(),
-              ),
-            );
-            break;
-          case 'Aset':
-            Navigator.push(
-              context,MaterialPageRoute(
-                builder: (_) => const AssetManagementPage(),
-              ),
-            );
-            break;
-          case 'Polis':
-            Navigator.pushNamed(context, '/polis');
-            break;
-          case 'Beli Polis':
-            Navigator.pushNamed(context, '/beliPolis');
-            break;
-          case 'Klaim':
-            Navigator.pushNamed(context, '/klaim');
-            break;
-          case 'Tagihan Pembayaran':
-            Navigator.pushNamed(context, '/tagihan');
-            break;
-          default:
-            debugPrint('Menu ${item.title} belum ada action');
-        }
-      }
-          : null,
+      onTap:
+          isActive
+              ? () {
+                final page = getMenuPage(item.title);
+                if (page != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => page),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    infoSnackBar('Fitur ${item.title} belum tersedia!'),
+                  );
+                }
+              }
+              : null,
 
       child: Opacity(
         opacity: isActive ? 1.0 : 0.4, // nonaktif jadi pudar
@@ -293,10 +248,13 @@ class ListMenuWidget extends StatelessWidget {
                         item.iconPath,
                         width: 38,
                         height: 38,
-                        colorFilter: isActive
-                            ? null
-                            : const ColorFilter.mode(
-                            Colors.grey, BlendMode.srcIn),
+                        colorFilter:
+                            isActive
+                                ? null
+                                : const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
                       ),
                     ),
                   ),
@@ -313,14 +271,13 @@ class ListMenuWidget extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(cardBorderRadius),
-                          gradient: orangeSmoothGradientHorizontal,
+                          gradient: primaryBadgeGradient,
                         ),
                         child: Text(
                           'Populer!',
-                          style: bodyTextStyle(context).copyWith(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: bodyTextStyle(
+                            context,
+                          ).copyWith(fontSize: 11, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -343,7 +300,7 @@ class ListMenuWidget extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: hPadding)
+            const SizedBox(height: hPadding),
           ],
         ),
       ),
@@ -376,6 +333,27 @@ class ListMenuWidget extends StatelessWidget {
         iconPath: 'assets/icons/tagihan-pembayaran-7.svg',
       ),
     ];
+  }
+
+  Widget? getMenuPage(String title) {
+    switch (title) {
+      case 'Cari Asuransi':
+        return CariAsuransiPage(); // Ganti ke page lo
+      // case 'Lapor \nKlaim':
+      //   return LaporKlaimPage();
+      // case 'Aset':
+      //   return AsetListPage();
+      // case 'Polis':
+      //   return PolisListPage();
+      // case 'Beli Polis':
+      //   return BeliPolisPage();
+      case 'Klaim':
+        return KlaimMainPage();
+      // case 'Tagihan Pembayaran':
+      //   return TagihanPembayaranPage();
+      default:
+        return null; // atau return Placeholder(), terserah
+    }
   }
 }
 

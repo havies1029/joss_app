@@ -103,7 +103,7 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
               ),
             ),
           ),
-          kDivider,
+          kDivider(),
           Expanded(
             child: SingleChildScrollView(
               controller: _scrollController,

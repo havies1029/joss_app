@@ -8,7 +8,7 @@ class BaseBackgroundFirstPage extends StatelessWidget {
   const BaseBackgroundFirstPage({
     super.key,
     required this.child,
-    this.fadeHeight = 300, // default tinggi fade
+    this.fadeHeight = 300,
     this.backgroundAsset = "assets/images/background_gradient.png",
   });
 

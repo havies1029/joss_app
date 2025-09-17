@@ -124,7 +124,7 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                 const SizedBox(height: 10),
 
                 Padding(
-                  padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, fieldSpacing),
+                  padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -482,43 +482,40 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
 
               const SizedBox(height: 12),
 
-              // Nama
-              Text('Nama PIC', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
-              TextFormField(
+              appTextField(
+                label: "Nama PIC",
+                hint: "Masukkan nama",
                 controller: ctrls.nama,
-                decoration: customInputDecoration('Nama PIC').copyWith(
-                  hintText: 'Masukkan nama',
-                ),
+                textInputAction: TextInputAction.next,
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Nama tidak boleh kosong' : null,
               ),
 
               const SizedBox(height: 12),
 
-              // Email
-              Text('Email', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
-              TextFormField(
+              appTextField(
+                label: "Email",
+                hint: "Masukkan email",
                 controller: ctrls.email,
                 keyboardType: TextInputType.emailAddress,
-                decoration: customInputDecoration('Email').copyWith(
-                  hintText: 'Masukkan email',
-                ),
+                textInputAction: TextInputAction.next,
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Email tidak boleh kosong' : null,
               ),
+
               const SizedBox(height: 12),
 
-              // HP
-              Text('No. HP', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),
-              TextFormField(
+              appTextField(
+                label: "No. HP",
+                hint: "Masukkan nomor HP",
                 controller: ctrls.hp,
                 keyboardType: TextInputType.phone,
-                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]'))],
-                decoration: customInputDecoration('No. HP').copyWith(
-                  hintText: 'Masukkan nomor HP',
-                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]')),
+                ],
+                textInputAction: TextInputAction.done,
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'No. HP tidak boleh kosong' : null,
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: vPadding),
 
               // Jabatan
               Text('Jabatan', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),

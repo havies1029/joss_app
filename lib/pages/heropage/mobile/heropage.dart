@@ -112,7 +112,7 @@ class HeroPage extends StatelessWidget {
         const SizedBox(height: vPadding - 3),
         const CarouselMenuWidget(),
         const SizedBox(height: vPadding - 3),
-        const TransaksiListWidget(),
+        if (custType == 'C') const TransaksiListWidget(),
       ],
     );
   }

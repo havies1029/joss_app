@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
-import 'package:joss_app/pages/login/welcome_header_login.dart';
+import 'package:joss_app/pages/login/welcome_header.dart';
 
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
@@ -24,18 +24,11 @@ const List<String> scopes = <String>[
   'email',
 ];
 
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: scopes,
-  clientId: kIsWeb ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com' : null,
-  serverClientId: kIsWeb ? null : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
-);
-
 class CachedGoogleSigninButton extends StatelessWidget {
   const CachedGoogleSigninButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // debugPrint('✅ Rendered CachedGoogleSigninButton sekali');
     return googleSigninButton();
   }
 }
@@ -68,7 +61,7 @@ class _LoginFormUserState extends State<LoginFormUser>
       vsync: this,
       duration: defaultDuration,
     );
-    _googleSignIn.onCurrentUserChanged
+    googleSignIn.onCurrentUserChanged
         .listen((GoogleSignInAccount? account) async {
       if (account != null && context.mounted) {
         context.read<EmailVerificationBloc>().add(
@@ -81,7 +74,7 @@ class _LoginFormUserState extends State<LoginFormUser>
         );
       }
     });
-    // _googleSignIn.signInSilently();
+    // googleSignIn.signInSilently();
   }
 
   @override
@@ -92,16 +85,13 @@ class _LoginFormUserState extends State<LoginFormUser>
     super.dispose();
   }
 
-  // Ganti method _buildEmailField dan _buildPasswordField dengan:
-
-  Widget _buildEmailField(double hPadding) {
+  Widget _buildEmailField() {
     return appTextField(
       label: "Email",
       hint: "Masukkan email",
       controller: _emailController,
       focusNode: _emailFocusNode,
       keyboardType: TextInputType.emailAddress,
-      padding: EdgeInsets.symmetric(horizontal: hPadding),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return kEmailNullError;
@@ -120,9 +110,6 @@ class _LoginFormUserState extends State<LoginFormUser>
   Widget _buildSignInButton() {
     return AppButton.primary(
       text: "Masuk",
-      width: double.infinity,
-      height: buttonHeight,
-      isLoading: false,
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           _animationController.forward(from: 0);
@@ -169,10 +156,10 @@ class _LoginFormUserState extends State<LoginFormUser>
   //     GoogleSignInAccount? user;
   //
   //     if (kIsWeb) {
-  //       user = await _googleSignIn.signIn();
+  //       user = await googleSignIn.signIn();
   //     } else {
-  //       user = await _googleSignIn.signInSilently();
-  //       user ??= await _googleSignIn.signIn();
+  //       user = await googleSignIn.signInSilently();
+  //       user ??= await googleSignIn.signIn();
   //     }
   //
   //     // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
@@ -236,7 +223,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                     children: <Widget>[
                       // Header Section
                       Padding(
-                        padding: EdgeInsets.all(20),
+                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -253,154 +240,145 @@ class _LoginFormUserState extends State<LoginFormUser>
                                   ? 140
                                   : 120,
                             ),
-                            WelcomeHeaderLogin(),
+                            WelcomeHeader(type: "login_user"),
                           ],
                         ),
                       ),
 
-                      // Card Section yang akan mengambil sisa ruang
+                      // Card Section
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border(
-                              top: BorderSide(
-                                color: primaryColor,
-                                width: 4.0,
-                              ),
+                            gradient: cardBorderGradient,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
                             ),
                           ),
-                          child: Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            margin: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              color: secondaryBlackColor,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
                             ),
-                            child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  _buildEmailField(0),
-                                  SizedBox(height: fieldSpacing),
-                                  // Row dengan checkbox dan forgot password
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical : vPadding),
+                                child: Column(
+                                  children: [
+                                    _buildEmailField(),
+                                    SizedBox(height: 10),
+                                    // Row dengan checkbox dan forgot password
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _rememberPassword = !_rememberPassword;
+                                              });
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Checkbox(
+                                                  value: _rememberPassword,
+                                                  activeColor: primaryColor,
+                                                  checkColor: primaryLightColor,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(
+                                                      checkboxBorderRadius,
+                                                    ),
+                                                  ),
+                                                  onChanged: (value) => setState(
+                                                        () => _rememberPassword = value ?? false,
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: Text(
+                                                    "Ingat Login",
+                                                    style: bodyTextStyle(
+                                                      context,
+                                                    ),
+                                                    overflow:
+                                                    TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    _buildSignInButton(),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                            child: kDivider(color: hintGrey)
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                          child: Text(
+                                            "atau",
+                                            style: TextStyle(
+                                              fontSize: getResponsiveFont(context, 18),
+                                              color: Colors.white70,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: kDivider(color: hintGrey)
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    // Tombol Google
+                                    AppData.kIsWeb
+                                        ? const CachedGoogleSigninButton()
+                                        : AppButton.iconLeft(
+                                      text: 'Masuk Dengan Google',
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/google-icon.svg',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      onPressed: () => _handleGmailRegisterForMobile(context),
+                                      backgroundColor: pGrey,
+                                    ),
+
+                                    Spacer(),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Belum Punya Akun? ",
+                                          style: bodyTextStyle(context).copyWith(color: hintGrey),
+                                        ),
+                                        GestureDetector(
                                           onTap: () {
-                                            setState(() {
-                                              _rememberPassword = !_rememberPassword;
-                                            });
+                                            Navigator.push(context, MaterialPageRoute(builder: (_) => LoginClient()));
                                           },
-                                          child: Row(
-                                            children: [
-                                              Checkbox(
-                                                value: _rememberPassword,
-                                                activeColor: primaryColor,
-                                                checkColor: primaryLightColor,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                    checkboxBorderRadius,
-                                                  ),
-                                                ),
-                                                onChanged: (value) => setState(
-                                                      () => _rememberPassword = value ?? false,
-                                                ),
-                                              ),
-                                              Flexible(
-                                                child: Text(
-                                                  "Ingat Login",
-                                                  style: bodyTextStyle(
-                                                    context,
-                                                  ),
-                                                  overflow:
-                                                  TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
+                                          child: Text(
+                                            "Masuk Sebagai Klien",
+                                            style: bodyTextStyle(context).copyWith(color: primaryColor),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: fieldSpacing),
-                                  _buildSignInButton(),
-                                  SizedBox(height: fieldSpacing),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Divider(
-                                          color: Colors.white24,
-                                          thickness: 1,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: Text(
-                                          "atau",
-                                          style: TextStyle(
-                                            fontSize: getResponsiveFont(context, 18),
-                                            color: Colors.white70,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Divider(
-                                          color: Colors.white24,
-                                          thickness: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: fieldSpacing),
-                                  // Tombol Google
-                                  AppData.kIsWeb
-                                      ? const CachedGoogleSigninButton()
-                                      : _buildIconButton(
-                                    text: 'Daftar Menggunakan Gmail',
-                                    iconPath: 'assets/icons/google-icon.svg',
-                                    isHovering: _isHoveringGmail,
-                                    onHover: (hovering) =>
-                                        setState(() => _isHoveringGmail = hovering),
-                                    onPressed: () => _handleGmailRegisterForMobile(context),
-                                  ),
+                                      ],
+                                    ),
 
-                                  // Sisa ruang akan diisi oleh Card background
-                                  Spacer(),
-
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Belum Punya Akun? ",
-                                        style: TextStyle(
-                                          fontSize: getResponsiveFont(context, 18),
-                                          color: Colors.white70, // warna teks abu
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (_) => LoginClient()));
-                                        },
-                                        child: Text(
-                                          "Masuk Sebagai Klien",
-                                          style: TextStyle(
-                                            fontSize: getResponsiveFont(context, 18),
-                                            fontWeight: FontWeight.w600,
-                                            color: primaryColor, // warna brand dari constants
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  // 🔽 Divider spacing
-                                  SizedBox(height: fieldSpacing),
-
-                                ],
+                                    SizedBox(height: 10),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -423,10 +401,10 @@ class _LoginFormUserState extends State<LoginFormUser>
       GoogleSignInAccount? user;
 
       if (kIsWeb) {
-        user = await _googleSignIn.signIn();
+        user = await googleSignIn.signIn();
       } else {
-        user = await _googleSignIn.signInSilently();
-        user ??= await _googleSignIn.signIn();
+        user = await googleSignIn.signInSilently();
+        user ??= await googleSignIn.signIn();
       }
 
       // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
@@ -454,70 +432,4 @@ class _LoginFormUserState extends State<LoginFormUser>
       }
     }
   }
-
-  Widget _buildIconButton({
-    required String text,
-    required String iconPath,
-    required bool isHovering,
-    required Function(bool) onHover,
-    required VoidCallback onPressed,
-  }) {
-    return MouseRegion(
-      onEnter: (_) => onHover(true),
-      onExit: (_) => onHover(false),
-      child: GestureDetector(
-        onTap: onPressed,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: double.infinity,
-          height: 40,
-          decoration: BoxDecoration(
-            color: isHovering ? Colors.grey.shade100 : Colors.white,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-              color: isHovering ? Colors.grey.shade400 : Colors.grey.shade300,
-              width: 1,
-            ),
-            boxShadow: isHovering
-                ? [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              )
-            ]
-                : [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 3,
-                offset: const Offset(0, 2),
-              )
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(iconPath, width: 24, height: 24),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: Color(0xFF91C050),
-                      fontSize: getResponsiveFont(context, 15),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
-
-

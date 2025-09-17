@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../widgets/mobiledesign_widget.dart';
+import 'package:joss_app/widgets/mobiledesign_widget.dart';
 import '../profilepage/mobile/profile/form_section/rekan_bank.dart';
 
 class MRekanBankCrudMainPage extends StatelessWidget {
@@ -11,10 +10,10 @@ class MRekanBankCrudMainPage extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		return MobileDesignWidget(
-			child: Scaffold(
-				appBar: AppBar(
-					title: Text('${viewMode == "tambah"?"Tambah":"Ubah"} Informasi Bank'),
-				),
-				body: MRekanBankCrudFormPage(viewMode: viewMode, recordId: recordId)));
+				child: Scaffold(
+						appBar: AppBar(
+							title: Text('${viewMode == "tambah"?"Tambah":"Ubah"} Rekan Bank'),
+						),
+						body: MRekanBankCrudFormPage(viewMode: viewMode, recordId: recordId)));
 	}
 }

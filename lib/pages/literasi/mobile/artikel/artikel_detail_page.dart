@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../../../blocs/gen_berita/berita3cari_bloc.dart';
 import '../../../../blocs/local_prefs/article_selection_cubit.dart';
 import 'package:joss_app/common/constants.dart';
@@ -24,14 +25,13 @@ class ArtikelDetailPage extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(6.67),
             onTap: () => Navigator.pop(context),
-            child: const SizedBox(
+            child: SizedBox(
               width: 40,
               height: 40,
               child: Center(
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: primaryColor,
-                  size: 20,
+                child: SvgPicture.asset(
+                  'assets/icons/arrow_back.svg',
+                  colorFilter: ColorFilter.mode(primaryColor, BlendMode.srcIn),
                 ),
               ),
             ),

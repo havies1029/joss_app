@@ -2,6 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/gen_klaim/mobile/widget/klaim1_inline_editor_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:joss_app/pages/gen_klaim/mobile/widget/rekan_klaim.dart';
+import 'package:joss_app/widgets/apptheme/header_card.dart';
+import 'dart:typed_data';
+import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
+import '../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../common/constants.dart';
 
 import '../../../widgets/apptheme/header_card.dart';
@@ -57,7 +64,7 @@ class _KlaimMainPageState extends State<KlaimMainPage>
                 iconPath: "assets/icons/shield2.svg",
                 title: "Klaim",
                 subtitle:
-                "Ajukan klaim Anda dengan mudah dan cepat sesuai ketentuan polis yang berlaku.",
+                    "Ajukan klaim Anda dengan mudah dan cepat sesuai ketentuan polis yang berlaku.",
               ),
               SizedBox(height: 12),
               Expanded(child: Klaim1InlineEditorPage()),

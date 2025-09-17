@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/widgets/form_error.dart';
+import 'package:joss_app/blocs/gen_profile/mrekanbankcrud_bloc.dart';
+import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
+import 'package:joss_app/models/combobox/combombank_model.dart';
+import 'package:joss_app/widgets/combobox/combombank_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-
-import '../../blocs/gen_profile/mrekanbankcrud_bloc.dart';
-import '../../common/constants.dart';
-import '../../models/combobox/combombank_model.dart';
-import '../../models/gen_profile/mrekanbankcrud_model.dart';
-import '../../widgets/combobox/combombank_widget.dart';
-import '../../widgets/form_error.dart';
-
 
 class MRekanBankCrudFormPage extends StatefulWidget {
 	final String viewMode;
@@ -44,94 +42,94 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 		return BlocConsumer<MRekanBankCrudBloc, MRekanBankCrudState>(
 			builder: (context, state) {
 				return Dialog(
-					shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-					child: SingleChildScrollView(
-						child: Padding(
-							padding: const EdgeInsets.all(8.0),
-							child: Form(
-								key: _formKey,
-								child: Column(
-									children: [
-										const SizedBox(height: 10),
-										Text(
-											"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} Informasi Bank",
-											style: const TextStyle(
-												fontSize: 20.0,
-												color: Color(0xffff6101),
-												fontWeight: FontWeight.w600,
-												fontFamily: 'Hind',
-												fontStyle: FontStyle.italic,
-												decoration: TextDecoration.underline,
-											),
-										),
-										const SizedBox(height: 25),
-										buildFieldMbankId(),
-										buildFieldMrekan1Id(),
-										buildFieldRekNama(),
-										buildFieldRekNo(),
-										const SizedBox(height: 25),
-										FormError(
-											errors: errors,
-											key: null,
-										),
-										Row(
-											mainAxisAlignment: MainAxisAlignment.spaceAround,
+						shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+						child: SingleChildScrollView(
+							child: Padding(
+								padding: const EdgeInsets.all(8.0),
+								child: Form(
+										key: _formKey,
+										child: Column(
 											children: [
-												SizedBox(
-													width: MediaQuery.of(context).size.width * 0.3,
-													height: 60,
-													child: Padding(
-														padding: const EdgeInsets.only(top: 30.0),
-														child: ElevatedButton(
-															onPressed: () {
-																_dismissDialog();
-															},
-															child: const Text(
-																'Close',
-																style: TextStyle(fontSize: 13.0),
-															),
-														),
+												const SizedBox(height: 10),
+												Text(
+													"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} Rekan Bank",
+													style: const TextStyle(
+														fontSize: 20.0,
+														color: Color(0xffff6101),
+														fontWeight: FontWeight.w600,
+														fontFamily: 'Hind',
+														fontStyle: FontStyle.italic,
+														decoration: TextDecoration.underline,
 													),
 												),
-												SizedBox(
-													width: MediaQuery.of(context).size.width * 0.3,
-													height: 60,
-													child: Padding(
-														padding: const EdgeInsets.only(top: 30.0),
-														child: ElevatedButton(
-															onPressed: () {
-																onSaveForm();
-															},
-															child: const Text(
-																'Save',
-																style: TextStyle(fontSize: 13.0),
+												const SizedBox(height: 25),
+												buildFieldMbankId(),
+												buildFieldMrekan1Id(),
+												buildFieldRekNama(),
+												buildFieldRekNo(),
+												const SizedBox(height: 25),
+												FormError(
+													errors: errors,
+													key: null,
+												),
+												Row(
+													mainAxisAlignment: MainAxisAlignment.spaceAround,
+													children: [
+														SizedBox(
+															width: MediaQuery.of(context).size.width * 0.3,
+															height: 60,
+															child: Padding(
+																padding: const EdgeInsets.only(top: 30.0),
+																child: ElevatedButton(
+																	onPressed: () {
+																		_dismissDialog();
+																	},
+																	child: const Text(
+																		'Close',
+																		style: TextStyle(fontSize: 13.0),
+																	),
+																),
 															),
 														),
-													),
+														SizedBox(
+															width: MediaQuery.of(context).size.width * 0.3,
+															height: 60,
+															child: Padding(
+																padding: const EdgeInsets.only(top: 30.0),
+																child: ElevatedButton(
+																	onPressed: () {
+																		onSaveForm();
+																	},
+																	child: const Text(
+																		'Save',
+																		style: TextStyle(fontSize: 13.0),
+																	),
+																),
+															),
+														),
+													],
 												),
 											],
-										),
-									],
-								)),
-						),
-					));
-				},
-				listener: (context, state) {
-					if (state.isLoaded) {
-						if (state.record != null){
-							fieldMrekan1IdController.text = state.record!.mrekan1Id;
-							fieldRekNamaController.text = state.record!.rekNama;
-							fieldRekNoController.text = state.record!.rekNo;
-						}
-						fieldComboMBank = state.comboMBank;
+										)),
+							),
+						));
+			},
+			listener: (context, state) {
+				if (state.isLoaded) {
+					if (state.record != null){
+						fieldMrekan1IdController.text = state.record!.mrekan1Id;
+						fieldRekNamaController.text = state.record!.rekNama;
+						fieldRekNoController.text = state.record!.rekNo;
 					}
-				},
-			);
-		}
+					fieldComboMBank = state.comboMBank;
+				}
+			},
+		);
+	}
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-		mRekanBankCrudBloc.add(
-			MRekanBankCrudLihatEvent(recordId: widget.recordId));
+			mRekanBankCrudBloc.add(
+					MRekanBankCrudLihatEvent(recordId: widget.recordId));
 		}
 	}
 
@@ -143,7 +141,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-						error: "Field ComboMBank tidak boleh kosong.");
+							error: "Field ComboMBank tidak boleh kosong.");
 					mRekanBankCrudBloc.add(ComboMBankChangedEvent(comboMBank: value));
 				}
 			},
@@ -155,7 +153,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-						error: "Field ComboMBank tidak boleh kosong.");
+							error: "Field ComboMBank tidak boleh kosong.");
 				}
 			},
 		);
@@ -170,7 +168,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -195,7 +193,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -217,7 +215,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {

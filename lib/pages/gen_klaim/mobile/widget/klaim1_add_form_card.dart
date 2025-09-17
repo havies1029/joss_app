@@ -164,17 +164,12 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
   }
 
   Widget _fieldText(String label, TextEditingController c, String hint) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-        TextFormField(
-          controller: c,
-          decoration: customInputDecoration(label).copyWith(labelText: label, hintText: 'Masukkan $hint'),
-          validator: (v) => (v == null || v.trim().isEmpty) ? 'Tidak boleh kosong' : null,
-          textInputAction: TextInputAction.next,
-        ),
-      ],
+    return appTextField(
+      label: label,
+      hint: 'Masukkan $hint',
+      controller: c,
+      validator: (v) =>
+      (v == null || v.trim().isEmpty) ? 'Tidak boleh kosong' : null,
     );
   }
 
@@ -184,23 +179,17 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tanggal Kejadian', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-        DateTimeFormField(
+        Text('Tanggal', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
+        AppDateField(
+          label: 'Tanggal',
           initialValue: _kejadianTgl ?? _today,
-          mode: DateTimeFieldPickerMode.date,
-          dateFormat: DateFormat('yyyy-MM-dd'),
           firstDate: DateTime(2000, 1, 1),
           lastDate: last,
-          decoration: customInputDecoration('Tanggal Kejadian').copyWith(
-            labelText: 'Tanggal Kejadian',
-            hintText: 'Pilih tanggal',
-            suffixIcon: const Icon(Icons.event),
-          ),
           validator: (dt) => (dt == null) ? 'Tanggal harus diisi' : null,
           onChanged: (dt) => setState(() {
             _kejadianTgl = DateTime(dt!.year, dt.month, dt.day);
           }),
-        ),
+        )
       ],
     );
   }
@@ -214,14 +203,15 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
           children: [
             Expanded(
               flex: 2,
-              child: TextFormField(
+              child: appTextField(
+                label: 'Jumlah Klaim',
+                hint: 'cth: 10.000.000',
                 controller: _klaimAmount,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsFormatterId()],
-                decoration: customInputDecoration('Jumlah Klaim').copyWith(
-                  labelText: 'Jumlah Klaim',
-                  hintText: 'cth: 10.000.000',
-                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  ThousandsFormatterId(),
+                ],
                 validator: (v) {
                   final raw = v?.replaceAll('.', '').replaceAll(',', '') ?? '';
                   if (raw.isEmpty) return 'Tidak boleh kosong';
@@ -229,7 +219,7 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
                   if (parsed == null) return 'Format tidak valid';
                   return null;
                 },
-              ),
+              )
             ),
             const SizedBox(width: 12),
             Expanded(

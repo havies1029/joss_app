@@ -18,6 +18,7 @@ import '../../profilepage/mobile/profile/form_section/rekan_bank.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_contact.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_general_cmp.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_general_idv.dart';
+import '../widgets/ubah_password_popup.dart';
 
 const List<String> scopes = <String>['email'];
 
@@ -212,7 +213,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             context: context,
                             nama: nama,
                             foto: null, // RegUserProfileCubit belum simpan foto
-                            subtitle: "User Baru",
+                            subtitle: "Nasabah Biasa",
                           );
                         },
                       );
@@ -229,36 +230,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 const SizedBox(height: vPadding),
 
-                Text('Akun', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
-                const SizedBox(height: 6),
-                Container(
-                  decoration: BoxDecoration(
-                    color: pGrey,
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(color: sGrey),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildMenuItem(
-                        svgAsset: 'assets/icons/ubah_pass.svg',
-                        title: 'Ubah Password',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const MRekanBankListMainPage(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: vPadding),
-
-                Text('Informasi', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
-                const SizedBox(height: 6),
                 BlocBuilder<AuthenticationBloc, AuthenticationState>(
                   builder: (context, authState) {
                     final custType = authState is AuthenticationAuthenticated
@@ -267,7 +238,49 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     if (custType == 'C') {
                       return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            'Akun',
+                            style: bodyTextStyle(
+                              context,
+                              fontSize: 16,
+                            ).copyWith(color: hintGrey),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: pGrey,
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              border: Border.all(color: sGrey),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildMenuItem(
+                                  svgAsset: 'assets/icons/ubah_pass.svg',
+                                  title: 'Ubah Password',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const UbahPasswordPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: vPadding),
+                          Text(
+                            'Informasi',
+                            style: bodyTextStyle(
+                              context,
+                              fontSize: 16,
+                            ).copyWith(color: hintGrey),
+                          ),
+
+                          const SizedBox(height: 6),
                           Container(
                             decoration: BoxDecoration(
                               color: pGrey,

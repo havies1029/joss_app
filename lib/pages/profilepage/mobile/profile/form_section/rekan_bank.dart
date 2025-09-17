@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
@@ -17,7 +16,6 @@ import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combombank_repository.dart';
-import '../../../../../widgets/apptheme/reusable_combobox.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -133,7 +131,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
                                           // Heading + subheading
                                           Padding(
-                                            padding: const EdgeInsets.only(bottom: fieldSpacing),
+                                            padding: const EdgeInsets.only(bottom: 20),
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
@@ -180,7 +178,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                                           FormError(errors: errors, key: null),
 
                                           const SizedBox(height: 16),
-                                          appButton(
+                                          AppButton.primary(
                                             text: "Submit",
                                             onPressed: onSaveForm,
                                             width: MediaQuery.of(context).size.width * 0.3,
@@ -342,46 +340,13 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
+  // MRekan1Id (readonly)
   Widget buildFieldMrekan1Id() {
-    return TextFormField(
+    return appTextField(
+      label: "MRekan1Id",
       controller: fieldMrekan1IdController,
-      readOnly: true,                // ga bisa diedit
-      showCursor: false,             // ga ada kursor
-      enableInteractiveSelection: false, // ga bisa select/copy (kalau mau bisa copy, set true)
-      style: const TextStyle(color: primaryLightColor),
-      textInputAction: TextInputAction.none,
-      decoration: customInputDecoration("MRekan1Id").copyWith(
-        suffixIcon: const Icon(Icons.lock_outline, size: 18),
-      ),
-
-      // non-editable, jadi onChanged ga perlu
-      // onChanged: ...
-
-      // tetap validasi biar form tau wajib ada nilainyas
-      validator: (value) {
-        if ((value == null) || value.isEmpty) {
-          addError(error: kStringNullError);
-          return ""; // biar error text di bawah decoration, sesuai pattern lo
-        }
-        return null;
-      },
-    );
-  }
-
-
-  Widget buildFieldRekNama(){
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 3,
-      controller: fieldRekNamaController,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("rekNama"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
-        }
-      },
+      enabled: false, // readonly
+      suffixIcon: const Icon(Icons.lock_outline, size: 18),
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);
@@ -392,16 +357,28 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
-  Widget buildFieldRekNo(){
-    return TextFormField(
-      controller: fieldRekNoController,
-      style: const TextStyle(color: primaryLightColor), // isi teks putih
-      decoration: customInputDecoration("rekNo"),
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
+// RekNama (multiline)
+  Widget buildFieldRekNama() {
+    return appTextField(
+      label: "rekNama",
+      controller: fieldRekNamaController,
+      keyboardType: TextInputType.multiline,
+      maxLines: 3,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kStringNullError);
+          return "";
         }
+        return null;
       },
+    );
+  }
+
+// RekNo (single line)
+  Widget buildFieldRekNo() {
+    return appTextField(
+      label: "rekNo",
+      controller: fieldRekNoController,
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);

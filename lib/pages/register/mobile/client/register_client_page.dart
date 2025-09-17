@@ -52,8 +52,6 @@ class _RegisterClientState extends State<RegisterClient>
       backgroundColor: primaryBlackColor, // ⬅️ kasih warna dasar hitam
       body: SafeArea(
         child: BaseBackgroundFirstPage(
-          backgroundAsset: "assets/images/background_gradient.png", // bisa custom
-          fadeHeight: 300,
           child: Column(
             children: [
               Expanded(
