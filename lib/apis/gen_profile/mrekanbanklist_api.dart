@@ -5,7 +5,7 @@ import 'package:joss_app/models/gen_profile/mrekanbanklist_model.dart';
 
 class MRekanBankListAPI{
 	Future<List<MRekanBankListModel>> getMRekanBankListAPI(String searchText, int hal) async {
-		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/gen_profile/mrekanbanklist/getlist";
+		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/profile/mrekanbanklist/getlist";
 
 		Map<String, String> queryParams = {"searchText": searchText, "hal": hal.toString()};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);

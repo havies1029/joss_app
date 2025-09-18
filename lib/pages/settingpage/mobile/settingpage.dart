@@ -11,7 +11,7 @@ import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
-import '../../profilepage/mobile/profile/form_section/pic_form/rekan_pic.dart';
+import '../../profilepage/mobile/profile/form_section/rekan_pic.dart';
 import '../../test_bank/mrekanbanklist_main.dart';
 import '../widgets/logout_popup.dart';
 import '../../profilepage/mobile/profile/form_section/rekan_bank.dart';

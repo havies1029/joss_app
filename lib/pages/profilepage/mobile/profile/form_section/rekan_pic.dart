@@ -10,11 +10,11 @@ import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 
-import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../../../blocs/user_profile/user_profile_state.dart';
-import '../../../../../../common/constants.dart';
-import '../../../../../../helper/image_uploader.dart';
-import '../../../../../base/base_background_sidepage.dart';
+import '../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../blocs/user_profile/user_profile_state.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../helper/image_uploader.dart';
+import '../../../../base/base_background_sidepage.dart';
 
 /// Bundle controller per baris
 class _PicRowCtrls {
@@ -104,54 +104,93 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
               ),
             );
           }
-          //
-          // // (opsional) tampilkan loading kalau ada state loading
-          // if (state.status == ListStatus.loading) {
-          //   return const Center(child: CircularProgressIndicator());
-          // }
 
-          // Sinkronisasi controllers dgn data list
           _ensureRowControllers(state);
 
-          // ====== KONTEN FORM LIST (scrollable) ======
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(12, contentTopPadding + 8, 12, 24),
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(12, 24, 12, 24), // ✅ no contentTopPadding
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // === LIST EDITABLE ===
+                // === AVATAR ===
+                BlocBuilder<UserProfileCubit, UserProfileState>(
+                  buildWhen: (prev, curr) =>
+                  (prev.fotoBytes?.lengthInBytes ?? -1) !=
+                      (curr.fotoBytes?.lengthInBytes ?? -1),
+                  builder: (context, state) {
+                    final imageBytes = state.fotoBytes;
+                    return InkResponse(
+                      onTap: () => ImageUploader.pickAndUpload(context),
+                      containedInkWell: true,
+                      customBorder: const CircleBorder(),
+                      radius: avatarRadius + 14,
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(avatarRingPadding),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: primaryBlackColor,
+                              border: Border.all(
+                                  color: sGrey, width: avatarBorderWidth),
+                            ),
+                            child: CircleAvatar(
+                              radius: avatarRadius,
+                              backgroundColor: secondaryBlackColor,
+                              backgroundImage: (imageBytes != null &&
+                                  imageBytes.isNotEmpty)
+                                  ? MemoryImage(imageBytes)
+                                  : null,
+                              child: (imageBytes == null || imageBytes.isEmpty)
+                                  ? const Icon(Icons.person,
+                                  color: Colors.white, size: 48)
+                                  : null,
+                            ),
+                          ),
+                          const Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: IgnorePointer(
+                              ignoring: true,
+                              child: CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Colors.black87,
+                                child: Icon(Icons.camera_alt,
+                                    color: Color(0xffff6101), size: 18),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 24),
 
+                // === HEADER ===
                 Padding(
                   padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Informasi PIC",
-                        style: TextStyle(
-                          fontSize: getResponsiveFont(context, 22),
-                          fontWeight: FontWeight.w600,
-                          color: primaryLightColor,
-                        ),
-                      ),
-                      Text(
-                        "Data penanggung jawab utama perusahaan.",
-                        style: TextStyle(
-                          fontSize: getResponsiveFont(context, 16),
-                          color: sGrey,
-                          height: 1.3,
-                        ),
-                      ),
+                      Text("Informasi PIC",
+                          style: TextStyle(
+                            fontSize: getResponsiveFont(context, 22),
+                            fontWeight: FontWeight.w600,
+                            color: primaryLightColor,
+                          )),
+                      Text("Data penanggung jawab utama perusahaan.",
+                          style: TextStyle(
+                            fontSize: getResponsiveFont(context, 16),
+                            color: sGrey,
+                            height: 1.3,
+                          )),
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.center, // ⬅️ ini kuncinya
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: primaryColor,
-                            size: 20,
-                          ),
+                          Icon(Icons.info_outline, color: primaryColor, size: 20),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
@@ -164,41 +203,13 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                             ),
                           ),
                         ],
-                      )
-
+                      ),
                     ],
                   ),
                 ),
 
-                // const SizedBox(height: 10),
-
-                // if (state.items.isEmpty)
-                //   const Padding(
-                //     padding: EdgeInsets.symmetric(vertical: 8),
-                //     child: Center(child: Text('Belum ada data PIC')),
-                //   )
-                // else
-                //   ListView.separated(
-                //     shrinkWrap: true,
-                //     physics: const NeverScrollableScrollPhysics(),
-                //     itemCount: state.items.length,
-                //     separatorBuilder: (_, __) => const SizedBox(height: 12),
-                //     itemBuilder: (ctx, idx) {
-                //       final item = state.items[idx];
-                //       final ctrls = _rowCtrls[item.mrekanpicId]!;
-                //       return _buildEditorRowCard(
-                //         title: 'Edit PIC',
-                //         ctrls: ctrls,
-                //         isNew: false,
-                //         onSave: () => _saveExisting(item.mrekanpicId, ctrls),
-                //         onDelete: () => _confirmDelete(item.mrekanpicId),
-                //       );
-                //     },
-                //   ),
-
-                if (state.items.isEmpty)
-                  const SizedBox.shrink() // ⬅️ kalau kosong, nggak render apa-apa
-                else
+                // === LIST ===
+                if (state.items.isNotEmpty)
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -217,10 +228,13 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                     },
                   ),
 
-                // === BUTTON TAMBAH / FORM TAMBAH ===
+                const SizedBox(height: vPadding),
+
+                // === FORM TAMBAH ===
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
-                  transitionBuilder: (child, anim) => SizeTransition(sizeFactor: anim, child: child),
+                  transitionBuilder: (child, anim) =>
+                      SizeTransition(sizeFactor: anim, child: child),
                   child: _showAddForm
                       ? _buildEditorRowCard(
                     key: const ValueKey('add-form'),
@@ -237,30 +251,21 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                     },
                     isSaving: _isSavingNew,
                   )
-                      : // import 'package:joss_app/common/constants.dart'; // pastikan constants kebawa
-
-                  SizedBox(
-                    key: const ValueKey('add-button'),
-                    width: double.infinity, // full width
-                    height: 56,             // tinggi tombol (cobain 56–60 biar mantap)
-                    child: AppButton.iconLeft(
-                      text: 'Tambah PIC',
-                      icon: const Icon(Icons.add, size: 20),
-                      onPressed: _isSavingNew ? null : () => setState(() => _showAddForm = true),
-
-                      // styling JPS
-                      backgroundColor: primaryColor,
-                      // textColor: Colors.white,
-                      // iconColor: Colors.white,
-                      // borderRadius: cardBorderRadius,
-                      // elevation: 0,
-                      // padding: const EdgeInsets.symmetric(horizontal: 16), // tinggi diatur oleh SizedBox
-                      // textStyle: bodyTextStyle(context).copyWith(
-                      //   fontWeight: FontWeight.w700,
-                      //   fontSize: getResponsiveFont(context, 22),
-                      //   height: 1.1,
-                      // ),
-                      iconTextSpacing: 10,
+                      : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding), // 👈 kasih jarak kiri-kanan
+                    child: SizedBox(
+                      key: const ValueKey('add-button'),
+                      width: double.infinity,
+                      height: 56,
+                      child: AppButton.iconLeft(
+                        text: 'Tambah PIC',
+                        icon: const Icon(Icons.add, size: 20),
+                        onPressed: _isSavingNew
+                            ? null
+                            : () => setState(() => _showAddForm = true),
+                        backgroundColor: primaryColor,
+                        iconTextSpacing: 10,
+                      ),
                     ),
                   ),
                 ),
@@ -304,62 +309,69 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                     child: Stack(
                       alignment: Alignment.topCenter,
                       children: [
-                        // --- konten scrollable (form list + tambah)
-                        content,
-
-                        // --- Avatar tetap di atas tengah (opsional, kalau mau dipakai di screen ini)
-                        Positioned(
-                          top: 16,
-                          child: BlocBuilder<UserProfileCubit, UserProfileState>(
-                            buildWhen: (prev, curr) =>
-                            (prev.fotoBytes?.lengthInBytes ?? -1) !=
-                                (curr.fotoBytes?.lengthInBytes ?? -1),
-                            builder: (context, state) {
-                              final imageBytes = state.fotoBytes;
-                              return InkResponse(
-                                onTap: () => ImageUploader.pickAndUpload(context),
-                                containedInkWell: true,
-                                customBorder: const CircleBorder(),
-                                radius: avatarRadius + 14,
-                                child: Stack(
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(avatarRingPadding),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: primaryBlackColor,
-                                        border: Border.all(color: sGrey, width: avatarBorderWidth),
-                                      ),
-                                      child: CircleAvatar(
-                                        radius: avatarRadius,
-                                        backgroundColor: secondaryBlackColor,
-                                        backgroundImage: (imageBytes != null && imageBytes.isNotEmpty)
-                                            ? MemoryImage(imageBytes)
-                                            : null,
-                                        child: (imageBytes == null || imageBytes.isEmpty)
-                                            ? const Icon(Icons.person, color: Colors.white, size: 48)
-                                            : null,
-                                      ),
-                                    ),
-                                    const Positioned(
-                                      bottom: 4,
-                                      right: 4,
-                                      child: IgnorePointer(
-                                        ignoring: true,
-                                        child: CircleAvatar(
-                                          radius: 18,
-                                          backgroundColor: Colors.black87,
-                                          child: Icon(Icons.camera_alt, color: Color(0xffff6101), size: 18),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                        // 🔥 scroll dipindah ke sini
+                        SingleChildScrollView(
+                          padding: EdgeInsets.zero,
+                          child: content,
                         ),
+
+                        // Avatar overlay
+                        // Positioned(
+                        //   top: 16,
+                        //   child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                        //     buildWhen: (prev, curr) =>
+                        //     (prev.fotoBytes?.lengthInBytes ?? -1) !=
+                        //         (curr.fotoBytes?.lengthInBytes ?? -1),
+                        //     builder: (context, state) {
+                        //       final imageBytes = state.fotoBytes;
+                        //       return InkResponse(
+                        //         onTap: () => ImageUploader.pickAndUpload(context),
+                        //         containedInkWell: true,
+                        //         customBorder: const CircleBorder(),
+                        //         radius: avatarRadius + 14,
+                        //         child: Stack(
+                        //           alignment: Alignment.bottomRight,
+                        //           children: [
+                        //             Container(
+                        //               padding: const EdgeInsets.all(avatarRingPadding),
+                        //               decoration: BoxDecoration(
+                        //                 shape: BoxShape.circle,
+                        //                 color: primaryBlackColor,
+                        //                 border: Border.all(
+                        //                     color: sGrey, width: avatarBorderWidth),
+                        //               ),
+                        //               child: CircleAvatar(
+                        //                 radius: avatarRadius,
+                        //                 backgroundColor: secondaryBlackColor,
+                        //                 backgroundImage: (imageBytes != null &&
+                        //                     imageBytes.isNotEmpty)
+                        //                     ? MemoryImage(imageBytes)
+                        //                     : null,
+                        //                 child: (imageBytes == null || imageBytes.isEmpty)
+                        //                     ? const Icon(Icons.person,
+                        //                     color: Colors.white, size: 48)
+                        //                     : null,
+                        //               ),
+                        //             ),
+                        //             const Positioned(
+                        //               bottom: 4,
+                        //               right: 4,
+                        //               child: IgnorePointer(
+                        //                 ignoring: true,
+                        //                 child: CircleAvatar(
+                        //                   radius: 18,
+                        //                   backgroundColor: Colors.black87,
+                        //                   child: Icon(Icons.camera_alt,
+                        //                       color: Color(0xffff6101), size: 18),
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -515,7 +527,7 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'No. HP tidak boleh kosong' : null,
               ),
 
-              const SizedBox(height: vPadding),
+              const SizedBox(height: 12),
 
               // Jabatan
               Text('Jabatan', style: TextStyle( fontSize: getResponsiveFont(context, 20)),),

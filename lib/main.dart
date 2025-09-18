@@ -389,8 +389,11 @@ class _AppState extends State<_App> {
           }
 
           if (state is AuthenticationUnauthenticated) {
+            debugPrint("🔑 Go to LoginUser()");
             context.read<UserProfileCubit>().clearProfile();
             context.read<RegUserProfileCubit>().clearProfile();
+            context.read<LoginBloc>().add(LoginReset());
+
             return const LoginUser();
           }
           if (state is AuthenticationRequireLoginClient) {
@@ -430,11 +433,11 @@ class _AppState extends State<_App> {
             return const LoginClient();
           }
 
-          if (state is AuthenticationRequirePinHPVerification) {
-            while (Navigator.of(context, rootNavigator: true).canPop()) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
-          }
+          // if (state is AuthenticationRequirePinHPVerification) {
+          //   while (Navigator.of(context, rootNavigator: true).canPop()) {
+          //     Navigator.of(context, rootNavigator: true).pop();
+          //   }
+          // }
 
           // default → loading
           return const LoadingIndicator();

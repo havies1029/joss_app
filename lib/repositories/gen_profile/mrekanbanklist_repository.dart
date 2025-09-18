@@ -7,4 +7,5 @@ class MRekanBankListRepository {
 		MRekanBankListAPI api = MRekanBankListAPI();
 		return await api.getMRekanBankListAPI(searchText, hal);
 	}
+
 }

@@ -10,11 +10,13 @@ import 'package:joss_app/models/combobox/combombank_model.dart';
 import 'package:joss_app/widgets/combobox/combombank_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../../../blocs/gen_profile/mrekanbanklist_bloc.dart';
 import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
+import '../../../../../models/gen_profile/mrekanbanklist_model.dart';
 import '../../../../../repositories/combobox/combombank_repository.dart';
 import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
@@ -39,29 +41,64 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   var fieldMrekan1IdController = TextEditingController();
   var fieldRekNamaController = TextEditingController();
   var fieldRekNoController = TextEditingController();
+  String? existingMrekanBankId; // simpan id kalau ketemu
 
+  // di dalam MRekanBankCrudFormPageFormState
+  List<MRekanBankListModel> _allRekanBankList = [];
+  List<MRekanBankListModel> _filteredRekanBankList = [];
   @override
   void initState() {
     super.initState();
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      context.read<MRekanBankListBloc>().add(
+        RefreshMRekanBankListEvent(searchText: "", hal: 0),
+      );
+    });
+
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
   }
 
+
+  void loadData() {
+    if (widget.viewMode == "ubah") {
+      mRekanBankCrudBloc.add(
+        MRekanBankCrudLihatEvent(recordId: widget.recordId),
+      );
+    }
+
+    final profile = context.read<UserProfileCubit>().state;
+    fieldMrekan1IdController.text = profile.mrekan1Id ?? '';
+
+    // 🔥 Filter list berdasarkan mrekan1Id (pasti 1 atau kosong)
+    final currentMrekan1Id = fieldMrekan1IdController.text;
+    _filteredRekanBankList = _allRekanBankList
+        .where((item) => item.mrekan1Id == currentMrekan1Id)
+        .toList();
+
+    // Debug biar jelas
+    if (_filteredRekanBankList.isNotEmpty) {
+      final item = _filteredRekanBankList.first;
+      debugPrint("🎯 RekanBank ditemukan untuk mrekan1Id=$currentMrekan1Id:");
+      debugPrint("- ${item.mrekanbankId} | ${item.mrekan1Id} | ${item.rekNama} | ${item.rekNo}");
+    } else {
+      debugPrint("⚠️ Tidak ada RekanBank untuk mrekan1Id=$currentMrekan1Id");
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    // init bloc contact
     mRekanBankCrudBloc = BlocProvider.of<MRekanBankCrudBloc>(context);
 
     final screenHeight = MediaQuery.of(context).size.height;
     final headerSpacing = screenHeight * 0.025;
 
-    // Avatar sizing (biar gampang tuning)
     const double avatarRadius = 50;
     const double avatarRingPadding = 3;
     const double avatarBorderWidth = 2;
-
-    // Ruang di atas konten untuk avatar (radius + margin)
     const double contentTopPadding = 120;
 
     return Scaffold(
@@ -75,41 +112,78 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
           child: Column(
             children: [
               SizedBox(height: headerSpacing * 4),
-              // di parent Column pastikan dibungkus Expanded ya:
+
+              // ⬇️ Tambahin BlocBuilder di sini buat nyimpen list
+              BlocListener<MRekanBankListBloc, MRekanBankListState>(
+                listenWhen: (prev, curr) => prev.items != curr.items,
+                listener: (context, state) async {
+                  _allRekanBankList = state.items;
+
+                  final currentMrekan1Id = fieldMrekan1IdController.text;
+                  final filtered = _allRekanBankList
+                      .where((item) => item.mrekan1Id == currentMrekan1Id)
+                      .toList();
+
+                  if (filtered.isNotEmpty) {
+                    final item = filtered.first;
+                    existingMrekanBankId = item.mrekanbankId;
+
+                    // 🔥 Prefill field otomatis
+                    setState(() {
+                      fieldMrekan1IdController.text = item.mrekan1Id;
+                      fieldRekNamaController.text   = item.rekNama;
+                      fieldRekNoController.text     = item.rekNo;
+
+                      // Dropdown bank (butuh ComboMBankModel)
+                      fieldComboMBank = ComboMBankModel(
+                        mbankId: item.mbankId,
+                        bankNama: item.bankNama,
+                      );
+                    });
+
+                    debugPrint("🎯 Prefill RekanBank ditemukan untuk mrekan1Id=$currentMrekan1Id:");
+                    debugPrint("- ${item.mrekanbankId} | ${item.mrekan1Id} | ${item.bankNama} | ${item.rekNama} | ${item.rekNo}");
+                  } else {
+                    existingMrekanBankId = null;
+                    debugPrint("⚠️ Tidak ada RekanBank untuk mrekan1Id=$currentMrekan1Id");
+                  }
+                },
+                child: const SizedBox.shrink(),
+              ),
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.only(                // ⬅️ hanya atas
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
                   child: Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: secondaryBlackColor, // panel hitamnya di sini
-                      borderRadius: BorderRadius.only(                // ⬅️ hanya atas
+                    decoration: const BoxDecoration(
+                      color: secondaryBlackColor,
+                      borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20),
                       ),
-                      border: const Border(
+                      border: Border(
                         top: BorderSide(color: primaryColor, width: 4.0),
                       ),
                     ),
                     child: Stack(
                       alignment: Alignment.topCenter,
                       children: [
-                        // --- FORM stretch sampai bawah + tetap bisa scroll ---
+                        // FORM lama tetap jalan
                         CustomScrollView(
-                          physics: const NeverScrollableScrollPhysics(), // ⬅️ matiin scroll gesture
+                          physics: const NeverScrollableScrollPhysics(),
                           slivers: [
                             SliverPadding(
                               padding: EdgeInsets.fromLTRB(
                                 16,
-                                contentTopPadding, // ruang buat avatar
+                                contentTopPadding,
                                 16,
-                                24 + MediaQuery.of(context).viewInsets.bottom, // aman dari keyboard
+                                24 + MediaQuery.of(context).viewInsets.bottom,
                               ),
                               sliver: SliverFillRemaining(
-                                hasScrollBody: false, // ⬅️ ini yang bikin "stretch"
+                                hasScrollBody: false,
                                 child: BlocConsumer<MRekanBankCrudBloc, MRekanBankCrudState>(
                                   listener: (context, state) {
                                     if (state.isLoaded) {
@@ -195,7 +269,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                           ],
                         ),
 
-                        // --- Avatar tetap di atas tengah ---
+                        // Avatar tetap
                         Positioned(
                           top: 16,
                           child: BlocBuilder<UserProfileCubit, UserProfileState>(
@@ -260,14 +334,8 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   }
 
 
-  void loadData() {
-    if (widget.viewMode == "ubah") {
-      mRekanBankCrudBloc.add(
-          MRekanBankCrudLihatEvent(recordId: widget.recordId));
-    }
-    final profile = context.read<UserProfileCubit>().state;
-    fieldMrekan1IdController.text = profile.mrekan1Id ?? '';
-  }
+
+
 
   // Widget buildFieldMbankId(){
   //   return buildFieldComboMBank(
@@ -397,28 +465,29 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      MRekanBankCrudModel record = MRekanBankCrudModel(
+      final record = MRekanBankCrudModel(
         mbankId: fieldComboMBank?.mbankId,
         mrekan1Id: fieldMrekan1IdController.text,
-        mrekanbankId: '',
+        mrekanbankId: existingMrekanBankId ?? '', // isi kalau update
         rekNama: fieldRekNamaController.text,
         rekNo: fieldRekNoController.text,
       );
 
-      print("📝 [onSaveForm] View Mode: ${widget.viewMode}");
-      print("📤 [onSaveForm] Data yang akan dikirim: ${record.toJson()}");
+      debugPrint("📤 [onSaveForm] Data yang akan dikirim: ${record.toJson()}");
 
-      if (widget.viewMode == "tambah") {
-        mRekanBankCrudBloc.add(MRekanBankCrudTambahEvent(record: record));
-      } else if (widget.viewMode == "ubah") {
-        record.mrekanbankId = mRekanBankCrudBloc.state.record!.mrekanbankId;
-        print("✏️ [onSaveForm] ID untuk ubah: ${record.mrekanbankId}");
+      if (existingMrekanBankId != null && existingMrekanBankId!.isNotEmpty) {
+        // 🔥 Update record
+        debugPrint("✏️ [onSaveForm] Update ID: $existingMrekanBankId");
         mRekanBankCrudBloc.add(MRekanBankCrudUbahEvent(record: record));
+      } else {
+        // 🔥 Tambah record baru
+        debugPrint("➕ [onSaveForm] Tambah record baru");
+        mRekanBankCrudBloc.add(MRekanBankCrudTambahEvent(record: record));
       }
 
       _dismissDialog();
     } else {
-      print("❌ [onSaveForm] Validasi form gagal.");
+      debugPrint("❌ [onSaveForm] Validasi form gagal.");
     }
   }
 

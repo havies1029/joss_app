@@ -341,8 +341,8 @@ class ListMenuWidget extends StatelessWidget {
         return CariAsuransiPage(); // Ganti ke page lo
       // case 'Lapor \nKlaim':
       //   return LaporKlaimPage();
-      // case 'Aset':
-      //   return AsetListPage();
+      case 'Aset':
+        return AssetManagementPage();
       // case 'Polis':
       //   return PolisListPage();
       // case 'Beli Polis':

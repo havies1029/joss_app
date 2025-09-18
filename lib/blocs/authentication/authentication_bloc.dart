@@ -129,13 +129,15 @@ class AuthenticationBloc
   //   // Setelah tree stabil → emit Unauthenticated
   //   emit(AuthenticationUnauthenticated());
   // }
-
-  Future<void> _onLoggedOut(
-      LoggedOut event, Emitter<AuthenticationState> emit) async {
+  Future<void> _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) async {
     emit(AuthenticationLoading());
+    debugPrint("🌀 Logout: emit AuthenticationLoading");
     await userRepository.deleteToken(id: 0);
+    debugPrint("🗑️ Token dihapus");
     emit(AuthenticationUnauthenticated());
+    debugPrint("✅ Logout: emit AuthenticationUnauthenticated");
   }
+
 
   Future<void> _onRequirePinEmailVerification(
       RequirePinEmailVerification event,
