@@ -13,45 +13,44 @@ class CariAsuransiMenu extends StatelessWidget {
     return Scaffold(
       body: BaseBackgroundFirstPage(
         child: SafeArea(
-          child: SingleChildScrollView( // ✅ Bungkus biar bisa scroll
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              decoration: BoxDecoration(
-                color: secondaryBlackColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: secondaryBlackColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: hPadding),
                   HeaderCard(
-                    iconPath: "assets/icons/cari-asuransi-1.svg",
+                    iconPath: "assets/icons/menu_cari_asuransi.svg",
                     title: "Cari Asuransi",
-                    subtitle: "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+                    subtitle:
+                        "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
                   ),
-
-                  // 🔽 Scrollable content
                   Container(
                     color: primaryBlackColor,
                     child: Column(
                       children: [
-                        // Kategori Asuransi
                         Container(
                           padding: EdgeInsets.symmetric(vertical: hPadding),
                           decoration: BoxDecoration(color: secondaryBlackColor),
                           child: Column(
                             children: [
-                              Text("Kategori Asuransi", style: bodyTextStyle(context)),
+                              Text(
+                                "Kategori Asuransi",
+                                style: bodyTextStyle(context),
+                              ),
                               const SizedBox(height: 10),
                               kDivider(),
                             ],
                           ),
                         ),
-
-                        // Grid kategori
                         Container(
                           padding: EdgeInsets.symmetric(
                             vertical: hPadding,
@@ -63,47 +62,103 @@ class CariAsuransiMenu extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(child: _buildCategory(context, "assets/icons/kendaraan.svg", "Kendaraan")),
+                                  Expanded(
+                                    child: _buildCategory(
+                                      context,
+                                      "assets/icons/kendaraan.svg",
+                                      "Kendaraan",
+                                    ),
+                                  ),
                                   const SizedBox(width: 12),
-                                  Expanded(child: _buildCategory(context, "assets/icons/properti.svg", "Rumah & Property")),
+                                  Expanded(
+                                    child: _buildCategory(
+                                      context,
+                                      "assets/icons/properti.svg",
+                                      "Rumah & Property",
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Expanded(child: _buildCategory(context, "assets/icons/kesehatan.svg", "Kesehatan")),
+                                  Expanded(
+                                    child: _buildCategory(
+                                      context,
+                                      "assets/icons/kesehatan.svg",
+                                      "Kesehatan",
+                                    ),
+                                  ),
                                   const SizedBox(width: 12),
-                                  Expanded(child: _buildCategory(context, "assets/icons/perjalanan.svg", "Perjalanan")),
+                                  Expanded(
+                                    child: _buildCategory(
+                                      context,
+                                      "assets/icons/perjalanan.svg",
+                                      "Perjalanan",
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Expanded(child: _buildCategory(context, "assets/icons/pendidikan.svg", "Pendidikan")),
+                                  Expanded(
+                                    child: _buildCategory(
+                                      context,
+                                      "assets/icons/pendidikan.svg",
+                                      "Pendidikan",
+                                    ),
+                                  ),
                                   const SizedBox(width: 12),
-                                  Expanded(child: _buildCategory(context, "assets/icons/jiwa.svg", "Jiwa")),
+                                  Expanded(
+                                    child: _buildCategory(
+                                      context,
+                                      "assets/icons/jiwa.svg",
+                                      "Jiwa",
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 30),
-
-                        // Kenapa pilih JPS
                         Container(
                           padding: EdgeInsets.all(hPadding * 1.5),
                           decoration: BoxDecoration(color: secondaryBlackColor),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Kenapa pilih asuransi di JPS?", style: bodyTextStyle(context)),
+                              Text(
+                                "Kenapa pilih asuransi di JPS?",
+                                style: bodyTextStyle(context),
+                              ),
                               const SizedBox(height: 10),
 
-                              _buildReason(context, "assets/icons/lightning.svg", "Klaim Anti Ribet", "Urus klaim cepat, gampang, dan selalu transparan."),
-                              _buildReason(context, "assets/icons/hospital.svg", "Mitra di Mana-Mana", "JPS selalu dekat denganmu."),
-                              _buildReason(context, "assets/icons/secured.svg", "Terjamin Aman", "JPS sudah resmi berizin OJK, jadi nggak perlu ragu."),
-                              _buildReason(context, "assets/icons/fulltime.svg", "Layanan 24/7", "Tenang, tim kami standby kapan pun kamu butuh."),
+                              _buildReason(
+                                context,
+                                "assets/icons/lightning.svg",
+                                "Klaim Anti Ribet",
+                                "Urus klaim cepat, gampang, dan selalu transparan.",
+                              ),
+                              _buildReason(
+                                context,
+                                "assets/icons/hospital.svg",
+                                "Mitra di Mana-Mana",
+                                "JPS selalu dekat denganmu.",
+                              ),
+                              _buildReason(
+                                context,
+                                "assets/icons/secured.svg",
+                                "Terjamin Aman",
+                                "JPS sudah resmi berizin OJK, jadi nggak perlu ragu.",
+                              ),
+                              _buildReason(
+                                context,
+                                "assets/icons/fulltime.svg",
+                                "Layanan 24/7",
+                                "Tenang, tim kami standby kapan pun kamu butuh.",
+                              ),
                             ],
                           ),
                         ),
@@ -140,11 +195,11 @@ class CariAsuransiMenu extends StatelessWidget {
   }
 
   Widget _buildReason(
-      BuildContext context,
-      String icon,
-      String title,
-      String subtitle,
-      ) {
+    BuildContext context,
+    String icon,
+    String title,
+    String subtitle,
+  ) {
     return Container(
       padding: EdgeInsets.all(hPadding),
       child: Row(

@@ -341,20 +341,20 @@ class ListMenuWidget extends StatelessWidget {
     return [
       MenuItem(
         title: 'Cari Asuransi',
-        iconPath: 'assets/icons/cari-asuransi-1.svg',
+        iconPath: 'assets/icons/menu_cari_asuransi.svg',
         isPopular: true,
       ),
       MenuItem(
-        title: 'Lapor \nKlaim',
-        iconPath: 'assets/icons/lapor-klaim-2.svg',
+        title: 'Lapor Klaim',
+        iconPath: 'assets/icons/menu_lapor_klaim.svg',
       ),
-      MenuItem(title: 'Aset', iconPath: 'assets/icons/aset-3.svg'),
-      MenuItem(title: 'Polis', iconPath: 'assets/icons/polis-4.svg'),
-      MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/beli-polis-5.svg'),
-      MenuItem(title: 'Klaim', iconPath: 'assets/icons/klaim-6.svg'),
+      MenuItem(title: 'Aset', iconPath: 'assets/icons/menu_aset.svg'),
+      MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
+      MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg'),
+      MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(
         title: 'Tagihan Pembayaran',
-        iconPath: 'assets/icons/tagihan-pembayaran-7.svg',
+        iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',
       ),
     ];
   }

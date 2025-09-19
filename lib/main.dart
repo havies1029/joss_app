@@ -10,7 +10,7 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/login/mobile/client/widget/popup_client_widget.dart';
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/popup_user_widget.dart';
-import 'package:joss_app/pages/profilepage/mobile/profile/form_section/rekan_pajak.dart';
+import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';

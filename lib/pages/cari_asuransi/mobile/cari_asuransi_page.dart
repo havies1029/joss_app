@@ -18,7 +18,7 @@ class CariAsuransiPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HeaderCard(
-              iconPath: "assets/icons/cari-asuransi-1.svg",
+              iconPath: "assets/icons/menu_cari_asuransi.svg",
               title: "Cari Asuransi",
               subtitle:
                   "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",

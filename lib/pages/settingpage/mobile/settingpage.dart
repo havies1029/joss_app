@@ -6,20 +6,20 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/pages/qontak/mobile/customer_service_page.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../blocs/reguser_profile/reguser_profile_state.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../blocs/user_profile/user_profile_state.dart';
-import '../../../common/constants.dart';
-import '../../base/base_background_firstpage.dart';
-import '../../profilepage/mobile/profile/form_section/rekan_pic.dart';
-import '../../test_bank/mrekanbanklist_main.dart';
+import '../../profile/mobile/profile/form_section/rekan_bank.dart';
+import '../../profile/mobile/profile/form_section/rekan_contact.dart';
+import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
+import '../../profile/mobile/profile/form_section/rekan_general_idv.dart';
+import '../../profile/mobile/profile/form_section/rekan_pic.dart';
 import '../widgets/logout_popup.dart';
-import '../../profilepage/mobile/profile/form_section/rekan_bank.dart';
-import '../../profilepage/mobile/profile/form_section/rekan_contact.dart';
-import '../../profilepage/mobile/profile/form_section/rekan_general_cmp.dart';
-import '../../profilepage/mobile/profile/form_section/rekan_general_idv.dart';
 import '../widgets/ubah_password_popup.dart';
+
+import '../../base/base_background_firstpage.dart';
+import '../../../common/constants.dart';
 
 const List<String> scopes = <String>['email'];
 
@@ -33,7 +33,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool emailNotification = true;
   bool darkMode = true;
-
 
   Widget _buildAvatar(Uint8List? bytes, String initials) {
     if (bytes != null && bytes.isNotEmpty) {
@@ -100,12 +99,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (email != null) ...[
                     Row(
                       children: [
-                        const Icon(Icons.email, color: primaryLightColor, size: 16),
+                        const Icon(
+                          Icons.email,
+                          color: primaryLightColor,
+                          size: 16,
+                        ),
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(
                             email,
-                            style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
+                            style: bodyTextStyle(
+                              context,
+                              fontSize: 16,
+                            ).copyWith(color: hintGrey),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -116,7 +122,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.phone, color: primaryLightColor, size: 16),
+                        const Icon(
+                          Icons.phone,
+                          color: primaryLightColor,
+                          size: 16,
+                        ),
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(
@@ -137,63 +147,78 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BaseBackgroundFirstPage(
         child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              decoration: BoxDecoration(
-                color: primaryBlackColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: primaryBlackColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 20,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ================== PROFILE SECTION ==================
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, authState) {
-                        final custType = authState is AuthenticationAuthenticated
-                            ? authState.user.custType
-                            : '';
+                        final custType =
+                            authState is AuthenticationAuthenticated
+                                ? authState.user.custType
+                                : '';
 
                         if (custType == 'C') {
-                          return BlocBuilder<UserProfileCubit, UserProfileState>(
+                          return BlocBuilder<
+                            UserProfileCubit,
+                            UserProfileState
+                          >(
                             buildWhen: (prev, curr) {
                               final nameChanged = prev.nama != curr.nama;
                               final emailChanged = prev.email != curr.email;
                               final telpChanged = prev.telepon != curr.telepon;
                               final bytesChanged =
-                                  (prev.fotoBytes == null && curr.fotoBytes != null) ||
-                                      (prev.fotoBytes != null && curr.fotoBytes == null) ||
-                                      (prev.fotoBytes != null &&
-                                          curr.fotoBytes != null &&
-                                          prev.fotoBytes!.lengthInBytes !=
-                                              curr.fotoBytes!.lengthInBytes);
-                              return nameChanged || emailChanged || telpChanged || bytesChanged;
+                                  (prev.fotoBytes == null &&
+                                      curr.fotoBytes != null) ||
+                                  (prev.fotoBytes != null &&
+                                      curr.fotoBytes == null) ||
+                                  (prev.fotoBytes != null &&
+                                      curr.fotoBytes != null &&
+                                      prev.fotoBytes!.lengthInBytes !=
+                                          curr.fotoBytes!.lengthInBytes);
+                              return nameChanged ||
+                                  emailChanged ||
+                                  telpChanged ||
+                                  bytesChanged;
                             },
                             builder: (context, state) {
-                              final nama = (state.nama?.trim().isNotEmpty ?? false)
-                                  ? state.nama!.trim()
-                                  : 'Pengguna';
-                              final email = (state.email?.trim().isNotEmpty ?? false)
-                                  ? state.email!.trim()
-                                  : null;
-                              final telepon = (state.telepon?.trim().isNotEmpty ?? false)
-                                  ? state.telepon!.trim()
-                                  : null;
-                              final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
-                                  ? state.fotoBytes
-                                  : null;
+                              final nama =
+                                  (state.nama?.trim().isNotEmpty ?? false)
+                                      ? state.nama!.trim()
+                                      : 'Pengguna';
+                              final email =
+                                  (state.email?.trim().isNotEmpty ?? false)
+                                      ? state.email!.trim()
+                                      : null;
+                              final telepon =
+                                  (state.telepon?.trim().isNotEmpty ?? false)
+                                      ? state.telepon!.trim()
+                                      : null;
+                              final foto =
+                                  (state.fotoBytes != null &&
+                                          state.fotoBytes!.isNotEmpty)
+                                      ? state.fotoBytes
+                                      : null;
 
                               return _buildProfileCard(
                                 context: context,
@@ -206,12 +231,16 @@ class _SettingsPageState extends State<SettingsPage> {
                             },
                           );
                         } else if (custType == 'U') {
-                          return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
+                          return BlocBuilder<
+                            RegUserProfileCubit,
+                            RegUserProfileState
+                          >(
                             buildWhen: (prev, curr) => prev.email != curr.email,
                             builder: (context, state) {
-                              final nama = (state.email.trim().isNotEmpty)
-                                  ? state.email.trim()
-                                  : 'Pengguna Baru';
+                              final nama =
+                                  (state.email.trim().isNotEmpty)
+                                      ? state.email.trim()
+                                      : 'Pengguna Baru';
 
                               return _buildProfileCard(
                                 context: context,
@@ -237,9 +266,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     // ================== AKUN SECTION ==================
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, authState) {
-                        final custType = authState is AuthenticationAuthenticated
-                            ? authState.user.custType
-                            : '';
+                        final custType =
+                            authState is AuthenticationAuthenticated
+                                ? authState.user.custType
+                                : '';
 
                         if (custType == 'C') {
                           return Column(
@@ -255,7 +285,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const UbahPasswordPage(),
+                                          builder:
+                                              (_) => const UbahPasswordPage(),
                                         ),
                                       );
                                     },
@@ -267,24 +298,32 @@ class _SettingsPageState extends State<SettingsPage> {
                               _buildCardContainer(
                                 children: [
                                   _buildMenuItem(
-                                    svgAsset: 'assets/icons/informasi_klien.svg',
+                                    svgAsset:
+                                        'assets/icons/informasi_klien.svg',
                                     title: 'Informasi Klien',
                                     onTap: () {
                                       final mjnsclientId =
-                                          context.read<UserProfileCubit>().state.mjnsclientId;
+                                          context
+                                              .read<UserProfileCubit>()
+                                              .state
+                                              .mjnsclientId;
 
                                       if (mjnsclientId == '10') {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => const MRekanGeneralIdvCrudFormPage(),
+                                            builder:
+                                                (_) =>
+                                                    const MRekanGeneralIdvCrudFormPage(),
                                           ),
                                         );
                                       } else {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => const MRekanGeneralCmpCrudFormPage(),
+                                            builder:
+                                                (_) =>
+                                                    const MRekanGeneralCmpCrudFormPage(),
                                           ),
                                         );
                                       }
@@ -298,7 +337,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const MRekanContactCrudFormPage(),
+                                          builder:
+                                              (_) =>
+                                                  const MRekanContactCrudFormPage(),
                                         ),
                                       );
                                     },
@@ -311,10 +352,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const MRekanBankCrudFormPage(
-                                            viewMode: 'tambah',
-                                            recordId: '',
-                                          ),
+                                          builder:
+                                              (_) =>
+                                                  const MRekanBankCrudFormPage(
+                                                    viewMode: 'tambah',
+                                                    recordId: '',
+                                                  ),
                                         ),
                                       );
                                     },
@@ -327,7 +370,25 @@ class _SettingsPageState extends State<SettingsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const MRekanPicInlineEditorList(),
+                                          builder:
+                                              (_) =>
+                                                  const MRekanPicInlineEditorList(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  sDivider,
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/group.svg',
+                                    title: 'Tim Akses',
+                                    svgAssetColor: primaryLightColor,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (_) =>
+                                                  const MRekanPicInlineEditorList(),
                                         ),
                                       );
                                     },
@@ -350,13 +411,19 @@ class _SettingsPageState extends State<SettingsPage> {
                         _buildMenuItem(
                           svgAsset: 'assets/icons/sk.svg',
                           title: 'Syarat dan Ketentuan',
-                          onTap: () => successSnackBar('Syarat dan Ketentuan diklik'),
+                          onTap:
+                              () => successSnackBar(
+                                'Syarat dan Ketentuan diklik',
+                              ),
                         ),
                         sDivider,
                         _buildMenuItem(
                           svgAsset: 'assets/icons/shield.svg',
                           title: 'Kebijakan dan Privasi',
-                          onTap: () => successSnackBar('Kebijakan dan Privasi diklik'),
+                          onTap:
+                              () => successSnackBar(
+                                'Kebijakan dan Privasi diklik',
+                              ),
                         ),
                       ],
                     ),
@@ -368,6 +435,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     _buildCardContainer(
                       children: [
                         _buildSwitchItem(
+                          svgAsset: 'assets/icons/notification.svg',
                           title: 'Email Notifikasi',
                           value: emailNotification,
                           onChanged: (value) {
@@ -380,7 +448,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         sDivider,
                         _buildMenuItem(
                           svgAsset: 'assets/icons/bantuan.svg',
-                          title: 'Customer Service',
+                          title: 'Bantuan',
                           onTap: () {
                             Navigator.push(
                               context,
@@ -409,13 +477,13 @@ class _SettingsPageState extends State<SettingsPage> {
                             showDialog(
                               context: context,
                               barrierDismissible: true,
-                              builder: (context) => const LogoutConfirmationPopup(),
+                              builder:
+                                  (context) => const LogoutConfirmationPopup(),
                             );
                           },
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 50),
                   ],
                 ),
@@ -427,7 +495,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-// 🔹 Helper kecil untuk section title
+  // 🔹 Helper kecil untuk section title
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -438,7 +506,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-// 🔹 Helper untuk card container
+  // 🔹 Helper untuk card container
   Widget _buildCardContainer({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
@@ -447,61 +515,6 @@ class _SettingsPageState extends State<SettingsPage> {
         border: Border.all(color: sGrey),
       ),
       child: Column(children: children),
-    );
-  }
-
-
-  Widget _buildCategory(BuildContext context, String svgPath, String label) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: pGrey,
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(color: sGrey),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SvgPicture.asset(svgPath, width: 40, height: 40),
-          const SizedBox(width: 10),
-          Flexible(child: Text(label, style: bodyTextStyle(context))),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReason(
-      BuildContext context,
-      String icon,
-      String title,
-      String subtitle,
-      ) {
-    return Container(
-      padding: EdgeInsets.all(hPadding),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SvgPicture.asset(icon, width: 34, height: 34),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: bodyTextStyle(context)),
-                const SizedBox(height: 1),
-                Text(
-                  subtitle,
-                  style: bodyTextStyle(
-                    context,
-                    fontSize: 16,
-                  ).copyWith(color: hintGrey),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -527,9 +540,10 @@ class _SettingsPageState extends State<SettingsPage> {
               svgAsset,
               width: 20,
               height: 20,
-              colorFilter: svgAssetColor != null
-                  ? ColorFilter.mode(svgAssetColor, BlendMode.srcIn)
-                  : null,
+              colorFilter:
+                  svgAssetColor != null
+                      ? ColorFilter.mode(svgAssetColor, BlendMode.srcIn)
+                      : null,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -547,17 +561,23 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildSwitchItem({
+    required String svgAsset,
     required String title,
     required bool value,
     required ValueChanged<bool> onChanged,
     double switchScale = 0.75,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: vPadding
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: vPadding),
       child: Row(
         children: [
+          SvgPicture.asset(
+            svgAsset,
+            width: 25,
+            height: 25,
+            colorFilter: ColorFilter.mode(primaryLightColor, BlendMode.srcIn),
+          ),
+          const SizedBox(width: 10),
           Expanded(child: Text(title, style: bodyTextStyle(context))),
           Transform.scale(
             scale: switchScale,

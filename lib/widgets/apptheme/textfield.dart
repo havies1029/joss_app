@@ -18,9 +18,6 @@ class appTextField extends StatelessWidget {
   final double? height;
   final TextInputAction? textInputAction;
 
-  /// ✅ Tambahan
-  final InputDecoration? customDecoration;
-
   const appTextField({
     super.key,
     required this.label,
@@ -38,50 +35,11 @@ class appTextField extends StatelessWidget {
     this.onFieldSubmitted,
     this.padding,
     this.height,
-    this.textInputAction,
-    this.customDecoration, // ✅
+    this.textInputAction
   });
 
   @override
   Widget build(BuildContext context) {
-    final defaultDecoration = InputDecoration(
-      labelText: label,
-      labelStyle: inputTextStyle(context),
-      hintText: hint,
-      hintStyle: inputTextStyle(context, color: sGrey),
-      filled: true,
-      fillColor: pGrey,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 12,
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-        borderSide: const BorderSide(color: sGrey),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-        borderSide: const BorderSide(color: sGrey),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-        borderSide: const BorderSide(color: primaryColor),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-      errorStyle: TextStyle(
-        color: pRed,
-        fontSize: getResponsiveFont(context, 15),
-      ),
-      suffixIcon: suffixIcon,
-    );
-
     Widget textField = TextFormField(
       controller: controller,
       focusNode: focusNode,
@@ -93,11 +51,34 @@ class appTextField extends StatelessWidget {
       textInputAction: textInputAction,
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
-      decoration: defaultDecoration.copyWith(
-        // ⬇️ kalau customDecoration != null, merge isinya
-        prefixText: customDecoration?.prefixText,
-        prefixStyle: customDecoration?.prefixStyle,
-        prefixIcon: customDecoration?.prefixIcon,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: (enabled ?? true) ? inputTextStyle(context) : bodyTextStyle(context),
+        hintText: hint,
+        hintStyle: inputTextStyle(context, color: sGrey),
+        filled: true,
+        fillColor: (enabled ?? true) ? formGrey : sGrey,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: sGrey),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: sGrey),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: sGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: primaryColor),
+        ),
+        suffixIcon: suffixIcon,
       ),
       validator: validator,
     );
@@ -106,6 +87,7 @@ class appTextField extends StatelessWidget {
       textField = SizedBox(height: height, child: textField);
     }
 
+    // Jika ada padding, bungkus dengan Padding
     if (padding != null) {
       return Padding(padding: padding!, child: textField);
     }
@@ -113,7 +95,6 @@ class appTextField extends StatelessWidget {
     return textField;
   }
 }
-
 
 class AppDateField extends StatefulWidget {
   final String label;
@@ -196,7 +177,7 @@ class _AppDateFieldState extends State<AppDateField> {
         hintText: widget.hint ?? 'Pilih tanggal',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
-        fillColor: pGrey,
+        fillColor: formGrey,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 12,
@@ -212,18 +193,6 @@ class _AppDateFieldState extends State<AppDateField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: primaryColor),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        errorStyle: TextStyle(
-          color: pRed,
-          fontSize: getResponsiveFont(context, 15),
         ),
         suffixIcon: const Icon(Icons.event, color: primaryLightColor),
       ),

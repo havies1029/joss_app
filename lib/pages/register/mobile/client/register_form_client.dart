@@ -91,7 +91,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
 
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return kNamelNullError;
+          return kNameNullError;
         }
         return null;
       },
@@ -116,14 +116,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       onTap: () {
         _animationController.forward(from: 0);
       },
-      customDecoration: const InputDecoration(
-        prefixText: "62 | ",
-        prefixStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-        ),
-      ),
     );
   }
 

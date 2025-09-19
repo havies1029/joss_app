@@ -142,7 +142,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget> {
                     Padding(
                       padding: const EdgeInsets.all(hPadding),
                       child: AppButton.primary(
-                        backgroundColor: sGrey,
+                        backgroundColor: formGrey,
                         text: "Lihat Semua Transaksi  ›",
                         onPressed: () {
                           // TODO: Arahkan ke halaman list transaksi penuh

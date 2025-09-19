@@ -7,6 +7,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
@@ -101,15 +102,19 @@ const defaultDuration = Duration(milliseconds: 250);
 final RegExp emailValidatorRegExp = RegExp(
   r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
 );
-const String kEmailNullError = "Please Enter your email";
-const String kInvalidEmailError = "Please Enter Valid Email";
-const String kPassNullError = "Please Enter your password";
-const String kShortPassError = "Password is too short";
-const String kMatchPassError = "Passwords don't match";
-const String kNamelNullError = "Please Enter your name";
-const String kPhoneNumberNullError = "Please Enter your phone number";
-const String kAddressNullError = "Please Enter your address";
-const String kStringNullError = "Please enter some text";
+
+const String kEmailNullError = "Email wajib diisi.";
+const String kInvalidEmailError = "Format email tidak valid.";
+const String kPassNullError = "Password wajib diisi.";
+const String kShortPassError = "Password terlalu pendek (minimal 6 karakter).";
+const String kMatchPassError = "Konfirmasi password tidak sama.";
+const String kNameNullError = "Nama wajib diisi.";
+const String kPhoneNumberNullError = "Nomor telepon wajib diisi.";
+const String kAddressNullError = "Alamat wajib diisi.";
+const String kStringNullError = "Bagian ini wajib diisi.";
+const String kStringProvinsiError = "Provinsi wajib diisi.";
+const String kStringKotaError = "Kota wajib diisi.";
+const String kStringKodeposError = "Kode Pos wajib diisi.";
 
 enum ListStatus { initial, success, failure }
 

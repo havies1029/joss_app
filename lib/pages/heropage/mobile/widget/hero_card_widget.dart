@@ -127,43 +127,9 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
         ),
         const SizedBox(width: 16),
 
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Halo, ${widget.userName}',
-                style: headingStyle(context, fontSize: 22),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  GestureDetector(
-                    onTap: widget.onNasabahTap,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.custType == 'C'
-                              ? 'Klien JPS'
-                              : 'Nasabah Biasa',
-                          style: bodyTextStyle(context),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_right,
-                          color: primaryColor,
-                          size: 11.33,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Button daftar klien
-
-                ],
-              ),
-            ],
-          ),
+        Text(
+          'Halo, ${widget.userName}',
+          style: headingStyle(context, fontSize: 22),
         ),
       ],
     );

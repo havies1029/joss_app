@@ -76,17 +76,14 @@ flutter:
     - assets/icons/arrow_right.svg
     - assets/icons/arrow_up.svg
     - assets/icons/arsitek.svg
-    - assets/icons/aset-3.svg
     - assets/icons/Back ICon.svg
     - assets/icons/badge.svg
     - assets/icons/bantuan.svg
-    - assets/icons/beli-polis-5.svg
     - assets/icons/Bell.svg
     - assets/icons/beranda.svg
     - assets/icons/Bill Icon.svg
     - assets/icons/Call.svg
     - assets/icons/Camera Icon.svg
-    - assets/icons/cari-asuransi-1.svg
     - assets/icons/Cart Icon.svg
     - assets/icons/Cash.svg
     - assets/icons/Chat bubble Icon.svg
@@ -108,10 +105,8 @@ flutter:
     - assets/icons/Heart Icon_2.svg
     - assets/icons/instagram.svg
     - assets/icons/jps_logo.svg
-    - assets/icons/klaim-6.svg
     - assets/icons/klaim_asuransi.svg
     - assets/icons/konsultan.svg
-    - assets/icons/lapor-klaim-2.svg
     - assets/icons/linkedin.svg
     - assets/icons/literasi.svg
     - assets/icons/Location point.svg
@@ -119,14 +114,13 @@ flutter:
     - assets/icons/logout.svg
     - assets/icons/logo_jps_no_background.png
     - assets/icons/Mail.svg
-    - assets/icons/notification.png
+    - assets/icons/notification.svg
     - assets/icons/Parcel.svg
     - assets/icons/pembayaran_premi.svg
     - assets/icons/pengacara.svg
     - assets/icons/penilaian.svg
     - assets/icons/Phone.svg
     - assets/icons/Plus Icon.svg
-    - assets/icons/polis-4.svg
     - assets/icons/premium.svg
     - assets/icons/Question mark.svg
     - assets/icons/quote.svg
@@ -139,7 +133,6 @@ flutter:
     - assets/icons/Shop Icon.svg
     - assets/icons/Star Icon.svg
     - assets/icons/Success.svg
-    - assets/icons/tagihan-pembayaran-7.svg
     - assets/icons/tagihan_pembayaran.svg
     - assets/icons/thumbsup_solid.svg
     - assets/icons/tiktok.svg
@@ -150,7 +143,7 @@ flutter:
     - assets/icons/User Icon.svg
     - assets/icons/verified.svg
     - assets/icons/website.svg
-    # yang bawah ini biarin, khusus image
+    # images
     - assets/images/jps-image.png
     - assets/images/vector-1.png
     - assets/images/vector-2.png

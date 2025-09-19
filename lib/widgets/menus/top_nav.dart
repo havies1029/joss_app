@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../common/constants.dart';
 
 AppBar MobileTopNavigationBar({
@@ -7,7 +8,7 @@ AppBar MobileTopNavigationBar({
   int notifCount = 2,
   VoidCallback? onNotifTap,
 }) {
-  const pageTitles = ['Beranda', 'Literasi', 'Cari Asuransi', 'Pengaturan'];
+  const pageTitles = ['Beranda', 'Cari Asuransi', 'Cari Literasi', 'Pengaturan'];
 
   final isBeranda = selectedIndex == 0;
 
@@ -52,8 +53,8 @@ AppBar MobileTopNavigationBar({
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        Image.asset(
-                          'assets/icons/notification.png',
+                        SvgPicture.asset(
+                          'assets/icons/notification.svg',
                           height: 39,
                           width: 40,
                         ),

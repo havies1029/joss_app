@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/widgets/mobiledesign_widget.dart';
-import '../profilepage/mobile/profile/form_section/rekan_bank.dart';
+import '../profile/mobile/profile/form_section/rekan_bank.dart';
 
 class MRekanBankCrudMainPage extends StatelessWidget {
 	final String viewMode;

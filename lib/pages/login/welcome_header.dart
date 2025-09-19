@@ -12,12 +12,12 @@ class WelcomeHeader extends StatelessWidget {
       "subtitle": "Yuk, buat akun dan mulai proteksi hidupmu.",
       "emoji": "🎉",
     },
-    "login_user": {
+    "login_client": {
       "title": "Selamat Datang Kembali!",
       "subtitle": "Yuk masuk, semua polis & klaimmu siap diakses.",
       "emoji": "👋",
     },
-    "login_client": {
+    "login_user": {
       "title": "Halo, siap lanjut proteksi?",
       "subtitle": "Yuk, Masuk dan urus polis & klaim dengan mudah.",
       "emoji": "👋",

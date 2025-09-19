@@ -15,7 +15,7 @@ Widget buildFieldComboMJnsclient({
 	String? Function(ComboMJnsclientModel?)? validatorCallback,
 }) {
 	return ReusableComboBox<ComboMJnsclientModel>(
-		labelText: labelText,
+		hintText: labelText,
 		searchHintText: "Cari jenis client…",
 		comboKey: comboKey,
 		initItem: initItem,
