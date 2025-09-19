@@ -101,8 +101,8 @@ class HeroPage extends StatelessWidget {
         HeroCardWidget(
           userName: displayName,
           imageBytes: bytes,
-          premiumAmount: '4.500.000',
-          polisCount: 21,
+          premiumAmount: custType == 'C' ? '4.500.000' : '9.999.999',
+          polisCount: custType == 'C' ? 21 : 0,
           onDetailTap: () => debugPrint('Detail tapped'),
           onNasabahTap: () => debugPrint('Nasabah tapped'),
           custType: custType,

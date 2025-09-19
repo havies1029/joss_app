@@ -273,8 +273,8 @@ class MRekanContactCrudFormPageFormState
     return appTextField(
       label: "No. Telp Perusahaan",
       controller: fieldTelpController,
-      keyboardType: TextInputType.multiline,
-      maxLines: 3,
+      keyboardType: TextInputType.number,
+      maxLines: 1,
       validator: (value) {
         if (value == null || value.isEmpty) {
           addError(error: kStringNullError);

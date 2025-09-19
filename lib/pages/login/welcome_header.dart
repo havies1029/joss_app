@@ -32,7 +32,7 @@ class WelcomeHeader extends StatelessWidget {
     final emoji = content["emoji"] ?? "👋";
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: hPadding * 1.5, horizontal: hPadding),
+      padding: EdgeInsets.symmetric(vertical: 0, horizontal: hPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -18,8 +18,8 @@ class MobileBottomNavigationBar extends StatelessWidget {
   // Daftar menu default JPS
   static const List<NavBarItem> _defaultItems = [
     NavBarItem(iconPath: 'assets/icons/beranda.svg', label: 'Beranda'),
+    NavBarItem(iconPath: 'assets/icons/find_insurance_icon.svg', label: 'Cari Asuransi'),
     NavBarItem(iconPath: 'assets/icons/literasi.svg', label: 'Literasi'),
-    NavBarItem(iconPath: 'assets/icons/bantuan.svg', label: 'Bantuan'),
     NavBarItem(iconPath: 'assets/icons/setting.svg', label: 'Pengaturan'),
   ];
 

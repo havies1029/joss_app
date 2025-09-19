@@ -22,6 +22,7 @@ import 'package:joss_app/repositories/gen_profile/mrekanpajakcrud_repository.dar
 import 'package:joss_app/repositories/gen_profile/mrekanpiccrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiclist_repository.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
+import 'package:mobile_chat_flutter/presentation/mobile_chat_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -308,11 +309,15 @@ Future<void> main() async {
     ),
   );
 }
-
 class _App extends StatefulWidget {
   final UserRepository userRepository;
   final bool seenOnboarding;
-  const _App({super.key, required this.userRepository, required this.seenOnboarding});
+
+  const _App({
+    super.key,
+    required this.userRepository,
+    required this.seenOnboarding,
+  });
 
   @override
   State<_App> createState() => _AppState();
@@ -320,6 +325,7 @@ class _App extends StatefulWidget {
 
 class _AppState extends State<_App> {
   late bool _showOnboarding;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -333,115 +339,159 @@ class _AppState extends State<_App> {
     });
   }
 
+  // 🔹 Helper untuk buka popup biar gak nulis ulang
+  Future<void> _showPopup(Widget page) async {
+    await _navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (_) => page),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'JPS Insurance',
-      theme: FlexThemeData.light(
-        scheme: FlexScheme.mandyRed,
-        fontFamily: 'Delm-Regular',
-      ),
-      darkTheme: FlexThemeData.dark(
-        scheme: FlexScheme.mandyRed,
-        fontFamily: 'Delm-Regular',
-        colorScheme: const ColorScheme.dark(
-          primary: primaryBlackColor,
-          secondary: primaryLightColor,
+    return MultiBlocListener(
+      listeners: [
+        // OTP via HP
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) =>
+          curr is AuthenticationRequirePinHPVerification,
+          listener: (_, state) {
+            if (state is AuthenticationRequirePinHPVerification) {
+              _showPopup(
+                PopupClientWidget(phoneNumber: state.hpno),
+              );
+            }
+          },
         ),
-      ),
-      themeMode: ThemeMode.dark,
-      home: _showOnboarding
-          ? StartScreen(onCompleted: _onOnboardingCompleted)
-          : BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          if (state is AuthenticationAuthenticated) {
-            // ✅ Tutup semua popup
-            while (Navigator.of(context, rootNavigator: true).canPop()) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
 
-            final user = state.user; // ambil user dari state
-
-            if (user.custType == 'C') {
-              // 🔹 Client → simpan ke UserProfileCubit
-              context.read<UserProfileCubit>().setProfile(
-                nama: user.nama,
-                email: user.email,
-                telepon: user.hp,
-                // kalau ada foto profil di user, tinggal masukkan juga
-              );
-            } else if (user.custType == 'U') {
-              // 🔹 User baru → simpan ke RegUserProfileCubit
-              context.read<RegUserProfileCubit>().setProfile(
-                email: user.email,
-                // tambahin field lain kalau ada di RegUserProfileCubit
+        // OTP via Email
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) =>
+          curr is AuthenticationRequirePinEmailVerification,
+          listener: (_, state) {
+            if (state is AuthenticationRequirePinEmailVerification) {
+              _showPopup(
+                PopupUserWidget(email: state.email),
               );
             }
+          },
+        ),
+      ],
+      child: MaterialApp(
+        navigatorKey: _navigatorKey, // 🔥 Fix error Navigator
+        debugShowCheckedModeBanner: false,
+        title: 'JPS Insurance',
+        theme: FlexThemeData.light(
+          scheme: FlexScheme.mandyRed,
+          fontFamily: 'Delm-Regular',
+        ),
+        darkTheme: FlexThemeData.dark(
+          scheme: FlexScheme.mandyRed,
+          fontFamily: 'Delm-Regular',
+          colorScheme: const ColorScheme.dark(
+            primary: primaryBlackColor,
+            secondary: primaryLightColor,
+          ),
+        ),
 
-            context.read<RegUserProfileCubit>().setProfile(
-              email: user.email,
-              // tambahin field lain kalau ada di RegUserProfileCubit
-            );
-
-            // ✅ Setelah data Cubit keisi → load HomeTabWidget
-            return HomeTabWidget(userRepository: widget.userRepository);
-          }
-
-          if (state is AuthenticationUnauthenticated) {
-            debugPrint("🔑 Go to LoginUser()");
-            context.read<UserProfileCubit>().clearProfile();
-            context.read<RegUserProfileCubit>().clearProfile();
-            context.read<LoginBloc>().add(LoginReset());
-
-            return const LoginUser();
-          }
-          if (state is AuthenticationRequireLoginClient) {
-            return const LoginClient(); // atau bikin LoginClientPage khusus
-          }
-          if (state is AuthenticationRequireRegisterClient) {
-            return const RegisterClient();
-          }
-          if (state is AuthenticationForgotPassword) {
-            // return const ForgotPasswordPage();
-          }
-          if (state is AuthenticationRequirePinHPVerification) {
-            // context.read<AuthenticationBloc>().add(LoggedOut());
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context, rootNavigator: true).push(
-                MaterialPageRoute(
-                  builder: (_) => PopupClientWidget(phoneNumber: state.hpno),
-                ),
+        themeMode: ThemeMode.dark,
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case 'chat':
+              return MaterialPageRoute(
+                builder: (_) => const MobileChatScreen(), // dari SDK Mekari
               );
-            });
-
-            // return HomeTabWidget(userRepository: userRepository);
+            default:
+              return null;
           }
-          if (state is AuthenticationRequirePinEmailVerification) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context, rootNavigator: true).push(
-                MaterialPageRoute(
-                  builder: (_) => PopupUserWidget(email: state.email),
-                ),
-              );
-            });
-            // return PopupUserWidget(email: state.email);
-          }
-          if (state is AuthenticationPhonePinVerified) {
-            // contoh: paksa logout lalu balik ke login
-            context.read<AuthenticationBloc>().add(LoggedOut());
-            return const LoginClient();
-          }
-
-          // if (state is AuthenticationRequirePinHPVerification) {
-          //   while (Navigator.of(context, rootNavigator: true).canPop()) {
-          //     Navigator.of(context, rootNavigator: true).pop();
-          //   }
-          // }
-
-          // default → loading
-          return const LoadingIndicator();
         },
+        home: _showOnboarding
+            ? StartScreen(onCompleted: _onOnboardingCompleted)
+            : BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          builder: (context, state) {
+            if (state is AuthenticationAuthenticated) {
+              // ✅ Tutup semua popup lama
+              while (_navigatorKey.currentState?.canPop() ?? false) {
+                _navigatorKey.currentState?.pop();
+              }
+
+              final user = state.user;
+
+              if (user.custType == 'C') {
+                context.read<UserProfileCubit>().setProfile(
+                  nama: user.nama,
+                  email: user.email,
+                  telepon: user.hp,
+                );
+              } else if (user.custType == 'U') {
+                context.read<RegUserProfileCubit>().setProfile(
+                  email: user.email,
+                );
+              }
+
+              return HomeTabWidget(
+                userRepository: widget.userRepository,
+              );
+            }
+
+            if (state is AuthenticationUnauthenticated) {
+              context.read<UserProfileCubit>().clearProfile();
+              context.read<RegUserProfileCubit>().clearProfile();
+              context.read<LoginBloc>().add(LoginReset());
+              return const LoginUser();
+            }
+
+            if (state is AuthenticationRequireLoginClient) {
+              return const LoginClient();
+            }
+
+            if (state is AuthenticationRequireRegisterClient) {
+              return const RegisterClient();
+            }
+
+            if (state is AuthenticationForgotPassword) {
+              // return const ForgotPasswordPage();
+            }
+
+            // if (state is AuthenticationPhonePinVerified) {
+            //   context.read<AuthenticationBloc>().add(LoggedOut());
+            //   WidgetsBinding.instance.addPostFrameCallback((_) {
+            //     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            //       MaterialPageRoute(builder: (_) => const LoginClient()),
+            //           (route) => false,
+            //     );
+            //   });
+            //
+            //   // Langsung tampilkan halaman login biar smooth
+            //   return const LoginClient();
+            // }
+
+            if (state is AuthenticationPhonePinVerified) {
+
+              while (_navigatorKey.currentState?.canPop() ?? false) {
+                _navigatorKey.currentState?.pop();
+              }
+              // 🚀 OTP sukses → langsung logout biar state balik ke Unauthenticated
+              context.read<AuthenticationBloc>().add(LoggedOut());
+              return const LoadingIndicator();
+            }
+
+            // if (state is AuthenticationPhonePinVerified) {
+            //   final userRepo = widget.userRepository;
+            //   context.read<AuthenticationBloc>().add(LoggedOut());
+            //   // 🚀 login ulang (future supaya ga blocking)
+            //   Future.microtask(() async {
+            //     final token = await userRepo.getToken();
+            //     final user = await userRepo.getUserByToken(token);
+            //     context.read<AuthenticationBloc>().add(LoggedIn(user: user));
+            //   });
+            //
+            //   // tampilkan indikator sementara
+            //   return const LoadingIndicator();
+            // }
+            // default → loading
+            return const LoadingIndicator();
+          },
+        ),
       ),
     );
   }

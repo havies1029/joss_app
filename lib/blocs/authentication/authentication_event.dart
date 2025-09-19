@@ -82,3 +82,4 @@ class GoogleUserAuthenticated extends AuthenticationEvent {
 class RequireRegisterClient extends AuthenticationEvent {}
 
 class PhonePinVerified extends AuthenticationEvent {}
+

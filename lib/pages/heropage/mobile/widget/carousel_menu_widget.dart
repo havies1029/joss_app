@@ -32,7 +32,7 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
       decoration: BoxDecoration(color: secondaryBlackColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildHeader(), _buildCarousel(context)],
+        children: [_buildHeader(),SizedBox(height: hPadding,), _buildCarousel(context)],
       ),
     );
   }

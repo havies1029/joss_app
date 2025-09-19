@@ -21,10 +21,7 @@ class ListMenuWidget extends StatelessWidget {
     return Column(
       children: [
         if (custType != 'C')
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: _buildDaftarKlienButton(context),
-          ),
+          _buildDaftarKlienButton(context),
 
         // Container utama untuk menu
         Container(
@@ -75,11 +72,38 @@ class ListMenuWidget extends StatelessWidget {
   Widget _buildDaftarKlienButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const RegisterClient()),
+        showGeneralDialog(
+          context: context,
+          barrierDismissible: true,
+          barrierLabel: '',
+          transitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (_, __, ___) {
+            return SafeArea(
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                body: Center(
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: primaryBlackColor, // biar full page
+                    child: const RegisterClient(),
+                  ),
+                ),
+              ),
+            );
+          },
+          transitionBuilder: (_, anim, __, child) {
+            return SlideTransition(
+              position: Tween(
+                begin: const Offset(0, 1), // animasi dari bawah
+                end: Offset.zero,
+              ).animate(anim),
+              child: child,
+            );
+          },
         );
       },
+
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -339,7 +363,8 @@ class ListMenuWidget extends StatelessWidget {
     switch (title) {
       case 'Cari Asuransi':
         return CariAsuransiPage(); // Ganti ke page lo
-      // case 'Lapor \nKlaim':
+      case 'Lapor \nKlaim':
+        return KlaimMainPage();
       //   return LaporKlaimPage();
       case 'Aset':
         return AssetManagementPage();

@@ -39,7 +39,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
   final FocusNode _konfirmasipasswordFocusNode = FocusNode();
 
   bool _isPasswordVisible = false;
-
+  bool _isConfirmPasswordVisible = false;
   // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -57,6 +57,11 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       vsync: this,
       duration: defaultDuration,
     );
+    // _konfirmasipasswordController.addListener(() {
+    //   if (_formKey.currentState != null) {
+    //     _formKey.currentState!.validate(); // paksa validator jalan setiap kali ngetik
+    //   }
+    // });
   }
 
   @override
@@ -95,15 +100,13 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       },
     );
   }
-
-  Widget _buildTeleponField() {
+  _buildTeleponField() {
     return appTextField(
       label: "Telepon",
-      hint: "Masukkan telepon",
+      hint: "8123456789",
       controller: _teleponController,
-      focusNode: _teleponFocusNode,
       keyboardType: TextInputType.number,
-
+      focusNode: _teleponFocusNode,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return kPhoneNumberNullError;
@@ -113,8 +116,17 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       onTap: () {
         _animationController.forward(from: 0);
       },
+      customDecoration: const InputDecoration(
+        prefixText: "62 | ",
+        prefixStyle: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+        ),
+      ),
     );
   }
+
 
   Widget _buildPasswordField() {
     return appTextField(
@@ -141,8 +153,12 @@ class _RegisterFormClientState extends State<RegisterFormClient>
         if (value.length < 6) {
           return kShortPassError;
         }
+        if (value != _passwordController.text) {
+          return "Konfirmasi password tidak sama";
+        }
         return null;
       },
+
       onTap: () {
         _animationController.forward(from: 0);
       },
@@ -155,16 +171,16 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       hint: "Masukkan ulang kata sandi",
       controller: _konfirmasipasswordController,
       focusNode: _konfirmasipasswordFocusNode,
-      obscureText: !_isPasswordVisible,
+      obscureText: !_isConfirmPasswordVisible,
 
       suffixIcon: IconButton(
         icon: Icon(
-          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
           color: sGrey,
           size: 22,
         ),
         onPressed: () =>
-            setState(() => _isPasswordVisible = !_isPasswordVisible),
+            setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -203,7 +219,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
     RegUserModel record = RegUserModel(
       userNama: AppData.user.username ?? "",
       personalNama: _nameController.text,
-      telepon: _teleponController.text,
+      telepon: "62${_teleponController.text.trim()}",
       password: _passwordController.text,
       jnsClientId: _selectedChoice,
       email: AppData.user.email ?? "",
@@ -278,6 +294,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // 🔹 Logo
                                 Image.asset(
                                   'assets/icons/logo_jps_no_background.png',
                                   height: isDesktop(context)
@@ -291,6 +308,42 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                       ? 140
                                       : 120,
                                 ),
+
+                                // Spasi antara logo & tombol
+                                SizedBox(height: vPadding * 0.6),
+
+                                // 🔹 Tombol kembali
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 4), // sesuaikan biar sejajar
+                                    child: TextButton.icon(
+                                      onPressed: () => Navigator.pop(context),
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: const Size(0, 0),
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new,
+                                        color: primaryColor,
+                                        size: getResponsiveFont(context, 18),
+                                      ),
+                                      label: Text(
+                                        "Kembali",
+                                        style: bodyTextStyle(context).copyWith(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                // Spasi antara tombol & header
+                                SizedBox(height: vPadding * 0.8),
+
+                                // 🔹 Welcome Header
                                 WelcomeHeader(type: "register_client"),
                               ],
                             ),
@@ -326,51 +379,46 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                     child: Column(
                                       children: [
                                         _buildNameField(),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: vPadding),
                                         _buildTeleponField(),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: vPadding),
                                         _buildPasswordField(),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: vPadding),
                                         _buildPasswordConfirmationField(),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: vPadding),
                                         buildFieldJenisClient(),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: vPadding),
 
                                         AppButton.primary(
-                                          text: isSaving
-                                              ? "Mengirim..."
-                                              : "Submit",
+                                          text: isSaving ? "Mengirim..." : "Submit",
                                           isLoading: isSaving,
                                           onPressed: isSaving
                                               ? null
                                               : () {
-                                            if (_formKey.currentState!
-                                                .validate()) {
-                                              _animationController.forward(
-                                                  from: 0);
-                                              // dispatch event
+                                            if (_formKey.currentState!.validate()) {
+                                              // Semua valid, baru kirim
+                                              _animationController.forward(from: 0);
+
                                               final record = RegUserModel(
-                                                userNama: AppData.user.username ??
-                                                    "",
-                                                personalNama: _nameController.text
-                                                    .trim(),
-                                                telepon: _teleponController.text
-                                                    .trim(),
-                                                password: _passwordController
-                                                    .text,
+                                                userNama: AppData.user.username ?? "",
+                                                personalNama: _nameController.text.trim(),
+                                                telepon: "62${_teleponController.text.trim()}",
+                                                password: _passwordController.text,
                                                 jnsClientId: _selectedChoice,
                                                 email: AppData.user.email ?? "",
                                               );
+
                                               debugPrint(
-                                                  'Dispatching RegUserTambahEvent: ${record
-                                                      .personalNama}, telepon=${record
-                                                      .telepon}');
+                                                'Dispatching RegUserTambahEvent: ${record.personalNama}, telepon=${record.telepon}',
+                                              );
+
                                               context.read<RegUserBloc>().add(
-                                                  RegUserTambahEvent(
-                                                      record: record));
+                                                RegUserTambahEvent(record: record),
+                                              );
                                             }
                                           },
                                         ),
+
                                         Spacer(),
                                       ],
                                     ),

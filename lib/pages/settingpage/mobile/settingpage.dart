@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:joss_app/pages/qontak/mobile/customer_service_page.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
@@ -137,346 +138,369 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryBlackColor,
       body: BaseBackgroundFirstPage(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-                horizontal: hPadding * 1.5
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ================== PROFILE SECTION ==================
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, authState) {
-                    final custType = authState is AuthenticationAuthenticated
-                        ? authState.user.custType
-                        : '';
-
-                    if (custType == 'C') {
-                      // 🔹 Client → ambil dari UserProfileCubit
-                      return BlocBuilder<UserProfileCubit, UserProfileState>(
-                        buildWhen: (prev, curr) {
-                          final nameChanged = prev.nama != curr.nama;
-                          final emailChanged = prev.email != curr.email;
-                          final telpChanged = prev.telepon != curr.telepon;
-                          final bytesChanged =
-                              (prev.fotoBytes == null && curr.fotoBytes != null) ||
-                                  (prev.fotoBytes != null && curr.fotoBytes == null) ||
-                                  (prev.fotoBytes != null &&
-                                      curr.fotoBytes != null &&
-                                      prev.fotoBytes!.lengthInBytes !=
-                                          curr.fotoBytes!.lengthInBytes);
-
-                          return nameChanged || emailChanged || telpChanged || bytesChanged;
-                        },
-                        builder: (context, state) {
-                          final nama = (state.nama?.trim().isNotEmpty ?? false)
-                              ? state.nama!.trim()
-                              : 'Pengguna';
-                          final email =
-                          (state.email?.trim().isNotEmpty ?? false) ? state.email!.trim() : null;
-                          final telepon = (state.telepon?.trim().isNotEmpty ?? false)
-                              ? state.telepon!.trim()
-                              : null;
-                          final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
-                              ? state.fotoBytes
-                              : null;
-
-                          return _buildProfileCard(
-                            context: context,
-                            nama: nama,
-                            email: email,
-                            telepon: telepon,
-                            foto: foto,
-                            subtitle: "Klien JPS",
-                          );
-                        },
-                      );
-                    } else if (custType == 'U') {
-                      // 🔹 User baru → ambil dari RegUserProfileCubit
-                      return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
-                        buildWhen: (prev, curr) =>
-                        prev.email != curr.email,
-                        builder: (context, state) {
-                          final nama = (state.email.trim().isNotEmpty)
-                              ? state.email.trim()
-                              : 'Pengguna Baru';
-                          // final email =
-                          // (state.email.trim().isNotEmpty) ? state.email.trim() : null;
-
-                          return _buildProfileCard(
-                            context: context,
-                            nama: nama,
-                            foto: null, // RegUserProfileCubit belum simpan foto
-                            subtitle: "Nasabah Biasa",
-                          );
-                        },
-                      );
-                    }
-
-                    return _buildProfileCard(
-                      context: context,
-                      nama: "Guest",
-                      foto: null,
-                      subtitle: "Nasabah biasa",
-                    );
-                  },
+            physics: const BouncingScrollPhysics(),
+            child: Container(
+              decoration: BoxDecoration(
+                color: primaryBlackColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ================== PROFILE SECTION ==================
+                    BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                      builder: (context, authState) {
+                        final custType = authState is AuthenticationAuthenticated
+                            ? authState.user.custType
+                            : '';
 
-                const SizedBox(height: vPadding),
+                        if (custType == 'C') {
+                          return BlocBuilder<UserProfileCubit, UserProfileState>(
+                            buildWhen: (prev, curr) {
+                              final nameChanged = prev.nama != curr.nama;
+                              final emailChanged = prev.email != curr.email;
+                              final telpChanged = prev.telepon != curr.telepon;
+                              final bytesChanged =
+                                  (prev.fotoBytes == null && curr.fotoBytes != null) ||
+                                      (prev.fotoBytes != null && curr.fotoBytes == null) ||
+                                      (prev.fotoBytes != null &&
+                                          curr.fotoBytes != null &&
+                                          prev.fotoBytes!.lengthInBytes !=
+                                              curr.fotoBytes!.lengthInBytes);
+                              return nameChanged || emailChanged || telpChanged || bytesChanged;
+                            },
+                            builder: (context, state) {
+                              final nama = (state.nama?.trim().isNotEmpty ?? false)
+                                  ? state.nama!.trim()
+                                  : 'Pengguna';
+                              final email = (state.email?.trim().isNotEmpty ?? false)
+                                  ? state.email!.trim()
+                                  : null;
+                              final telepon = (state.telepon?.trim().isNotEmpty ?? false)
+                                  ? state.telepon!.trim()
+                                  : null;
+                              final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
+                                  ? state.fotoBytes
+                                  : null;
 
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, authState) {
-                    final custType = authState is AuthenticationAuthenticated
-                        ? authState.user.custType
-                        : '';
+                              return _buildProfileCard(
+                                context: context,
+                                nama: nama,
+                                email: email,
+                                telepon: telepon,
+                                foto: foto,
+                                subtitle: "Klien JPS",
+                              );
+                            },
+                          );
+                        } else if (custType == 'U') {
+                          return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
+                            buildWhen: (prev, curr) => prev.email != curr.email,
+                            builder: (context, state) {
+                              final nama = (state.email.trim().isNotEmpty)
+                                  ? state.email.trim()
+                                  : 'Pengguna Baru';
 
-                    if (custType == 'C') {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Akun',
-                            style: bodyTextStyle(
-                              context,
-                              fontSize: 16,
-                            ).copyWith(color: hintGrey),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: pGrey,
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
-                              border: Border.all(color: sGrey),
-                            ),
-                            child: Column(
-                              children: [
-                                _buildMenuItem(
-                                  svgAsset: 'assets/icons/ubah_pass.svg',
-                                  title: 'Ubah Password',
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const UbahPasswordPage(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: vPadding),
-                          Text(
-                            'Informasi',
-                            style: bodyTextStyle(
-                              context,
-                              fontSize: 16,
-                            ).copyWith(color: hintGrey),
-                          ),
+                              return _buildProfileCard(
+                                context: context,
+                                nama: nama,
+                                foto: null,
+                                subtitle: "Nasabah Biasa",
+                              );
+                            },
+                          );
+                        }
 
-                          const SizedBox(height: 6),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: pGrey,
-                              borderRadius: BorderRadius.circular(cardBorderRadius),
-                              border: Border.all(color: sGrey),
-                            ),
-                            child: Column(
-                              children: [
-                                _buildMenuItem(
-                                  svgAsset: 'assets/icons/informasi_klien.svg',
-                                  title: 'Informasi Klien',
-                                  onTap: () {
-                                    final mjnsclientId =
-                                        context.read<UserProfileCubit>().state.mjnsclientId;
+                        return _buildProfileCard(
+                          context: context,
+                          nama: "Guest",
+                          foto: null,
+                          subtitle: "Nasabah biasa",
+                        );
+                      },
+                    ),
 
-                                    if (mjnsclientId == '10') {
+                    const SizedBox(height: vPadding),
+
+                    // ================== AKUN SECTION ==================
+                    BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                      builder: (context, authState) {
+                        final custType = authState is AuthenticationAuthenticated
+                            ? authState.user.custType
+                            : '';
+
+                        if (custType == 'C') {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionTitle(context, 'Akun'),
+                              _buildCardContainer(
+                                children: [
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/ubah_pass.svg',
+                                    title: 'Ubah Password',
+                                    onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                          const MRekanGeneralIdvCrudFormPage(),
+                                          builder: (_) => const UbahPasswordPage(),
                                         ),
                                       );
-                                    } else {
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: vPadding),
+                              _buildSectionTitle(context, 'Informasi'),
+                              _buildCardContainer(
+                                children: [
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/informasi_klien.svg',
+                                    title: 'Informasi Klien',
+                                    onTap: () {
+                                      final mjnsclientId =
+                                          context.read<UserProfileCubit>().state.mjnsclientId;
+
+                                      if (mjnsclientId == '10') {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const MRekanGeneralIdvCrudFormPage(),
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const MRekanGeneralCmpCrudFormPage(),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  sDivider,
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/location.svg',
+                                    title: 'Kontak & Alamat',
+                                    onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                          const MRekanGeneralCmpCrudFormPage(),
+                                          builder: (_) => const MRekanContactCrudFormPage(),
                                         ),
                                       );
-                                    }
-                                  },
-                                ),
-                                sDivider,
-                                _buildMenuItem(
-                                  svgAsset: 'assets/icons/location.svg',
-                                  title: 'Kontak & Alamat',
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                        const MRekanContactCrudFormPage(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                sDivider,
-                                _buildMenuItem(
-                                  svgAsset: 'assets/icons/bank.svg',
-                                  title: 'Rekening Bank',
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MRekanBankCrudFormPage(
-                                          viewMode: 'tambah',
-                                          recordId: '',
+                                    },
+                                  ),
+                                  sDivider,
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/bank.svg',
+                                    title: 'Rekening Bank',
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const MRekanBankCrudFormPage(
+                                            viewMode: 'tambah',
+                                            recordId: '',
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                sDivider,
-                                _buildMenuItem(
-                                  svgAsset: 'assets/icons/pic.svg',
-                                  title: 'Informasi PIC',
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MRekanPicInlineEditorList(
-                                          // viewMode: 'tambah',
-                                          // recordId: '',
+                                      );
+                                    },
+                                  ),
+                                  sDivider,
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/pic.svg',
+                                    title: 'Informasi PIC',
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const MRekanPicInlineEditorList(),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: vPadding),
-                        ],
-                      );
-                    }
-
-                    // Kalau bukan custType C → return widget kosong
-                    return const SizedBox.shrink();
-                  },
-                ),
-
-                Text('Syarat dan Ketentuan', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
-                const SizedBox(height: 6),
-                Container(
-                  decoration: BoxDecoration(
-                    color: pGrey,
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(color: sGrey),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildMenuItem(
-                        svgAsset: 'assets/icons/sk.svg',
-                        title: 'Syarat dan Ketentuan',
-                        onTap:
-                            () =>
-                            successSnackBar('Syarat dan Ketentuan diklik'),
-                      ),
-                      // _buildMenuItem(
-                      //   svgAsset: 'assets/icons/pic.svg',
-                      //   title: 'Informasi PIC',
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => const KlaimMainPage(
-                      //           // viewMode: 'tambah',
-                      //           // recordId: '',
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
-                      sDivider,
-                      _buildMenuItem(
-                        svgAsset:'assets/icons/shield.svg',
-                        title: 'Kebijaan dan Privasi',
-                        onTap:
-                            () =>
-                            successSnackBar('Kebijakan dan Privasi diklik'),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: vPadding),
-
-                Text('Lainnnya', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
-                const SizedBox(height: 6),
-                // Toggle Settings
-                Container(
-                  decoration: BoxDecoration(
-                    color: pGrey,
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(color: sGrey),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildSwitchItem(
-                        title: 'Email Notifikasi',
-                        value: emailNotification,
-                        onChanged: (value) {
-                          setState(() => emailNotification = value);
-                          successSnackBar(
-                            'Email Notifikasi ${value ? 'diaktifkan' : 'dinonaktifkan'}',
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
                           );
-                        },
-                      ),
-                    ],
-                  ),
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+
+                    const SizedBox(height: vPadding),
+
+                    // ================== SYARAT & KETENTUAN ==================
+                    _buildSectionTitle(context, 'Syarat dan Ketentuan'),
+                    _buildCardContainer(
+                      children: [
+                        _buildMenuItem(
+                          svgAsset: 'assets/icons/sk.svg',
+                          title: 'Syarat dan Ketentuan',
+                          onTap: () => successSnackBar('Syarat dan Ketentuan diklik'),
+                        ),
+                        sDivider,
+                        _buildMenuItem(
+                          svgAsset: 'assets/icons/shield.svg',
+                          title: 'Kebijakan dan Privasi',
+                          onTap: () => successSnackBar('Kebijakan dan Privasi diklik'),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: vPadding),
+
+                    // ================== LAINNYA ==================
+                    _buildSectionTitle(context, 'Lainnya'),
+                    _buildCardContainer(
+                      children: [
+                        _buildSwitchItem(
+                          title: 'Email Notifikasi',
+                          value: emailNotification,
+                          onChanged: (value) {
+                            setState(() => emailNotification = value);
+                            successSnackBar(
+                              'Email Notifikasi ${value ? 'diaktifkan' : 'dinonaktifkan'}',
+                            );
+                          },
+                        ),
+                        sDivider,
+                        _buildMenuItem(
+                          svgAsset: 'assets/icons/bantuan.svg',
+                          title: 'Customer Service',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CustomerServicePage(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: vPadding),
+
+                    // ================== LOGOUT ==================
+                    _buildSectionTitle(context, 'Keluar'),
+                    _buildCardContainer(
+                      children: [
+                        _buildMenuItem(
+                          svgAsset: 'assets/icons/logout.svg',
+                          title: 'Keluar',
+                          titleColor: pDarkRed,
+                          showForwardsvgAsset: false,
+                          svgAssetColor: pRed,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) => const LogoutConfirmationPopup(),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 50),
+                  ],
                 ),
-
-                const SizedBox(height: vPadding),
-
-                Text('Keluar', style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey)),
-                const SizedBox(height: 6),
-                // Logout Button
-                Container(
-                  decoration: BoxDecoration(
-                    color: pGrey,
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(color: sGrey),
-                  ),
-                  child: _buildMenuItem(
-                    svgAsset: 'assets/icons/logout.svg',
-                    title: 'Keluar',
-                    titleColor: pDarkRed,
-                    showForwardsvgAsset: false,
-                    svgAssetColor: pRed,
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (context) => const LogoutConfirmationPopup(),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 50),
-              ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+// 🔹 Helper kecil untuk section title
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        title,
+        style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
+      ),
+    );
+  }
+
+// 🔹 Helper untuk card container
+  Widget _buildCardContainer({required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: pGrey,
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        border: Border.all(color: sGrey),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+
+  Widget _buildCategory(BuildContext context, String svgPath, String label) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: pGrey,
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        border: Border.all(color: sGrey),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SvgPicture.asset(svgPath, width: 40, height: 40),
+          const SizedBox(width: 10),
+          Flexible(child: Text(label, style: bodyTextStyle(context))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReason(
+      BuildContext context,
+      String icon,
+      String title,
+      String subtitle,
+      ) {
+    return Container(
+      padding: EdgeInsets.all(hPadding),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SvgPicture.asset(icon, width: 34, height: 34),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: bodyTextStyle(context)),
+                const SizedBox(height: 1),
+                Text(
+                  subtitle,
+                  style: bodyTextStyle(
+                    context,
+                    fontSize: 16,
+                  ).copyWith(color: hintGrey),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

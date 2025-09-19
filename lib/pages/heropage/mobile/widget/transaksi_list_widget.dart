@@ -59,40 +59,40 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 13),
-          // Search bar
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  style: bodyTextStyle(context),
-                  decoration: InputDecoration(
-                    hintText: "Cari transaksi...",
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(cardBorderRadius),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  onSubmitted: (val) => refreshData(),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: refreshData,
-              ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: refreshData,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: vPadding),
+          // // Search bar
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: TextField(
+          //         controller: _searchController,
+          //         style: bodyTextStyle(context),
+          //         decoration: InputDecoration(
+          //           hintText: "Cari transaksi...",
+          //           filled: true,
+          //           contentPadding: const EdgeInsets.symmetric(
+          //             horizontal: 10,
+          //             vertical: 5,
+          //           ),
+          //           border: OutlineInputBorder(
+          //             borderRadius: BorderRadius.circular(cardBorderRadius),
+          //             borderSide: BorderSide.none,
+          //           ),
+          //         ),
+          //         onSubmitted: (val) => refreshData(),
+          //       ),
+          //     ),
+          //     IconButton(
+          //       icon: const Icon(Icons.search),
+          //       onPressed: refreshData,
+          //     ),
+          //     IconButton(
+          //       icon: const Icon(Icons.refresh),
+          //       onPressed: refreshData,
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(height: 10),
           // List transaksi
           BlocBuilder<TrslogCariBloc, TrslogCariState>(
             builder: (context, state) {

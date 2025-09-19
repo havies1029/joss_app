@@ -33,7 +33,7 @@ class _LoginFormClientState extends State<LoginFormClient>
   final FocusNode _passwordFocusNode = FocusNode();
 
   bool _isPasswordVisible = false;
-  bool _rememberPassword = false; // Variabel untuk checkbox Remember Password
+  bool _rememberPassword = true; // Variabel untuk checkbox Remember Password
 
   @override
   void initState() {
@@ -293,7 +293,7 @@ class _LoginFormClientState extends State<LoginFormClient>
                                                     ),
                                                     Flexible(
                                                       child: Text(
-                                                        "Ingat Kata Sandi",
+                                                        "Simpan Sesi Login",
                                                         style: bodyTextStyle(
                                                           context,
                                                         ),

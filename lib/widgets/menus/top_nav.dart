@@ -7,7 +7,7 @@ AppBar MobileTopNavigationBar({
   int notifCount = 2,
   VoidCallback? onNotifTap,
 }) {
-  const pageTitles = ['Beranda', 'Literasi', 'Bantuan', 'Pengaturan'];
+  const pageTitles = ['Beranda', 'Literasi', 'Cari Asuransi', 'Pengaturan'];
 
   final isBeranda = selectedIndex == 0;
 

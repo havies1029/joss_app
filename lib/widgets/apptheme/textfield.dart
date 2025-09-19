@@ -18,6 +18,9 @@ class appTextField extends StatelessWidget {
   final double? height;
   final TextInputAction? textInputAction;
 
+  /// ✅ Tambahan
+  final InputDecoration? customDecoration;
+
   const appTextField({
     super.key,
     required this.label,
@@ -35,11 +38,50 @@ class appTextField extends StatelessWidget {
     this.onFieldSubmitted,
     this.padding,
     this.height,
-    this.textInputAction
+    this.textInputAction,
+    this.customDecoration, // ✅
   });
 
   @override
   Widget build(BuildContext context) {
+    final defaultDecoration = InputDecoration(
+      labelText: label,
+      labelStyle: inputTextStyle(context),
+      hintText: hint,
+      hintStyle: inputTextStyle(context, color: sGrey),
+      filled: true,
+      fillColor: pGrey,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 12,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+        borderSide: const BorderSide(color: sGrey),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+        borderSide: const BorderSide(color: sGrey),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+        borderSide: const BorderSide(color: primaryColor),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      errorStyle: TextStyle(
+        color: pRed,
+        fontSize: getResponsiveFont(context, 15),
+      ),
+      suffixIcon: suffixIcon,
+    );
+
     Widget textField = TextFormField(
       controller: controller,
       focusNode: focusNode,
@@ -51,52 +93,19 @@ class appTextField extends StatelessWidget {
       textInputAction: textInputAction,
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: inputTextStyle(context),
-        hintText: hint,
-        hintStyle: inputTextStyle(context, color: sGrey),
-        filled: true,
-        fillColor: pGrey,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: sGrey),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: sGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: primaryColor),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: Colors.red),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: Colors.red),
-        ),
-        errorStyle: TextStyle(
-          color: pRed,
-          fontSize: getResponsiveFont(context, 15),
-        ),
-        suffixIcon: suffixIcon,
+      decoration: defaultDecoration.copyWith(
+        // ⬇️ kalau customDecoration != null, merge isinya
+        prefixText: customDecoration?.prefixText,
+        prefixStyle: customDecoration?.prefixStyle,
+        prefixIcon: customDecoration?.prefixIcon,
       ),
       validator: validator,
     );
 
-    // Jika ada custom height, bungkus dengan SizedBox
     if (height != null) {
       textField = SizedBox(height: height, child: textField);
     }
 
-    // Jika ada padding, bungkus dengan Padding
     if (padding != null) {
       return Padding(padding: padding!, child: textField);
     }
@@ -104,6 +113,7 @@ class appTextField extends StatelessWidget {
     return textField;
   }
 }
+
 
 class AppDateField extends StatefulWidget {
   final String label;

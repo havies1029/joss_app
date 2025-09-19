@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
+import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
@@ -165,20 +166,8 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
       _verifyOtp();
     }
   }
-
-  void _verifyOtp() {
+  void _verifyOtp() async {
     String otp = _otpControllers.map((c) => c.text).join();
-
-    // HapticFeedback.mediumImpact();
-    // showDialog(
-    //   context: context,
-    //   barrierDismissible: false,
-    //   builder: (_) => const Center(
-    //     child: CircularProgressIndicator(
-    //       valueColor: AlwaysStoppedAnimation(primaryColor), // pakai constant
-    //     ),
-    //   ),
-    // );
 
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -189,17 +178,24 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
       );
       return;
     }
-    //Navigator.of(context).pop();
 
     RegUserModel? record = context.read<RegUserBloc>().state.record;
     record?.kodePin = otp;
 
+    // Kirim event validasi OTP ke RegUserBloc
     context.read<RegUserBloc>().add(
-      ValidasiPinHPEvent(
-          record: record!
-      ),
+      ValidasiPinHPEvent(record: record!),
     );
+
+    // // 🚀 Trigger AuthenticationAuthenticated langsung
+    // final userRepo = context.read<UserRepository>();
+    // final user = await userRepo.getUserByToken(await userRepo.getToken());
+    // context.read<AuthenticationBloc>().add(LoggedIn(user: user));
+
+    // 🚪 Tutup popup
+    Navigator.of(context, rootNavigator: true).pop();
   }
+
 
   void _shakeOtpFields() {
     HapticFeedback.heavyImpact();

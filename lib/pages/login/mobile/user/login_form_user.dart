@@ -52,7 +52,7 @@ class _LoginFormUserState extends State<LoginFormUser>
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
   bool _isHoveringGmail = false;
-  bool _rememberPassword = false; // Variabel untuk checkbox Remember Password
+  bool _rememberPassword = true; // Variabel untuk checkbox Remember Password
 
   @override
   void initState() {
@@ -121,25 +121,11 @@ class _LoginFormUserState extends State<LoginFormUser>
 
 // Fungsi untuk memicu event register email
   void onRegisterButtonPressed() {
+    if (!_formKey.currentState!.validate()) return;
+
     final email = _emailController.text.trim();
-    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
-    String? error;
-    if (email.isEmpty) {
-      error = 'Email tidak boleh kosong';
-    } else if (!emailRegex.hasMatch(email)) {
-      error = 'Format email tidak valid';
-    }
-
-    if (error != null) {
-      setState(() => _emailError = error);
-      return;
-    }
-
-    // ✅ Clear error
-    setState(() => _emailError = null);
-
-    // ✅ Trigger ke EmailVerificationBloc (untuk proses verifikasi / register)
+    // ✅ Trigger ke EmailVerificationBloc
     final record = EmailVerificationModel(
       email: email,
       requestFrom: 'email',
@@ -150,46 +136,30 @@ class _LoginFormUserState extends State<LoginFormUser>
     );
   }
 
+  Widget footerLoginText(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Sudah Punya Akun? ",
+          style: bodyTextStyle(context).copyWith(color: hintGrey),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => LoginClient()),
+            );
+          },
+          child: Text(
+            "Masuk Sebagai Klien",
+            style: bodyTextStyle(context).copyWith(color: primaryColor),
+          ),
+        ),
+      ],
+    );
+  }
 
-  // void _handleGmailRegisterForMobile(BuildContext context) async {
-  //   try {
-  //     GoogleSignInAccount? user;
-  //
-  //     if (kIsWeb) {
-  //       user = await googleSignIn.signIn();
-  //     } else {
-  //       user = await googleSignIn.signInSilently();
-  //       user ??= await googleSignIn.signIn();
-  //     }
-  //
-  //     // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
-  //
-  //     if (user != null && context.mounted) {
-  //       // 🔒 Simpan email & display name ke AuthLocalCubit
-  //       final authLocalCubit = context.read<AuthLocalCubit>();
-  //       authLocalCubit.setLastLoginEmail(user.email);
-  //       authLocalCubit.setGoogleDisplayName(user.displayName);
-  //
-  //       // ⛳ Kirim ke EmailVerificationBloc
-  //       context.read<EmailVerificationBloc>().add(
-  //         EmailVerificationTambahEvent(
-  //           record: EmailVerificationModel(
-  //             email: user.email,
-  //             requestFrom: 'google',
-  //           ),
-  //         ),
-  //       );
-  //     }
-  //
-  //   } catch (e) {
-  //     debugPrint('[GMAIL] ERROR: $e');
-  //     if (context.mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Login Google gagal: $e')),
-  //       );
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +273,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                                 ),
                                                 Flexible(
                                                   child: Text(
-                                                    "Ingat Login",
+                                                    "Simpan Sesi Login",
                                                     style: bodyTextStyle(
                                                       context,
                                                     ),
@@ -357,24 +327,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                     ),
 
                                     Spacer(),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Belum Punya Akun? ",
-                                          style: bodyTextStyle(context).copyWith(color: hintGrey),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context, MaterialPageRoute(builder: (_) => LoginClient()));
-                                          },
-                                          child: Text(
-                                            "Masuk Sebagai Klien",
-                                            style: bodyTextStyle(context).copyWith(color: primaryColor),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    footerLoginText(context),
 
                                     SizedBox(height: 10),
                                   ],

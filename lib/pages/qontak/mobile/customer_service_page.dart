@@ -8,7 +8,6 @@ import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
-
 class CustomerServicePage extends StatefulWidget {
   const CustomerServicePage({super.key});
 
@@ -28,33 +27,27 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
     super.didChangeDependencies();
     _initChatIfNeeded();
 
-    // Auto-open chat setelah frame pertama
     if (!_opened && isMobile) {
       _opened = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, 'chat');
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await Navigator.pushNamed(context, 'chat');
+          // setelah chat ditutup, langsung keluar dari CustomerServicePage
+          if (mounted) Navigator.of(context).pop();
+        } catch (e) {
+          debugPrint("[CustomerServicePage] gagal push: $e");
+        }
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<AuthenticationBloc, AuthenticationState>(
-          listener: (_, __) => _initChatIfNeeded(),
-        ),
-        BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
-          listenWhen: (prev, curr) =>
-          prev.record?.rekanNama != curr.record?.rekanNama,
-          listener: (_, __) => _initChatIfNeeded(),
-        ),
-      ],
-      child: const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(), // loading sementara
-        ),
+    // tampilkan hanya loading sederhana
+    return const Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
@@ -70,7 +63,7 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
 
       try {
         MobileChatInitialization.init(
-          "_zGBGl1xg9V1ZQJVZNyFJg", // TODO: pindahin ke env/config
+          "_zGBGl1xg9V1ZQJVZNyFJg",
           "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
           "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE",
           userId,
@@ -89,29 +82,18 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
 
     if (authState is AuthenticationAuthenticated) {
       final custType = authState.user.custType;
-
       if (custType == 'C') {
-        // 🔹 Client → ambil dari UserProfileCubit
         final profileState = context.read<UserProfileCubit>().state;
-        final nama = profileState.nama?.trim();
-        if (nama != null && nama.isNotEmpty) {
-          return nama;
-        }
-        return 'Client User'; // default kalau kosong
+        return profileState.nama?.trim().isNotEmpty == true
+            ? profileState.nama!.trim()
+            : 'Client User';
       } else if (custType == 'U') {
-        // 🔹 User baru → ambil dari RegUserProfileCubit
         final regState = context.read<RegUserProfileCubit>().state;
-        if (regState.email.isNotEmpty) {
-          return regState.email;
-        }
-        return 'New User'; // default kalau email kosong
+        return regState.email.isNotEmpty ? regState.email : 'New User';
       }
     }
-
-    // 🔹 Default (belum login / state lain)
     return 'Guest';
   }
-
 
   String _getUserId(BuildContext context) {
     final authState = context.read<AuthenticationBloc>().state;
