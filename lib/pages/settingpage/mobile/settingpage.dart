@@ -149,6 +149,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final mjnsclientId =
+        context.read<UserProfileCubit>().state.mjnsclientId;
     return Scaffold(
       body: BaseBackgroundFirstPage(
         child: SafeArea(
@@ -302,12 +304,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                         'assets/icons/informasi_klien.svg',
                                     title: 'Informasi Klien',
                                     onTap: () {
-                                      final mjnsclientId =
-                                          context
-                                              .read<UserProfileCubit>()
-                                              .state
-                                              .mjnsclientId;
-
                                       if (mjnsclientId == '10') {
                                         Navigator.push(
                                           context,
@@ -362,37 +358,35 @@ class _SettingsPageState extends State<SettingsPage> {
                                       );
                                     },
                                   ),
-                                  sDivider,
-                                  _buildMenuItem(
-                                    svgAsset: 'assets/icons/pic.svg',
-                                    title: 'Informasi PIC',
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (_) =>
-                                                  const MRekanPicInlineEditorList(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  sDivider,
-                                  _buildMenuItem(
-                                    svgAsset: 'assets/icons/group.svg',
-                                    title: 'Tim Akses',
-                                    svgAssetColor: primaryLightColor,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (_) =>
-                                                  const MRekanPicInlineEditorList(),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  if (mjnsclientId != '10') ...[
+                                    sDivider,
+                                    _buildMenuItem(
+                                      svgAsset: 'assets/icons/pic.svg',
+                                      title: 'Informasi PIC',
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const MRekanPicInlineEditorList(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    sDivider,
+                                    _buildMenuItem(
+                                      svgAsset: 'assets/icons/group.svg',
+                                      title: 'Tim Akses',
+                                      svgAssetColor: primaryLightColor,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const MRekanPicInlineEditorList(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ],
                               ),
                             ],

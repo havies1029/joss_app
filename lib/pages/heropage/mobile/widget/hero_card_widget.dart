@@ -1,9 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
-import '../../../register/mobile/client/register_client_page.dart';
+import '../../../settingpage/mobile/settingpage.dart';
 
 class HeroCardWidget extends StatefulWidget {
   final String userName;
@@ -11,9 +10,10 @@ class HeroCardWidget extends StatefulWidget {
   final String? userImage;
   final String premiumAmount;
   final int polisCount;
+  final int asetCount;
   final VoidCallback? onDetailTap;
-  final VoidCallback? onNasabahTap;
   final String custType;
+
 
   static const String _placeholder = 'assets/images/profile_placeholder.jpg';
 
@@ -24,8 +24,8 @@ class HeroCardWidget extends StatefulWidget {
     this.userImage,
     required this.premiumAmount,
     required this.polisCount,
+    required this.asetCount,
     this.onDetailTap,
-    this.onNasabahTap,
     required this.custType,
   }) : super(key: key);
 
@@ -35,16 +35,23 @@ class HeroCardWidget extends StatefulWidget {
 
 class _HeroCardWidgetState extends State<HeroCardWidget> {
   bool _isPremiumVisible = false;
-
-  // Function untuk convert premium amount ke stars
-  String _getStarsText(String amount) {
-    String cleanAmount = amount.replaceAll(RegExp(r'[^\d]'), '');
-    int length = cleanAmount.length;
-
-    // Return bintang sesuai panjang angka
-    return '*' * (length > 0 ? length : 8);
+  int _cardIndex = 0;
+  late final PageController _cardPageController;
+  String _getStarsText(String amount) => '-' * 6;
+  @override
+  void initState() {
+    super.initState();
+    _cardPageController = PageController(
+      viewportFraction: 1.0,
+      initialPage: 0,
+    );
   }
 
+  @override
+  void dispose() {
+    _cardPageController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -76,9 +83,20 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           children: [
             _buildUserHeader(context),
             const SizedBox(height: 16),
-            _buildInfoCard(context),
+            SizedBox(
+              height: 120, // kasih tinggi tetap supaya PageView punya constraint
+              child: PageView(
+                controller: _cardPageController,
+                physics: const BouncingScrollPhysics(),
+                onPageChanged: (i) => setState(() => _cardIndex = i),
+                children: [
+                  _buildInfoCardPremi(context), // card 1 (punyamu yang premi)
+                  _buildInfoCardPolis(context), // card 2 (ringkasan polis + tipe)
+                ],
+              ),
+            ),
             const SizedBox(height: 8),
-            _buildDotsIndicator(),
+            _buildDotsIndicator(count: 2, index:_cardIndex),
           ],
         ),
       ),
@@ -127,9 +145,22 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
         ),
         const SizedBox(width: 16),
 
-        Text(
-          'Halo, ${widget.userName}',
-          style: headingStyle(context, fontSize: 22),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Halo, ${widget.userName}',
+                style: headingStyle(context, fontSize: 22),
+              ),
+              Text(
+                widget.custType == 'C'
+                    ? 'Klien JPS'
+                    : 'Nasabah Biasa',
+                style: bodyTextStyle(context),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -140,7 +171,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
     child: const Icon(Icons.person, color: primaryLightColor, size: 25),
   );
 
-  Widget _buildInfoCard(BuildContext context) {
+  Widget _buildInfoCardPremi(BuildContext context) {
     return IntrinsicHeight(
       child: Container(
         decoration: BoxDecoration(
@@ -170,6 +201,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        // ===== Amount =====
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 400),
                           transitionBuilder: (child, animation) {
@@ -178,24 +210,24 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                               child: child,
                             );
                           },
-                          child:
-                              _isPremiumVisible
-                                  ? Text(
-                                    'Rp ${widget.premiumAmount}',
-                                    key: const ValueKey('visible'),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: headingStyle(context),
-                                  )
-                                  : Text(
-                                    _getStarsText(widget.premiumAmount),
-                                    key: const ValueKey('stars'),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: headingStyle(context),
-                                  ),
+                          child: _isPremiumVisible
+                              ? Text(
+                            'Rp ${widget.premiumAmount}',
+                            key: const ValueKey('visible'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: headingStyle(context),
+                          )
+                              : Text(
+                            _getStarsText(widget.premiumAmount),
+                            key: const ValueKey('stars'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: headingStyle(context),
+                          ),
                         ),
                         const SizedBox(width: 4),
+                        // ===== Icon =====
                         SizedBox(
                           width: 20,
                           height: 20,
@@ -206,10 +238,14 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                               });
                             },
                             child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 300),
                               transitionBuilder: (child, animation) {
-                                return RotationTransition(
-                                  turns: animation,
+                                // bikin animasi scale + fade
+                                return ScaleTransition(
+                                  scale: CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeOutBack, // efek "jauh → deket" smooth
+                                  ),
                                   child: FadeTransition(
                                     opacity: animation,
                                     child: child,
@@ -280,25 +316,80 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
     );
   }
 
-  Widget _buildDotsIndicator() {
+  Widget _buildInfoCardPolis(BuildContext context) {
+    return IntrinsicHeight(
+      child: Container(
+        decoration: BoxDecoration(
+          color: pGrey,
+          borderRadius: BorderRadius.circular(cardBorderRadius * 1.6),
+          border: Border.all(color: sGrey),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: vPadding - 12,
+                  horizontal: hPadding + 6,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Aset',
+                      style: bodyTextStyle(context).copyWith(fontSize: 16),
+                    ),
+                    Text(
+                      '${widget.asetCount}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: headingStyle(context),
+                    ),
+                    GestureDetector(
+                      onTap: widget.onDetailTap,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Buka Detail', style: bodyTextStyle(context)),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.keyboard_arrow_right,
+                            color: primaryColor,
+                            size: 11.33,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDotsIndicator({required int count, required int index}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 8,
+      children: List.generate(count, (i) {
+        final active = i == index;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
           height: 8,
-          decoration: const BoxDecoration(
-            color: primaryColor,
-            shape: BoxShape.circle,
+          width: active ? 18 : 8, // aktif lebih panjang biar jelas
+          decoration: BoxDecoration(
+            color: active ? primaryColor : sGrey,
+            borderRadius: BorderRadius.circular(999),
           ),
-        ),
-        const SizedBox(width: 6),
-        Container(
-          width: 8,
-          height: 8,
-          decoration: const BoxDecoration(color: sGrey, shape: BoxShape.circle),
-        ),
-      ],
+        );
+      }),
     );
   }
 }

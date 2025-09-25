@@ -5,6 +5,7 @@ class appTextField extends StatelessWidget {
   final String? hint;
   final TextEditingController controller;
   final Widget? suffixIcon;
+  final Widget? prefix; // 👈 tambahan opsional
   final bool obscureText;
   final bool? enabled;
   final int? maxLines;
@@ -24,6 +25,7 @@ class appTextField extends StatelessWidget {
     this.hint,
     required this.controller,
     this.suffixIcon,
+    this.prefix, // 👈 inisialisasi prefix opsional
     this.obscureText = false,
     this.enabled,
     this.maxLines,
@@ -53,7 +55,9 @@ class appTextField extends StatelessWidget {
       style: bodyTextStyle(context),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: (enabled ?? true) ? inputTextStyle(context) : bodyTextStyle(context),
+        labelStyle: (enabled ?? true)
+            ? inputTextStyle(context)
+            : bodyTextStyle(context),
         hintText: hint,
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
@@ -78,8 +82,10 @@ class appTextField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: primaryColor),
         ),
+        prefix: prefix,        // 👈 pakai prefix bukan prefixIcon
         suffixIcon: suffixIcon,
       ),
+
       validator: validator,
     );
 
@@ -87,7 +93,6 @@ class appTextField extends StatelessWidget {
       textField = SizedBox(height: height, child: textField);
     }
 
-    // Jika ada padding, bungkus dengan Padding
     if (padding != null) {
       return Padding(padding: padding!, child: textField);
     }

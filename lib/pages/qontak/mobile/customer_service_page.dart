@@ -96,11 +96,23 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
   }
 
   String _getUserId(BuildContext context) {
-    final authState = context.read<AuthenticationBloc>().state;
-    if (authState is AuthenticationAuthenticated &&
-        authState.user.id != null) {
-      return authState.user.id.toString();
+    // 1. Cek dulu dari UserProfileCubit
+    final profileState = context.read<UserProfileCubit>().state;
+    if (profileState.mrekan1Id != null &&
+        profileState.mrekan1Id!.trim().isNotEmpty) {
+      return profileState.mrekan1Id!;
     }
+    //
+    // // 2. Kalau nggak ada, cek AuthenticationBloc
+    // final authState = context.read<AuthenticationBloc>().state;
+    // if (authState is AuthenticationAuthenticated &&
+    //     authState.user.id != null &&
+    //     authState.user.id.toString().isNotEmpty) {
+    //   return authState.user.id.toString();
+    // }
+
+    // 3. Fallback guest
     return 'guest-${DateTime.now().millisecondsSinceEpoch}';
   }
+
 }

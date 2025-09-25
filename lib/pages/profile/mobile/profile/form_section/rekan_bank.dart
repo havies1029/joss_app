@@ -108,8 +108,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
           title: 'Rekening Bank',
           child: Column(
             children: [
-              SizedBox(height: getProportionateScreenHeight(100)),
-
               BlocListener<MRekanBankListBloc, MRekanBankListState>(
                 listenWhen: (prev, curr) => prev.items != curr.items,
                 listener: (context, state) async {
@@ -145,179 +143,99 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                 child: const SizedBox.shrink(),
               ),
               Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: secondaryBlackColor,
                   ),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: secondaryBlackColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                      border: Border(top: BorderSide(color: primaryColor)),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 20,
                     ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: BlocConsumer<
+                    child: BlocConsumer<
                         MRekanBankCrudBloc,
                         MRekanBankCrudState
-                      >(
-                        listener: (context, state) {
-                          if (state.isLoaded) {
-                            if (state.record != null) {
-                              fieldMrekan1IdController.text =
-                                  state.record!.mrekan1Id;
-                              fieldRekNamaController.text =
-                                  state.record!.rekNama;
-                              fieldRekNoController.text = state.record!.rekNo;
-                            }
-                            if (state.isSaved && !state.hasFailure) {
-                              context.read<MRekanBankCrudBloc>().add(
-                                MRekanBankCrudLihatEvent(recordId: widget.recordId),
-                              );
-                            }
-                            fieldComboMBank = state.comboMBank;
+                    >(
+                      listener: (context, state) {
+                        if (state.isLoaded) {
+                          if (state.record != null) {
+                            fieldMrekan1IdController.text =
+                                state.record!.mrekan1Id;
+                            fieldRekNamaController.text =
+                                state.record!.rekNama;
+                            fieldRekNoController.text = state.record!.rekNo;
                           }
-                        },
-                        builder: (context, state) {
-                          return Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                BlocBuilder<UserProfileCubit, UserProfileState>(
-                                  buildWhen:
-                                      (prev, curr) =>
-                                          (prev.fotoBytes?.lengthInBytes ??
-                                              -1) !=
-                                          (curr.fotoBytes?.lengthInBytes ?? -1),
-                                  builder: (context, state) {
-                                    final imageBytes = state.fotoBytes;
-                                    return Center(
-                                      child: InkResponse(
-                                        onTap:
-                                            () => ImageUploader.pickAndUpload(
-                                              context,
-                                            ),
-                                        containedInkWell: true,
-                                        customBorder: const CircleBorder(),
-                                        child: Stack(
-                                          alignment: Alignment.bottomRight,
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 50,
-                                              backgroundColor:
-                                                  secondaryBlackColor,
-                                              backgroundImage:
-                                                  (imageBytes != null &&
-                                                          imageBytes.isNotEmpty)
-                                                      ? MemoryImage(imageBytes)
-                                                      : null,
-                                              child:
-                                                  (imageBytes == null ||
-                                                          imageBytes.isEmpty)
-                                                      ? const Icon(
-                                                        Icons.person,
-                                                        color: Colors.white,
-                                                        size: 48,
-                                                      )
-                                                      : null,
-                                            ),
-                                            Positioned(
-                                              bottom: 0,
-                                              right: 0,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(
-                                                  2,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: sGrey,
-                                                  ),
-                                                  color: pGrey,
-                                                ),
-                                                child: CircleAvatar(
-                                                  radius: 16,
-                                                  backgroundColor: pGrey,
-                                                  child: SvgPicture.asset(
-                                                    "assets/icons/camera.svg",
-                                                    width: 24,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  "Rekening Bank",
-                                  style: headingStyle(context, fontSize: 22),
-                                ),
-                                Text(
-                                  "Lengkapi data rekening untuk pencairan klaim.",
-                                  style: bodyTextStyle(
-                                    context,
-                                    fontSize: 16,
-                                  ).copyWith(color: hintGrey),
-                                ),
-                                const SizedBox(height: 10),
+                          if (state.isSaved && !state.hasFailure) {
+                            context.read<MRekanBankCrudBloc>().add(
+                              MRekanBankCrudLihatEvent(recordId: widget.recordId),
+                            );
+                          }
+                          fieldComboMBank = state.comboMBank;
+                        }
+                      },
+                      builder: (context, state) {
+                        return Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                "Rekening Bank",
+                                style: headingStyle(context, fontSize: 22),
+                              ),
+                              Text(
+                                "Lengkapi data rekening untuk pencairan klaim.",
+                                style: bodyTextStyle(
+                                  context,
+                                  fontSize: 16,
+                                ).copyWith(color: hintGrey),
+                              ),
+                              const SizedBox(height: 10),
 
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 15,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: pGrey,
-                                    border: Border.all(color: sGrey),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(cardBorderRadius),
-                                    ),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      // Fields
-                                      buildFieldNamaBank(),
-                                      // const SizedBox(height: 16),
-                                      // BlocListener<UserProfileCubit, UserProfileState>(
-                                      //   listenWhen: (prev, curr) => prev.mrekan1Id != curr.mrekan1Id,
-                                      //   listener: (context, state) {
-                                      //     final next = state.mrekan1Id ?? '';
-                                      //     if (fieldMrekan1IdController.text != next) {
-                                      //       fieldMrekan1IdController.text = next;
-                                      //     }
-                                      //   },
-                                      //   child: buildFieldMrekan1Id(),
-                                      // ),
-                                      const SizedBox(height: 16),
-                                      buildFieldRekNama(),
-                                      const SizedBox(height: 16),
-                                      buildFieldRekNo(),
-                                    ],
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 15,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: pGrey,
+                                  border: Border.all(color: sGrey),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(cardBorderRadius),
                                   ),
                                 ),
-                                const SizedBox(height: 30),
-                                AppButton.primary(
-                                  text: "Submit",
-                                  onPressed: onSaveForm,
+                                child: Column(
+                                  children: [
+                                    // Fields
+                                    buildFieldNamaBank(),
+                                    // const SizedBox(height: 16),
+                                    // BlocListener<UserProfileCubit, UserProfileState>(
+                                    //   listenWhen: (prev, curr) => prev.mrekan1Id != curr.mrekan1Id,
+                                    //   listener: (context, state) {
+                                    //     final next = state.mrekan1Id ?? '';
+                                    //     if (fieldMrekan1IdController.text != next) {
+                                    //       fieldMrekan1IdController.text = next;
+                                    //     }
+                                    //   },
+                                    //   child: buildFieldMrekan1Id(),
+                                    // ),
+                                    const SizedBox(height: 16),
+                                    buildFieldRekNama(),
+                                    const SizedBox(height: 16),
+                                    buildFieldRekNo(),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              ),
+                              const SizedBox(height: 30),
+                              AppButton.primary(
+                                text: "Submit",
+                                onPressed: onSaveForm,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

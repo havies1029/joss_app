@@ -226,7 +226,7 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     screenHeight < 700 ? screenHeight * 0.06 : screenHeight * 0.095;
 
     return Scaffold(
-      backgroundColor: primaryBlackColor,
+      backgroundColor: secondaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundFirstPage(
           child: Column(

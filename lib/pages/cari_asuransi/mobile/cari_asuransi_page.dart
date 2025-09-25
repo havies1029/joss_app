@@ -4,167 +4,154 @@ import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 import '../../../common/constants.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../base/base_background_firstpage.dart';
 
-class CariAsuransiPage extends StatelessWidget {
-  const CariAsuransiPage({super.key});
+enum CariAsuransiType { page, menu }
+
+class CariAsuransiWidget extends StatelessWidget {
+  final CariAsuransiType type;
+
+  const CariAsuransiWidget({super.key, this.type = CariAsuransiType.page});
+
+  const CariAsuransiWidget.page({Key? key})
+    : type = CariAsuransiType.page,
+      super(key: key);
+
+  const CariAsuransiWidget.menu({Key? key})
+    : type = CariAsuransiType.menu,
+      super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return type == CariAsuransiType.page
+        ? _buildAsPage(context)
+        : _buildAsMenu(context);
+  }
+
+  // Build sebagai Page (BaseBackgroundSidePage)
+  Widget _buildAsPage(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Cari Asuransi",
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: hPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HeaderCard(
-              iconPath: "assets/icons/menu_cari_asuransi.svg",
-              title: "Cari Asuransi",
-              subtitle:
-                  "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
-            ),
-            Container(
-              color: primaryBlackColor,
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: hPadding),
-                    decoration: BoxDecoration(color: secondaryBlackColor),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Kategori Asuransi",
-                          style: bodyTextStyle(context),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
-                        kDivider(),
-                      ],
-                    ),
-                  ),
+        child: _buildContent(context),
+      ),
+    );
+  }
 
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: hPadding,
-                      horizontal: hPadding * 1.5,
-                    ),
-                    decoration: BoxDecoration(color: secondaryBlackColor),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildCategory(
-                                context,
-                                "assets/icons/kendaraan.svg",
-                                "Kendaraan",
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildCategory(
-                                context,
-                                "assets/icons/properti.svg",
-                                "Rumah & Property",
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildCategory(
-                                context,
-                                "assets/icons/kesehatan.svg",
-                                "Kesehatan",
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildCategory(
-                                context,
-                                "assets/icons/perjalanan.svg",
-                                "Perjalanan",
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildCategory(
-                                context,
-                                "assets/icons/pendidikan.svg",
-                                "Pendidikan",
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildCategory(
-                                context,
-                                "assets/icons/jiwa.svg",
-                                "Jiwa",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  Container(
-                    padding: EdgeInsets.all(hPadding * 1.5),
-                    decoration: BoxDecoration(color: secondaryBlackColor),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Kenapa pilih asuransi di JPS?",
-                          style: bodyTextStyle(context),
-                          textAlign: TextAlign.left,
-                        ),
-                        const SizedBox(height: 10),
-
-                        _buildReason(
-                          context,
-                          "assets/icons/lightning.svg",
-                          "Klaim Anti Ribet",
-                          "Urus klaim cepat, gampang, dan selalu transparan.",
-                        ),
-                        _buildReason(
-                          context,
-                          "assets/icons/hospital.svg",
-                          "Mitra di Mana-Mana",
-                          "JPS selalu dekat denganmu.",
-                        ),
-                        _buildReason(
-                          context,
-                          "assets/icons/secured.svg",
-                          "Terjamin Aman",
-                          "JPS sudah resmi berizin OJK, jadi nggak perlu ragu.",
-                        ),
-                        _buildReason(
-                          context,
-                          "assets/icons/fulltime.svg",
-                          "Layanan 24/7",
-                          "Tenang, tim kami standby kapan pun kamu butuh.",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+  // Build sebagai Menu (Scaffold + BaseBackgroundFirstPage)
+  Widget _buildAsMenu(BuildContext context) {
+    return Scaffold(
+      body: BaseBackgroundFirstPage(
+        child: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              color: secondaryBlackColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
-          ],
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [SizedBox(height: hPadding), _buildContent(context)],
+              ),
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeaderCard(
+          iconPath: "assets/icons/menu_cari_asuransi.svg",
+          title: "Cari Asuransi",
+          subtitle:
+              "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+        ),
+        Container(
+          color: primaryBlackColor,
+          child: Column(
+            children: [
+              _buildKategoriSection(context),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKategoriSection(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(vertical: hPadding),
+          decoration: BoxDecoration(color: secondaryBlackColor),
+          child: Column(
+            children: [
+              Text(
+                "Kategori Asuransi",
+                style: bodyTextStyle(context),
+                textAlign:
+                    type == CariAsuransiType.page
+                        ? TextAlign.center
+                        : TextAlign.left,
+              ),
+              const SizedBox(height: 10),
+              kDivider(),
+            ],
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(
+            vertical: hPadding,
+            horizontal: hPadding * 1.5,
+          ),
+          decoration: BoxDecoration(color: secondaryBlackColor),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCategoryRow(context, [
+                ("assets/icons/kendaraan.svg", "Kendaraan"),
+                ("assets/icons/properti.svg", "Rumah & Property"),
+              ]),
+              const SizedBox(height: 12),
+              _buildCategoryRow(context, [
+                ("assets/icons/kesehatan.svg", "Kesehatan"),
+                ("assets/icons/perjalanan.svg", "Perjalanan"),
+              ]),
+              const SizedBox(height: 12),
+              _buildCategoryRow(context, [
+                ("assets/icons/pendidikan.svg", "Pendidikan"),
+                ("assets/icons/jiwa.svg", "Jiwa"),
+              ]),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryRow(
+    BuildContext context,
+    List<(String, String)> categories,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildCategory(context, categories[0].$1, categories[0].$2),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildCategory(context, categories[1].$1, categories[1].$2),
+        ),
+      ],
     );
   }
 
@@ -187,38 +174,12 @@ class CariAsuransiPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildReason(
-    BuildContext context,
-    String icon,
-    String title,
-    String subtitle,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(hPadding),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SvgPicture.asset(icon, width: 34, height: 34),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: bodyTextStyle(context)),
-                const SizedBox(height: 1),
-                Text(
-                  subtitle,
-                  style: bodyTextStyle(
-                    context,
-                    fontSize: 16,
-                  ).copyWith(color: hintGrey),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+class CariAsuransiPage extends CariAsuransiWidget {
+  const CariAsuransiPage({super.key}) : super(type: CariAsuransiType.page);
+}
+
+class CariAsuransiMenu extends CariAsuransiWidget {
+  const CariAsuransiMenu({super.key}) : super(type: CariAsuransiType.menu);
 }

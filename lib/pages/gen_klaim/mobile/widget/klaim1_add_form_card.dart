@@ -12,6 +12,9 @@ import 'package:joss_app/models/combobox/combomstsclaim_model.dart';
 import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:joss_app/widgets/combobox/combomstsclaim_widget.dart';
 
+import '../../../../repositories/combobox/combomstsclaim_repository.dart';
+import '../../../../repositories/combobox/combormatauang_repository.dart';
+
 class Klaim1AddFormCard extends StatefulWidget {
   final bool isSaving;
   final VoidCallback onCancel;
@@ -129,33 +132,53 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
               const SizedBox(height: 12),
 
               // Status
-              Text('Status Klaim', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-              FormField<ComboMStsclaimModel>(
-                validator: (_) => _mStsclaim == null ? 'Status harus dipilih' : null,
-                builder: (ffState) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildFieldComboMStsclaim(
-                        comboKey: _stsClaimKey,
-                        labelText: 'Pilih Status Klaim',
-                        initItem: _mStsclaim,
-                        onChangedCallback: (val) {
-                          setState(() => _mStsclaim = val);
-                          ffState.didChange(val);
-                        },
-                        onSaveCallback: (val) => _mStsclaim = val,
-                        validatorCallback: (_) => null,
-                      ),
-                      if (ffState.hasError)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(ffState.errorText!, style: const TextStyle(color: Colors.red, fontSize: 12)),
-                        ),
-                    ],
-                  );
-                },
-              ),
+              // Text('Status Klaim', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
+              // FormField<ComboMStsclaimModel>(
+              //   validator: (_) => _mStsclaim == null ? 'Status harus dipilih' : null,
+              //   builder: (ffState) {
+              //     return Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         // buildFieldComboMStsclaim(
+              //         //   comboKey: _stsClaimKey,
+              //         //   labelText: 'Pilih Status Klaim',
+              //         //   initItem: _mStsclaim,
+              //         //   onChangedCallback: (val) {
+              //         //     setState(() => _mStsclaim = val);
+              //         //     ffState.didChange(val);
+              //         //   },
+              //         //   onSaveCallback: (val) => _mStsclaim = val,
+              //         //   validatorCallback: (_) => null,
+              //         // ),
+              //         ReusableComboBox<ComboMStsclaimModel>(
+              //           hintText: "Status",
+              //           searchHintText: "Pilih Status Klaim",
+              //           comboKey: _stsClaimKey,
+              //           initItem: _mStsclaim,
+              //           dataLoader: () => ComboMStsclaimRepository().getComboMStsclaim(),
+              //           displayText: (item) => item.statusNama,
+              //           compareItems: (a, b) => a.mstsclaimId == b.mstsclaimId,
+              //           onChangedCallback: (val) {
+              //             setState(() => _mStsclaim = val);
+              //             ffState.didChange(val);
+              //           },
+              //           onSaveCallback: (val) => _mStsclaim = val,
+              //           validatorCallback: (value) {
+              //             if (value == null) {
+              //               return kStringNullError;
+              //             }
+              //             return null;
+              //           },
+              //         ),
+              //         if (ffState.hasError)
+              //           Padding(
+              //             padding: const EdgeInsets.only(top: 4),
+              //             child: Text(ffState.errorText!, style: const TextStyle(color: Colors.red, fontSize: 12)),
+              //           ),
+              //       ],
+              //     );
+              //   },
+              // ),
             ],
           ),
         ),
@@ -202,24 +225,24 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
         Row(
           children: [
             Expanded(
-              flex: 2,
-              child: appTextField(
-                label: 'Jumlah Klaim',
-                hint: 'cth: 10.000.000',
-                controller: _klaimAmount,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  ThousandsFormatterId(),
-                ],
-                validator: (v) {
-                  final raw = v?.replaceAll('.', '').replaceAll(',', '') ?? '';
-                  if (raw.isEmpty) return 'Tidak boleh kosong';
-                  final parsed = double.tryParse(raw);
-                  if (parsed == null) return 'Format tidak valid';
-                  return null;
-                },
-              )
+                flex: 2,
+                child: appTextField(
+                  label: 'Jumlah Klaim',
+                  hint: 'cth: 10.000.000',
+                  controller: _klaimAmount,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsFormatterId(),
+                  ],
+                  validator: (v) {
+                    final raw = v?.replaceAll('.', '').replaceAll(',', '') ?? '';
+                    if (raw.isEmpty) return 'Tidak boleh kosong';
+                    final parsed = double.tryParse(raw);
+                    if (parsed == null) return 'Format tidak valid';
+                    return null;
+                  },
+                )
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -230,16 +253,26 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildFieldComboRMatauang(
+                      ReusableComboBox<ComboRMatauangModel>(
+                        hintText: "Mata Uang",
+                        searchHintText: "Cari Mata Uang...",
                         comboKey: _mataUangKey,
-                        labelText: 'Mata Uang',
                         initItem: _rMatauang,
+                        dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
+                        displayText: (item) => item.rmatauangNama,
+                        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
                         onChangedCallback: (val) {
                           setState(() => _rMatauang = val);
                           ffState.didChange(val);
                         },
+                        showClearButton: false,
                         onSaveCallback: (val) => _rMatauang = val,
-                        validatorCallback: (_) => null,
+                        validatorCallback: (value) {
+                          if (value == null) {
+                            return kStringNullError;
+                          }
+                          return null;
+                        },
                       ),
                       if (ffState.hasError)
                         Padding(
@@ -279,8 +312,8 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
       klaimAmount: amount,
       kursId: _rMatauang?.rmatauangKode,
       comboRMatauang: _rMatauang,
-      lastStsclaimId: _mStsclaim?.mstsclaimId,
-      comboMStsclaim: _mStsclaim,
+      // lastStsclaimId: _mStsclaim?.mstsclaimId,
+      // comboMStsclaim: _mStsclaim,
     );
 
     widget.onSave(record);

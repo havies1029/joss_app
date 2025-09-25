@@ -15,6 +15,9 @@ import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:joss_app/widgets/combobox/combomstsclaim_widget.dart';
 import 'package:joss_app/blocs/gen_klaim/klaim1list_bloc.dart';
 
+import '../../../../repositories/combobox/combomstsclaim_repository.dart';
+import '../../../../repositories/combobox/combormatauang_repository.dart';
+
 class Klaim1ListEditor extends StatefulWidget {
   final Map<String, bool> isSavingById;
   final void Function(String id, Klaim1CrudModel record) onSaveExisting;
@@ -68,6 +71,22 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
     return BlocBuilder<Klaim1ListBloc, Klaim1ListState>(
       buildWhen: (p, c) => p.items != c.items || p.status != c.status,
       builder: (context, state) {
+
+        debugPrint("📢 Klaim1ListState update:");
+        debugPrint("Status: ${state.status}");
+        debugPrint("Jumlah items: ${state.items.length}");
+
+        for (final item in state.items) {
+          debugPrint(
+              "👉 ID: ${item.klaim1Id}, "
+                  "Nama: ${item.insuredName}, "
+                  "Lokasi: ${item.kejadianLokasi}, "
+                  "Tanggal: ${item.kejadianTgl}, "
+                  "Amount: ${item.klaimAmount}, "
+                  "Mata Uang: ${item.rmatauangNama}, "
+                  "Status: ${item.statusNama}"
+          );
+        }
         if (state.status == ListStatus.failure) {
           return Center(
             child: Column(
@@ -142,33 +161,33 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Tooltip(
-                            message: 'Simpan',
-                            child: ElevatedButton(
-                              onPressed: saving ? null : () => _saveExisting(item.klaim1Id, ctrls),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              ),
-                              child: saving
-                                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                  : const Icon(Icons.check, color: Colors.white),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Tooltip(
-                            message: 'Hapus',
-                            child: OutlinedButton(
-                              onPressed: () => _confirmDelete(context, item.klaim1Id),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: pRed),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.all(12),
-                              ),
-                              child: const Icon(Icons.delete, color: pRed, size: 20),
-                            ),
-                          ),
+                          // const SizedBox(width: 8),
+                          // Tooltip(
+                          //   message: 'Simpan',
+                          //   child: ElevatedButton(
+                          //     onPressed: saving ? null : () => _saveExisting(item.klaim1Id, ctrls),
+                          //     style: ElevatedButton.styleFrom(
+                          //       padding: const EdgeInsets.all(12),
+                          //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          //     ),
+                          //     child: saving
+                          //         ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          //         : const Icon(Icons.check, color: Colors.white),
+                          //   ),
+                          // ),
+                          // const SizedBox(width: 8),
+                          // Tooltip(
+                          //   message: 'Hapus',
+                          //   child: OutlinedButton(
+                          //     onPressed: () => _confirmDelete(context, item.klaim1Id),
+                          //     style: OutlinedButton.styleFrom(
+                          //       side: const BorderSide(color: pRed),
+                          //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          //       padding: const EdgeInsets.all(12),
+                          //     ),
+                          //     child: const Icon(Icons.delete, color: pRed, size: 20),
+                          //   ),
+                          // ),
                         ],
                       ),
 
@@ -207,16 +226,37 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildFieldComboMStsclaim(
+                              // buildFieldComboMStsclaim(
+                              //   comboKey: ctrls.stsClaimKey,
+                              //   labelText: 'Pilih Status Klaim',
+                              //   initItem: ctrls.mStsclaim,
+                              //   onChangedCallback: (val) {
+                              //     setState(() => ctrls.mStsclaim = val);
+                              //     ffState.didChange(val);
+                              //   },
+                              //   onSaveCallback: (val) => ctrls.mStsclaim = val,
+                              //   validatorCallback: (_) => null,
+                              // ),
+                              ReusableComboBox<ComboMStsclaimModel>(
+                                hintText: "Status",
+                                searchHintText: "Pilih Status Klaim",
                                 comboKey: ctrls.stsClaimKey,
-                                labelText: 'Pilih Status Klaim',
                                 initItem: ctrls.mStsclaim,
+                                dataLoader: () => ComboMStsclaimRepository().getComboMStsclaim(),
+                                displayText: (item) => item.statusNama,
+                                compareItems: (a, b) => a.mstsclaimId == b.mstsclaimId,
+                                isEnabled: false,
                                 onChangedCallback: (val) {
                                   setState(() => ctrls.mStsclaim = val);
                                   ffState.didChange(val);
                                 },
                                 onSaveCallback: (val) => ctrls.mStsclaim = val,
-                                validatorCallback: (_) => null,
+                                validatorCallback: (value) {
+                                  if (value == null) {
+                                    return kStringNullError;
+                                  }
+                                  return null;
+                                },
                               ),
                               if (ffState.hasError)
                                 Padding(
@@ -252,7 +292,7 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
             ? ''
             : NumberFormat.decimalPattern('id').format(item.klaimAmount);
         c.kejadianTgl = item.kejadianTgl ?? _today;
-        c.rMatauang = ComboRMatauangModel(rmatauangKode: item.kursId, rmatauangNama: item.rMATAUANGNAMA);
+        c.rMatauang = ComboRMatauangModel(rmatauangKode: item.kursId, rmatauangNama: item.rmatauangNama);
         c.mStsclaim = ComboMStsclaimModel(mstsclaimId: item.lastStsclaimId, statusNama: item.statusNama);
         _rowCtrls[item.klaim1Id] = c;
       }
@@ -319,16 +359,38 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildFieldComboRMatauang(
+                      // buildFieldComboRMatauang(
+                      //   comboKey: ctrls.mataUangKey,
+                      //   labelText: 'Mata Uang',
+                      //   initItem: ctrls.rMatauang,
+                      //   onChangedCallback: (val) {
+                      //     setState(() => ctrls.rMatauang = val);
+                      //     ffState.didChange(val);
+                      //   },
+                      //   onSaveCallback: (val) => ctrls.rMatauang = val,
+                      //   validatorCallback: (_) => null,
+                      // ),
+                      ReusableComboBox<ComboRMatauangModel>(
+                        hintText: "Mata Uang",
+                        searchHintText: "Cari Mata Uang...",
                         comboKey: ctrls.mataUangKey,
-                        labelText: 'Mata Uang',
                         initItem: ctrls.rMatauang,
+                        dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
+                        displayText: (item) => item.rmatauangNama,
+                        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+                        isEnabled: false,
                         onChangedCallback: (val) {
                           setState(() => ctrls.rMatauang = val);
                           ffState.didChange(val);
                         },
+                        showClearButton: false,
                         onSaveCallback: (val) => ctrls.rMatauang = val,
-                        validatorCallback: (_) => null,
+                        validatorCallback: (value) {
+                          if (value == null) {
+                            return kStringNullError;
+                          }
+                          return null;
+                        },
                       ),
                       if (ffState.hasError)
                         Padding(

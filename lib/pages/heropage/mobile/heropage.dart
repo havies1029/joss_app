@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/heropage/mobile/widget/detail_premi.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
@@ -50,6 +51,7 @@ class HeroPage extends StatelessWidget {
                                 : null; // default kalau belum ada foto
 
                             return _buildHeroContent(
+                              context,
                               displayName: displayName,
                               custType: custType,
                               bytes: bytes,
@@ -66,6 +68,7 @@ class HeroPage extends StatelessWidget {
                                 : 'New User'; // default kalau email kosong
 
                             return _buildHeroContent(
+                              context,
                               displayName: displayName,
                               custType: custType,
                               bytes: null, // user baru belum ada foto
@@ -76,6 +79,7 @@ class HeroPage extends StatelessWidget {
 
   // 🔹 Default (belum login / state lain) → render placeholder juga
                       return _buildHeroContent(
+                        context,
                         displayName: 'Guest', // fallback
                         custType: '',
                         bytes: null,
@@ -91,7 +95,8 @@ class HeroPage extends StatelessWidget {
   }
 
   /// Helper untuk bangun HeroPage UI
-  Widget _buildHeroContent({
+  Widget _buildHeroContent(
+      BuildContext context,{
     required String displayName,
     required String custType,
     Uint8List? bytes,
@@ -101,10 +106,15 @@ class HeroPage extends StatelessWidget {
         HeroCardWidget(
           userName: displayName,
           imageBytes: bytes,
-          premiumAmount: custType == 'C' ? '4.500.000' : '9.999.999',
+          premiumAmount: custType == 'C' ? '10.500.000.000' : '9.999.999',
           polisCount: custType == 'C' ? 21 : 0,
-          onDetailTap: () => debugPrint('Detail tapped'),
-          onNasabahTap: () => debugPrint('Nasabah tapped'),
+          onDetailTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DetailPremiPage()),
+            );
+          },
+          asetCount : custType == "C" ? 156 : 0,
           custType: custType,
         ),
         const SizedBox(height: vPadding - 3),

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:joss_app/pages/heropage/mobile/widget/transaksi_page.dart';
 
 class TransaksiListWidget extends StatefulWidget {
   const TransaksiListWidget({super.key});
@@ -145,7 +146,10 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget> {
                         backgroundColor: formGrey,
                         text: "Lihat Semua Transaksi  ›",
                         onPressed: () {
-                          // TODO: Arahkan ke halaman list transaksi penuh
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const TransaksiPage()),
+                          );
                         },
                         width: double.infinity,
                       ),
@@ -168,7 +172,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget> {
     if (item.trsTgl != null) {
       try {
         final tglDt =
-            (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
+        (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
         tgl = "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}";
       } catch (_) {}
     }

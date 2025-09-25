@@ -10,7 +10,7 @@ class Klaim1ListTileWidget extends StatelessWidget {
 	final DateTime kejadianTgl;
 	final double klaimAmount;
 	final String klaim1Id;
-	final String rMATAUANGNAMA;
+	final String rmatauangNama;
 	final String rugiDesc;
 	final String statusNama;
 
@@ -22,7 +22,7 @@ class Klaim1ListTileWidget extends StatelessWidget {
 		required this.kejadianTgl, 
 		required this.klaimAmount, 
 		required this.klaim1Id, 
-		required this.rMATAUANGNAMA, 
+		required this.rmatauangNama, 
 		required this.rugiDesc, 
 		required this.statusNama});
 
@@ -96,12 +96,12 @@ class Klaim1ListTileWidget extends StatelessWidget {
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("rMATAUANGNAMA",
+						Text("rmatauangNama",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							rMATAUANGNAMA,
+							rmatauangNama,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),

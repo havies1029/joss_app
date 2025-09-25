@@ -307,7 +307,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                           ),
                                         ),
                                         Expanded(
-                                          child: kDivider(color: hintGrey)
+                                            child: kDivider(color: hintGrey)
                                         ),
                                       ],
                                     ),
@@ -326,7 +326,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                       backgroundColor: pGrey,
                                     ),
 
-                                    Spacer(),
+                                    SizedBox(height: vPadding,),
                                     footerLoginText(context),
 
                                     SizedBox(height: 10),

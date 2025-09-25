@@ -21,7 +21,11 @@ import 'package:joss_app/repositories/gen_profile/mrekangeneralidvcrud_repositor
 import 'package:joss_app/repositories/gen_profile/mrekanpajakcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiccrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiclist_repository.dart';
+import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
+import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
+import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
+import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -68,6 +72,12 @@ import 'blocs/gen_berita/beritalaincari_bloc.dart';
 import 'blocs/gen_klaim/klaim1crud_bloc.dart';
 import 'blocs/gen_klaim/klaim1list_bloc.dart';
 import 'blocs/gen_klaim/klaim2crud_bloc.dart';
+import 'blocs/gen_promo/promo1cari_bloc.dart';
+import 'blocs/gen_promo/promo2cari_bloc.dart';
+import 'blocs/gen_sppamv/sppamvcrud_bloc.dart';
+import 'blocs/gen_sppamv/sppamvlist_bloc.dart';
+import 'blocs/gen_sppapar/sppaparcrud_bloc.dart';
+import 'blocs/gen_sppapar/sppaparlist_bloc.dart';
 import 'blocs/gen_status_aset/statusasetcari_bloc.dart';
 import 'blocs/klaim/klaim2list_bloc.dart';
 import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
@@ -78,6 +88,8 @@ import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
+import 'blocs/simulmv/simulmvcrud_bloc.dart';
+import 'blocs/simulpar/simulparcrud_bloc.dart';
 import 'helper/app_prefs.dart';
 
 Future<void> main() async {
@@ -85,11 +97,11 @@ Future<void> main() async {
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory:
-        kIsWeb
-            ? HydratedStorageDirectory.web
-            : HydratedStorageDirectory(
-              (await getApplicationDocumentsDirectory()).path,
-            ),
+    kIsWeb
+        ? HydratedStorageDirectory.web
+        : HydratedStorageDirectory(
+      (await getApplicationDocumentsDirectory()).path,
+    ),
   );
 
   final userRepository = UserRepository();
@@ -142,7 +154,6 @@ Future<void> main() async {
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
-        BlocProvider(create: (_) => UserProfileCubit()),
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
@@ -157,7 +168,6 @@ Future<void> main() async {
         BlocProvider(
           create: (_) => BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3)),
         ),
-
         BlocProvider(create: (_) => Berita2CariBloc()),
         BlocProvider(create: (_) => Berita3CariBloc()),
         BlocProvider<ArticleSelectionCubit>(
@@ -191,6 +201,18 @@ Future<void> main() async {
         BlocProvider<AsetHealthCariBloc>(
             create: (context) => AsetHealthCariBloc()),
         BlocProvider<AsetDashboardCariBloc>(create: (context) => AsetDashboardCariBloc()),
+        BlocProvider(create: (context) => Promo1CariBloc()),
+        BlocProvider(create: (context) => Promo2CariBloc()),
+        BlocProvider(create:(context) => SppamvListBloc()),
+        BlocProvider(create: (context) => SppamvCrudBloc(repository: SppamvCrudRepository())),
+        BlocProvider(create: (context) => SppaparListBloc()),
+        BlocProvider(create: (context) => SppaparCrudBloc(repository: SppaparCrudRepository())),
+        BlocProvider<SimulmvCrudBloc>(
+            create: (context) =>
+                SimulmvCrudBloc(repository: SimulmvCrudRepository())),
+        BlocProvider<SimulparCrudBloc>(
+            create: (context) =>
+                SimulparCrudBloc(repository: SimulparCrudRepository())),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -287,7 +309,7 @@ Future<void> main() async {
             },
           ),
 
-          // 🖼️ Foto profil listener
+          // 🖼 Foto profil listener
           BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
             listenWhen: (_, c) => c is ProfileDownloadFotoLoaded,
             listener: (context, state) {
@@ -432,6 +454,18 @@ class _AppState extends State<_App> {
                 userRepository: widget.userRepository,
               );
             }
+
+
+            if (state is AuthenticationGoogleUserAuthenticated) {
+              while (_navigatorKey.currentState?.canPop() ?? false) {
+                _navigatorKey.currentState?.pop();
+              }
+
+              return HomeTabWidget(
+                userRepository: widget.userRepository,
+              );
+            }
+
 
             if (state is AuthenticationUnauthenticated) {
               context.read<UserProfileCubit>().clearProfile();

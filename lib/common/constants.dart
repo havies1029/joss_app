@@ -18,16 +18,13 @@ part '../widgets/apptheme/snackbar.dart';
 part '../widgets/apptheme/textstyles.dart';
 part '../widgets/apptheme/dropdown.dart';
 
-final GoogleSignIn googleSignIn = GoogleSignIn(
-  scopes: const ['email'],
-  clientId:
-      kIsWeb
-          ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com'
-          : null,
-  serverClientId:
-      kIsWeb
-          ? null
-          : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
+const List<String> scopes = <String>[
+  'email',
+];
+GoogleSignIn googleSignIn = GoogleSignIn(
+  scopes: scopes,
+  clientId: kIsWeb ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com' : null,
+  serverClientId: kIsWeb ? null : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
 );
 
 /// Device/Platform Utils
@@ -89,7 +86,7 @@ const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
 
 /// Padding & Spacing
-  const double hPadding = 10.0;
+const double hPadding = 10.0;
 const double vPadding = 20.0;
 const double cardBorderRadius = 10.0;
 const double checkboxBorderRadius = 4.0;
@@ -140,6 +137,13 @@ const LinearGradient primaryBlackGradient = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
   colors: [primaryColor, primaryBlackColor],
+);
+
+const LinearGradient registerButtonGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [Color(0xFFFF8732), Color(0xFFFFCC92), Color(0xFFFF8732)],
+  stops: [0.0, 0.48, 1.0],
 );
 
 const LinearGradient cardBorderGradient = LinearGradient(

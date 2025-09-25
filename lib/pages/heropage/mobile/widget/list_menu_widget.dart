@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
+import '../../../beli_polis/mobile/beli_polis_page.dart';
 import '../../../gen_aset_dashboard/asetdashboardcari_main.dart';
 import '../../../gen_aset_ringkasan/asetringkasancari_main.dart';
 import '../../../gen_klaim/klaim1list_main.dart';
@@ -18,13 +19,14 @@ class ListMenuWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final menuItems = _getMenuItems();
+    final itemWidth = getItemWidth(context);
     return Column(
       children: [
-        if (custType != 'C')
-          _buildDaftarKlienButton(context),
+        if (custType != 'C') _buildDaftarKlienButton(context),
 
-        // Container utama untuk menu
         Container(
+          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
           decoration: BoxDecoration(
             color: secondaryBlackColor,
             borderRadius: const BorderRadius.only(
@@ -35,33 +37,48 @@ class ListMenuWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 15,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+              SizedBox(
+                height: 140,
+                child: Stack(
                   children: [
-                    // 🔹 Bagian kanan: "Lihat Semua" + icon
-                    Row(
-                      children: [
-                        Text(
-                          'Lihat Semua',
-                          style: bodyTextStyle(context).copyWith(fontSize: 20),
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: menuItems.length,
+                      itemBuilder: (context, index) {
+                        final item = menuItems[index];
+                        return SizedBox(
+                          width: itemWidth,
+                          child: _buildMenuItem(context, item, custType),
+                        );
+                      },
+                    ),
+                    // Gradient kiri (gelap → transparan)
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: 40,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: blackFadeGradientHorizontal,
                         ),
-                        const SizedBox(width: 10),
-                        SvgPicture.asset(
-                          'assets/icons/settings-2.svg',
-                          width: 20,
-                          height: 20,
+                      ),
+                    ),
+                    // Gradient kanan (transparan → gelap)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: 48,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: blackFadeGradientHorizontalReversed,
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              _buildHorizontalMenu(context),
             ],
           ),
         ),
@@ -85,7 +102,7 @@ class ListMenuWidget extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: primaryBlackColor, // biar full page
+                    color: primaryBlackColor,
                     child: const RegisterClient(),
                   ),
                 ),
@@ -95,7 +112,7 @@ class ListMenuWidget extends StatelessWidget {
           transitionBuilder: (_, anim, __, child) {
             return SlideTransition(
               position: Tween(
-                begin: const Offset(0, 1), // animasi dari bawah
+                begin: const Offset(0, 1),
                 end: Offset.zero,
               ).animate(anim),
               child: child,
@@ -103,61 +120,64 @@ class ListMenuWidget extends StatelessWidget {
           },
         );
       },
-
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: primaryBadgeGradient,
+          gradient: registerButtonGradient,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(cardBorderRadius),
-            topRight: Radius.circular(cardBorderRadius),
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
         ),
-        child: IntrinsicHeight(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: hPadding,
+            horizontal: vPadding,
+          ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white.withOpacity(0.4),
-                      width: 1,
-                    ),
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(cardBorderRadius),
-                  ),
-                ),
-                clipBehavior: Clip.antiAlias,
+              // Content area
+              Expanded(
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.star, color: pYellow, size: 20),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Daftar Klien',
-                      style: headingStyle(context, fontSize: 20),
+                    SvgPicture.asset(
+                      'assets/icons/diamond.svg',
+                      width: 20,
+                      height: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Daftar Klien Sekarang!',
+                          style: bodyTextStyle(context, fontSize: 16),
+                        ),
+                        Text(
+                          'Langkah pertama untuk mengelola Polis',
+                          style: bodyTextStyle(context, fontSize: 14),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Mudah dan Cepat!', style: bodyTextStyle(context)),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        color: primaryLightColor,
-                        size: 20,
-                      ),
-                    ],
-                  ),
+              const SizedBox(width: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Mulai',
+                  style: bodyTextStyle(context, fontSize: 16),
                 ),
               ),
             ],
@@ -167,89 +187,38 @@ class ListMenuWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHorizontalMenu(BuildContext context) {
-    final menuItems = _getMenuItems();
-    final itemWidth = getItemWidth(context);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: SizedBox(
-        height: 145,
-        child: Stack(
-          children: [
-            ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                final item = menuItems[index];
-                return SizedBox(
-                  width: itemWidth,
-                  child: _buildMenuItem(context, item, custType),
-                );
-              },
-            ),
-            // Gradient kiri (gelap → transparan)
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 40,
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: blackFadeGradientHorizontal,
-                ),
-              ),
-            ),
-            // Gradient kanan (transparan → gelap)
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 48,
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: blackFadeGradientHorizontalReversed,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildMenuItem(BuildContext context, MenuItem item, String custType) {
     final isClient = custType == 'C';
     final isAlwaysActive =
-        item.title == "Cari Asuransi" || item.title == "Lapor \nKlaim";
+        item.title == "Cari Asuransi" || item.title == "Lapor Klaim";
 
-    // aktif kalau client, atau kalau menu khusus
     final isActive = isClient || isAlwaysActive;
 
     return GestureDetector(
-      onTap:
-          isActive
-              ? () {
-                final page = getMenuPage(item.title);
-                if (page != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => page),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    infoSnackBar('Fitur ${item.title} belum tersedia!'),
-                  );
-                }
-              }
-              : null,
+      onTap: () {
+        if (isActive) {
+          final page = getMenuPage(item.title);
+          if (page != null) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+          } else {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(infoSnackBar('Fitur ${item.title} belum tersedia!'));
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            infoSnackBar(
+              'Untuk akses fitur ${item.title}, Anda harus menjadi Klien JPS dahulu!',
+            ),
+          );
+        }
+      },
 
       child: Opacity(
-        opacity: isActive ? 1.0 : 0.4, // nonaktif jadi pudar
+        opacity: isActive ? 1.0 : 0.4,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 🔵 Icon Circle
             Container(
               width: 68,
               height: 68,
@@ -276,14 +245,13 @@ class ListMenuWidget extends StatelessWidget {
                             isActive
                                 ? null
                                 : const ColorFilter.mode(
-                                  Colors.grey,
+                                  hintGrey,
                                   BlendMode.srcIn,
                                 ),
                       ),
                     ),
                   ),
 
-                  // 🟠 Badge Populer
                   if (item.isPopular)
                     Positioned(
                       top: -10,
@@ -311,7 +279,6 @@ class ListMenuWidget extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // 📝 Title
             Expanded(
               child: Text(
                 item.title,
@@ -320,7 +287,7 @@ class ListMenuWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: bodyTextStyle(context).copyWith(
                   height: 1,
-                  color: isActive ? Colors.white : Colors.grey,
+                  color: isActive ? primaryLightColor : hintGrey,
                 ),
               ),
             ),
@@ -339,45 +306,43 @@ class ListMenuWidget extends StatelessWidget {
 
   List<MenuItem> _getMenuItems() {
     return [
-      MenuItem(
-        title: 'Cari Asuransi',
-        iconPath: 'assets/icons/menu_cari_asuransi.svg',
-        isPopular: true,
-      ),
-      MenuItem(
-        title: 'Lapor Klaim',
-        iconPath: 'assets/icons/menu_lapor_klaim.svg',
-      ),
-      MenuItem(title: 'Aset', iconPath: 'assets/icons/menu_aset.svg'),
+      MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
+      MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg'),
+      MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
-      MenuItem(
-        title: 'Tagihan Pembayaran',
-        iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',
-      ),
+      MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
+
+  // List<MenuItem> _getMenuItems() {
+  //   return [
+  //     MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
+  //     MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
+  //     MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
+  //     MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
+  //     MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
+  //     MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
+  //   ];
+  // }
 
   Widget? getMenuPage(String title) {
     switch (title) {
       case 'Cari Asuransi':
-        return CariAsuransiPage(); // Ganti ke page lo
+        return CariAsuransiWidget.page();
       case 'Lapor \nKlaim':
         return KlaimMainPage();
       //   return LaporKlaimPage();
-      case 'Aset':
-        return AssetManagementPage();
       // case 'Polis':
       //   return PolisListPage();
-      // case 'Beli Polis':
-      //   return BeliPolisPage();
+      case 'Beli Polis':
+        return BeliPolisPage();
       case 'Klaim':
         return KlaimMainPage();
       // case 'Tagihan Pembayaran':
       //   return TagihanPembayaranPage();
       default:
-        return null; // atau return Placeholder(), terserah
+        return null;
     }
   }
 }

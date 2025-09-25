@@ -432,21 +432,20 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
 
   Widget _buildOtpField(int i) {
     return Container(
-      width: 45,
-      height: 56,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: Colors.grey[800],
-        borderRadius: BorderRadius.circular(12),
+        color: pGrey,
+        borderRadius: BorderRadius.circular(checkboxBorderRadius),
         border: Border.all(
-          color: _focusNodes[i].hasFocus ? primaryColor : Colors.grey[700]!,
-          width: 2,
+          color: _focusNodes[i].hasFocus ? primaryColor : sGrey,
         ),
       ),
       child: TextField(
         controller: _otpControllers[i],
         focusNode: _focusNodes[i],
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
             fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         keyboardType: TextInputType.number,
         maxLength: 1,

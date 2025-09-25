@@ -365,7 +365,7 @@ class _AppButtonState extends State<AppButton>
 
   TextStyle _getTextStyle() {
     return widget.textStyle ??
-        headingStyle(context, fontSize: 22);
+        headingStyle(context, fontSize: 18);
   }
 
   ButtonStyle _getButtonStyle() {
@@ -383,7 +383,7 @@ class _AppButtonState extends State<AppButton>
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         elevation: elevation,
-        padding: widget.padding ?? EdgeInsets.symmetric(vertical: hPadding),
+        padding: widget.padding ?? EdgeInsets.symmetric(vertical: 5),
       );
     }
 
@@ -395,7 +395,7 @@ class _AppButtonState extends State<AppButton>
         side: widget.borderSide ?? BorderSide.none,
       ),
       elevation: elevation,
-      padding: widget.padding ?? EdgeInsets.symmetric(vertical: hPadding),
+      padding: widget.padding ?? EdgeInsets.symmetric(vertical: 5),
     );
   }
 

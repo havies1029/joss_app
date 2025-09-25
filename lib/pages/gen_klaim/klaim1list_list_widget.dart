@@ -111,7 +111,7 @@ class Klaim1ListListWidgetState extends State<Klaim1ListListWidget> {
 											kejadianTgl: state.items[index].kejadianTgl,
 											klaimAmount: state.items[index].klaimAmount,
 											klaim1Id: state.items[index].klaim1Id,
-											rMATAUANGNAMA: state.items[index].rMATAUANGNAMA,
+											rmatauangNama: state.items[index].rmatauangNama,
 											rugiDesc: state.items[index].rugiDesc,
 											statusNama: state.items[index].statusNama,
 										),

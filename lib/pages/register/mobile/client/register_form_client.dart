@@ -100,13 +100,17 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       },
     );
   }
-  _buildTeleponField() {
+  Widget _buildTeleponField() {
     return appTextField(
       label: "Telepon",
       hint: "8123456789",
       controller: _teleponController,
       keyboardType: TextInputType.number,
       focusNode: _teleponFocusNode,
+      prefix: Text(
+        "62 | ",
+        style: inputTextStyle(context, color: primaryLightColor),
+      ),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return kPhoneNumberNullError;
@@ -118,6 +122,8 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       },
     );
   }
+
+
 
 
   Widget _buildPasswordField() {

@@ -14,7 +14,6 @@ import '../../common/constants.dart';
 import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
 import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
-import '../cari_asuransi/mobile/cari_asuransi_menu.dart';
 import '../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../heropage/mobile/heropage.dart';
 import '../qontak/mobile/customer_service_page.dart';
@@ -37,7 +36,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
     super.initState();
     pages = [
       const HeroPage(),
-      const CariAsuransiMenu(),
+      const CariAsuransiWidget.menu(),
       const LiterasiPage(),
       const SettingsPage(),
     ];

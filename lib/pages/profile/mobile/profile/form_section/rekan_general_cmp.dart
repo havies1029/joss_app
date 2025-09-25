@@ -54,182 +54,151 @@ class MRekanGeneralCmpCrudFormPageFormState
 
     SizeConfig().init(context);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor,
-      body: SafeArea(
-        child: BaseBackgroundSidePage(
-          title: 'Informasi Klien',
-          child: Column(
-            children: [
-              SizedBox(height: getProportionateScreenHeight(100)),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: secondaryBlackColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                      border: Border(top: BorderSide(color: primaryColor)),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: BlocConsumer<
-                        MRekanGeneralCmpCrudBloc,
-                        MRekanGeneralCmpCrudState
-                      >(
-                        listener: (context, state) {
-                          if (state.isLoaded) {
-                            if (state.record != null) {
-                              fieldRekanNamaController.text =
-                                  state.record?.rekanNama ?? "";
-                            }
-                            fieldComboMBentukCst = state.comboMBentukCst;
-                            fieldComboMBidang = state.comboMBidang;
-                          }
-                        },
-                        builder: (context, state) {
-                          return Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return BaseBackgroundSidePage(
+      title: 'Informasi Klien',
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+          decoration: BoxDecoration(color: secondaryBlackColor),
+          child: BlocConsumer<
+            MRekanGeneralCmpCrudBloc,
+            MRekanGeneralCmpCrudState
+          >(
+            listener: (context, state) {
+              if (state.isLoaded) {
+                if (state.record != null) {
+                  fieldRekanNamaController.text =
+                      state.record?.rekanNama ?? "";
+
+                  if (state.record!.rekanNama!.isNotEmpty) {
+                    fieldRekanNamaController.text = state.record!.rekanNama!;
+                  } else {
+                    final profile = context
+                        .read<UserProfileCubit>()
+                        .state;
+                    if (fieldRekanNamaController.text.isEmpty &&
+                        (profile.nama?.isNotEmpty ?? false)) {
+                      fieldRekanNamaController.text = profile.nama!;
+                    }
+                  }
+                }
+                fieldComboMBentukCst = state.comboMBentukCst;
+                fieldComboMBidang = state.comboMBidang;
+              }
+            },
+            builder: (context, state) {
+              return Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // --- Avatar ---
+                    BlocBuilder<UserProfileCubit, UserProfileState>(
+                      buildWhen:
+                          (prev, curr) =>
+                              (prev.fotoBytes?.lengthInBytes ?? -1) !=
+                              (curr.fotoBytes?.lengthInBytes ?? -1),
+                      builder: (context, state) {
+                        final imageBytes = state.fotoBytes;
+                        return Center(
+                          child: InkResponse(
+                            onTap: () => ImageUploader.pickAndUpload(context),
+                            containedInkWell: true,
+                            customBorder: const CircleBorder(),
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
                               children: [
-                                // --- Avatar ---
-                                BlocBuilder<UserProfileCubit, UserProfileState>(
-                                  buildWhen:
-                                      (prev, curr) =>
-                                          (prev.fotoBytes?.lengthInBytes ??
-                                              -1) !=
-                                          (curr.fotoBytes?.lengthInBytes ?? -1),
-                                  builder: (context, state) {
-                                    final imageBytes = state.fotoBytes;
-                                    return Center(
-                                      child: InkResponse(
-                                        onTap:
-                                            () => ImageUploader.pickAndUpload(
-                                              context,
-                                            ),
-                                        containedInkWell: true,
-                                        customBorder: const CircleBorder(),
-                                        child: Stack(
-                                          alignment: Alignment.bottomRight,
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 50,
-                                              backgroundColor:
-                                                  secondaryBlackColor,
-                                              backgroundImage:
-                                                  (imageBytes != null &&
-                                                          imageBytes.isNotEmpty)
-                                                      ? MemoryImage(imageBytes)
-                                                      : null,
-                                              child:
-                                                  (imageBytes == null ||
-                                                          imageBytes.isEmpty)
-                                                      ? const Icon(
-                                                        Icons.person,
-                                                        color: Colors.white,
-                                                        size: 48,
-                                                      )
-                                                      : null,
-                                            ),
-                                            Positioned(
-                                              bottom: 0,
-                                              right: 0,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(
-                                                  2,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: sGrey,
-                                                  ),
-                                                  color: pGrey,
-                                                ),
-                                                child: CircleAvatar(
-                                                  radius: 16,
-                                                  backgroundColor: pGrey,
-                                                  child: SvgPicture.asset(
-                                                    "assets/icons/camera.svg",
-                                                    width: 24,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: secondaryBlackColor,
+                                  backgroundImage:
+                                      (imageBytes != null &&
+                                              imageBytes.isNotEmpty)
+                                          ? MemoryImage(imageBytes)
+                                          : null,
+                                  child:
+                                      (imageBytes == null || imageBytes.isEmpty)
+                                          ? const Icon(
+                                            Icons.person,
+                                            color: Colors.white,
+                                            size: 48,
+                                          )
+                                          : null,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: sGrey),
+                                      color: pGrey,
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: pGrey,
+                                      child: SvgPicture.asset(
+                                        "assets/icons/camera.svg",
+                                        width: 24,
                                       ),
-                                    );
-                                  },
-                                ),
-
-                                const SizedBox(height: 24),
-
-                                // --- Heading ---
-                                Text(
-                                  "Informasi Perusahaan",
-                                  style: headingStyle(context, fontSize: 22),
-                                ),
-                                Text(
-                                  "Lengkapi identitas dasar Anda dengan benar.",
-                                  style: bodyTextStyle(
-                                    context,
-                                    fontSize: 16,
-                                  ).copyWith(color: hintGrey),
-                                ),
-
-                                const SizedBox(height: 10),
-
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 15,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: pGrey,
-                                    border: Border.all(color: sGrey),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(cardBorderRadius),
                                     ),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      buildFieldJenisKlien(),
-                                      const SizedBox(height: 16),
-                                      buildFieldNamaPerusahaan(),
-                                      const SizedBox(height: 16),
-                                      buildFieldBentukPerusahaan(),
-                                      const SizedBox(height: 16),
-                                      buildFieldBidangUsaha(),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 30),
-                                AppButton.primary(
-                                  text: "Submit",
-                                  onPressed: onSaveForm,
                                 ),
                               ],
                             ),
-                          );
-                        },
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // --- Heading ---
+                    Text(
+                      "Informasi Perusahaan",
+                      style: headingStyle(context, fontSize: 22),
+                    ),
+                    Text(
+                      "Lengkapi identitas dasar Anda dengan benar.",
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: 16,
+                      ).copyWith(color: hintGrey),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 15,
+                      ),
+                      decoration: BoxDecoration(
+                        color: pGrey,
+                        border: Border.all(color: sGrey),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(cardBorderRadius),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          buildFieldJenisKlien(),
+                          const SizedBox(height: 16),
+                          buildFieldNamaPerusahaan(),
+                          const SizedBox(height: 16),
+                          buildFieldBentukPerusahaan(),
+                          const SizedBox(height: 16),
+                          buildFieldBidangUsaha(),
+                        ],
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 30),
+                    AppButton.primary(text: "Submit", onPressed: onSaveForm),
+                  ],
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
@@ -238,6 +207,13 @@ class MRekanGeneralCmpCrudFormPageFormState
 
   void loadData() {
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+
+    final profile = context.read<UserProfileCubit>().state;
+
+    if (fieldRekanNamaController.text.isEmpty && (profile.nama?.isNotEmpty ?? false)) {
+      fieldRekanNamaController.text = profile.nama!;
+    }
+
   }
 
   Widget buildFieldBentukPerusahaan() {
@@ -318,6 +294,7 @@ class MRekanGeneralCmpCrudFormPageFormState
       },
     );
   }
+
   Widget buildFieldJenisKlien() {
     return appTextField(
       label: "Badan Usaha",
@@ -325,6 +302,7 @@ class MRekanGeneralCmpCrudFormPageFormState
       enabled: false,
     );
   }
+
   void onSaveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();

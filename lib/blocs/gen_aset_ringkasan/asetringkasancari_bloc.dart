@@ -31,7 +31,7 @@ class AsetRingkasanCariBloc
     AsetRingkasanCariRepository repo = AsetRingkasanCariRepository();
     if (state.status == ListStatus.initial) {
       List<AsetRingkasanCariModel> items =
-          await repo.getAsetRingkasanCari(state.statusId, state.searchText, 0);
+      await repo.getAsetRingkasanCari(state.statusId, state.searchText, 0);
       return emit(state.copyWith(
           items: items,
           hasReachedMax: false,
@@ -39,7 +39,7 @@ class AsetRingkasanCariBloc
           hal: 1));
     }
     List<AsetRingkasanCariModel> items =
-        await repo.getAsetRingkasanCari(state.statusId, state.searchText, state.hal);
+    await repo.getAsetRingkasanCari(state.statusId, state.searchText, state.hal);
     if (items.isEmpty) {
       return emit(state.copyWith(hasReachedMax: true));
     } else {
@@ -48,9 +48,9 @@ class AsetRingkasanCariBloc
 
       final result = asetRingkasanCari
           .whereWithIndex((e, index) =>
-              asetRingkasanCari.indexWhere(
-                  (e2) => e2.asetRingkasanId == e.asetRingkasanId) ==
-              index)
+      asetRingkasanCari.indexWhere(
+              (e2) => e2.asetRingkasanId == e.asetRingkasanId) ==
+          index)
           .toList();
 
       return emit(state.copyWith(

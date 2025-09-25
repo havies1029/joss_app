@@ -53,198 +53,178 @@ class MRekanGeneralIdvCrudFormPageFormState
     );
     SizeConfig().init(context);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor,
-      body: SafeArea(
-        child: BaseBackgroundSidePage(
-          title: 'Informasi Klien',
-          child: Column(
-            children: [
-              SizedBox(height: getProportionateScreenHeight(100)),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: secondaryBlackColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                      border: const Border(
-                        top: BorderSide(color: primaryColor),
-                      ),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: BlocConsumer<
-                        MRekanGeneralIdvCrudBloc,
-                        MRekanGeneralIdvCrudState
-                      >(
-                        listener: (context, state) {
-                          if (state.isLoaded) {
-                            if (state.record != null) {
-                              fieldRekanNamaController.text =
-                                  state.record!.rekanNama;
-                            }
-                            fieldComboMPekerjaan = state.comboMPekerjaan;
-                            fieldComboMJnskel = state.comboMJnskel;
-                          }
-                          if (state.isSaved && !state.hasFailure) {
-                            context.read<MRekan1CrudBloc>().add(
-                              MRekan1CrudLihatEvent(),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              successSnackBar("Data berhasil disimpan."),
-                            );
-                          }
-                        },
-                        builder: (context, state) {
-                          return Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                BlocBuilder<UserProfileCubit, UserProfileState>(
-                                  buildWhen:
-                                      (prev, curr) =>
-                                          (prev.fotoBytes?.lengthInBytes ??
-                                              -1) !=
-                                          (curr.fotoBytes?.lengthInBytes ?? -1),
-                                  builder: (context, state) {
-                                    final imageBytes = state.fotoBytes;
-                                    return Center(
-                                      child: InkResponse(
-                                        onTap:
-                                            () => ImageUploader.pickAndUpload(
-                                              context,
-                                            ),
-                                        containedInkWell: true,
-                                        customBorder: const CircleBorder(),
-                                        child: Stack(
-                                          alignment: Alignment.bottomRight,
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 50,
-                                              backgroundColor:
-                                                  secondaryBlackColor,
-                                              backgroundImage:
-                                                  (imageBytes != null &&
-                                                          imageBytes.isNotEmpty)
-                                                      ? MemoryImage(imageBytes)
-                                                      : null,
-                                              child:
-                                                  (imageBytes == null ||
-                                                          imageBytes.isEmpty)
-                                                      ? const Icon(
-                                                        Icons.person,
-                                                        color: Colors.white,
-                                                        size: 48,
-                                                      )
-                                                      : null,
-                                            ),
-                                            Positioned(
-                                              bottom: 0,
-                                              right: 0,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(
-                                                  2,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: sGrey,
-                                                  ),
-                                                  color: pGrey,
-                                                ),
-                                                child: CircleAvatar(
-                                                  radius: 16,
-                                                  backgroundColor: pGrey,
-                                                  child: SvgPicture.asset(
-                                                    "assets/icons/camera.svg",
-                                                    width: 24,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+    return BaseBackgroundSidePage(
+      title: 'Informasi Klien',
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(color: secondaryBlackColor),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+              child: BlocConsumer<
+                MRekanGeneralIdvCrudBloc,
+                MRekanGeneralIdvCrudState
+              >(
+                listener: (context, state) {
+                  if (state.isLoaded) {
+                    if (state.record != null) {
+                      fieldRekanNamaController.text =
+                          state.record!.rekanNama;
+
+                      if (state.record!.rekanNama.isNotEmpty) {
+                        fieldRekanNamaController.text = state.record!.rekanNama;
+                      } else {
+                        final profile = context.read<UserProfileCubit>().state;
+                        if (fieldRekanNamaController.text.isEmpty && (profile.nama?.isNotEmpty ?? false)) {
+                          fieldRekanNamaController.text = profile.nama!;
+                        }
+                      }
+                    }
+                    fieldComboMPekerjaan = state.comboMPekerjaan;
+                    fieldComboMJnskel = state.comboMJnskel;
+                  }
+                  if (state.isSaved && !state.hasFailure) {
+                    context.read<MRekan1CrudBloc>().add(
+                      MRekan1CrudLihatEvent(),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      successSnackBar("Data berhasil disimpan."),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  return Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        BlocBuilder<UserProfileCubit, UserProfileState>(
+                          buildWhen:
+                              (prev, curr) =>
+                                  (prev.fotoBytes?.lengthInBytes ?? -1) !=
+                                  (curr.fotoBytes?.lengthInBytes ?? -1),
+                          builder: (context, state) {
+                            final imageBytes = state.fotoBytes;
+                            return Center(
+                              child: InkResponse(
+                                onTap:
+                                    () => ImageUploader.pickAndUpload(context),
+                                containedInkWell: true,
+                                customBorder: const CircleBorder(),
+                                child: Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 50,
+                                      backgroundColor: secondaryBlackColor,
+                                      backgroundImage:
+                                          (imageBytes != null &&
+                                                  imageBytes.isNotEmpty)
+                                              ? MemoryImage(imageBytes)
+                                              : null,
+                                      child:
+                                          (imageBytes == null ||
+                                                  imageBytes.isEmpty)
+                                              ? const Icon(
+                                                Icons.person,
+                                                color: Colors.white,
+                                                size: 48,
+                                              )
+                                              : null,
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: sGrey),
+                                          color: pGrey,
+                                        ),
+                                        child: CircleAvatar(
+                                          radius: 16,
+                                          backgroundColor: pGrey,
+                                          child: SvgPicture.asset(
+                                            "assets/icons/camera.svg",
+                                            width: 24,
+                                          ),
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 10),
-                                // Heading + subheading
-                                Text(
-                                  "Informasi Klien",
-                                  textAlign: TextAlign.start,
-                                  style: headingStyle(context, fontSize: 22),
-                                ),
-                                Text(
-                                  "Lengkapi identitas dasar Anda dengan benar.",
-                                  style: bodyTextStyle(
-                                    context,
-                                    fontSize: 16,
-                                  ).copyWith(color: hintGrey),
-                                ),
-                                const SizedBox(height: 10),
-
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 15,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: pGrey,
-                                    border: Border.all(color: sGrey),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(cardBorderRadius),
                                     ),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      buildFieldRekanNama(),
-                                      const SizedBox(height: 16),
-                                      buildFieldJenisKlien(),
-                                      const SizedBox(height: 16),
-                                      buildFieldPekerjaan(),
-                                      const SizedBox(height: 16),
-                                      buildFieldJenisKelamin(),
-                                    ],
-                                  ),
+                                  ],
                                 ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        // Heading + subheading
+                        Text(
+                          "Informasi Klien",
+                          textAlign: TextAlign.start,
+                          style: headingStyle(context, fontSize: 22),
+                        ),
+                        Text(
+                          "Lengkapi identitas dasar Anda dengan benar.",
+                          style: bodyTextStyle(
+                            context,
+                            fontSize: 16,
+                          ).copyWith(color: hintGrey),
+                        ),
+                        const SizedBox(height: 10),
 
-                                const SizedBox(height: 30),
-                                AppButton.primary(
-                                  text: "Submit",
-                                  onPressed: onSaveForm,
-                                ),
-                              ],
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 15,
+                          ),
+                          decoration: BoxDecoration(
+                            color: pGrey,
+                            border: Border.all(color: sGrey),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(cardBorderRadius),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                          child: Column(
+                            children: [
+                              buildFieldRekanNama(),
+                              const SizedBox(height: 16),
+                              buildFieldJenisKlien(),
+                              const SizedBox(height: 16),
+                              buildFieldPekerjaan(),
+                              const SizedBox(height: 16),
+                              buildFieldJenisKelamin(),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+                        AppButton.primary(
+                          text: "Submit",
+                          onPressed: onSaveForm,
+                        ),
+                      ],
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   void loadData() {
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+
+    final profile = context.read<UserProfileCubit>().state;
+
+    if (fieldRekanNamaController.text.isEmpty && (profile.nama?.isNotEmpty ?? false)) {
+      fieldRekanNamaController.text = profile.nama!;
+    }
   }
 
   Widget buildFieldPekerjaan() {

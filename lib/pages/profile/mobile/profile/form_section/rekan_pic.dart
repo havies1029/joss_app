@@ -104,66 +104,6 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Avatar
-              BlocBuilder<UserProfileCubit, UserProfileState>(
-                buildWhen: (prev, curr) =>
-                (prev.fotoBytes?.lengthInBytes ?? -1) !=
-                    (curr.fotoBytes?.lengthInBytes ?? -1),
-                builder: (context, state) {
-                  final imageBytes = state.fotoBytes;
-                  return Center(
-                    child: InkResponse(
-                      onTap: () => ImageUploader.pickAndUpload(context),
-                      containedInkWell: true,
-                      customBorder: const CircleBorder(),
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: secondaryBlackColor,
-                            backgroundImage: (imageBytes != null &&
-                                imageBytes.isNotEmpty)
-                                ? MemoryImage(imageBytes)
-                                : null,
-                            child: (imageBytes == null || imageBytes.isEmpty)
-                                ? const Icon(Icons.person,
-                                color: Colors.white, size: 48)
-                                : null,
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(
-                                2,
-                              ),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: sGrey,
-                                ),
-                                color: pGrey,
-                              ),
-                              child: CircleAvatar(
-                                radius: 16,
-                                backgroundColor: pGrey,
-                                child: SvgPicture.asset(
-                                  "assets/icons/camera.svg",
-                                  width: 24,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 24),
-
               Text("Informasi PIC",
                 style: headingStyle(context, fontSize: 22),
               ),
@@ -253,32 +193,18 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
           title: 'Informasi PIC',
           child: Column(
             children: [
-              SizedBox(height: getProportionateScreenHeight(100)),
               Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: secondaryBlackColor,
                   ),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: secondaryBlackColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                      border: Border(
-                        top: BorderSide(color: primaryColor, width: 4.0),
-                      ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 20,
                     ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: content,
-                    ),
+                    child: content,
                   ),
                 ),
               ),
@@ -496,6 +422,7 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
       isDefault: c.isDefault,
     );
     crudBloc.add(MRekanPicCrudTambahEvent(record: record));
+    Navigator.pop(context);
   }
 
   void _clearNewRow() {
