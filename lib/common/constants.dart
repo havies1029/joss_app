@@ -1,15 +1,12 @@
 library constants;
 
-import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 part '../widgets/apptheme/textfield.dart';
@@ -17,6 +14,7 @@ part '../widgets/apptheme/button.dart';
 part '../widgets/apptheme/snackbar.dart';
 part '../widgets/apptheme/textstyles.dart';
 part '../widgets/apptheme/dropdown.dart';
+part '../widgets/apptheme/checkbox_widget.dart';
 
 const List<String> scopes = <String>[
   'email',

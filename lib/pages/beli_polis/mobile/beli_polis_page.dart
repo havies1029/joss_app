@@ -7,8 +7,6 @@ import '../../../common/constants.dart';
 import '../../../widgets/section/polis/simul_polis/simul_mv/simul_mv_page.dart';
 import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart';
 import '../../base/base_background_firstpage.dart';
-import '../../gen_sppamv/sppamvlist_main.dart';
-import '../../gen_sppapar/sppaparlist_list.dart';
 import '../../polis/simul/simul_polis_mv.dart';
 import '../../polis/simul/simul_polis_par.dart';
 

@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/simulmv/simulmvcrud_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
-import 'package:joss_app/widgets/checkbox_widget.dart';
 import 'package:quick_input_formatters/quick_input_formatters.dart';
 
 class SimulmvFormOpsiPage extends StatefulWidget {

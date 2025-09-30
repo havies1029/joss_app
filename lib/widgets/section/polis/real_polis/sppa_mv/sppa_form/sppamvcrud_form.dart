@@ -20,7 +20,6 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
 import 'package:string_validator/string_validator.dart';
-import 'package:joss_app/widgets/checkbox_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../../../blocs/local_prefs/simulasi_mv_local_cubit.dart';

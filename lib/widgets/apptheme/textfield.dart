@@ -5,7 +5,7 @@ class appTextField extends StatelessWidget {
   final String? hint;
   final TextEditingController controller;
   final Widget? suffixIcon;
-  final Widget? prefix; // 👈 tambahan opsional
+  final Widget? prefix;
   final bool obscureText;
   final bool? enabled;
   final int? maxLines;
@@ -17,6 +17,7 @@ class appTextField extends StatelessWidget {
   final ValueChanged<String>? onFieldSubmitted;
   final EdgeInsets? padding;
   final double? height;
+  final ValueChanged<String>? onChanged;
   final TextInputAction? textInputAction;
 
   const appTextField({
@@ -25,8 +26,9 @@ class appTextField extends StatelessWidget {
     this.hint,
     required this.controller,
     this.suffixIcon,
-    this.prefix, // 👈 inisialisasi prefix opsional
+    this.prefix,
     this.obscureText = false,
+    this.onChanged,
     this.enabled,
     this.maxLines,
     this.keyboardType,
@@ -37,8 +39,41 @@ class appTextField extends StatelessWidget {
     this.onFieldSubmitted,
     this.padding,
     this.height,
-    this.textInputAction
+    this.textInputAction,
   });
+
+  List<TextInputFormatter>? _getDefaultFormatters() {
+    if (inputFormatters != null) return inputFormatters;
+
+    switch (keyboardType) {
+      case TextInputType.number:
+      case TextInputType.phone:
+        return [FilteringTextInputFormatter.digitsOnly];
+      case TextInputType.emailAddress:
+        return [
+          FilteringTextInputFormatter.allow(
+            RegExp(r'[a-zA-Z0-9@._\-+]'),
+          ),
+        ];
+      case TextInputType.url:
+        return [
+          FilteringTextInputFormatter.allow(
+            RegExp(r'[a-zA-Z0-9:/?&=._\-#]'),
+          ),
+        ];
+      case TextInputType.visiblePassword:
+        return null;
+      case TextInputType.name:
+        return [
+          FilteringTextInputFormatter.allow(
+            RegExp(r"[a-zA-ZÀ-ÿ'\- ]"),
+          ),
+        ];
+      case TextInputType.text:
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +84,9 @@ class appTextField extends StatelessWidget {
       enabled: enabled,
       maxLines: maxLines ?? 1,
       keyboardType: keyboardType,
+      inputFormatters: _getDefaultFormatters(), // 🔹 otomatis pilih formatter
       onTap: onTap,
+      onChanged: onChanged,
       textInputAction: textInputAction,
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
@@ -82,21 +119,18 @@ class appTextField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: primaryColor),
         ),
-        prefix: prefix,        // 👈 pakai prefix bukan prefixIcon
-        suffixIcon: suffixIcon,
+        prefix: prefix,
+        suffix: suffixIcon,
       ),
-
       validator: validator,
     );
 
     if (height != null) {
       textField = SizedBox(height: height, child: textField);
     }
-
     if (padding != null) {
       return Padding(padding: padding!, child: textField);
     }
-
     return textField;
   }
 }
@@ -150,8 +184,8 @@ class _AppDateFieldState extends State<AppDateField> {
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onPrimary: primaryLightColor,
+              onSurface: primaryBlackColor,
             ),
           ),
           child: child!,

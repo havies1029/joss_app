@@ -2,15 +2,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
 
-import '../../../settingpage/mobile/settingpage.dart';
-
 class HeroCardWidget extends StatefulWidget {
   final String userName;
   final Uint8List? imageBytes;
   final String? userImage;
   final String premiumAmount;
   final int polisCount;
-  final int asetCount;
+  final String asetCount;
   final VoidCallback? onDetailTap;
   final String custType;
 
@@ -18,7 +16,7 @@ class HeroCardWidget extends StatefulWidget {
   static const String _placeholder = 'assets/images/profile_placeholder.jpg';
 
   const HeroCardWidget({
-    Key? key,
+    super.key,
     required this.userName,
     this.imageBytes,
     this.userImage,
@@ -27,7 +25,7 @@ class HeroCardWidget extends StatefulWidget {
     required this.asetCount,
     this.onDetailTap,
     required this.custType,
-  }) : super(key: key);
+  });
 
   @override
   State<HeroCardWidget> createState() => _HeroCardWidgetState();
@@ -58,22 +56,10 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
       margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(cardBorderRadius * 2),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            primaryColor,
-            primaryColor.withOpacity(0.6),
-            primaryColor.withOpacity(0.4),
-            primaryColor.withOpacity(0.2),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.5, 0.75, 0.9, 1.0],
-        ),
+        gradient: primaryBlackGradient
       ),
       child: Container(
-        margin: const EdgeInsets.all(1.5),
-        padding: const EdgeInsets.all(hPadding + 6),
+        margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: secondaryBlackColor,
           borderRadius: BorderRadius.circular(cardBorderRadius * 2 - 1.5),
@@ -81,22 +67,24 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 16),
             _buildUserHeader(context),
             const SizedBox(height: 16),
             SizedBox(
-              height: 120, // kasih tinggi tetap supaya PageView punya constraint
+              height: 97,
               child: PageView(
                 controller: _cardPageController,
                 physics: const BouncingScrollPhysics(),
                 onPageChanged: (i) => setState(() => _cardIndex = i),
                 children: [
-                  _buildInfoCardPremi(context), // card 1 (punyamu yang premi)
-                  _buildInfoCardPolis(context), // card 2 (ringkasan polis + tipe)
+                  _buildInfoCardPremi(context),
+                  _buildInfoCardPolis(context),
                 ],
               ),
             ),
             const SizedBox(height: 8),
             _buildDotsIndicator(count: 2, index:_cardIndex),
+            const SizedBox(height: 12)
           ],
         ),
       ),
@@ -125,44 +113,47 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
       );
     }
 
-    return Row(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          child: ClipOval(
-            child:
-                hasBytes
-                    ? Image.memory(
-                      widget.imageBytes!,
-                      fit: BoxFit.cover,
-                      gaplessPlayback: true,
-                      filterQuality: FilterQuality.medium,
-                      errorBuilder: (_, __, ___) => _avatarFallback(),
-                    )
-                    : buildFromString(src),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: hPadding + 6),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 46,
+            height: 46,
+            child: ClipOval(
+              child:
+              hasBytes
+                  ? Image.memory(
+                widget.imageBytes!,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                filterQuality: FilterQuality.medium,
+                errorBuilder: (_, __, ___) => _avatarFallback(),
+              )
+                  : buildFromString(src),
+            ),
           ),
-        ),
-        const SizedBox(width: 16),
+          const SizedBox(width: 16),
 
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Halo, ${widget.userName}',
-                style: headingStyle(context, fontSize: 22),
-              ),
-              Text(
-                widget.custType == 'C'
-                    ? 'Klien JPS'
-                    : 'Nasabah Biasa',
-                style: bodyTextStyle(context),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Halo, ${widget.userName}',
+                  style: headingStyle(context, fontSize: 22),
+                ),
+                Text(
+                  widget.custType == 'C'
+                      ? 'Klien JPS'
+                      : 'Nasabah Biasa',
+                  style: bodyTextStyle(context),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      )
     );
   }
 
@@ -174,6 +165,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
   Widget _buildInfoCardPremi(BuildContext context) {
     return IntrinsicHeight(
       child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: pGrey,
           borderRadius: BorderRadius.circular(cardBorderRadius * 1.6),
@@ -183,20 +175,20 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              flex: 2,
+              flex: 4,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  vertical: vPadding - 12,
+                  vertical: 8,
                   horizontal: hPadding + 6,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Premi',
-                      style: bodyTextStyle(context).copyWith(fontSize: 16),
+                      style: bodyTextStyle(context, fontSize: 16),
                     ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -240,11 +232,10 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
                               transitionBuilder: (child, animation) {
-                                // bikin animasi scale + fade
                                 return ScaleTransition(
                                   scale: CurvedAnimation(
                                     parent: animation,
-                                    curve: Curves.easeOutBack, // efek "jauh → deket" smooth
+                                    curve: Curves.easeOutBack,
                                   ),
                                   child: FadeTransition(
                                     opacity: animation,
@@ -299,7 +290,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                   Text(
                     'Polis',
                     textAlign: TextAlign.center,
-                    style: bodyTextStyle(context),
+                    style: bodyTextStyle(context, fontSize: 16),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -317,56 +308,32 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
   }
 
   Widget _buildInfoCardPolis(BuildContext context) {
-    return IntrinsicHeight(
-      child: Container(
-        decoration: BoxDecoration(
-          color: pGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius * 1.6),
-          border: Border.all(color: sGrey),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: pGrey,
+        borderRadius: BorderRadius.circular(cardBorderRadius * 1.6),
+        border: Border.all(color: sGrey),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: vPadding - 12,
+          horizontal: hPadding + 6,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: vPadding - 12,
-                  horizontal: hPadding + 6,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Aset',
-                      style: bodyTextStyle(context).copyWith(fontSize: 16),
-                    ),
-                    Text(
-                      '${widget.asetCount}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: headingStyle(context),
-                    ),
-                    GestureDetector(
-                      onTap: widget.onDetailTap,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('Buka Detail', style: bodyTextStyle(context)),
-                          const SizedBox(width: 2),
-                          const Icon(
-                            Icons.keyboard_arrow_right,
-                            color: primaryColor,
-                            size: 11.33,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            Text(
+              'TSI',
+              style: bodyTextStyle(context, fontSize: 16),
+            ),
+            Text(
+              'Rp ${widget.asetCount}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: headingStyle(context),
             ),
           ],
         ),
@@ -382,8 +349,8 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           margin: const EdgeInsets.symmetric(horizontal: 3),
-          height: 8,
-          width: active ? 18 : 8, // aktif lebih panjang biar jelas
+          height: active ? 8 : 6,
+          width: active ? 8 : 6,
           decoration: BoxDecoration(
             color: active ? primaryColor : sGrey,
             borderRadius: BorderRadius.circular(999),
