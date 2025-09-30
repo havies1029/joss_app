@@ -177,6 +177,15 @@ flutter:
     - assets/icons/calender.svg
     - assets/icons/find_insurance_icon.svg
     - assets/icons/group_icon.svg
+    - assets/icons/claim-icon-property.svg
+    - assets/icons/claim-icon-car.svg
+    - assets/icons/home_icon.svg
+    - assets/icons/delete_icon_polis.svg
+    - assets/icons/edit_icon_polis.svg
+    - assets/icons/tambah_polis_icon_polis.svg
+    - assets/icons/unduh_data_polis.svg
+    - assets/icons/share_data_polis.svg
+    - assets/icons/others_icon_polis.svg
 
   fonts:
     - family: Delm-Regular

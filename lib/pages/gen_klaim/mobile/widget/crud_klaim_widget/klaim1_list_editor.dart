@@ -15,8 +15,8 @@ import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:joss_app/widgets/combobox/combomstsclaim_widget.dart';
 import 'package:joss_app/blocs/gen_klaim/klaim1list_bloc.dart';
 
-import '../../../../repositories/combobox/combomstsclaim_repository.dart';
-import '../../../../repositories/combobox/combormatauang_repository.dart';
+import '../../../../../repositories/combobox/combomstsclaim_repository.dart';
+import '../../../../../repositories/combobox/combormatauang_repository.dart';
 
 class Klaim1ListEditor extends StatefulWidget {
   final Map<String, bool> isSavingById;

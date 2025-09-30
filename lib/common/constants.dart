@@ -182,3 +182,16 @@ const LinearGradient blackFadeGradientHorizontalReversed = LinearGradient(
   end: Alignment.centerRight,
   colors: [Color(0x00181818), Color(0xFF181818)],
 );
+
+const LinearGradient orangeToBlackGradient = LinearGradient(
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+  colors: [
+    Color(0xFFEF7A28), // oranye
+    Color(0xFF181818), // hitam
+  ],
+  stops: [
+    0.0,  // oranye mulai
+    0.9,  // hitam lebih cepat "menguasai" (80% posisi sudah hitam)
+  ],
+);

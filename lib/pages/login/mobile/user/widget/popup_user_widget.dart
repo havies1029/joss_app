@@ -160,7 +160,7 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     }
   }
 
-  void _verifyOtp() {
+  void  _verifyOtp() {
     String otp = _otpControllers.map((c) => c.text).join();
 
     // HapticFeedback.mediumImpact();

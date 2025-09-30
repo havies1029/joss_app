@@ -94,16 +94,14 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
         width: double.infinity,
         decoration: BoxDecoration(
           color: secondaryBlackColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
+          // no borderRadius
         ),
         child: Padding(
           padding: const EdgeInsets.all(hPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: hPadding),
               // COB ChoiceChip list
               AssetListWidget(
                 labelText: '',
@@ -132,44 +130,44 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
                 allowDeselect: false,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: hPadding),
 
-              // tampilkan loading / hasil dashboard
-              if (_loadingDashboard)
-                const Center(child: CircularProgressIndicator())
-              else if (_dashboard != null && _dashboard!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                  child: Row(
-                    children: [
-                      _buildStatusBox(
-                        assetPath: "assets/icons/correct.svg",
-                        value: _dashboard!.first.aktifQty,
-                        bgColor: Colors.green,
-                      ),
-                      const SizedBox(width: vPadding), // jarak antar box
-                      _buildStatusBox(
-                        assetPath: "assets/icons/clock.svg",
-                        value: _dashboard!.first.berakhirQty,
-                        bgColor: Colors.orange,
-                      ),
-                      const SizedBox(width: vPadding),
-                      _buildStatusBox(
-                        assetPath: "assets/icons/exit.svg",
-                        value: _dashboard!.first.nonAktifQty,
-                        bgColor: Colors.red,
-                      ),
-                      const SizedBox(width: vPadding),
-                      _buildStatusBox(
-                        assetPath: "assets/icons/calender.svg",
-                        value: _dashboard!.first.onProgressQty,
-                        bgColor: Colors.blue,
-                      ),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: vPadding),
+              // // tampilkan loading / hasil dashboard
+              // if (_loadingDashboard)
+              //   const Center(child: CircularProgressIndicator())
+              // else if (_dashboard != null && _dashboard!.isNotEmpty)
+              //   Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: hPadding),
+              //     child: Row(
+              //       children: [
+              //         _buildStatusBox(
+              //           assetPath: "assets/icons/correct.svg",
+              //           value: _dashboard!.first.aktifQty,
+              //           bgColor: Colors.green,
+              //         ),
+              //         const SizedBox(width: vPadding), // jarak antar box
+              //         _buildStatusBox(
+              //           assetPath: "assets/icons/clock.svg",
+              //           value: _dashboard!.first.berakhirQty,
+              //           bgColor: Colors.orange,
+              //         ),
+              //         const SizedBox(width: vPadding),
+              //         _buildStatusBox(
+              //           assetPath: "assets/icons/exit.svg",
+              //           value: _dashboard!.first.nonAktifQty,
+              //           bgColor: Colors.red,
+              //         ),
+              //         const SizedBox(width: vPadding),
+              //         _buildStatusBox(
+              //           assetPath: "assets/icons/calender.svg",
+              //           value: _dashboard!.first.onProgressQty,
+              //           bgColor: Colors.blue,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              //
+              // const SizedBox(height: vPadding),
               // BaseTableAsetWidget(
               //   cobId: _formData['cobId'],
               //   cobNama: _formData['cobNama'],

@@ -12,6 +12,7 @@ class Klaim1ListModel {
 	String rmatauangNama;
 	String rugiDesc;
 	String statusNama;
+	String curr;
 
 	Klaim1ListModel({required this.insuredName, required this.kejadianLokasi,
 		required this.kejadianTgl, required this.klaimAmount,
@@ -19,7 +20,7 @@ class Klaim1ListModel {
 		required this.lastStsclaimId, required this.minsuranceId,
 		required this.mjenisrugiId, required this.insuranceName,
 		required this.rmatauangNama, required this.rugiDesc,
-		required this.statusNama});
+		required this.statusNama, required this.curr});
 
 	factory Klaim1ListModel.fromJson(Map<String, dynamic> data) {
 		return Klaim1ListModel(
@@ -35,7 +36,8 @@ class Klaim1ListModel {
 				insuranceName: data['insuranceName']??'',
 				rmatauangNama: data['rmatauangNama']??'',
 				rugiDesc: data['rugiDesc']??'',
-				statusNama: data['statusNama']??''
+				statusNama: data['statusNama']??'',
+				curr: data['curr']??''
 		);
 
 	}
@@ -53,6 +55,7 @@ class Klaim1ListModel {
 				'insuranceName': insuranceName,
 				'rmatauangNama': rmatauangNama,
 				'rugiDesc': rugiDesc,
-				'statusNama': statusNama};
+				'statusNama': statusNama,
+				'curr': curr};
 
 }

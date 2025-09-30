@@ -7,7 +7,10 @@ import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
+import '../../../blocs/reguser_profile/reguser_profile_state.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../blocs/user_profile/user_profile_state.dart';
+
 class CustomerServicePage extends StatefulWidget {
   const CustomerServicePage({super.key});
 
@@ -43,11 +46,29 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
 
   @override
   Widget build(BuildContext context) {
-    // tampilkan hanya loading sederhana
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: CircularProgressIndicator(),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<UserProfileCubit, UserProfileState>(
+          listener: (context, state) {
+            _initChatIfNeeded();
+          },
+        ),
+        BlocListener<RegUserProfileCubit, RegUserProfileState>(
+          listener: (context, state) {
+            _initChatIfNeeded();
+          },
+        ),
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listener: (context, state) {
+            _initChatIfNeeded();
+          },
+        ),
+      ],
+      child: const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }
@@ -63,9 +84,9 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
 
       try {
         MobileChatInitialization.init(
-          "_zGBGl1xg9V1ZQJVZNyFJg",
-          "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
-          "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE",
+          "_zGBGl1xg9V1ZQJVZNyFJg", // appId
+          "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc", // apiKey
+          "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE", // secretKey
           userId,
           displayName,
         );
@@ -92,7 +113,7 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
         return regState.email.isNotEmpty ? regState.email : 'New User';
       }
     }
-    return 'Guest';
+    return 'guest-${DateTime.now().millisecondsSinceEpoch}';
   }
 
   String _getUserId(BuildContext context) {
@@ -102,17 +123,16 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
         profileState.mrekan1Id!.trim().isNotEmpty) {
       return profileState.mrekan1Id!;
     }
-    //
-    // // 2. Kalau nggak ada, cek AuthenticationBloc
-    // final authState = context.read<AuthenticationBloc>().state;
-    // if (authState is AuthenticationAuthenticated &&
-    //     authState.user.id != null &&
-    //     authState.user.id.toString().isNotEmpty) {
-    //   return authState.user.id.toString();
-    // }
+
+    // 2. (opsional) bisa ambil dari AuthenticationBloc kalau perlu
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is AuthenticationAuthenticated &&
+        authState.user.id != null &&
+        authState.user.id.toString().isNotEmpty) {
+      return authState.user.id.toString();
+    }
 
     // 3. Fallback guest
     return 'guest-${DateTime.now().millisecondsSinceEpoch}';
   }
-
 }

@@ -8,6 +8,8 @@ import '../../../gen_aset_dashboard/asetdashboardcari_main.dart';
 import '../../../gen_aset_ringkasan/asetringkasancari_main.dart';
 import '../../../gen_klaim/klaim1list_main.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
+import '../../../gen_klaim/mobile/widget/crud_klaim_widget/klaim1_inline_editor_page.dart';
+import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../gen_status_aset/statusasetcari_main.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
@@ -307,10 +309,10 @@ class ListMenuWidget extends StatelessWidget {
   List<MenuItem> _getMenuItems() {
     return [
       MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
+      MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
       MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
-      MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -330,15 +332,15 @@ class ListMenuWidget extends StatelessWidget {
     switch (title) {
       case 'Cari Asuransi':
         return CariAsuransiWidget.page();
-      case 'Lapor \nKlaim':
-        return KlaimMainPage();
-      //   return LaporKlaimPage();
-      // case 'Polis':
-      //   return PolisListPage();
+      case 'Lapor Klaim':
+        // return KlaimMainPage();
+        return Klaim1InlineEditorPage();
+      case 'Polis':
+        return AssetManagementPage();
       case 'Beli Polis':
         return BeliPolisPage();
       case 'Klaim':
-        return KlaimMainPage();
+        return ListKlaimWidget();
       // case 'Tagihan Pembayaran':
       //   return TagihanPembayaranPage();
       default:

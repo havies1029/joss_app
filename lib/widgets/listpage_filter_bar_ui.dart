@@ -11,9 +11,7 @@ class ListPageFilterBarUIWidget extends StatelessWidget {
   }
 
   Widget getFilterBarUI() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(        
+    return Container(
         // Add padding around the search bar
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         // Use a Material design search bar
@@ -46,7 +44,6 @@ class ListPageFilterBarUIWidget extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

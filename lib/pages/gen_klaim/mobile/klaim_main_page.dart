@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/gen_klaim/mobile/widget/klaim1_inline_editor_page.dart';
+import 'package:joss_app/pages/gen_klaim/mobile/widget/crud_klaim_widget/klaim1_inline_editor_page.dart';
 import 'package:joss_app/widgets/apptheme/header_card.dart';
 import '../../../../common/constants.dart';
 import '../../base/base_background_sidepage.dart';
