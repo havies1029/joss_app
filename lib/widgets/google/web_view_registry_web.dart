@@ -3,7 +3,7 @@ import 'dart:ui_web' as ui_web;
 
 import 'package:flutter/material.dart';
 
-void registerWebViewFactory(String viewType, Object Function(int viewId) factory) {  
+void registerWebViewFactory(String viewType, Object Function(int viewId) factory) {
 
   debugPrint("registerWebViewFactory called for viewType: $viewType");
 

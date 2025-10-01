@@ -186,6 +186,7 @@ flutter:
     - assets/icons/unduh_data_polis.svg
     - assets/icons/share_data_polis.svg
     - assets/icons/others_icon_polis.svg
+    - assets/icons/select_icon_polis.svg
 
   fonts:
     - family: Delm-Regular

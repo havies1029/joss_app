@@ -6,6 +6,7 @@ import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
+import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_ringkasan_widget.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/login/mobile/client/widget/popup_client_widget.dart';
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
@@ -88,6 +89,7 @@ import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
+import 'blocs/share_cubit/share_cubit_state.dart';
 import 'blocs/simulmv/simulmvcrud_bloc.dart';
 import 'blocs/simulpar/simulparcrud_bloc.dart';
 import 'helper/app_prefs.dart';
@@ -154,6 +156,7 @@ Future<void> main() async {
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
+        BlocProvider(create: (_) => ShareStateCubit()), // hydrated
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),

@@ -16,7 +16,8 @@ import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
 
 import '../../../../models/login/emailverification_model.dart';
-import '../../../../widgets/google/google_signin_button_stub.dart';
+import 'package:joss_app/widgets/google/google_signin_button_stub.dart'
+  if (dart.library.js_interop) 'package:joss_app/widgets/google/google_signin_button_web.dart';
 import '../../../base/base_background_firstpage.dart';
 import '../client/login_client_page.dart';
 
@@ -313,10 +314,10 @@ class _LoginFormUserState extends State<LoginFormUser>
                                     ),
                                     SizedBox(height: 10),
                                     // Tombol Google
-                                    AppData.kIsWeb
+                                    kIsWeb
                                         ? const CachedGoogleSigninButton()
                                         : AppButton.iconLeft(
-                                      text: 'Masuk Dengan Google',
+                                      text: 'Masuk Dengan bebek',
                                       icon: SvgPicture.asset(
                                         'assets/icons/google-icon.svg',
                                         width: 20,

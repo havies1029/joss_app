@@ -11,7 +11,7 @@ void registerGoogleSigninButton() async {
 
   final plugin = GoogleSignInPlatform.instance as GoogleSignInPlugin;
   await plugin.init(clientId: '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com');
-  
+
 }
 
 Widget googleSigninButton() {
