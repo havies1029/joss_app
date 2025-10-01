@@ -80,6 +80,7 @@ const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
+const Color secondaryGreenColor = Color(0xFF27AE68);
 const Color pDarkRed = Color(0xFFDC1C1C);
 
 const Color kategoriYellow = Color(0xFFFFC107);

@@ -9,6 +9,7 @@ import '../../../../../../blocs/share_cubit/share_cubit_state.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../widgets/apptheme/build_status_box.dart';
 import '../../../../../../widgets/apptheme/build_status_text_box.dart';
+import '../../../../../../widgets/apptheme/popup_widget.dart';
 import '../list_form/aset_list_ringkasan.dart';
 
 class TableRingkasanWidget extends StatefulWidget {
@@ -94,11 +95,57 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                           text: "Tambah",
                           bgColor: Colors.orange,
                         ),
-                        const StatusTextBox(
+                        StatusTextBox(
                           assetPath: "assets/icons/unduh_data_polis.svg",
                           text: "Unduh",
                           bgColor: Colors.grey,
+                          onTap: () {
+                            showGeneralDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              barrierLabel: "Tutup",
+                              barrierColor: Colors.black.withOpacity(0.6),
+                              transitionDuration: const Duration(milliseconds: 250),
+                              pageBuilder: (context, animation, secondaryAnimation) {
+                                return GestureDetector(
+                                  onTap: () => Navigator.of(context).pop(), // ✅ klik luar = close
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: Center(
+                                      child: GestureDetector(
+                                        onTap: () {}, // block klik dalam popup
+                                        child: PopupWidget(
+                                          title: "Pilih format file untuk diunduh",
+                                          subtitle: "Tersedia dalam format Excel dan PDF",
+                                          button1Text: "Excel",
+                                          button2Text: "PDF",
+                                          onExportSelected: (format) {
+                                            Navigator.of(context).pop();
+                                            debugPrint("Dipilih format: $format");
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              transitionBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: ScaleTransition(
+                                    scale: CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.easeOutBack,
+                                    ),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                            );
+
+                          },
                         ),
+
                         const StatusTextBox(
                           assetPath: "assets/icons/share_data_polis.svg",
                           text: "Share",
