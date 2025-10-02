@@ -132,8 +132,12 @@ class AuthenticationBloc
   Future<void> _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) async {
     emit(AuthenticationLoading());
     debugPrint("🌀 Logout: emit AuthenticationLoading");
+
     await userRepository.deleteToken(id: 0);
-    debugPrint("🗑️ Token dihapus");
+    AppData.user = User();       // object baru kosong
+    AppData.userToken = "";      // string kosong
+
+    debugPrint("🗑️ Token & user dihapus");
     emit(AuthenticationUnauthenticated());
     debugPrint("✅ Logout: emit AuthenticationUnauthenticated");
   }

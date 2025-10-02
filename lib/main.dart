@@ -5,6 +5,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
+import 'package:joss_app/blocs/hasil_simul_mv_cubit/hasil_simul_mv_cubit.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_ringkasan_widget.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
@@ -12,6 +13,7 @@ import 'package:joss_app/pages/login/mobile/client/widget/popup_client_widget.da
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/popup_user_widget.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.dart';
+import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
@@ -80,6 +82,7 @@ import 'blocs/gen_sppamv/sppamvlist_bloc.dart';
 import 'blocs/gen_sppapar/sppaparcrud_bloc.dart';
 import 'blocs/gen_sppapar/sppaparlist_bloc.dart';
 import 'blocs/gen_status_aset/statusasetcari_bloc.dart';
+import 'blocs/hasil_simul_par_cubit/hasil_simul_par_cubit.dart';
 import 'blocs/klaim/klaim2list_bloc.dart';
 import 'blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
@@ -92,6 +95,7 @@ import 'blocs/gen_review/reviewcari_bloc.dart';
 import 'blocs/share_cubit/share_cubit_state.dart';
 import 'blocs/simulmv/simulmvcrud_bloc.dart';
 import 'blocs/simulpar/simulparcrud_bloc.dart';
+import 'blocs/user_profile/user_profile_state.dart';
 import 'helper/app_prefs.dart';
 
 Future<void> main() async {
@@ -157,6 +161,8 @@ Future<void> main() async {
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
         BlocProvider(create: (_) => ShareStateCubit()), // hydrated
+        BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
+        BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
@@ -434,7 +440,6 @@ class _AppState extends State<_App> {
             : BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
-              // ✅ Tutup semua popup lama
               while (_navigatorKey.currentState?.canPop() ?? false) {
                 _navigatorKey.currentState?.pop();
               }
@@ -443,19 +448,62 @@ class _AppState extends State<_App> {
 
               if (user.custType == 'C') {
                 context.read<UserProfileCubit>().setProfile(
+                  mrekan1Id: user.id?.toString(),
                   nama: user.nama,
                   email: user.email,
                   telepon: user.hp,
                 );
+
+                return BlocListener<UserProfileCubit, UserProfileState>(
+                  listenWhen: (prev, curr) =>
+                  prev.mrekan1Id != curr.mrekan1Id &&
+                      curr.mrekan1Id != null &&
+                      curr.mrekan1Id!.trim().isNotEmpty,
+                  listener: (context, profile) async {
+                    final userId = profile.mrekan1Id!.trim();
+                    final displayName = profile.nama?.trim().isNotEmpty == true
+                        ? profile.nama!.trim()
+                        : profile.email ?? "Guest";
+
+                    final ok = await ChatInitService.I.ensureInit(
+                      userId: userId,
+                      displayName: displayName,
+                    );
+
+                    debugPrint(ok
+                        ? "✅ Chat pre-init done untuk $displayName ($userId)"
+                        : "❌ Chat pre-init gagal");
+                  },
+                  child: HomeTabWidget(userRepository: widget.userRepository),
+                );
               } else if (user.custType == 'U') {
+                // 🔹 User Register → simple sekali aja
                 context.read<RegUserProfileCubit>().setProfile(
                   email: user.email,
                 );
+
+                Future.microtask(() async {
+                  final regProfile = context.read<RegUserProfileCubit>().state;
+                  final userId = "guest-${DateTime.now().millisecondsSinceEpoch}";
+                  final displayName =
+                  regProfile.email.isNotEmpty ? regProfile.email : "New User";
+
+                  final ok = await ChatInitService.I.ensureInit(
+                    userId: userId,
+                    displayName: displayName,
+                    context: context,
+                  );
+
+                  debugPrint(ok
+                      ? "✅ Chat pre-init done untuk $displayName ($userId)"
+                      : "❌ Chat pre-init gagal");
+                });
+
+                return HomeTabWidget(userRepository: widget.userRepository);
               }
 
-              return HomeTabWidget(
-                userRepository: widget.userRepository,
-              );
+              // fallback
+              return HomeTabWidget(userRepository: widget.userRepository);
             }
 
 

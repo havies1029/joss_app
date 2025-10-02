@@ -93,27 +93,24 @@ class _AsetRingkasanCard extends StatelessWidget {
                 ),
 
                 // Bagian kanan (Share per card pakai Bloc)
-                BlocBuilder<ShareStateCubit, Map<String, bool>>(
-                  builder: (context, map) {
+                BlocBuilder<ShareStateCubit, Map<String, AsetRingkasanCariModel>>(
+                  builder: (context, state) {
                     final cubit = context.read<ShareStateCubit>();
                     final isActive = cubit.isItemActive(item.asetRingkasanId);
 
                     return StatusBox(
                       assetPath: "assets/icons/share_data_polis.svg",
-                      borderColor: primaryLightColor,
                       bgColor: Colors.transparent,
                       fullIcon: true,
                       showBorder: false,
                       enableBorderClickFill: true,
                       activeIconColor: secondaryBlackColor,
-                      iconColor: isActive
-                          ? secondaryBlackColor
-                          : primaryLightColor,
-                      onTap: () =>
-                          cubit.toggleItem(item.asetRingkasanId), // local toggle
+                      iconColor: isActive ? secondaryBlackColor : primaryLightColor,
+                      onTap: () => cubit.toggleItem(item), // ⬅️ sekarang passing full object
                     );
                   },
                 ),
+
               ],
             ),
           ),

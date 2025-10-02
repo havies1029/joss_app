@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
 
+/// Format yang didukung
+enum ExportFormat { excel, pdf }
+
 class PopupWidget extends StatelessWidget {
   final String title;             // Baris pertama (fontSize 18)
   final String subtitle;          // Baris kedua (fontSize 16)
@@ -8,10 +11,10 @@ class PopupWidget extends StatelessWidget {
   final String button2Text;       // Tulisan tombol kanan
   final Color button1Color;       // Warna tombol kiri
   final Color button2Color;       // Warna tombol kanan
-  final void Function(String format)? onExportSelected;
+  final void Function(ExportFormat format)? onExportSelected;
 
   const PopupWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.button1Text,
@@ -19,7 +22,7 @@ class PopupWidget extends StatelessWidget {
     this.button1Color = Colors.green,
     this.button2Color = Colors.red,
     this.onExportSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +44,7 @@ class PopupWidget extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 6.0),
+
             // Sub Judul
             Text(
               subtitle,
@@ -62,7 +66,8 @@ class PopupWidget extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    onPressed: () => onExportSelected?.call(button1Text),
+                    // ✅ klik tombol 1 = Excel
+                    onPressed: () => onExportSelected?.call(ExportFormat.excel),
                     icon: const Icon(Icons.table_chart, color: Colors.white),
                     label: Text(
                       button1Text,
@@ -80,7 +85,8 @@ class PopupWidget extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    onPressed: () => onExportSelected?.call(button2Text),
+                    // ✅ klik tombol 2 = PDF
+                    onPressed: () => onExportSelected?.call(ExportFormat.pdf),
                     icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
                     label: Text(
                       button2Text,
