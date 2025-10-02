@@ -29,7 +29,7 @@ class SimulparCrudFormPageFormV2State extends State<SimulparCrudFormV2Page> {
         headerBorderColorOpened: Colors.transparent,
         // headerBorderWidth: 1,
         headerBackgroundColorOpened: Colors.green,
-        contentBackgroundColor: Colors.white,
+        contentBackgroundColor: Colors.black,
         contentBorderColor: Colors.green,
         contentBorderWidth: 3,
         contentHorizontalPadding: 5,
@@ -44,7 +44,7 @@ class SimulparCrudFormPageFormV2State extends State<SimulparCrudFormV2Page> {
             contentHorizontalPadding: 15,
             contentVerticalPadding: 15,
             leftIcon:
-                const Icon(Icons.factory, color: Colors.white),
+                const Icon(Icons.factory, color: Colors.black),
             header: Text('Informasi Bangunan', style: MyText.headerStyle()),
             content: SimulparCrudFormBangunanPage(viewMode: widget.viewMode, recordId: widget.recordId,)
           ),
@@ -53,7 +53,7 @@ class SimulparCrudFormPageFormV2State extends State<SimulparCrudFormV2Page> {
             contentHorizontalPadding: 15,
             contentVerticalPadding: 15,
             leftIcon:
-                const Icon(Icons.money, color: Colors.white),
+                const Icon(Icons.money, color: Colors.black),
             header: Text('Sum Insured', style: MyText.headerStyle()),
             content: SimulparCrudFormSumInsuredPage(viewMode: widget.viewMode, recordId: widget.recordId,)
           ),
@@ -62,7 +62,7 @@ class SimulparCrudFormPageFormV2State extends State<SimulparCrudFormV2Page> {
             contentHorizontalPadding: 15,
             contentVerticalPadding: 15,
             leftIcon:
-                const Icon(Icons.security, color: Colors.white),
+                const Icon(Icons.security, color: Colors.black),
             header: Text('Rate', style: MyText.headerStyle()),
             content: SimulparCrudFormCoverV2Page(viewMode: widget.viewMode, recordId: widget.recordId,)
           ),
@@ -71,7 +71,7 @@ class SimulparCrudFormPageFormV2State extends State<SimulparCrudFormV2Page> {
             contentHorizontalPadding: 5,
             contentVerticalPadding: 5,
             leftIcon:
-                const Icon(Icons.calculate, color: Colors.white),
+                const Icon(Icons.calculate, color: Colors.black),
             header: Text('Perhitungan Premi', style: MyText.headerStyle()),
             content: SimulparCrudFormPremiPage(viewMode: widget.viewMode, recordId: widget.recordId,)
           ),

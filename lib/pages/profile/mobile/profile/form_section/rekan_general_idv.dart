@@ -230,7 +230,6 @@ class MRekanGeneralIdvCrudFormPageFormState
   Widget buildFieldPekerjaan() {
     return ReusableComboBox<ComboMPekerjaanModel>(
       hintText: "Pekerjaan",
-      searchHintText: "Cari Pekerjaan...",
       comboKey: comboMPekerjaanKey,
       initItem: fieldComboMPekerjaan,
       dataLoader: () => ComboMPekerjaanRepository().getComboMPekerjaan(),

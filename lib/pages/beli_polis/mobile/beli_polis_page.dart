@@ -6,9 +6,6 @@ import 'package:joss_app/widgets/apptheme/header_card.dart';
 import '../../../common/constants.dart';
 import '../../../widgets/section/polis/simul_polis/simul_mv/simul_mv_page.dart';
 import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart';
-import '../../base/base_background_firstpage.dart';
-import '../../polis/simul/simul_polis_mv.dart';
-import '../../polis/simul/simul_polis_par.dart';
 
 class BeliPolisPage extends StatelessWidget {
   const BeliPolisPage({super.key});
@@ -93,7 +90,7 @@ class BeliPolisPage extends StatelessWidget {
       children: [
         Expanded(child: _buildCategory(context, categories[0].$1, categories[0].$2, const SimulMvPage())),
         const SizedBox(width: 12),
-        Expanded(child: _buildCategory(context, categories[1].$1, categories[1].$2, const SimulPolisParPage())),
+        Expanded(child: _buildCategory(context, categories[1].$1, categories[1].$2, const SimulParPage())),
       ],
     );
   }

@@ -250,7 +250,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   Widget buildFieldNamaBank() {
     return ReusableComboBox<ComboMBankModel>(
       hintText: "Bank",
-      searchHintText: "Cari Bank...",
       comboKey: comboMBankKey,
       initItem: fieldComboMBank,
       dataLoader: () => ComboMBankRepository().getComboMBank(),

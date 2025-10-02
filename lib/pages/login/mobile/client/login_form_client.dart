@@ -3,15 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
-
-import '../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../../blocs/networkconnection/network_bloc.dart';
-import '../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../common/constants.dart';
-
-import '../../../base/base_background_firstpage.dart';
 
 class LoginFormClient extends StatefulWidget {
   const LoginFormClient({super.key});

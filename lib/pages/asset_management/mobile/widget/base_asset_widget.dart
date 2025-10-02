@@ -183,52 +183,5 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
       ),
     );
   }
-
-  Widget _buildStatusBox({
-    required String assetPath,
-    required int value,
-    required Color bgColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: sGrey,
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                assetPath,
-                width: 18,
-                height: 18,
-                colorFilter: const ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 15),
-          Text(
-            value.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: getResponsiveFont(context, 16),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 

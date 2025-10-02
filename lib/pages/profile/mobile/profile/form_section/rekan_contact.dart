@@ -227,7 +227,6 @@ class MRekanContactCrudFormPageFormState
   Widget buildFieldMpropinsiId() {
     return ReusableComboBox<ComboMPropinsiModel>(
       hintText: "Provinsi",
-      searchHintText: "Cari provinsi...",
       comboKey: comboMPropinsiKey,
       initItem: fieldComboMPropinsi,
       dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
@@ -261,7 +260,6 @@ class MRekanContactCrudFormPageFormState
   Widget buildFieldMkotaId() {
     return ReusableComboBox<ComboMKotaModel>(
       hintText: "Kota",
-      searchHintText: "Cari Kota...",
       comboKey: comboMKotaKey,
       initItem: fieldComboMKota,
       dataLoader:
@@ -294,7 +292,6 @@ class MRekanContactCrudFormPageFormState
   Widget buildFieldRkodeposId() {
     return ReusableComboBox<ComboRKodeposModel>(
       hintText: "Kodepos",
-      searchHintText: "Cari kodepos...",
       comboKey: comboRKodeposKey,
       initItem: fieldComboRKodepos,
       dataLoader:

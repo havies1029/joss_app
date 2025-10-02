@@ -1,20 +1,24 @@
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart'
     show ComboRMatauangModel;
-import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
+import 'package:joss_app/repositories/combobox/combormatauang_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/simulpar/simulparcrud_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:quick_input_formatters/quick_input_formatters.dart';
 
 class SimulparFormSumInsuredPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
 
-  const SimulparFormSumInsuredPage(
-      {super.key, required this.viewMode, required this.recordId});
+  const SimulparFormSumInsuredPage({
+    super.key,
+    required this.viewMode,
+    required this.recordId,
+  });
 
   @override
   SimulparFormSumInsuredPageState createState() =>
@@ -24,7 +28,6 @@ class SimulparFormSumInsuredPage extends StatefulWidget {
 class SimulparFormSumInsuredPageState
     extends State<SimulparFormSumInsuredPage> {
   late SimulparCrudBloc simulparCrudBloc;
-  final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
   var fieldSiBuildingController = TextEditingController();
   var fieldSiContentController = TextEditingController();
@@ -35,134 +38,71 @@ class SimulparFormSumInsuredPageState
   var fieldSiBiController = TextEditingController();
   var fieldSiTotalController = TextEditingController();
   ComboRMatauangModel? fieldComboRMatauang;
-
+  final GlobalKey<DropdownSearchState<ComboRMatauangModel>> comboRMatauangKey =
+      GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
+  
   @override
   Widget build(BuildContext context) {
     simulparCrudBloc = BlocProvider.of<SimulparCrudBloc>(context);
     return BlocConsumer<SimulparCrudBloc, SimulparCrudState>(
       builder: (context, state) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: buildFieldCurr()),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: buildFieldSiBuilding()),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: buildFieldSiMachinery(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: buildFieldSiStock()),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: fieldFieldStockAdjustable(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: buildFieldSiContent()),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: buildFieldSiOthers(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: buildFieldSiBi()),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: buildFieldSiTotal(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )),
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: pGrey,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+          ),
+          child: Column(
+            children: [
+              buildFieldCurr(),
+              const SizedBox(height: 10),
+              buildFieldSiMachinery(),
+              const SizedBox(height: 10),
+              buildFieldSiBuilding(),
+              const SizedBox(height: 10),
+              buildFieldSiStock(),
+              const SizedBox(height: 10),
+              buildFieldStockAdjustable(),
+              const SizedBox(height: 10),
+              buildFieldSiContent(),
+              const SizedBox(height: 10),
+              buildFieldSiOthers(),
+              const SizedBox(height: 10),
+              buildFieldSiBi(),
+              const SizedBox(height: 10),
+              buildFieldSiTotal(),
+            ],
           ),
         );
       },
       listener: (context, state) {
         if (state.isLoaded) {
           if (state.record != null) {
-            fieldSiBuildingController.text =
-                NumberFormat("#,###").format(state.record!.siBuilding);
-            fieldSiContentController.text =
-                NumberFormat("#,###").format(state.record!.siContent);
-            fieldSiMachineryController.text =
-                NumberFormat("#,###").format(state.record!.siMachinery);
-            fieldSiOtherController.text =
-                NumberFormat("#,###").format(state.record!.siOther);
-            fieldSiStockController.text =
-                NumberFormat("#,###").format(state.record!.siStock);
-            fieldStockAdjustableController.text =
-                NumberFormat("###.00").format(state.record!.stockAdjustable);
-            fieldSiBiController.text =
-                NumberFormat("#,###").format(state.record!.siBi);
+            fieldSiBuildingController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siBuilding);
+            fieldSiContentController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siContent);
+            fieldSiMachineryController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siMachinery);
+            fieldSiOtherController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siOther);
+            fieldSiStockController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siStock);
+            fieldStockAdjustableController.text = NumberFormat(
+              "###.00",
+            ).format(state.record!.stockAdjustable);
+            fieldSiBiController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siBi);
 
-            fieldSiTotalController.text =
-                NumberFormat("#,###").format(state.record!.siTotal);
+            fieldSiTotalController.text = NumberFormat(
+              "#,###",
+            ).format(state.record!.siTotal);
           }
 
           fieldComboRMatauang = state.comboRMatauang;
@@ -171,167 +111,202 @@ class SimulparFormSumInsuredPageState
     );
   }
 
-
   Widget buildFieldSiBuilding() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Bangunan",
+      hint: "0",
       controller: fieldSiBuildingController,
-      decoration: const InputDecoration(
-        labelText: "Building",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: ",000,000,-",
-      ),
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      suffix: Text(",000,000,-", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return kStringNullError;
+        }
+        return null;
+      },
       onChanged: (value) {
         value = value.replaceAll(",", "");
         simulparCrudBloc.add(
-            FieldSiBuildingChangedEvent(si: (double.tryParse(value) ?? 0)));
+          FieldSiBuildingChangedEvent(si: double.tryParse(value) ?? 0),
+        );
       },
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldSiContent() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Konten",
+      hint: "0",
       controller: fieldSiContentController,
-      decoration: const InputDecoration(
-        labelText: "Content",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: ",000,000,-",
-      ),
+      keyboardType: TextInputType.number,
+      suffix: Text(",000,000,-", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return kStringNullError;
+        }
+        return null;
+      },
       onChanged: (value) {
         value = value.replaceAll(",", "");
-        simulparCrudBloc
-            .add(FieldSiContentChangedEvent(si: (double.tryParse(value) ?? 0)));
+        simulparCrudBloc.add(
+          FieldSiContentChangedEvent(si: double.tryParse(value) ?? 0),
+        );
       },
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldSiMachinery() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Mesin",
+      hint: "0",
       controller: fieldSiMachineryController,
-      decoration: const InputDecoration(
-        labelText: "Machinery",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: ",000,000,-",
-      ),
+      keyboardType: TextInputType.number,
+      suffix: Text(",000,000,-", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return kStringNullError;
+        }
+        return null;
+      },
       onChanged: (value) {
         value = value.replaceAll(",", "");
         simulparCrudBloc.add(
-            FieldSiMachineryChangedEvent(si: (double.tryParse(value) ?? 0)));
+          FieldSiMachineryChangedEvent(si: double.tryParse(value) ?? 0),
+        );
       },
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldSiOthers() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Lainnya",
+      hint: "0",
       controller: fieldSiOtherController,
-      decoration: const InputDecoration(
-        labelText: "Others",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: ",000,000,-",
-      ),
+      keyboardType: TextInputType.number,
+      suffix: Text(",000,000,-", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) return kStringNullError;
+        return null;
+      },
       onChanged: (value) {
         value = value.replaceAll(",", "");
-        simulparCrudBloc
-            .add(FieldSiOthersChangedEvent(si: (double.tryParse(value) ?? 0)));
+        simulparCrudBloc.add(
+          FieldSiOthersChangedEvent(si: double.tryParse(value) ?? 0),
+        );
       },
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldSiStock() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Stok",
+      hint: "0",
       controller: fieldSiStockController,
-      decoration: const InputDecoration(
-        labelText: "Stock",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: ",000,000,-",
-      ),
+      keyboardType: TextInputType.number,
+      suffix: Text(",000,000,-", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) return kStringNullError;
+        return null;
+      },
       onChanged: (value) {
         value = value.replaceAll(",", "");
-        simulparCrudBloc
-            .add(FieldSiStockChangedEvent(si: (double.tryParse(value) ?? 0)));
+        simulparCrudBloc.add(
+          FieldSiStockChangedEvent(si: double.tryParse(value) ?? 0),
+        );
       },
-      textAlign: TextAlign.right,
     );
   }
 
-  fieldFieldStockAdjustable() {
-    return TextFormField(
+  Widget buildFieldStockAdjustable() {
+    return appTextField(
+      label: "Stok Yang Dapat Disesuaikan",
+      hint: "0",
+      controller: fieldStockAdjustableController,
       keyboardType: TextInputType.number,
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
-        DecimalTextInputFormatter(2)
+        DecimalTextInputFormatter(2),
       ],
-      controller: fieldStockAdjustableController,
-      decoration: const InputDecoration(
-        labelText: "Stock Adjustable",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: " %",
-      ),
-      onChanged: (value) {
-        simulparCrudBloc.add(FieldStockAdjustableChangedEvent(
-            adjustable: (double.tryParse(value) ?? 0)));
+      suffix: Text("%", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return kStringNullError;
+        }
+        return null;
       },
-      textAlign: TextAlign.right,
+      onChanged: (value) {
+        simulparCrudBloc.add(
+          FieldStockAdjustableChangedEvent(
+            adjustable: double.tryParse(value) ?? 0,
+          ),
+        );
+      },
     );
   }
 
   Widget buildFieldSiBi() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "BI",
+      hint: "0",
       controller: fieldSiBiController,
-      decoration: const InputDecoration(
-        labelText: "BI",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixText: ",000,000,-",
-      ),
+      keyboardType: TextInputType.number,
+      suffix: Text(",000,000,-", style: bodyTextStyle(context)),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) return kStringNullError;
+        return null;
+      },
       onChanged: (value) {
         value = value.replaceAll(",", "");
-        simulparCrudBloc
-            .add(FieldSiBiChangedEvent(si: (double.tryParse(value) ?? 0)));
+        simulparCrudBloc.add(
+          FieldSiBiChangedEvent(si: double.tryParse(value) ?? 0),
+        );
       },
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldCurr() {
-    return buildFieldComboRMatauang(
-      labelText: 'Currency',
+    return ReusableComboBox<ComboRMatauangModel>(
+      hintText: "Mata Uang",
+      comboKey: comboRMatauangKey,
       initItem: fieldComboRMatauang,
+      dataLoader: () async {
+        return ComboRMatauangRepository().getComboRMatauang();
+      },
+      displayText: (item) => item.rmatauangSimbol,
+      compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
       onChangedCallback: (value) {
         if (value != null) {
-          simulparCrudBloc
-              .add(ComboRMatauangChangedEvent(comboRMatauang: value));
+          simulparCrudBloc.add(
+            ComboRMatauangChangedEvent(comboRMatauang: value),
+          );
         }
       },
-      onSaveCallback: (value) {},
+      onSaveCallback: (value) {
+        if (value != null) {
+          fieldComboRMatauang = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) return kStringNullError;
+        return null;
+      },
     );
   }
 
   Widget buildFieldSiTotal() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Total",
       controller: fieldSiTotalController,
-      decoration: const InputDecoration(
-          labelText: "Total",
-          floatingLabelBehavior: FloatingLabelBehavior.always),
-      onChanged: (value) {},
-      textAlign: TextAlign.right,
+      keyboardType: TextInputType.number,
+      enabled: false,
+      onChanged: null,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return kStringNullError;
+        }
+        return null;
+      },
     );
   }
 }

@@ -16,7 +16,6 @@ Widget buildFieldComboMJnsclient({
 }) {
 	return ReusableComboBox<ComboMJnsclientModel>(
 		hintText: labelText,
-		searchHintText: "Cari jenis client…",
 		comboKey: comboKey,
 		initItem: initItem,
 		onChangedCallback: onChangedCallback,

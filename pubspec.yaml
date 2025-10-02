@@ -27,6 +27,12 @@ dependencies:
   flutter_staggered_animations: ^1.1.1 
   flutter_svg: ^2.0.17   
   foundation: ^0.0.5
+  excel: ^2.0.6
+  pdf: ^3.10.6
+  printing: ^5.12.0
+  docx_template: ^0.4.0
+  file_saver: ^0.2.2
+  open_filex: ^4.6.0
   google_sign_in: ^6.3.0    
   google_sign_in_web: ^0.12.4+4
   google_fonts: ^6.1.0   
@@ -143,6 +149,17 @@ flutter:
     - assets/icons/User Icon.svg
     - assets/icons/verified.svg
     - assets/icons/website.svg
+    - assets/icons/group_icon.svg
+    - assets/icons/claim-icon-property.svg
+    - assets/icons/claim-icon-car.svg
+    - assets/icons/home_icon.svg
+    - assets/icons/delete_icon_polis.svg
+    - assets/icons/edit_icon_polis.svg
+    - assets/icons/tambah_polis_icon_polis.svg
+    - assets/icons/unduh_data_polis.svg
+    - assets/icons/share_data_polis.svg
+    - assets/icons/others_icon_polis.svg
+    - assets/icons/select_icon_polis.svg
     # images
     - assets/images/jps-image.png
     - assets/images/vector-1.png

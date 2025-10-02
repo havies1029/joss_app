@@ -5,6 +5,7 @@ class appTextField extends StatelessWidget {
   final String? hint;
   final TextEditingController controller;
   final Widget? suffixIcon;
+  final Widget? suffix;
   final Widget? prefix;
   final bool obscureText;
   final bool? enabled;
@@ -26,6 +27,7 @@ class appTextField extends StatelessWidget {
     this.hint,
     required this.controller,
     this.suffixIcon,
+    this.suffix,
     this.prefix,
     this.obscureText = false,
     this.onChanged,
@@ -47,6 +49,7 @@ class appTextField extends StatelessWidget {
 
     switch (keyboardType) {
       case TextInputType.number:
+      return [ThousandsSeparatorInputFormatter()];
       case TextInputType.phone:
         return [FilteringTextInputFormatter.digitsOnly];
       case TextInputType.emailAddress:
@@ -84,7 +87,7 @@ class appTextField extends StatelessWidget {
       enabled: enabled,
       maxLines: maxLines ?? 1,
       keyboardType: keyboardType,
-      inputFormatters: _getDefaultFormatters(), // 🔹 otomatis pilih formatter
+      inputFormatters: _getDefaultFormatters(), 
       onTap: onTap,
       onChanged: onChanged,
       textInputAction: textInputAction,
@@ -120,7 +123,8 @@ class appTextField extends StatelessWidget {
           borderSide: BorderSide(color: primaryColor),
         ),
         prefix: prefix,
-        suffix: suffixIcon,
+        suffix: suffix,
+        suffixIcon: suffixIcon,
       ),
       validator: validator,
     );

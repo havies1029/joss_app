@@ -19,7 +19,6 @@ import 'package:joss_app/widgets/combobox/combomwarna_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
-import 'package:string_validator/string_validator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../../../blocs/local_prefs/simulasi_mv_local_cubit.dart';
@@ -158,27 +157,20 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 
 		return BlocConsumer<SppamvCrudBloc, SppamvCrudState>(
 			builder: (context, state) {
-				return Dialog(
-					shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-					child: Container(
-						decoration: BoxDecoration(
-							color: Colors.white, // ✅ full background putih
-							borderRadius: BorderRadius.circular(20),
-						),
-						child: SingleChildScrollView(
-							child: Padding(
-								padding: const EdgeInsets.all(20.0),
-								child: Form(
+				return Container(
+						padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: pGrey,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+          ),
+						child: Form(
 									key: _formKey,
 									child: Column(
 										crossAxisAlignment: CrossAxisAlignment.start,
 										children: [
-											// Header Title
-											const SizedBox(height: 25),
-
 											// Section: Basic Information
-											_buildSectionHeader("Informasi Dasar"),
-											const SizedBox(height: 16),
+                      Text("Informasi Dasar", style: bodyTextStyle(context)),
+											const SizedBox(height: 10),
 											buildFieldSppaTgl(),
 											const SizedBox(height: 12),
 											_buildResponsiveRow([
@@ -297,10 +289,8 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 										],
 									),
 								),
-							),
-						),
-					),
-				);
+							
+					);
 			},
 			listener: (context, state) {
 				if (state.isLoaded) {

@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/widgets/form_error.dart';
+import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/simulpar/simulparcrud_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
 class SimulparFormPremiPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
 
-  const SimulparFormPremiPage(
-      {super.key, required this.viewMode, required this.recordId});
+  const SimulparFormPremiPage({
+    super.key,
+    required this.viewMode,
+    required this.recordId,
+  });
 
   @override
   SimulparFormPremiPageFormState createState() =>
       SimulparFormPremiPageFormState();
 }
 
-class SimulparFormPremiPageFormState
-    extends State<SimulparFormPremiPage> {
+class SimulparFormPremiPageFormState extends State<SimulparFormPremiPage> {
   late SimulparCrudBloc simulparCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
@@ -56,11 +56,11 @@ class SimulparFormPremiPageFormState
             final f = NumberFormat.decimalPattern('id');
             fieldPremiFlexasController.text = f.format(r.premiFlexas ?? 0);
             fieldPremiRsmdccController.text = f.format(r.premiRsmdcc ?? 0);
-            fieldPremiTsfwdController.text  = f.format(r.premiTsfwd  ?? 0);
-            fieldPremiEqvetController.text  = f.format(r.premiEqvet  ?? 0);
+            fieldPremiTsfwdController.text = f.format(r.premiTsfwd ?? 0);
+            fieldPremiEqvetController.text = f.format(r.premiEqvet ?? 0);
             fieldPremiOthersController.text = f.format(r.premiOthers ?? 0);
-            fieldPremiBiController.text     = f.format(r.premiBi     ?? 0);
-            fieldPremiTotalController.text  = f.format(r.premiTotal  ?? 0);
+            fieldPremiBiController.text = f.format(r.premiBi ?? 0);
+            fieldPremiTotalController.text = f.format(r.premiTotal ?? 0);
             currDesc = r.currDesc ?? "IDR";
           } else {
             fieldPremiFlexasController.clear();
@@ -74,37 +74,36 @@ class SimulparFormPremiPageFormState
           }
         }
       },
-      buildWhen: (p, c) =>
-      p.isLoaded != c.isLoaded ||
-          p.isGroupFieldPremiChanged != c.isGroupFieldPremiChanged ||
-          p.errors != c.errors,
+      buildWhen:
+          (p, c) =>
+              p.isLoaded != c.isLoaded ||
+              p.isGroupFieldPremiChanged != c.isGroupFieldPremiChanged ||
+              p.errors != c.errors,
       builder: (context, state) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // ✅ TANPA tombol, hanya field hasil
-                  buildFieldPremiFlexas(),
-                  const SizedBox(height: 10),
-                  buildFieldPremiRsmdcc(),
-                  const SizedBox(height: 10),
-                  buildFieldPremiTsfwd(),
-                  const SizedBox(height: 10),
-                  buildFieldPremiEqvet(),
-                  const SizedBox(height: 10),
-                  buildFieldPremiOthers(),
-                  const SizedBox(height: 10),
-                  buildFieldPremiBI(),
-                  const SizedBox(height: 10),
-                  buildFieldPremiTotal(),
-
-                  const SizedBox(height: 16),
-                  FormError(errors: state.errors ?? [], key: null,),
-                ],
-              ),
+        return Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: pGrey,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                buildFieldPremiFlexas(),
+                const SizedBox(height: 12),
+                buildFieldPremiRsmdcc(),
+                const SizedBox(height: 12),
+                buildFieldPremiTsfwd(),
+                const SizedBox(height: 12),
+                buildFieldPremiEqvet(),
+                const SizedBox(height: 12),
+                buildFieldPremiOthers(),
+                const SizedBox(height: 12),
+                buildFieldPremiBI(),
+                const SizedBox(height: 12),
+                buildFieldPremiTotal(),
+              ],
             ),
           ),
         );
@@ -113,108 +112,79 @@ class SimulparFormPremiPageFormState
   }
 
   Widget buildFieldPremiTotal() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Total Premi",
       controller: fieldPremiTotalController,
-      decoration: InputDecoration(
-          labelText: "Total Premi",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldPremiBI() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Premi BI",
       controller: fieldPremiBiController,
-      decoration: InputDecoration(
-          labelText: "Premi BI",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldPremiFlexas() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Premi FLEXAS",
       controller: fieldPremiFlexasController,
-      decoration: InputDecoration(
-          labelText: "Premi FLEXAS",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldPremiRsmdcc() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Premi RSMDCC",
       controller: fieldPremiRsmdccController,
-      decoration: InputDecoration(
-          labelText: "Premi RSMDCC",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldPremiTsfwd() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Premi TSFWD",
       controller: fieldPremiTsfwdController,
-      decoration: InputDecoration(
-          labelText: "Premi TSFWD",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldPremiEqvet() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Premi EQVET",
       controller: fieldPremiEqvetController,
-      decoration: InputDecoration(
-          labelText: "Premi EQVET",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
 
   Widget buildFieldPremiOthers() {
-    return TextFormField(
-      readOnly: true,
-      keyboardType: TextInputType.number,
-      inputFormatters: [ThousandsSeparatorInputFormatter()],
+    return appTextField(
+      label: "Premi Lainnya",
       controller: fieldPremiOthersController,
-      decoration: InputDecoration(
-          labelText: "Premi Others",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          prefixText: currDesc),
+      keyboardType: TextInputType.number,
+      enabled: false,
+      prefix: Text("$currDesc | ", style: bodyTextStyle(context)),
       onChanged: (value) {},
-      textAlign: TextAlign.right,
     );
   }
- 
 }

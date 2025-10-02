@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,21 +6,25 @@ import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
 import 'package:joss_app/pages/gen_aset_ringkasan/asetringkasancari_list_widget.dart';
 
+import '../../../../../../blocs/share_cubit/share_cubit_state.dart';
 import '../../../../../../common/constants.dart';
-import '../../../../../../widgets/apptheme/build_status_box.dart';
+import '../../../../../../helper/expert_helper.dart';
+import '../../../../../../helper/mobile_expert_helper.dart';
+import '../../../../../../models/gen_aset_ringkasan/asetringkasancari_model.dart';
 import '../../../../../../widgets/apptheme/build_status_text_box.dart';
+import '../../../../../../widgets/apptheme/popup_widget.dart';
 import '../list_form/aset_list_ringkasan.dart';
 
 class TableRingkasanWidget extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
   final String initialStatusId;
-  final double? listHeight; // <— tambahin
+  final double? listHeight;
 
   const TableRingkasanWidget({
     super.key,
     this.padding,
     this.initialStatusId = '10001',
-    this.listHeight, // <—
+    this.listHeight,
   });
 
   @override
@@ -32,7 +37,6 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
   @override
   void initState() {
     super.initState();
-    // lebih stabil daripada delay
     WidgetsBinding.instance.addPostFrameCallback((_) => _refreshData());
   }
 
@@ -45,7 +49,7 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
   void _refreshData() {
     context.read<AsetRingkasanCariBloc>().add(
       RefreshAsetRingkasanCariEvent(
-        statusId: widget.initialStatusId, // gunakan initialStatusId
+        statusId: widget.initialStatusId,
         searchText: _searchController.text,
       ),
     );
@@ -53,52 +57,223 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: widget.padding ?? EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListPageFilterBarUIWidget(
-            searchController: _searchController,
-            searchButton: _buildSearchButton(),
-          ),
-          const SizedBox(height: hPadding),
+    return BlocProvider(
+      create: (_) => ShareStateCubit(),
+      child: MultiBlocListener(
+        listeners: [
+          /// Listener untuk debug ShareStateCubit
+          BlocListener<ShareStateCubit, Map<String, AsetRingkasanCariModel>>(
+            listener: (context, state) {
+              final selected = state.values.toList();
 
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPadding),
-            child: Row(
-              children: const [
-                StatusTextBox(
-                  assetPath: "assets/icons/tambah_polis_icon_polis.svg",
-                  text: "Tambah",
-                    bgColor: Colors.orange,
-                ),
-                SizedBox(width: hPadding),
-                StatusTextBox(
-                  assetPath: "assets/icons/unduh_data_polis.svg",
-                  text: "Unduh",
-                  bgColor: Colors.grey,
-                ),
-                SizedBox(width: hPadding),
-                StatusTextBox(
-                  assetPath: "assets/icons/share_data_polis.svg",
-                  text: "Share",
-                  bgColor: Colors.blue,
-                ),
-              ],
-            ),
+              debugPrint("=============================================");
+              debugPrint("✅ Selected Items: ${selected.length}");
+              debugPrint("=============================================");
+
+              for (var i = 0; i < selected.length; i++) {
+                final item = selected[i];
+                debugPrint("[$i]");
+                debugPrint("  • ID       : ${item.asetRingkasanId}");
+                debugPrint("  • Nama     : ${item.asetNama}");
+                debugPrint("  • Currency : ${item.curr}");
+                debugPrint("  • Jumlah   : ${item.jmlAset} ${item.satuan}");
+                debugPrint("  • Nilai    : ${item.nilaiAset}");
+                debugPrint("  • Premi    : ${item.nilaiPremi}");
+                debugPrint("  • No Urut  : ${item.noUrut}");
+                debugPrint("  • Satuan  : ${item.satuan}");
+                debugPrint("---------------------------------------------");
+              }
+
+              if (selected.isEmpty) {
+                debugPrint("⚠️ Tidak ada item yang dipilih.");
+              }
+            },
           ),
 
-          const SizedBox(height: hPadding),
-
-
-          // 📋 biarkan AsetListRingkasan handle scroll
-          Expanded(
-            child: AsetListRingkasan(
-              searchText: _searchController.text,
-            ),
-          ),
         ],
+        child: BlocBuilder<ShareStateCubit, Map<String, AsetRingkasanCariModel>>(
+          builder: (context, map) {
+            final cubit = context.read<ShareStateCubit>();
+
+            return Padding(
+              padding: widget.padding ?? EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListPageFilterBarUIWidget(
+                    searchController: _searchController,
+                    searchButton: _buildSearchButton(),
+                  ),
+                  const SizedBox(height: vPadding),
+
+                  /// Toolbar (global actions)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hPadding),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const StatusTextBox(
+                          assetPath: "assets/icons/tambah_polis_icon_polis.svg",
+                          text: "Tambah",
+                          bgColor: Colors.orange,
+                        ),
+
+                    StatusTextBox(
+                      assetPath: "assets/icons/unduh_data_polis.svg",
+                      text: "Unduh",
+                      bgColor: Colors.grey,
+                      onTap: () {
+
+                        showGeneralDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierLabel: "Tutup",
+                          barrierColor: Colors.black.withOpacity(0.6),
+                          transitionDuration: const Duration(milliseconds: 250),
+                          pageBuilder: (context, animation, secondaryAnimation) {
+                            return BlocProvider.value(
+                              value: cubit, // 🔑 pass cubit yang udah ada
+                              child: GestureDetector(
+                                onTap: () => Navigator.of(context).pop(),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Center(
+                                    child: GestureDetector(
+                                      onTap: () {},
+                                      child: PopupWidget(
+                                        title: "Pilih format file untuk diunduh",
+                                        subtitle: "Tersedia dalam format Excel dan PDF",
+                                        button1Text: "Excel",
+                                        button2Text: "PDF",
+                                          onExportSelected: (format) async {
+                                            final exportData = cubit.toExportData(); // ✅ sekarang pasti isi
+
+                                            if (exportData.isEmpty) {
+                                              Navigator.of(context).pop();
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text("⚠️ Tidak ada data yang dipilih"),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            Navigator.of(context).pop();
+
+                                            switch (format) {
+                                              case ExportFormat.excel:
+                                                if (kIsWeb) {
+                                                  await ExportHelper.export("excel", exportData, CategoryType.ringkasan);
+                                                } else {
+                                                  await MobileDownloadHelper.download(
+                                                    context: context,
+                                                    fileName: "Data_Ringkasan.xlsx",
+                                                    data: exportData,
+                                                    format: "excel",
+                                                  );
+                                                }
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
+                                                    backgroundColor: Colors.green,
+                                                  ),
+                                                );
+                                                break;
+
+                                              case ExportFormat.pdf:
+                                                if (kIsWeb) {
+                                                  await ExportHelper.export("pdf", exportData, CategoryType.ringkasan);
+                                                } else {
+                                                  await MobileDownloadHelper.download(
+                                                    context: context,
+                                                    fileName: "Data_Ringkasan.pdf",
+                                                    data: exportData,
+                                                    format: "pdf",
+                                                  );
+                                                }
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
+                                                    backgroundColor: Colors.green,
+                                                  ),
+                                                );
+                                                break;
+                                            }
+                                          }
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          transitionBuilder: (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutBack,
+                                ),
+                                child: child,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+
+
+                    const StatusTextBox(
+                          assetPath: "assets/icons/share_data_polis.svg",
+                          text: "Share",
+                          bgColor: Colors.blue,
+                        ),
+
+                        /// 🔑 Global Share (REAL IDs)
+                        BlocBuilder<AsetRingkasanCariBloc, AsetRingkasanCariState>(
+                          builder: (context, asetState) {
+                            final cubit = context.read<ShareStateCubit>();
+
+                            return StatusTextBox(
+                              assetPath: "assets/icons/share_data_polis.svg",
+                              borderColor: primaryLightColor,
+                              activeIconColor: secondaryBlackColor,
+                              enableBorderClickFill: true,
+                              bgColor: cubit.globalActive
+                                  ? primaryLightColor
+                                  : Colors.transparent,
+                              iconColor: cubit.globalActive
+                                  ? secondaryBlackColor
+                                  : primaryLightColor,
+                              onTap: () {
+                                cubit.toggleGlobal(asetState.items); // ⬅️ full data, bukan ID doang
+
+                                final selected = cubit.selectedItems;
+                                debugPrint("👉 Global Share toggled. Selected ${selected.length} items");
+                              },
+                            );
+                          },
+                        ),
+
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: vPadding),
+
+                  /// 📋 biarkan AsetListRingkasan handle scroll
+                  Expanded(
+                    child: AsetListRingkasan(
+                      searchText: _searchController.text,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

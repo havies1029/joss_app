@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/qontak/mobile/customer_service_page.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
@@ -443,13 +444,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         _buildMenuItem(
                           svgAsset: 'assets/icons/bantuan.svg',
                           title: 'Bantuan',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CustomerServicePage(),
-                              ),
-                            );
+                          onTap: () async {
+                            if (ChatInitService.I.isInitialized) {
+                              Navigator.pushNamed(context, 'chat');
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Chat belum siap, coba lagi')),
+                              );
+                            }
                           },
                         ),
                       ],

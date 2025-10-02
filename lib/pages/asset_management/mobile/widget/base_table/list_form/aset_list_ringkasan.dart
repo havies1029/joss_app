@@ -6,6 +6,7 @@ import 'package:joss_app/blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
 import 'package:joss_app/models/gen_aset_ringkasan/asetringkasancari_model.dart';
 
 // ⬅️ pastikan StatusBox udah lo bikin class kayak sebelumnya
+import '../../../../../../blocs/share_cubit/share_cubit_state.dart';
 import '../../../../../../widgets/apptheme/build_status_box.dart';
 
 class AsetListRingkasan extends StatelessWidget {
@@ -29,8 +30,7 @@ class AsetListRingkasan extends StatelessWidget {
 
         if (state.status == ListStatus.success && state.items.isNotEmpty) {
           return ListView.builder(
-            padding: EdgeInsets.symmetric(
-                horizontal: hPadding, vertical: vPadding),
+            padding: const EdgeInsets.symmetric(horizontal: hPadding),
             itemCount: state.items.length,
             itemBuilder: (context, index) {
               final item = state.items[index];
@@ -43,15 +43,14 @@ class AsetListRingkasan extends StatelessWidget {
           child: Text(
             "No Data Available!!",
             style: TextStyle(
-                color: Colors.red,
-                fontSize: 14,
-                fontWeight: FontWeight.bold),
+                color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
           ),
         );
       },
     );
   }
 }
+
 class _AsetRingkasanCard extends StatelessWidget {
   final AsetRingkasanCariModel item;
   const _AsetRingkasanCard({required this.item});
@@ -59,7 +58,7 @@ class _AsetRingkasanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: vPadding),
       decoration: BoxDecoration(
         color: pGrey,
         borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -67,36 +66,65 @@ class _AsetRingkasanCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // 🔹 StatusBox paling atas
+          // 🔹 Action bar atas
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
-              children: const [
-                StatusBox(
-                    assetPath: "assets/icons/edit_icon_polis.svg",
-                    bgColor: Colors.green),
-                SizedBox(width: hPadding),
-                StatusBox(
-                    assetPath: "assets/icons/delete_icon_polis.svg",
-                    bgColor: Colors.orange),
-                SizedBox(width: hPadding),
-                StatusBox(
-                    assetPath: "assets/icons/others_icon_polis.svg",
-                    bgColor: Colors.red),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Bagian kiri
+                Row(
+                  children: const [
+                    StatusBox(
+                      assetPath: "assets/icons/edit_icon_polis.svg",
+                      bgColor: Colors.green,
+                    ),
+                    SizedBox(width: hPadding),
+                    StatusBox(
+                      assetPath: "assets/icons/delete_icon_polis.svg",
+                      bgColor: Colors.orange,
+                    ),
+                    SizedBox(width: hPadding),
+                    StatusBox(
+                      assetPath: "assets/icons/others_icon_polis.svg",
+                      bgColor: Colors.red,
+                    ),
+                  ],
+                ),
+
+                // Bagian kanan (Share per card pakai Bloc)
+                BlocBuilder<ShareStateCubit, Map<String, AsetRingkasanCariModel>>(
+                  builder: (context, state) {
+                    final cubit = context.read<ShareStateCubit>();
+                    final isActive = cubit.isItemActive(item.asetRingkasanId);
+
+                    return StatusBox(
+                      assetPath: "assets/icons/share_data_polis.svg",
+                      bgColor: Colors.transparent,
+                      fullIcon: true,
+                      showBorder: false,
+                      enableBorderClickFill: true,
+                      activeIconColor: secondaryBlackColor,
+                      iconColor: isActive ? secondaryBlackColor : primaryLightColor,
+                      onTap: () => cubit.toggleItem(item), // ⬅️ sekarang passing full object
+                    );
+                  },
+                ),
+
               ],
             ),
           ),
-          _divider(), // ⬅️ Divider setelah action bar
 
-          // 🔹 Semua data ditampilkan
+          _divider(),
+
+          // 🔹 Detail data
           _buildDetailRow(context, "Nama Aset", item.asetNama),
           _divider(),
           _buildDetailRow(context, "ID Ringkasan", item.asetRingkasanId),
           _divider(),
           _buildDetailRow(context, "Currency", item.curr),
           _divider(),
-          _buildDetailRow(context, "Jumlah",
-              "${item.jmlAset} ${item.satuan}"), // jml + satuan
+          _buildDetailRow(context, "Jumlah", "${item.jmlAset} ${item.satuan}"),
           _divider(),
           _buildDetailRow(
             context,
@@ -127,7 +155,7 @@ class _AsetRingkasanCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 110, // 🔹 fix lebar kolom label biar rata
+            width: 110,
             child: Text(
               label,
               style: TextStyle(

@@ -347,7 +347,6 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
                     children: [
                       ReusableComboBox<ComboMJabatanModel>(
                         hintText: "Jabatan",
-                        searchHintText: "Cari Jabatan...",
                         comboKey: ctrls.comboKey,
                         initItem: ctrls.jabatan,
                         maxHeight: 150,

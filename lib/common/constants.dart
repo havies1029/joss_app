@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';
@@ -110,6 +111,7 @@ const String kStringNullError = "Bagian ini wajib diisi.";
 const String kStringProvinsiError = "Provinsi wajib diisi.";
 const String kStringKotaError = "Kota wajib diisi.";
 const String kStringKodeposError = "Kode Pos wajib diisi.";
+const String kString0 = "Harus lebih dari 0.";
 
 enum ListStatus { initial, success, failure }
 

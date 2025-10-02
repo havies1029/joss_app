@@ -2,7 +2,6 @@ part of '../../common/constants.dart';
 
 class ReusableComboBox<T> extends StatefulWidget {
   final String hintText;
-  final String? searchHintText;
   final GlobalKey<DropdownSearchState<T>>? comboKey;
   final T? initItem;
   final Function(T?)? onChangedCallback;
@@ -30,7 +29,6 @@ class ReusableComboBox<T> extends StatefulWidget {
     required this.displayText,
     required this.compareItems,
     required this.onSaveCallback,
-    this.searchHintText,
     this.comboKey,
     this.initItem,
     this.onChangedCallback,
@@ -60,8 +58,10 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
       decoratorProps: DropDownDecoratorProps(
         baseStyle: bodyTextStyle(context),
         decoration: InputDecoration(
-          hintText: widget.hintText,
-          hintStyle: inputTextStyle(context),
+          labelText: widget.hintText,
+          labelStyle: inputTextStyle(context),
+          hintText: 'Pilih ${widget.hintText}',
+          hintStyle: bodyTextStyle(context).copyWith(color: hintGrey),
           prefixIcon:
               widget.prefixIcon != null ? Icon(widget.prefixIcon, color: primaryColor) : null,
           filled: true,
@@ -136,7 +136,7 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
                   cursorColor: primaryLightColor,
                   decoration: InputDecoration(
                     isDense: true,
-                    hintText: widget.searchHintText ?? "Cari...",
+                    hintText: 'Cari ${widget.hintText}...',
                     hintStyle: inputTextStyle(context, color: hintGrey),
                     prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
                     filled: true,

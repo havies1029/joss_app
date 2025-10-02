@@ -239,7 +239,6 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                               // ),
                               ReusableComboBox<ComboMStsclaimModel>(
                                 hintText: "Status",
-                                searchHintText: "Pilih Status Klaim",
                                 comboKey: ctrls.stsClaimKey,
                                 initItem: ctrls.mStsclaim,
                                 dataLoader: () => ComboMStsclaimRepository().getComboMStsclaim(),
@@ -372,7 +371,6 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                       // ),
                       ReusableComboBox<ComboRMatauangModel>(
                         hintText: "Mata Uang",
-                        searchHintText: "Cari Mata Uang...",
                         comboKey: ctrls.mataUangKey,
                         initItem: ctrls.rMatauang,
                         dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),

@@ -547,7 +547,6 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
                     children: [
                       ReusableComboBox<ComboRMatauangModel>(
                         hintText: "Mata Uang",
-                        searchHintText: "Cari Mata Uang...",
                         comboKey: _mataUangKey,
                         initItem: _rMatauang,
                         dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),

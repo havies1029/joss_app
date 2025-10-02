@@ -5,9 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "joss_app",
+            "name": "Flutter Web",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "deviceId": "chrome",
+            "args": [
+                "--web-port=53555"
+            ]
         },
         {
             "name": "joss_app (profile mode)",

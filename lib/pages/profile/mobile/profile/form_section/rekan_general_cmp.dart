@@ -251,7 +251,6 @@ class MRekanGeneralCmpCrudFormPageFormState
   Widget buildFieldBidangUsaha() {
     return ReusableComboBox<ComboMBidangModel>(
       hintText: "Pilih Bidang Usaha",
-      searchHintText: "Cari Bidang Usaha...",
       comboKey: comboMBidangKey,
       initItem: fieldComboMBidang,
       dataLoader: () => ComboMBidangRepository().getComboMBidang(),
