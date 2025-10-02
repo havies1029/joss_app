@@ -1,7 +1,20 @@
 // lib/services/chat_init_service.dart
 import 'dart:async';
-import 'package:flutter/material.dart'; // ✅ perlu buat snackbar
 import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart';
+
+class ChatInitResult {
+  final bool success;
+  final String? error;
+  final String userId;
+  final String displayName;
+
+  ChatInitResult({
+    required this.success,
+    required this.userId,
+    required this.displayName,
+    this.error,
+  });
+}
 
 class ChatInitService {
   ChatInitService._();
@@ -10,26 +23,26 @@ class ChatInitService {
   bool _initialized = false;
   String? _lastUserId;
   String? _lastDisplayName;
-  Completer<bool>? _pending;
+  Completer<ChatInitResult>? _pending;
 
   bool get isInitialized => _initialized;
 
-  Future<bool> ensureInit({
+  Future<ChatInitResult> ensureInit({
     required String userId,
     required String displayName,
     bool force = false,
-    BuildContext? context, // 🔑 tambahin context opsional
   }) async {
     if (!force && _initialized && _lastUserId == userId && _lastDisplayName == displayName) {
-      return true;
+      return ChatInitResult(success: true, userId: userId, displayName: displayName);
     }
 
     if (_pending != null) return _pending!.future;
 
-    _pending = Completer<bool>();
+    _pending = Completer<ChatInitResult>();
 
     try {
-      MobileChatInitialization.init(
+      // kalau lib init ini async, pake await
+      await MobileChatInitialization.init(
         "_zGBGl1xg9V1ZQJVZNyFJg",
         "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
         "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE",
@@ -40,35 +53,25 @@ class ChatInitService {
       _initialized = true;
       _lastUserId = userId;
       _lastDisplayName = displayName;
-      _pending?.complete(true);
 
-      // ✅ tampilkan snackbar sukses
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Chat berhasil diinisialisasi untuk $displayName"),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+      final result = ChatInitResult(
+        success: true,
+        userId: userId,
+        displayName: displayName,
+      );
+      _pending?.complete(result);
+      return result;
     } catch (e) {
-      _pending?.complete(false);
-
-      // ✅ tampilkan snackbar error
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Gagal inisialisasi chat: $e"),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
+      final result = ChatInitResult(
+        success: false,
+        userId: userId,
+        displayName: displayName,
+        error: e.toString(),
+      );
+      _pending?.complete(result);
+      return result;
     } finally {
       _pending = null;
     }
-
-    return _initialized;
   }
 }

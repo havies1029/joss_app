@@ -465,19 +465,30 @@ class _AppState extends State<_App> {
                         ? profile.nama!.trim()
                         : profile.email ?? "Guest";
 
-                    final ok = await ChatInitService.I.ensureInit(
+                    final result = await ChatInitService.I.ensureInit(
                       userId: userId,
                       displayName: displayName,
                     );
 
-                    debugPrint(ok
-                        ? "✅ Chat pre-init done untuk $displayName ($userId)"
-                        : "❌ Chat pre-init gagal");
+                    if (result.success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("✅ Chat berhasil diinisialisasi untuk ${result.displayName}"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("❌ Gagal inisialisasi chat: ${result.error}"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   child: HomeTabWidget(userRepository: widget.userRepository),
                 );
               } else if (user.custType == 'U') {
-                // 🔹 User Register → simple sekali aja
                 context.read<RegUserProfileCubit>().setProfile(
                   email: user.email,
                 );
@@ -488,15 +499,28 @@ class _AppState extends State<_App> {
                   final displayName =
                   regProfile.email.isNotEmpty ? regProfile.email : "New User";
 
-                  final ok = await ChatInitService.I.ensureInit(
+                  final result = await ChatInitService.I.ensureInit(
                     userId: userId,
                     displayName: displayName,
-                    context: context,
                   );
 
-                  debugPrint(ok
-                      ? "✅ Chat pre-init done untuk $displayName ($userId)"
-                      : "❌ Chat pre-init gagal");
+                  if (context.mounted) {
+                    if (result.success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("✅ Chat berhasil diinisialisasi untuk ${result.displayName}"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("❌ Gagal inisialisasi chat: ${result.error}"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 });
 
                 return HomeTabWidget(userRepository: widget.userRepository);
@@ -505,6 +529,7 @@ class _AppState extends State<_App> {
               // fallback
               return HomeTabWidget(userRepository: widget.userRepository);
             }
+
 
 
             if (state is AuthenticationGoogleUserAuthenticated) {
