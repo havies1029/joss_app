@@ -530,8 +530,6 @@ class _AppState extends State<_App> {
               return HomeTabWidget(userRepository: widget.userRepository);
             }
 
-
-
             if (state is AuthenticationGoogleUserAuthenticated) {
               while (_navigatorKey.currentState?.canPop() ?? false) {
                 _navigatorKey.currentState?.pop();

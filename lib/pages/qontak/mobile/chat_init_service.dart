@@ -1,5 +1,6 @@
 // lib/services/chat_init_service.dart
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart';
 
 class ChatInitResult {
@@ -39,9 +40,8 @@ class ChatInitService {
     if (_pending != null) return _pending!.future;
 
     _pending = Completer<ChatInitResult>();
-
     try {
-      // kalau lib init ini async, pake await
+      // ✅ tunggu sampai init selesai
       await MobileChatInitialization.init(
         "_zGBGl1xg9V1ZQJVZNyFJg",
         "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
@@ -61,13 +61,16 @@ class ChatInitService {
       );
       _pending?.complete(result);
       return result;
-    } catch (e) {
+
+    } catch (e, st) {
+      // ✅ tangkap error dengan jelas
       final result = ChatInitResult(
         success: false,
         userId: userId,
         displayName: displayName,
         error: e.toString(),
       );
+      debugPrint("❌ Chat init gagal: $e\n$st");
       _pending?.complete(result);
       return result;
     } finally {
