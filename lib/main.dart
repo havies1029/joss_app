@@ -97,7 +97,7 @@ import 'blocs/gen_review/reviewcari_bloc.dart';
 import 'blocs/simulmv/simulmvcrud_bloc.dart';
 import 'blocs/simulpar/simulparcrud_bloc.dart';
 import 'blocs/hasil_simul_par_cubit/hasil_simul_par_cubit.dart';
-import 'blocs/share_cubit/share_cubit_state.dart';
+import 'blocs/share_cubit/share_ringkasan_state_cubit.dart';
 import 'package:joss_app/blocs/hasil_simul_mv_cubit/hasil_simul_mv_cubit.dart';
 import 'helper/app_prefs.dart';
 import 'models/reguser/reguser_model.dart';
@@ -170,7 +170,7 @@ Future<void> main() async {
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
-        BlocProvider(create: (_) => ShareStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareRingkasanStateCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
 

@@ -6,7 +6,7 @@ import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
 import 'package:joss_app/pages/gen_aset_ringkasan/asetringkasancari_list_widget.dart';
 
-import '../../../../../../blocs/share_cubit/share_cubit_state.dart';
+import '../../../../../../blocs/share_cubit/share_ringkasan_state_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/expert_helper.dart';
 import '../../../../../../helper/mobile_expert_helper.dart';
@@ -58,11 +58,11 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ShareStateCubit(),
+      create: (_) => ShareRingkasanStateCubit(),
       child: MultiBlocListener(
         listeners: [
-          /// Listener untuk debug ShareStateCubit
-          BlocListener<ShareStateCubit, Map<String, AsetRingkasanCariModel>>(
+          /// Listener untuk debug ShareRingkasanStateCubit
+          BlocListener<ShareRingkasanStateCubit, Map<String, AsetRingkasanCariModel>>(
             listener: (context, state) {
               final selected = state.values.toList();
 
@@ -91,19 +91,24 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
           ),
 
         ],
-        child: BlocBuilder<ShareStateCubit, Map<String, AsetRingkasanCariModel>>(
+        child: BlocBuilder<ShareRingkasanStateCubit, Map<String, AsetRingkasanCariModel>>(
           builder: (context, map) {
-            final cubit = context.read<ShareStateCubit>();
+            final cubit = context.read<ShareRingkasanStateCubit>();
 
             return Padding(
               padding: widget.padding ?? EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListPageFilterBarUIWidget(
-                    searchController: _searchController,
-                    searchButton: _buildSearchButton(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hPadding),
+                    child: ListPageFilterBarUIWidget(
+                      searchController: _searchController,
+                      searchButton: _buildSearchButton(),
+                      hintText: "Cari Polis.... ",
+                    ),
                   ),
+
                   const SizedBox(height: vPadding),
 
                   /// Toolbar (global actions)
@@ -119,13 +124,13 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                           children: [
                             StatusTextBox(
                               assetPath: "assets/icons/tambah_polis_icon_polis.svg",
-                              text: hideText ? null : "Tambah",   // ⬅️ hilangkan teks
+                              text: "Tambah",   // ⬅️ hilangkan teks
                               bgColor: Colors.orange,
                             ),
 
                             StatusTextBox(
                               assetPath: "assets/icons/unduh_data_polis.svg",
-                              text: hideText ? null : "Unduh",
+                              text: "Unduh",
                               bgColor: Colors.grey,
                               onTap: () {
                                 showGeneralDialog(
@@ -230,34 +235,8 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
 
                             StatusTextBox(
                               assetPath: "assets/icons/share_data_polis.svg",
-                              text: hideText ? null : "Share",
+                              text: "Share",
                               bgColor: Colors.blue,
-                            ),
-
-                            /// 🔑 Global Share (REAL IDs)
-                            BlocBuilder<AsetRingkasanCariBloc, AsetRingkasanCariState>(
-                              builder: (context, asetState) {
-                                final cubit = context.read<ShareStateCubit>();
-
-                                return StatusTextBox(
-                                  assetPath: "assets/icons/share_data_polis.svg",
-                                  text: hideText ? null : "Share", // ⬅️ ikut sembunyi
-                                  borderColor: primaryLightColor,
-                                  activeIconColor: secondaryBlackColor,
-                                  enableBorderClickFill: true,
-                                  bgColor: cubit.globalActive
-                                      ? primaryLightColor
-                                      : Colors.transparent,
-                                  iconColor: cubit.globalActive
-                                      ? secondaryBlackColor
-                                      : primaryLightColor,
-                                  onTap: () {
-                                    cubit.toggleGlobal(asetState.items);
-                                    final selected = cubit.selectedItems;
-                                    debugPrint("👉 Global Share toggled. Selected ${selected.length} items");
-                                  },
-                                );
-                              },
                             ),
                           ],
                         );
@@ -267,7 +246,6 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
 
                   const SizedBox(height: vPadding),
 
-                  /// 📋 biarkan AsetListRingkasan handle scroll
                   Expanded(
                     child: AsetListRingkasan(
                       searchText: _searchController.text,

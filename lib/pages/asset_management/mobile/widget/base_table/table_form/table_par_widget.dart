@@ -1,8 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/gen_aset_par/asetparcari_bloc.dart';
-import 'package:joss_app/pages/gen_aset_par/asetparcari_list_widget.dart';
+import 'package:joss_app/models/gen_aset_par/asetparcari_model.dart';
+import 'package:joss_app/widgets/apptheme/build_status_text_box.dart';
+import 'package:joss_app/widgets/apptheme/popup_widget.dart';
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/helper/expert_helper.dart';
+import 'package:joss_app/helper/mobile_expert_helper.dart';
+import 'package:joss_app/blocs/share_cubit/share_par_state_cubit.dart';
+
+import '../list_form/aset_list_par.dart';
 
 class TableParWidget extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
@@ -17,16 +26,15 @@ class TableParWidget extends StatefulWidget {
   });
 
   @override
-  TableParWidgetState createState() => TableParWidgetState();
+  State<TableParWidget> createState() => _TableParWidgetState();
 }
 
-class TableParWidgetState extends State<TableParWidget> {
+class _TableParWidgetState extends State<TableParWidget> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // lebih stabil dibanding Future.delayed
     WidgetsBinding.instance.addPostFrameCallback((_) => _refreshData());
   }
 
@@ -47,33 +55,239 @@ class TableParWidgetState extends State<TableParWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final double h = widget.listHeight ?? 400; // default tinggi list
-
-    return Padding(
-      padding: widget.padding ?? EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListPageFilterBarUIWidget(
-            searchController: _searchController,
-            searchButton: IconButton(
-              icon: const Icon(Icons.autorenew_rounded, size: 28),
-              tooltip: 'Refresh',
-              onPressed: _refreshData,
-            ),
+    return BlocProvider(
+      create: (_) => ShareParStateCubit(),
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ShareParStateCubit, Map<String, AsetParCariModel>>(
+            listener: (context, state) {
+              if (kDebugMode) {
+                final selected = state.values.toList();
+                debugPrint("=============================================");
+                debugPrint("✅ Selected Items: ${selected.length}");
+                debugPrint("=============================================");
+                for (var i = 0; i < selected.length; i++) {
+                  final item = selected[i];
+                  debugPrint("[$i]");
+                  debugPrint("  • ID       : ${item.asetParId}");
+                  debugPrint("  • Alamat   : ${item.alamat}");
+                  debugPrint("  • Currency : ${item.curr}");
+                  debugPrint("  • Premi    : ${item.premi}");
+                  debugPrint("  • SumIns   : ${item.sumInsured}");
+                  debugPrint("---------------------------------------------");
+                }
+              }
+            },
           ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: h,
-            child: Scrollbar(
-              thumbVisibility: true,
-              child: AsetParCariListWidget(
-                searchText: _searchController.text,
+        ],
+        child: BlocBuilder<ShareParStateCubit, Map<String, AsetParCariModel>>(
+          builder: (context, map) {
+            final cubit = context.read<ShareParStateCubit>();
+
+            return Padding(
+              padding: widget.padding ?? EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// 🔍 Search bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding),
+                    child: ListPageFilterBarUIWidget(
+                      searchController: _searchController,
+                      searchButton: _buildSearchButton(),
+                      hintText: "Cari Properti...",
+                    ),
+                  ),
+
+                  const SizedBox(height: vPadding),
+
+                  /// 🧭 Toolbar global (Tambah, Unduh, Share)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final bool hideText = constraints.maxWidth < 480;
+                        final bool isCompact = constraints.maxWidth < 700;
+
+                        // Responsive: wrap di layar kecil
+                        return isCompact
+                            ? Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: _buildToolbarButtons(context, cubit, hideText),
+                        )
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: _buildToolbarButtons(context, cubit, hideText)
+                              .map((btn) => Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: btn,
+                          ))
+                              .toList(),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: vPadding),
+
+                  /// 📋 List data PAR
+                  Expanded(
+                    child: AsetListPar(
+                      searchText: _searchController.text,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  /// 🔄 Tombol search/refresh utama
+  IconButton _buildSearchButton() {
+    return IconButton(
+      icon: const Icon(Icons.autorenew_rounded, size: 28),
+      onPressed: _refreshData,
+      tooltip: 'Refresh data',
+    );
+  }
+
+  /// 🎛️ Toolbar buttons (Tambah, Unduh, Share)
+  List<Widget> _buildToolbarButtons(
+      BuildContext context, ShareParStateCubit cubit, bool hideText) {
+    return [
+      StatusTextBox(
+        assetPath: "assets/icons/tambah_polis_icon_polis.svg",
+        text: hideText ? null : "Tambah",
+        bgColor: Colors.orange,
+      ),
+      StatusTextBox(
+        assetPath: "assets/icons/unduh_data_polis.svg",
+        text: hideText ? null : "Unduh",
+        bgColor: Colors.grey,
+        onTap: () => _showExportDialog(context, cubit),
+      ),
+      StatusTextBox(
+        assetPath: "assets/icons/share_data_polis.svg",
+        text: hideText ? null : "Share",
+        bgColor: Colors.blue,
+      ),
+    ];
+  }
+
+  /// 📤 Popup ekspor file
+  Future<void> _showExportDialog(
+      BuildContext context, ShareParStateCubit cubit) async {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.6),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return BlocProvider.value(
+          value: cubit,
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Material(
+              color: Colors.transparent,
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {},
+                  child: PopupWidget(
+                    title: "Pilih format file untuk diunduh",
+                    subtitle: "Tersedia dalam format Excel dan PDF",
+                    button1Text: "Excel",
+                    button2Text: "PDF",
+                    onExportSelected: (format) async {
+                      final exportData = cubit.toExportData();
+
+                      if (exportData.isEmpty) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("⚠️ Tidak ada data yang dipilih"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      Navigator.of(context).pop();
+
+                      switch (format) {
+                        case ExportFormat.excel:
+                          if (kIsWeb) {
+                            await ExportHelper.export(
+                              "excel",
+                              exportData,
+                              CategoryType.properti,
+                            );
+                          } else {
+                            await MobileDownloadHelper.download(
+                              context: context,
+                              fileName: "Data_Properti.xlsx",
+                              data: exportData,
+                              format: "excel",
+                            );
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  "✅ Berhasil ekspor ${exportData.length} data ke Excel"),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          break;
+
+                        case ExportFormat.pdf:
+                          if (kIsWeb) {
+                            await ExportHelper.export(
+                              "pdf",
+                              exportData,
+                              CategoryType.properti,
+                            );
+                          } else {
+                            await MobileDownloadHelper.download(
+                              context: context,
+                              fileName: "Data_Properti.pdf",
+                              data: exportData,
+                              format: "pdf",
+                            );
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  "✅ Berhasil ekspor ${exportData.length} data ke PDF"),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          break;
+                      }
+                    },
+                  ),
+                ),
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
