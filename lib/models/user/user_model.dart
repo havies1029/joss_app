@@ -55,6 +55,8 @@ class User {
         custType: data['custType'] ?? '',
       );
 
+  // get reguserId => null;
+
   Map<String, dynamic> toDatabaseJson() => {
         "id": id,
         "username": username,

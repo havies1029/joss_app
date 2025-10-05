@@ -12,6 +12,7 @@ import '../../../gen_klaim/mobile/widget/crud_klaim_widget/klaim1_inline_editor_
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../gen_status_aset/statusasetcari_main.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../qontak/mobile/chat_init_service.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
@@ -192,21 +193,14 @@ class ListMenuWidget extends StatelessWidget {
   Widget _buildMenuItem(BuildContext context, MenuItem item, String custType) {
     final isClient = custType == 'C';
     final isAlwaysActive =
-        item.title == "Cari Asuransi" || item.title == "Lapor Klaim";
+        item.title == "Cari Asuransi" || item.title == "Lapor Klaim" || item.title == "Bantuan";
 
     final isActive = isClient || isAlwaysActive;
 
     return GestureDetector(
       onTap: () {
         if (isActive) {
-          final page = getMenuPage(item.title);
-          if (page != null) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-          } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(infoSnackBar('Fitur ${item.title} belum tersedia!'));
-          }
+          handleMenuTap(context, item.title);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             infoSnackBar(
@@ -215,6 +209,7 @@ class ListMenuWidget extends StatelessWidget {
           );
         }
       },
+
 
       child: Opacity(
         opacity: isActive ? 1.0 : 0.4,
@@ -309,8 +304,9 @@ class ListMenuWidget extends StatelessWidget {
   List<MenuItem> _getMenuItems() {
     return [
       MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
-      MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
+      MenuItem(title: 'Bantuan', iconPath: 'assets/icons/bantuan.svg'),
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
+      MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
       MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
@@ -328,25 +324,45 @@ class ListMenuWidget extends StatelessWidget {
   //   ];
   // }
 
-  Widget? getMenuPage(String title) {
+  void handleMenuTap(BuildContext context, String title) async {
     switch (title) {
       case 'Cari Asuransi':
-        return CariAsuransiWidget.page();
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CariAsuransiWidget.page()));
+        break;
+
       case 'Lapor Klaim':
-        // return KlaimMainPage();
-        return Klaim1InlineEditorPage();
+        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimMainPage()));
+        break;
+
       case 'Polis':
-        return AssetManagementPage();
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AssetManagementPage()));
+        break;
+
+      case 'Bantuan':
+        if (ChatInitService.I.isInitialized) {
+          Navigator.pushNamed(context, 'chat');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Chat belum siap, coba lagi')),
+          );
+        }
+        break;
+
       case 'Beli Polis':
-        return BeliPolisPage();
+        Navigator.push(context, MaterialPageRoute(builder: (_) => BeliPolisPage()));
+        break;
+
       case 'Klaim':
-        return ListKlaimWidget();
-      // case 'Tagihan Pembayaran':
-      //   return TagihanPembayaranPage();
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));
+        break;
+
       default:
-        return null;
+        ScaffoldMessenger.of(context).showSnackBar(
+          infoSnackBar('Fitur $title belum tersedia!'),
+        );
     }
   }
+
 }
 
 class MenuItem {

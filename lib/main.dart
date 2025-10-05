@@ -100,6 +100,7 @@ import 'blocs/hasil_simul_par_cubit/hasil_simul_par_cubit.dart';
 import 'blocs/share_cubit/share_cubit_state.dart';
 import 'package:joss_app/blocs/hasil_simul_mv_cubit/hasil_simul_mv_cubit.dart';
 import 'helper/app_prefs.dart';
+import 'models/reguser/reguser_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -269,6 +270,7 @@ Future<void> main() async {
               if (record.email.isNotEmpty) {
                 context.read<RegUserProfileCubit>().setProfile(
                   email: record.email,
+                  reguserId: record.requestId,
                 );
               }
             },
@@ -451,15 +453,22 @@ class _AppState extends State<_App> {
             : BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
-              // ✅ Tutup semua popup lama
+              // 🔹 1. Tutup semua route sebelumnya biar stack bersih
               while (_navigatorKey.currentState?.canPop() ?? false) {
                 _navigatorKey.currentState?.pop();
               }
 
               final user = state.user;
+              final homeWidget = HomeTabWidget(userRepository: widget.userRepository);
 
+              // 🔹 2. Cegah double inisialisasi chat
+              if (ChatInitService.I.isInitialized) {
+                debugPrint("⚠️ [ChatInitService] Sudah diinisialisasi, skip ulang init.");
+                return homeWidget;
+              }
+
+              // 🔹 3. Handle client (‘C’)
               if (user.custType == 'C') {
-                // 🔹 Client → pakai UserProfileCubit
                 context.read<UserProfileCubit>().setProfile(
                   mrekan1Id: user.id?.toString(),
                   nama: user.nama,
@@ -473,58 +482,92 @@ class _AppState extends State<_App> {
                       curr.mrekan1Id != null &&
                       curr.mrekan1Id!.trim().isNotEmpty,
                   listener: (context, profile) async {
-                    final userId = profile.mrekan1Id!.trim();
-                    final displayName = profile.nama?.trim().isNotEmpty == true
-                        ? profile.nama!.trim()
-                        : profile.email ?? "Guest";
+                    // ✅ Pastikan belum pernah init ulang
+                    if (ChatInitService.I.isInitialized) return;
 
-                    final ok = await ChatInitService.I.ensureInit(
+                    try {
+                      final userId = profile.mrekan1Id!.trim();
+                      final displayName = (profile.nama?.trim().isNotEmpty ?? false)
+                          ? profile.nama!.trim()
+                          : profile.email ?? "Guest";
+
+                      final result = await ChatInitService.I.ensureInit(
+                        userId: userId,
+                        displayName: displayName,
+                      );
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result.success
+                                ? "✅ Chat siap: ${result.displayName}"
+                                : "❌ Gagal inisialisasi chat: ${result.error}"),
+                            backgroundColor:
+                            result.success ? Colors.green : Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e, s) {
+                      debugPrint("🔥 [ChatInit Error] $e\n$s");
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("❌ Error inisialisasi chat: $e"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: homeWidget,
+                );
+              }
+
+              // 🔹 4. Handle user biasa (‘U’)
+              else if (user.custType == 'U') {
+                Future.microtask(() async {
+                  if (ChatInitService.I.isInitialized) return;
+
+                  try {
+                    final regProfile = context.read<RegUserProfileCubit>().state;
+
+                    final guestId = "guest-${DateTime.now().millisecondsSinceEpoch}";
+                    final userId =
+                    regProfile.reguserId.isNotEmpty ? regProfile.reguserId : guestId;
+                    final displayName = regProfile.email.isNotEmpty
+                        ? regProfile.email
+                        : "New User";
+
+                    final result = await ChatInitService.I.ensureInit(
                       userId: userId,
                       displayName: displayName,
                     );
 
-                    debugPrint(ok
-                        ? "✅ Chat pre-init done untuk $displayName ($userId)"
-                        : "❌ Chat pre-init gagal");
-                  },
-                  child: HomeTabWidget(userRepository: widget.userRepository),
-                );
-              } else if (user.custType == 'U') {
-                // 🔹 User Register → simple sekali aja
-                context.read<RegUserProfileCubit>().setProfile(
-                  email: user.email,
-                );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.success
+                              ? "✅ Chat siap: ${result.displayName}"
+                              : "❌ Gagal inisialisasi chat: ${result.error}"),
+                          backgroundColor:
+                          result.success ? Colors.green : Colors.red,
+                        ),
+                      );
+                    }
 
-                Future.microtask(() async {
-                  final regProfile = context.read<RegUserProfileCubit>().state;
-                  final userId = "guest-${DateTime.now().millisecondsSinceEpoch}";
-                  final displayName =
-                  regProfile.email.isNotEmpty ? regProfile.email : "New User";
-
-                  final ok = await ChatInitService.I.ensureInit(
-                    userId: userId,
-                    displayName: displayName,
-                  );
-
-                  debugPrint(ok
-                      ? "✅ Chat pre-init done untuk $displayName ($userId)"
-                      : "❌ Chat pre-init gagal");
+                    debugPrint(result.success
+                        ? "✅ [ChatInitService] Initialized untuk $displayName"
+                        : "⚠️ [ChatInitService] Gagal init: ${result.error}");
+                  } catch (e, s) {
+                    debugPrint("🔥 [ChatInit Error U] $e\n$s");
+                  }
                 });
 
-                return HomeTabWidget(userRepository: widget.userRepository);
+                return homeWidget;
               }
 
-              // fallback
-              return HomeTabWidget(userRepository: widget.userRepository);}
-
-            if (state is AuthenticationGoogleUserAuthenticated) {
-              while (_navigatorKey.currentState?.canPop() ?? false) {
-                _navigatorKey.currentState?.pop();
-              }
-
-              return HomeTabWidget(
-                userRepository: widget.userRepository,
-              );
+              // 🔹 5. Default fallback
+              return homeWidget;
             }
 
 

@@ -5,6 +5,7 @@ import 'package:joss_app/common/constants.dart';
 class StatusTextBox extends StatefulWidget {
   final String assetPath;
   final String? text;
+  final bool showText;
   final Color? bgColor;
   final Color? borderColor;
   final Color? iconColor;
@@ -21,6 +22,7 @@ class StatusTextBox extends StatefulWidget {
     super.key,
     required this.assetPath,
     this.text,
+    this.showText = true,
     this.bgColor,
     this.borderColor,
     this.iconColor,
@@ -87,7 +89,7 @@ class _StatusTextBoxState extends State<StatusTextBox> {
                 BlendMode.srcIn,
               ),
             ),
-            if (widget.text != null && widget.text!.isNotEmpty) ...[
+            if (widget.showText && widget.text != null) ...[
               SizedBox(width: widget.spacing),
               Text(
                 widget.text!,

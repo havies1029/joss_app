@@ -109,155 +109,159 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                   /// Toolbar (global actions)
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const StatusTextBox(
-                          assetPath: "assets/icons/tambah_polis_icon_polis.svg",
-                          text: "Tambah",
-                          bgColor: Colors.orange,
-                        ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // threshold bebas lo atur, misalnya < 480 px sembunyikan teks
+                        final bool hideText = constraints.maxWidth < 480;
 
-                    StatusTextBox(
-                      assetPath: "assets/icons/unduh_data_polis.svg",
-                      text: "Unduh",
-                      bgColor: Colors.grey,
-                      onTap: () {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            StatusTextBox(
+                              assetPath: "assets/icons/tambah_polis_icon_polis.svg",
+                              text: hideText ? null : "Tambah",   // ⬅️ hilangkan teks
+                              bgColor: Colors.orange,
+                            ),
 
-                        showGeneralDialog(
-                          context: context,
-                          barrierDismissible: true,
-                          barrierLabel: "Tutup",
-                          barrierColor: Colors.black.withOpacity(0.6),
-                          transitionDuration: const Duration(milliseconds: 250),
-                          pageBuilder: (context, animation, secondaryAnimation) {
-                            return BlocProvider.value(
-                              value: cubit, // 🔑 pass cubit yang udah ada
-                              child: GestureDetector(
-                                onTap: () => Navigator.of(context).pop(),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: Center(
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: PopupWidget(
-                                        title: "Pilih format file untuk diunduh",
-                                        subtitle: "Tersedia dalam format Excel dan PDF",
-                                        button1Text: "Excel",
-                                        button2Text: "PDF",
-                                          onExportSelected: (format) async {
-                                            final exportData = cubit.toExportData(); // ✅ sekarang pasti isi
+                            StatusTextBox(
+                              assetPath: "assets/icons/unduh_data_polis.svg",
+                              text: hideText ? null : "Unduh",
+                              bgColor: Colors.grey,
+                              onTap: () {
+                                showGeneralDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  barrierLabel: "Tutup",
+                                  barrierColor: Colors.black.withOpacity(0.6),
+                                  transitionDuration: const Duration(milliseconds: 250),
+                                  pageBuilder: (context, animation, secondaryAnimation) {
+                                    return BlocProvider.value(
+                                      value: cubit, // 🔑 pass cubit yang udah ada
+                                      child: GestureDetector(
+                                        onTap: () => Navigator.of(context).pop(),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: Center(
+                                            child: GestureDetector(
+                                              onTap: () {},
+                                              child: PopupWidget(
+                                                title: "Pilih format file untuk diunduh",
+                                                subtitle: "Tersedia dalam format Excel dan PDF",
+                                                button1Text: "Excel",
+                                                button2Text: "PDF",
+                                                onExportSelected: (format) async {
+                                                  final exportData = cubit.toExportData();
 
-                                            if (exportData.isEmpty) {
-                                              Navigator.of(context).pop();
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text("⚠️ Tidak ada data yang dipilih"),
-                                                  backgroundColor: Colors.red,
-                                                ),
-                                              );
-                                              return;
-                                            }
+                                                  if (exportData.isEmpty) {
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text("⚠️ Tidak ada data yang dipilih"),
+                                                        backgroundColor: Colors.red,
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
 
-                                            Navigator.of(context).pop();
+                                                  Navigator.of(context).pop();
 
-                                            switch (format) {
-                                              case ExportFormat.excel:
-                                                if (kIsWeb) {
-                                                  await ExportHelper.export("excel", exportData, CategoryType.ringkasan);
-                                                } else {
-                                                  await MobileDownloadHelper.download(
-                                                    context: context,
-                                                    fileName: "Data_Ringkasan.xlsx",
-                                                    data: exportData,
-                                                    format: "excel",
-                                                  );
-                                                }
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
-                                                    backgroundColor: Colors.green,
-                                                  ),
-                                                );
-                                                break;
+                                                  switch (format) {
+                                                    case ExportFormat.excel:
+                                                      if (kIsWeb) {
+                                                        await ExportHelper.export("excel", exportData, CategoryType.ringkasan);
+                                                      } else {
+                                                        await MobileDownloadHelper.download(
+                                                          context: context,
+                                                          fileName: "Data_Ringkasan.xlsx",
+                                                          data: exportData,
+                                                          format: "excel",
+                                                        );
+                                                      }
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
+                                                          backgroundColor: Colors.green,
+                                                        ),
+                                                      );
+                                                      break;
 
-                                              case ExportFormat.pdf:
-                                                if (kIsWeb) {
-                                                  await ExportHelper.export("pdf", exportData, CategoryType.ringkasan);
-                                                } else {
-                                                  await MobileDownloadHelper.download(
-                                                    context: context,
-                                                    fileName: "Data_Ringkasan.pdf",
-                                                    data: exportData,
-                                                    format: "pdf",
-                                                  );
-                                                }
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
-                                                    backgroundColor: Colors.green,
-                                                  ),
-                                                );
-                                                break;
-                                            }
-                                          }
+                                                    case ExportFormat.pdf:
+                                                      if (kIsWeb) {
+                                                        await ExportHelper.export("pdf", exportData, CategoryType.ringkasan);
+                                                      } else {
+                                                        await MobileDownloadHelper.download(
+                                                          context: context,
+                                                          fileName: "Data_Ringkasan.pdf",
+                                                          data: exportData,
+                                                          format: "pdf",
+                                                        );
+                                                      }
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
+                                                          backgroundColor: Colors.green,
+                                                        ),
+                                                      );
+                                                      break;
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          transitionBuilder: (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: ScaleTransition(
-                                scale: CurvedAnimation(
-                                  parent: animation,
-                                  curve: Curves.easeOutBack,
-                                ),
-                                child: child,
-                              ),
-                            );
-                          },
+                                    );
+                                  },
+                                  transitionBuilder: (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: ScaleTransition(
+                                        scale: CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.easeOutBack,
+                                        ),
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+
+                            StatusTextBox(
+                              assetPath: "assets/icons/share_data_polis.svg",
+                              text: hideText ? null : "Share",
+                              bgColor: Colors.blue,
+                            ),
+
+                            /// 🔑 Global Share (REAL IDs)
+                            BlocBuilder<AsetRingkasanCariBloc, AsetRingkasanCariState>(
+                              builder: (context, asetState) {
+                                final cubit = context.read<ShareStateCubit>();
+
+                                return StatusTextBox(
+                                  assetPath: "assets/icons/share_data_polis.svg",
+                                  text: hideText ? null : "Share", // ⬅️ ikut sembunyi
+                                  borderColor: primaryLightColor,
+                                  activeIconColor: secondaryBlackColor,
+                                  enableBorderClickFill: true,
+                                  bgColor: cubit.globalActive
+                                      ? primaryLightColor
+                                      : Colors.transparent,
+                                  iconColor: cubit.globalActive
+                                      ? secondaryBlackColor
+                                      : primaryLightColor,
+                                  onTap: () {
+                                    cubit.toggleGlobal(asetState.items);
+                                    final selected = cubit.selectedItems;
+                                    debugPrint("👉 Global Share toggled. Selected ${selected.length} items");
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         );
                       },
-                    ),
-
-
-                    const StatusTextBox(
-                          assetPath: "assets/icons/share_data_polis.svg",
-                          text: "Share",
-                          bgColor: Colors.blue,
-                        ),
-
-                        /// 🔑 Global Share (REAL IDs)
-                        BlocBuilder<AsetRingkasanCariBloc, AsetRingkasanCariState>(
-                          builder: (context, asetState) {
-                            final cubit = context.read<ShareStateCubit>();
-
-                            return StatusTextBox(
-                              assetPath: "assets/icons/share_data_polis.svg",
-                              borderColor: primaryLightColor,
-                              activeIconColor: secondaryBlackColor,
-                              enableBorderClickFill: true,
-                              bgColor: cubit.globalActive
-                                  ? primaryLightColor
-                                  : Colors.transparent,
-                              iconColor: cubit.globalActive
-                                  ? secondaryBlackColor
-                                  : primaryLightColor,
-                              onTap: () {
-                                cubit.toggleGlobal(asetState.items); // ⬅️ full data, bukan ID doang
-
-                                final selected = cubit.selectedItems;
-                                debugPrint("👉 Global Share toggled. Selected ${selected.length} items");
-                              },
-                            );
-                          },
-                        ),
-
-                      ],
                     ),
                   ),
 
@@ -272,6 +276,7 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                 ],
               ),
             );
+
           },
         ),
       ),

@@ -10,6 +10,7 @@ import 'package:joss_app/widgets/apptheme/header_card.dart';
 import '../../../../../models/gen_klaim/klaim1list_model.dart';
 import '../../../../../widgets/my_text.dart';
 import '../../../../base/base_background_sidepage.dart';
+import '../../klaim_main_page.dart';
 import '../crud_klaim_widget/klaim1_inline_editor_page.dart';
 
 class TimelineCardWidget extends StatefulWidget {
@@ -190,7 +191,7 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const Klaim1InlineEditorPage(),
+                          builder: (_) => const KlaimMainPage(),
                         ),
                       );
                     },

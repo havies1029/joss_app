@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
 import '../../../../../blocs/login/emailverification_bloc.dart';
+import '../../../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/login/emailverification_model.dart';
 import '../../../../../repositories/user/user_repository.dart';
@@ -184,6 +185,9 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
       return;
     }
     //Navigator.of(context).pop();
+      context.read<RegUserProfileCubit>().setProfile(
+        email: widget.email,
+      );
 
     context.read<EmailVerificationBloc>().add(
       ValidasiPinEmailEvent(

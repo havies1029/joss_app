@@ -269,11 +269,6 @@ class _Klaim1InlineEditorPageState extends State<Klaim1InlineEditorPage> {
         child: Container(
           decoration: const BoxDecoration(
             color: secondaryBlackColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            border: Border(top: BorderSide(color: primaryColor, width: 4.0)),
           ),
           child: content,
         ),

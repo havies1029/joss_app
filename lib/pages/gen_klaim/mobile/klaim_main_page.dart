@@ -51,13 +51,6 @@ class _KlaimMainPageState extends State<KlaimMainPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: const [
-              HeaderCard(
-                iconPath: "assets/icons/shield2.svg",
-                title: "Klaim",
-                subtitle:
-                "Ajukan klaim Anda dengan mudah dan cepat sesuai ketentuan polis yang berlaku.",
-              ),
-              SizedBox(height: 12),
               Expanded(child: Klaim1InlineEditorPage()),
             ],
           ),
