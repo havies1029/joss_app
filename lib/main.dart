@@ -126,10 +126,10 @@ Future<void> main() async {
           create: (_) => AuthenticationBloc(userRepository: userRepository)..add(AppStarted()),
         ),
         BlocProvider<SimulasiParLocalCubit>(
-          create: (_) => SimulasiParLocalCubit(appPrefs), 
+          create: (_) => SimulasiParLocalCubit(appPrefs),
         ),
         BlocProvider<SimulasiMvLocalCubit>(
-          create: (_) => SimulasiMvLocalCubit(appPrefs), 
+          create: (_) => SimulasiMvLocalCubit(appPrefs),
         ),
         BlocProvider(
           create: (ctx) => LoginBloc(
@@ -458,6 +458,25 @@ class _AppState extends State<_App> {
                 _navigatorKey.currentState?.pop();
               }
 
+              final u = state.user;
+              debugPrint('================ AUTH USER DATA ================');
+              debugPrint('ID              : ${u.id}');
+              debugPrint('Username        : ${u.username}');
+              debugPrint('Nama            : ${u.nama}');
+              debugPrint('HP              : ${u.hp}');
+              debugPrint('Email           : ${u.email}');
+              debugPrint('Alamat 1        : ${u.alamat1}');
+              debugPrint('Alamat 2        : ${u.alamat2}');
+              debugPrint('Propinsi ID     : ${u.propinsiId}');
+              debugPrint('Propinsi Desc   : ${u.propinsiDesc}');
+              debugPrint('Jenis Kelamin   : ${u.jnskel}');
+              debugPrint('User Cabang     : ${u.userCabang}');
+              debugPrint('Has Downline    : ${u.hasDownline}');
+              debugPrint('CustType        : ${u.custType}');
+              debugPrint('Token           : ${u.token != null ? u.token!.substring(0, 10) + "..." : "NULL"}');
+              debugPrint('Foto            : ${u.foto != null ? "ADA (${u.foto!.lengthInBytes} bytes)" : "TIDAK ADA"}');
+              debugPrint('================================================');
+
               final user = state.user;
               final homeWidget = HomeTabWidget(userRepository: widget.userRepository);
 
@@ -575,6 +594,8 @@ class _AppState extends State<_App> {
               context.read<UserProfileCubit>().clearProfile();
               context.read<RegUserProfileCubit>().clearProfile();
               context.read<LoginBloc>().add(LoginReset());
+
+              ChatInitService.I.dispose();
               return const LoginUser();
             }
 

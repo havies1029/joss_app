@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/login/login_bloc.dart';
+import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
+import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../common/constants.dart';
+import '../../qontak/mobile/chat_init_service.dart';
 
 class LogoutConfirmationPopup extends StatefulWidget {
   const LogoutConfirmationPopup({Key? key}) : super(key: key);
@@ -89,6 +93,10 @@ class _LogoutConfirmationPopupState extends State<LogoutConfirmationPopup>
 
       // Trigger logout BEFORE closing popup
       if (authBloc != null) {
+        // context.read<UserProfileCubit>().clearProfile();
+        // context.read<RegUserProfileCubit>().clearProfile();
+        // context.read<LoginBloc>().add(LoginReset());
+        // ChatInitService.I.dispose();
         authBloc.add(LoggedOut());
         await Future.delayed(const Duration(milliseconds: 100));
       } else {

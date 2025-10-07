@@ -304,7 +304,6 @@ class ListMenuWidget extends StatelessWidget {
   List<MenuItem> _getMenuItems() {
     return [
       MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
-      MenuItem(title: 'Bantuan', iconPath: 'assets/icons/bantuan.svg'),
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
@@ -338,15 +337,15 @@ class ListMenuWidget extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => AssetManagementPage()));
         break;
 
-      case 'Bantuan':
-        if (ChatInitService.I.isInitialized) {
-          Navigator.pushNamed(context, 'chat');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Chat belum siap, coba lagi')),
-          );
-        }
-        break;
+      // case 'Bantuan':
+      //   if (ChatInitService.I.isInitialized) {
+      //     Navigator.pushNamed(context, 'chat');
+      //   } else {
+      //     ScaffoldMessenger.of(context).showSnackBar(
+      //       const SnackBar(content: Text('Chat belum siap, coba lagi')),
+      //     );
+      //   }
+      //   break;
 
       case 'Beli Polis':
         Navigator.push(context, MaterialPageRoute(builder: (_) => BeliPolisPage()));

@@ -31,6 +31,7 @@ class HeroPage extends StatelessWidget {
                   BlocBuilder<AuthenticationBloc, AuthenticationState>(
                     builder: (context, authState) {
                       final custType = authState is AuthenticationAuthenticated
+
                           ? authState.user.custType
                           : '';
 

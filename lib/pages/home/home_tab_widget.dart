@@ -16,8 +16,10 @@ import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
 import '../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../heropage/mobile/heropage.dart';
+import '../qontak/mobile/chat_init_service.dart';
 import '../qontak/mobile/customer_service_page.dart';
 import '../settingpage/mobile/settingpage.dart';
+import 'draggable_chat_button.dart';
 
 class HomeTabWidget extends StatefulWidget {
   final UserRepository userRepository;
@@ -96,7 +98,26 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
-        body: pages[selectedIndex],
+        body: Stack(
+          children: [
+            IndexedStack(
+              index: selectedIndex,
+              children: pages,
+            ),
+            DraggableChatButton(
+              onTap: () {
+                if (ChatInitService.I.isInitialized) {
+                  Navigator.pushNamed(context, 'chat');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Chat belum siap, coba lagi')),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+
         bottomNavigationBar: Material(
           color: primaryBlackColor,
           child: SafeArea(

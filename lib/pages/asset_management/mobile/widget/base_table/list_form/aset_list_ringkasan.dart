@@ -96,7 +96,7 @@ class _AsetListRingkasanState extends State<AsetListRingkasan> {
                                     7: IntrinsicColumnWidth(),
                                     8: IntrinsicColumnWidth(),
                                     9: IntrinsicColumnWidth(),
-                                    10: IntrinsicColumnWidth(),
+                                    // 10: IntrinsicColumnWidth(),
                                   },
                                   children: [
                                     // ✅ Header row dengan Select All
@@ -153,7 +153,7 @@ class _AsetListRingkasanState extends State<AsetListRingkasan> {
                                         const _HeaderCell("Premi"),
                                         const _HeaderCell("Nomor Urut", center: true),
                                         const _HeaderCell("Satuan", center: true),
-                                        const _HeaderCell("Aksi"),
+                                        // const _HeaderCell("Aksi"),
                                       ],
                                     ),
 
@@ -214,7 +214,7 @@ class _AsetListRingkasanState extends State<AsetListRingkasan> {
       decoration: BoxDecoration(
         // 🔹 Warna baris berdasarkan nomor urut
         color: isActive
-            ? primaryColor.withOpacity(0.08) // tetap ada highlight kalau dipilih
+            ? primaryColor.withOpacity(0.20) // tetap ada highlight kalau dipilih
             : (rowNumber.isEven
             ? formGrey     // genap → abu muda (lebih terang)
             : pGrey),    // ganjil → abu gelap (lebih kontras)
@@ -256,26 +256,26 @@ class _AsetListRingkasanState extends State<AsetListRingkasan> {
             .format(item.nilaiPremi)),
         _CellText("${item.noUrut}", center: true),
         _CellText(item.satuan, center: true),
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit, size: 18, color: Colors.green),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, size: 18, color: Colors.orange),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.more_horiz, size: 18, color: Colors.red),
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(6),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       IconButton(
+        //         icon: const Icon(Icons.edit, size: 18, color: Colors.green),
+        //         onPressed: () {},
+        //       ),
+        //       IconButton(
+        //         icon: const Icon(Icons.delete, size: 18, color: Colors.orange),
+        //         onPressed: () {},
+        //       ),
+        //       IconButton(
+        //         icon: const Icon(Icons.more_horiz, size: 18, color: Colors.red),
+        //         onPressed: () {},
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }

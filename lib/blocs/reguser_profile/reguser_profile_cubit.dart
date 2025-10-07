@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import '../../models/reguser/reguser_model.dart';
 import 'reguser_profile_state.dart';
@@ -25,7 +26,8 @@ class RegUserProfileCubit extends HydratedCubit<RegUserProfileState> {
   }
 
   void clearProfile() {
-    clear(); // hapus cache HydratedBloc
+    clear(); // hapus cache HydratedBl
+    debugPrint('[RegUserProfileCubit] CLEAR DIPANGGIL');// oc
     emit(const RegUserProfileState());
   }
 

@@ -120,7 +120,7 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                         final bool hideText = constraints.maxWidth < 480;
 
                         return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             StatusTextBox(
                               assetPath: "assets/icons/tambah_polis_icon_polis.svg",
@@ -128,6 +128,9 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                               bgColor: Colors.orange,
                             ),
 
+                            const SizedBox(
+                                width: hPadding
+                            ),
                             StatusTextBox(
                               assetPath: "assets/icons/unduh_data_polis.svg",
                               text: "Unduh",
@@ -233,6 +236,10 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
                               },
                             ),
 
+
+                            const SizedBox(
+                                width: hPadding
+                            ),
                             StatusTextBox(
                               assetPath: "assets/icons/share_data_polis.svg",
                               text: "Share",

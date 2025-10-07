@@ -26,6 +26,15 @@ class ChatInitService {
   String? _lastDisplayName;
   Completer<ChatInitResult>? _pending;
 
+  void dispose() {
+    _initialized = false;
+    _lastUserId = null;
+    _lastDisplayName = null;
+    _pending = null;
+
+    debugPrint("🧹 ChatInitService disposed & reset complete");
+  }
+
   bool get isInitialized => _initialized;
 
   Future<ChatInitResult> ensureInit({

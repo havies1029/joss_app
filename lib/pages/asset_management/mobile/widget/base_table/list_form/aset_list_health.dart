@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/gen_aset_health/asethealthcari_bloc.dart';
-import 'package:joss_app/models/gen_aset_health/asethealthcari_model.dart';
+
+import '../../../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
 import '../../../../../../blocs/share_cubit/share_health_state_cubit.dart';
+import '../../../../../../models/gen_aset_health/asethealthcari_model.dart';
 
 class AsetListHealth extends StatefulWidget {
   final String searchText;
@@ -22,7 +23,8 @@ class _AsetListHealthState extends State<AsetListHealth> {
   Widget build(BuildContext context) {
     return BlocConsumer<AsetHealthCariBloc, AsetHealthCariState>(
       listener: (context, state) {},
-      buildWhen: (prev, curr) => prev.status != curr.status || prev.items != curr.items,
+      buildWhen: (prev, curr) =>
+      prev.status != curr.status || prev.items != curr.items,
       builder: (context, state) {
         if (state.status == ListStatus.initial) {
           return const Center(
@@ -33,6 +35,7 @@ class _AsetListHealthState extends State<AsetListHealth> {
         }
 
         if (state.status == ListStatus.success && state.items.isNotEmpty) {
+          // 🔹 Pagination logic
           final totalItems = state.items.length;
           final totalPages = (totalItems / _rowsPerPage).ceil();
           final startIndex = (_currentPage - 1) * _rowsPerPage;
@@ -42,11 +45,12 @@ class _AsetListHealthState extends State<AsetListHealth> {
           final paginatedItems = state.items.sublist(startIndex, endIndex);
 
           final cubit = context.read<ShareHealthStateCubit>();
-          cubit.updateTotalItems(totalItems);
+          cubit.updateTotalItems(totalItems); // ✅ Sinkron total count ke cubit
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              /// 🔹 Flexible biar tinggi tabel adaptif (ngikut jumlah data)
               Flexible(
                 fit: FlexFit.loose,
                 child: Padding(
@@ -57,15 +61,15 @@ class _AsetListHealthState extends State<AsetListHealth> {
                       borderRadius: BorderRadius.circular(cardBorderRadius),
                       border: Border.all(color: sGrey.withOpacity(0.5), width: 1),
                     ),
-                    clipBehavior: Clip.hardEdge,
+                    clipBehavior: Clip.hardEdge, // ⬅️ pastiin isi scroll ke-clip rapi
                     child: ScrollConfiguration(
                       behavior: ScrollConfiguration.of(context).copyWith(
                         scrollbars: false,
-                        overscroll: false,
+                        overscroll: false, // ⬅️ hilangin efek pantulan/glow Android
                       ),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
-                        physics: const ClampingScrollPhysics(),
+                        physics: const ClampingScrollPhysics(), // no bounce
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           physics: const ClampingScrollPhysics(),
@@ -74,11 +78,13 @@ class _AsetListHealthState extends State<AsetListHealth> {
                             child: BlocBuilder<ShareHealthStateCubit,
                                 Map<String, AsetHealthCariModel>>(
                               builder: (context, shareState) {
-                                final isAllSelected =
-                                    cubit.selectedItems.length == totalItems && totalItems > 0;
+                                final isAllSelected = cubit.selectedItems.length == totalItems && totalItems > 0;
 
                                 return Table(
-                                  border: TableBorder.all(color: sGrey, width: 1),
+                                  border: TableBorder.all(
+                                    color: sGrey,
+                                    width: 1,
+                                  ),
                                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                                   columnWidths: const {
                                     0: IntrinsicColumnWidth(),
@@ -90,11 +96,14 @@ class _AsetListHealthState extends State<AsetListHealth> {
                                     6: IntrinsicColumnWidth(),
                                     7: IntrinsicColumnWidth(),
                                     8: IntrinsicColumnWidth(),
+                                    9: IntrinsicColumnWidth(),
                                   },
                                   children: [
-                                    // 🔹 Header Row
+                                    // ✅ Header row dengan Select All
                                     TableRow(
-                                      decoration: const BoxDecoration(color: formGrey),
+                                      decoration: BoxDecoration(
+                                        color: formGrey,
+                                      ),
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.all(8),
@@ -119,16 +128,16 @@ class _AsetListHealthState extends State<AsetListHealth> {
                                               borderRadius: BorderRadius.circular(4),
                                               child: AnimatedSwitcher(
                                                 duration: const Duration(milliseconds: 150),
-                                                transitionBuilder: (child, anim) =>
-                                                    ScaleTransition(scale: anim, child: child),
+                                                transitionBuilder: (child, anim) => ScaleTransition(
+                                                  scale: anim,
+                                                  child: child,
+                                                ),
                                                 child: Icon(
                                                   isAllSelected
                                                       ? Icons.check_box
                                                       : Icons.check_box_outline_blank,
                                                   key: ValueKey(isAllSelected),
-                                                  color: isAllSelected
-                                                      ? primaryLightColor
-                                                      : sGrey,
+                                                  color: isAllSelected ? primaryLightColor : sGrey,
                                                   size: 20,
                                                 ),
                                               ),
@@ -136,17 +145,18 @@ class _AsetListHealthState extends State<AsetListHealth> {
                                           ),
                                         ),
                                         const _HeaderCell("No", center: true),
+                                        const _HeaderCell("ID Health"),
+                                        const _HeaderCell("Dob"),
+                                        const _HeaderCell("Jenis Kelamin"),
                                         const _HeaderCell("Nama"),
-                                        const _HeaderCell("Jenis Kelamin", center: true),
-                                        const _HeaderCell("Tanggal Lahir", center: true),
-                                        const _HeaderCell("Polis No"),
-                                        const _HeaderCell("Posisi"),
+                                        const _HeaderCell("Nomor Polis"),
+                                        const _HeaderCell("Posisi", center: true),
                                         const _HeaderCell("Status", center: true),
-                                        const _HeaderCell("Aksi", center: true),
+                                        const _HeaderCell("Aksi"),
                                       ],
                                     ),
 
-                                    // 🔹 Data Rows
+                                    // ✅ Rows
                                     for (int i = 0; i < paginatedItems.length; i++)
                                       _buildDataRow(
                                         context,
@@ -165,12 +175,17 @@ class _AsetListHealthState extends State<AsetListHealth> {
                   ),
                 ),
               ),
+
               const SizedBox(height: hPadding),
-              if (totalItems > _rowsPerPage) buildPagination(context, totalPages),
+
+              // 🔹 Pagination muncul kalau data > 10
+              if (totalItems > _rowsPerPage)
+                buildPagination(context, totalPages),
             ],
           );
         }
 
+        // 🔹 Kalau kosong
         return Center(
           child: Text(
             "No Data Available!!",
@@ -185,6 +200,7 @@ class _AsetListHealthState extends State<AsetListHealth> {
     );
   }
 
+
   TableRow _buildDataRow(
       BuildContext context,
       AsetHealthCariModel item,
@@ -192,22 +208,28 @@ class _AsetListHealthState extends State<AsetListHealth> {
       ShareHealthStateCubit cubit,
       ) {
     final isActive = cubit.isItemActive(item.asethealthId);
-    final date = DateFormat('dd/MM/yyyy').format(item.dob);
 
     return TableRow(
       decoration: BoxDecoration(
+        // 🔹 Warna baris berdasarkan nomor urut
         color: isActive
-            ? primaryColor.withOpacity(0.08)
-            : (rowNumber.isEven ? formGrey : pGrey),
+            ? primaryColor.withOpacity(0.20) // tetap ada highlight kalau dipilih
+            : (rowNumber.isEven
+            ? formGrey     // genap → abu muda (lebih terang)
+            : pGrey),    // ganjil → abu gelap (lebih kontras)
       ),
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
           child: Tooltip(
-            message: isActive ? "Batalkan share item ini" : "Pilih untuk di-share",
+            message: isActive
+                ? "Batalkan share item ini"
+                : "Pilih untuk di-share",
             child: InkWell(
               borderRadius: BorderRadius.circular(4),
-              onTap: () => cubit.toggleItem(item),
+              onTap: () {
+                cubit.toggleItem(item);
+              },
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 150),
                 transitionBuilder: (child, anim) =>
@@ -223,9 +245,10 @@ class _AsetListHealthState extends State<AsetListHealth> {
           ),
         ),
         _CellText("$rowNumber", center: true),
+        _CellText(item.asethealthId),
+        _CellText(DateFormat('dd/MM/yyyy').format(item.dob)),
+        _CellText(item.jnskel),
         _CellText(item.nama),
-        _CellText(item.jnskel, center: true),
-        _CellText(date, center: true),
         _CellText(item.polisNo),
         _CellText(item.posisi),
         _CellText(item.status, center: true),
@@ -242,6 +265,10 @@ class _AsetListHealthState extends State<AsetListHealth> {
                 icon: const Icon(Icons.delete, size: 18, color: Colors.orange),
                 onPressed: () {},
               ),
+              IconButton(
+                icon: const Icon(Icons.more_horiz, size: 18, color: Colors.red),
+                onPressed: () {},
+              ),
             ],
           ),
         ),
@@ -249,20 +276,23 @@ class _AsetListHealthState extends State<AsetListHealth> {
     );
   }
 
+  // 🧭 Pagination logic tetap sama seperti sebelumnya
   Widget buildPagination(BuildContext context, int totalPages) {
+    // kalau cuma 1 halaman, sembunyikan pagination
     if (totalPages <= 1) return const SizedBox.shrink();
 
     final screenWidth = MediaQuery.of(context).size.width;
     int maxVisible;
     if (screenWidth < 400) {
-      maxVisible = 5;
+      maxVisible = 5; // HP kecil
     } else if (screenWidth < 700) {
-      maxVisible = 7;
+      maxVisible = 7; // HP besar / tablet kecil
     } else if (screenWidth < 1200) {
-      maxVisible = 9;
+      maxVisible = 9; // tablet besar
     } else {
-      maxVisible = 11;
+      maxVisible = 11; // desktop lebar
     }
+
 
     List<int> visiblePages = [];
 
@@ -283,44 +313,90 @@ class _AsetListHealthState extends State<AsetListHealth> {
       }
 
       visiblePages = List.generate(end - start + 1, (i) => start + i);
+      if (!visiblePages.contains(1)) visiblePages[0] = 1;
+      if (!visiblePages.contains(totalPages)) {
+        visiblePages[visiblePages.length - 1] = totalPages;
+      }
     }
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center, // biar rapi di tengah
       children: [
-        _arrowButton("<", _currentPage > 1, () {
-          if (_currentPage > 1) setState(() => _currentPage--);
-        }),
-        for (final page in visiblePages)
-          _pageButton(page, isActive: _currentPage == page, onTap: () {
-            setState(() => _currentPage = page);
-          }),
-        _arrowButton(">", _currentPage < totalPages, () {
-          if (_currentPage < totalPages) setState(() => _currentPage++);
-        }),
+        _buildArrowButton(
+          context,
+          label: "<",
+          enabled: _currentPage > 1,
+          onTap: () {
+            if (_currentPage > 1) setState(() => _currentPage--);
+          },
+        ),
+
+        // angka halaman
+        for (int i = 0; i < visiblePages.length; i++) ...[
+          if (i > 0 && visiblePages[i] != visiblePages[i - 1] + 1)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                "...",
+                style: TextStyle(
+                  fontSize: getResponsiveFont(context, 16),
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          _buildPageNumberButton(
+            context,
+            page: visiblePages[i],
+            isActive: _currentPage == visiblePages[i],
+            onTap: () => setState(() => _currentPage = visiblePages[i]),
+          ),
+        ],
+
+        _buildArrowButton(
+          context,
+          label: ">",
+          enabled: _currentPage < totalPages,
+          onTap: () {
+            if (_currentPage < totalPages) setState(() => _currentPage++);
+          },
+        ),
       ],
     );
   }
-
-  Widget _arrowButton(String label, bool enabled, VoidCallback onTap) {
+  Widget _buildArrowButton(
+      BuildContext context, {
+        required String label,
+        required bool enabled,
+        required VoidCallback onTap,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        child: Container(
-          width: 36,
-          height: 36,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: enabled ? secondaryBlackColor : sGrey.withOpacity(0.25),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: sGrey.withOpacity(0.5)),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: enabled ? primaryLightColor : sGrey,
-              fontWeight: FontWeight.w600,
+      child: MouseRegion(
+        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.forbidden,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 150),
+          opacity: enabled ? 1.0 : 0.5,
+          child: GestureDetector(
+            onTap: enabled ? onTap : null,
+            child: Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: enabled ? secondaryBlackColor : sGrey.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: enabled ? sGrey.withOpacity(0.5) : sGrey.withOpacity(0.25),
+                ),
+              ),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: enabled ? primaryLightColor : sGrey.withOpacity(0.6),
+                  fontSize: getResponsiveFont(context, 16),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ),
@@ -328,31 +404,45 @@ class _AsetListHealthState extends State<AsetListHealth> {
     );
   }
 
-  Widget _pageButton(int label, {bool isActive = false, VoidCallback? onTap}) {
+  Widget _buildPageNumberButton(
+      BuildContext context, {
+        required int page,
+        required bool isActive,
+        required VoidCallback onTap,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 36,
-          height: 36,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: isActive ? primaryColor : secondaryBlackColor,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: sGrey.withOpacity(0.6)),
-          ),
-          child: Text(
-            "$label",
-            style: TextStyle(
-              color: isActive ? secondaryBlackColor : primaryLightColor,
-              fontWeight: FontWeight.w600,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isActive ? primaryColor : secondaryBlackColor,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: isActive ? primaryColor : sGrey.withOpacity(0.6),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              "$page",
+              style: TextStyle(
+                fontSize: getResponsiveFont(context, 16),
+                color: isActive ? secondaryBlackColor : primaryLightColor,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
 }
 
 class _HeaderCell extends StatelessWidget {
