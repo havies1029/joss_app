@@ -15,8 +15,6 @@ class LoginApi {
     final tokenURL = _base + tokenEndpoint;
     UserInfo userinfo = UserInfo(userLogin: userLogin);
 
-    debugPrint("validateUserLogin #10");
-
     //debugPrint(tokenURL);
     //debugPrint(jsonEncode(userinfo.toJson()));
 

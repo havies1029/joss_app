@@ -16,17 +16,8 @@ class AsetParCariAPI{
 			'Authorization': 'Bearer ${AppData.userToken}'
 		});
 
-
-		debugPrint('📥 STATUS CODE: ${response.statusCode}');
-		debugPrint('🔗 GET URL: $uri');
-		debugPrint('📄 BODY:\n${response.body}');
-
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
-			// Tambahkan ini untuk lihat status tiap item:
-			for (var item in parsed) {
-				debugPrint('🧾 Item status: ${item["status"]}');
-			}
 
 			return parsed
 				.map<AsetParCariModel>((json) => AsetParCariModel.fromJson(json))

@@ -72,21 +72,21 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
       buildWhen: (p, c) => p.items != c.items || p.status != c.status,
       builder: (context, state) {
 
-        debugPrint("📢 Klaim1ListState update:");
-        debugPrint("Status: ${state.status}");
-        debugPrint("Jumlah items: ${state.items.length}");
-
-        for (final item in state.items) {
-          debugPrint(
-              "👉 ID: ${item.klaim1Id}, "
-                  "Nama: ${item.insuredName}, "
-                  "Lokasi: ${item.kejadianLokasi}, "
-                  "Tanggal: ${item.kejadianTgl}, "
-                  "Amount: ${item.klaimAmount}, "
-                  "Mata Uang: ${item.rmatauangNama}, "
-                  "Status: ${item.statusNama}"
-          );
-        }
+        // debugPrint("📢 Klaim1ListState update:");
+        // debugPrint("Status: ${state.status}");
+        // debugPrint("Jumlah items: ${state.items.length}");
+        //
+        // for (final item in state.items) {
+        //   debugPrint(
+        //       "👉 ID: ${item.klaim1Id}, "
+        //           "Nama: ${item.insuredName}, "
+        //           "Lokasi: ${item.kejadianLokasi}, "
+        //           "Tanggal: ${item.kejadianTgl}, "
+        //           "Amount: ${item.klaimAmount}, "
+        //           "Mata Uang: ${item.rmatauangNama}, "
+        //           "Status: ${item.statusNama}"
+        //   );
+        // }
         if (state.status == ListStatus.failure) {
           return Center(
             child: Column(

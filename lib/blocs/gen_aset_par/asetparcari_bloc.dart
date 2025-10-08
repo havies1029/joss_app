@@ -26,10 +26,6 @@ Future<void> onRefreshAsetParCari(
 		hasReachedMax: false,
 	));
   emit(state.copyWith( searchText: event.searchText, hal: 0, statusId: event.statusId));
-	// 🔍 Tambahkan debugPrint di sini:
-	debugPrint('📡 Bloc menerima RefreshAsetMvCariEvent');
-	debugPrint('🔎 searchText: "${event.searchText}"');
-	debugPrint('📊 statusId: "${event.statusId}"');
 
 	add(FetchAsetParCariEvent());
 }

@@ -84,7 +84,7 @@ class HeroPage extends StatelessWidget {
                             ? (authState.user.email?.trim() ?? 'Guest User')
                             : 'Guest User';
 
-                        debugPrint("⚙️ [Hero Header] CustType kosong, pakai fallback email: $fallbackEmail");
+                        // debugPrint("⚙️ [Hero Header] CustType kosong, pakai fallback email: $fallbackEmail");
 
                         return _buildHeroContent(
                           context,

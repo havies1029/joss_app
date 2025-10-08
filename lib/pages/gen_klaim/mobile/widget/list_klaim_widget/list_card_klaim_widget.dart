@@ -67,21 +67,21 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
     return BlocBuilder<Klaim1ListBloc, Klaim1ListState>(
       buildWhen: (p, c) => p.items != c.items || p.status != c.status,
       builder: (context, state) {
-        debugPrint("📢 Klaim1ListState update:");
-        debugPrint("Status: ${state.status}");
-        debugPrint("Jumlah items: ${state.items.length}");
-
-        for (final item in state.items) {
-          debugPrint(
-            "👉 ID: ${item.klaim1Id}, "
-                "Nama: ${item.insuredName}, "
-                "Lokasi: ${item.kejadianLokasi}, "
-                "Tanggal: ${item.kejadianTgl}, "
-                "Amount: ${item.klaimAmount}, "
-                "Mata Uang: ${item.rmatauangNama}, "
-                "Status: ${item.statusNama}",
-          );
-        }
+        // debugPrint("📢 Klaim1ListState update:");
+        // debugPrint("Status: ${state.status}");
+        // debugPrint("Jumlah items: ${state.items.length}");
+        //
+        // for (final item in state.items) {
+        //   debugPrint(
+        //     "👉 ID: ${item.klaim1Id}, "
+        //         "Nama: ${item.insuredName}, "
+        //         "Lokasi: ${item.kejadianLokasi}, "
+        //         "Tanggal: ${item.kejadianTgl}, "
+        //         "Amount: ${item.klaimAmount}, "
+        //         "Mata Uang: ${item.rmatauangNama}, "
+        //         "Status: ${item.statusNama}",
+        //   );
+        // }
 
         // Error State
         if (state.status == ListStatus.failure) {

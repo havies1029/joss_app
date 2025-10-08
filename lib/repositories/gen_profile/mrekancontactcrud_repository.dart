@@ -11,14 +11,6 @@ class MRekanContactCrudRepository {
 
 	Future<MRekanContactCrudModel> mRekanContactCrudLihat() async {
 		final result = await api.mRekanContactCrudLihatAPI();
-
-		// DEBUG: Cetak isi model
-		print("[DEBUG] API Result (parsed model):");
-		print(" - email: ${result.email}");
-		print(" - telp: ${result.telp}");
-		print(" - alamat: ${result.alamat1}");
-		print(" - mrekancontact1Id: ${result.mrekancontact1Id}");
-
 		return result;
 	}
 

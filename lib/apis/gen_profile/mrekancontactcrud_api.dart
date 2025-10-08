@@ -32,7 +32,6 @@ class MRekanContactCrudAPI {
 	}
 	
 	Future<MRekanContactCrudModel> mRekanContactCrudLihatAPI() async {
-		debugPrint("mRekanContactCrudLihatAPI");
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/profile/mrekancontactcrud/read";
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint);
 		final http.Response response =
@@ -41,9 +40,6 @@ class MRekanContactCrudAPI {
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
 		});
-
-		debugPrint("response.statusCodexxx : ${response.statusCode}");
-		debugPrint("response.body xxxxxx: ${response.body}");
 
 		if (response.statusCode == 200) {
 			var returnData = MRekanContactCrudModel.fromJson(jsonDecode(response.body));

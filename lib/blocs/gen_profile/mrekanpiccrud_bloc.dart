@@ -40,14 +40,10 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
       MRekanPicCrudUbahEvent event,
       Emitter<MRekanPicCrudState> emit,
       ) async {
-    debugPrint('[🟡 Bloc] MRekanPicCrudUbahEvent diterima');
-    debugPrint('[📥 Bloc] Data yang dikirim: ${event.record.toJson()}');
 
     emit(state.copyWith(isSaving: true, isSaved: false));
 
     bool result = await repository.mRekanPicCrudUbah(event.record);
-
-    debugPrint('[📤 Bloc] Hasil pemanggilan repository: $result');
 
     bool hasFailure = !result;
 

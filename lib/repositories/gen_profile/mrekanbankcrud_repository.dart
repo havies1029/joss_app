@@ -17,11 +17,7 @@ class MRekanBankCrudRepository {
 		return await api.mRekanBankCrudHapusAPI(mrekanbankId);
 	}
 	Future<MRekanBankCrudModel> mRekanBankCrudLihat(String mrekanbankId) async {
-		debugPrint("📥 [mRekanBankCrudLihat] Dipanggil dengan ID: $mrekanbankId");
-
 		final result = await api.mRekanBankCrudLihatAPI(mrekanbankId);
-
-		debugPrint("📦 [mRekanBankCrudLihat] Data diterima: ${result.toJson()}");
 
 		return result;
 	}

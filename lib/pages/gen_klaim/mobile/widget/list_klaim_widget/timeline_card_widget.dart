@@ -6,12 +6,9 @@ import 'package:joss_app/blocs/klaim/klaim2list_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/gen_klaim/mobile/widget/list_klaim_widget/timeline/header_asuransi_card_widget.dart';
 import 'package:joss_app/pages/gen_klaim/mobile/widget/list_klaim_widget/timeline/step_bullet_widget.dart';
-import 'package:joss_app/widgets/apptheme/header_card.dart';
 import '../../../../../models/gen_klaim/klaim1list_model.dart';
-import '../../../../../widgets/my_text.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../klaim_main_page.dart';
-import '../crud_klaim_widget/klaim1_inline_editor_page.dart';
 
 class TimelineCardWidget extends StatefulWidget {
   final Klaim1ListModel record;
