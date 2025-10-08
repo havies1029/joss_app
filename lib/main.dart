@@ -453,7 +453,7 @@ class _AppState extends State<_App> {
             : BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
-              // 🔹 1. Tutup semua route sebelumnya biar stack bersih
+              // 🔹 1. Bersihkan semua route sebelumnya
               while (_navigatorKey.currentState?.canPop() ?? false) {
                 _navigatorKey.currentState?.pop();
               }
@@ -486,8 +486,8 @@ class _AppState extends State<_App> {
                 return homeWidget;
               }
 
-              // 🔹 3. Handle client (‘C’)
-              if (user.custType == 'C') {
+              // 🔹 3. Handle Client ('C')
+              if ((user.custType ?? '').toUpperCase() == 'C') {
                 context.read<UserProfileCubit>().setProfile(
                   mrekan1Id: user.id?.toString(),
                   nama: user.nama,
@@ -501,7 +501,6 @@ class _AppState extends State<_App> {
                       curr.mrekan1Id != null &&
                       curr.mrekan1Id!.trim().isNotEmpty,
                   listener: (context, profile) async {
-                    // ✅ Pastikan belum pernah init ulang
                     if (ChatInitService.I.isInitialized) return;
 
                     try {
@@ -521,13 +520,12 @@ class _AppState extends State<_App> {
                             content: Text(result.success
                                 ? "✅ Chat siap: ${result.displayName}"
                                 : "❌ Gagal inisialisasi chat: ${result.error}"),
-                            backgroundColor:
-                            result.success ? Colors.green : Colors.red,
+                            backgroundColor: result.success ? Colors.green : Colors.red,
                           ),
                         );
                       }
                     } catch (e, s) {
-                      debugPrint("🔥 [ChatInit Error] $e\n$s");
+                      debugPrint("🔥 [ChatInit Error C] $e\n$s");
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -542,24 +540,26 @@ class _AppState extends State<_App> {
                 );
               }
 
-              // 🔹 4. Handle user biasa (‘U’)
-              else if (user.custType == 'U') {
-                Future.microtask(() async {
+              // 🔹 4. Handle User Biasa ('U')
+              else if ((user.custType ?? '').toUpperCase() == 'U') {
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
                   if (ChatInitService.I.isInitialized) return;
 
                   try {
-                    final regProfile = context.read<RegUserProfileCubit>().state;
+                    debugPrint("===== 🧠 [DEBUG USER DATA - TYPE U] =====");
+                    debugPrint("ID         : ${user.id}");
+                    debugPrint("Username   : ${user.username}");
+                    debugPrint("Email      : ${user.email}");
+                    debugPrint("CustType   : ${user.custType}");
+                    debugPrint("Token      : ${user.token}");
+                    debugPrint("=========================================");
 
                     final guestId = "guest-${DateTime.now().millisecondsSinceEpoch}";
-                    final userId =
-                    regProfile.reguserId.isNotEmpty ? regProfile.reguserId : guestId;
-                    final displayName = regProfile.email.isNotEmpty
-                        ? regProfile.email
-                        : "New User";
+                    final email = user.email?.trim() ?? guestId;
 
                     final result = await ChatInitService.I.ensureInit(
-                      userId: userId,
-                      displayName: displayName,
+                      userId: email,
+                      displayName: email,
                     );
 
                     if (context.mounted) {
@@ -568,26 +568,63 @@ class _AppState extends State<_App> {
                           content: Text(result.success
                               ? "✅ Chat siap: ${result.displayName}"
                               : "❌ Gagal inisialisasi chat: ${result.error}"),
-                          backgroundColor:
-                          result.success ? Colors.green : Colors.red,
+                          backgroundColor: result.success ? Colors.green : Colors.red,
                         ),
                       );
                     }
 
                     debugPrint(result.success
-                        ? "✅ [ChatInitService] Initialized untuk $displayName"
+                        ? "✅ [ChatInitService] Initialized untuk $email"
                         : "⚠️ [ChatInitService] Gagal init: ${result.error}");
                   } catch (e, s) {
                     debugPrint("🔥 [ChatInit Error U] $e\n$s");
                   }
                 });
-
-                return homeWidget;
               }
 
-              // 🔹 5. Default fallback
+              // 🔹 5. Handle CustType kosong atau tidak dikenali
+              else {
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  if (ChatInitService.I.isInitialized) return;
+
+                  try {
+                    debugPrint("===== ⚙️ [DEBUG USER DATA - TYPE UNKNOWN] =====");
+                    debugPrint("CustType kosong atau tidak dikenal, pakai email default.");
+                    debugPrint("Email : ${user.email}");
+                    debugPrint("===============================================");
+
+                    final guestId = "guest-${DateTime.now().millisecondsSinceEpoch}";
+                    final email = user.email?.trim() ?? guestId;
+
+                    final result = await ChatInitService.I.ensureInit(
+                      userId: email,
+                      displayName: email,
+                    );
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.success
+                              ? "✅ Chat siap (default): ${result.displayName}"
+                              : "❌ Gagal inisialisasi chat: ${result.error}"),
+                          backgroundColor: result.success ? Colors.green : Colors.red,
+                        ),
+                      );
+                    }
+
+                    debugPrint(result.success
+                        ? "✅ [ChatInitService] Initialized default untuk $email"
+                        : "⚠️ [ChatInitService] Gagal init default: ${result.error}");
+                  } catch (e, s) {
+                    debugPrint("🔥 [ChatInit Error UNKNOWN] $e\n$s");
+                  }
+                });
+              }
+
+              // 🔹 6. Default fallback
               return homeWidget;
             }
+
 
 
             if (state is AuthenticationUnauthenticated) {

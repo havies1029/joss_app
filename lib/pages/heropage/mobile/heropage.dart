@@ -31,18 +31,16 @@ class HeroPage extends StatelessWidget {
                   BlocBuilder<AuthenticationBloc, AuthenticationState>(
                     builder: (context, authState) {
                       final custType = authState is AuthenticationAuthenticated
-
-                          ? authState.user.custType
+                          ? (authState.user.custType ?? '').toUpperCase()
                           : '';
 
                       if (custType == 'C') {
-  // 🔹 Client → ambil dari UserProfileCubit
+                        // 🔹 Client → ambil dari UserProfileCubit
                         return BlocBuilder<UserProfileCubit, UserProfileState>(
                           buildWhen: (prev, curr) =>
                           prev.nama != curr.nama || prev.fotoBytes != curr.fotoBytes,
                           builder: (context, profileState) {
-                            final displayName =
-                            (profileState.nama?.trim().isNotEmpty ?? false)
+                            final displayName = (profileState.nama?.trim().isNotEmpty ?? false)
                                 ? profileState.nama!.trim()
                                 : 'Client User'; // default kalau masih kosong
 
@@ -59,8 +57,10 @@ class HeroPage extends StatelessWidget {
                             );
                           },
                         );
-                      } else if (custType == 'U') {
-  // 🔹 User baru → ambil dari RegUserProfileCubit
+                      }
+
+                      else if (custType == 'U') {
+                        // 🔹 User baru → ambil dari RegUserProfileCubit
                         return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
                           buildWhen: (prev, curr) => prev.email != curr.email,
                           builder: (context, regState) {
@@ -78,13 +78,29 @@ class HeroPage extends StatelessWidget {
                         );
                       }
 
-  // 🔹 Default (belum login / state lain) → render placeholder juga
-                      return _buildHeroContent(
-                        context,
-                        displayName: 'Guest', // fallback
-                        custType: '',
-                        bytes: null,
-                      );
+                      else {
+                        // 🔹 CustType kosong / tidak dikenal → ambil dari authState langsung
+                        final fallbackEmail = authState is AuthenticationAuthenticated
+                            ? (authState.user.email?.trim() ?? 'Guest User')
+                            : 'Guest User';
+
+                        debugPrint("⚙️ [Hero Header] CustType kosong, pakai fallback email: $fallbackEmail");
+
+                        return _buildHeroContent(
+                          context,
+                          displayName: fallbackEmail,
+                          custType: custType.isEmpty ? '(Unknown)' : custType,
+                          bytes: null,
+                        );
+                      }
+                      //
+                      // // 🔹 Default (belum login / state lain) → render placeholder juga
+                      // return _buildHeroContent(
+                      //   context,
+                      //   displayName: 'Guest', // fallback
+                      //   custType: '',
+                      //   bytes: null,
+                      // );
                     },
                   ),
               ],

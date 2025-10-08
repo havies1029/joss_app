@@ -176,52 +176,37 @@ class _SettingsPageState extends State<SettingsPage> {
                     // ================== PROFILE SECTION ==================
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, authState) {
-                        final custType =
-                            authState is AuthenticationAuthenticated
-                                ? authState.user.custType
-                                : '';
+                        final custType = authState is AuthenticationAuthenticated
+                            ? (authState.user.custType ?? '').toUpperCase()
+                            : '';
 
                         if (custType == 'C') {
-                          return BlocBuilder<
-                            UserProfileCubit,
-                            UserProfileState
-                          >(
+                          // 🔹 CLIENT
+                          return BlocBuilder<UserProfileCubit, UserProfileState>(
                             buildWhen: (prev, curr) {
                               final nameChanged = prev.nama != curr.nama;
                               final emailChanged = prev.email != curr.email;
                               final telpChanged = prev.telepon != curr.telepon;
                               final bytesChanged =
-                                  (prev.fotoBytes == null &&
-                                      curr.fotoBytes != null) ||
-                                  (prev.fotoBytes != null &&
-                                      curr.fotoBytes == null) ||
-                                  (prev.fotoBytes != null &&
-                                      curr.fotoBytes != null &&
-                                      prev.fotoBytes!.lengthInBytes !=
-                                          curr.fotoBytes!.lengthInBytes);
-                              return nameChanged ||
-                                  emailChanged ||
-                                  telpChanged ||
-                                  bytesChanged;
+                                  (prev.fotoBytes == null && curr.fotoBytes != null) ||
+                                      (prev.fotoBytes != null && curr.fotoBytes == null) ||
+                                      (prev.fotoBytes != null &&
+                                          curr.fotoBytes != null &&
+                                          prev.fotoBytes!.lengthInBytes != curr.fotoBytes!.lengthInBytes);
+                              return nameChanged || emailChanged || telpChanged || bytesChanged;
                             },
                             builder: (context, state) {
-                              final nama =
-                                  (state.nama?.trim().isNotEmpty ?? false)
-                                      ? state.nama!.trim()
-                                      : 'Pengguna';
+                              final nama = (state.nama?.trim().isNotEmpty ?? false)
+                                  ? state.nama!.trim()
+                                  : 'Pengguna';
                               final email =
-                                  (state.email?.trim().isNotEmpty ?? false)
-                                      ? state.email!.trim()
-                                      : null;
-                              final telepon =
-                                  (state.telepon?.trim().isNotEmpty ?? false)
-                                      ? state.telepon!.trim()
-                                      : null;
-                              final foto =
-                                  (state.fotoBytes != null &&
-                                          state.fotoBytes!.isNotEmpty)
-                                      ? state.fotoBytes
-                                      : null;
+                              (state.email?.trim().isNotEmpty ?? false) ? state.email!.trim() : null;
+                              final telepon = (state.telepon?.trim().isNotEmpty ?? false)
+                                  ? state.telepon!.trim()
+                                  : null;
+                              final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
+                                  ? state.fotoBytes
+                                  : null;
 
                               return _buildProfileCard(
                                 context: context,
@@ -233,17 +218,16 @@ class _SettingsPageState extends State<SettingsPage> {
                               );
                             },
                           );
-                        } else if (custType == 'U') {
-                          return BlocBuilder<
-                            RegUserProfileCubit,
-                            RegUserProfileState
-                          >(
+                        }
+
+                        else if (custType == 'U') {
+                          // 🔹 USER BIASA
+                          return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
                             buildWhen: (prev, curr) => prev.email != curr.email,
                             builder: (context, state) {
-                              final nama =
-                                  (state.email.trim().isNotEmpty)
-                                      ? state.email.trim()
-                                      : 'Pengguna Baru';
+                              final nama = (state.email.trim().isNotEmpty)
+                                  ? state.email.trim()
+                                  : 'Pengguna Baru';
 
                               return _buildProfileCard(
                                 context: context,
@@ -255,12 +239,29 @@ class _SettingsPageState extends State<SettingsPage> {
                           );
                         }
 
-                        return _buildProfileCard(
-                          context: context,
-                          nama: "Guest",
-                          foto: null,
-                          subtitle: "Nasabah biasa",
-                        );
+// 🔹 CUSTTYPE KOSONG / TIDAK DIKENAL
+                        else {
+                          final fallbackEmail = authState is AuthenticationAuthenticated
+                              ? (authState.user.email?.trim() ?? 'Guest User')
+                              : 'Guest User';
+
+                          debugPrint(
+                              "⚙️ [ProfileCard] CustType kosong/tidak dikenal → pakai auth email: $fallbackEmail");
+
+                          return _buildProfileCard(
+                            context: context,
+                            nama: fallbackEmail,
+                            foto: null,
+                            subtitle: "Nasabah Biasa",
+                          );
+                        }
+
+                        // return _buildProfileCard(
+                        //   context: context,
+                        //   nama: "Guest",
+                        //   foto: null,
+                        //   subtitle: "Nasabah biasa",
+                        // );
                       },
                     ),
 
