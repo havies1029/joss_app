@@ -199,78 +199,48 @@ class _Klaim1InlineEditorPageState extends State<Klaim1InlineEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    final content = BlocListener<Klaim1CrudBloc, Klaim1CrudState>(
-      listener: (context, state) {
-        if (state.isSaved) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data berhasil disimpan')),
-          );
-          setState(() => _isSavingNew = false);
-        } else if (state.hasFailure) {
-          setState(() => _isSavingNew = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gagal menyimpan data')),
-          );
-        }
-      },
-      child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(hPadding, 24, hPadding, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Tambah Klaim',
-                    style: TextStyle(
-                      fontSize: getResponsiveFont(context, 22),
-                      fontWeight: FontWeight.w600,
-                      color: primaryLightColor,
-                    ),
-                  ),
-                  Text(
-                    'Isi data klaim utama: tertanggung, lokasi, tanggal kejadian, jumlah, mata uang, dan status.',
-                    style: TextStyle(
-                      fontSize: getResponsiveFont(context, 16),
-                      color: sGrey,
-                      height: 1.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Form langsung muncul
-            Klaim1AddFormCard(
-              isSaving: _isSavingNew,
-              onSave: (record) {
-                setState(() => _isSavingNew = true);
-                context
-                    .read<Klaim1CrudBloc>()
-                    .add(Klaim1CrudTambahEvent(record: record));
-              },
-              onCancel: () {
-                Navigator.of(context).pop(); // cancel → langsung balik halaman
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor,
       body: SafeArea(
-        child: Container(
+        child: Container(padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
           decoration: const BoxDecoration(
             color: secondaryBlackColor,
           ),
-          child: content,
+          child: BlocListener<Klaim1CrudBloc, Klaim1CrudState>(
+            listener: (context, state) {
+              if (state.isSaved) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  successSnackBar('Data berhasil disimpan'),
+                );
+                setState(() => _isSavingNew = false);
+              } else if (state.hasFailure) {
+                setState(() => _isSavingNew = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar('Gagal menyimpan data'),
+                );
+              }
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Klaim1AddFormCard(
+                    isSaving: _isSavingNew,
+                    onSave: (record) {
+                      setState(() => _isSavingNew = true);
+                      context
+                          .read<Klaim1CrudBloc>()
+                          .add(Klaim1CrudTambahEvent(record: record));
+                    },
+                    onCancel: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

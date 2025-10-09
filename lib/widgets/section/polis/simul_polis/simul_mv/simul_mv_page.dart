@@ -214,7 +214,7 @@ class _SimulMvPageState extends State<SimulMvPage> {
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: _showPremiSection ? 1.0 : 0.33,
+              widthFactor: _showPremiSection ? 1.0 : 0.5,
               child: Container(
                 decoration: BoxDecoration(
                   color: primaryColor,
@@ -226,7 +226,7 @@ class _SimulMvPageState extends State<SimulMvPage> {
         ),
         const SizedBox(height: vPadding),
         Text(
-          _showPremiSection ? '100%' : '33%',
+          _showPremiSection ? '100%' : '50%',
           style: bodyTextStyle(context, fontSize: 16),
         ),
       ],

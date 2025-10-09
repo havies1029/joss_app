@@ -8,13 +8,11 @@ class ReusableComboBox<T> extends StatefulWidget {
   final Function(T?) onSaveCallback;
   final String? Function(T?)? validatorCallback;
 
-  // Data & Logic Properties
   final Future<List<T>> Function() dataLoader;
   final String Function(T) displayText;
   final bool Function(T, T) compareItems;
   final Widget Function(BuildContext, T, bool, bool)? customItemBuilder;
 
-  // Simplified Styling (fixed, not customizable)
   final bool showClearButton;
   final bool enableSearch;
   final bool isEnabled;
@@ -46,7 +44,6 @@ class ReusableComboBox<T> extends StatefulWidget {
 }
 
 class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
-  // Internal cache untuk menyimpan data items
   List<T>? _cachedItems;
 
   @override
@@ -172,14 +169,12 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
     bool isSelected,
     bool isDisabled,
   ) {
-    // Cek apakah ini item pertama atau terakhir
     final items = _cachedItems ?? [];
     final isFirstItem = items.isNotEmpty && widget.compareItems(item, items.first);
     final isLastItem = items.isNotEmpty && widget.compareItems(item, items.last);
 
     return Column(
       children: [
-        // Divider di atas hanya untuk item pertama
         if (isFirstItem) kDivider(color: sGrey),
 
         Padding(
@@ -190,13 +185,11 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
           ),
         ),
 
-        // Divider di bawah untuk semua item kecuali yang terakhir
         if (!isLastItem) kDivider(color: sGrey),
       ],
     );
   }
 
-  // Tetap sediakan method lama untuk backward compatibility
   Widget defaultItemBuilder(
     BuildContext context,
     T item,

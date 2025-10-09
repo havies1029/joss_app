@@ -26,6 +26,8 @@ import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../../../blocs/local_prefs/simulasi_par_local_cubit.dart';
+import '../../../../../../repositories/combobox/combomkabzonagempa_repository.dart';
+import '../../../../../../repositories/combobox/combomwilayah_repository.dart';
 import '../../../../../../repositories/combobox/comborkonstruksiojk_repository.dart';
 import '../../../../../../repositories/combobox/comborokupasi_repository.dart';
 
@@ -204,110 +206,90 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		sppaparCrudBloc = BlocProvider.of<SppaparCrudBloc>(context);
 		return BlocConsumer<SppaparCrudBloc, SppaparCrudState>(
 			builder: (context, state) {
-				return Dialog(
-						shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-						child: SingleChildScrollView(
-							child: Padding(
-								padding: const EdgeInsets.all(8.0),
-								child: Form(
-										key: _formKey,
-										child: Column(
-											children: [
-												const SizedBox(height: 10),
-												Text(
-													"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} SPPA PAR",
-													style: const TextStyle(
-														fontSize: 20.0,
-														color: Color(0xffff6101),
-														fontWeight: FontWeight.w600,
-														fontFamily: 'Hind',
-														fontStyle: FontStyle.italic,
-														decoration: TextDecoration.underline,
+				return Form(
+						key: _formKey,
+						child: Column(
+							children: [
+								buildFieldBuildingDesc(),
+								buildFieldContentDesc(),
+								buildFieldInsuredAlamat1(),
+								buildFieldInsuredAlamat2(),
+								buildFieldInsuredNama(),
+								buildFieldKab2zonagempaId(),
+								buildFieldLokasi1(),
+								buildFieldLokasi2(),
+								buildFieldMachineryDesc(),
+								buildFieldMwilayahId(),
+								buildFieldOtherDesc(),
+								buildFieldPeriodeAkhir(),
+								buildFieldPeriodeMulai(),
+								buildFieldPremiEqvet(),
+								buildFieldPremiOther(),
+								buildFieldPremiPar(),
+								buildFieldPremiRsmdcc(),
+								buildFieldPremiTotal(),
+								buildFieldPremiTsfwd(),
+								buildFieldRateEqvet(),
+								buildFieldRateOther(),
+								buildFieldRatePar(),
+								buildFieldRateRsmdcc(),
+								buildFieldRateTotal(),
+								buildFieldRateTsfwd(),
+								buildFieldRkodeposId(),
+								buildFieldRkonstruksiojkId(),
+								buildFieldRokupasiId(),
+								buildFieldSiBuilding(),
+								buildFieldSiContent(),
+								buildFieldSiMachinery(),
+								buildFieldSiOther(),
+								buildFieldSiStock(),
+								buildFieldSppaTgl(),
+								buildFieldStockAdjustable(),
+								buildFieldStockDesc(),
+								buildFieldTsi(),
+								const SizedBox(height: 25),
+								FormError(
+									errors: errors,
+									key: null,
+								),
+								Row(
+									mainAxisAlignment: MainAxisAlignment.spaceAround,
+									children: [
+										SizedBox(
+											width: MediaQuery.of(context).size.width * 0.3,
+											height: 60,
+											child: Padding(
+												padding: const EdgeInsets.only(top: 30.0),
+												child: ElevatedButton(
+													onPressed: () {
+														_dismissDialog();
+													},
+													child: const Text(
+														'Close',
+														style: TextStyle(fontSize: 13.0),
 													),
 												),
-												const SizedBox(height: 25),
-												buildFieldBuildingDesc(),
-												buildFieldContentDesc(),
-												buildFieldInsuredAlamat1(),
-												buildFieldInsuredAlamat2(),
-												buildFieldInsuredNama(),
-												buildFieldKab2zonagempaId(),
-												buildFieldLokasi1(),
-												buildFieldLokasi2(),
-												buildFieldMachineryDesc(),
-												buildFieldMwilayahId(),
-												buildFieldOtherDesc(),
-												buildFieldPeriodeAkhir(),
-												buildFieldPeriodeMulai(),
-												buildFieldPremiEqvet(),
-												buildFieldPremiOther(),
-												buildFieldPremiPar(),
-												buildFieldPremiRsmdcc(),
-												buildFieldPremiTotal(),
-												buildFieldPremiTsfwd(),
-												buildFieldRateEqvet(),
-												buildFieldRateOther(),
-												buildFieldRatePar(),
-												buildFieldRateRsmdcc(),
-												buildFieldRateTotal(),
-												buildFieldRateTsfwd(),
-												buildFieldRkodeposId(),
-												buildFieldRkonstruksiojkId(),
-												buildFieldRokupasiId(),
-												buildFieldSiBuilding(),
-												buildFieldSiContent(),
-												buildFieldSiMachinery(),
-												buildFieldSiOther(),
-												buildFieldSiStock(),
-												buildFieldSppaTgl(),
-												buildFieldStockAdjustable(),
-												buildFieldStockDesc(),
-												buildFieldTsi(),
-												const SizedBox(height: 25),
-												FormError(
-													errors: errors,
-													key: null,
+											),
+										),
+										SizedBox(
+											width: MediaQuery.of(context).size.width * 0.3,
+											height: 60,
+											child: Padding(
+												padding: const EdgeInsets.only(top: 30.0),
+												child: ElevatedButton(
+													onPressed: () {
+														onSaveForm();
+													},
+													child: const Text(
+														'Save',
+														style: TextStyle(fontSize: 13.0),
+													),
 												),
-												Row(
-													mainAxisAlignment: MainAxisAlignment.spaceAround,
-													children: [
-														SizedBox(
-															width: MediaQuery.of(context).size.width * 0.3,
-															height: 60,
-															child: Padding(
-																padding: const EdgeInsets.only(top: 30.0),
-																child: ElevatedButton(
-																	onPressed: () {
-																		_dismissDialog();
-																	},
-																	child: const Text(
-																		'Close',
-																		style: TextStyle(fontSize: 13.0),
-																	),
-																),
-															),
-														),
-														SizedBox(
-															width: MediaQuery.of(context).size.width * 0.3,
-															height: 60,
-															child: Padding(
-																padding: const EdgeInsets.only(top: 30.0),
-																child: ElevatedButton(
-																	onPressed: () {
-																		onSaveForm();
-																	},
-																	child: const Text(
-																		'Save',
-																		style: TextStyle(fontSize: 13.0),
-																	),
-																),
-															),
-														),
-													],
-												),
-											],
-										)),
-							),
+											),
+										),
+									],
+								),
+							],
 						));
 			},
 			listener: (context, state) {
@@ -362,16 +344,13 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		}
 	}
 
-	Widget buildFieldBuildingDesc(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldBuildingDesc() {
+		return appTextField(
+			label: "Building Description",
+			hint: "Masukkan deskripsi bangunan...",
 			controller: fieldBuildingDescController,
-			decoration: const InputDecoration(
-				labelText: "buildingDesc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -387,17 +366,13 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-
-	Widget buildFieldContentDesc(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldContentDesc() {
+		return appTextField(
+			label: "Content Description",
+			hint: "Masukkan deskripsi konten...",
 			controller: fieldContentDescController,
-			decoration: const InputDecoration(
-				labelText: "contentDesc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -413,17 +388,13 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-
-	Widget buildFieldInsuredAlamat1(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldInsuredAlamat1() {
+		return appTextField(
+			label: "Alamat Tertanggung 1",
+			hint: "Masukkan alamat pertama tertanggung...",
 			controller: fieldInsuredAlamat1Controller,
-			decoration: const InputDecoration(
-				labelText: "insuredAlamat1",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -439,41 +410,13 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldInsuredAlamat2(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldInsuredAlamat2() {
+		return appTextField(
+			label: "Alamat Tertanggung 2",
+			hint: "Masukkan alamat kedua tertanggung...",
 			controller: fieldInsuredAlamat2Controller,
-			decoration: const InputDecoration(
-				labelText: "insuredAlamat2",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
-			onChanged: (value) {
-				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
-				}
-			},
-			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
-				}
-				return null;
-			},
-		);
-	}
-
-	Widget buildFieldInsuredNama(){
-		return TextFormField(
 			keyboardType: TextInputType.multiline,
-			minLines: 1,
 			maxLines: 3,
-			controller: fieldInsuredNamaController,
-			decoration: const InputDecoration(
-				labelText: "insuredNama",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -489,16 +432,42 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldKab2zonagempaId(){
-		return buildFieldComboMKabZonaGempa(
+	Widget buildFieldInsuredNama() {
+		return appTextField(
+			label: "Nama Tertanggung",
+			hint: "Masukkan nama tertanggung...",
+			controller: fieldInsuredNamaController,
+			keyboardType: TextInputType.name,
+			maxLines: 1,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+		);
+	}
+
+	Widget buildFieldKab2zonagempaId() {
+		return ReusableComboBox<ComboMKabZonaGempaModel>(
+			hintText: "Kabupaten Zona Gempa",
 			comboKey: comboMKabZonaGempaKey,
-			labelText: 'kab2zonagempaId',
 			initItem: fieldComboMKabZonaGempa,
+			dataLoader: () async => ComboMKabZonaGempaRepository().getComboMKabZonaGempa(''),
+			displayText: (item) => "${item.mzonagempaId} - ${item.kabupaten}",
+			compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
 			onChangedCallback: (value) {
 				if (value != null) {
-					removeError(
-							error: "Field ComboMKabZonaGempa tidak boleh kosong.");
-					sppaparCrudBloc.add(ComboMKabZonaGempaChangedEvent(comboMKabZonaGempa: value));
+					removeError(error: "Field ComboMKabZonaGempa tidak boleh kosong.");
+					sppaparCrudBloc.add(
+						ComboMKabZonaGempaChangedEvent(comboMKabZonaGempa: value),
+					);
 				}
 			},
 			onSaveCallback: (value) {
@@ -508,23 +477,21 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 			},
 			validatorCallback: (value) {
 				if (value == null) {
-					addError(
-							error: "Field ComboMKabZonaGempa tidak boleh kosong.");
+					addError(error: "Field ComboMKabZonaGempa tidak boleh kosong.");
+					return "";
 				}
+				return null;
 			},
 		);
 	}
 
-	Widget buildFieldLokasi1(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldLokasi1() {
+		return appTextField(
+			label: "Lokasi 1",
+			hint: "Masukkan lokasi pertama...",
 			controller: fieldLokasi1Controller,
-			decoration: const InputDecoration(
-				labelText: "lokasi1",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -540,41 +507,13 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldLokasi2(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldLokasi2() {
+		return appTextField(
+			label: "Lokasi 2",
+			hint: "Masukkan lokasi kedua...",
 			controller: fieldLokasi2Controller,
-			decoration: const InputDecoration(
-				labelText: "lokasi2",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
-			onChanged: (value) {
-				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
-				}
-			},
-			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
-				}
-				return null;
-			},
-		);
-	}
-
-	Widget buildFieldMachineryDesc(){
-		return TextFormField(
 			keyboardType: TextInputType.multiline,
-			minLines: 1,
 			maxLines: 3,
-			controller: fieldMachineryDescController,
-			decoration: const InputDecoration(
-				labelText: "machineryDesc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -590,16 +529,42 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldMwilayahId(){
-		return buildFieldComboMWilayah(
+	Widget buildFieldMachineryDesc() {
+		return appTextField(
+			label: "Deskripsi Mesin",
+			hint: "Masukkan deskripsi mesin...",
+			controller: fieldMachineryDescController,
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+		);
+	}
+
+	Widget buildFieldMwilayahId() {
+		return ReusableComboBox<ComboMWilayahModel>(
+			hintText: "Wilayah",
 			comboKey: comboMWilayahKey,
-			labelText: 'mwilayahId',
 			initItem: fieldComboMWilayah,
+			dataLoader: () async => ComboMWilayahRepository().getComboMWilayah(),
+			displayText: (item) => item.wilayahNama,
+			compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
 			onChangedCallback: (value) {
 				if (value != null) {
-					removeError(
-							error: "Field ComboMWilayah tidak boleh kosong.");
-					sppaparCrudBloc.add(ComboMWilayahChangedEvent(comboMWilayah: value));
+					removeError(error: "Field ComboMWilayah tidak boleh kosong.");
+					sppaparCrudBloc.add(
+						ComboMWilayahChangedEvent(comboMWilayah: value),
+					);
 				}
 			},
 			onSaveCallback: (value) {
@@ -609,23 +574,21 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 			},
 			validatorCallback: (value) {
 				if (value == null) {
-					addError(
-							error: "Field ComboMWilayah tidak boleh kosong.");
+					addError(error: "Field ComboMWilayah tidak boleh kosong.");
+					return "";
 				}
+				return null;
 			},
 		);
 	}
 
-	Widget buildFieldOtherDesc(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+	Widget buildFieldOtherDesc() {
+		return appTextField(
+			label: "Deskripsi Lainnya",
+			hint: "Masukkan deskripsi lainnya...",
 			controller: fieldOtherDescController,
-			decoration: const InputDecoration(
-				labelText: "otherDesc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -641,15 +604,12 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldPeriodeAkhir(){
-		return DateTimeFormField(
-			mode: DateTimeFieldPickerMode.date,
-			dateFormat: DateFormat('dd/MM/yyyy'),
+	Widget buildFieldPeriodeAkhir() {
+		return AppDateField(
+			label: "Periode Akhir",
 			initialValue: DateTime.tryParse(fieldPeriodeAkhirController.text),
-			decoration: const InputDecoration(
-				labelText: "periodeAkhir",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
 			onChanged: (value) {
 				if (value != null) {
 					removeError(error: kStringNullError);
@@ -666,15 +626,12 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldPeriodeMulai(){
-		return DateTimeFormField(
-			mode: DateTimeFieldPickerMode.date,
-			dateFormat: DateFormat('dd/MM/yyyy'),
+	Widget buildFieldPeriodeMulai() {
+		return AppDateField(
+			label: "Periode Mulai",
 			initialValue: DateTime.tryParse(fieldPeriodeMulaiController.text),
-			decoration: const InputDecoration(
-				labelText: "periodeMulai",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
 			onChanged: (value) {
 				if (value != null) {
 					removeError(error: kStringNullError);
@@ -691,16 +648,13 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-
-	Widget buildFieldPremiEqvet(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldPremiEqvet() {
+		return appTextField(
+			label: "Premi EQVET",
+			hint: "Masukkan nilai premi EQVET...",
 			controller: fieldPremiEqvetController,
-			decoration: const InputDecoration(
-				labelText: "premiEqvet",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -713,20 +667,16 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-
-	Widget buildFieldPremiOther(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldPremiOther() {
+		return appTextField(
+			label: "Premi Lainnya",
+			hint: "Masukkan nilai premi lainnya...",
 			controller: fieldPremiOtherController,
-			decoration: const InputDecoration(
-				labelText: "premiOther",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -739,19 +689,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldPremiPar(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldPremiPar() {
+		return appTextField(
+			label: "Premi PAR",
 			controller: fieldPremiParController,
-			decoration: const InputDecoration(
-				labelText: "premiPar",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -764,19 +710,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldPremiRsmdcc(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldPremiRsmdcc() {
+		return appTextField(
+			label: "Premi RSMDCC",
 			controller: fieldPremiRsmdccController,
-			decoration: const InputDecoration(
-				labelText: "premiRsmdcc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -789,19 +731,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldPremiTotal(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldPremiTotal() {
+		return appTextField(
+			label: "Premi Total",
 			controller: fieldPremiTotalController,
-			decoration: const InputDecoration(
-				labelText: "premiTotal",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -814,19 +752,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldPremiTsfwd(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldPremiTsfwd() {
+		return appTextField(
+			label: "Premi T/S/FWD",
 			controller: fieldPremiTsfwdController,
-			decoration: const InputDecoration(
-				labelText: "premiTsfwd",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -839,19 +773,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldRateEqvet(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldRateEqvet() {
+		return appTextField(
+			label: "Rate EQVET",
 			controller: fieldRateEqvetController,
-			decoration: const InputDecoration(
-				labelText: "rateEqvet",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -864,19 +794,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldRateOther(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldRateOther() {
+		return appTextField(
+			label: "Rate Other",
 			controller: fieldRateOtherController,
-			decoration: const InputDecoration(
-				labelText: "rateOther",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -889,19 +815,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldRatePar(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldRatePar() {
+		return appTextField(
+			label: "Rate PAR",
 			controller: fieldRateParController,
-			decoration: const InputDecoration(
-				labelText: "ratePar",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -914,19 +836,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldRateRsmdcc(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldRateRsmdcc() {
+		return appTextField(
+			label: "Rate RSM/DCC",
 			controller: fieldRateRsmdccController,
-			decoration: const InputDecoration(
-				labelText: "rateRsmdcc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -939,19 +857,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldRateTotal(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldRateTotal() {
+		return appTextField(
+			label: "Rate Total",
 			controller: fieldRateTotalController,
-			decoration: const InputDecoration(
-				labelText: "rateTotal",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -964,19 +878,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldRateTsfwd(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldRateTsfwd() {
+		return appTextField(
+			label: "Rate T/S/FWD",
 			controller: fieldRateTsfwdController,
-			decoration: const InputDecoration(
-				labelText: "rateTsfwd",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -989,7 +899,6 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
@@ -1021,220 +930,77 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 	}
 
 	Widget buildFieldRkonstruksiojkId() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					'Konstruksi',
-					style: TextStyle(
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Colors.black87,
-					),
-				),
-				const SizedBox(height: 8),
-
-				DropdownSearch<ComboRKonstruksiojkModel>(
-					key: comboRKonstruksiojkKey,
-					selectedItem: fieldComboRKonstruksiojk,
-
-					// BORDER & DECORATION
-					decoratorProps: DropDownDecoratorProps(
-						decoration: InputDecoration(
-							hintText: '-- Pilih Konstruksi --',
-							hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-							contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-							border: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.5),
-							),
-							enabledBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.5),
-							),
-							focusedBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Color(0xFF91C050), width: 2.0),
-							),
-							errorBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Colors.red, width: 1.5),
-							),
-							focusedErrorBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Colors.red, width: 2.0),
-							),
-							floatingLabelBehavior: FloatingLabelBehavior.never,
-						),
-					),
-
-					// ASYNC DROPDOWN ITEMS
-					items: (filter, _) async {
-						return ComboRKonstruksiojkRepository().getComboRKonstruksiojk();
-					},
-
-					compareFn: (item, sItem) => item.rkonstruksiojkId == sItem.rkonstruksiojkId,
-					itemAsString: (item) => item.kelasNama,
-
-					onChanged: (value) {
-						if (value != null) {
-							removeError(error: "Field ComboRKonstruksiojk tidak boleh kosong.");
-							sppaparCrudBloc.add(
-								ComboRKonstruksiojkChangedEvent(comboRKonstruksiojk: value),
-							);
-						}
-					},
-
-					onSaved: (value) {
-						if (value != null) {
-							fieldComboRKonstruksiojk = value;
-						}
-					},
-
-					validator: (value) {
-						if (value == null) {
-							addError(error: "Field ComboRKonstruksiojk tidak boleh kosong.");
-							return "Field ComboRKonstruksiojk tidak boleh kosong.";
-						}
-						return null;
-					},
-
-					suffixProps: const DropdownSuffixProps(
-						clearButtonProps: ClearButtonProps(isVisible: false),
-						dropdownButtonProps: DropdownButtonProps(
-							iconClosed: Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-							iconOpened: Icon(Icons.keyboard_arrow_up, color: Color(0xFF91C050)),
-						),
-					),
-
-					popupProps: PopupPropsMultiSelection.modalBottomSheet(
-						disableFilter: false,
-						showSelectedItems: true,
-						showSearchBox: false,
-						itemBuilder: itemBuilderComboRKonstruksiojk,
-						modalBottomSheetProps: const ModalBottomSheetProps(
-							shape: RoundedRectangleBorder(
-								borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-							),
-						),
-					),
-				),
-			],
+		return ReusableComboBox<ComboRKonstruksiojkModel>(
+			hintText: 'Konstruksi',
+			comboKey: comboRKonstruksiojkKey,
+			initItem: fieldComboRKonstruksiojk,
+			dataLoader: () async {
+				return ComboRKonstruksiojkRepository().getComboRKonstruksiojk();
+			},
+			displayText: (item) => item.kelasNama,
+			compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Konstruksi tidak boleh kosong.");
+					sppaparCrudBloc.add(
+						ComboRKonstruksiojkChangedEvent(comboRKonstruksiojk: value),
+					);
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboRKonstruksiojk = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Konstruksi tidak boleh kosong.");
+					return "Field Konstruksi tidak boleh kosong.";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldRokupasiId() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					'Rokupasi',
-					style: TextStyle(
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Colors.black87,
-					),
-				),
-				const SizedBox(height: 8),
-
-				DropdownSearch<ComboROkupasiModel>(
-					key: comboROkupasiKey,
-					selectedItem: fieldComboROkupasi,
-
-					// DESAIN BORDER KONSISTEN
-					decoratorProps: DropDownDecoratorProps(
-						decoration: InputDecoration(
-							hintText: '-- Pilih Rokupasi --',
-							hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-							contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-							border: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.5),
-							),
-							enabledBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.5),
-							),
-							focusedBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Color(0xFF91C050), width: 2.0),
-							),
-							errorBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Colors.red, width: 1.5),
-							),
-							focusedErrorBorder: OutlineInputBorder(
-								borderRadius: BorderRadius.circular(8),
-								borderSide: const BorderSide(color: Colors.red, width: 2.0),
-							),
-							floatingLabelBehavior: FloatingLabelBehavior.never,
-						),
-					),
-
-					// LOAD ASYNC DATA
-					items: (filter, _) async {
-						return ComboROkupasiRepository().getComboROkupasi(filter);
-					},
-
-					compareFn: (item, sItem) => item.rokupasiId == sItem.rokupasiId,
-					itemAsString: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
-
-					onChanged: (value) {
-						if (value != null) {
-							removeError(error: "Field ComboROkupasi tidak boleh kosong.");
-							sppaparCrudBloc.add(ComboROkupasiChangedEvent(comboROkupasi: value));
-						}
-					},
-
-					onSaved: (value) {
-						if (value != null) {
-							fieldComboROkupasi = value;
-						}
-					},
-
-					validator: (value) {
-						if (value == null) {
-							addError(error: "Field ComboROkupasi tidak boleh kosong.");
-							return "Field ComboROkupasi tidak boleh kosong.";
-						}
-						return null;
-					},
-
-					suffixProps: const DropdownSuffixProps(
-						clearButtonProps: ClearButtonProps(isVisible: false),
-						dropdownButtonProps: DropdownButtonProps(
-							iconClosed: Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-							iconOpened: Icon(Icons.keyboard_arrow_up, color: Color(0xFF91C050)),
-						),
-					),
-
-					popupProps: PopupPropsMultiSelection.modalBottomSheet(
-						disableFilter: false,
-						showSelectedItems: true,
-						showSearchBox: true,
-						itemBuilder: itemBuilderComboROkupasi,
-						modalBottomSheetProps: const ModalBottomSheetProps(
-							shape: RoundedRectangleBorder(
-								borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-							),
-						),
-					),
-				),
-			],
+		return ReusableComboBox<ComboROkupasiModel>(
+			hintText: 'Rokupasi',
+			comboKey: comboROkupasiKey,
+			initItem: fieldComboROkupasi,
+			dataLoader: () async {
+				return ComboROkupasiRepository().getComboROkupasi('');
+			},
+			displayText: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
+			compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Rokupasi tidak boleh kosong.");
+					sppaparCrudBloc.add(
+						ComboROkupasiChangedEvent(comboROkupasi: value),
+					);
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboROkupasi = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Rokupasi tidak boleh kosong.");
+					return "Field Rokupasi tidak boleh kosong.";
+				}
+				return null;
+			},
 		);
 	}
 
-
-
-	Widget buildFieldSiBuilding(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldSiBuilding() {
+		return appTextField(
+			label: "SI Building",
 			controller: fieldSiBuildingController,
-			decoration: const InputDecoration(
-				labelText: "siBuilding",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -1247,19 +1013,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldSiContent(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldSiContent() {
+		return appTextField(
+			label: "SI Content",
 			controller: fieldSiContentController,
-			decoration: const InputDecoration(
-				labelText: "siContent",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -1272,19 +1034,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldSiMachinery(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldSiMachinery() {
+		return appTextField(
+			label: "SI Machinery",
 			controller: fieldSiMachineryController,
-			decoration: const InputDecoration(
-				labelText: "siMachinery",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -1297,44 +1055,15 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldSiOther(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldSiOther() {
+		return appTextField(
+			label: "SI Other",
 			controller: fieldSiOtherController,
-			decoration: const InputDecoration(
-				labelText: "siOther",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
-			onChanged: (value) {
-				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
-				}
-			},
-			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
-				}
-				return null;
-			},
-			textAlign: TextAlign.right,
-		);
-	}
-
-	Widget buildFieldSiStock(){
-		return TextFormField(
 			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
-			controller: fieldSiStockController,
-			decoration: const InputDecoration(
-				labelText: "siStock",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -1347,19 +1076,36 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
 		);
 	}
 
-	Widget buildFieldSppaTgl(){
-		return DateTimeFormField(
-			mode: DateTimeFieldPickerMode.date,
-			dateFormat: DateFormat('dd/MM/yyyy'),
+	Widget buildFieldSiStock() {
+		return appTextField(
+			label: "SI Stock",
+			controller: fieldSiStockController,
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.done,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+		);
+	}
+
+	Widget buildFieldSppaTgl() {
+		return AppDateField(
+			label: "SPPA Tanggal",
 			initialValue: DateTime.tryParse(fieldSppaTglController.text),
-			decoration: const InputDecoration(
-				labelText: "sppaTgl",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
 			onChanged: (value) {
 				if (value != null) {
 					removeError(error: kStringNullError);
@@ -1376,65 +1122,12 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 		);
 	}
 
-	Widget buildFieldStockAdjustable(){
-		return TextFormField(
-			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
+	Widget buildFieldStockAdjustable() {
+		return appTextField(
+			label: "Stock Adjustable",
 			controller: fieldStockAdjustableController,
-			decoration: const InputDecoration(
-				labelText: "stockAdjustable",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
-			onChanged: (value) {
-				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
-				}
-			},
-			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
-				}
-				return null;
-			},
-			textAlign: TextAlign.right,
-		);
-	}
-
-	Widget buildFieldStockDesc(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
-			controller: fieldStockDescController,
-			decoration: const InputDecoration(
-				labelText: "stockDesc",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
-			onChanged: (value) {
-				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
-				}
-			},
-			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
-				}
-				return null;
-			},
-		);
-	}
-
-	Widget buildFieldTsi(){
-		return TextFormField(
 			keyboardType: TextInputType.number,
-			inputFormatters: [ThousandsSeparatorInputFormatter()],
-			controller: fieldTsiController,
-			decoration: const InputDecoration(
-				labelText: "tsi",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
+			textInputAction: TextInputAction.next,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -1447,7 +1140,48 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 				}
 				return null;
 			},
-			textAlign: TextAlign.right,
+		);
+	}
+
+	Widget buildFieldStockDesc() {
+		return appTextField(
+			label: "Stock Description",
+			controller: fieldStockDescController,
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+		);
+	}
+
+	Widget buildFieldTsi() {
+		return appTextField(
+			label: "TSI",
+			controller: fieldTsiController,
+			keyboardType: TextInputType.number,
+			textInputAction: TextInputAction.next,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 

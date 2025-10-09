@@ -28,81 +28,81 @@ class HeroPage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, authState) {
-                      final custType = authState is AuthenticationAuthenticated
-                          ? (authState.user.custType ?? '').toUpperCase()
-                          : '';
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, authState) {
+                    final custType = authState is AuthenticationAuthenticated
+                        ? (authState.user.custType ?? '').toUpperCase()
+                        : '';
 
-                      if (custType == 'C') {
-                        // 🔹 Client → ambil dari UserProfileCubit
-                        return BlocBuilder<UserProfileCubit, UserProfileState>(
-                          buildWhen: (prev, curr) =>
-                          prev.nama != curr.nama || prev.fotoBytes != curr.fotoBytes,
-                          builder: (context, profileState) {
-                            final displayName = (profileState.nama?.trim().isNotEmpty ?? false)
-                                ? profileState.nama!.trim()
-                                : 'Client User'; // default kalau masih kosong
+                    if (custType == 'C') {
+                      // 🔹 Client → ambil dari UserProfileCubit
+                      return BlocBuilder<UserProfileCubit, UserProfileState>(
+                        buildWhen: (prev, curr) =>
+                        prev.nama != curr.nama || prev.fotoBytes != curr.fotoBytes,
+                        builder: (context, profileState) {
+                          final displayName = (profileState.nama?.trim().isNotEmpty ?? false)
+                              ? profileState.nama!.trim()
+                              : 'Client User'; // default kalau masih kosong
 
-                            final bytes = (profileState.fotoBytes != null &&
-                                profileState.fotoBytes!.isNotEmpty)
-                                ? profileState.fotoBytes
-                                : null; // default kalau belum ada foto
+                          final bytes = (profileState.fotoBytes != null &&
+                              profileState.fotoBytes!.isNotEmpty)
+                              ? profileState.fotoBytes
+                              : null; // default kalau belum ada foto
 
-                            return _buildHeroContent(
-                              context,
-                              displayName: displayName,
-                              custType: custType,
-                              bytes: bytes,
-                            );
-                          },
-                        );
-                      }
+                          return _buildHeroContent(
+                            context,
+                            displayName: displayName,
+                            custType: custType,
+                            bytes: bytes,
+                          );
+                        },
+                      );
+                    }
 
-                      else if (custType == 'U') {
-                        // 🔹 User baru → ambil dari RegUserProfileCubit
-                        return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
-                          buildWhen: (prev, curr) => prev.email != curr.email,
-                          builder: (context, regState) {
-                            final displayName = regState.email.isNotEmpty
-                                ? regState.email
-                                : 'New User'; // default kalau email kosong
+                    else if (custType == 'U') {
+                      // 🔹 User baru → ambil dari RegUserProfileCubit
+                      return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
+                        buildWhen: (prev, curr) => prev.email != curr.email,
+                        builder: (context, regState) {
+                          final displayName = regState.email.isNotEmpty
+                              ? regState.email
+                              : 'New User'; // default kalau email kosong
 
-                            return _buildHeroContent(
-                              context,
-                              displayName: displayName,
-                              custType: custType,
-                              bytes: null, // user baru belum ada foto
-                            );
-                          },
-                        );
-                      }
+                          return _buildHeroContent(
+                            context,
+                            displayName: displayName,
+                            custType: custType,
+                            bytes: null, // user baru belum ada foto
+                          );
+                        },
+                      );
+                    }
 
-                      else {
-                        // 🔹 CustType kosong / tidak dikenal → ambil dari authState langsung
-                        final fallbackEmail = authState is AuthenticationAuthenticated
-                            ? (authState.user.email?.trim() ?? 'Guest User')
-                            : 'Guest User';
+                    else {
+                      // 🔹 CustType kosong / tidak dikenal → ambil dari authState langsung
+                      final fallbackEmail = authState is AuthenticationAuthenticated
+                          ? (authState.user.email?.trim() ?? 'Guest User')
+                          : 'Guest User';
 
-                        // debugPrint("⚙️ [Hero Header] CustType kosong, pakai fallback email: $fallbackEmail");
+                      // debugPrint("⚙ [Hero Header] CustType kosong, pakai fallback email: $fallbackEmail");
 
-                        return _buildHeroContent(
-                          context,
-                          displayName: fallbackEmail,
-                          custType: custType.isEmpty ? '(Unknown)' : custType,
-                          bytes: null,
-                        );
-                      }
-                      //
-                      // // 🔹 Default (belum login / state lain) → render placeholder juga
-                      // return _buildHeroContent(
-                      //   context,
-                      //   displayName: 'Guest', // fallback
-                      //   custType: '',
-                      //   bytes: null,
-                      // );
-                    },
-                  ),
+                      return _buildHeroContent(
+                        context,
+                        displayName: fallbackEmail,
+                        custType: custType.isEmpty ? '(Unknown)' : custType,
+                        bytes: null,
+                      );
+                    }
+                    //
+                    // // 🔹 Default (belum login / state lain) → render placeholder juga
+                    // return _buildHeroContent(
+                    //   context,
+                    //   displayName: 'Guest', // fallback
+                    //   custType: '',
+                    //   bytes: null,
+                    // );
+                  },
+                ),
               ],
             ),
           ),
@@ -114,16 +114,16 @@ class HeroPage extends StatelessWidget {
   /// Helper untuk bangun HeroPage UI
   Widget _buildHeroContent(
       BuildContext context,{
-    required String displayName,
-    required String custType,
-    Uint8List? bytes,
-  }) {
+        required String displayName,
+        required String custType,
+        Uint8List? bytes,
+      }) {
     return Column(
       children: [
         HeroCardWidget(
           userName: displayName,
           imageBytes: bytes,
-          premiumAmount: custType == 'C' ? '10.500.000.000' : '9.999.999',
+          premiumAmount: custType == 'C' ? '10.500.000.000' : '0',
           polisCount: custType == 'C' ? 21 : 0,
           onDetailTap: () {
             Navigator.push(
@@ -131,7 +131,7 @@ class HeroPage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const DetailPremiPage()),
             );
           },
-          asetCount : custType == "C" ? '50.000.000' : '9.999.999',
+          asetCount : custType == "C" ? '50.000.000.000' : '0',
           custType: custType,
         ),
         const SizedBox(height: vPadding - 3),

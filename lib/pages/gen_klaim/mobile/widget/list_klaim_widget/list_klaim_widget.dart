@@ -47,28 +47,22 @@ class _ListKlaimWidgetState extends State<ListKlaimWidget>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final headerSpacing = screenHeight * 0.025;
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundSidePage(
-          backgroundAsset: "assets/images/background_gradient.png",
-          fadeHeight: 300,
           title: 'Klaim',
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const HeaderCard(
-                  iconPath: "assets/icons/shield2.svg",
+                  iconPath: "assets/icons/menu_klaim.svg",
                   title: "Klaim",
                   subtitle:
                   "Ajukan klaim Anda dengan mudah dan cepat sesuai ketentuan polis yang berlaku.",
                 ),
-                SizedBox(height: headerSpacing),
                 ListCardKlaimWidget(
                   isSavingById: _isSavingById,
                   onSaveExisting: (id, record) {

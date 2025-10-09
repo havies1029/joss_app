@@ -15,6 +15,7 @@ import '../../../../../models/combobox/combomwilayah_model.dart';
 import '../../../../../models/combobox/comborkonstruksiojk_model.dart';
 import '../../../../../models/combobox/comborokupasi_model.dart';
 import '../../../../../pages/polis/sppa/sppa_polis_par.dart';
+import '../../real_polis/sppa_par/sppa_par_page.dart';
 
 class SimulParPage extends StatefulWidget {
   const SimulParPage({super.key});
@@ -25,6 +26,7 @@ class SimulParPage extends StatefulWidget {
 
 class _SimulParPageState extends State<SimulParPage> {
   final _formKey = GlobalKey<FormState>();
+  bool _showPremiSection = false;
 
   @override
   void initState() {
@@ -183,7 +185,7 @@ class _SimulParPageState extends State<SimulParPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder:
-                                              (_) => const SppaPolisParMain(),
+                                              (_) => const SppaParPage(),
                                         ),
                                       );
                                     },
@@ -246,6 +248,37 @@ class _SimulParPageState extends State<SimulParPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProgressBar() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 10,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: sGrey,
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: _showPremiSection ? 1.0 : 0.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: vPadding),
+        Text(
+          _showPremiSection ? '100%' : '50%',
+          style: bodyTextStyle(context, fontSize: 16),
+        ),
+      ],
     );
   }
 }

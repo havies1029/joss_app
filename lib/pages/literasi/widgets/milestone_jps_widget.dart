@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
 class MilestoneJPSWidget extends StatelessWidget {
@@ -52,11 +53,6 @@ class MilestoneJPSWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          decoration: BoxDecoration(
-            color: pGrey,
-            border: Border.all(color: sGrey),
-            borderRadius: BorderRadius.circular(cardBorderRadius),
-          ),
           padding: const EdgeInsets.only(
             right: 20,
             left: 20,
@@ -83,101 +79,10 @@ class MilestoneJPSWidget extends StatelessWidget {
               ),
               const SizedBox(height: 28),
 
-              SizedBox(
-                height: 263,
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceEvenly,
-                    maxY: 80,
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: 20,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(color: sGrey, strokeWidth: 0.5);
-                      },
-                    ),
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (double value, meta) {
-                            if (value == 0 ||
-                                value == 20 ||
-                                value == 40 ||
-                                value == 60 ||
-                                value == 80) {
-                              return Text(
-                                value.toInt().toString(),
-                                style: bodyTextStyle(
-                                  context,
-                                  fontSize: 12,
-                                ).copyWith(color: primaryLightColor),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                          reservedSize: 28,
-                          interval: 20,
-                        ),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (double value, meta) {
-                            final idx = value.toInt();
-                            if (idx >= 0 && idx < milestones.length) {
-                              return Text(
-                                milestones[idx].year,
-                                style: bodyTextStyle(
-                                  context,
-                                ).copyWith(color: primaryLightColor),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                          reservedSize: 32,
-                        ),
-                      ),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border: Border(
-                        left: BorderSide(color: sGrey, width: 0.5),
-                        bottom: BorderSide(color: sGrey, width: 0.5),
-                      ),
-                    ),
-                    barGroups: List.generate(
-                      milestones.length,
-                          (i) => BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: milestones[i].value.toDouble(),
-                            width: 24,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(4),
-                            ),
-                            color: primaryColor,
-                            gradient: LinearGradient(
-                              colors: [primaryColor, const Color(0xFFFFB84D)],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    barTouchData: BarTouchData(enabled: false),
-                  ),
-                ),
+              SvgPicture.asset(
+                'assets/icons/milestone.svg',
+                height: 325,
+                fit: BoxFit.contain,
               ),
             ],
           ),

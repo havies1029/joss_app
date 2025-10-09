@@ -1,4 +1,3 @@
-// lib/pages/gen_klaim/widgets/klaim1_list_editor.dart
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +36,7 @@ class _RowCtrls {
   final insuredName = TextEditingController();
   final kejadianLokasi = TextEditingController();
   final klaimAmount = TextEditingController();
+  final kategoriAsuransi = "Asuransi Properti";
   DateTime? kejadianTgl;
 
   final mataUangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
@@ -54,11 +54,17 @@ class _RowCtrls {
 
 class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
   final Map<String, _RowCtrls> _rowCtrls = {};
-  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final _today = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
 
   @override
   void dispose() {
-    for (final c in _rowCtrls.values) { c.dispose(); }
+    for (final c in _rowCtrls.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -92,9 +98,10 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
                 const Text('Gagal memuat data Klaim'),
                 const SizedBox(height: 8),
                 TextButton(
-                  onPressed: () => context
-                      .read<Klaim1ListBloc>()
-                      .add(FetchKlaim1ListEvent()),
+                  onPressed:
+                      () => context.read<Klaim1ListBloc>().add(
+                        FetchKlaim1ListEvent(),
+                      ),
                   child: const Text('Coba lagi'),
                 ),
               ],
@@ -120,22 +127,24 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
 
         // Success State dengan list klaim
         return Container(
-          color: primaryBlackColor, // 🎨 Tambahan container hitam sekunder
+          color: secondaryBlackColor,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(
               horizontal: hPadding * 1.5,
-              vertical: hPadding * 1.5,
+              vertical: vPadding,
             ),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, __) => const SizedBox(height: 15),
             itemBuilder: (ctx, idx) {
               final item = state.items[idx];
               final ctrls = _rowCtrls[item.klaim1Id]!;
               final saving = widget.isSavingById[item.klaim1Id] ?? false;
+              final kategoriAsuransi = 'Asuransi Properti';
 
               return KlaimCardWidget(
+                kategoriAsuransi: kategoriAsuransi,
                 insuredNameCtrl: ctrls.insuredName,
                 lokasiCtrl: ctrls.kejadianLokasi,
                 initialTanggal: ctrls.kejadianTgl ?? DateTime.now(),
@@ -144,14 +153,12 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
                 status: item.statusNama ?? "Waiting Doc",
                 onView: () => widget.onView(item),
               );
-
             },
           ),
         );
       },
     );
   }
-
 
   void _ensureRowControllers(Klaim1ListState state) {
     if (state.items.isEmpty) {
@@ -163,12 +170,19 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
         final c = _RowCtrls();
         c.insuredName.text = item.insuredName ?? '';
         c.kejadianLokasi.text = item.kejadianLokasi ?? '';
-        c.klaimAmount.text = (item.klaimAmount == null || item.klaimAmount == 0)
-            ? ''
-            : NumberFormat.decimalPattern('id').format(item.klaimAmount);
+        c.klaimAmount.text =
+            (item.klaimAmount == null || item.klaimAmount == 0)
+                ? ''
+                : NumberFormat.decimalPattern('id').format(item.klaimAmount);
         c.kejadianTgl = item.kejadianTgl ?? _today;
-        c.rMatauang = ComboRMatauangModel(rmatauangKode: item.kursId, rmatauangNama: item.rmatauangNama);
-        c.mStsclaim = ComboMStsclaimModel(mstsclaimId: item.lastStsclaimId, statusNama: item.statusNama);
+        c.rMatauang = ComboRMatauangModel(
+          rmatauangKode: item.kursId,
+          rmatauangNama: item.rmatauangNama,
+        );
+        c.mStsclaim = ComboMStsclaimModel(
+          mstsclaimId: item.lastStsclaimId,
+          statusNama: item.statusNama,
+        );
         _rowCtrls[item.klaim1Id] = c;
       }
     }
@@ -181,27 +195,56 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
   }
 }
 
-/// Copied same as add-form (bisa dipindah ke shared file kalau mau).
 class ThousandsFormatterId extends TextInputFormatter {
   final _nf = NumberFormat.decimalPattern('id');
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldV, TextEditingValue newV) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldV,
+    TextEditingValue newV,
+  ) {
     final digits = newV.text.replaceAll(RegExp(r'[^0-9]'), '');
     if (digits.isEmpty) {
-      return const TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
     }
-    final oldDigitsBefore = _countDigitsBefore(oldV.text, oldV.selection.baseOffset);
-    final newDigitsBefore = _countDigitsBefore(newV.text, newV.selection.baseOffset);
+    final oldDigitsBefore = _countDigitsBefore(
+      oldV.text,
+      oldV.selection.baseOffset,
+    );
+    final newDigitsBefore = _countDigitsBefore(
+      newV.text,
+      newV.selection.baseOffset,
+    );
     final number = int.parse(digits);
     final newText = _nf.format(number);
     final targetDigitIndex = newDigitsBefore.clamp(0, digits.length);
     final caretOffset = _offsetForDigitIndex(newText, targetDigitIndex);
-    return TextEditingValue(text: newText, selection: TextSelection.collapsed(offset: caretOffset));
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: caretOffset),
+    );
   }
-  int _countDigitsBefore(String t, int off) { if (off <= 0) return 0; off = off.clamp(0, t.length); return RegExp(r'[0-9]').allMatches(t.substring(0, off)).length; }
-  int _offsetForDigitIndex(String f, int idx) { if (idx <= 0) return 0; int c = 0; for (int i = 0; i < f.length; i++) { if (RegExp(r'[0-9]').hasMatch(f[i])) { c++; if (c == idx) return i + 1; } } return f.length; }
-}
 
+  int _countDigitsBefore(String t, int off) {
+    if (off <= 0) return 0;
+    off = off.clamp(0, t.length);
+    return RegExp(r'[0-9]').allMatches(t.substring(0, off)).length;
+  }
+
+  int _offsetForDigitIndex(String f, int idx) {
+    if (idx <= 0) return 0;
+    int c = 0;
+    for (int i = 0; i < f.length; i++) {
+      if (RegExp(r'[0-9]').hasMatch(f[i])) {
+        c++;
+        if (c == idx) return i + 1;
+      }
+    }
+    return f.length;
+  }
+}
 
 class KlaimCardWidget extends StatelessWidget {
   final TextEditingController insuredNameCtrl;
@@ -211,9 +254,12 @@ class KlaimCardWidget extends StatelessWidget {
   final String mataUang;
   final String status;
   final VoidCallback? onView;
+  final String kategoriAsuransi;
+
 
   const KlaimCardWidget({
     super.key,
+    required this.kategoriAsuransi,
     required this.insuredNameCtrl,
     required this.lokasiCtrl,
     required this.initialTanggal,
@@ -227,11 +273,11 @@ class KlaimCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: secondaryBlackColor,
-        border: Border.all(color: pGrey),
+        color: pGrey,
+        border: Border.all(color: sGrey),
         borderRadius: BorderRadius.circular(cardBorderRadius),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -240,18 +286,10 @@ class KlaimCardWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// Icon
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: SvgPicture.asset(
-                  "assets/icons/claim-icon-property.svg",
-                  width: 32,
-                  height: 32,
-                  color: Colors.white,
-                ),
+              SvgPicture.asset(
+                _iconForKategori(kategoriAsuransi),
+                width: 52,
+                height: 52,
               ),
               const SizedBox(width: 12),
 
@@ -260,72 +298,96 @@ class KlaimCardWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// Asuransi + Amount
+                    // Asuransi + Amount
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Asuransi Properti", // dummy
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        Text(
+                          kategoriAsuransi, // dummy
+                          style: headingStyle(context, fontSize: 18),
                         ),
                         Text(
                           "$mataUang ${amountCtrl.text}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: headingStyle(context, fontSize: 18),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 5),
 
                     /// Nama
-                    Text(
-                      "Nama: ${insuredNameCtrl.text}",
-                      style:  inputTextStyle(context,color: unselectedColor),
+                    RichText(
+                      text: TextSpan(
+                        style: headingStyle(context, fontSize: 16).copyWith(fontFamily: 'Delm-Regular'),
+                        children: [
+                          TextSpan(
+                            text: "Nama: ",
+                            style: headingStyle(context, fontSize: 16).copyWith(color: hintGrey, fontFamily: 'Delm-Regular'),
+                          ),
+                          TextSpan(text: insuredNameCtrl.text),
+                        ],
+                      ),
                     ),
-
+                    const SizedBox(height: 3),
                     /// No Klaim → sementara ambil dari lokasiCtrl
-                    Text(
-                      "No Klaim: ${lokasiCtrl.text}",
-                      style: inputTextStyle(context,color: unselectedColor),
+                    RichText(
+                      text: TextSpan(
+                        style: headingStyle(context, fontSize: 16).copyWith(fontFamily: 'Delm-Regular'),
+                        children: [
+                          TextSpan(
+                            text: "No Klaim: ",
+                            style: headingStyle(context, fontSize: 16).copyWith(color: hintGrey, fontFamily: 'Delm-Regular'),
+                          ),
+                          TextSpan(text: lokasiCtrl.text),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 3),
 
                     /// Tanggal
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Tanggal: ${_formatTanggal(initialTanggal)}",
-                          style: inputTextStyle(context,color: unselectedColor),
+                        RichText(
+                          text: TextSpan(
+                            style: headingStyle(context, fontSize: 16).copyWith(fontFamily: 'Delm-Regular'),
+                            children: [
+                              TextSpan(
+                                text: "Tanggal: ",
+                                style: headingStyle(context, fontSize: 16).copyWith(color: hintGrey, fontFamily: 'Delm-Regular'),
+                              ),
+                              TextSpan(text: _formatTanggal(initialTanggal)),
+                            ],
+                          ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 4),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: status == "Disetujui"
-                                ? Colors.green
-                                : status == "Waiting Doc"
-                                ? Colors.orange
-                                : Colors.grey,
-                            borderRadius: BorderRadius.circular(cardBorderRadius),
+                            color:
+                                status == "Disetujui"
+                                    ? pGreen
+                                    : status == "Waiting Doc"
+                                    ? primaryColor
+                                    : hintGrey,
+                            borderRadius: BorderRadius.circular(
+                              cardBorderRadius,
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle,
-                                  size: 14, color: Colors.white),
+                              const Icon(
+                                Icons.check_circle,
+                                size: 12,
+                                color: Colors.white,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 status,
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 12),
+                                style: headingStyle(context, fontSize: 12),
                               ),
                             ],
                           ),
@@ -338,14 +400,14 @@ class KlaimCardWidget extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           SizedBox(
             width: double.infinity,
             child: AppButton.iconLeft(
               text: 'Lihat Detail Klaim',
-              backgroundColor: pGrey,
-              icon:  const Icon(Icons.search, color: Colors.white),
+              backgroundColor: formGrey,
+              icon: const Icon(Icons.search, color: Colors.white),
               onPressed: onView,
             ),
           ),
@@ -364,5 +426,25 @@ class KlaimCardWidget extends StatelessWidget {
       "Jul", "Agt", "Sep", "Okt", "Nov", "Des"
     ];
     return bulanStr[bulan - 1];
+  }
+
+  String _iconForKategori(String kategoriAsuransi) {
+    final name = kategoriAsuransi.toLowerCase();
+
+    if (name.contains('kendaraan') || name.contains('mobil') || name.contains('motor')) {
+      return 'assets/icons/kendaraan.svg';
+    } else if (name.contains('properti') || name.contains('bangunan')) {
+      return 'assets/icons/properti.svg';
+    } else if (name.contains('kesehatan') || name.contains('medis')) {
+      return 'assets/icons/claim-icon-health.svg';
+    } else if (name.contains('kapal') || name.contains('marine')) {
+      return 'assets/icons/claim-icon-ship.svg';
+    } else if (name.contains('perjalanan') || name.contains('travel')) {
+      return 'assets/icons/claim-icon-travel.svg';
+    } else if (name.contains('tanggung') || name.contains('gugat') || name.contains('liability')) {
+      return 'assets/icons/claim-icon-liability.svg';
+    } else {
+      return 'assets/icons/claim-icon-default.svg';
+    }
   }
 }

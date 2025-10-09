@@ -37,17 +37,12 @@ class _KlaimMainPageState extends State<KlaimMainPage>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final headerSpacing = screenHeight * 0.025;
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundSidePage(
-          backgroundAsset: "assets/images/background_gradient.png",
-          fadeHeight: 300,
-          title: 'Klaim',
+          title: 'Lapor Klaim',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: const [

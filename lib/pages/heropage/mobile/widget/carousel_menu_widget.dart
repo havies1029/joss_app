@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:joss_app/blocs/gallery/galleryeventcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'dart:math';
 
 class CarouselMenuWidget extends StatefulWidget {
   const CarouselMenuWidget({super.key});
@@ -13,16 +13,18 @@ class CarouselMenuWidget extends StatefulWidget {
 
 class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   late final PageController _pageController;
-  int _currentIndex = 1; // kita mulai dari 1 (karena looping pakai dummy)
+  int _currentIndex = 1; // mulai dari 1 karena pakai dummy looping
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(
-      viewportFraction: 0.78,
+      viewportFraction: 0.82,
       initialPage: _currentIndex,
+      keepPage: true,
     );
 
+    // trigger ambil data
     context.read<GalleryeventCariBloc>().add(RefreshGalleryeventCariEvent());
   }
 
@@ -35,20 +37,21 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: vPadding),
+      padding: const EdgeInsets.symmetric(vertical: vPadding * 0.7),
       decoration: const BoxDecoration(color: secondaryBlackColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
-          _buildCarouselFromBloc(),
+          _buildHeader(context),
+          const SizedBox(height: 8),
+          _buildCarouselFromBloc(context),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
       child: Text(
         'Yuk, mulai klaim sekarang!',
@@ -57,124 +60,113 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
     );
   }
 
-  Widget _buildCarouselFromBloc() {
+  Widget _buildCarouselFromBloc(BuildContext context) {
+    return BlocBuilder<GalleryeventCariBloc, GalleryeventCariState>(
+      buildWhen: (prev, curr) => prev.items != curr.items || prev.status != curr.status,
+      builder: (context, state) {
+        if (state.status == ListStatus.initial) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+              ),
+            ),
+          );
+        }
+
+        if (state.status == ListStatus.success && state.items.isEmpty) {
+          return Center(
+            child: Text(
+              "Tidak ada gambar event 😢",
+              style: TextStyle(
+                color: primaryLightColor.withOpacity(0.6),
+                fontSize: getResponsiveFont(context, 16),
+              ),
+            ),
+          );
+        }
+
+        if (state.status == ListStatus.success && state.items.isNotEmpty) {
+          final images = state.items;
+          final loopedImages = [images.last, ...images, images.first];
+          return _buildCarousel(loopedImages);
+        }
+
+        return const Center(
+          child: Text("Terjadi kesalahan saat memuat gambar"),
+        );
+      },
+    );
+  }
+
+  Widget _buildCarousel(List images) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // ambil lebar parent
         final width = constraints.maxWidth;
-        // atur rasio banner dinamis — misal 16:9 (bisa disesuaikan)
-        final height = width * 0.45; // 16:7-ish, cocok buat banner landscape
-
+        final height = width * 0.38; // lebih ramping & responsif
         return SizedBox(
           height: height,
-          child: BlocBuilder<GalleryeventCariBloc, GalleryeventCariState>(
-            builder: (context, state) {
-              if (state.status == ListStatus.initial) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                  ),
-                );
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: images.length,
+            physics: const BouncingScrollPhysics(),
+            onPageChanged: (index) {
+              // Tanpa rebuild global, cukup logic looping saja
+              if (index == 0) {
+                Future.microtask(() => _pageController.jumpToPage(images.length - 2));
+              } else if (index == images.length - 1) {
+                Future.microtask(() => _pageController.jumpToPage(1));
+              } else {
+                setState(() => _currentIndex = index);
               }
-
-              if (state.status == ListStatus.success && state.items.isNotEmpty) {
-                final images = state.items;
-                if (images.length < 2) {
-                  return _buildCarouselItemFromNetwork(images.first.galleryUrl);
-                }
-
-                final loopedImages = [
-                  images.last,
-                  ...images,
-                  images.first,
-                ];
-
-                return PageView.builder(
-                  controller: _pageController,
-                  itemCount: loopedImages.length,
-                  physics: const BouncingScrollPhysics(),
-                  onPageChanged: (index) {
-                    setState(() => _currentIndex = index);
-                    if (index == 0) {
-                      _pageController.jumpToPage(loopedImages.length - 2);
-                    } else if (index == loopedImages.length - 1) {
-                      _pageController.jumpToPage(1);
-                    }
-                  },
-                  itemBuilder: (context, index) {
-                    final item = loopedImages[index];
-
-                    return AnimatedBuilder(
-                      animation: _pageController,
-                      builder: (context, child) {
-                        double value = 1.0;
-                        if (_pageController.position.haveDimensions) {
-                          final diff = _pageController.page! - index;
-                          value = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);
-                        } else {
-                          value = (index == _currentIndex) ? 1.0 : 0.9;
-                        }
-
-                        return Center(
-                          child: Transform.scale(
-                            scale: value,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: _buildCarouselItemFromNetwork(item.galleryUrl),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              }
-
-              if (state.status == ListStatus.success && state.items.isEmpty) {
-                return Center(
-                  child: Text(
-                    "Tidak ada gambar event 😢",
-                    style: TextStyle(
-                      color: primaryLightColor.withOpacity(0.6),
-                      fontSize: getResponsiveFont(context, 16),
+            },
+            itemBuilder: (context, index) {
+              final item = images[index];
+              return AnimatedBuilder(
+                animation: _pageController,
+                builder: (context, child) {
+                  double scale = 1.0;
+                  if (_pageController.position.haveDimensions) {
+                    final diff = _pageController.page! - index;
+                    scale = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);
+                  }
+                  return Center(
+                    child: Transform.scale(
+                      scale: scale,
+                      child: child,
                     ),
-                  ),
-                );
-              }
-
-              return const Center(
-                child: Text("Terjadi kesalahan saat memuat gambar"),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: _buildCachedImage(item.galleryUrl),
+                ),
               );
             },
           ),
         );
       },
     );
-
   }
 
-  Widget _buildCarouselItemFromNetwork(String imageUrl) {
+  Widget _buildCachedImage(String imageUrl) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        imageUrl,
+      child: CachedNetworkImage(
+        imageUrl: imageUrl,
         fit: BoxFit.cover,
         width: double.infinity,
-        loadingBuilder: (context, child, progress) {
-          if (progress == null) return child;
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey.shade900,
-            alignment: Alignment.center,
-            child: const Icon(Icons.broken_image, color: Colors.grey, size: 40),
-          );
-        },
+        placeholder: (context, url) => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.grey.shade900,
+          alignment: Alignment.center,
+          child: const Icon(Icons.broken_image, color: Colors.grey, size: 40),
+        ),
       ),
     );
   }

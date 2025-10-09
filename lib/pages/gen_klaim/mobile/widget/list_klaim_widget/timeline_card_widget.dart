@@ -23,6 +23,7 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
   late AnimationController _animationController;
   final ScrollController _hScroll = ScrollController();
   late Klaim2ListBloc klaim2ListBloc;
+  final kategoriAsuransi = "Asuransi Properti";
 
   final List<IconData> _stepIcons = const [
     Icons.upload_rounded,
@@ -66,19 +67,15 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
       backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundSidePage(
-          backgroundAsset: "assets/images/background_gradient.png",
-          fadeHeight: 300,
           title: 'Detail Klaim',
           child: Container(
-            color: secondaryBlackColor, // 🔶 Background hitam sekunder
+            color: secondaryBlackColor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const HeaderAsuransiCard(
-                  iconPath: "assets/icons/home_icon.svg",
-                  title: "Asuransi Properti",
-                ),
-                // 🔶 Timeline
+                const SizedBox(height: 15),
+                _headerForKategori(kategoriAsuransi),
+                const SizedBox(height: 18),
                 Flexible(
                   fit: FlexFit.loose,
                   child: BlocConsumer<Klaim2ListBloc, Klaim2ListState>(
@@ -109,64 +106,58 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
                     },
                   ),
                 ),
-
-                // 🔹 Ringkasan klaim
+                const SizedBox(height: 18),
                 Container(
                   margin: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5, vertical: 12),
+                      horizontal: hPadding * 1.5),
                   decoration: BoxDecoration(
-                    color: primaryBlackColor,
+                    color: pGrey,
                     borderRadius: BorderRadius.circular(cardBorderRadius),
-                    border: Border.all(color: pGrey, width: 1),
+                    border: Border.all(color: sGrey),
                   ),
                   child: Column(
                     children: [
                       _buildDetailRow("ID Klaim", widget.record.klaim1Id ?? "-"),
-                      _divider(),
+                      kDivider(color: sGrey),
                       _buildDetailRow("Nama Tertanggung",
                           widget.record.insuredName ?? "-"),
-                      _divider(),
+                      kDivider(color: sGrey),
                       _buildDetailRow("Lokasi", widget.record.kejadianLokasi ?? "-"),
-                      _divider(),
+                      kDivider(color: sGrey),
                       _buildDetailRow(
                           "Tanggal Kejadian",
                           widget.record.kejadianTgl?.toString() ?? "-"),
-                      _divider(),
+                      kDivider(color: sGrey),
                       _buildDetailRow(
                         "Nilai Klaim",
                         NumberFormat.currency(locale: 'id', symbol: 'IDR ')
                             .format(widget.record.klaimAmount ?? 0),
                       ),
-                      _divider(),
+                      kDivider(color: sGrey),
 
                       // 🔹 Status dengan badge
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               "Status Awal Klaim",
-                              style: TextStyle(
-                                  color: unselectedColor,
-                                  fontSize: getResponsiveFont(context, 18)),
+                              style: bodyTextStyle(context).copyWith(color: hintGrey),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: (widget.record.statusNama?.toLowerCase() ==
                                     "waiting")
-                                    ? Colors.orange
-                                    : Colors.green,
+                                    ? primaryColor
+                                    : pGreen,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
                                 widget.record.statusNama ?? "-",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: getResponsiveFont(context, 18)),
+                                style: bodyTextStyle(context),
                               ),
                             ),
                           ],
@@ -182,7 +173,6 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
                   margin: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                   child: AppButton.iconLeft(
                     text: 'Ajukan Klaim Baru',
-                    backgroundColor: primaryColor,
                     icon: const Icon(Icons.add_box, color: Colors.white),
                     onPressed: () {
                       Navigator.push(
@@ -205,19 +195,15 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
   // ======= UI Builders =======
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: unselectedColor, fontSize: getResponsiveFont(context, 18))),
+          Text(label, style: bodyTextStyle(context).copyWith(color: hintGrey)),
           Flexible(
             child: Text(
               value,
-              style: TextStyle(
-                fontSize: getResponsiveFont(context, 18),
-                color: primaryLightColor,
-                fontWeight: FontWeight.w500,
-              ),
+              style: bodyTextStyle(context),
               textAlign: TextAlign.right,
               overflow: TextOverflow.ellipsis,
             ),
@@ -227,20 +213,13 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
     );
   }
 
-  Widget _divider() {
-    return Container(
-      height: 1,
-      color: pGrey,
-    );
-  }
-
   Widget _buildHorizontalTimeline(List<dynamic> items) {
     final int lastIndex = items.length - 1;
     const double stepWidth = 90.0; // 50% lebih pendek dari 180
     const double bulletSize = 56.0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
         controller: _hScroll,
         scrollDirection: Axis.horizontal,
@@ -301,6 +280,33 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
           ],
         ),
       ),
+    );
+  }
+
+  HeaderAsuransiCard _headerForKategori(String kategoriAsuransi) {
+    final name = kategoriAsuransi.toLowerCase();
+    String iconPath;
+
+    if (name.contains('kendaraan') || name.contains('mobil') || name.contains('motor')) {
+      iconPath = 'assets/icons/claim-icon-car.svg';
+    } else if (name.contains('properti') || name.contains('bangunan')) {
+      iconPath = 'assets/icons/claim-icon-property.svg';
+    } else if (name.contains('kesehatan') || name.contains('medis')) {
+      iconPath = 'assets/icons/claim-icon-health.svg';
+    } else if (name.contains('kapal') || name.contains('marine')) {
+      iconPath = 'assets/icons/claim-icon-ship.svg';
+    } else if (name.contains('perjalanan') || name.contains('travel')) {
+      iconPath = 'assets/icons/claim-icon-travel.svg';
+    } else if (name.contains('tanggung') || name.contains('gugat') || name.contains('liability')) {
+      iconPath = 'assets/icons/claim-icon-liability.svg';
+    } else {
+      iconPath = 'assets/icons/claim-icon-default.svg';
+    }
+
+    return HeaderAsuransiCard(
+      title: kategoriAsuransi,
+      iconPath: iconPath,
+      onTap: () => debugPrint('Tapped on header $kategoriAsuransi'),
     );
   }
 

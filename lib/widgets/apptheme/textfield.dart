@@ -49,7 +49,7 @@ class appTextField extends StatelessWidget {
 
     switch (keyboardType) {
       case TextInputType.number:
-      return [ThousandsSeparatorInputFormatter()];
+        return [FilteringTextInputFormatter.digitsOnly];
       case TextInputType.phone:
         return [FilteringTextInputFormatter.digitsOnly];
       case TextInputType.emailAddress:
@@ -98,7 +98,7 @@ class appTextField extends StatelessWidget {
         labelStyle: (enabled ?? true)
             ? inputTextStyle(context)
             : bodyTextStyle(context),
-        hintText: hint,
+        hintText: hint ?? 'Masukkan $label...',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: (enabled ?? true) ? formGrey : sGrey,
@@ -141,7 +141,6 @@ class appTextField extends StatelessWidget {
 
 class AppDateField extends StatefulWidget {
   final String label;
-  final String? hint;
   final DateTime? initialValue;
   final DateTime firstDate;
   final DateTime lastDate;
@@ -153,7 +152,6 @@ class AppDateField extends StatefulWidget {
   const AppDateField({
     super.key,
     required this.label,
-    this.hint,
     this.initialValue,
     required this.firstDate,
     required this.lastDate,
@@ -217,7 +215,7 @@ class _AppDateFieldState extends State<AppDateField> {
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: inputTextStyle(context),
-        hintText: widget.hint ?? 'Pilih tanggal',
+        hintText: 'Pilih ${widget.label}',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: formGrey,

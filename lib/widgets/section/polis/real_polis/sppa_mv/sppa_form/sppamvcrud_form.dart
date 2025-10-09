@@ -5,23 +5,21 @@ import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/gen_sppamv/sppamvcrud_bloc.dart';
 import 'package:joss_app/models/gen_sppamv/sppamvcrud_model.dart';
 import 'package:joss_app/models/combobox/combommvgrupojk_model.dart';
-import 'package:joss_app/widgets/combobox/combommvgrupojk_widget.dart';
 import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
-import 'package:joss_app/widgets/combobox/combommvjnscover_widget.dart';
 import 'package:joss_app/models/combobox/combommvmerk_model.dart';
-import 'package:joss_app/widgets/combobox/combommvmerk_widget.dart';
 import 'package:joss_app/models/combobox/combommvtipe_model.dart';
-import 'package:joss_app/widgets/combobox/combommvtipe_widget.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
-import 'package:joss_app/widgets/combobox/combomwilayah_widget.dart';
 import 'package:joss_app/models/combobox/combomwarna_model.dart';
-import 'package:joss_app/widgets/combobox/combomwarna_widget.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
-import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../../../blocs/local_prefs/simulasi_mv_local_cubit.dart';
+import '../../../../../../repositories/combobox/combommvgrupojk_repository.dart';
+import '../../../../../../repositories/combobox/combommvjnscover_repository.dart';
+import '../../../../../../repositories/combobox/combommvmerk_repository.dart';
+import '../../../../../../repositories/combobox/combommvtipe_repository.dart';
+import '../../../../../../repositories/combobox/combomwarna_repository.dart';
+import '../../../../../../repositories/combobox/combomwilayah_repository.dart';
 
 class SppamvFormPage extends StatefulWidget {
 	final String viewMode;
@@ -157,140 +155,113 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 
 		return BlocConsumer<SppamvCrudBloc, SppamvCrudState>(
 			builder: (context, state) {
-				return Container(
-						padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: pGrey,
-            borderRadius: BorderRadius.circular(cardBorderRadius),
-          ),
-						child: Form(
-									key: _formKey,
-									child: Column(
-										crossAxisAlignment: CrossAxisAlignment.start,
-										children: [
-											// Section: Basic Information
-                      Text("Informasi Dasar", style: bodyTextStyle(context)),
-											const SizedBox(height: 10),
-											buildFieldSppaTgl(),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldPeriodeMulai(),
-												buildFieldPeriodeAkhir(),
-											]),
+				return Form(
+					key: _formKey,
+					child: Column(
+						crossAxisAlignment: CrossAxisAlignment.start,
+						children: [
+							Text("Informasi Dasar", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldSppaTgl(),
+							buildFieldPeriodeMulai(),
+							buildFieldPeriodeAkhir(),
 
-											const SizedBox(height: 24),
+							const SizedBox(height: 24),
 
-											// Section: Insured Information
-											_buildSectionHeader("Informasi Tertanggung"),
-											const SizedBox(height: 16),
-											buildFieldInsuredNama(),
-											const SizedBox(height: 12),
-											buildFieldInsuredAlamat1(),
-											const SizedBox(height: 12),
-											buildFieldInsuredAlamat2(),
+							// Section: Insured Information
+							Text("Informasi Tertanggung", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldInsuredNama(),
+							const SizedBox(height: 12),
+							buildFieldInsuredAlamat1(),
+							const SizedBox(height: 12),
+							buildFieldInsuredAlamat2(),
 
-											const SizedBox(height: 24),
+							const SizedBox(height: 24),
 
-											// Section: Vehicle Information
-											_buildSectionHeader("Data Kendaraan", icon: Icons.directions_car),
-											const SizedBox(height: 16),
-											_buildResponsiveRow([
-												buildFieldJenisKendaraan(),
-												buildFieldThnBuat(),
-											]),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldJenisCover(),
-												buildFieldHarga(),
-											]),
+							// Section: Vehicle Information
+							Text("Data Kendaraan", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldJenisKendaraan(),
+							buildFieldThnBuat(),
+							const SizedBox(height: 12),
+							buildFieldJenisCover(),
+							buildFieldHarga(),
 
-											const SizedBox(height: 24),
+							const SizedBox(height: 24),
 
-											// Section: Additional Coverage
-											_buildSectionHeader("Perlindungan Tambahan", icon: Icons.security),
-											const SizedBox(height: 16),
-											_buildCheckboxGrid([
-												buildFieldIsEq(),
-												buildFieldIsFlood(),
-												buildFieldIsSrcc(),
-												buildFieldIsTerrorism(),
-											]),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldPad(),
-												buildFieldPap(),
-											]),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldPll(),
-												buildFieldTpl(),
-											]),
-											const SizedBox(height: 12),
-											buildFieldAw(),
+							// Section: Additional Coverage
+							Text("Perlindungan Tambahan", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldIsEq(),
+							buildFieldIsFlood(),
+							buildFieldIsSrcc(),
+							buildFieldIsTerrorism(),
+							const SizedBox(height: 12),
+							buildFieldPad(),
+							buildFieldPap(),
+							const SizedBox(height: 12),
+							buildFieldPll(),
+							buildFieldTpl(),
+							const SizedBox(height: 12),
+							buildFieldAw(),
 
-											const SizedBox(height: 24),
+							const SizedBox(height: 24),
 
-											// Section: Coverage Information
-											_buildSectionHeader("Informasi Pertanggungan"),
-											const SizedBox(height: 16),
-											buildFieldWilayah(),
-											const SizedBox(height: 12),
-											buildFieldTsi(),
+							// Section: Coverage Information
+							Text("Informasi Pertanggungan", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldWilayah(),
+							const SizedBox(height: 12),
+							buildFieldTsi(),
 
-											const SizedBox(height: 24),
+							const SizedBox(height: 24),
 
-											// Section: Premium Information
-											_buildSectionHeader("Informasi Premi"),
-											const SizedBox(height: 16),
-											_buildResponsiveRow([
-												buildFieldPremi(),
-												buildFieldPremiAdd(),
-											]),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldPremiCasco(),
-												buildFieldPremiTotal(),
-											]),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldBiayaPolis(),
-												buildFieldMaterai(),
-											]),
+							// Section: Premium Information
+							Text("Informasi Premi", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldPremi(),
+							buildFieldPremiAdd(),
+							const SizedBox(height: 12),
+							buildFieldPremiCasco(),
+							buildFieldPremiTotal(),
+							const SizedBox(height: 12),
+							buildFieldBiayaPolis(),
+							buildFieldMaterai(),
 
-											const SizedBox(height: 24),
+							const SizedBox(height: 24),
 
-											// Section: Vehicle Details
-											_buildSectionHeader("Detail Kendaraan"),
-											const SizedBox(height: 16),
-											_buildResponsiveRow([
-												buildFieldMerkKendaraan(),
-												buildFieldTipeKendaraan(),
-											]),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldWarnaKendaraan(),
-												Container(), // Spacer
-											]),
-											const SizedBox(height: 12),
-											buildFieldPolisiNo(),
-											const SizedBox(height: 12),
-											_buildResponsiveRow([
-												buildFieldRangkaNo(),
-												buildFieldMesinNo(),
-											]),
+							// Section: Vehicle Details
+							Text("Detail Kendaraan", style: bodyTextStyle(context)),
+							const SizedBox(height: 10),
+							buildFieldMerkKendaraan(),
+							buildFieldTipeKendaraan(),
+							const SizedBox(height: 12),
+							buildFieldWarnaKendaraan(),
+							Container(), // Spacer
+							const SizedBox(height: 12),
+							buildFieldPolisiNo(),
+							const SizedBox(height: 12),
+							buildFieldRangkaNo(),
+							buildFieldMesinNo(),
 
-											const SizedBox(height: 30),
-											FormError(errors: errors, key: null),
-											const SizedBox(height: 20),
+							const SizedBox(height: 30),
+							FormError(errors: errors, key: null),
+							const SizedBox(height: 20),
 
-											// Action Buttons
-											_buildActionButtons(),
-											const SizedBox(height: 20),
-										],
-									),
-								),
-							
-					);
+							// Action Buttons
+							AppButton.primary(
+								text: 'Batal',
+								onPressed: () => Navigator.pop(context),
+							),
+							AppButton.primary(
+								text: 'Simpan',
+								onPressed: onSaveForm,
+							),
+							const SizedBox(height: 20),
+						],
+					),
+				);
 			},
 			listener: (context, state) {
 				if (state.isLoaded) {
@@ -335,224 +306,6 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 		);
 	}
 
-
-	// Custom Input Decoration sesuai design
-	InputDecoration _buildInputDecoration(String label, {String? prefix, String? suffix}) {
-		return InputDecoration(
-			labelText: label,
-			prefixText: prefix,
-			suffixText: suffix,
-			floatingLabelBehavior: FloatingLabelBehavior.always,
-			border: OutlineInputBorder(
-				borderRadius: BorderRadius.circular(8.0),
-				borderSide: BorderSide(color: Colors.grey.shade300),
-			),
-			enabledBorder: OutlineInputBorder(
-				borderRadius: BorderRadius.circular(8.0),
-				borderSide: BorderSide(color: Colors.grey.shade300),
-			),
-			focusedBorder: OutlineInputBorder(
-				borderRadius: BorderRadius.circular(8.0),
-				borderSide: const BorderSide(color: Color(0xff91C050), width: 2.0),
-			),
-			filled: true,
-			fillColor: Colors.grey.shade50,
-			contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-			labelStyle: TextStyle(
-				color: Colors.grey.shade700,
-				fontSize: 14.0,
-				fontWeight: FontWeight.w500,
-			),
-		);
-	}
-
-	Widget _buildSectionHeader(String title, {IconData? icon}) {
-		return Container(
-			width: double.infinity,
-			padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-			decoration: BoxDecoration(
-				color: const Color(0xff91C050).withOpacity(0.1),
-				borderRadius: BorderRadius.circular(8.0),
-				border: Border.all(color: const Color(0xff91C050).withOpacity(0.3)),
-			),
-			child: Row(
-				children: [
-					if (icon != null) ...[
-						Icon(
-							icon,
-							color: const Color(0xff91C050),
-							size: 20.0,
-						),
-						const SizedBox(width: 8.0),
-					],
-					Text(
-						title,
-						style: const TextStyle(
-							fontSize: 16.0,
-							fontWeight: FontWeight.w600,
-							color: Color(0xff91C050),
-						),
-					),
-				],
-			),
-		);
-	}
-
-	Widget _buildResponsiveRow(List<Widget> children) {
-		return LayoutBuilder(
-			builder: (context, constraints) {
-				if (constraints.maxWidth < 600) {
-					return Column(
-						children: children.where((child) => child.runtimeType != Container || (child as Container).child != null).map((child) =>
-								Padding(
-									padding: const EdgeInsets.only(bottom: 12.0),
-									child: child,
-								)
-						).toList(),
-					);
-				} else {
-					return Row(
-						children: children.asMap().entries.map((entry) {
-							int index = entry.key;
-							Widget child = entry.value;
-
-							if (child.runtimeType == Container && (child as Container).child == null) {
-								return Expanded(child: Container());
-							}
-
-							return Expanded(
-								child: Padding(
-									padding: EdgeInsets.only(
-										right: index < children.length - 1 ? 12.0 : 0,
-									),
-									child: child,
-								),
-							);
-						}).toList(),
-					);
-				}
-			},
-		);
-	}
-
-	Widget _buildCheckboxGrid(List<Widget> checkboxes) {
-		return LayoutBuilder(
-			builder: (context, constraints) {
-				if (constraints.maxWidth < 600) {
-					return Column(
-						children: checkboxes.map((checkbox) =>
-								Padding(
-									padding: const EdgeInsets.only(bottom: 8.0),
-									child: checkbox,
-								)
-						).toList(),
-					);
-				} else {
-					return Column(
-						children: [
-							Row(
-								children: [
-									Expanded(child: checkboxes[0]),
-									const SizedBox(width: 12.0),
-									Expanded(child: checkboxes[1]),
-								],
-							),
-							const SizedBox(height: 8.0),
-							Row(
-								children: [
-									Expanded(child: checkboxes[2]),
-									const SizedBox(width: 12.0),
-									Expanded(child: checkboxes[3]),
-								],
-							),
-						],
-					);
-				}
-			},
-		);
-	}
-
-	Widget _buildActionButtons() {
-		return LayoutBuilder(
-			builder: (context, constraints) {
-				final isMobile = constraints.maxWidth < 600;
-				final buttonWidth = isMobile ? double.infinity : constraints.maxWidth * 0.4;
-
-				return isMobile
-						? Column(
-					children: [
-						SizedBox(
-							width: buttonWidth,
-							height: 50,
-							child: ElevatedButton(
-								onPressed: () => Navigator.pop(context),
-								style: ElevatedButton.styleFrom(
-									backgroundColor: Colors.grey[600],
-									foregroundColor: Colors.white,
-									shape: RoundedRectangleBorder(
-										borderRadius: BorderRadius.circular(8.0),
-									),
-								),
-								child: const Text('Batal'),
-							),
-						),
-						const SizedBox(height: 12),
-						SizedBox(
-							width: buttonWidth,
-							height: 50,
-							child: ElevatedButton(
-								onPressed: onSaveForm,
-								style: ElevatedButton.styleFrom(
-									backgroundColor: const Color(0xff91C050),
-									foregroundColor: Colors.white,
-									shape: RoundedRectangleBorder(
-										borderRadius: BorderRadius.circular(8.0),
-									),
-								),
-								child: const Text('Simpan'),
-							),
-						),
-					],
-				)
-						: Row(
-					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-					children: [
-						SizedBox(
-							width: buttonWidth,
-							height: 50,
-							child: ElevatedButton(
-								onPressed: () => Navigator.pop(context),
-								style: ElevatedButton.styleFrom(
-									backgroundColor: Colors.grey[600],
-									foregroundColor: Colors.white,
-									shape: RoundedRectangleBorder(
-										borderRadius: BorderRadius.circular(8.0),
-									),
-								),
-								child: const Text('Batal'),
-							),
-						),
-						SizedBox(
-							width: buttonWidth,
-							height: 50,
-							child: ElevatedButton(
-								onPressed: onSaveForm,
-								style: ElevatedButton.styleFrom(
-									backgroundColor: const Color(0xff91C050),
-									foregroundColor: Colors.white,
-									shape: RoundedRectangleBorder(
-										borderRadius: BorderRadius.circular(8.0),
-									),
-								),
-								child: const Text('Simpan'),
-							),
-						),
-					],
-				);
-			},
-		);
-	}
-
 	void loadData() {
 		if (widget.viewMode == "ubah") {
 			sppamvCrudBloc.add(SppamvCrudLihatEvent(recordId: widget.recordId));
@@ -563,1898 +316,743 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 
 	// Date Fields
 	Widget buildFieldSppaTgl() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header (pisah dari field)
-				const Text(
-					"Tanggal SPPA",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				DateTimeFormField(
-					mode: DateTimeFieldPickerMode.date,
-					dateFormat: DateFormat('dd/MM/yyyy'),
-					initialValue: DateTime.tryParse(fieldSppaTglController.text),
-					decoration: InputDecoration(
-						hintText: "-- Pilih Tanggal --",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value != null) {
-							removeError(error: kStringNullError);
-							fieldSppaTglController.text = value.toIso8601String();
-						}
-					},
-					validator: (value) {
-						if (value == null) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return AppDateField(
+			label: 'Tanggal SPPA',
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
+			initialValue: DateTime.tryParse(fieldSppaTglController.text),
+			onChanged: (value) {
+				if (value != null) {
+					removeError(error: kStringNullError);
+					fieldSppaTglController.text = value.toIso8601String();
+				}
+			},
+			validator: (value) {
+				if (value == null) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 
 	Widget buildFieldPeriodeMulai() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Periode Mulai",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				DateTimeFormField(
-					mode: DateTimeFieldPickerMode.date,
-					dateFormat: DateFormat('dd/MM/yyyy'),
-					initialValue: DateTime.tryParse(fieldPeriodeMulaiController.text),
-					decoration: InputDecoration(
-						hintText: "-- Pilih Tanggal --",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value != null) {
-							removeError(error: kStringNullError);
-							fieldPeriodeMulaiController.text = value.toIso8601String();
-						}
-					},
-					validator: (value) {
-						if (value == null) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return AppDateField(
+			label: "Periode Mulai",
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
+			initialValue: DateTime.tryParse(fieldPeriodeMulaiController.text),
+			onChanged: (value) {
+				if (value != null) {
+					removeError(error: kStringNullError);
+					fieldPeriodeMulaiController.text = value.toIso8601String();
+				}
+			},
+			validator: (value) {
+				if (value == null) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPeriodeAkhir() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Periode Akhir",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				DateTimeFormField(
-					mode: DateTimeFieldPickerMode.date,
-					dateFormat: DateFormat('dd/MM/yyyy'),
-					initialValue: DateTime.tryParse(fieldPeriodeAkhirController.text),
-					decoration: InputDecoration(
-						hintText: "-- Pilih Tanggal --",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value != null) {
-							removeError(error: kStringNullError);
-							fieldPeriodeAkhirController.text = value.toIso8601String();
-						}
-					},
-					validator: (value) {
-						if (value == null) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return AppDateField(
+			label: "Periode Akhir",
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
+			initialValue: DateTime.tryParse(fieldPeriodeAkhirController.text),
+			onChanged: (value) {
+				if (value != null) {
+					removeError(error: kStringNullError);
+					fieldPeriodeAkhirController.text = value.toIso8601String();
+				}
+			},
+			validator: (value) {
+				if (value == null) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 // Personal Information Fields
 	Widget buildFieldInsuredNama() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Nama Tertanggung",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					controller: fieldInsuredNamaController,
-					decoration: InputDecoration(
-						hintText: "Masukkan nama tertanggung",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Nama Tertanggung",
+			controller: fieldInsuredNamaController,
+			keyboardType: TextInputType.name,
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
 		);
 	}
 
-
 	Widget buildFieldInsuredAlamat1() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Alamat Tertanggung 1",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.multiline,
-					minLines: 1,
-					maxLines: 3,
-					controller: fieldInsuredAlamat1Controller,
-					decoration: InputDecoration(
-						hintText: "Masukkan alamat tertanggung",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Alamat Tertanggung 1",
+			controller: fieldInsuredAlamat1Controller,
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
 		);
 	}
 
 	Widget buildFieldInsuredAlamat2() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Alamat Tertanggung 2",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.multiline,
-					minLines: 1,
-					maxLines: 3,
-					controller: fieldInsuredAlamat2Controller,
-					decoration: InputDecoration(
-						hintText: "Masukkan alamat tertanggung (opsional)",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-				),
-			],
+		return appTextField(
+			label: "Alamat Tertanggung 2",
+			hint: "Masukkan alamat tertanggung (opsional)",
+			controller: fieldInsuredAlamat2Controller,
+			keyboardType: TextInputType.multiline,
+			maxLines: 3,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
 		);
 	}
 
-	// Vehicle Information Fields
 	Widget buildFieldJenisKendaraan() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Jenis Kendaraan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field (Combo)
-				buildFieldComboMMvgrupOjk(
-					comboKey: comboMMvgrupOjkKey,
-					labelText: '', // ❌ jangan pakai label di dalam field
-					initItem: fieldComboMMvgrupOjk,
-					onChangedCallback: (value) {
-						if (value != null) {
-							removeError(error: "Field Jenis Kendaraan tidak boleh kosong.");
-							sppamvCrudBloc.add(
-								ComboMMvgrupOjkChangedEvent(comboMMvgrupOjk: value),
-							);
-						}
-					},
-					onSaveCallback: (value) {
-						if (value != null) {
-							fieldComboMMvgrupOjk = value;
-						}
-					},
-					validatorCallback: (value) {
-						if (value == null) {
-							addError(error: "Field Jenis Kendaraan tidak boleh kosong.");
-						}
-					},
-				),
-			],
+		return ReusableComboBox<ComboMMvgrupOjkModel>(
+			hintText: "Jenis Kendaraan",
+			comboKey: comboMMvgrupOjkKey,
+			initItem: fieldComboMMvgrupOjk,
+			dataLoader: () => ComboMMvgrupOjkRepository().getComboMMvgrupOjk(),
+			displayText: (item) => item.grupNama,
+			compareItems: (a, b) => a.mmvgrupojkId == b.mmvgrupojkId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Jenis Kendaraan tidak boleh kosong.");
+					sppamvCrudBloc.add(
+						ComboMMvgrupOjkChangedEvent(comboMMvgrupOjk: value),
+					);
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboMMvgrupOjk = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Jenis Kendaraan tidak boleh kosong.");
+					return "Field Jenis Kendaraan tidak boleh kosong.";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldThnBuat() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"Tahun Pembuatan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
+		final int currentYear = DateTime.now().year;
+		final List<int> tahunList = [
+			for (int y = currentYear; y >= 1980; y--) y
+		];
 
-				TextFormField(
-					controller: fieldThnBuatController,
-					readOnly: true,
-					decoration: InputDecoration(
-						hintText: "-- Pilih Tahun --",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding:
-						const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-					onTap: () async {
-						final currentYear = DateTime.now().year;
-						final selected = await showDatePicker(
-							context: context,
-							initialDate: DateTime(currentYear),
-							firstDate: DateTime(1980),
-							lastDate: DateTime(currentYear),
-							initialDatePickerMode: DatePickerMode.year,
-						);
-						if (selected != null) {
-							fieldThnBuatController.text = selected.year.toString();
-							removeError(error: kStringNullError);
-						}
-					},
-				),
-			],
+		return ReusableComboBox<int>(
+			hintText: "Tahun Pembuatan",
+			initItem: fieldThnBuatController.text.isNotEmpty
+					? int.tryParse(fieldThnBuatController.text)
+					: null,
+			dataLoader: () async => tahunList,
+			displayText: (item) => item.toString(),
+			compareItems: (a, b) => a == b,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: kStringNullError);
+					fieldThnBuatController.text = value.toString();
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldThnBuatController.text = value.toString();
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: kStringNullError);
+					return "Field Tahun Pembuatan tidak boleh kosong.";
+				}
+				return null;
+			},
+			enableSearch: false,
 		);
 	}
 
 	Widget buildFieldMerkKendaraan() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Merk Kendaraan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field (Combo)
-				buildFieldComboMMvmerk(
-					comboKey: comboMMvmerkKey,
-					labelText: '', // ❌ jangan pakai labelText di dalam field
-					initItem: fieldComboMMvmerk,
-					onChangedCallback: (value) {
-						if (value != null) {
-							removeError(error: "Field Merk Kendaraan tidak boleh kosong.");
-							sppamvCrudBloc.add(
-								ComboMMvmerkChangedEvent(comboMMvmerk: value),
-							);
-						}
-					},
-					onSaveCallback: (value) {
-						if (value != null) {
-							fieldComboMMvmerk = value;
-						}
-					},
-					validatorCallback: (value) {
-						if (value == null) {
-							addError(error: "Field Merk Kendaraan tidak boleh kosong.");
-						}
-					},
-
-					// // 🔹 Custom decoration biar konsisten
-					// decoration: InputDecoration(
-					// 	hintText: "-- Pilih Merk Kendaraan --",
-					// 	hintStyle: TextStyle(
-					// 		fontFamily: 'Satoshi-Regular',
-					// 		fontSize: 15,
-					// 		color: const Color(0xFF1C1C1C).withOpacity(0.4),
-					// 	),
-					// 	enabledBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-					// 	),
-					// 	focusedBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-					// 	),
-					// 	contentPadding: const EdgeInsets.symmetric(
-					// 		vertical: 14,
-					// 		horizontal: 12,
-					// 	),
-					// ),
-				),
-			],
+		return ReusableComboBox<ComboMMvmerkModel>(
+			hintText: "Merk Kendaraan",
+			comboKey: comboMMvmerkKey,
+			initItem: fieldComboMMvmerk,
+			dataLoader: () async {
+				return await ComboMMvmerkRepository().getComboMMvmerk('');
+			},
+			displayText: (item) => item.nmMerk,
+			compareItems: (a, b) => a.mmvmerkId == b.mmvmerkId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Merk Kendaraan tidak boleh kosong.");
+					sppamvCrudBloc.add(ComboMMvmerkChangedEvent(comboMMvmerk: value));
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) fieldComboMMvmerk = value;
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Merk Kendaraan tidak boleh kosong.");
+					return "Field Merk Kendaraan tidak boleh kosong.";
+				}
+				return null;
+			},
+			enableSearch: true,
 		);
 	}
 
-
 	Widget buildFieldTipeKendaraan() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Tipe Kendaraan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field (Combo)
-				buildFieldComboMMvtipe(
-					comboKey: comboMMvtipeKey,
-					labelText: '', // ❌ jangan pakai label di dalam field
-					initItem: fieldComboMMvtipe,
-					onChangedCallback: (value) {
-						if (value != null) {
-							removeError(error: "Field Tipe Kendaraan tidak boleh kosong.");
-							sppamvCrudBloc.add(
-								ComboMMvtipeChangedEvent(comboMMvtipe: value),
-							);
-						}
-					},
-					onSaveCallback: (value) {
-						if (value != null) {
-							fieldComboMMvtipe = value;
-						}
-					},
-					validatorCallback: (value) {
-						if (value == null) {
-							addError(error: "Field Tipe Kendaraan tidak boleh kosong.");
-						}
-					},
-
-					// // 🔹 Custom decoration biar konsisten
-					// decoration: InputDecoration(
-					// 	hintText: "-- Pilih Tipe Kendaraan --",
-					// 	hintStyle: TextStyle(
-					// 		fontFamily: 'Satoshi-Regular',
-					// 		fontSize: 15,
-					// 		color: const Color(0xFF1C1C1C).withOpacity(0.4),
-					// 	),
-					// 	enabledBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-					// 	),
-					// 	focusedBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-					// 	),
-					// 	contentPadding: const EdgeInsets.symmetric(
-					// 		vertical: 14,
-					// 		horizontal: 12,
-					// 	),
-					// ),
-				),
-			],
+		return ReusableComboBox<ComboMMvtipeModel>(
+			hintText: "Tipe Kendaraan",
+			comboKey: comboMMvtipeKey,
+			initItem: fieldComboMMvtipe,
+			dataLoader: () async {
+				return await ComboMMvtipeRepository().getComboMMvtipe('');
+			},
+			displayText: (item) => item.nmTipe,
+			compareItems: (a, b) => a.mmvtipeId == b.mmvtipeId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Tipe Kendaraan tidak boleh kosong.");
+					sppamvCrudBloc.add(ComboMMvtipeChangedEvent(comboMMvtipe: value));
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboMMvtipe = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Tipe Kendaraan tidak boleh kosong.");
+					return "Field Tipe Kendaraan tidak boleh kosong.";
+				}
+				return null;
+			},
+			enableSearch: true,
 		);
 	}
 
 	Widget buildFieldWarnaKendaraan() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Warna Kendaraan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field (Combo)
-				buildFieldComboMWarna(
-					comboKey: comboMWarnaKey,
-					labelText: '', // ❌ header jangan di dalam field
-					initItem: fieldComboMWarna,
-					onChangedCallback: (value) {
-						if (value != null) {
-							removeError(error: "Field Warna Kendaraan tidak boleh kosong.");
-							sppamvCrudBloc.add(
-								ComboMWarnaChangedEvent(comboMWarna: value),
-							);
-						}
-					},
-					onSaveCallback: (value) {
-						if (value != null) {
-							fieldComboMWarna = value;
-						}
-					},
-					validatorCallback: (value) {
-						if (value == null) {
-							addError(error: "Field Warna Kendaraan tidak boleh kosong.");
-						}
-					},
-
-					// // 🔹 Custom decoration konsisten
-					// decoration: InputDecoration(
-					// 	hintText: "-- Pilih Warna Kendaraan --",
-					// 	hintStyle: TextStyle(
-					// 		fontFamily: 'Satoshi-Regular',
-					// 		fontSize: 15,
-					// 		color: const Color(0xFF1C1C1C).withOpacity(0.4),
-					// 	),
-					// 	enabledBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-					// 	),
-					// 	focusedBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-					// 	),
-					// 	contentPadding: const EdgeInsets.symmetric(
-					// 		vertical: 14,
-					// 		horizontal: 12,
-					// 	),
-					// ),
-				),
-			],
+		return ReusableComboBox<ComboMWarnaModel>(
+			hintText: "Warna Kendaraan",
+			comboKey: comboMWarnaKey,
+			initItem: fieldComboMWarna,
+			dataLoader: () async {
+				return await ComboMWarnaRepository().getComboMWarna('');
+			},
+			displayText: (item) => item.warnaDesc,
+			compareItems: (a, b) => a.mwarnaId == b.mwarnaId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Warna Kendaraan tidak boleh kosong.");
+					sppamvCrudBloc.add(ComboMWarnaChangedEvent(comboMWarna: value));
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboMWarna = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Warna Kendaraan tidak boleh kosong.");
+					return "Field Warna Kendaraan tidak boleh kosong.";
+				}
+				return null;
+			},
+			enableSearch: true,
 		);
 	}
 
 	Widget buildFieldHarga() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Harga Kendaraan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldHargaController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan harga kendaraan",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Harga Kendaraan",
+			controller: fieldHargaController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPolisiNo() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Nomor Polisi",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					controller: fieldPolisiNoController,
-					decoration: InputDecoration(
-						hintText: "Masukkan nomor polisi",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Nomor Polisi",
+			controller: fieldPolisiNoController,
+			keyboardType: TextInputType.text,
+			textInputAction: TextInputAction.next,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
-
 	Widget buildFieldRangkaNo() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Nomor Rangka",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					controller: fieldRangkaNoController,
-					decoration: InputDecoration(
-						hintText: "Masukkan nomor rangka",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Nomor Rangka",
+			controller: fieldRangkaNoController,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldMesinNo() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Nomor Mesin",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					controller: fieldMesinNoController,
-					decoration: InputDecoration(
-						hintText: "Masukkan nomor mesin",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Nomor Mesin",
+			controller: fieldMesinNoController,
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
-	// Coverage Information Fields
 	Widget buildFieldWilayah() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Wilayah",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field (Combo)
-				buildFieldComboMWilayah(
-					comboKey: comboMWilayahKey,
-					labelText: '', // ❌ header jangan di dalam field
-					initItem: fieldComboMWilayah,
-					onChangedCallback: (value) {
-						if (value != null) {
-							removeError(error: "Field Wilayah tidak boleh kosong.");
-							sppamvCrudBloc.add(
-								ComboMWilayahChangedEvent(comboMWilayah: value),
-							);
-						}
-					},
-					onSaveCallback: (value) {
-						if (value != null) {
-							fieldComboMWilayah = value;
-						}
-					},
-					validatorCallback: (value) {
-						if (value == null) {
-							addError(error: "Field Wilayah tidak boleh kosong.");
-						}
-					},
-
-					// // 🔹 Dekorasi konsisten
-					// decoration: InputDecoration(
-					// 	hintText: "-- Pilih Wilayah --",
-					// 	hintStyle: TextStyle(
-					// 		fontFamily: 'Satoshi-Regular',
-					// 		fontSize: 15,
-					// 		color: const Color(0xFF1C1C1C).withOpacity(0.4),
-					// 	),
-					// 	enabledBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-					// 	),
-					// 	focusedBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-					// 	),
-					// 	contentPadding: const EdgeInsets.symmetric(
-					// 		vertical: 14,
-					// 		horizontal: 12,
-					// 	),
-					// ),
-				),
-			],
+		return ReusableComboBox<ComboMWilayahModel>(
+			hintText: "Wilayah",
+			comboKey: comboMWilayahKey,
+			initItem: fieldComboMWilayah,
+			dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
+			displayText: (item) => item.wilayahNama,
+			compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Wilayah tidak boleh kosong.");
+					sppamvCrudBloc.add(
+						ComboMWilayahChangedEvent(comboMWilayah: value),
+					);
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboMWilayah = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Wilayah tidak boleh kosong.");
+					return "Field Wilayah tidak boleh kosong.";
+				}
+				return null;
+			},
 		);
 	}
+
 	Widget buildFieldJenisCover() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Jenis Cover",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
+		return ReusableComboBox<ComboMMvjnscoverModel>(
+			hintText: "Jenis Cover",
+			comboKey: comboMMvjnscoverKey,
+			initItem: fieldComboMMvjnscover,
+			dataLoader: () => ComboMMvjnscoverRepository().getComboMMvjnscover(),
+			displayText: (item) => item.coverName,
+			compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
 
-				// 🔹 Field (Combo)
-				buildFieldComboMMvjnscover(
-					comboKey: comboMMvjnscoverKey,
-					labelText: '', // ❌ jangan pakai label di dalam field
-					initItem: fieldComboMMvjnscover,
-					onChangedCallback: (value) {
-						if (value != null) {
-							removeError(error: "Field Jenis Cover tidak boleh kosong.");
-							sppamvCrudBloc.add(
-								ComboMMvjnscoverChangedEvent(comboMMvjnscover: value),
-							);
-						}
-					},
-					onSaveCallback: (value) {
-						if (value != null) {
-							fieldComboMMvjnscover = value;
-						}
-					},
-					validatorCallback: (value) {
-						if (value == null) {
-							addError(error: "Field Jenis Cover tidak boleh kosong.");
-						}
-					},
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(error: "Field Jenis Cover tidak boleh kosong.");
+					sppamvCrudBloc.add(
+						ComboMMvjnscoverChangedEvent(comboMMvjnscover: value),
+					);
+				}
+			},
 
-					// // 🔹 Custom decoration konsisten
-					// decoration: InputDecoration(
-					// 	hintText: "-- Pilih Jenis Cover --",
-					// 	hintStyle: TextStyle(
-					// 		fontFamily: 'Satoshi-Regular',
-					// 		fontSize: 15,
-					// 		color: const Color(0xFF1C1C1C).withOpacity(0.4),
-					// 	),
-					// 	enabledBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-					// 	),
-					// 	focusedBorder: OutlineInputBorder(
-					// 		borderRadius: BorderRadius.circular(8),
-					// 		borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-					// 	),
-					// 	contentPadding: const EdgeInsets.symmetric(
-					// 		vertical: 14,
-					// 		horizontal: 12,
-					// 	),
-					// ),
-				),
-			],
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboMMvjnscover = value;
+				}
+			},
+
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(error: "Field Jenis Cover tidak boleh kosong.");
+					return "Field Jenis Cover tidak boleh kosong.";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldTsi() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Total Sum Insured (TSI)",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldTsiController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan nilai TSI",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Total Sum Insured (TSI)",
+			controller: fieldTsiController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	// Premium Information Fields
 	Widget buildFieldPremi() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Premi",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPremiController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan premi",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Premi",
+			controller: fieldPremiController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPremiAdd() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Premi Tambahan",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPremiAddController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan premi tambahan",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Premi Tambahan",
+			controller: fieldPremiAddController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPremiCasco() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Premi Casco",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPremiCascoController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan premi casco",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Premi Casco",
+			hint: "Masukkan premi casco",
+			controller: fieldPremiCascoController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPremiTotal() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Total Premi",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPremiTotalController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan total premi",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Total Premi",
+			controller: fieldPremiTotalController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldBiayaPolis() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				// 🔹 Header
-				const Text(
-					"Biaya Polis",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				// 🔹 Field
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldBiayaPolisController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan biaya polis",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(
-							vertical: 14,
-							horizontal: 12,
-						),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Biaya Polis",
+			hint: "Masukkan biaya polis",
+			controller: fieldBiayaPolisController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
+
 	Widget buildFieldMaterai() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"Materai",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldMateraiController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan materai",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding:
-						const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Materai",
+			controller: fieldMateraiController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldAw() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"Authorized Workshop",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldAwController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan persentase",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						suffixText: "%",
-						suffixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding:
-						const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Authorized Workshop",
+			controller: fieldAwController,
+			keyboardType: TextInputType.number,
+			suffix: Text("%", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPad() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"PA Driver",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPadController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan PA Driver",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding:
-						const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "PA Driver",
+			controller: fieldPadController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPap() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"Passenger Liability",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPapController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan passenger liability",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding:
-						const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) {
-							removeError(error: kStringNullError);
-						}
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Passenger Liability",
+			controller: fieldPapController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
 
 	Widget buildFieldPll() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"Public Liability (PLL)",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldPllController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan nilai PLL",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) removeError(error: kStringNullError);
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Public Liability (PLL)",
+			controller: fieldPllController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
-
 
 	Widget buildFieldTpl() {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				const Text(
-					"Third Party Liability (TPL)",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 16,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				const SizedBox(height: 8),
-
-				TextFormField(
-					keyboardType: TextInputType.number,
-					inputFormatters: [ThousandsSeparatorInputFormatter()],
-					controller: fieldTplController,
-					textAlign: TextAlign.left,
-					decoration: InputDecoration(
-						hintText: "Masukkan nilai TPL",
-						hintStyle: TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							color: const Color(0xFF1C1C1C).withOpacity(0.4),
-						),
-						prefixText: "IDR ",
-						prefixStyle: const TextStyle(
-							fontFamily: 'Satoshi-Regular',
-							fontSize: 15,
-							fontWeight: FontWeight.w500,
-							color: Color(0xFF1C1C1C),
-						),
-						enabledBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 1.2),
-						),
-						focusedBorder: OutlineInputBorder(
-							borderRadius: BorderRadius.circular(8),
-							borderSide: const BorderSide(color: Color(0xFF91C050), width: 2),
-						),
-						contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-					),
-					onChanged: (value) {
-						if (value.isNotEmpty) removeError(error: kStringNullError);
-					},
-					validator: (value) {
-						if (value == null || value.isEmpty) {
-							addError(error: kStringNullError);
-							return "";
-						}
-						return null;
-					},
-				),
-			],
+		return appTextField(
+			label: "Third Party Liability (TPL)",
+			hint: "Masukkan nilai TPL",
+			controller: fieldTplController,
+			keyboardType: TextInputType.number,
+			prefix: Text("IDR | ", style: bodyTextStyle(context)),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+					removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
 		);
 	}
-
 
 	// Checkbox Fields for Additional Coverage with Custom Design
 	Widget buildFieldIsEq() {
-		return Container(
-			decoration: BoxDecoration(
-				borderRadius: BorderRadius.circular(8.0),
-				border: Border.all(color: const Color(0xFF91C050), width: 1.2),
-				color: Colors.white,
-			),
-			child: CheckboxListTile(
-				title: const Text(
-					"EQ (Gempa)",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 15,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				value: _isEq,
-				onChanged: (value) {
-					setState(() {
-						_isEq = value ?? false;
-					});
-				},
-				activeColor: const Color(0xff91C050),
-				checkColor: Colors.white,
-				contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-				controlAffinity: ListTileControlAffinity.leading,
-			),
+		return CheckboxWidget(
+			leftLabel: '',
+			rightLabel: 'EQ',
+			initialValue: _isEq,
+			callback: (value) {
+				setState(() {
+					_isEq = value;
+				});
+			},
 		);
 	}
 
 	Widget buildFieldIsFlood() {
-		return Container(
-			decoration: BoxDecoration(
-				borderRadius: BorderRadius.circular(8.0),
-				border: Border.all(color: const Color(0xFF91C050), width: 1.2),
-				color: Colors.white,
-			),
-			child: CheckboxListTile(
-				title: const Text(
-					"Flood (Banjir)",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 15,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				value: _isFlood,
-				onChanged: (value) {
-					setState(() {
-						_isFlood = value ?? false;
-					});
-				},
-				activeColor: const Color(0xff91C050),
-				checkColor: Colors.white,
-				contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-				controlAffinity: ListTileControlAffinity.leading,
-			),
+		return CheckboxWidget(
+			leftLabel: '',
+			rightLabel: 'Flood',
+			initialValue: _isFlood,
+			callback: (value) {
+				setState(() {
+					_isFlood = value;
+				});
+			},
 		);
 	}
 
 	Widget buildFieldIsSrcc() {
-		return Container(
-			decoration: BoxDecoration(
-				borderRadius: BorderRadius.circular(8.0),
-				border: Border.all(color: const Color(0xFF91C050), width: 1.2),
-				color: Colors.white,
-			),
-			child: CheckboxListTile(
-				title: const Text(
-					"SRCC (Kerusuhan)",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 15,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				value: _isSrcc,
-				onChanged: (value) {
-					setState(() {
-						_isSrcc = value ?? false;
-					});
-				},
-				activeColor: const Color(0xff91C050),
-				checkColor: Colors.white,
-				contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-				controlAffinity: ListTileControlAffinity.leading,
-			),
+		return CheckboxWidget(
+			leftLabel: '',
+			rightLabel: 'SRCC (Kerusuhan)',
+			initialValue: _isSrcc,
+			callback: (value) {
+				setState(() {
+					_isSrcc = value;
+				});
+			},
 		);
 	}
 
 	Widget buildFieldIsTerrorism() {
-		return Container(
-			decoration: BoxDecoration(
-				borderRadius: BorderRadius.circular(8.0),
-				border: Border.all(color: const Color(0xFF91C050), width: 1.2),
-				color: Colors.white,
-			),
-			child: CheckboxListTile(
-				title: const Text(
-					"Terrorism",
-					style: TextStyle(
-						fontFamily: 'Satoshi-Regular',
-						fontSize: 15,
-						fontWeight: FontWeight.w500,
-						color: Color(0xFF1C1C1C),
-					),
-				),
-				value: _isTerrorism,
-				onChanged: (value) {
-					setState(() {
-						_isTerrorism = value ?? false;
-					});
-				},
-				activeColor: const Color(0xff91C050),
-				checkColor: Colors.white,
-				contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-				controlAffinity: ListTileControlAffinity.leading,
-			),
+		return CheckboxWidget(
+			leftLabel: '',
+			rightLabel: 'Terrorism',
+			initialValue: _isTerrorism,
+			callback: (value) {
+				setState(() {
+					_isTerrorism = value;
+				});
+			},
 		);
 	}
-
 
 	void onSaveForm() {
 		if (_formKey.currentState!.validate()) {
@@ -2522,7 +1120,6 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 		}
 	}
 
-	// Helper method untuk boolean parsing
 	bool toBoolean(String value) {
 		return value.toLowerCase() == 'true';
 	}

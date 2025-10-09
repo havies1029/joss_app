@@ -360,6 +360,7 @@ import 'package:joss_app/models/combobox/combomstsclaim_model.dart';
 import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:joss_app/widgets/combobox/combomstsclaim_widget.dart';
 
+import '../../../../../common/thousand_separator_input_formatter.dart';
 import '../../../../../repositories/combobox/combomstsclaim_repository.dart';
 import '../../../../../repositories/combobox/combormatauang_repository.dart';
 
@@ -416,177 +417,130 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Card isi form
-        Card(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          color: pGrey,
-          shape: RoundedRectangleBorder(
+        Container(
+          decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(cardBorderRadius),
-            side: const BorderSide(color: sGrey, width: 1.0),
+            border: Border.all(color: sGrey),
+            color: pGrey,
           ),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
-                  Text(
-                    'Tambah Klaim Baru',
-                    style: TextStyle(
-                      fontSize: getResponsiveFont(context, 20),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  _twoCol(
-                    _fieldText('Nama Tertanggung', _insuredName, 'Nama Tertanggung'),
-                    _fieldText('Lokasi Kejadian', _kejadianLokasi, 'Lokasi Kejadian'),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  _twoCol(
-                    _fieldTanggal(),
-                    _fieldAmountAndCurrency(),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // (opsional: tambahin Status Klaim di sini kalau mau diaktifin lagi)
+                  _fieldNama(),
+                  const SizedBox(height: vPadding),
+                  _fieldLokasi(),
+                  const SizedBox(height: vPadding),
+                  _fieldTanggal(),
+                  const SizedBox(height: vPadding),
+                  _fieldJumlahKlaim(),
+                  const SizedBox(height: vPadding),
+                  _fieldMataUang(),
                 ],
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 25),
 
-        // Tombol simpan di luar card
-        AppButton.iconLeft(
+        AppButton.primary(
           text: 'Lapor',
-          backgroundColor: primaryColor,
-          icon: const Icon(Icons.save, color: Colors.white),
           onPressed: widget.isSaving ? null : _submit,
         ),
       ],
     );
   }
 
-
-  Widget _fieldText(String label, TextEditingController c, String hint) {
-    return appTextField(
-      label: label,
-      hint: 'Masukkan $hint',
-      controller: c,
-      validator: (v) =>
-      (v == null || v.trim().isEmpty) ? 'Tidak boleh kosong' : null,
-    );
-  }
-
   Widget _fieldTanggal() {
-    final last = (_kejadianTgl != null && _kejadianTgl!.isAfter(_today)) ? _kejadianTgl! : _today;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Tanggal', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-        AppDateField(
-          label: 'Tanggal',
-          initialValue: _kejadianTgl ?? _today,
-          firstDate: DateTime(2000, 1, 1),
-          lastDate: last,
-          validator: (dt) => (dt == null) ? 'Tanggal harus diisi' : null,
-          onChanged: (dt) => setState(() {
-            _kejadianTgl = DateTime(dt!.year, dt.month, dt.day);
-          }),
-        )
-      ],
+    return AppDateField(
+      label: 'Tanggal Kejadian',
+      initialValue: _kejadianTgl ?? _today,
+      firstDate: DateTime(2000, 1, 1),
+      lastDate: (_kejadianTgl != null && _kejadianTgl!.isAfter(_today))
+          ? _kejadianTgl!
+          : _today,
+      validator: (dt) => (dt == null) ? kStringNullError : null,
+      onChanged: (dt) => setState(() {
+        _kejadianTgl = dt != null ? DateTime(dt.year, dt.month, dt.day) : null;
+      }),
     );
   }
 
-  Widget _fieldAmountAndCurrency() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Jumlah Klaim & Mata Uang', style: TextStyle(fontSize: getResponsiveFont(context, 18))),
-        Row(
+  Widget _fieldNama() {
+    return appTextField(
+      label: 'Nama Tertanggung',
+      hint: 'Masukkan Nama Tertanggung',
+      controller: _insuredName,
+      validator: (v) =>
+      (v == null || v.trim().isEmpty) ? kStringNullError : null,
+    );
+  }
+
+  Widget _fieldLokasi() {
+    return appTextField(
+      label: 'Lokasi Kejadian',
+      hint: 'Masukkan Lokasi Kejadian',
+      controller: _kejadianLokasi,
+      validator: (v) =>
+      (v == null || v.trim().isEmpty) ? kStringNullError : null,
+    );
+  }
+
+  Widget _fieldJumlahKlaim() {
+    return appTextField(
+      label: 'Jumlah Klaim',
+      hint: 'cth: 10.000.000',
+      controller: _klaimAmount,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        ThousandsSeparatorInputFormatter()
+      ],
+      validator: (v) {
+        final raw = v?.replaceAll('.', '').replaceAll(',', '') ?? '';
+        if (raw.isEmpty) return kStringNullError;
+        final parsed = double.tryParse(raw);
+        if (parsed == null) return 'Format tidak valid';
+        return null;
+      },
+    );
+  }
+
+  Widget _fieldMataUang() {
+    return FormField<ComboRMatauangModel>(
+      validator: (_) => _rMatauang == null ? kStringNullError : null,
+      builder: (ffState) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-                flex: 2,
-                child: appTextField(
-                  label: 'Jumlah Klaim',
-                  hint: 'cth: 10.000.000',
-                  controller: _klaimAmount,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsFormatterId(),
-                  ],
-                  validator: (v) {
-                    final raw = v?.replaceAll('.', '').replaceAll(',', '') ?? '';
-                    if (raw.isEmpty) return 'Tidak boleh kosong';
-                    final parsed = double.tryParse(raw);
-                    if (parsed == null) return 'Format tidak valid';
-                    return null;
-                  },
-                )
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              flex: 1,
-              child: FormField<ComboRMatauangModel>(
-                validator: (_) => _rMatauang == null ? 'Wajib' : null,
-                builder: (ffState) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ReusableComboBox<ComboRMatauangModel>(
-                        hintText: "Mata Uang",
-                        comboKey: _mataUangKey,
-                        initItem: _rMatauang,
-                        dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-                        displayText: (item) => item.rmatauangSimbol,
-                        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-                        onChangedCallback: (val) {
-                          setState(() => _rMatauang = val);
-                          ffState.didChange(val);
-                        },
-                        showClearButton: false,
-                        onSaveCallback: (val) => _rMatauang = val,
-                        validatorCallback: (value) {
-                          if (value == null) {
-                            return kStringNullError;
-                          }
-                          return null;
-                        },
-                      ),
-                      if (ffState.hasError)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(ffState.errorText!, style: const TextStyle(color: Colors.red, fontSize: 12)),
-                        ),
-                    ],
-                  );
-                },
-              ),
+            ReusableComboBox<ComboRMatauangModel>(
+              hintText: "Mata Uang",
+              comboKey: _mataUangKey,
+              initItem: _rMatauang,
+              dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
+              displayText: (item) => item.rmatauangSimbol,
+              compareItems: (a, b) =>
+              a.rmatauangKode == b.rmatauangKode,
+              onChangedCallback: (val) {
+                setState(() => _rMatauang = val);
+                ffState.didChange(val);
+              },
+              onSaveCallback: (val) => _rMatauang = val,
+              validatorCallback: (value) {
+                if (value == null) return kStringNullError;
+                return null;
+              },
+              showClearButton: false,
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
-  }
-
-  Widget _twoCol(Widget a, Widget b) {
-    return LayoutBuilder(builder: (_, c) {
-      final wide = c.maxWidth >= 720;
-      if (!wide) return Column(children: [a, const SizedBox(height: 12), b]);
-      return Row(children: [Expanded(child: a), const SizedBox(width: 12), Expanded(child: b)]);
-    });
   }
 
   void _submit() {
@@ -609,25 +563,4 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
 
     widget.onSave(record);
   }
-}
-
-/// Locale ID formatter + keep caret
-class ThousandsFormatterId extends TextInputFormatter {
-  final _nf = NumberFormat.decimalPattern('id');
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldV, TextEditingValue newV) {
-    final digits = newV.text.replaceAll(RegExp(r'[^0-9]'), '');
-    if (digits.isEmpty) {
-      return const TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
-    }
-    final oldDigitsBefore = _countDigitsBefore(oldV.text, oldV.selection.baseOffset);
-    final newDigitsBefore = _countDigitsBefore(newV.text, newV.selection.baseOffset);
-    final number = int.parse(digits);
-    final newText = _nf.format(number);
-    final targetDigitIndex = newDigitsBefore.clamp(0, digits.length);
-    final caretOffset = _offsetForDigitIndex(newText, targetDigitIndex);
-    return TextEditingValue(text: newText, selection: TextSelection.collapsed(offset: caretOffset));
-  }
-  int _countDigitsBefore(String t, int off) { if (off <= 0) return 0; off = off.clamp(0, t.length); return RegExp(r'[0-9]').allMatches(t.substring(0, off)).length; }
-  int _offsetForDigitIndex(String f, int idx) { if (idx <= 0) return 0; int c = 0; for (int i = 0; i < f.length; i++) { if (RegExp(r'[0-9]').hasMatch(f[i])) { c++; if (c == idx) return i + 1; } } return f.length; }
 }

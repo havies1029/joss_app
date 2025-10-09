@@ -18,13 +18,10 @@ class HeaderAsuransiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: hPadding * 1.5,
-        vertical: vPadding,
-      ),
-      padding: const EdgeInsets.all(14),
+      margin: EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: orangeToBlackGradient, // 🔶 pakai variabel dari constants.dart
+        gradient: orangeToBlackGradient,
         borderRadius: BorderRadius.circular(cardBorderRadius),
       ),
       child: InkWell(
@@ -36,20 +33,13 @@ class HeaderAsuransiCard extends StatelessWidget {
               SvgPicture.asset(
                 iconPath!,
                 color: Colors.white,
-                width: 32,  // bisa disesuaikan
-                height: 32, // bisa disesuaikan
+                width: 28,
+                height: 28,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
             ],
             Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: primaryLightColor,
-                ),
-              ),
+              child: Text(title, style: headingStyle(context, fontSize: 20)),
             ),
           ],
         ),

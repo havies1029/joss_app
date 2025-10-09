@@ -309,7 +309,6 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
 
     return AppDateField(
       label: 'Tanggal Kejadian',
-      hint: 'Pilih tanggal',
       initialValue: ctrls.kejadianTgl ?? _today,
       firstDate: DateTime(2000, 1, 1),
       lastDate: last,

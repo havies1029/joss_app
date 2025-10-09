@@ -105,7 +105,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       label: "Telepon",
       hint: "8123456789",
       controller: _teleponController,
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.phone,
       focusNode: _teleponFocusNode,
       prefix: Text(
         "62 | ",

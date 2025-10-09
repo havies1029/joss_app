@@ -122,7 +122,7 @@ class SimulparFormCoverV2PageFormState extends State<SimulparFormCoverV2Page> {
 
   Widget buildFieldRatePAR() {
     return appTextField(
-      label: "Rate",
+      label: "Rate PAR",
       controller: fieldRateParController,
       keyboardType: TextInputType.number,
       enabled: false,
@@ -139,7 +139,7 @@ class SimulparFormCoverV2PageFormState extends State<SimulparFormCoverV2Page> {
 
   Widget buildFieldRateRSMDCC() {
     return appTextField(
-      label: "Rate",
+      label: "Rate RSMDCC",
       controller: fieldRateRsmdccController,
       keyboardType: TextInputType.number,
       inputFormatters: [
@@ -185,7 +185,7 @@ class SimulparFormCoverV2PageFormState extends State<SimulparFormCoverV2Page> {
 
   Widget buildFieldRateTSFWD() {
     return appTextField(
-      label: "Rate",
+      label: "Rate TSFWD",
       controller: fieldRateTsfwdController,
       enabled: false,
       keyboardType: TextInputType.number,
@@ -229,7 +229,7 @@ class SimulparFormCoverV2PageFormState extends State<SimulparFormCoverV2Page> {
 
   Widget buildFieldRateEQVET() {
     return appTextField(
-      label: "Rate",
+      label: "Rate EQVET",
       controller: fieldRateEqvetController,
       enabled: false,
       keyboardType: TextInputType.number,
@@ -246,7 +246,7 @@ class SimulparFormCoverV2PageFormState extends State<SimulparFormCoverV2Page> {
 
   Widget buildFieldRateOther() {
     return appTextField(
-      label: "Rate",
+      label: "Rate Other",
       controller: fieldRateOtherController,
       keyboardType: TextInputType.number,
       inputFormatters: [
@@ -265,7 +265,7 @@ class SimulparFormCoverV2PageFormState extends State<SimulparFormCoverV2Page> {
 
   Widget buildFieldRateTotal() {
     return appTextField(
-      label: "Rate",
+      label: "Rate Total",
       controller: fieldRateTotalController,
       enabled: false,
       keyboardType: TextInputType.number,

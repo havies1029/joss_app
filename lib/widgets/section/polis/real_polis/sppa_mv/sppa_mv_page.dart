@@ -1,3 +1,4 @@
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/section/polis/real_polis/sppa_mv/sppa_form/sppamvcrud_form.dart';
@@ -12,7 +13,7 @@ class SppaMvPage extends StatefulWidget {
 
 class _SppaMvPageState extends State<SppaMvPage> {
   final _formKey = GlobalKey<FormState>();
-  final bool _showPremiSection = false;
+  final bool _showPremiSection = true;
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +36,6 @@ class _SppaMvPageState extends State<SppaMvPage> {
                       _buildHeader(), const SizedBox(height: vPadding),
                       _buildProgressBar(), const SizedBox(height: 15),
 
-                      // CASCO
-                      Text("Data Kendaraan", style: bodyTextStyle(context)),
-                      const SizedBox(height: 10),
                       SppamvFormPage(viewMode: "tambah", recordId: ""),
                     ],
                   ),
@@ -62,8 +60,10 @@ class _SppaMvPageState extends State<SppaMvPage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // SVG di kanan bawahe.asset("assets/icons/kendaraan.svg", width: 40, height: 40),
+          // SVG
+          SvgPicture.asset("assets/icons/kendaraan.svg", width: 40, height: 40),
           const SizedBox(width: 10),
+
           // Teks Header
           Expanded(
             child: Column(
@@ -99,7 +99,7 @@ class _SppaMvPageState extends State<SppaMvPage> {
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: _showPremiSection ? 1.0 : 0.33,
+              widthFactor: _showPremiSection ? 1.0 : 0.5,
               child: Container(
                 decoration: BoxDecoration(
                   color: primaryColor,
@@ -111,7 +111,7 @@ class _SppaMvPageState extends State<SppaMvPage> {
         ),
         const SizedBox(height: vPadding),
         Text(
-          _showPremiSection ? '100%' : '33%',
+          _showPremiSection ? '100%' : '50%',
           style: bodyTextStyle(context, fontSize: 16),
         ),
       ],
