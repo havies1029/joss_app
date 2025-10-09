@@ -317,7 +317,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                     kIsWeb
                                         ? const CachedGoogleSigninButton()
                                         : AppButton.iconLeft(
-                                      text: 'Masuk Dengan bebek',
+                                      text: 'Masuk Dengan Google',
                                       icon: SvgPicture.asset(
                                         'assets/icons/google-icon.svg',
                                         width: 20,

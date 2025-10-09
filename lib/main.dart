@@ -495,25 +495,25 @@ class _AppState extends State<_App> {
                         displayName: displayName,
                       );
 
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(result.success
-                                ? "✅ Chat siap: ${result.displayName}"
-                                : "❌ Gagal inisialisasi chat: ${result.error}"),
-                            backgroundColor: result.success ? Colors.green : Colors.red,
-                          ),
-                        );
-                      }
+                      // if (context.mounted) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(result.success
+                      //           ? "✅ Chat siap: ${result.displayName}"
+                      //           : "❌ Gagal inisialisasi chat: ${result.error}"),
+                      //       backgroundColor: result.success ? Colors.green : Colors.red,
+                      //     ),
+                      //   );
+                      // }
                     } catch (e, s) {
                       debugPrint("🔥 [ChatInit Error C] $e\n$s");
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("❌ Error inisialisasi chat: $e"),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(
+                        //     content: Text("❌ Error inisialisasi chat: $e"),
+                        //     backgroundColor: Colors.red,
+                        //   ),
+                        // );
                       }
                     }
                   },
@@ -536,14 +536,14 @@ class _AppState extends State<_App> {
                     );
 
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result.success
-                              ? "✅ Chat siap: ${result.displayName}"
-                              : "❌ Gagal inisialisasi chat: ${result.error}"),
-                          backgroundColor: result.success ? Colors.green : Colors.red,
-                        ),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content: Text(result.success
+                      //         ? "✅ Chat siap: ${result.displayName}"
+                      //         : "❌ Gagal inisialisasi chat: ${result.error}"),
+                      //     backgroundColor: result.success ? Colors.green : Colors.red,
+                      //   ),
+                      // );
                     }
 
                     debugPrint(result.success
@@ -570,14 +570,14 @@ class _AppState extends State<_App> {
                     );
 
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result.success
-                              ? "✅ Chat siap (default): ${result.displayName}"
-                              : "❌ Gagal inisialisasi chat: ${result.error}"),
-                          backgroundColor: result.success ? Colors.green : Colors.red,
-                        ),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content: Text(result.success
+                      //         ? "✅ Chat siap (default): ${result.displayName}"
+                      //         : "❌ Gagal inisialisasi chat: ${result.error}"),
+                      //     backgroundColor: result.success ? Colors.green : Colors.red,
+                      //   ),
+                      // );
                     }
 
                     debugPrint(result.success

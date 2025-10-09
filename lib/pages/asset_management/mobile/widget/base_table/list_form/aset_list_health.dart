@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 
@@ -257,22 +258,60 @@ class _AsetListHealthState extends State<AsetListHealth> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                icon: const Icon(Icons.edit, size: 18, color: Colors.green),
-                onPressed: () {},
+              _buildActionButton(
+                asset: 'assets/icons/btn_endorse.svg',
+                bgColor: const Color(0xFFFDC13C), // kuning
+                onTap: () {},
               ),
-              IconButton(
-                icon: const Icon(Icons.delete, size: 18, color: Colors.orange),
-                onPressed: () {},
+              _buildActionButton(
+                asset: 'assets/icons/btn_delete.svg',
+                bgColor: const Color(0xFFF85B5B), // merah
+                onTap: () {},
               ),
-              IconButton(
-                icon: const Icon(Icons.more_horiz, size: 18, color: Colors.red),
-                onPressed: () {},
+              _buildActionButton(
+                asset: 'assets/icons/btn_lacak.svg',
+                bgColor: const Color(0xFFB9B9B9), // abu
+                onTap: () {},
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required String asset,
+    required Color bgColor,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 26, // 🔹 kecilin lagi biar tampil subtle
+        height: 26,
+        margin: const EdgeInsets.symmetric(horizontal: 3), // 🔹 gap antar tombol lebih rapat
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12), // 🔹 lembut banget
+              blurRadius: 5,
+              spreadRadius: 0,
+              offset: const Offset(1, 2), // sedikit ke bawah
+            ),
+          ],
+        ),
+        child: Center(
+          child: SvgPicture.asset(
+            asset,
+            width: 16, // 🔹 proporsional dengan card kecil
+            height: 16,
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 

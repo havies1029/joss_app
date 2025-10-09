@@ -32,7 +32,7 @@ class _StartScreenState extends State<StartScreen> {
       image: 'assets/images/start-3.svg',
       title: 'Didampingi Broker Terpercaya',
       subtitle:
-          'Dapatkan pendampingan langsung dari broker berlisensi dan terpercaya.',
+      'Dapatkan pendampingan langsung dari broker berlisensi dan terpercaya.',
     ),
   ];
 
@@ -157,23 +157,30 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   Widget _buildSkipButton() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: _skipToEnd,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Skip', style: headingStyle(context, fontSize: 20)),
-            SizedBox(width: getProportionateScreenWidth(5)),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: getProportionateScreenWidth(14),
-              color: primaryLightColor,
-            ),
-          ],
+    bool isLastPage = _currentIndex == _onboardingData.length - 1;
+
+    return AnimatedSwitcher(
+      duration: 300.ms,
+      child: isLastPage
+          ? const SizedBox.shrink()
+          : Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(
+          onPressed: _skipToEnd,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Skip', style: headingStyle(context, fontSize: 20)),
+              SizedBox(width: getProportionateScreenWidth(5)),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: getProportionateScreenWidth(14),
+                color: primaryLightColor,
+              ),
+            ],
+          ),
         ),
-      ),
+      ).animate().fadeIn(duration: 300.ms),
     );
   }
 
@@ -181,22 +188,22 @@ class _StartScreenState extends State<StartScreen> {
     return Row(
       children: List.generate(
         _onboardingData.length,
-        (index) => Expanded(
+            (index) => Expanded(
           child:
-              AnimatedContainer(
-                duration: defaultDuration,
-                margin: EdgeInsets.symmetric(
-                  horizontal: getProportionateScreenWidth(5),
-                ),
-                height: getProportionateScreenHeight(8),
-                decoration: BoxDecoration(
-                  color:
-                      _currentIndex == index
-                          ? primaryColor
-                          : primaryLightColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ).animate().fadeIn(duration: 300.ms).slideX(),
+          AnimatedContainer(
+            duration: defaultDuration,
+            margin: EdgeInsets.symmetric(
+              horizontal: getProportionateScreenWidth(5),
+            ),
+            height: getProportionateScreenHeight(8),
+            decoration: BoxDecoration(
+              color:
+              _currentIndex == index
+                  ? primaryColor
+                  : primaryLightColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(100),
+            ),
+          ).animate().fadeIn(duration: 300.ms).slideX(),
         ),
       ),
     );
@@ -214,10 +221,10 @@ class _StartScreenState extends State<StartScreen> {
             flex: 3,
             child: Center(
               child: SvgPicture.asset(
-                    data.image,
-                    height: getProportionateScreenHeight(250),
-                    fit: BoxFit.contain,
-                  )
+                data.image,
+                height: getProportionateScreenHeight(250),
+                fit: BoxFit.contain,
+              )
                   .animate()
                   .fadeIn(duration: 600.ms)
                   .scale(begin: const Offset(0.8, 0.8), duration: 600.ms),
@@ -232,10 +239,10 @@ class _StartScreenState extends State<StartScreen> {
               children: [
                 // Title
                 Text(
-                      data.title,
-                      style: headingStyle(context),
-                      textAlign: TextAlign.center,
-                    )
+                  data.title,
+                  style: headingStyle(context),
+                  textAlign: TextAlign.center,
+                )
                     .animate()
                     .fadeIn(delay: 200.ms, duration: 500.ms)
                     .slideY(begin: 0.3),
@@ -248,13 +255,13 @@ class _StartScreenState extends State<StartScreen> {
                     horizontal: getProportionateScreenWidth(20),
                   ),
                   child: Text(
-                        data.subtitle,
-                        style: headingStyle(
-                          context,
-                          fontSize: 20,
-                        ).copyWith(color: hintGrey),
-                        textAlign: TextAlign.center,
-                      )
+                    data.subtitle,
+                    style: headingStyle(
+                      context,
+                      fontSize: 20,
+                    ).copyWith(color: hintGrey),
+                    textAlign: TextAlign.center,
+                  )
                       .animate()
                       .fadeIn(delay: 400.ms, duration: 500.ms)
                       .slideY(begin: 0.3),
@@ -278,17 +285,17 @@ class _StartScreenState extends State<StartScreen> {
       child: AnimatedSwitcher(
         duration: defaultDuration,
         child:
-            isLastPage
-                ? AppButton.primary(text: 'Selesai', onPressed: _onGetStarted)
-                : AppButton.iconRight(
-                  text: 'Selanjutnya',
-                  icon: Icon(
-                    Icons.arrow_forward_ios,
-                    size: getProportionateScreenWidth(14),
-                    color: Colors.white,
-                  ),
-                  onPressed: _nextPage,
-                ),
+        isLastPage
+            ? AppButton.primary(text: 'Selesai', onPressed: _onGetStarted)
+            : AppButton.iconRight(
+          text: 'Selanjutnya',
+          icon: Icon(
+            Icons.arrow_forward_ios,
+            size: getProportionateScreenWidth(14),
+            color: Colors.white,
+          ),
+          onPressed: _nextPage,
+        ),
       ),
     );
   }

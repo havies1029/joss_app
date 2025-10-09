@@ -31,17 +31,31 @@ class WelcomeHeader extends StatelessWidget {
     final subtitle = content["subtitle"] ?? "";
     final emoji = content["emoji"] ?? "👋";
 
+    // 🧠 Cek lebar layar
+    final screenWidth = MediaQuery.of(context).size.width;
+    final showEmoji = screenWidth > 360; // batas aman 360px (bisa lo ubah)
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 0, horizontal: hPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
+          // Title Row
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(title, style: headingStyle(context)),
-              Text(emoji, style: headingStyle(context)),
+              Flexible(
+                child: Text(
+                  title,
+                  style: headingStyle(context),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (showEmoji)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Text(emoji, style: headingStyle(context)),
+                ),
             ],
           ),
           // Subtitle
