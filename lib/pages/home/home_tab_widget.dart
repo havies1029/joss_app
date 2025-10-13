@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
-import 'package:joss_app/pages/testpage/testpage1.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
 import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
@@ -15,6 +14,7 @@ import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
 import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
 import '../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../gen_klaim/mobile/klaim_main_page.dart';
 import '../heropage/mobile/heropage.dart';
 import '../qontak/mobile/chat_init_service.dart';
 import '../qontak/mobile/customer_service_page.dart';
@@ -39,6 +39,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
     pages = [
       const HeroPage(),
       const CariAsuransiWidget.menu(),
+      const KlaimMainPage.menu(),
       const LiterasiPage(),
       const SettingsPage(),
     ];

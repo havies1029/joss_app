@@ -20,8 +20,6 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
   final List<String> sections = [
     'Semua',
     'Tentang',
-    'Peran',
-    'Pencapaian',
     'Company Profile',
     'Testimoni',
     'Klien',
@@ -117,24 +115,12 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
                     ),
                     const SizedBox(height: 40),
                     Container(
-                      key: sectionKeys['Peran'],
-                      child: PeranJPSWidget(),
-                    ),
-                    const SizedBox(height: 40),
-                    Container(
-                      key: sectionKeys['Pencapaian'],
-                      child: MilestoneJPSWidget(),
-                    ),
-                    const SizedBox(height: 40),
-                    Container(
                       key: sectionKeys['Company Profile'],
                       child: CompanyProfileCard(
                         onDownload: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                'Download Company Profile coming soon!',
-                              ),
+                              content: Text('Hubungi kami untuk mendapatkan company profile'),
                               backgroundColor: Colors.orange,
                               behavior: SnackBarBehavior.floating,
                             ),

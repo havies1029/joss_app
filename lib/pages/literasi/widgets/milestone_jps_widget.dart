@@ -80,7 +80,7 @@ class MilestoneJPSWidget extends StatelessWidget {
               const SizedBox(height: 28),
 
               SvgPicture.asset(
-                'assets/icons/milestone.svg',
+                'assets/icons/Milestone.svg',
                 height: 325,
                 fit: BoxFit.contain,
               ),

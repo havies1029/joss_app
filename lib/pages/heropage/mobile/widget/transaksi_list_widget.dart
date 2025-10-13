@@ -27,6 +27,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
   void initState() {
     super.initState();
     trslogCariBloc = BlocProvider.of<TrslogCariBloc>(context);
+    // Ambil data awal (tanpa search)
     Future.delayed(const Duration(milliseconds: 500), () {
       refreshData();
     });
@@ -200,70 +201,62 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
     final iconAsset = _getIconAsset(item.jenis_trs);
 
     // Format tanggal
-    String tgl = "-";
+    String dateTimeStr = "-";
     if (item.trsTgl != null) {
       try {
         final tglDt =
         (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
-        tgl = "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}";
+        dateTimeStr = "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}";
       } catch (_) {}
     }
 
     return Container(
       padding: const EdgeInsets.all(hPadding),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: sGrey, width: 0.5)),
-      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Icon dengan background
           SvgPicture.asset(iconAsset, width: 40, height: 40),
           const SizedBox(width: 16),
+
+          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.jenis_trs ?? "-",
-                    style: bodyTextStyle(context, fontSize: 20)),
-                if (item.keterangan != null &&
-                    item.keterangan.toString().trim().isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Text(
-                      item.keterangan,
-                      style: bodyTextStyle(context, fontSize: 16)
-                          .copyWith(color: hintGrey),
-                    ),
-                  ),
+                // Transaction type
                 Text(
-                  tgl,
-                  style: bodyTextStyle(context, fontSize: 16)
-                      .copyWith(color: hintGrey),
+                  item.jenis_trs ?? "-",
+                  style: bodyTextStyle(context, fontSize: 20),
+                ),
+                const SizedBox(height: 4),
+
+                // Date and time
+                Text(
+                  dateTimeStr,
+                  style: bodyTextStyle(
+                    context,
+                    fontSize: 16,
+                  ).copyWith(color: hintGrey),
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                "${item.curr ?? ''} ${item.nilaiTrs != null ? NumberFormat("#,###").format(item.nilaiTrs) : '-'}",
-                style: bodyTextStyle(context),
-              ),
-              const SizedBox(height: 2),
-              Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(item.status_nama),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  item.status_nama ?? "-",
-                  style: bodyTextStyle(context, fontSize: 16),
-                ),
-              ),
-            ],
+
+          // status
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 4,
+            ),
+            decoration: BoxDecoration(
+              color: _getStatusColor(item.status_nama),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              item.status_nama ?? "-",
+              style: bodyTextStyle(context, fontSize: 16),
+            ),
           ),
         ],
       ),

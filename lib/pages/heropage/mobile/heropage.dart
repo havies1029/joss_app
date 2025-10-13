@@ -131,7 +131,6 @@ class HeroPage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const DetailPremiPage(sppa1Id: '',)),
             );
           },
-          asetCount : custType == "C" ? '50.000.000.000' : '0',
           custType: custType,
         ),
         const SizedBox(height: vPadding - 3),

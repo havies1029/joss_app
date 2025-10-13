@@ -1,6 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+
+import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/user_profile/user_profile_cubit.dart';
 
 class HeroCardWidget extends StatefulWidget {
   final String userName;
@@ -8,7 +12,6 @@ class HeroCardWidget extends StatefulWidget {
   final String? userImage;
   final String premiumAmount;
   final int polisCount;
-  final String asetCount;
   final VoidCallback? onDetailTap;
   final String custType;
 
@@ -22,7 +25,6 @@ class HeroCardWidget extends StatefulWidget {
     this.userImage,
     required this.premiumAmount,
     required this.polisCount,
-    required this.asetCount,
     this.onDetailTap,
     required this.custType,
   });
@@ -33,7 +35,6 @@ class HeroCardWidget extends StatefulWidget {
 
 class _HeroCardWidgetState extends State<HeroCardWidget> {
   bool _isPremiumVisible = false;
-  int _cardIndex = 0;
   late final PageController _cardPageController;
   String _getStarsText(String amount) => '-' * 6;
   @override
@@ -52,11 +53,14 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
   }
   @override
   Widget build(BuildContext context) {
+    final custType = widget.custType;
+    final mjnsclientId = context.watch<UserProfileCubit>().state.mjnsclientId ?? '';
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(cardBorderRadius * 2),
-        gradient: primaryBlackGradient
+        gradient: primaryBlackGradient,
       ),
       child: Container(
         margin: const EdgeInsets.all(1),
@@ -70,21 +74,10 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
             const SizedBox(height: 16),
             _buildUserHeader(context),
             const SizedBox(height: 16),
-            SizedBox(
-              height: 97,
-              child: PageView(
-                controller: _cardPageController,
-                physics: const BouncingScrollPhysics(),
-                onPageChanged: (i) => setState(() => _cardIndex = i),
-                children: [
-                  _buildInfoCardPremi(context),
-                  _buildInfoCardPolis(context),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildDotsIndicator(count: 2, index:_cardIndex),
-            const SizedBox(height: 12)
+
+            if (custType == 'C' && mjnsclientId == '10') _buildInfoCardPremi(context),
+
+            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -256,21 +249,21 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: widget.onDetailTap,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('Buka Detail', style: bodyTextStyle(context)),
-                          const SizedBox(width: 2),
-                          const Icon(
-                            Icons.keyboard_arrow_right,
-                            color: primaryColor,
-                            size: 11.33,
-                          ),
-                        ],
-                      ),
-                    ),
+                    // GestureDetector(
+                    //   onTap: widget.onDetailTap,
+                    //   child: Row(
+                    //     mainAxisSize: MainAxisSize.min,
+                    //     children: [
+                    //       Text('Buka Detail', style: bodyTextStyle(context)),
+                    //       const SizedBox(width: 2),
+                    //       const Icon(
+                    //         Icons.keyboard_arrow_right,
+                    //         color: primaryColor,
+                    //         size: 11.33,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -304,59 +297,6 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoCardPolis(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: pGrey,
-        borderRadius: BorderRadius.circular(cardBorderRadius * 1.6),
-        border: Border.all(color: sGrey),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: vPadding - 12,
-          horizontal: hPadding + 6,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'TSI',
-              style: bodyTextStyle(context, fontSize: 16),
-            ),
-            Text(
-              'Rp ${widget.asetCount}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: headingStyle(context),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDotsIndicator({required int count, required int index}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(count, (i) {
-        final active = i == index;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          height: active ? 8 : 6,
-          width: active ? 8 : 6,
-          decoration: BoxDecoration(
-            color: active ? primaryColor : sGrey,
-            borderRadius: BorderRadius.circular(999),
-          ),
-        );
-      }),
     );
   }
 }

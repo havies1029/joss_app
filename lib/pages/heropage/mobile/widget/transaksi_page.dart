@@ -48,8 +48,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
             allItems
                 .where(
                   (item) =>
-                      item.jenis_trs?.toLowerCase() == filter.toLowerCase(),
-                )
+              item.jenis_trs?.toLowerCase() == filter.toLowerCase(),
+            )
                 .toList();
       }
     });
@@ -98,7 +98,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                     ),
                     const SizedBox(width: 8),
                     ...filterOptions.map(
-                      (filter) => Padding(
+                          (filter) => Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: ChoiceChip(
                           label: Text(
@@ -134,153 +134,164 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
             // Transaction List
             Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                decoration: BoxDecoration(
-                  color: pGrey,
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                  border: Border.all(color: sGrey),
-                ),
-                child: BlocListener<TrslogCariBloc, TrslogCariState>(
-                  listener: (context, state) {
-                    if (state.status == ListStatus.success) {
-                      _updateItemsFromBloc(state.items);
+              child: BlocListener<TrslogCariBloc, TrslogCariState>(
+                listener: (context, state) {
+                  if (state.status == ListStatus.success) {
+                    _updateItemsFromBloc(state.items);
+                  }
+                },
+                child: BlocBuilder<TrslogCariBloc, TrslogCariState>(
+                  builder: (context, state) {
+                    if (state.status == ListStatus.initial) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                     }
-                  },
-                  child: BlocBuilder<TrslogCariBloc, TrslogCariState>(
-                    builder: (context, state) {
-                      if (state.status == ListStatus.initial) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(32),
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
 
-                      if (state.status == ListStatus.failure) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 48,
-                                  color: hintGrey,
-                                ),
-                                const SizedBox(height: 16),
+                    if (state.status == ListStatus.failure) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                size: 48,
+                                color: hintGrey,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                "Gagal memuat data",
+                                style: bodyTextStyle(context, fontSize: 18),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Periksa koneksi internet Anda",
+                                style: bodyTextStyle(
+                                  context,
+                                ).copyWith(color: hintGrey),
+                              ),
+                              const SizedBox(height: 16),
+                              AppButton.primary(
+                                text: "Coba Lagi",
+                                onPressed: _loadData,
+                                backgroundColor: pBlue,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (filteredItems.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/icons/transaksi.svg",
+                                width: 64,
+                                height: 64,
+                                color: hintGrey,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                selectedFilter == null
+                                    ? "Belum ada transaksi"
+                                    : "Tidak ada transaksi",
+                                style: bodyTextStyle(context, fontSize: 18),
+                                textAlign: TextAlign.center,
+                              ),
+                              if (selectedFilter != null)
                                 Text(
-                                  "Gagal memuat data",
-                                  style: bodyTextStyle(context, fontSize: 18),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Periksa koneksi internet Anda",
+                                  "untuk kategori \"$selectedFilter\"",
                                   style: bodyTextStyle(
                                     context,
                                   ).copyWith(color: hintGrey),
-                                ),
-                                const SizedBox(height: 16),
-                                AppButton.primary(
-                                  text: "Coba Lagi",
-                                  onPressed: _loadData,
-                                  backgroundColor: pBlue,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      if (filteredItems.isEmpty) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/icons/transaksi.svg",
-                                  width: 64,
-                                  height: 64,
-                                  color: hintGrey,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  selectedFilter == null
-                                      ? "Belum ada transaksi"
-                                      : "Tidak ada transaksi",
-                                  style: bodyTextStyle(context, fontSize: 18),
                                   textAlign: TextAlign.center,
                                 ),
-                                if (selectedFilter != null)
-                                  Text(
-                                    "untuk kategori \"$selectedFilter\"",
-                                    style: bodyTextStyle(
-                                      context,
-                                    ).copyWith(color: hintGrey),
-                                    textAlign: TextAlign.center,
-                                  ),
-                              ],
-                            ),
+                            ],
                           ),
-                        );
-                      }
-
-                      return Column(
-                        children: [
-                          // Header
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(hPadding),
-                            child: Row(
-                              children: [
-                                Text(
-                                  selectedFilter == null
-                                      ? "Semua Transaksi"
-                                      : selectedFilter!,
-                                  style: bodyTextStyle(context, fontSize: 20),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  "${filteredItems.length} transaksi",
-                                  style: bodyTextStyle(
-                                    context,
-                                  ).copyWith(color: hintGrey),
-                                ),
-                              ],
-                            ),
-                          ),
-                          kDivider(color: sGrey),
-
-                          // List
-                          Expanded(
-                            child: RefreshIndicator(
-                              onRefresh: () async {
-                                _loadData();
-                              },
-                              child: ListView.separated(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                itemCount: filteredItems.length,
-                                separatorBuilder:
-                                    (context, index) => kDivider(color: sGrey),
-                                itemBuilder: (context, index) {
-                                  final item = filteredItems[index];
-                                  return _buildTransactionItem(context, item);
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       );
-                    },
-                  ),
+                    }
+
+                    return Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          _loadData();
+                        },
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: _groupedTransactions().length,
+                          itemBuilder: (context, groupIndex) {
+                            final group = _groupedTransactions()[groupIndex];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Month Header (Outside card)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: hPadding * 1.5,
+                                    vertical: 12,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        group['month'],
+                                        style: bodyTextStyle(context, fontSize: 16),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        "${group['items'].length} Transaksi",
+                                        style: bodyTextStyle(context, fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Card with transactions
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: hPadding * 1.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: pGrey,
+                                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                                    border: Border.all(color: sGrey),
+                                  ),
+                                  child: ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: group['items'].length,
+                                    separatorBuilder: (context, index) =>
+                                        kDivider(color: sGrey),
+                                    itemBuilder: (context, index) {
+                                      final item = group['items'][index];
+                                      return _buildTransactionItem(context, item);
+                                    },
+                                  ),
+                                ),
+
+                                const SizedBox(height: vPadding),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
-            const SizedBox(height: vPadding),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -290,24 +301,23 @@ class _TransaksiPageState extends State<TransaksiPage> {
   Widget _buildTransactionItem(BuildContext context, dynamic item) {
     final iconAsset = _getIconAsset(item.jenis_trs);
 
-    // Format tanggal dan waktu
+    // Format tanggal
     String dateTimeStr = "-";
     if (item.trsTgl != null) {
       try {
         final tglDt =
-            (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
-        dateTimeStr =
-            "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}  ${DateFormat("HH:mm").format(tglDt)}";
+        (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
+        dateTimeStr = "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}";
       } catch (_) {}
     }
 
     return Container(
       padding: const EdgeInsets.all(hPadding),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Icon dengan background
-          SvgPicture.asset(iconAsset, width: 32, height: 32),
+          SvgPicture.asset(iconAsset, width: 40, height: 40),
           const SizedBox(width: 16),
 
           // Content
@@ -318,65 +328,36 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 // Transaction type
                 Text(
                   item.jenis_trs ?? "-",
-                  style: bodyTextStyle(context, fontSize: 18),
+                  style: bodyTextStyle(context, fontSize: 20),
                 ),
                 const SizedBox(height: 4),
-
-                // Description
-                if (item.keterangan != null &&
-                    item.keterangan.toString().trim().isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      item.keterangan,
-                      style: bodyTextStyle(
-                        context,
-                        fontSize: 14,
-                      ).copyWith(color: hintGrey),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
 
                 // Date and time
                 Text(
                   dateTimeStr,
                   style: bodyTextStyle(
                     context,
-                    fontSize: 14,
+                    fontSize: 16,
                   ).copyWith(color: hintGrey),
                 ),
               ],
             ),
           ),
 
-          // Amount and status
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // Amount
-              Text(
-                "${item.curr ?? ''} ${item.nilaiTrs != null ? NumberFormat("#,###").format(item.nilaiTrs) : '-'}",
-                style: bodyTextStyle(context, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-
-              // Status badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(item.status_nama),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  item.status_nama ?? "-",
-                  style: bodyTextStyle(context, fontSize: 12),
-                ),
-              ),
-            ],
+          // status
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 4,
+            ),
+            decoration: BoxDecoration(
+              color: _getStatusColor(item.status_nama),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              item.status_nama ?? "-",
+              style: bodyTextStyle(context, fontSize: 16),
+            ),
           ),
         ],
       ),
@@ -415,6 +396,25 @@ class _TransaksiPageState extends State<TransaksiPage> {
     return bulan[month];
   }
 
+  String _monthIndoFull(int month) {
+    const bulan = [
+      '',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return bulan[month];
+  }
+
   Color _getStatusColor(String? status) {
     if (status == null) return pGrey;
     switch (status.toLowerCase()) {
@@ -428,5 +428,62 @@ class _TransaksiPageState extends State<TransaksiPage> {
       default:
         return pGrey;
     }
+  }
+
+  List<Map<String, dynamic>> _groupedTransactions() {
+    Map<String, List<dynamic>> grouped = {};
+
+    for (var item in filteredItems) {
+      if (item.trsTgl != null) {
+        try {
+          final tglDt = (item.trsTgl is String)
+              ? DateTime.parse(item.trsTgl)
+              : item.trsTgl;
+          final monthYear = "${_monthIndoFull(tglDt.month)} ${tglDt.year}";
+
+          if (!grouped.containsKey(monthYear)) {
+            grouped[monthYear] = [];
+          }
+          grouped[monthYear]!.add(item);
+        } catch (_) {}
+      }
+    }
+
+    // Sort by date (newest first)
+    List<Map<String, dynamic>> result = [];
+    final sortedKeys = grouped.keys.toList()..sort((a, b) {
+      try {
+        final dateA = _parseMonthYear(a);
+        final dateB = _parseMonthYear(b);
+        return dateB.compareTo(dateA);
+      } catch (_) {
+        return 0;
+      }
+    });
+
+    for (var key in sortedKeys) {
+      result.add({
+        'month': key,
+        'items': grouped[key]!,
+      });
+    }
+
+    return result;
+  }
+
+  DateTime _parseMonthYear(String monthYear) {
+    final parts = monthYear.split(' ');
+    if (parts.length != 2) return DateTime.now();
+
+    final monthMap = {
+      'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4,
+      'Mei': 5, 'Juni': 6, 'Juli': 7, 'Agustus': 8,
+      'September': 9, 'Oktober': 10, 'November': 11, 'Desember': 12,
+    };
+
+    final month = monthMap[parts[0]] ?? 1;
+    final year = int.tryParse(parts[1]) ?? DateTime.now().year;
+
+    return DateTime(year, month);
   }
 }

@@ -136,18 +136,14 @@ class _ClientLogoCard extends StatelessWidget {
 Widget SocmedIcon(String assetPath, bool isMobile) => Container(
   width: isMobile ? 40 : 48,
   height: isMobile ? 40 : 48,
-  padding: const EdgeInsets.all(2),
+  padding: const EdgeInsets.all(1),
   decoration: BoxDecoration(
     shape: BoxShape.circle,
-    gradient: const LinearGradient(
-      colors: [Color(0xFFFCCF6F), Color(0xFFEF7A28)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
+    color: sGrey
   ),
   child: Container(
     decoration: const BoxDecoration(
-      color: primaryColor,
+      color: pGrey,
       shape: BoxShape.circle,
     ),
     child: Center(

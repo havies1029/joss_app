@@ -19,6 +19,7 @@ class MobileBottomNavigationBar extends StatelessWidget {
   static const List<NavBarItem> _defaultItems = [
     NavBarItem(iconPath: 'assets/icons/beranda.svg', label: 'Beranda'),
     NavBarItem(iconPath: 'assets/icons/find_insurance_icon.svg', label: 'Cari Asuransi'),
+    NavBarItem(iconPath: 'assets/icons/btn_lapor_klaim.svg', label: 'Lapor Klaim'),
     NavBarItem(iconPath: 'assets/icons/literasi.svg', label: 'Literasi'),
     NavBarItem(iconPath: 'assets/icons/setting.svg', label: 'Pengaturan'),
   ];

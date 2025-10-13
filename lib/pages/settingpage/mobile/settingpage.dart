@@ -363,35 +363,33 @@ class _SettingsPageState extends State<SettingsPage> {
                                       );
                                     },
                                   ),
-                                  if (mjnsclientId != '10') ...[
-                                    sDivider,
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/pic.svg',
-                                      title: 'Informasi PIC',
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const MRekanPicInlineEditorList(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    sDivider,
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/group.svg',
-                                      title: 'Tim Akses',
-                                      svgAssetColor: primaryLightColor,
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const MRekanPicListSimple(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
+                                  sDivider,
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/pic.svg',
+                                    title: 'Informasi PIC',
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const MRekanPicInlineEditorList(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  sDivider,
+                                  _buildMenuItem(
+                                    svgAsset: 'assets/icons/group.svg',
+                                    title: 'Tim Akses',
+                                    svgAssetColor: primaryLightColor,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const MRekanPicInlineEditorList(),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ],
