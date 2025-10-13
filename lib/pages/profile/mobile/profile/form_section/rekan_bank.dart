@@ -139,6 +139,8 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                       "⚠️ Tidak ada RekanBank untuk mrekan1Id=$currentMrekan1Id",
                     );
                   }
+
+
                 },
                 child: const SizedBox.shrink(),
               ),
@@ -158,22 +160,29 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                         MRekanBankCrudState
                     >(
                       listener: (context, state) {
+                        // 🔸 Load data record (tetap di sini)
                         if (state.isLoaded) {
                           if (state.record != null) {
-                            fieldMrekan1IdController.text =
-                                state.record!.mrekan1Id;
-                            fieldRekNamaController.text =
-                                state.record!.rekNama;
+                            fieldMrekan1IdController.text = state.record!.mrekan1Id;
+                            fieldRekNamaController.text = state.record!.rekNama;
                             fieldRekNoController.text = state.record!.rekNo;
-                          }
-                          if (state.isSaved && !state.hasFailure) {
-                            context.read<MRekanBankCrudBloc>().add(
-                              MRekanBankCrudLihatEvent(recordId: widget.recordId),
-                            );
                           }
                           fieldComboMBank = state.comboMBank;
                         }
+
+                        // ✅ Pindahkan ke luar
+                        if (state.isSaved && !state.hasFailure) {
+                          // Refresh data yang baru disimpan
+                          context.read<MRekanBankListBloc>().add(
+                            RefreshMRekanBankListEvent(searchText: "", hal: 0),
+                          );
+                          // Tampilkan notifikasi sukses
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            successSnackBar("Data berhasil disimpan "),
+                          );
+                        }
                       },
+
                       builder: (context, state) {
                         return Form(
                           key: _formKey,
@@ -318,10 +327,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
-  void _dismissDialog() {
-    Navigator.pop(context);
-  }
-
   void onSaveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -340,7 +345,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
         mRekanBankCrudBloc.add(MRekanBankCrudTambahEvent(record: record));
       }
 
-      _dismissDialog();
     } else {
       debugPrint("[onSaveForm] Validasi form gagal.");
     }

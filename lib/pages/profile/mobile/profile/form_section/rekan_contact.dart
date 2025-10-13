@@ -69,25 +69,29 @@ class MRekanContactCrudFormPageFormState
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           child: BlocConsumer<MRekanContactCrudBloc, MRekanContactCrudState>(
             listener: (context, state) {
+              // 🟢 Muat data dari API (bagian existing-mu)
               if (state.isLoaded) {
                 if (state.record != null) {
                   fieldAlamat1Controller.text = state.record!.alamat1;
 
-                  // Prioritas: data dari API kalau ada
+                  // Email dari API > fallback ke profil user
                   if (state.record!.email.isNotEmpty) {
                     fieldEmailController.text = state.record!.email;
                   } else {
                     final profile = context.read<UserProfileCubit>().state;
-                    if (fieldEmailController.text.isEmpty && (profile.email?.isNotEmpty ?? false)) {
+                    if (fieldEmailController.text.isEmpty &&
+                        (profile.email?.isNotEmpty ?? false)) {
                       fieldEmailController.text = profile.email!;
                     }
                   }
 
+                  // Telepon dari API > fallback ke profil user
                   if (state.record!.telp.isNotEmpty) {
                     fieldTelpController.text = state.record!.telp;
                   } else {
                     final profile = context.read<UserProfileCubit>().state;
-                    if (fieldTelpController.text.isEmpty && (profile.telepon?.isNotEmpty ?? false)) {
+                    if (fieldTelpController.text.isEmpty &&
+                        (profile.telepon?.isNotEmpty ?? false)) {
                       fieldTelpController.text = profile.telepon!;
                     }
                   }
@@ -97,12 +101,24 @@ class MRekanContactCrudFormPageFormState
                   fieldComboRKodepos = state.comboRKodepos;
                 }
 
-
                 fieldComboMKota = state.comboMKota;
                 fieldComboMPropinsi = state.comboMPropinsi;
                 fieldComboRKodepos = state.comboRKodepos;
               }
+
+              // ✅ Tambahan SnackBar sukses di luar blok isLoaded
+              if (state.isSaved && !state.hasFailure) {
+                context.read<MRekanContactCrudBloc>().add(
+                  MRekanContactCrudLihatEvent(),
+                );
+
+                // Tampilkan notifikasi sukses
+                ScaffoldMessenger.of(context).showSnackBar(
+                  successSnackBar("Data berhasil disimpan 🎉"),
+                );
+              }
             },
+
             builder: (context, state) {
               return Form(
                 key: _formKey,

@@ -84,6 +84,13 @@ class MRekanGeneralCmpCrudFormPageFormState
                 }
                 fieldComboMBentukCst = state.comboMBentukCst;
                 fieldComboMBidang = state.comboMBidang;
+              } if (state.isSaved && !state.hasFailure) {
+                context.read<MRekanGeneralCmpCrudBloc>().add(
+                  MRekanGeneralCmpCrudLihatEvent(),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  successSnackBar("Data berhasil disimpan."),
+                );
               }
             },
             builder: (context, state) {
