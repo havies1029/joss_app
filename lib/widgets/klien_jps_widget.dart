@@ -43,10 +43,11 @@ class _ClientSectionState extends State<ClientSection> {
           const SizedBox(height: 6),
           // Badge orange
           Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(horizontal: hPadding, vertical: 5),
             decoration: BoxDecoration(
-              color: primaryColor,
+              color: pGrey,
               borderRadius: BorderRadius.circular(cardBorderRadius),
+              border: Border.all(color: sGrey),
             ),
             child: Text(
               "Terdaftar Resmi Oleh:",
@@ -113,7 +114,7 @@ class _ClientLogoCard extends StatelessWidget {
       padding: EdgeInsets.all(1),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(color: primaryColor, width: 1),
+        border: Border.all(color: sGrey),
         color: primaryLightColor,
       ),
       child: ClipRRect(

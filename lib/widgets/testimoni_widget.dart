@@ -228,36 +228,45 @@ class TestimonialSectionState extends State<TestimonialSection> {
         children: [
           // Rating + stars row
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                height: 20.37,
-                padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                decoration: BoxDecoration(
-                  color: pYellow.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        item.nilai.toStringAsFixed(1),
-                        style: const TextStyle(color: pYellow, fontSize: 14),
-                      ),
-                      Text(
-                        ' /${item.skala.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          color: hintGrey,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              Text(
+                DateFormat('dd/MM/yyyy').format(item.reviewTgl),
+                style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
               ),
-              const SizedBox(width: 5),
-              _buildStarRating(item.nilai, 18),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 20.37,
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding),
+                    decoration: BoxDecoration(
+                      color: pYellow.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(cardBorderRadius),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            item.nilai.toStringAsFixed(1),
+                            style: const TextStyle(color: pYellow, fontSize: 14),
+                          ),
+                          Text(
+                            ' /${item.skala.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              color: hintGrey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  _buildStarRating(item.nilai, 18),
+                ],
+              )
             ],
           ),
           const SizedBox(height: 15),
@@ -270,10 +279,6 @@ class TestimonialSectionState extends State<TestimonialSection> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      DateFormat('dd/MM/yyyy').format(item.reviewTgl),
-                      style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
-                    ),
                     Text(
                       item.reviewer,
                       style: bodyTextStyle(context, fontSize: 20),
