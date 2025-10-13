@@ -21,7 +21,9 @@ class _LiterasiPageState extends State<LiterasiPage> {
       'label': 'Artikel',
       'page': const ArtikelPage(constraints: BoxConstraints()),
     },
-    {'label': 'Testimoni', 'page': const TestimoniPage()},
+    // {'label': 'Testimoni', 'page': const TestimoniPage()},
+    {'label': 'Rating', 'page': const TestimoniPage()},
+
   ];
 
   @override

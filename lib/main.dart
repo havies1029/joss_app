@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/gen_dn1/dn1cari_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
@@ -18,6 +19,7 @@ import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.d
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
+import 'package:joss_app/repositories/gen_dn1/dn1cari_repository.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim2crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanbankcrud_repository.dart';
@@ -75,6 +77,7 @@ import 'blocs/gen_berita/berita2cari_bloc.dart';
 import 'blocs/gen_berita/berita3cari_bloc.dart';
 import 'blocs/gen_berita/beritakecilcari_bloc.dart';
 import 'blocs/gen_berita/beritalaincari_bloc.dart';
+import 'blocs/gen_cob_app/cobcari_bloc.dart';
 import 'blocs/gen_klaim/klaim1crud_bloc.dart';
 import 'blocs/gen_klaim/klaim1list_bloc.dart';
 import 'blocs/gen_klaim/klaim2crud_bloc.dart';
@@ -234,6 +237,9 @@ Future<void> main() async {
         BlocProvider<SimulparCrudBloc>(
             create: (context) =>
                 SimulparCrudBloc(repository: SimulparCrudRepository())),
+        BlocProvider<CobCariBloc>(
+            create: (context) => CobCariBloc()),
+        BlocProvider<Dn1CariBloc>(create: (context) => Dn1CariBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

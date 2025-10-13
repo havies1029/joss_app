@@ -128,7 +128,7 @@ class HeroPage extends StatelessWidget {
           onDetailTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const DetailPremiPage()),
+              MaterialPageRoute(builder: (_) => const DetailPremiPage(sppa1Id: '',)),
             );
           },
           asetCount : custType == "C" ? '50.000.000.000' : '0',

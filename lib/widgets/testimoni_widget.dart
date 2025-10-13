@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -269,6 +270,10 @@ class TestimonialSectionState extends State<TestimonialSection> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(item.reviewTgl),
+                      style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
+                    ),
                     Text(
                       item.reviewer,
                       style: bodyTextStyle(context, fontSize: 20),

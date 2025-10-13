@@ -1,16 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
-import 'package:joss_app/pages/gen_aset_ringkasan/asetringkasancari_list_widget.dart';
 
+import '../../../../../../blocs/gen_aset_dashboard/asetdashboardcari_bloc.dart';
 import '../../../../../../blocs/share_cubit/share_ringkasan_state_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/expert_helper.dart';
 import '../../../../../../helper/mobile_expert_helper.dart';
 import '../../../../../../models/gen_aset_ringkasan/asetringkasancari_model.dart';
+import '../../../../../../widgets/apptheme/build_status_box.dart';
 import '../../../../../../widgets/apptheme/build_status_text_box.dart';
 import '../../../../../../widgets/apptheme/popup_widget.dart';
 import '../list_form/aset_list_ringkasan.dart';
@@ -33,6 +35,8 @@ class TableRingkasanWidget extends StatefulWidget {
 
 class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
   final TextEditingController _searchController = TextEditingController();
+  String? _selectedStatusId;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -43,15 +47,23 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
+  // 🔹 hanya dipanggil sekali saat init
   void _refreshData() {
+    // 🔸 refresh tabel
     context.read<AsetRingkasanCariBloc>().add(
       RefreshAsetRingkasanCariEvent(
         statusId: widget.initialStatusId,
         searchText: _searchController.text,
       ),
+    );
+
+    // 🔸 refresh dashboard (summary)
+    context.read<AsetDashboardCariBloc>().add(
+      RefreshAsetDashboardCariEvent(cobAppId: "10001"),
     );
   }
 
@@ -100,6 +112,134 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hPadding),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final bool isCompact = constraints.maxWidth < 480;
+                        final double iconSize = isCompact ? 16 : 20;
+                        final double boxSize = isCompact ? 36 : 42;
+                        final textStyle = TextStyle(
+                          fontSize: isCompact ? 13 : 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        );
+
+                        // ✅ Reusable card sederhana
+                        Widget buildStatusCard({
+                          required StatusType type,
+                          required String text,
+                          required bool isSelected,
+                          required VoidCallback onTap,
+                        }) {
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: onTap,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              decoration: BoxDecoration(
+                                color: pGrey,
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                border: Border.all(
+                                  color: isSelected ? type.color : sGrey.withOpacity(0.5),
+                                  width: isSelected ? 2 : 1,
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // 🔥 Gunakan IgnorePointer biar tap di ikon gak “nahan” gesture
+                                  IgnorePointer(
+                                    child: StatusBox(
+                                      assetPath: type.asset,
+                                      bgColor: type.color,
+                                      iconColor: Colors.white,
+                                      size: isSelected ? boxSize + 2 : boxSize,
+                                      iconSize: iconSize,
+                                      showBorder: false,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    text,
+                                    style: textStyle.copyWith(
+                                      fontWeight:
+                                      isSelected ? FontWeight.w700 : FontWeight.w500,
+                                      color: isSelected ? Colors.white : Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        // 🔹 Ambil data dari Dashboard
+                        return BlocBuilder<AsetDashboardCariBloc, AsetDashboardCariState>(
+                          builder: (context, state) {
+                            if (state.status == ListStatus.success && state.items.isNotEmpty) {
+                              final summary = state.items.first;
+
+                              final statusData = {
+                                StatusType.aktif: summary.aktifQty,
+                                StatusType.onProgress: summary.onProgressQty,
+                                StatusType.nonAktif: summary.nonAktifQty,
+                                StatusType.berakhir: summary.berakhirQty,
+                              };
+
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: StatusType.values.map((type) {
+                                  final bool isSelected = _selectedStatusId == type.id;
+
+                                  return buildStatusCard(
+                                    type: type,
+                                    text: statusData[type].toString(),
+                                    isSelected: isSelected,
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedStatusId = (isSelected) ? null : type.id;
+                                      });
+
+                                      // 🧩 Batasi event agar tidak spam (debounce 350ms)
+                                      _debounce?.cancel();
+                                      _debounce = Timer(const Duration(milliseconds: 350), () {
+                                        context.read<AsetRingkasanCariBloc>().add(
+                                          RefreshAsetRingkasanCariEvent(
+                                            statusId: _selectedStatusId ?? widget.initialStatusId,
+                                            searchText: _searchController.text,
+                                          ),
+                                        );
+                                      });
+                                    },
+
+                                  );
+                                }).toList(),
+                              );
+                            }
+
+                            // Placeholder state
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: StatusType.values.map((type) {
+                                return buildStatusCard(
+                                  type: type,
+                                  text: "-",
+                                  isSelected: false,
+                                  onTap: () {},
+                                );
+                              }).toList(),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+
+                  const SizedBox(height: vPadding),
+
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding),
                     child: ListPageFilterBarUIWidget(

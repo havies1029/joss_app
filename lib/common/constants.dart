@@ -69,6 +69,7 @@ const Color primaryLightColor = Color(0xFFF7F7F7);
 const Color primaryBlackColor = Color(0xFF121212);
 const Color secondaryBlackColor = Color(0xFF181818);
 
+const Color cardGrey = Color(0xFF8C8C8C);
 const Color formGrey = Color(0xFF333333);
 const Color pGrey = Color(0xFF292929);
 const Color sGrey = Color(0xFF4E4E4E);
@@ -77,6 +78,7 @@ const Color unselectedColor = Color(0xFF666666);
 
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
+const Color sBlue = Color(0xFF0088FF);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
 const Color pDarkRed = Color(0xFFDC1C1C);
@@ -195,3 +197,15 @@ const LinearGradient orangeToBlackGradient = LinearGradient(
     0.9,  // hitam lebih cepat "menguasai" (80% posisi sudah hitam)
   ],
 );
+
+enum StatusType {
+  aktif("10002", "assets/icons/correct.svg", Colors.green),
+  nonAktif("10003", "assets/icons/exit.svg", Colors.red),
+  onProgress("10004", "assets/icons/clock.svg", Colors.amber),
+  berakhir("10005", "assets/icons/calender.svg", Colors.blue);
+
+  final String id;
+  final String asset;
+  final Color color;
+  const StatusType(this.id, this.asset, this.color);
+}

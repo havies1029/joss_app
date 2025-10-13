@@ -204,6 +204,11 @@ flutter:
     - assets/icons/unduh_data_polis.svg
     - assets/icons/share_data_polis.svg
     - assets/icons/others_icon_polis.svg
+    - assets/icons/btn_endorse.svg
+    - assets/icons/btn_delete.svg
+    - assets/icons/btn_lacak.svg
+    - assets/icons/save_btn_pic.svg
+    - assets/icons/send_btn_pic.svg
 
   fonts:
     - family: Delm-Regular

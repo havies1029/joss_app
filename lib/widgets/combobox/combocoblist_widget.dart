@@ -37,7 +37,7 @@ DropdownSearch<ComboCobListModel> buildFieldComboCobList({
 					style: const TextStyle(color: Colors.black),      // teks hitam
 					cursorColor: Colors.black,
 					decoration: InputDecoration(
-						hintText: 'Cari provinsi…',
+						hintText: 'Cari Cob…',
 						hintStyle: const TextStyle(color: Colors.black54),
 						filled: true,
 						fillColor: Colors.white,                        // background putih biar kontras

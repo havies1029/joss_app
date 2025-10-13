@@ -26,11 +26,11 @@ class BaseTableAsetWidget extends StatelessWidget {
     if (_isRingkasan) {
       child = const TableRingkasanWidget(initialStatusId: "10001");
     } else if (_isPar) {
-      child = const TableParWidget(initialStatusId: "10002");
+      child = const TableParWidget(initialStatusId: "10001");
     } else if (_isMv) {
-      child = const TableMvWidget(initialStatusId: "10003");
+      child = const TableMvWidget(initialStatusId: "10001");
     } else if (_isHealth) {
-      child = const TableHealthWidget(initialStatusId: "10005");
+      child = const TableHealthWidget(initialStatusId: "10001");
     } else {
       child = Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
