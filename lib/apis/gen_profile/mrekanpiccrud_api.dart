@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -51,6 +52,7 @@ class MRekanPicCrudAPI {
 		}
 		return returnData.success;
 	}
+
 	Future<bool> mRekanPicCrudHapusAPI(String mrekanpicId) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/delete";
 		Map<String, String> queryParams = {
@@ -64,14 +66,17 @@ class MRekanPicCrudAPI {
 			'Authorization': 'Bearer ${AppData.userToken}'
 		});
 
+
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
+
 		return returnData.success;
 	}
+
 	Future<MRekanPicCrudModel> mRekanPicCrudLihatAPI(String mrekanpicId) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/read";
 		Map<String, String> queryParams = {'mrekanpicId': mrekanpicId};

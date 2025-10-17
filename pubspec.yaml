@@ -209,6 +209,9 @@ flutter:
     - assets/icons/btn_lacak.svg
     - assets/icons/save_btn_pic.svg
     - assets/icons/send_btn_pic.svg
+    - assets/icons/logo_bantuan.svg
+    - assets/icons/refresh_cob_icon.svg
+    - assets/icons/list_cob_icon.svg
 
   fonts:
     - family: Delm-Regular

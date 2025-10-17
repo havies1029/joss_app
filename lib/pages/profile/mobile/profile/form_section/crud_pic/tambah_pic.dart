@@ -10,8 +10,14 @@ import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
+import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../common/constants.dart';
+import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
+import '../../../../../../repositories/gen_profile/mrekanpiccrud_repository.dart';
+import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
+import '../../../../../gen_profile/common/rekanpiccobcari_list.dart';
+import '../../../../../gen_profile/rekanpiccobmultipage.dart';
 
 class TambahPicWidget extends StatefulWidget {
   const TambahPicWidget({super.key});
@@ -21,6 +27,9 @@ class TambahPicWidget extends StatefulWidget {
 }
 
 class _TambahPicWidgetState extends State<TambahPicWidget> {
+  List< RekanPicCobCariModel> _pendingCobList = [];
+
+
   final _formKey = GlobalKey<FormState>();
   final _nama = TextEditingController();
   final _email = TextEditingController();
@@ -56,25 +65,27 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
   String _normalizeHp(String s) => s.replaceAll(' ', '');
 
-  void _save() {
+  void _save() async {
     final valid = _formKey.currentState?.validate() ?? false;
     if (!valid) {
       if (!_showErrors) setState(() => _showErrors = true);
       return;
     }
 
-    ComboMJabatanModel? selected = _jabatan;
-    try {
-      final st = _comboKey.currentState;
-      if (selected == null) selected = st?.getSelectedItem;
-    } catch (_) {}
-
-    final idJabatan = (selected?.mjabatanId ?? '').trim();
+    final idJabatan = (_jabatan?.mjabatanId ?? '').trim();
     if (idJabatan.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Jabatan harus dipilih')),
       );
-      if (!_showErrors) setState(() => _showErrors = true);
+      return;
+    }
+
+    // 🚫 VALIDASI: wajib pilih minimal 1 COB
+    if (_pendingCobList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.')),
+      );
+      debugPrint('⚠️ [VALIDATION] User belum memilih COB — simpan dibatalkan.');
       return;
     }
 
@@ -88,10 +99,65 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
       isDefault: _isDefault,
     );
 
-    context.read<MRekanPicCrudBloc>().add(
-      MRekanPicCrudTambahEvent(record: record),
-    );
+    debugPrint('🚀 [SAVE] Mulai simpan data PIC...');
+    debugPrint('📦 Payload: ${record.toJson()}');
+
+    // 🛰️ Step 1: Simpan PIC ke API
+    final repo = MRekanPicCrudRepository();
+    final returnData = await repo.mRekanPicCrudTambah(record);
+
+    if (!returnData.success) {
+      debugPrint('❌ [SAVE] Gagal menyimpan PIC ke server.');
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menyimpan PIC. Coba lagi.')),
+      );
+      return;
+    }
+
+    // ✅ Step 2: Ambil picId dari returnData
+    final picId = returnData.data;
+    debugPrint('✅ [SAVE] PIC berhasil disimpan dengan ID: $picId');
+
+    // 🔄 Step 3: Kirim pending COB ke server
+    debugPrint('📤 Mengirim ${_pendingCobList.length} COB ke PIC ID $picId...');
+
+    try {
+      final cobRepo = RekanPicCobCariRepository();
+
+      final listCheckbox = _pendingCobList.map((e) =>
+          RekanPicCobCariCheckboxModel(
+            mcobId: e.mcobId,
+            isChecked: e.isChecked,
+          ),
+      ).toList();
+
+      debugPrint('🧾 [COB] Payload dikirim: ${listCheckbox.map((e) => e.toJson()).toList()}');
+
+      final cobResult = await cobRepo.rekanPicCobUpdateList(picId, listCheckbox);
+
+      if (cobResult.success) {
+        debugPrint('✅ [COB] ${listCheckbox.length} item berhasil diupdate ke server.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PIC & ${listCheckbox.length} COB berhasil disimpan!')),
+        );
+      } else {
+        debugPrint('⚠️ [COB] Gagal update COB ke server untuk PIC $picId.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PIC tersimpan, tapi gagal update COB.')),
+        );
+      }
+    } catch (e) {
+      debugPrint('💥 [ERROR] Gagal kirim pending COB: $e');
+    }
+
+    setState(() => _saving = false);
+
+    debugPrint('🎯 [DONE] Semua proses selesai — PIC & COB tersimpan.');
+    Navigator.pop(context, true);
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +167,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-          listener: (context, state) {
-            if (state.isSaved == true) {
-              Navigator.pop(context, true);
-              return;
-            }
+          listener: (context, state) async {
+
             if (state.hasFailure == true) {
               setState(() => _saving = false);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -170,7 +233,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                         'Form Tambah PIC',
                                         style: headingStyle(context, fontSize: 20),
                                       ),
-                                      const SizedBox(height: 16),
+
+                                      const SizedBox(height: hPadding),
 
                                       // 🔹 Nama
                                       appTextField(
@@ -181,7 +245,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                             : null,
                                         textInputAction: TextInputAction.next,
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: hPadding),
 
                                       // 🔹 Email
                                       appTextField(
@@ -191,7 +255,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                         validator: _emailValidator,
                                         textInputAction: TextInputAction.next,
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: hPadding),
 
                                       // 🔹 Nomor Telepon
                                       appTextField(
@@ -206,7 +270,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                             ? kPhoneNumberNullError
                                             : null,
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: hPadding),
 
                                       // 🔹 Combo Jabatan
                                       ReusableComboBox<ComboMJabatanModel>(
@@ -227,22 +291,122 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                         validatorCallback: (val) =>
                                         val == null ? kStringNullError : null,
                                       ),
-                                      const SizedBox(height: 8),
+
+                                      const SizedBox(height: hPadding),
 
                                       CheckboxListTile(
                                         value: _isDefault,
-                                        onChanged: (v) =>
-                                            setState(() => _isDefault = v ?? false),
+                                        onChanged: (v) => setState(() => _isDefault = v ?? false),
                                         title: Text(
                                           'Jadikan sebagai PIC default',
                                           style: bodyTextStyle(context),
                                         ),
                                         dense: true,
                                         activeColor: primaryColor,
-                                        controlAffinity:
-                                        ListTileControlAffinity.leading,
+                                        controlAffinity: ListTileControlAffinity.leading,
                                         contentPadding: EdgeInsets.zero,
                                       ),
+                                      const SizedBox(height: hPadding),
+
+
+                                      GestureDetector(
+                                        onTap: () async {
+                                          final selectedCobs = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => BlocProvider(
+                                                create: (_) => RekanPicCobCariBloc(),
+                                                child: RekanPicCobCariPage(
+                                                  rekanPicId: '0', // untuk mode tambah
+                                                  viewMode: 'tambah',
+                                                ),
+                                              ),
+                                            ),
+                                          );
+
+                                          if (selectedCobs != null && selectedCobs.isNotEmpty) {
+                                            setState(() {
+                                              _pendingCobList = selectedCobs;
+                                            });
+                                            debugPrint("🟠 Pending COB disimpan sementara: ${_pendingCobList!.length} item");
+                                          }
+                                        },
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // 🧩 Icon kiri
+                                            Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade800,
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: SvgPicture.asset(
+                                                'assets/icons/list_cob_icon.svg',
+                                                width: 20,
+                                                height: 20,
+                                                colorFilter: const ColorFilter.mode(
+                                                  Colors.white,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+
+                                            // 📋 Isi konten
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Akses',
+                                                    style: bodyTextStyle(context)
+                                                        .copyWith(color: Colors.white70, fontSize: 13),
+                                                  ),
+                                                  const SizedBox(height: 4),
+
+                                                  if (_pendingCobList == null || _pendingCobList!.isEmpty)
+                                                    const Text(
+                                                      'Pilih Daftar COB',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 15,
+                                                      ),
+                                                    )
+                                                  else
+                                                    Wrap(
+                                                      spacing: 6,
+                                                      runSpacing: 6,
+                                                      children: _pendingCobList!
+                                                          .map(
+                                                            (e) => Container(
+                                                          padding: const EdgeInsets.symmetric(
+                                                              horizontal: 10, vertical: 6),
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(0xFFFF9D00),
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                          child: Text(
+                                                            e.cobNama,
+                                                            style: const TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 13,
+                                                              fontWeight: FontWeight.w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                          .toList(),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+
                                       const SizedBox(height: 16),
 
                                       // 🔹 Tombol Aksi

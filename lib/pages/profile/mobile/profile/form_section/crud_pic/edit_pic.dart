@@ -2,6 +2,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
@@ -9,8 +10,13 @@ import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
+import '../../../../../../apis/gen_profile/rekanpiccobcari_api.dart';
+import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../common/constants.dart';
+import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../base/base_background_sidepage.dart';
+import '../../../../../gen_profile/common/rekanpiccobcari_list.dart';
+import '../../../../../gen_profile/rekanpiccobmultipage.dart';
 
 class EditPicWidget extends StatefulWidget {
   final String mrekanpicId;
@@ -39,6 +45,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
+  List<RekanPicCobCariModel>? _selectedCobList = [];
 
   final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
   ComboMJabatanModel? _jabatan;
@@ -58,6 +65,14 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _email.text = widget.initEmail ?? '';
     _hp.text = widget.initHp ?? '';
     _isDefault = widget.initIsDefault;
+// 🔹 Tambahkan inisialisasi untuk COB list
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cobBloc = context.read<RekanPicCobCariBloc>();
+      cobBloc.add(RefreshRekanPicCobCariEvent(
+        rekanPicId: widget.mrekanpicId,
+        searchText: '',
+      ));
+    });
 
     if (widget.initJabatanModel != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -198,7 +213,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         : null,
                                     textInputAction: TextInputAction.next,
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: hPadding),
 
                                   appTextField(
                                     label: 'Email',
@@ -207,8 +222,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                     validator: _emailValidator,
                                     textInputAction: TextInputAction.next,
                                   ),
-                                  const SizedBox(height: 12),
-
+                                  const SizedBox(height: hPadding),
                                   appTextField(
                                     label: 'No. Telp',
                                     controller: _hp,
@@ -222,7 +236,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         ? kPhoneNumberNullError
                                         : null,
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: hPadding),
 
                                   // Jabatan
                                   ReusableComboBox<ComboMJabatanModel>(
@@ -242,23 +256,123 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                     validatorCallback: (val) =>
                                     val == null ? kStringNullError : null,
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: hPadding),
 
                                   CheckboxListTile(
                                     value: _isDefault,
-                                    onChanged: (v) => setState(
-                                            () => _isDefault = v ?? false),
+                                    onChanged: (v) => setState(() => _isDefault = v ?? false),
                                     title: Text(
                                       'Jadikan sebagai PIC default',
                                       style: bodyTextStyle(context),
                                     ),
                                     dense: true,
                                     activeColor: primaryColor,
-                                    controlAffinity:
-                                    ListTileControlAffinity.leading,
+                                    controlAffinity: ListTileControlAffinity.leading,
                                     contentPadding: EdgeInsets.zero,
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: hPadding),
+
+
+                                  GestureDetector(
+                                    onTap: () async {
+                                      // 🔹 Buka halaman multi-select COB (mode UBAH)
+                                      final selectedCobs = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BlocProvider(
+                                            create: (_) => RekanPicCobCariBloc(),
+                                            child: RekanPicCobCariPage(
+                                              rekanPicId: widget.mrekanpicId, // ID PIC valid
+                                              viewMode: 'ubah',
+                                            ),
+                                          ),
+                                        ),
+                                      );
+
+                                      // 🔹 Setelah kembali dari halaman pilih COB
+                                      if (selectedCobs != null && selectedCobs.isNotEmpty) {
+                                        setState(() {
+                                          _selectedCobList = selectedCobs; // update daftar lokal (tampilan)
+                                        });
+                                        debugPrint("✅ Daftar COB diperbarui untuk ${widget.mrekanpicId}");
+                                      }
+                                    },
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // 🧩 Icon kiri (pakai SVG list_cob_icon)
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade800,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: SvgPicture.asset(
+                                            'assets/icons/list_cob_icon.svg',
+                                            width: 20,
+                                            height: 20,
+                                            colorFilter: const ColorFilter.mode(
+                                              Colors.white,
+                                              BlendMode.srcIn,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+
+                                        // 📋 Konten teks & daftar chip COB
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Akses',
+                                                style: bodyTextStyle(context)
+                                                    .copyWith(color: Colors.white70, fontSize: 13),
+                                              ),
+                                              const SizedBox(height: 4),
+
+                                              if (_selectedCobList == null || _selectedCobList!.isEmpty)
+                                                const Text(
+                                                  'Pilih Daftar COB',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 15,
+                                                  ),
+                                                )
+                                              else
+                                                Wrap(
+                                                  spacing: 6,
+                                                  runSpacing: 6,
+                                                  children: _selectedCobList!
+                                                      .map(
+                                                        (e) => Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                          horizontal: 10, vertical: 6),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xFFFF9D00),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                      ),
+                                                      child: Text(
+                                                        e.cobNama,
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                      .toList(),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 20),
 
                                   Row(
                                     children: [

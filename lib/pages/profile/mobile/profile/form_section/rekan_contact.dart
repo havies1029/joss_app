@@ -310,16 +310,15 @@ class MRekanContactCrudFormPageFormState
       hintText: "Kodepos",
       comboKey: comboRKodeposKey,
       initItem: fieldComboRKodepos,
-      dataLoader:
-          () => ComboRKodeposRepository().getComboRKodepos(
-            fieldComboMKota?.mkotaId ?? "",
-            "",
-          ),
+      dataLoader: () => ComboRKodeposRepository().getComboRKodepos(
+        fieldComboMKota?.mkotaId ?? "",
+        "",
+      ),
       displayText: (item) => item.kodeposNo,
       compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(error: kStringKodeposError);
+          // Hapus validasi error (tidak perlu removeError)
           mRekanContactCrudBloc.add(
             ComboRKodeposChangedEvent(comboRKodepos: value),
           );
@@ -330,12 +329,7 @@ class MRekanContactCrudFormPageFormState
           fieldComboRKodepos = value;
         }
       },
-      validatorCallback: (value) {
-        if (value == null) {
-          return kStringKodeposError;
-        }
-        return null;
-      },
+      // ❌ validatorCallback dihapus
     );
   }
 

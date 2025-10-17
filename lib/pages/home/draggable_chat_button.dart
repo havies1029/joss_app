@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DraggableChatButton extends StatefulWidget {
   final VoidCallback onTap;
@@ -30,7 +32,7 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
     _animation = Tween<Offset>(begin: position, end: newPosition).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutCubic, // 🔹 lebih halus dari Quad, natural deceleration
+        curve: Curves.easeOutCubic,
       ),
     );
 
@@ -48,9 +50,9 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
     const double buttonSize = 70.0;
     const double topNavHeight = 80;
     const double bottomNavHeight = 80;
-    const double floatMargin = 45; // 🔹 jarak elegan dari bottom nav
+    const double floatMargin = 45;
 
-    // default posisi awal
+    // posisi awal default
     if (position == Offset.zero) {
       position = Offset(
         screen.width - buttonSize - 20,
@@ -79,7 +81,6 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
           final double vx = details.velocity.pixelsPerSecond.dx;
           final double vy = details.velocity.pixelsPerSecond.dy;
 
-          // batas aman top & bottom
           final double minY = topNavHeight + 10;
           final double maxY = screen.height -
               buttonSize -
@@ -91,9 +92,8 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
           (position.dx + vx / 12).clamp(10, screen.width - buttonSize - 10);
           double newY = (position.dy + vy / 12).clamp(minY, maxY);
 
-          // 🔹 Pantulan lebih jauh dari bottomNav biar gak tenggelam
-          const double bounceTop = 14; // halus
-          const double bounceBottom = 28; // agak jauh, jaga radius bottom nav
+          const double bounceTop = 14;
+          const double bounceBottom = 28;
 
           if (newY <= minY + 5) newY += bounceTop;
           if (newY >= maxY - 5) newY -= bounceBottom;
@@ -108,8 +108,9 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
             width: buttonSize,
             height: buttonSize,
             decoration: BoxDecoration(
-              color: Colors.blueAccent,
+              color: Colors.white, // 🔹 Ubah warna background ke PUTIH
               shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.25),
@@ -118,17 +119,23 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
                 ),
               ],
             ),
+            // 🔹 Ganti ikon ke logo_bantuan.svg
             child: Center(
               child: SvgPicture.asset(
-                'assets/icons/bantuan.svg',
-                width: 30,
-                height: 30,
-                color: Colors.white,
+                'assets/icons/logo_bantuan.svg',
+                width: 36,
+                height: 36,
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

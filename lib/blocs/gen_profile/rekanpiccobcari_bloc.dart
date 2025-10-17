@@ -13,58 +13,65 @@ part 'rekanpiccobcari_event.dart';
 part 'rekanpiccobcari_state.dart';
 
 class RekanPicCobCariBloc extends Bloc<RekanPicCobCariEvents, RekanPicCobCariState> {
-	RekanPicCobCariBloc() : super(const RekanPicCobCariState()) {
-		on<FetchRekanPicCobCariEvent>(onFetchRekanPicCobCari);
-		on<RefreshRekanPicCobCariEvent>(onRefreshRekanPicCobCari);
+  RekanPicCobCariBloc() : super(const RekanPicCobCariState()) {
+    on<FetchRekanPicCobCariEvent>(onFetchRekanPicCobCari);
+    on<RefreshRekanPicCobCariEvent>(onRefreshRekanPicCobCari);
     on<InitialSelectedCOBRekanPicCobEvent>(onInitialSelectedCOB);
     on<UpdateCheckboxRekanPicCobEvent>(onUpdateCheckboxChanged);
     on<Update2ApiJRekanPicCobEvent>(onUpdate2ApiRekanPicCob);
-	}
+    on<RequestToUpdateRekanPicCobEvent>(onRequestToUpdate);
+  }
 
-Future<void> onRefreshRekanPicCobCari(
-		RefreshRekanPicCobCariEvent event, Emitter<RekanPicCobCariState> emit) async {
-	emit(const RekanPicCobCariState());
+  Future<void> onRequestToUpdate(RequestToUpdateRekanPicCobEvent event,
+      Emitter<RekanPicCobCariState> emit) async {
+    emit(state.copyWith(requestToUpdate: false));
+    emit(state.copyWith(requestToUpdate: true));
+  }
 
-  emit(state.copyWith(rekanPicId: event.rekanPicId, searchText: event.searchText));
+  Future<void> onRefreshRekanPicCobCari(
+      RefreshRekanPicCobCariEvent event, Emitter<RekanPicCobCariState> emit) async {
+    emit(RekanPicCobCariState(status: ListStatus.initial));
 
-	add(FetchRekanPicCobCariEvent());
-}
+    emit(state.copyWith(rekanPicId: event.rekanPicId, searchText: event.searchText));
 
-Future<void> onFetchRekanPicCobCari(
-		FetchRekanPicCobCariEvent event, Emitter<RekanPicCobCariState> emit) async {
-	if (state.hasReachedMax) return;
+    add(FetchRekanPicCobCariEvent());
+  }
 
-	RekanPicCobCariRepository repo = RekanPicCobCariRepository();
-	if (state.status == ListStatus.initial) {
-		List<RekanPicCobCariModel> items = await repo.getRekanPicCobCari(state.rekanPicId, state.searchText, 0);
-		return emit(state.copyWith(
-			items: items,
-			hasReachedMax: false,
-			status: ListStatus.success,
-      hal: 1
-			));
-	}
-	List<RekanPicCobCariModel> items = await repo.getRekanPicCobCari(state.rekanPicId, state.searchText, state.hal);
-	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
-	} else {
-		List<RekanPicCobCariModel> rekanPicCobCari = List.of(state.items)..addAll(items);
+  Future<void> onFetchRekanPicCobCari(
+      FetchRekanPicCobCariEvent event, Emitter<RekanPicCobCariState> emit) async {
+    if (state.hasReachedMax) return;
 
-		final result = rekanPicCobCari
-			.whereWithIndex((e, index) =>
-				rekanPicCobCari.indexWhere((e2) => e2.mrekanpiccobId == e.mrekanpiccobId) ==
-				index)
-			.toList();
+    RekanPicCobCariRepository repo = RekanPicCobCariRepository();
+    if (state.status == ListStatus.initial) {
+      List<RekanPicCobCariModel> items = await repo.getRekanPicCobCari(state.rekanPicId, state.searchText, 0);
+      return emit(state.copyWith(
+          items: items,
+          hasReachedMax: false,
+          status: ListStatus.success,
+          hal: 1
+      ));
+    }
+    List<RekanPicCobCariModel> items = await repo.getRekanPicCobCari(state.rekanPicId, state.searchText, state.hal);
+    if (items.isEmpty) {
+      return emit(state.copyWith(hasReachedMax: true));
+    } else {
+      List<RekanPicCobCariModel> rekanPicCobCari = List.of(state.items)..addAll(items);
 
-		return emit(state.copyWith(
-			items: result,
-			hasReachedMax: false,
-			status: ListStatus.success,
-      hal: state.hal + 1
-			));
-		}
+      final result = rekanPicCobCari
+          .whereWithIndex((e, index) =>
+      rekanPicCobCari.indexWhere((e2) => e2.mrekanpiccobId == e.mrekanpiccobId) ==
+          index)
+          .toList();
 
-	}
+      return emit(state.copyWith(
+          items: result,
+          hasReachedMax: false,
+          status: ListStatus.success,
+          hal: state.hal + 1
+      ));
+    }
+
+  }
 
   Future<void> onInitialSelectedCOB(InitialSelectedCOBRekanPicCobEvent event,
       Emitter<RekanPicCobCariState> emit) async {
@@ -81,37 +88,37 @@ Future<void> onFetchRekanPicCobCari(
     //debugPrint("state.selectedItems after initialing : ${jsonEncode(state.selectedItems)}");
   }
 
-  Future<void> onUpdateCheckboxChanged(UpdateCheckboxRekanPicCobEvent event,
-      Emitter<RekanPicCobCariState> emit) async {
-    //emit(state.copyWith(status: ListStatus.initial));
-
+  Future<void> onUpdateCheckboxChanged(
+      UpdateCheckboxRekanPicCobEvent event,
+      Emitter<RekanPicCobCariState> emit,
+      ) async {
     debugPrint("onUpdateCheckboxChanged #10");
 
-    RekanPicCobCariModel itemCheckbox = event.rekanPicCobItem;
-    itemCheckbox.isChecked = event.isChecked;
+    // 🧱 1. Buat salinan baru dari item (immutable update)
+    final updatedItem = event.rekanPicCobItem.copyWith(
+      isChecked: event.isChecked,
+    );
 
-    List<RekanPicCobCariModel> items = state.items;
+    // 🧱 2. Buat salinan baru dari list
+    final newItems = List<RekanPicCobCariModel>.from(state.items);
+    final index = newItems.indexWhere((e) => e.mcobId == updatedItem.mcobId);
+    if (index != -1) newItems[index] = updatedItem;
 
-    debugPrint("before : items : ${jsonEncode(items)}");
+    // 🧱 3. Update selected items
+    final updatedSelectedItems =
+    await updateSelectedItem(state.selectedItems, [updatedItem]);
 
-    debugPrint("itemCheckbox.cobNama : ${itemCheckbox.cobNama}");
+    // 🧱 4. Emit state baru (baru beneran berubah!)
+    emit(state.copyWith(
+      items: newItems,
+      selectedItems: updatedSelectedItems,
+      status: ListStatus.success,
+    ));
 
-    items[items.indexWhere(
-      (element) => element.mcobId == itemCheckbox.mcobId)] = itemCheckbox;
-
-    List<RekanPicCobCariModel> checked = [itemCheckbox];
-
-    List<RekanPicCobCariModel>? selectedItems =
-      await updateSelectedItem(state.selectedItems, checked);
-    
-    emit(state.copyWith(selectedItems: selectedItems));
-
-    debugPrint("after : state.items : ${jsonEncode(items)}");
-
-    debugPrint("onUpdateCheckboxChanged #20");
-
-    emit(state.copyWith(items: items, status: ListStatus.success));
+    debugPrint("onUpdateCheckboxChanged #20 ✅ item updated ${updatedItem.cobNama}");
   }
+
+
 
   Future<List<RekanPicCobCariModel>> updateSelectedItem(
       List<RekanPicCobCariModel> selectedItems,
@@ -126,7 +133,7 @@ Future<void> onFetchRekanPicCobCari(
     List<RekanPicCobCariModel> newSelectedItems = newItems
         .where(
           (element) => element.isChecked,
-        )
+    )
         .toList();
 
     //debugPrint("new SelectedItems : ${jsonEncode(newSelectedItems)}");
@@ -138,7 +145,7 @@ Future<void> onFetchRekanPicCobCari(
     List<RekanPicCobCariModel> removedItems = newItems
         .where(
           (element) => !element.isChecked,
-        )
+    )
         .toList();
 
     if (removedItems.isNotEmpty) {
@@ -168,17 +175,17 @@ Future<void> onFetchRekanPicCobCari(
     if (event.rekanPicId.isNotEmpty) {
       List<RekanPicCobCariModel> picCobList = state.selectedItems;
       List<RekanPicCobCariCheckboxModel> listCheckbox =
-          List<RekanPicCobCariCheckboxModel>.generate(
-              picCobList.length,
+      List<RekanPicCobCariCheckboxModel>.generate(
+          picCobList.length,
               (index) => RekanPicCobCariCheckboxModel(
-                  mcobId: picCobList[index].mcobId,
-                  isChecked: picCobList[index].isChecked));
+              mcobId: picCobList[index].mcobId,
+              isChecked: picCobList[index].isChecked));
 
       listCheckbox.removeWhere((element) => !element.isChecked);
       if (listCheckbox.isNotEmpty) {
         RekanPicCobCariRepository repo = RekanPicCobCariRepository();
         ReturnDataAPI returnApi =
-            await repo.rekanPicCobUpdateList(event.rekanPicId, listCheckbox);
+        await repo.rekanPicCobUpdateList(event.rekanPicId, listCheckbox);
         hasFailure = !returnApi.success;
       }
     }

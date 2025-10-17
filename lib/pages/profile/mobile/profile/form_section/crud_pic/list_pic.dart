@@ -1,16 +1,17 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:joss_app/blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
+import 'package:joss_app/blocs/gen_profile/rekanpiccobcari_bloc.dart';
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/crud_pic/tambah_pic.dart';
+import 'package:joss_app/pages/profile/mobile/profile/form_section/crud_pic/edit_pic.dart';
 import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 
-import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
-import '../../../../../../common/constants.dart';
-import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../base/base_background_sidepage.dart';
-import 'edit_pic.dart';
+
 
 class MRekanPicListSimple extends StatefulWidget {
   const MRekanPicListSimple({super.key});
@@ -26,7 +27,6 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
   @override
   void initState() {
     super.initState();
-    // fetch awal setelah context ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
       listBloc = context.read<MRekanPicListBloc>();
       crudBloc = context.read<MRekanPicCrudBloc>();
@@ -41,8 +41,7 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
     crudBloc = context.read<MRekanPicCrudBloc>();
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.transparent, // biarkan transparan; warna di container utama
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: BaseBackgroundSidePage(
           title: 'Informasi PIC',
@@ -53,9 +52,9 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Container(
                     width: double.infinity,
-                    color: secondaryBlackColor, // <-- warna penuh layar
+                    color: secondaryBlackColor,
                     padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5, // ➜ jarak kiri/kanan ke tembok
+                      horizontal: hPadding * 1.5,
                       vertical: 20,
                     ),
                     child: Column(
@@ -67,10 +66,8 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                             final total = state.items.length;
                             return Row(
                               children: [
-                                Text(
-                                  'Total PIC: $total',
-                                  style: bodyTextStyle(context, fontSize: 18),
-                                ),
+                                Text('Total PIC: $total',
+                                    style: bodyTextStyle(context, fontSize: 18)),
                                 const Spacer(),
                                 _PrimaryButton(
                                   onPressed: () async {
@@ -115,37 +112,41 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                     ),
                                   );
                                 }
+
                                 if (state.status == ListStatus.failure) {
                                   return Column(
                                     children: [
                                       const SizedBox(height: 12),
-                                      Text(
-                                        'Gagal memuat data PIC',
-                                        style: bodyTextStyle(context),
-                                      ),
+                                      Text('Gagal memuat data PIC',
+                                          style: bodyTextStyle(context)),
                                       const SizedBox(height: 8),
                                       TextButton(
-                                        onPressed: () =>
-                                            listBloc.add(FetchMRekanPicListEvent()),
+                                        onPressed: () => listBloc.add(FetchMRekanPicListEvent()),
                                         child: const Text('Coba lagi'),
                                       ),
                                     ],
                                   );
                                 }
+
                                 if (state.items.isEmpty) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Text(
-                                      'Belum ada PIC.',
-                                      style: bodyTextStyle(context, fontSize: 16)
-                                          .copyWith(color: hintGrey),
-                                    ),
+                                    child: Text('Belum ada PIC.',
+                                        style: bodyTextStyle(context, fontSize: 16)
+                                            .copyWith(color: hintGrey)),
                                   );
                                 }
 
                                 return Column(
                                   children: List.generate(state.items.length, (i) {
                                     final it = state.items[i];
+                                    if (it.mrekanpicId == null ||
+                                        it.mrekanpicId!.isEmpty) {
+                                      debugPrint(
+                                          '⛔ Skip card karena mrekanpicId kosong untuk ${it.picNama}');
+                                      return const SizedBox.shrink();
+                                    }
+
                                     return Padding(
                                       padding: EdgeInsets.only(
                                         bottom: i == state.items.length - 1 ? 0 : 14,
@@ -156,9 +157,10 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                         email: it.picEmail ?? '-',
                                         telp: it.picHp ?? '-',
                                         jabatan: it.jabatanDesc ?? '-',
-                                        mrekanpicId: it.mrekanpicId,
+                                        mrekanpicId: it.mrekanpicId!,
                                         onEdit: () async {
-                                          final jabatanModelFromList = ComboMJabatanModel(
+                                          final jabatanModelFromList =
+                                          ComboMJabatanModel(
                                             mjabatanId: it.mjabatanId!.toString(),
                                             jabatanDesc: it.jabatanDesc ?? '',
                                           );
@@ -169,12 +171,14 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                               builder: (_) => BlocProvider.value(
                                                 value: context.read<MRekanPicCrudBloc>(),
                                                 child: EditPicWidget(
-                                                  mrekanpicId: it.mrekanpicId,
+                                                  mrekanpicId: it.mrekanpicId!,
                                                   initNama: it.picNama,
                                                   initEmail: it.picEmail,
                                                   initHp: it.picHp,
-                                                  initJabatanModel: jabatanModelFromList,
-                                                  initIsDefault: it.isDefault ?? false,
+                                                  initJabatanModel:
+                                                  jabatanModelFromList,
+                                                  initIsDefault:
+                                                  it.isDefault ?? false,
                                                 ),
                                               ),
                                             ),
@@ -204,31 +208,42 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
         ),
       ),
     );
-
   }
 
-  void _confirmDelete(BuildContext context, String recordId) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => ShowDialogHapusWidget(
-        onHapusFunction: (id) =>
-            crudBloc.add(MRekanPicCrudHapusEvent(recordId: id)),
-        recordId: recordId,
-      ),
-    ).then((_) {
-      listBloc.add(CloseDialogMRekanPicListEvent());
-    });
-  }
+    void _confirmDelete(BuildContext context, String recordId) {
+      // if (recordId.trim().isEmpty) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text('ID PIC kosong, tidak bisa dihapus.')),
+      //   );
+      //   return;
+      // }
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ShowDialogHapusWidget(
+          onHapusFunction: (id) {
+            crudBloc.add(MRekanPicCrudHapusEvent(recordId: id));
+          },
+          recordId: recordId,
+        ),
+      );
+
+    }
+
 }
 
-class _PicReadOnlyCard extends StatelessWidget {
+// ====================================================================
+// CARD READ ONLY dengan load COB terpisah
+// ====================================================================
+
+class _PicReadOnlyCard extends StatefulWidget {
   final String title;
   final String nama;
   final String email;
   final String telp;
   final String jabatan;
-  final String mrekanpicId; // 👈 tambahkan ini
+  final String mrekanpicId;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -238,11 +253,42 @@ class _PicReadOnlyCard extends StatelessWidget {
     required this.email,
     required this.telp,
     required this.jabatan,
-    required this.mrekanpicId, // 👈 dan ini
+    required this.mrekanpicId,
     required this.onEdit,
     required this.onDelete,
   });
 
+  @override
+  State<_PicReadOnlyCard> createState() => _PicReadOnlyCardState();
+}
+
+class _PicReadOnlyCardState extends State<_PicReadOnlyCard> {
+  late final RekanPicCobCariBloc cobBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    cobBloc = RekanPicCobCariBloc();
+
+    /// Delay fetch biar nunggu UI mount
+    Future.microtask(() {
+      if (widget.mrekanpicId.isNotEmpty) {
+        debugPrint('🚀 Fetch COB untuk ${widget.mrekanpicId}');
+        cobBloc.add(RefreshRekanPicCobCariEvent(
+          rekanPicId: widget.mrekanpicId,
+          searchText: '',
+        ));
+      } else {
+        debugPrint('⛔ Skip fetch karena mrekanpicId kosong');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    cobBloc.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,99 +297,157 @@ class _PicReadOnlyCard extends StatelessWidget {
     final valueStyle =
     bodyTextStyle(context, fontSize: 16).copyWith(color: primaryLightColor);
 
-    return Card(
-      color: formGrey,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        side: const BorderSide(color: sGrey, width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // tombol kiri atas
-            Row(
-              children: [
-                _GhostIconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  onPressed: onEdit,
-                  bg: const Color(0xFFFFC107), // kuning soft
-                ),
-                const SizedBox(width: 8),
-                _GhostIconButton(
-                  icon: const Icon(Icons.delete, size: 20),
-                  onPressed: onDelete,
-                  bg: const Color(0xFFE53935), // merah soft
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
+    return BlocProvider.value(
+      value: cobBloc,
+      child: Card(
+        color: formGrey,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          side: const BorderSide(color: sGrey, width: 1),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _GhostIconButton(
+                    icon: const Icon(Icons.edit, size: 20),
+                    onPressed: widget.onEdit,
+                    bg: const Color(0xFFFFC107),
+                  ),
+                  const SizedBox(width: 8),
+                  _GhostIconButton(
+                    icon: const Icon(Icons.delete, size: 20),
+                    onPressed: widget.onDelete,
+                    bg: const Color(0xFFE53935),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Divider(color: sGrey, height: 20),
+              _kv('Nama PIC :', widget.nama, labelStyle, valueStyle),
+              _kv('Email :', widget.email, labelStyle, valueStyle),
+              _kv('No. Telp :', widget.telp, labelStyle, valueStyle),
+              _kv('Jabatan :', widget.jabatan, labelStyle, valueStyle),
+              const SizedBox(height: 12),
+              Divider(color: sGrey, height: 20),
+              const SizedBox(height: 8),
+              Text('Polis yang bisa diakses:',
+                  style: bodyTextStyle(context, fontSize: 16)
+                      .copyWith(color: hintGrey, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              _CobListSection(rekanPicId: widget.mrekanpicId)
 
-            Divider(color: sGrey, height: 20),
-
-            const SizedBox(height: 6),
-
-            _kv(context, 'Nama PIC :', nama, labelStyle, valueStyle),
-            const SizedBox(height: 6),
-            _kv(context, 'Email :', email, labelStyle, valueStyle),
-            const SizedBox(height: 6),
-            _kv(context, 'No. Telp :', telp, labelStyle, valueStyle),
-            const SizedBox(height: 6),
-            _kv(context, 'Jabatan :', jabatan, labelStyle, valueStyle),
-
-            // === Tambahan: Divider + List COB ===
-            const SizedBox(height: 12),
-            Divider(color: sGrey, height: 20),
-            const SizedBox(height: 8),
-            Text(
-              'Polis yang bisa di Akses:',
-              style: bodyTextStyle(context, fontSize: 16)
-                  .copyWith(color: hintGrey, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-
-// inject bloc baru untuk sub-list
-            BlocProvider(
-              create: (context) => RekanPicCobCariBloc()
-                ..add(RefreshRekanPicCobCariEvent(
-                  rekanPicId: mrekanpicId, // 👈 dikirim dari parent
-                  searchText: '',
-                )),
-              child: const _CobListSection(),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _kv(
-      BuildContext context, // 👈 tambahin ini
-      String label,
-      String value,
-      TextStyle labelStyle,
-      TextStyle valueStyle,
-      ) {
-    return Text.rich(
-      TextSpan(
-        children: [
+  Widget _kv(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Text.rich(
+        TextSpan(children: [
           TextSpan(text: '$label ', style: labelStyle),
           TextSpan(text: value, style: valueStyle),
-        ],
+        ]),
       ),
-      style: bodyTextStyle(context, fontSize: 16), // ✅ otomatis pakai font "Delm"
     );
   }
-
-
 }
 
-/// ===== Button styles (ringan, tanpa AppButton)
+// ====================================================================
+// COB SECTION
+// ====================================================================
+class _CobListSection extends StatelessWidget {
+  final String rekanPicId;
+  const _CobListSection({required this.rekanPicId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => RekanPicCobCariBloc()
+        ..add(RefreshRekanPicCobCariEvent(
+          rekanPicId: rekanPicId,
+          searchText: '',
+        )),
+      child: BlocBuilder<RekanPicCobCariBloc, RekanPicCobCariState>(
+        builder: (context, state) {
+          if (state.status == ListStatus.initial) {
+            return const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            );
+          }
+          if (state.status == ListStatus.failure) {
+            return Text('⚠️ Gagal memuat COB',
+                style: bodyTextStyle(context).copyWith(color: Colors.red));
+          }
+          if (state.items.isEmpty) {
+            return Text('Tidak ada COB.',
+                style: bodyTextStyle(context).copyWith(color: hintGrey));
+          }
+
+          final selected = state.items.where((c) => c.isChecked).toList();
+          return Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: selected
+                .map((c) => Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+              ),
+              child: Text(
+                c.cobNama,
+                style: bodyTextStyle(context, fontSize: 12)
+                    .copyWith(color: Colors.white),
+              ),
+            ))
+                .toList(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _GhostIconButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final Widget icon;
+  final Color bg;
+
+  const _GhostIconButton({
+    required this.onPressed,
+    required this.icon,
+    required this.bg,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: bg,
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        onTap: onPressed,
+        child: Padding(padding: const EdgeInsets.all(8), child: icon),
+      ),
+    );
+  }
+}
+
 class _PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Widget icon;
   final String label;
+
   const _PrimaryButton({
     required this.onPressed,
     required this.icon,
@@ -360,95 +464,8 @@ class _PrimaryButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-        ),
-      ),
-    );
-  }
-}
-class _CobListSection extends StatelessWidget {
-  const _CobListSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<RekanPicCobCariBloc, RekanPicCobCariState>(
-      builder: (context, state) {
-        if (state.status == ListStatus.initial) {
-          return const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-          );
-        }
-        if (state.status == ListStatus.failure) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Gagal memuat COB.',
-              style: bodyTextStyle(context).copyWith(color: Colors.red),
-            ),
-          );
-        }
-        if (state.items.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Tidak ada COB.',
-              style: bodyTextStyle(context).copyWith(color: hintGrey),
-            ),
-          );
-        }
-
-        // ✅ Tampilan seperti "chip card" (Properti, Kendaraan, dll)
-        return Wrap(
-          spacing: 8, // jarak horizontal antar chip
-          runSpacing: 8, // jarak vertikal kalau pindah baris
-          children: state.items.map((cob) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: primaryColor, // 🔸 warna oranye (sesuai theme kamu)
-                borderRadius: BorderRadius.circular(cardBorderRadius),
-              ),
-              child: Text(
-                cob.cobNama ?? '-',
-                style: bodyTextStyle(context, fontSize: 12).copyWith(
-                  color: primaryLightColor, // 🔸 warna font terang
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-}
-
-
-
-class _GhostIconButton extends StatelessWidget {
-  final VoidCallback? onPressed;
-  final Widget icon;
-  final Color bg;
-  const _GhostIconButton({
-    required this.onPressed,
-    required this.icon,
-    required this.bg,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: bg,
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: icon,
-        ),
+        shape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(cardBorderRadius)),
       ),
     );
   }

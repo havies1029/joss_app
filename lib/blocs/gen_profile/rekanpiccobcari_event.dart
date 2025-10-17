@@ -1,10 +1,10 @@
 part of 'rekanpiccobcari_bloc.dart';
 
 abstract class RekanPicCobCariEvents extends Equatable {
-	const RekanPicCobCariEvents();
+  const RekanPicCobCariEvents();
 
-	@override
-	List<Object> get props => [];
+  @override
+  List<Object> get props => [];
 }
 
 class FetchRekanPicCobCariEvent extends RekanPicCobCariEvents {}
