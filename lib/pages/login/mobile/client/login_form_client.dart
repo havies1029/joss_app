@@ -331,7 +331,12 @@ class _LoginFormClientState extends State<LoginFormClient>
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            Navigator.push(context, MaterialPageRoute(builder: (_) => LoginUser()));
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (_) => const LoginUser()),
+                                            ).then((_) {
+                                              Navigator.pop(context); // auto kembali ke halaman sebelumnya
+                                            });
                                           },
                                           child: Text(
                                             "Masuk Sebagai Pengguna",

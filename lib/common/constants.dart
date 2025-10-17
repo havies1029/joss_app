@@ -62,6 +62,9 @@ double getProportionateScreenWidth(double inputWidth) {
   return (inputWidth / 375.0) * screenWidth;
 }
 
+final RegExp phoneValidatorRegExp =
+RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
+
 /// Color Palette
 const Color primaryColor = Color(0xFFEF7A28);
 const Color primaryLightColor = Color(0xFFF7F7F7);

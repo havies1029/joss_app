@@ -15,6 +15,7 @@ import '../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
 
+import '../../../../helper/auth_input_router.dart';
 import '../../../../models/login/emailverification_model.dart';
 import 'package:joss_app/widgets/google/google_signin_button_stub.dart'
   if (dart.library.js_interop) 'package:joss_app/widgets/google/google_signin_button_web.dart';
@@ -45,7 +46,8 @@ class _LoginFormUserState extends State<LoginFormUser>
     with SingleTickerProviderStateMixin {
   late final Widget _cachedGoogleButton;
   // Controller untuk input field
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailOrPhoneController = TextEditingController();
+
   String? _emailError;
   // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -80,30 +82,32 @@ class _LoginFormUserState extends State<LoginFormUser>
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _emailOrPhoneController.dispose();
     _animationController.dispose();
     _emailFocusNode.dispose();
     super.dispose();
   }
 
-  Widget _buildEmailField() {
+  Widget _buildEmailOrPhoneField() {
     return appTextField(
-      label: "Email",
-      hint: "Masukkan email",
-      controller: _emailController,
-      focusNode: _emailFocusNode,
-      keyboardType: TextInputType.emailAddress,
+      label: "Email atau No. Handphone",
+      hint: "Masukkan email atau nomor HP kamu",
+      controller: _emailOrPhoneController,
+      keyboardType: TextInputType.emailAddress, // biar bisa input campuran
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return kEmailNullError;
+          return "Mohon isi email atau nomor handphone";
         }
-        if (!emailValidatorRegExp.hasMatch(value)) {
-          return kInvalidEmailError;
+
+        // validasi email atau hp
+        final isEmail = emailValidatorRegExp.hasMatch(value.trim());
+        final isPhone = RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$').hasMatch(value.trim());
+
+        if (!isEmail && !isPhone) {
+          return "Masukkan format email atau nomor HP yang valid";
         }
+
         return null;
-      },
-      onTap: () {
-        _animationController.forward(from: 0);
       },
     );
   }
@@ -113,29 +117,30 @@ class _LoginFormUserState extends State<LoginFormUser>
       text: "Masuk",
       onPressed: () {
         if (_formKey.currentState!.validate()) {
-          _animationController.forward(from: 0);
-          onRegisterButtonPressed();
+          final input = _emailOrPhoneController.text.trim();
+          AuthInputRouter.handleInput(context, input);
         }
       },
     );
   }
 
+
 // Fungsi untuk memicu event register email
-  void onRegisterButtonPressed() {
-    if (!_formKey.currentState!.validate()) return;
-
-    final email = _emailController.text.trim();
-
-    // ✅ Trigger ke EmailVerificationBloc
-    final record = EmailVerificationModel(
-      email: email,
-      requestFrom: 'email',
-    );
-
-    context.read<EmailVerificationBloc>().add(
-      EmailVerificationTambahEvent(record: record),
-    );
-  }
+//   void onRegisterButtonPressed() {
+//     if (!_formKey.currentState!.validate()) return;
+//
+//     final email = _emailOrPhoneController.text.trim();
+//
+//     // ✅ Trigger ke EmailVerificationBloc
+//     final record = EmailVerificationModel(
+//       email: email,
+//       requestFrom: 'email',
+//     );
+//
+//     context.read<EmailVerificationBloc>().add(
+//       EmailVerificationTambahEvent(record: record),
+//     );
+//   }
 
   Widget footerLoginText(BuildContext context) {
     return Row(
@@ -245,7 +250,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                                 padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical : vPadding),
                                 child: Column(
                                   children: [
-                                    _buildEmailField(),
+                                    _buildEmailOrPhoneField(),
                                     SizedBox(height: 10),
                                     // Row dengan checkbox dan forgot password
                                     Row(

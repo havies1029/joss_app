@@ -26,14 +26,13 @@ class BaseBackgroundSidePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // ===================== HEADER =====================
             Container(
               height: 56,
               color: primaryBlackColor,
-              padding: const EdgeInsets.symmetric(horizontal: hPadding*2),
+              padding: const EdgeInsets.symmetric(horizontal: hPadding * 2),
               child: Stack(
                 children: [
-                  // Tombol back di kiri
                   Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
@@ -41,8 +40,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
                       child: SvgPicture.asset("assets/icons/arrow_back.svg"),
                     ),
                   ),
-
-                  // Title
                   Center(
                     child: Text(
                       title,
@@ -54,14 +51,14 @@ class BaseBackgroundSidePage extends StatelessWidget {
               ),
             ),
 
-            // Background + konten
+            // ===================== BODY + BACKGROUND =====================
             Expanded(
               child: LayoutBuilder(
                 builder: (context, c) {
                   final double height = c.maxHeight * 0.45;
                   return Stack(
                     children: [
-                      // Background dengan fade
+                      // Background fade
                       Align(
                         alignment: Alignment.topCenter,
                         child: SizedBox(
@@ -86,8 +83,27 @@ class BaseBackgroundSidePage extends StatelessWidget {
                         ),
                       ),
 
-                      // Konten
+                      // Konten utama
                       child,
+
+                      // ===================== FOOTER FIXED =====================
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          height: 46,
+                          width: double.infinity,
+                          color: secondaryBlackColor,
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Claim Is Simple",
+                            style: headingStyle(
+                              context,
+                              fontSize: getResponsiveFont(context, 16),
+
+                            ).copyWith(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                      ),
                     ],
                   );
                 },
@@ -95,20 +111,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class KelolaProfilPage extends StatelessWidget {
-  const KelolaProfilPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: "Kelola Profil",
-      child: Center(
-        child: Text("Konten di sini", style: bodyTextStyle(context)),
       ),
     );
   }
