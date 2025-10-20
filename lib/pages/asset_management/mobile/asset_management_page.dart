@@ -47,21 +47,17 @@ class _AssetManagementPageState extends State<AssetManagementPage>
       backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundSidePage(
-          backgroundAsset: "assets/images/background_gradient.png",
-          fadeHeight: 300,
           title: 'Polis',
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // const HeaderCard(
-                //   iconPath: "assets/icons/aset-3.svg",
-                //   title: "Aset",
-                //   subtitle: "Kelola dan pantau semua aset Anda dalam satu aplikasi.",
-                // ),
-                // const SizedBox(height: 12),
-                // kotak hitam di bawah HeaderCard
+                const HeaderCard(
+                  iconPath: "assets/icons/menu_polis.svg",
+                  title: "Polis",
+                  subtitle: "Kelola dan pantau semua polis Anda dalam satu aplikasi.",
+                ),
                 BaseAssetWidget(),
               ],
             ),

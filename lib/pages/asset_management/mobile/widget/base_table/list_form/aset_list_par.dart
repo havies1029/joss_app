@@ -54,125 +54,122 @@ class _AsetListParState extends State<AsetListPar> {
               /// 🔹 Flexible biar tinggi tabel adaptif (ngikut jumlah data)
               Flexible(
                 fit: FlexFit.loose,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: secondaryBlackColor,
-                      borderRadius: BorderRadius.circular(cardBorderRadius),
-                      border: Border.all(color: sGrey.withOpacity(0.5), width: 1),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: secondaryBlackColor,
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    border: Border.all(color: sGrey.withOpacity(0.5), width: 1),
+                  ),
+                  clipBehavior: Clip.hardEdge, // ⬅️ pastiin isi scroll ke-clip rapi
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(
+                      scrollbars: false,
+                      overscroll: false, // ⬅️ hilangin efek pantulan/glow Android
                     ),
-                    clipBehavior: Clip.hardEdge, // ⬅️ pastiin isi scroll ke-clip rapi
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context).copyWith(
-                        scrollbars: false,
-                        overscroll: false, // ⬅️ hilangin efek pantulan/glow Android
-                      ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      physics: const ClampingScrollPhysics(), // no bounce
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        physics: const ClampingScrollPhysics(), // no bounce
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const ClampingScrollPhysics(),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(cardBorderRadius),
-                            child: BlocBuilder<ShareParStateCubit,
-                                Map<String, AsetParCariModel>>(
-                              builder: (context, shareState) {
-                                final isAllSelected = cubit.selectedItems.length == totalItems && totalItems > 0;
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                          child: BlocBuilder<ShareParStateCubit,
+                              Map<String, AsetParCariModel>>(
+                            builder: (context, shareState) {
+                              final isAllSelected = cubit.selectedItems.length == totalItems && totalItems > 0;
 
-                                return Table(
-                                  border: TableBorder.all(
-                                    color: sGrey,
-                                    width: 1,
-                                  ),
-                                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                                  columnWidths: const {
-                                    0: IntrinsicColumnWidth(),
-                                    1: IntrinsicColumnWidth(),
-                                    2: IntrinsicColumnWidth(),
-                                    3: IntrinsicColumnWidth(),
-                                    4: IntrinsicColumnWidth(),
-                                    5: IntrinsicColumnWidth(),
-                                    6: IntrinsicColumnWidth(),
-                                    7: IntrinsicColumnWidth(),
-                                    8: IntrinsicColumnWidth(),
-                                    9: IntrinsicColumnWidth(),
-                                    10: IntrinsicColumnWidth(),
-                                    11: IntrinsicColumnWidth(),
-                                  },
-                                  children: [
-                                    // ✅ Header row dengan Select All
-                                    TableRow(
-                                      decoration: BoxDecoration(
-                                        color: formGrey,
-                                      ),
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Tooltip(
-                                            message: isAllSelected
-                                                ? "Batalkan semua pilihan"
-                                                : "Pilih semua data",
-                                            child: InkWell(
-                                              onTap: () {
-                                                cubit.toggleGlobal(state.items);
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      cubit.globalActive
-                                                          ? "✅ Semua data dipilih (${cubit.selectedItems.length})"
-                                                          : "❎ Semua pilihan dibatalkan",
-                                                    ),
-                                                    duration: const Duration(seconds: 2),
+                              return Table(
+                                border: TableBorder.all(
+                                  color: sGrey,
+                                  width: 1,
+                                ),
+                                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                                columnWidths: const {
+                                  0: IntrinsicColumnWidth(),
+                                  1: IntrinsicColumnWidth(),
+                                  2: IntrinsicColumnWidth(),
+                                  3: IntrinsicColumnWidth(),
+                                  4: IntrinsicColumnWidth(),
+                                  5: IntrinsicColumnWidth(),
+                                  6: IntrinsicColumnWidth(),
+                                  7: IntrinsicColumnWidth(),
+                                  8: IntrinsicColumnWidth(),
+                                  9: IntrinsicColumnWidth(),
+                                  10: IntrinsicColumnWidth(),
+                                  11: IntrinsicColumnWidth(),
+                                },
+                                children: [
+                                  // ✅ Header row dengan Select All
+                                  TableRow(
+                                    decoration: BoxDecoration(
+                                      color: formGrey,
+                                    ),
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Tooltip(
+                                          message: isAllSelected
+                                              ? "Batalkan semua pilihan"
+                                              : "Pilih semua data",
+                                          child: InkWell(
+                                            onTap: () {
+                                              cubit.toggleGlobal(state.items);
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    cubit.globalActive
+                                                        ? "✅ Semua data dipilih (${cubit.selectedItems.length})"
+                                                        : "❎ Semua pilihan dibatalkan",
                                                   ),
-                                                );
-                                              },
-                                              borderRadius: BorderRadius.circular(4),
-                                              child: AnimatedSwitcher(
-                                                duration: const Duration(milliseconds: 150),
-                                                transitionBuilder: (child, anim) => ScaleTransition(
-                                                  scale: anim,
-                                                  child: child,
+                                                  duration: const Duration(seconds: 2),
                                                 ),
-                                                child: Icon(
-                                                  isAllSelected
-                                                      ? Icons.check_box
-                                                      : Icons.check_box_outline_blank,
-                                                  key: ValueKey(isAllSelected),
-                                                  color: isAllSelected ? primaryLightColor : sGrey,
-                                                  size: 20,
-                                                ),
+                                              );
+                                            },
+                                            borderRadius: BorderRadius.circular(4),
+                                            child: AnimatedSwitcher(
+                                              duration: const Duration(milliseconds: 150),
+                                              transitionBuilder: (child, anim) => ScaleTransition(
+                                                scale: anim,
+                                                child: child,
+                                              ),
+                                              child: Icon(
+                                                isAllSelected
+                                                    ? Icons.check_box
+                                                    : Icons.check_box_outline_blank,
+                                                key: ValueKey(isAllSelected),
+                                                color: isAllSelected ? primaryLightColor : sGrey,
+                                                size: 20,
                                               ),
                                             ),
                                           ),
                                         ),
-                                        const _HeaderCell("No", center: true),
-                                        const _HeaderCell("Alamat"),
-                                        const _HeaderCell("ID Aset PAR"),
-                                        const _HeaderCell("Currency"),
-                                        const _HeaderCell("Klausula Bank"),
-                                        const _HeaderCell("Rekan ID"),
-                                        const _HeaderCell("Polis No"),
-                                        const _HeaderCell("Sum Insured"),
-                                        const _HeaderCell("Premi"),
-                                        const _HeaderCell("Status", center: true),
-                                        const _HeaderCell("Aksi"),
-                                      ],
-                                    ),
-
-                                    // ✅ Rows
-                                    for (int i = 0; i < paginatedItems.length; i++)
-                                      _buildDataRow(
-                                        context,
-                                        paginatedItems[i],
-                                        startIndex + i + 1,
-                                        cubit,
                                       ),
-                                  ],
-                                );
-                              },
-                            ),
+                                      const _HeaderCell("No", center: true),
+                                      const _HeaderCell("Alamat"),
+                                      const _HeaderCell("ID Aset PAR"),
+                                      const _HeaderCell("Currency"),
+                                      const _HeaderCell("Klausula Bank"),
+                                      const _HeaderCell("Rekan ID"),
+                                      const _HeaderCell("Polis No"),
+                                      const _HeaderCell("Sum Insured"),
+                                      const _HeaderCell("Premi"),
+                                      const _HeaderCell("Status", center: true),
+                                      const _HeaderCell("Aksi"),
+                                    ],
+                                  ),
+
+                                  // ✅ Rows
+                                  for (int i = 0; i < paginatedItems.length; i++)
+                                    _buildDataRow(
+                                      context,
+                                      paginatedItems[i],
+                                      startIndex + i + 1,
+                                      cubit,
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ),

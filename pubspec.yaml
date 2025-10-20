@@ -212,12 +212,6 @@ flutter:
     - assets/icons/logo_bantuan.svg
     - assets/icons/refresh_cob_icon.svg
     - assets/icons/list_cob_icon.svg
-    - assets/icons/1.bni.png
-    - assets/icons/2.bsi.png
-    - assets/icons/3.uob.png
-    - assets/icons/4.ocdc.png
-    - assets/icons/5.taf.png
-    - assets/icons/6.andalan.png
 
 
   fonts:

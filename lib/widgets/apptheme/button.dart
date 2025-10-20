@@ -139,6 +139,7 @@ class AppButton extends StatefulWidget {
     bool isLoading = false,
     bool hasAnimation = true,
     bool isOutlined = false,
+    BorderSide? borderSide,
   }) {
     return AppButton(
       text: text,
@@ -156,6 +157,7 @@ class AppButton extends StatefulWidget {
       isLoading: isLoading,
       hasAnimation: hasAnimation,
       isOutlined: isOutlined,
+      borderSide: borderSide,
       layoutType: ButtonLayoutType.iconLeft,
     );
   }
@@ -383,6 +385,7 @@ class _AppButtonState extends State<AppButton>
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         elevation: elevation,
+        backgroundColor: widget.backgroundColor,
         padding: widget.padding ?? EdgeInsets.symmetric(vertical: 5),
       );
     }

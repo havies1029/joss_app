@@ -13,7 +13,7 @@ import '../../../../../../helper/expert_helper.dart';
 import '../../../../../../helper/mobile_expert_helper.dart';
 import '../../../../../../models/gen_aset_ringkasan/asetringkasancari_model.dart';
 import '../../../../../../widgets/apptheme/build_status_box.dart';
-import '../../../../../../widgets/apptheme/build_status_text_box.dart';
+import '../../../../../../widgets/apptheme/polis_button.dart';
 import '../../../../../../widgets/apptheme/popup_widget.dart';
 import '../list_form/aset_list_ringkasan.dart';
 
@@ -43,7 +43,20 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _refreshData());
   }
-
+  String _getStatusLabel(StatusType type) {
+    switch (type) {
+      case StatusType.aktif:
+        return 'Aktif';
+      case StatusType.onProgress:
+        return 'Diproses';
+      case StatusType.nonAktif:
+        return 'Non Aktif';
+      case StatusType.berakhir:
+        return 'Jatuh Tempo';
+      default:
+        return '';
+    }
+  }
   @override
   void dispose() {
     _searchController.dispose();
@@ -112,286 +125,275 @@ class _TableRingkasanWidgetState extends State<TableRingkasanWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final bool isCompact = constraints.maxWidth < 480;
-                        final double iconSize = isCompact ? 16 : 20;
-                        final double boxSize = isCompact ? 36 : 42;
-                        final textStyle = TextStyle(
-                          fontSize: isCompact ? 13 : 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        );
 
-                        // ✅ Reusable card sederhana
-                        Widget buildStatusCard({
-                          required StatusType type,
-                          required String text,
-                          required bool isSelected,
-                          required VoidCallback onTap,
-                        }) {
-                          return GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: onTap,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              decoration: BoxDecoration(
-                                color: pGrey,
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
-                                border: Border.all(
-                                  color: isSelected ? type.color : sGrey.withOpacity(0.5),
-                                  width: isSelected ? 2 : 1,
-                                ),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // 🔥 Gunakan IgnorePointer biar tap di ikon gak “nahan” gesture
-                                  IgnorePointer(
-                                    child: StatusBox(
-                                      assetPath: type.asset,
-                                      bgColor: type.color,
-                                      iconColor: Colors.white,
-                                      size: isSelected ? boxSize + 2 : boxSize,
-                                      iconSize: iconSize,
-                                      showBorder: false,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    text,
-                                    style: textStyle.copyWith(
-                                      fontWeight:
-                                      isSelected ? FontWeight.w700 : FontWeight.w500,
-                                      color: isSelected ? Colors.white : Colors.white70,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
+                  const SizedBox(height: hPadding),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/tambah_polis.svg",
+                            text: "Tambah Polis",
+                            bgColor: Color(0xFFFF9D00),
+                            borderColor: Color(0xFFFFC972),
+                          ),),
 
-                        // 🔹 Ambil data dari Dashboard
-                        return BlocBuilder<AsetDashboardCariBloc, AsetDashboardCariState>(
-                          builder: (context, state) {
-                            if (state.status == ListStatus.success && state.items.isNotEmpty) {
-                              final summary = state.items.first;
+                          const SizedBox(
+                              width: hPadding
+                          ),
 
-                              final statusData = {
-                                StatusType.aktif: summary.aktifQty,
-                                StatusType.onProgress: summary.onProgressQty,
-                                StatusType.nonAktif: summary.nonAktifQty,
-                                StatusType.berakhir: summary.berakhirQty,
-                              };
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/endorse.svg",
+                            text: "Endorse",
+                            bgColor: Color(0xFF00BBFF),
+                            borderColor: Color(0xFF7ADBFF),
+                          ),),
 
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: StatusType.values.map((type) {
-                                  final bool isSelected = _selectedStatusId == type.id;
+                          const SizedBox(
+                              width: hPadding
+                          ),
 
-                                  return buildStatusCard(
-                                    type: type,
-                                    text: statusData[type].toString(),
-                                    isSelected: isSelected,
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedStatusId = (isSelected) ? null : type.id;
-                                      });
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/hapus.svg",
+                            text: "Hapus",
+                            bgColor: Color(0xFFF12929),
+                            borderColor: Color(0xFFFE5E5E),
+                          ),),
 
-                                      // 🧩 Batasi event agar tidak spam (debounce 350ms)
-                                      _debounce?.cancel();
-                                      _debounce = Timer(const Duration(milliseconds: 350), () {
-                                        context.read<AsetRingkasanCariBloc>().add(
-                                          RefreshAsetRingkasanCariEvent(
-                                            statusId: _selectedStatusId ?? widget.initialStatusId,
-                                            searchText: _searchController.text,
-                                          ),
-                                        );
-                                      });
-                                    },
+                          const SizedBox(
+                              width: hPadding
+                          ),
 
-                                  );
-                                }).toList(),
-                              );
-                            }
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/unduh.svg",
+                            text: "Unduh",
+                            bgColor: Color(0xFFA1A1AA),
+                            borderColor: Color(0xFFBCBCC7),
+                            onTap: () {
+                              showGeneralDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                barrierLabel: "Tutup",
+                                barrierColor: Colors.black.withOpacity(0.6),
+                                transitionDuration: const Duration(milliseconds: 250),
+                                pageBuilder: (context, animation, secondaryAnimation) {
+                                  return BlocProvider.value(
+                                    value: cubit, // 🔑 pass cubit yang udah ada
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.of(context).pop(),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: Center(
+                                          child: GestureDetector(
+                                            onTap: () {},
+                                            child: PopupWidget(
+                                              title: "Pilih format file untuk diunduh",
+                                              subtitle: "Tersedia dalam format Excel dan PDF",
+                                              button1Text: "Excel",
+                                              button2Text: "PDF",
+                                              onExportSelected: (format) async {
+                                                final exportData = cubit.toExportData();
 
-                            // Placeholder state
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: StatusType.values.map((type) {
-                                return buildStatusCard(
-                                  type: type,
-                                  text: "-",
-                                  isSelected: false,
-                                  onTap: () {},
-                                );
-                              }).toList(),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                                                if (exportData.isEmpty) {
+                                                  Navigator.of(context).pop();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text("⚠️ Tidak ada data yang dipilih"),
+                                                      backgroundColor: Colors.red,
+                                                    ),
+                                                  );
+                                                  return;
+                                                }
 
+                                                Navigator.of(context).pop();
 
-                  const SizedBox(height: vPadding),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding),
-                    child: ListPageFilterBarUIWidget(
-                      searchController: _searchController,
-                      searchButton: _buildSearchButton(),
-                      hintText: "Cari Polis.... ",
-                    ),
-                  ),
-
-                  const SizedBox(height: vPadding),
-
-                  /// Toolbar (global actions)
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // threshold bebas lo atur, misalnya < 480 px sembunyikan teks
-                        final bool hideText = constraints.maxWidth < 480;
-
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            StatusTextBox(
-                              assetPath: "assets/icons/tambah_polis_icon_polis.svg",
-                              text: "Tambah",   // ⬅️ hilangkan teks
-                              bgColor: Colors.orange,
-                            ),
-
-                            const SizedBox(
-                                width: hPadding
-                            ),
-                            StatusTextBox(
-                              assetPath: "assets/icons/unduh_data_polis.svg",
-                              text: "Unduh",
-                              bgColor: Colors.grey,
-                              onTap: () {
-                                showGeneralDialog(
-                                  context: context,
-                                  barrierDismissible: true,
-                                  barrierLabel: "Tutup",
-                                  barrierColor: Colors.black.withOpacity(0.6),
-                                  transitionDuration: const Duration(milliseconds: 250),
-                                  pageBuilder: (context, animation, secondaryAnimation) {
-                                    return BlocProvider.value(
-                                      value: cubit, // 🔑 pass cubit yang udah ada
-                                      child: GestureDetector(
-                                        onTap: () => Navigator.of(context).pop(),
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: Center(
-                                            child: GestureDetector(
-                                              onTap: () {},
-                                              child: PopupWidget(
-                                                title: "Pilih format file untuk diunduh",
-                                                subtitle: "Tersedia dalam format Excel dan PDF",
-                                                button1Text: "Excel",
-                                                button2Text: "PDF",
-                                                onExportSelected: (format) async {
-                                                  final exportData = cubit.toExportData();
-
-                                                  if (exportData.isEmpty) {
-                                                    Navigator.of(context).pop();
+                                                switch (format) {
+                                                  case ExportFormat.excel:
+                                                    if (kIsWeb) {
+                                                      await ExportHelper.export("excel", exportData, CategoryType.ringkasan);
+                                                    } else {
+                                                      await MobileDownloadHelper.download(
+                                                        context: context,
+                                                        fileName: "Data_Ringkasan.xlsx",
+                                                        data: exportData,
+                                                        format: "excel",
+                                                      );
+                                                    }
                                                     ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text("⚠️ Tidak ada data yang dipilih"),
-                                                        backgroundColor: Colors.red,
+                                                      SnackBar(
+                                                        content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
+                                                        backgroundColor: Colors.green,
                                                       ),
                                                     );
-                                                    return;
-                                                  }
+                                                    break;
 
-                                                  Navigator.of(context).pop();
-
-                                                  switch (format) {
-                                                    case ExportFormat.excel:
-                                                      if (kIsWeb) {
-                                                        await ExportHelper.export("excel", exportData, CategoryType.ringkasan);
-                                                      } else {
-                                                        await MobileDownloadHelper.download(
-                                                          context: context,
-                                                          fileName: "Data_Ringkasan.xlsx",
-                                                          data: exportData,
-                                                          format: "excel",
-                                                        );
-                                                      }
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
-                                                          backgroundColor: Colors.green,
-                                                        ),
+                                                  case ExportFormat.pdf:
+                                                    if (kIsWeb) {
+                                                      await ExportHelper.export("pdf", exportData, CategoryType.ringkasan);
+                                                    } else {
+                                                      await MobileDownloadHelper.download(
+                                                        context: context,
+                                                        fileName: "Data_Ringkasan.pdf",
+                                                        data: exportData,
+                                                        format: "pdf",
                                                       );
-                                                      break;
-
-                                                    case ExportFormat.pdf:
-                                                      if (kIsWeb) {
-                                                        await ExportHelper.export("pdf", exportData, CategoryType.ringkasan);
-                                                      } else {
-                                                        await MobileDownloadHelper.download(
-                                                          context: context,
-                                                          fileName: "Data_Ringkasan.pdf",
-                                                          data: exportData,
-                                                          format: "pdf",
-                                                        );
-                                                      }
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
-                                                          backgroundColor: Colors.green,
-                                                        ),
-                                                      );
-                                                      break;
-                                                  }
-                                                },
-                                              ),
+                                                    }
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
+                                                        backgroundColor: Colors.green,
+                                                      ),
+                                                    );
+                                                    break;
+                                                }
+                                              },
                                             ),
                                           ),
                                         ),
                                       ),
-                                    );
-                                  },
-                                  transitionBuilder: (context, animation, secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: ScaleTransition(
-                                        scale: CurvedAnimation(
-                                          parent: animation,
-                                          curve: Curves.easeOutBack,
-                                        ),
-                                        child: child,
+                                    ),
+                                  );
+                                },
+                                transitionBuilder: (context, animation, secondaryAnimation, child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: ScaleTransition(
+                                      scale: CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.easeOutBack,
                                       ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),),
 
-
-                            const SizedBox(
-                                width: hPadding
-                            ),
-                            StatusTextBox(
-                              assetPath: "assets/icons/share_data_polis.svg",
-                              text: "Share",
-                              bgColor: Colors.blue,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                          const SizedBox(
+                              width: hPadding
+                          ),
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/bagikan.svg",
+                            text: "Bagikan",
+                            bgColor: Color(0xFF295EFF),
+                            borderColor: Color(0xFF5D86FF),
+                          ),)
+                        ],
+                      );
+                    },
                   ),
 
                   const SizedBox(height: vPadding),
+
+                  ListPageFilterBarUIWidget(
+                    searchController: _searchController,
+                    searchButton: _buildSearchButton(),
+                    hintText: "Cari Polis.... ",
+                  ),
+
+                  const SizedBox(height: hPadding),
+
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return BlocBuilder<AsetDashboardCariBloc, AsetDashboardCariState>(
+                        builder: (context, state) {
+                          if (state.status == ListStatus.success && state.items.isNotEmpty) {
+                            final summary = state.items.first;
+
+                            final statusData = [
+                              {
+                                'type': StatusType.aktif,
+                                'label': 'Aktif',
+                                'count': summary.aktifQty.toString(),
+                              },
+                              {
+                                'type': StatusType.onProgress,
+                                'label': 'Diproses',
+                                'count': summary.onProgressQty.toString(),
+                              },
+                              {
+                                'type': StatusType.nonAktif,
+                                'label': 'Non Aktif',
+                                'count': summary.nonAktifQty.toString(),
+                              },
+                              {
+                                'type': StatusType.berakhir,
+                                'label': 'Jatuh Tempo',
+                                'count': summary.berakhirQty.toString(),
+                              },
+                            ];
+
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: statusData.asMap().entries.map((entry) {
+                                  final data = entry.value;
+                                  final type = data['type'] as StatusType;
+                                  final isSelected = _selectedStatusId == type.id;
+
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      right: entry.key < statusData.length - 1 ? 10 : 0,
+                                    ),
+                                    child: StatusChip(
+                                      assetPath: type.asset,
+                                      label: data['label'] as String,
+                                      count: data['count'] as String,
+                                      iconColor: type.color,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedStatusId = isSelected ? null : type.id;
+                                        });
+
+                                        _debounce?.cancel();
+                                        _debounce = Timer(const Duration(milliseconds: 350), () {
+                                          context.read<AsetRingkasanCariBloc>().add(
+                                            RefreshAsetRingkasanCariEvent(
+                                              statusId: _selectedStatusId ?? widget.initialStatusId,
+                                              searchText: _searchController.text,
+                                            ),
+                                          );
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            );
+                          }
+
+                          // Placeholder state
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Row(
+                              children: StatusType.values.asMap().entries.map((entry) {
+                                final type = entry.value;
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    right: entry.key < StatusType.values.length - 1 ? 10 : 0,
+                                  ),
+                                  child: StatusChip(
+                                    assetPath: type.asset,
+                                    label: _getStatusLabel(type),
+                                    count: '-',
+                                    iconColor: type.color,
+                                    isSelected: false,
+                                    onTap: () {},
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: hPadding),
 
                   Expanded(
                     child: AsetListRingkasan(

@@ -136,10 +136,14 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                   'Halo, ${widget.userName}',
                   style: headingStyle(context, fontSize: 22),
                 ),
+                // Text(
+                //   widget.custType == 'C'
+                //       ? 'Klien JPS'
+                //       : 'Nasabah Biasa',
+                //   style: bodyTextStyle(context),
+                // ),
                 Text(
-                  widget.custType == 'C'
-                      ? 'Klien JPS'
-                      : 'Nasabah Biasa',
+                  _getGreeting(),
                   style: bodyTextStyle(context),
                 ),
               ],
@@ -298,5 +302,19 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
         ),
       ),
     );
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 4 && hour < 11) {
+      return 'Selamat Pagi!';
+    } else if (hour >= 11 && hour < 15) {
+      return 'Selamat Siang!';
+    } else if (hour >= 15 && hour < 18) {
+      return 'Selamat Sore!';
+    } else {
+      return 'Selamat Malam!';
+    }
   }
 }

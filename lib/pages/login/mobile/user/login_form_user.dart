@@ -117,8 +117,8 @@ class _LoginFormUserState extends State<LoginFormUser>
       text: "Masuk",
       onPressed: () {
         if (_formKey.currentState!.validate()) {
-          final input = _emailOrPhoneController.text.trim();
-          AuthInputRouter.handleInput(context, input);
+          _animationController.forward(from: 0);
+          onRegisterButtonPressed();
         }
       },
     );
@@ -126,21 +126,21 @@ class _LoginFormUserState extends State<LoginFormUser>
 
 
 // Fungsi untuk memicu event register email
-//   void onRegisterButtonPressed() {
-//     if (!_formKey.currentState!.validate()) return;
-//
-//     final email = _emailOrPhoneController.text.trim();
-//
-//     // ✅ Trigger ke EmailVerificationBloc
-//     final record = EmailVerificationModel(
-//       email: email,
-//       requestFrom: 'email',
-//     );
-//
-//     context.read<EmailVerificationBloc>().add(
-//       EmailVerificationTambahEvent(record: record),
-//     );
-//   }
+  void onRegisterButtonPressed() {
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = _emailOrPhoneController.text.trim();
+
+    // ✅ Trigger ke EmailVerificationBloc
+    final record = EmailVerificationModel(
+      email: email,
+      requestFrom: 'email',
+    );
+
+    context.read<EmailVerificationBloc>().add(
+      EmailVerificationTambahEvent(record: record),
+    );
+  }
 
   Widget footerLoginText(BuildContext context) {
     return Row(

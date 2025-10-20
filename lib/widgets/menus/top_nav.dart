@@ -27,7 +27,7 @@ AppBar MobileTopNavigationBar({
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Image.asset(
-            'assets/icons/logo_jps_no_background.png',
+            'assets/images/logo.png',
             gaplessPlayback: true,
             height:
             isDesktop(context)

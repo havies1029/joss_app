@@ -202,10 +202,10 @@ const LinearGradient orangeToBlackGradient = LinearGradient(
 );
 
 enum StatusType {
-  aktif("10002", "assets/icons/correct.svg", Colors.green),
-  nonAktif("10003", "assets/icons/exit.svg", Colors.red),
-  onProgress("10004", "assets/icons/clock.svg", Colors.amber),
-  berakhir("10005", "assets/icons/calender.svg", Colors.blue);
+  aktif("10002", "assets/icons/aktif.svg", pGreen),
+  nonAktif("10003", "assets/icons/nonaktif.svg", pRed),
+  onProgress("10004", "assets/icons/diproses.svg", pYellow),
+  berakhir("10005", "assets/icons/nonaktif.svg", pBlue);
 
   final String id;
   final String asset;

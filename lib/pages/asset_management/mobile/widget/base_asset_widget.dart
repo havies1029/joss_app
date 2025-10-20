@@ -86,99 +86,89 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final headerSpacing = screenHeight * 0.025;
 
     return Expanded(
       child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: secondaryBlackColor,
-          // no borderRadius
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(hPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: hPadding),
-              // COB ChoiceChip list
-              AssetListWidget(
-                labelText: '',
-                initItem: _selectedCob,
-                loader: () => _cobFuture,
-                onChangedCallback: (val) {
-                  if (_selectedCob?.mCobApp1Id != val?.mCobApp1Id) {
-                    setState(() => _selectedCob = val);
-                  }
+        color: secondaryBlackColor,
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AssetListWidget(
+              labelText: '',
+              initItem: _selectedCob,
+              loader: () => _cobFuture,
+              onChangedCallback: (val) {
+                if (_selectedCob?.mCobApp1Id != val?.mCobApp1Id) {
+                  setState(() => _selectedCob = val);
+                }
 
-                  if (val != null) {
-                    _formData['cobId'] = val.mCobApp1Id;
-                    _formData['cobNama'] = val.cobNama;
+                if (val != null) {
+                  _formData['cobId'] = val.mCobApp1Id;
+                  _formData['cobNama'] = val.cobNama;
 
-                    debugPrint("COB dipilih: ${val.mCobApp1Id} - ${val.cobNama}");
-                    _fetchDashboard(val.mCobApp1Id);
-                  }
-                },
-                onSaveCallback: (val) {
-                  _formData['cobId'] = val?.mCobApp1Id;
-                  _formData['cobNama'] = val?.cobNama;
-                },
-                validatorCallback: (val) =>
-                val == null ? 'Pilih COB dulu ya' : null,
-                horizontalScroll: true,
-                allowDeselect: false,
-              ),
+                  debugPrint("COB dipilih: ${val.mCobApp1Id} - ${val.cobNama}");
+                  _fetchDashboard(val.mCobApp1Id);
+                }
+              },
+              onSaveCallback: (val) {
+                _formData['cobId'] = val?.mCobApp1Id;
+                _formData['cobNama'] = val?.cobNama;
+              },
+              validatorCallback: (val) =>
+              val == null ? 'Pilih COB dulu ya' : null,
+              horizontalScroll: true,
+              allowDeselect: false,
+            ),
 
-              const SizedBox(height: hPadding),
+            const SizedBox(height: hPadding),
 
-              // // tampilkan loading / hasil dashboard
-              // if (_loadingDashboard)
-              //   const Center(child: CircularProgressIndicator())
-              // else if (_dashboard != null && _dashboard!.isNotEmpty)
-              //   Padding(
-              //     padding: const EdgeInsets.symmetric(horizontal: hPadding),
-              //     child: Row(
-              //       children: [
-              //         _buildStatusBox(
-              //           assetPath: "assets/icons/correct.svg",
-              //           value: _dashboard!.first.aktifQty,
-              //           bgColor: Colors.green,
-              //         ),
-              //         const SizedBox(width: vPadding), // jarak antar box
-              //         _buildStatusBox(
-              //           assetPath: "assets/icons/clock.svg",
-              //           value: _dashboard!.first.berakhirQty,
-              //           bgColor: Colors.orange,
-              //         ),
-              //         const SizedBox(width: vPadding),
-              //         _buildStatusBox(
-              //           assetPath: "assets/icons/exit.svg",
-              //           value: _dashboard!.first.nonAktifQty,
-              //           bgColor: Colors.red,
-              //         ),
-              //         const SizedBox(width: vPadding),
-              //         _buildStatusBox(
-              //           assetPath: "assets/icons/calender.svg",
-              //           value: _dashboard!.first.onProgressQty,
-              //           bgColor: Colors.blue,
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              //
-              // const SizedBox(height: vPadding),
-              // BaseTableAsetWidget(
-              //   cobId: _formData['cobId'],
-              //   cobNama: _formData['cobNama'],
-              // ),
-              BaseTableAsetWidget(
-                cobId: _selectedCob?.mCobApp1Id,
-                cobNama: _selectedCob?.cobNama,
-              ),
+            // // tampilkan loading / hasil dashboard
+            // if (_loadingDashboard)
+            //   const Center(child: CircularProgressIndicator())
+            // else if (_dashboard != null && _dashboard!.isNotEmpty)
+            //   Padding(
+            //     padding: const EdgeInsets.symmetric(horizontal: hPadding),
+            //     child: Row(
+            //       children: [
+            //         _buildStatusBox(
+            //           assetPath: "assets/icons/correct.svg",
+            //           value: _dashboard!.first.aktifQty,
+            //           bgColor: Colors.green,
+            //         ),
+            //         const SizedBox(width: vPadding), // jarak antar box
+            //         _buildStatusBox(
+            //           assetPath: "assets/icons/clock.svg",
+            //           value: _dashboard!.first.berakhirQty,
+            //           bgColor: Colors.orange,
+            //         ),
+            //         const SizedBox(width: vPadding),
+            //         _buildStatusBox(
+            //           assetPath: "assets/icons/exit.svg",
+            //           value: _dashboard!.first.nonAktifQty,
+            //           bgColor: Colors.red,
+            //         ),
+            //         const SizedBox(width: vPadding),
+            //         _buildStatusBox(
+            //           assetPath: "assets/icons/calender.svg",
+            //           value: _dashboard!.first.onProgressQty,
+            //           bgColor: Colors.blue,
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            //
+            // const SizedBox(height: vPadding),
+            // BaseTableAsetWidget(
+            //   cobId: _formData['cobId'],
+            //   cobNama: _formData['cobNama'],
+            // ),
+            BaseTableAsetWidget(
+              cobId: _selectedCob?.mCobApp1Id,
+              cobNama: _selectedCob?.cobNama,
+            ),
 
-            ],
-          ),
+          ],
         ),
       ),
     );

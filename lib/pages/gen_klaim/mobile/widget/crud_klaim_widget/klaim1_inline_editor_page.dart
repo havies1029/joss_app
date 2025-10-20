@@ -155,7 +155,6 @@
 // }
 //
 
-
 // lib/pages/gen_klaim/klaim1_inline_editor_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -166,9 +165,9 @@ import 'package:joss_app/blocs/gen_klaim/klaim1crud_bloc.dart';
 import 'package:joss_app/pages/gen_klaim/mobile/widget/list_klaim_widget/timeline_card_widget.dart';
 
 import '../../../../../blocs/gen_klaim/klaim1list_bloc.dart';
+import '../../../../../widgets/apptheme/header_card.dart';
 import 'klaim1_add_form_card.dart';
 import 'klaim1_list_editor.dart';
-
 
 class Klaim1InlineEditorPage extends StatefulWidget {
   const Klaim1InlineEditorPage({super.key});
@@ -201,44 +200,52 @@ class _Klaim1InlineEditorPageState extends State<Klaim1InlineEditorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Container(padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
-          decoration: const BoxDecoration(
-            color: secondaryBlackColor,
-          ),
-          child: BlocListener<Klaim1CrudBloc, Klaim1CrudState>(
-            listener: (context, state) {
-              if (state.isSaved) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar('Data berhasil disimpan'),
-                );
-                setState(() => _isSavingNew = false);
-              } else if (state.hasFailure) {
-                setState(() => _isSavingNew = false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  errorSnackBar('Gagal menyimpan data'),
-                );
-              }
-            },
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Klaim1AddFormCard(
+        child: BlocListener<Klaim1CrudBloc, Klaim1CrudState>(
+          listener: (context, state) {
+            if (state.isSaved) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(successSnackBar('Data berhasil disimpan'));
+              setState(() => _isSavingNew = false);
+            } else if (state.hasFailure) {
+              setState(() => _isSavingNew = false);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(errorSnackBar('Gagal menyimpan data'));
+            }
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                HeaderCard(
+                  iconPath: "assets/icons/menu_lapor_klaim.svg",
+                  title: "Lapor Klaim",
+                  subtitle:
+                      "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: vPadding,
+                  ),
+                  decoration: const BoxDecoration(color: secondaryBlackColor),
+                  child: Klaim1AddFormCard(
                     isSaving: _isSavingNew,
                     onSave: (record) {
                       setState(() => _isSavingNew = true);
-                      context
-                          .read<Klaim1CrudBloc>()
-                          .add(Klaim1CrudTambahEvent(record: record));
+                      context.read<Klaim1CrudBloc>().add(
+                        Klaim1CrudTambahEvent(record: record),
+                      );
                     },
                     onCancel: () {
                       Navigator.of(context).pop();
                     },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

@@ -1,93 +1,189 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../../common/constants.dart';
 
 class CompanyProfileCard extends StatelessWidget {
-  final VoidCallback? onDownload;
-  const CompanyProfileCard({super.key, this.onDownload});
+
+  const CompanyProfileCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Center(
-          child: Container(
-            width: 392,
-            height: 134,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/compro_bg.png'),
-                fit: BoxFit.cover,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double offsetY = kIsWeb ? -30 : -50;
+        final double bgWidth =
+        constraints.maxWidth > 420 ? 392 : constraints.maxWidth * 1;
+        final double cardWidth =
+        constraints.maxWidth > 420 ? 340 : constraints.maxWidth * 0.9;
+
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: bgWidth,
+              height: 134,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/compro_bg.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-        ),
-        Center(
-          child: Transform.translate(
-            offset: const Offset(0, -50),
-            child: SafeArea(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 18),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: pGrey,
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                  border: Border.all(color: sGrey),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/employee_shield.svg',
-                      height: 40,
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        style: bodyTextStyle(
-                          context,
-                          fontSize: 24,
-                        ).copyWith(fontFamily: "Delm-Regular"),
-                        children: [
-                          const TextSpan(text: 'Company '),
-                          TextSpan(
-                            text: 'Profile',
-                            style: TextStyle(color: primaryColor),
-                          ),
-                        ],
+            Transform.translate(
+              offset: Offset(0, offsetY),
+              child: SafeArea(
+                child: Container(
+                  width: cardWidth,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: pGrey,
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    border: Border.all(color: sGrey),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
                       ),
-                    ),
-                    // Subjudul
-                    Text(
-                      'Semua tentang JPS dalam satu dokumen.',
-                      style: bodyTextStyle(
-                        context,
-                        fontSize: 16,
-                      ).copyWith(color: hintGrey),
-                    ),
-                    const SizedBox(height: 12),
-                    // Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: AppButton.iconLeft(
-                        text: 'Unduh Sekarang',
-                        onPressed: onDownload ?? () {},
-                        icon: SvgPicture.asset(
-                          'assets/icons/download.svg',
-                          height: 18,
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/employee_shield.svg',
+                        height: 40,
+                      ),
+                      const SizedBox(height: 6),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: bodyTextStyle(
+                            context,
+                            fontSize: 24,
+                          ).copyWith(fontFamily: "Delm-Regular"),
+                          children: [
+                            const TextSpan(text: 'Company '),
+                            TextSpan(
+                              text: 'Profile',
+                              style: TextStyle(color: primaryColor),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        'Semua tentang JPS dalam satu dokumen.',
+                        textAlign: TextAlign.center,
+                        style: bodyTextStyle(
+                          context,
+                          fontSize: 16,
+                        ).copyWith(color: hintGrey),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AppButton.iconLeft(
+                          text: 'Hubungi Kami',
+                          onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => const ComproContactDialog(),
+                                );
+                              },
+                          icon: SvgPicture.asset(
+                            'assets/icons/chat.svg',
+                            height: 18,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class ComproContactDialog extends StatefulWidget {
+  const ComproContactDialog({Key? key}) : super(key: key);
+
+  @override
+  State<ComproContactDialog> createState() => ComproContactDialogState();
+}
+
+class ComproContactDialogState extends State<ComproContactDialog> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: pGrey,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(cardBorderRadius)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Masukan No. Telephone Anda",
+              style: bodyTextStyle(context, fontSize: 16)
+            ),
+            const SizedBox(height: 15),
+            appTextField(
+              label: "No. Telp",
+              controller: _controller,
+              keyboardType: TextInputType.phone,
+              prefix: Text(
+                  "+62 | ",
+                  style: bodyTextStyle(context, fontSize: 16)
+              ),
+              hint: "Masukkan nomor telepon",
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton.iconLeft(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 16),
+                    text: "Batal",
+                    textStyle: headingStyle(context, fontSize: 16),
+                    onPressed: () => Navigator.pop(context),
+                    isOutlined: true,
+                    backgroundColor: formGrey,
+                    height: 31.58,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: AppButton.iconLeft(
+                    text: "Lanjut",
+                    height: 31.58,
+                    icon: const Icon(Icons.check, color: Colors.white, size: 16),
+                    backgroundColor: pGreen,
+                    textStyle: headingStyle(context, fontSize: 16),
+                    onPressed: () {
+                      final phone = _controller.text.trim();
+                      if (phone.isNotEmpty) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Nomor: +62 $phone')),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            )
+          ],
         ),
-      ],
+      ),
     );
   }
 }

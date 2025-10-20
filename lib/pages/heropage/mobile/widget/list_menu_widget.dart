@@ -4,15 +4,9 @@ import 'package:joss_app/common/constants.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
-import '../../../gen_aset_dashboard/asetdashboardcari_main.dart';
-import '../../../gen_aset_ringkasan/asetringkasancari_main.dart';
-import '../../../gen_klaim/klaim1list_main.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
-import '../../../gen_klaim/mobile/widget/crud_klaim_widget/klaim1_inline_editor_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
-import '../../../gen_status_aset/statusasetcari_main.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
-import '../../../qontak/mobile/chat_init_service.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
@@ -38,10 +32,14 @@ class ListMenuWidget extends StatelessWidget {
             ),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                child: Text('Claim is Simple.', style: bodyTextStyle(context))
+              ),
               SizedBox(
-                height: 140,
+                height: 120,
                 child: Stack(
                   children: [
                     ListView.builder(
@@ -199,20 +197,11 @@ class ListMenuWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (isActive) {
-          handleMenuTap(context, item.title);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            infoSnackBar(
-              'Untuk akses fitur ${item.title}, Anda harus menjadi Klien JPS dahulu!',
-            ),
-          );
-        }
+        handleMenuTap(context, item.title);
       },
 
-
       child: Opacity(
-        opacity: isActive ? 1.0 : 0.4,
+        opacity: isActive ? 1.0 : 0,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -227,10 +216,10 @@ class ListMenuWidget extends StatelessWidget {
                     width: 68,
                     height: 68,
                     decoration: BoxDecoration(
-                      color: isActive ? pGrey : Colors.grey.shade800,
+                      color: pGrey,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isActive ? sGrey : Colors.grey.shade700,
+                        color: sGrey,
                       ),
                     ),
                     child: Center(
@@ -238,13 +227,6 @@ class ListMenuWidget extends StatelessWidget {
                         item.iconPath,
                         width: 38,
                         height: 38,
-                        colorFilter:
-                            isActive
-                                ? null
-                                : const ColorFilter.mode(
-                                  hintGrey,
-                                  BlendMode.srcIn,
-                                ),
                       ),
                     ),
                   ),
@@ -307,7 +289,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      // MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -347,9 +329,9 @@ class ListMenuWidget extends StatelessWidget {
       //   }
       //   break;
 
-      case 'Beli Polis':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => BeliPolisPage()));
-        break;
+      // case 'Beli Polis':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => BeliPolisPage()));
+      //   break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));
