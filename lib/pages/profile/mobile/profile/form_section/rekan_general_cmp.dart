@@ -56,158 +56,168 @@ class MRekanGeneralCmpCrudFormPageFormState
 
     return BaseBackgroundSidePage(
       title: 'Informasi Klien',
-      child: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-          decoration: BoxDecoration(color: secondaryBlackColor),
-          child: BlocConsumer<
-            MRekanGeneralCmpCrudBloc,
-            MRekanGeneralCmpCrudState
-          >(
-            listener: (context, state) {
-              if (state.isLoaded) {
-                if (state.record != null) {
-                  fieldRekanNamaController.text =
-                      state.record?.rekanNama ?? "";
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            width: double.infinity,
+            height: constraints.maxHeight, // ✅ full tinggi layar
+            color: secondaryBlackColor, // ✅ background utama hitam elegan
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight, // ✅ tetap isi penuh walau konten sedikit
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  child: BlocConsumer<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                    listener: (context, state) {
+                      if (state.isLoaded) {
+                        if (state.record != null) {
+                          fieldRekanNamaController.text = state.record?.rekanNama ?? "";
 
-                  if (state.record!.rekanNama!.isNotEmpty) {
-                    fieldRekanNamaController.text = state.record!.rekanNama!;
-                  } else {
-                    final profile = context
-                        .read<UserProfileCubit>()
-                        .state;
-                    if (fieldRekanNamaController.text.isEmpty &&
-                        (profile.nama?.isNotEmpty ?? false)) {
-                      fieldRekanNamaController.text = profile.nama!;
-                    }
-                  }
-                }
-                fieldComboMBentukCst = state.comboMBentukCst;
-                fieldComboMBidang = state.comboMBidang;
-              } if (state.isSaved && !state.hasFailure) {
-                context.read<MRekanGeneralCmpCrudBloc>().add(
-                  MRekanGeneralCmpCrudLihatEvent(),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar("Data berhasil disimpan."),
-                );
-              }
-            },
-            builder: (context, state) {
-              return Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // --- Avatar ---
-                    BlocBuilder<UserProfileCubit, UserProfileState>(
-                      buildWhen:
-                          (prev, curr) =>
+                          if (state.record!.rekanNama!.isNotEmpty) {
+                            fieldRekanNamaController.text = state.record!.rekanNama!;
+                          } else {
+                            final profile = context.read<UserProfileCubit>().state;
+                            if (fieldRekanNamaController.text.isEmpty &&
+                                (profile.nama?.isNotEmpty ?? false)) {
+                              fieldRekanNamaController.text = profile.nama!;
+                            }
+                          }
+                        }
+                        fieldComboMBentukCst = state.comboMBentukCst;
+                        fieldComboMBidang = state.comboMBidang;
+                      }
+
+                      if (state.isSaved && !state.hasFailure) {
+                        context.read<MRekanGeneralCmpCrudBloc>().add(
+                          MRekanGeneralCmpCrudLihatEvent(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          successSnackBar("Data berhasil disimpan."),
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      return Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // --- Avatar ---
+                            BlocBuilder<UserProfileCubit, UserProfileState>(
+                              buildWhen: (prev, curr) =>
                               (prev.fotoBytes?.lengthInBytes ?? -1) !=
-                              (curr.fotoBytes?.lengthInBytes ?? -1),
-                      builder: (context, state) {
-                        final imageBytes = state.fotoBytes;
-                        return Center(
-                          child: InkResponse(
-                            onTap: () => ImageUploader.pickAndUpload(context),
-                            containedInkWell: true,
-                            customBorder: const CircleBorder(),
-                            child: Stack(
-                              alignment: Alignment.bottomRight,
-                              children: [
-                                CircleAvatar(
-                                  radius: 50,
-                                  backgroundColor: secondaryBlackColor,
-                                  backgroundImage:
-                                      (imageBytes != null &&
+                                  (curr.fotoBytes?.lengthInBytes ?? -1),
+                              builder: (context, state) {
+                                final imageBytes = state.fotoBytes;
+                                return Center(
+                                  child: InkResponse(
+                                    onTap: () => ImageUploader.pickAndUpload(context),
+                                    containedInkWell: true,
+                                    customBorder: const CircleBorder(),
+                                    child: Stack(
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 50,
+                                          backgroundColor: secondaryBlackColor,
+                                          backgroundImage: (imageBytes != null &&
                                               imageBytes.isNotEmpty)
-                                          ? MemoryImage(imageBytes)
-                                          : null,
-                                  child:
-                                      (imageBytes == null || imageBytes.isEmpty)
-                                          ? const Icon(
-                                            Icons.person,
+                                              ? MemoryImage(imageBytes)
+                                              : null,
+                                          child: (imageBytes == null ||
+                                              imageBytes.isEmpty)
+                                              ? const Icon(
+                                            Icons.business,
                                             color: Colors.white,
                                             size: 48,
                                           )
-                                          : null,
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(2),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: sGrey),
-                                      color: pGrey,
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor: pGrey,
-                                      child: SvgPicture.asset(
-                                        "assets/icons/camera.svg",
-                                        width: 24,
-                                      ),
+                                              : null,
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: sGrey),
+                                              color: secondaryBlackColor,
+                                            ),
+                                            child: CircleAvatar(
+                                              radius: 16,
+                                              backgroundColor: secondaryBlackColor,
+                                              child: SvgPicture.asset(
+                                                "assets/icons/camera.svg",
+                                                width: 22,
+                                                colorFilter: const ColorFilter.mode(
+                                                  Colors.white,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
+                                );
+                              },
                             ),
-                          ),
-                        );
-                      },
-                    ),
 
-                    const SizedBox(height: 24),
+                            const SizedBox(height: 24),
 
-                    // --- Heading ---
-                    Text(
-                      "Informasi Perusahaan",
-                      style: headingStyle(context, fontSize: 22),
-                    ),
-                    Text(
-                      "Lengkapi identitas dasar Anda dengan benar.",
-                      style: bodyTextStyle(
-                        context,
-                        fontSize: 16,
-                      ).copyWith(color: hintGrey),
-                    ),
+                            // --- Heading ---
+                            Text(
+                              "Informasi Perusahaan",
+                              style: headingStyle(context, fontSize: 22)
+                                  .copyWith(color: Colors.white),
+                            ),
+                            Text(
+                              "Lengkapi identitas dasar Anda dengan benar.",
+                              style: bodyTextStyle(context, fontSize: 16)
+                                  .copyWith(color: hintGrey),
+                            ),
+                            const SizedBox(height: 20),
 
-                    const SizedBox(height: 10),
+                            // --- Form Section ---
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 15,
+                              ),
+                              decoration: BoxDecoration(
+                                color: secondaryBlackColor.withOpacity(0.25), // ✅ layer lembut
+                                border: Border.all(color: sGrey.withOpacity(0.4)),
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              child: Column(
+                                children: [
+                                  buildFieldJenisKlien(),
+                                  const SizedBox(height: 16),
+                                  buildFieldNamaPerusahaan(),
+                                  const SizedBox(height: 16),
+                                  buildFieldBentukPerusahaan(),
+                                  const SizedBox(height: 16),
+                                  buildFieldBidangUsaha(),
+                                ],
+                              ),
+                            ),
 
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 15,
-                      ),
-                      decoration: BoxDecoration(
-                        color: pGrey,
-                        border: Border.all(color: sGrey),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(cardBorderRadius),
+                            const SizedBox(height: 40),
+                            AppButton.primary(text: "Submit", onPressed: onSaveForm),
+                          ],
                         ),
-                      ),
-                      child: Column(
-                        children: [
-                          buildFieldJenisKlien(),
-                          const SizedBox(height: 16),
-                          buildFieldNamaPerusahaan(),
-                          const SizedBox(height: 16),
-                          buildFieldBentukPerusahaan(),
-                          const SizedBox(height: 16),
-                          buildFieldBidangUsaha(),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    AppButton.primary(text: "Submit", onPressed: onSaveForm),
-                  ],
+                      );
+                    },
+                  ),
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -36,7 +36,16 @@ class ListMenuWidget extends StatelessWidget {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: Text('Claim is Simple.', style: bodyTextStyle(context))
+                child: Text(
+                "Claim Is Simple",
+                  style: headingStyle(
+                        context,
+                        fontSize: getResponsiveFont(context, 18),
+                      ).copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: primaryLightColor, // ganti sesuai warna brand lo
+                  ),
+                ),
               ),
               SizedBox(
                 height: 120,

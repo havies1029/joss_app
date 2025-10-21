@@ -118,29 +118,19 @@ class _LoginFormUserState extends State<LoginFormUser>
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           _animationController.forward(from: 0);
-          onRegisterButtonPressed();
+          onRegisterButtonPressed(context); // ⬅️ kirim context ke fungsi
         }
       },
     );
   }
 
-
-// Fungsi untuk memicu event register email
-  void onRegisterButtonPressed() {
+  void onRegisterButtonPressed(BuildContext context) {
     if (!_formKey.currentState!.validate()) return;
 
-    final email = _emailOrPhoneController.text.trim();
-
-    // ✅ Trigger ke EmailVerificationBloc
-    final record = EmailVerificationModel(
-      email: email,
-      requestFrom: 'email',
-    );
-
-    context.read<EmailVerificationBloc>().add(
-      EmailVerificationTambahEvent(record: record),
-    );
+    final input = _emailOrPhoneController.text;
+    AuthInputRouter.handleInput(context, input);
   }
+
 
   Widget footerLoginText(BuildContext context) {
     return Row(
@@ -204,18 +194,22 @@ class _LoginFormUserState extends State<LoginFormUser>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(
-                              'assets/icons/logo_jps_no_background.png',
-                              height: isDesktop(context)
+                              'assets/images/logo.png',
+                              gaplessPlayback: true,
+                              height:
+                              isDesktop(context)
                                   ? 56
                                   : isTablet(context)
                                   ? 48
                                   : 42,
-                              width: isDesktop(context)
+                              width:
+                              isDesktop(context)
                                   ? 180
                                   : isTablet(context)
                                   ? 140
                                   : 120,
                             ),
+                            SizedBox(height: hPadding,),
                             WelcomeHeader(type: "login_user"),
                           ],
                         ),

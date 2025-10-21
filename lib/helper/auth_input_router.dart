@@ -22,13 +22,14 @@ class AuthInputRouter {
         ),
       );
     } else if (phoneRegex.hasMatch(input)) {
-      // context.read<LoginBloc>().add(
-      //   LoginButtonPressed(
-      //     email: input,
-      //     password: password,
-      //     rememberMe: _rememberPassword,
-      //   ),
-      // );
+      context.read<EmailVerificationBloc>().add(
+        EmailVerificationTambahEvent(
+          record: EmailVerificationModel(
+            email: input,
+            requestFrom: 'hp',
+          ),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

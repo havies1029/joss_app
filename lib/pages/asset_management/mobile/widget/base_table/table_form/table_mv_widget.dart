@@ -412,129 +412,17 @@ class _TableMvWidgetState extends State<TableMvWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Padding(
-                  //   padding: EdgeInsets.symmetric(horizontal: hPadding),
-                  //   child: LayoutBuilder(
-                  //     builder: (context, constraints) {
-                  //       final bool isCompact = constraints.maxWidth < 480;
-                  //       final double iconSize = isCompact ? 16 : 20;
-                  //       final double boxSize = isCompact ? 36 : 42;
-                  //       final textStyle = TextStyle(
-                  //         fontSize: isCompact ? 13 : 14,
-                  //         color: Colors.white,
-                  //         fontWeight: FontWeight.w500,
-                  //       );
-                  //
-                  //       Widget buildStatusCard({
-                  //         required String assetPath,
-                  //         required Color bgColor,
-                  //         required String text,
-                  //       }) {
-                  //         return Container(
-                  //           decoration: BoxDecoration(
-                  //             color: pGrey,
-                  //             borderRadius: BorderRadius.circular(cardBorderRadius),
-                  //             border: Border.all(color: sGrey.withOpacity(0.5), width: 1),
-                  //           ),
-                  //           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  //           child: Row(
-                  //             mainAxisSize: MainAxisSize.min,
-                  //             children: [
-                  //               StatusBox(
-                  //                 assetPath: assetPath,
-                  //                 bgColor: bgColor,
-                  //                 iconColor: Colors.white,
-                  //                 size: boxSize,
-                  //                 iconSize: iconSize,
-                  //                 showBorder: false,
-                  //                 onTap: () {},
-                  //               ),
-                  //               const SizedBox(width: 10),
-                  //               Text(text, style: textStyle),
-                  //             ],
-                  //           ),
-                  //         );
-                  //       }
-                  //
-                  //       // 🔹 Gunakan BlocBuilder untuk ambil data dari state
-                  //       return BlocBuilder<AsetDashboardCariBloc, AsetDashboardCariState>(
-                  //         builder: (context, state) {
-                  //           if (state.status == ListStatus.success && state.items.isNotEmpty) {
-                  //             final summary = state.items.first;
-                  //
-                  //             return Row(
-                  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //               children: [
-                  //                 buildStatusCard(
-                  //                   assetPath: "assets/icons/correct.svg",
-                  //                   bgColor: Colors.green,
-                  //                   text: summary.aktifQty.toString(),
-                  //                 ),
-                  //                 buildStatusCard(
-                  //                   assetPath: "assets/icons/clock.svg",
-                  //                   bgColor: Colors.amber.shade700,
-                  //                   text: summary.onProgressQty.toString(),
-                  //                 ),
-                  //                 buildStatusCard(
-                  //                   assetPath: "assets/icons/exit.svg",
-                  //                   bgColor: Colors.red,
-                  //                   text: summary.nonAktifQty.toString(),
-                  //                 ),
-                  //                 buildStatusCard(
-                  //                   assetPath: "assets/icons/calender.svg",
-                  //                   bgColor: Colors.blue,
-                  //                   text: summary.berakhirQty.toString(),
-                  //                 ),
-                  //               ],
-                  //             );
-                  //           }
-                  //
-                  //           // kalau belum ada data
-                  //           return Row(
-                  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //             children: [
-                  //               buildStatusCard(
-                  //                 assetPath: "assets/icons/correct.svg",
-                  //                 bgColor: Colors.green,
-                  //                 text: "-",
-                  //               ),
-                  //               buildStatusCard(
-                  //                 assetPath: "assets/icons/clock.svg",
-                  //                 bgColor: Colors.amber.shade700,
-                  //                 text: "-",
-                  //               ),
-                  //               buildStatusCard(
-                  //                 assetPath: "assets/icons/exit.svg",
-                  //                 bgColor: Colors.red,
-                  //                 text: "-",
-                  //               ),
-                  //               buildStatusCard(
-                  //                 assetPath: "assets/icons/calender.svg",
-                  //                 bgColor: Colors.blue,
-                  //                 text: "-",
-                  //               ),
-                  //             ],
-                  //           );
-                  //         },
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-
                   const SizedBox(height: hPadding),
-
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      // threshold bebas lo atur, misalnya < 480 px sembunyikan teks
-                      final bool hideText = constraints.maxWidth < 480;
-
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Flexible(child: PolisButton(
-                            assetPath: "assets/icons/tambah_polis_icon_polis.svg",
-                            text: "Tambah",   // ⬅️ hilangkan teks
-                            bgColor: Colors.orange,
+                            assetPath: "assets/icons/tambah_polis.svg",
+                            text: "Tambah Polis",
+                            bgColor: Color(0xFFFF9D00),
+                            borderColor: Color(0xFFFFC972),
                           ),),
 
                           const SizedBox(
@@ -542,9 +430,32 @@ class _TableMvWidgetState extends State<TableMvWidget> {
                           ),
 
                           Flexible(child: PolisButton(
-                            assetPath: "assets/icons/unduh_data_polis.svg",
+                            assetPath: "assets/icons/endorse.svg",
+                            text: "Endorse",
+                            bgColor: Color(0xFF00BBFF),
+                            borderColor: Color(0xFF7ADBFF),
+                          ),),
+
+                          const SizedBox(
+                              width: hPadding
+                          ),
+
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/hapus.svg",
+                            text: "Hapus",
+                            bgColor: Color(0xFFF12929),
+                            borderColor: Color(0xFFFE5E5E),
+                          ),),
+
+                          const SizedBox(
+                              width: hPadding
+                          ),
+
+                          Flexible(child: PolisButton(
+                            assetPath: "assets/icons/unduh.svg",
                             text: "Unduh",
-                            bgColor: Colors.grey,
+                            bgColor: Color(0xFFA1A1AA),
+                            borderColor: Color(0xFFBCBCC7),
                             onTap: () {
                               showGeneralDialog(
                                 context: context,
@@ -590,7 +501,7 @@ class _TableMvWidgetState extends State<TableMvWidget> {
                                                     } else {
                                                       await MobileDownloadHelper.download(
                                                         context: context,
-                                                        fileName: "Data_Mv.xlsx",
+                                                        fileName: "Data_Ringkasan.xlsx",
                                                         data: exportData,
                                                         format: "excel",
                                                       );
@@ -609,7 +520,7 @@ class _TableMvWidgetState extends State<TableMvWidget> {
                                                     } else {
                                                       await MobileDownloadHelper.download(
                                                         context: context,
-                                                        fileName: "Data_Mv.pdf",
+                                                        fileName: "Data_Ringkasan.pdf",
                                                         data: exportData,
                                                         format: "pdf",
                                                       );
@@ -649,11 +560,11 @@ class _TableMvWidgetState extends State<TableMvWidget> {
                           const SizedBox(
                               width: hPadding
                           ),
-
                           Flexible(child: PolisButton(
-                            assetPath: "assets/icons/share_data_polis.svg",
-                            text: "Share",
-                            bgColor: Colors.blue,
+                            assetPath: "assets/icons/bagikan.svg",
+                            text: "Bagikan",
+                            bgColor: Color(0xFF295EFF),
+                            borderColor: Color(0xFF5D86FF),
                           ),)
                         ],
                       );

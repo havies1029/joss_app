@@ -166,7 +166,7 @@ class ComproContactDialogState extends State<ComproContactDialog> {
                     text: "Lanjut",
                     height: 31.58,
                     icon: const Icon(Icons.check, color: Colors.white, size: 16),
-                    backgroundColor: pGreen,
+                    backgroundColor: primaryColor,
                     textStyle: headingStyle(context, fontSize: 16),
                     onPressed: () {
                       final phone = _controller.text.trim();

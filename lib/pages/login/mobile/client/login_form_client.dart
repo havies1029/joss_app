@@ -201,7 +201,8 @@ class _LoginFormClientState extends State<LoginFormClient>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(
-                              'assets/icons/logo_jps_no_background.png',
+                              'assets/images/logo.png',
+                              gaplessPlayback: true,
                               height:
                               isDesktop(context)
                                   ? 56
@@ -215,6 +216,7 @@ class _LoginFormClientState extends State<LoginFormClient>
                                   ? 140
                                   : 120,
                             ),
+                            SizedBox(height: hPadding,),
                             WelcomeHeader(type: "login_client"),
                           ],
                         ),

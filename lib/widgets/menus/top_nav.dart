@@ -91,12 +91,34 @@ AppBar MobileTopNavigationBar({
         ],
       )
       // Page lain
-          : Container(
-        padding: const EdgeInsets.symmetric(horizontal: hPadding*2, vertical: hPadding),
-        child: Text(
-          pageTitles[selectedIndex],
-          style: bodyTextStyle(context, fontSize: 22),
-          overflow: TextOverflow.ellipsis,
+          : Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: hPadding * 2,
+          vertical: hPadding,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 🔹 Judul halaman
+            Text(
+              pageTitles[selectedIndex],
+              style: bodyTextStyle(context, fontSize: 22),
+              overflow: TextOverflow.ellipsis,
+            ),
+
+            // 🔸 Tagline "Claim Is Simple"
+            Text(
+              "Claim Is Simple",
+              style: headingStyle(
+                context,
+                fontSize: getResponsiveFont(context, 18),
+              ).copyWith(
+                fontStyle: FontStyle.italic,
+                color: primaryLightColor, // ganti sesuai warna brand lo
+              ),
+            ),
+          ],
         ),
       ),
     ),

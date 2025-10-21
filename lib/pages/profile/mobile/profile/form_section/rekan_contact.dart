@@ -62,119 +62,127 @@ class MRekanContactCrudFormPageFormState
 
     return BaseBackgroundSidePage(
       title: "Kontak & Alamat",
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(color: secondaryBlackColor),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-          child: BlocConsumer<MRekanContactCrudBloc, MRekanContactCrudState>(
-            listener: (context, state) {
-              // 🟢 Muat data dari API (bagian existing-mu)
-              if (state.isLoaded) {
-                if (state.record != null) {
-                  fieldAlamat1Controller.text = state.record!.alamat1;
-
-                  // Email dari API > fallback ke profil user
-                  if (state.record!.email.isNotEmpty) {
-                    fieldEmailController.text = state.record!.email;
-                  } else {
-                    final profile = context.read<UserProfileCubit>().state;
-                    if (fieldEmailController.text.isEmpty &&
-                        (profile.email?.isNotEmpty ?? false)) {
-                      fieldEmailController.text = profile.email!;
-                    }
-                  }
-
-                  // Telepon dari API > fallback ke profil user
-                  if (state.record!.telp.isNotEmpty) {
-                    fieldTelpController.text = state.record!.telp;
-                  } else {
-                    final profile = context.read<UserProfileCubit>().state;
-                    if (fieldTelpController.text.isEmpty &&
-                        (profile.telepon?.isNotEmpty ?? false)) {
-                      fieldTelpController.text = profile.telepon!;
-                    }
-                  }
-
-                  fieldComboMKota = state.comboMKota;
-                  fieldComboMPropinsi = state.comboMPropinsi;
-                  fieldComboRKodepos = state.comboRKodepos;
-                }
-
-                fieldComboMKota = state.comboMKota;
-                fieldComboMPropinsi = state.comboMPropinsi;
-                fieldComboRKodepos = state.comboRKodepos;
-              }
-
-              // ✅ Tambahan SnackBar sukses di luar blok isLoaded
-              if (state.isSaved && !state.hasFailure) {
-                context.read<MRekanContactCrudBloc>().add(
-                  MRekanContactCrudLihatEvent(),
-                );
-
-                // Tampilkan notifikasi sukses
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar("Data berhasil disimpan 🎉"),
-                );
-              }
-            },
-
-            builder: (context, state) {
-              return Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      "Kontak & Alamat",
-                      textAlign: TextAlign.start,
-                      style: headingStyle(context, fontSize: 22),
-                    ),
-                    Text(
-                      "Gunakan email yang aktif dan alamat yang jelas.",
-                      style: bodyTextStyle(
-                        context,
-                        fontSize: 16,
-                      ).copyWith(color: hintGrey),
-                    ),
-                    const SizedBox(height: 10),
-
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 15,
-                      ),
-                      decoration: BoxDecoration(
-                        color: pGrey,
-                        border: Border.all(color: sGrey),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(cardBorderRadius),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          buildFieldEmail(),
-                          const SizedBox(height: 16),
-                          buildFieldTelp(),
-                          const SizedBox(height: 16),
-                          buildFieldAlamat1(),
-                          const SizedBox(height: 16),
-                          buildFieldMpropinsiId(),
-                          const SizedBox(height: 16),
-                          buildFieldMkotaId(),
-                          const SizedBox(height: 16),
-                          buildFieldRkodeposId(),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    AppButton.primary(text: "Submit", onPressed: onSaveForm),
-                  ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            width: double.infinity,
+            height: constraints.maxHeight, // ✅ full tinggi layar
+            color: secondaryBlackColor, // ✅ ganti warna utama
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight, // ✅ tetap isi seluruh layar walau konten sedikit
                 ),
-              );
-            },
-          ),
-        ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  child: BlocConsumer<MRekanContactCrudBloc, MRekanContactCrudState>(
+                    listener: (context, state) {
+                      // 🟢 Muat data dari API (seperti semula)
+                      if (state.isLoaded) {
+                        if (state.record != null) {
+                          fieldAlamat1Controller.text = state.record!.alamat1;
+
+                          // Email fallback dari profil
+                          if (state.record!.email.isNotEmpty) {
+                            fieldEmailController.text = state.record!.email;
+                          } else {
+                            final profile = context.read<UserProfileCubit>().state;
+                            if (fieldEmailController.text.isEmpty &&
+                                (profile.email?.isNotEmpty ?? false)) {
+                              fieldEmailController.text = profile.email!;
+                            }
+                          }
+
+                          // Telepon fallback dari profil
+                          if (state.record!.telp.isNotEmpty) {
+                            fieldTelpController.text = state.record!.telp;
+                          } else {
+                            final profile = context.read<UserProfileCubit>().state;
+                            if (fieldTelpController.text.isEmpty &&
+                                (profile.telepon?.isNotEmpty ?? false)) {
+                              fieldTelpController.text = profile.telepon!;
+                            }
+                          }
+
+                          fieldComboMKota = state.comboMKota;
+                          fieldComboMPropinsi = state.comboMPropinsi;
+                          fieldComboRKodepos = state.comboRKodepos;
+                        }
+                      }
+
+                      if (state.isSaved && !state.hasFailure) {
+                        context.read<MRekanContactCrudBloc>().add(
+                          MRekanContactCrudLihatEvent(),
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          successSnackBar("Data berhasil disimpan 🎉"),
+                        );
+                      }
+                    },
+
+                    builder: (context, state) {
+                      return Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "Kontak & Alamat",
+                              textAlign: TextAlign.start,
+                              style: headingStyle(context, fontSize: 22)
+                                  .copyWith(color: Colors.white),
+                            ),
+                            Text(
+                              "Gunakan email yang aktif dan alamat yang jelas.",
+                              style: bodyTextStyle(
+                                context,
+                                fontSize: 16,
+                              ).copyWith(color: hintGrey),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // 🧩 Card form utama
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 15,
+                              ),
+                              decoration: BoxDecoration(
+                                color: secondaryBlackColor.withOpacity(0.2), // ✅ transparan halus
+                                border: Border.all(color: sGrey.withOpacity(0.4)),
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              child: Column(
+                                children: [
+                                  buildFieldEmail(),
+                                  const SizedBox(height: 16),
+                                  buildFieldTelp(),
+                                  const SizedBox(height: 16),
+                                  buildFieldAlamat1(),
+                                  const SizedBox(height: 16),
+                                  buildFieldMpropinsiId(),
+                                  const SizedBox(height: 16),
+                                  buildFieldMkotaId(),
+                                  const SizedBox(height: 16),
+                                  buildFieldRkodeposId(),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 40),
+                            AppButton.primary(text: "Submit", onPressed: onSaveForm),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -307,7 +315,7 @@ class MRekanContactCrudFormPageFormState
 
   Widget buildFieldRkodeposId() {
     return ReusableComboBox<ComboRKodeposModel>(
-      hintText: "Kodepos",
+      hintText: "Kodepos (Opsional)",
       comboKey: comboRKodeposKey,
       initItem: fieldComboRKodepos,
       dataLoader: () => ComboRKodeposRepository().getComboRKodepos(

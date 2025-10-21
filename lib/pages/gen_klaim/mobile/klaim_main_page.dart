@@ -77,12 +77,12 @@ class _KlaimMainPageState extends State<KlaimMainPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: hPadding),
-                HeaderCard(
-                  iconPath: "assets/icons/menu_lapor_klaim.svg",
-                  title: "Klaim",
-                  subtitle:
-                  "Ajukan klaim sesuai ketentuan polis Anda dengan mengisi formulir berikut secara lengkap.",
-                ),
+                // HeaderCard(
+                //   iconPath: "assets/icons/menu_lapor_klaim.svg",
+                //   title: "Klaim",
+                //   subtitle:
+                //   "Ajukan klaim sesuai ketentuan polis Anda dengan mengisi formulir berikut secara lengkap.",
+                // ),
                 Expanded(
                   child: _buildContent(context),
                 ),

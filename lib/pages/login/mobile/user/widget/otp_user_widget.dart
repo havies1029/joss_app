@@ -277,7 +277,7 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                   const SizedBox(height: 6),
                                   Column(
                                     children: [
-                                      Text("Kami sudah mengirim kode OTP ke nomor", style: bodyTextStyle(context, fontSize: 20)),
+                                      Text("Kami sudah mengirim kode OTP ke nomor/email", style: bodyTextStyle(context, fontSize: 20)),
                                       Text(
                                         widget.email, style: bodyTextStyle(context, fontSize: 20).copyWith(color: primaryColor)
                                       ),

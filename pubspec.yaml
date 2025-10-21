@@ -58,6 +58,7 @@ dependencies:
   dio: ^5.4.0
   fl_chart: ^0.66.0
   flutter_speed_dial: ^7.0.0
+  carousel_slider: 4.2.0
 
 dev_dependencies:
   flutter_test:
@@ -210,6 +211,7 @@ flutter:
     - assets/icons/save_btn_pic.svg
     - assets/icons/send_btn_pic.svg
     - assets/icons/logo_bantuan.svg
+    - assets/icons/logo_bantuan.jpg
     - assets/icons/refresh_cob_icon.svg
     - assets/icons/list_cob_icon.svg
 

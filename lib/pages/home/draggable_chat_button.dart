@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class DraggableChatButton extends StatefulWidget {
   final VoidCallback onTap;
@@ -108,7 +105,7 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
             width: buttonSize,
             height: buttonSize,
             decoration: BoxDecoration(
-              color: Colors.white, // 🔹 Ubah warna background ke PUTIH
+              color: Colors.white, // background putih clean
               shape: BoxShape.circle,
               border: Border.all(color: Colors.grey.shade300, width: 1),
               boxShadow: [
@@ -119,14 +116,33 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
                 ),
               ],
             ),
-            // 🔹 Ganti ikon ke logo_bantuan.svg
+            // 🧠 Ganti SVG ke icon bawaan dulu
             child: Center(
-              child: SvgPicture.asset(
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/icons/logo_bantuan.jpg',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
+
+            /*
+            child: Center(
+              child:SvgPicture.asset(
                 'assets/icons/logo_bantuan.svg',
                 width: 36,
                 height: 36,
+                colorFilter: const ColorFilter.mode(
+                  Colors.black, // ubah jadi hitam
+                  BlendMode.srcIn,
+                ),
               ),
             ),
+          ),
+          */
           ),
         ),
       ),
