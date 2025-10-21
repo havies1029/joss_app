@@ -47,7 +47,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   var fieldRekNamaController = TextEditingController();
   var fieldRekNoController = TextEditingController();
   String? existingMrekanBankId; // simpan id kalau ketemu
-
+  bool _isFirstLoad = true;
   // di dalam MRekanBankCrudFormPageFormState
   List<MRekanBankListModel> _allRekanBankList = [];
   List<MRekanBankListModel> _filteredRekanBankList = [];
@@ -161,7 +161,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                     >(
                       listener: (context, state) {
                         // 🔸 Load data record (tetap di sini)
-                        if (state.isLoaded) {
+                        if (state.isLoaded && _isFirstLoad) {
                           if (state.record != null) {
                             fieldMrekan1IdController.text = state.record!.mrekan1Id;
                             fieldRekNamaController.text = state.record!.rekNama;
@@ -172,15 +172,12 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
                         // ✅ Pindahkan ke luar
                         if (state.isSaved && !state.hasFailure) {
-                          // Refresh data yang baru disimpan
-                          context.read<MRekanBankListBloc>().add(
-                            RefreshMRekanBankListEvent(searchText: "", hal: 0),
-                          );
-                          // Tampilkan notifikasi sukses
                           ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan "),
+                            successSnackBar("Data berhasil disimpan 🎉"),
                           );
+                          _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
                         }
+
                       },
 
                       builder: (context, state) {

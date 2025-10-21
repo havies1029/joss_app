@@ -1,20 +1,25 @@
 class ReturnDataAPI {
-  bool success = false;
-  String data = "";
-  int rowcount = 0;
+  bool success;
+  String data;
+  int rowcount;
 
-  ReturnDataAPI(
-      {required this.success, required this.data, required this.rowcount});
+  ReturnDataAPI({
+    required this.success,
+    required this.data,
+    required this.rowcount,
+  });
 
-  factory ReturnDataAPI.fromDatabaseJson(Map<String, dynamic> data) =>
-      ReturnDataAPI(
-        success: data['success'], 
-        data: data['data'], 
-        rowcount: data['rowcount']);
+  factory ReturnDataAPI.fromDatabaseJson(Map<String, dynamic> json) {
+    return ReturnDataAPI(
+      success: json['success'] ?? false,
+      data: json['data']?.toString() ?? '', // 🔥 tangani null jadi string kosong
+      rowcount: json['rowcount'] ?? 0,
+    );
+  }
 
   Map<String, dynamic> toDatabaseJson() => {
     "success": success,
     "data": data,
-    "rowcount": rowcount
+    "rowcount": rowcount,
   };
 }

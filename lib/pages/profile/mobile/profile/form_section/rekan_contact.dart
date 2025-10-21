@@ -44,7 +44,7 @@ class MRekanContactCrudFormPageFormState
   ComboRKodeposModel? fieldComboRKodepos;
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
   var fieldTelpController = TextEditingController();
-
+  bool _isFirstLoad = true;
   @override
   void initState() {
     super.initState();
@@ -79,7 +79,7 @@ class MRekanContactCrudFormPageFormState
                   child: BlocConsumer<MRekanContactCrudBloc, MRekanContactCrudState>(
                     listener: (context, state) {
                       // 🟢 Muat data dari API (seperti semula)
-                      if (state.isLoaded) {
+                      if (state.isLoaded && _isFirstLoad) {
                         if (state.record != null) {
                           fieldAlamat1Controller.text = state.record!.alamat1;
 
@@ -112,14 +112,12 @@ class MRekanContactCrudFormPageFormState
                       }
 
                       if (state.isSaved && !state.hasFailure) {
-                        context.read<MRekanContactCrudBloc>().add(
-                          MRekanContactCrudLihatEvent(),
-                        );
-
                         ScaffoldMessenger.of(context).showSnackBar(
                           successSnackBar("Data berhasil disimpan 🎉"),
                         );
+                        _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
                       }
+
                     },
 
                     builder: (context, state) {
@@ -316,6 +314,7 @@ class MRekanContactCrudFormPageFormState
   Widget buildFieldRkodeposId() {
     return ReusableComboBox<ComboRKodeposModel>(
       hintText: "Kodepos (Opsional)",
+      showClearButton: true,
       comboKey: comboRKodeposKey,
       initItem: fieldComboRKodepos,
       dataLoader: () => ComboRKodeposRepository().getComboRKodepos(
@@ -326,36 +325,46 @@ class MRekanContactCrudFormPageFormState
       compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
       onChangedCallback: (value) {
         if (value != null) {
-          // Hapus validasi error (tidak perlu removeError)
+          // ✅ kalau user pilih kodepos baru
           mRekanContactCrudBloc.add(
             ComboRKodeposChangedEvent(comboRKodepos: value),
           );
-        }
-      },
-      onSaveCallback: (value) {
-        if (value != null) {
           fieldComboRKodepos = value;
+        } else {
+          // ✅ kalau user hapus / clear pilihan
+          fieldComboRKodepos = const ComboRKodeposModel(); // 🔥 reset total, bukan null
+          mRekanContactCrudBloc.add(
+            ComboRKodeposChangedEvent(
+              comboRKodepos: fieldComboRKodepos ?? const ComboRKodeposModel(),
+            ),
+          );
         }
+        setState(() {}); // refresh tampilan
       },
-      // ❌ validatorCallback dihapus
+
+      onSaveCallback: (value) {
+        fieldComboRKodepos = value;
+      },
     );
   }
 
   void onSaveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
       MRekanContactCrudModel record = MRekanContactCrudModel(
         alamat1: fieldAlamat1Controller.text,
         email: fieldEmailController.text,
-        mkotaId: fieldComboMKota?.mkotaId,
-        mpropinsiId: fieldComboMPropinsi?.mpropinsiId,
+        mkotaId: fieldComboMKota?.mkotaId,          // biarkan null normal
+        mpropinsiId: fieldComboMPropinsi?.mpropinsiId, // biarkan null normal
         mrekancontact1Id: '',
-        rkodeposId: fieldComboRKodepos?.rkodeposId,
+        rkodeposId: fieldComboRKodepos?.rkodeposId ?? "", // 🔥 khusus ini aja jadi ""
         telp: fieldTelpController.text,
       );
 
       record.mrekancontact1Id =
           mRekanContactCrudBloc.state.record!.mrekancontact1Id;
+
       mRekanContactCrudBloc.add(MRekanContactCrudUbahEvent(record: record));
     }
   }

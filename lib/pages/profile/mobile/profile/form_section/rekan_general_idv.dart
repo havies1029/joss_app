@@ -36,7 +36,7 @@ class MRekanGeneralIdvCrudFormPageFormState
       GlobalKey<DropdownSearchState<ComboMPekerjaanModel>>();
   final comboMJnsKelKey = GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
   var fieldRekanNamaController = TextEditingController();
-
+  bool _isFirstLoad = true;
   @override
   void initState() {
     super.initState();
@@ -71,7 +71,7 @@ class MRekanGeneralIdvCrudFormPageFormState
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: BlocConsumer<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
                     listener: (context, state) {
-                      if (state.isLoaded) {
+                      if (state.isLoaded && _isFirstLoad) {
                         if (state.record != null) {
                           fieldRekanNamaController.text = state.record!.rekanNama;
 
@@ -88,13 +88,13 @@ class MRekanGeneralIdvCrudFormPageFormState
                         fieldComboMPekerjaan = state.comboMPekerjaan;
                         fieldComboMJnskel = state.comboMJnskel;
                       }
-
                       if (state.isSaved && !state.hasFailure) {
-                        context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
                         ScaffoldMessenger.of(context).showSnackBar(
-                          successSnackBar("Data berhasil disimpan."),
+                          successSnackBar("Data berhasil disimpan 🎉"),
                         );
+                        _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
                       }
+
                     },
                     builder: (context, state) {
                       return Form(

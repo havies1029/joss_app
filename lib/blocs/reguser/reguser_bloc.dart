@@ -21,33 +21,34 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
 	}
 
-	Future<void> onTambahRegUser(
-		RegUserTambahEvent event, Emitter<RegUserState> emit) async {
-
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.regUserTambah(event.record);
-    event.record.reguserId = returnData.data;
-		hasFailure = !returnData.success;
+  Future<void> onTambahRegUser(
+      RegUserTambahEvent event, Emitter<RegUserState> emit) async {
+    ReturnDataAPI returnData;
+    bool hasFailure = true;
+    emit(state.copyWith(isSaving: true, isSaved: false));
+    returnData = await repository.regUserTambah(event.record);
+    final String dataString = returnData.data.toString();
+    List<String> info = dataString.split(';');
+    event.record.reguserId = info.isNotEmpty ? info[0] : '';
+    hasFailure = !returnData.success;
     List<String> errors = [];
     if (hasFailure) {
       errors.add(returnData.data);
     }
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-      record: event.record,
-      errors: errors,
-			hasFailure: hasFailure));
+    emit(state.copyWith(
+        isSaving: false,
+        isSaved: true,
+        record: event.record,
+        errors: errors,
+        hasFailure: hasFailure));
 
-    if (!hasFailure) {      
-      authenticationBloc.add(
-        RequirePinHPVerification(hpno: event.record.telepon)
-      );
+    if (!hasFailure) {
+      if (info[1] == '0') {
+        authenticationBloc
+            .add(RequirePinHPVerification(hpno: event.record.telepon));
+      }
     }
-
-	}
+  }
 
 	Future<void> onUbahRegUser(
 		RegUserUbahEvent event, Emitter<RegUserState> emit) async {
