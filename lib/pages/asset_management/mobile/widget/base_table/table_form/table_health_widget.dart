@@ -119,13 +119,12 @@ class _TableHealthWidgetState extends State<TableHealthWidget> {
                       return SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             PolisButton(
                               assetPath: "assets/icons/tambah_polis.svg",
-                              text: "Tambah Polis",
+                              text: "Tambah",
                               bgColor: const Color(0xFFFF9D00),
                               borderColor: const Color(0xFFFFC972),
                             ),

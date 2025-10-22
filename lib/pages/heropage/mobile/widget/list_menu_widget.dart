@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
@@ -8,6 +10,9 @@ import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
+
+
+import 'package:confetti/confetti.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String custType;
@@ -339,7 +344,7 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
 
       // case 'Beli Polis':
-      //   Navigator.push(context, MaterialPageRoute(builder: (_) => BeliPolisPage()));
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => SuccessPage()));
       //   break;
 
       case 'Klaim':
@@ -365,4 +370,157 @@ class MenuItem {
     required this.iconPath,
     this.isPopular = false,
   });
+}
+
+class SuccessPage extends StatefulWidget {
+  const SuccessPage({Key? key}) : super(key: key);
+
+  @override
+  State<SuccessPage> createState() => _SuccessPageState();
+}
+
+class _SuccessPageState extends State<SuccessPage> {
+  late ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController.play();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 🎨 Background pakai ShaderMask biar mirip StartScreen
+          SizedBox.expand(
+            child: ShaderMask(
+              shaderCallback: (Rect rect) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.white, Colors.transparent],
+                  stops: [0.0, 1.0],
+                ).createShader(rect);
+              },
+              blendMode: BlendMode.dstIn,
+              child: Image.asset(
+                "assets/images/background_gradient.png",
+                fit: BoxFit.fitWidth,
+                alignment: Alignment.topCenter,
+              ),
+            ),
+          ),
+
+          // 🎊 Confetti efek
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            gravity: 0.3,
+            emissionFrequency: 0.05,
+            numberOfParticles: 25,
+            colors: const [
+              Colors.pinkAccent,
+              Colors.orangeAccent,
+              Colors.tealAccent,
+              Colors.yellowAccent,
+              Colors.blueAccent,
+            ],
+          ),
+
+          // 💚 Konten utama
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // ✅ Icon success
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF2ECC71),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 60,
+                    color: Colors.white,
+                  )
+                      .animate()
+                      .scale(duration: 600.ms, curve: Curves.easeOutBack)
+                      .fadeIn(duration: 500.ms),
+                ),
+
+                const SizedBox(height: 30),
+
+                Text(
+                  "Perubahan berhasil disimpan!",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+                    .animate()
+                    .fadeIn(duration: 600.ms)
+                    .slideY(begin: 0.3, end: 0),
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  "Tim internal akan meninjau dan mengonfirmasi status Anda.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 16,
+                  ),
+                )
+                    .animate()
+                    .fadeIn(duration: 800.ms)
+                    .slideY(begin: 0.3, end: 0),
+
+                const SizedBox(height: 30),
+
+                // 🔘 Tombol
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.1),
+                    side: const BorderSide(color: Colors.white30),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // contoh back
+                  },
+                  child: const Text(
+                    "Lihat Detail",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+                    .animate()
+                    .fadeIn(duration: 900.ms)
+                    .slideY(begin: 0.2, end: 0),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -12,6 +12,7 @@ class PolisButton extends StatelessWidget {
   final double borderRadius;
   final double iconSize;
   final double height;
+  final double? width;
   final TextStyle? textStyle;
 
   const PolisButton({
@@ -24,13 +25,14 @@ class PolisButton extends StatelessWidget {
     this.borderColor,
     this.borderRadius = 8,
     this.iconSize = 12,
-    this.height = 30  ,
+    this.height = 30,
+    this.width,
     this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppButton.iconLeft(
+    final button = AppButton.iconLeft(
       text: text,
       icon: SvgPicture.asset(
         assetPath,
@@ -38,8 +40,10 @@ class PolisButton extends StatelessWidget {
         height: iconSize,
         color: textColor ?? primaryLightColor,
       ),
+      iconTextSpacing: 4,
       onPressed: onTap,
       height: height,
+      padding: EdgeInsets.all(10),
       backgroundColor: bgColor ?? Colors.transparent,
       borderRadius: borderRadius,
       isOutlined: true,
@@ -48,7 +52,21 @@ class PolisButton extends StatelessWidget {
         width: 0.5,
       ),
       textStyle: textStyle ??
-          bodyTextStyle(context, fontSize: 12),
+          bodyTextStyle(
+            context,
+            fontSize: 12,
+          ),
     );
+
+    if (width != null) {
+      return SizedBox(width: width, height: height, child: button);
+    } else {
+      return IntrinsicWidth(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: height),
+          child: button,
+        ),
+      );
+    }
   }
 }

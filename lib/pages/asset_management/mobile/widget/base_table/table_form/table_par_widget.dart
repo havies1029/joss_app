@@ -122,158 +122,163 @@ class _TableParWidgetState extends State<TableParWidget> {
                   const SizedBox(height: hPadding),
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Flexible(child: PolisButton(
-                            assetPath: "assets/icons/tambah_polis.svg",
-                            text: "Tambah Polis",
-                            bgColor: Color(0xFFFF9D00),
-                            borderColor: Color(0xFFFFC972),
-                          ),),
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            PolisButton(
+                              assetPath: "assets/icons/tambah_polis.svg",
+                              text: "Tambah",
+                              bgColor: Color(0xFFFF9D00),
+                              borderColor: Color(0xFFFFC972),
+                            ),
 
-                          const SizedBox(
-                              width: hPadding
-                          ),
+                            const SizedBox(
+                                width: hPadding
+                            ),
 
-                          Flexible(child: PolisButton(
-                            assetPath: "assets/icons/endorse.svg",
-                            text: "Endorse",
-                            bgColor: Color(0xFF00BBFF),
-                            borderColor: Color(0xFF7ADBFF),
-                          ),),
+                            PolisButton(
+                              assetPath: "assets/icons/endorse.svg",
+                              text: "Endorse",
+                              bgColor: Color(0xFF00BBFF),
+                              borderColor: Color(0xFF7ADBFF),
+                            ),
 
-                          const SizedBox(
-                              width: hPadding
-                          ),
+                            const SizedBox(
+                                width: hPadding
+                            ),
 
-                          Flexible(child: PolisButton(
-                            assetPath: "assets/icons/hapus.svg",
-                            text: "Hapus",
-                            bgColor: Color(0xFFF12929),
-                            borderColor: Color(0xFFFE5E5E),
-                          ),),
+                            PolisButton(
+                              assetPath: "assets/icons/hapus.svg",
+                              text: "Hapus",
+                              bgColor: Color(0xFFF12929),
+                              borderColor: Color(0xFFFE5E5E),
+                            ),
 
-                          const SizedBox(
-                              width: hPadding
-                          ),
+                            const SizedBox(
+                                width: hPadding
+                            ),
 
-                          Flexible(child: PolisButton(
-                            assetPath: "assets/icons/unduh.svg",
-                            text: "Unduh",
-                            bgColor: Color(0xFFA1A1AA),
-                            borderColor: Color(0xFFBCBCC7),
-                            onTap: () {
-                              showGeneralDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                barrierLabel: "Tutup",
-                                barrierColor: Colors.black.withOpacity(0.6),
-                                transitionDuration: const Duration(milliseconds: 250),
-                                pageBuilder: (context, animation, secondaryAnimation) {
-                                  return BlocProvider.value(
-                                    value: cubit, // 🔑 pass cubit yang udah ada
-                                    child: GestureDetector(
-                                      onTap: () => Navigator.of(context).pop(),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: Center(
-                                          child: GestureDetector(
-                                            onTap: () {},
-                                            child: PopupWidget(
-                                              title: "Pilih format file untuk diunduh",
-                                              subtitle: "Tersedia dalam format Excel dan PDF",
-                                              button1Text: "Excel",
-                                              button2Text: "PDF",
-                                              onExportSelected: (format) async {
-                                                final exportData = cubit.toExportData();
+                            PolisButton(
+                              assetPath: "assets/icons/unduh.svg",
+                              text: "Unduh",
+                              bgColor: Color(0xFFA1A1AA),
+                              borderColor: Color(0xFFBCBCC7),
+                              onTap: () {
+                                showGeneralDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  barrierLabel: "Tutup",
+                                  barrierColor: Colors.black.withOpacity(0.6),
+                                  transitionDuration: const Duration(milliseconds: 250),
+                                  pageBuilder: (context, animation, secondaryAnimation) {
+                                    return BlocProvider.value(
+                                      value: cubit, // 🔑 pass cubit yang udah ada
+                                      child: GestureDetector(
+                                        onTap: () => Navigator.of(context).pop(),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: Center(
+                                            child: GestureDetector(
+                                              onTap: () {},
+                                              child: PopupWidget(
+                                                title: "Pilih format file untuk diunduh",
+                                                subtitle: "Tersedia dalam format Excel dan PDF",
+                                                button1Text: "Excel",
+                                                button2Text: "PDF",
+                                                onExportSelected: (format) async {
+                                                  final exportData = cubit.toExportData();
 
-                                                if (exportData.isEmpty) {
+                                                  if (exportData.isEmpty) {
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text("⚠️ Tidak ada data yang dipilih"),
+                                                        backgroundColor: Colors.red,
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+
                                                   Navigator.of(context).pop();
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text("⚠️ Tidak ada data yang dipilih"),
-                                                      backgroundColor: Colors.red,
-                                                    ),
-                                                  );
-                                                  return;
-                                                }
 
-                                                Navigator.of(context).pop();
-
-                                                switch (format) {
-                                                  case ExportFormat.excel:
-                                                    if (kIsWeb) {
-                                                      await ExportHelper.export("excel", exportData, CategoryType.properti);
-                                                    } else {
-                                                      await MobileDownloadHelper.download(
-                                                        context: context,
-                                                        fileName: "Data_Ringkasan.xlsx",
-                                                        data: exportData,
-                                                        format: "excel",
+                                                  switch (format) {
+                                                    case ExportFormat.excel:
+                                                      if (kIsWeb) {
+                                                        await ExportHelper.export("excel", exportData, CategoryType.properti);
+                                                      } else {
+                                                        await MobileDownloadHelper.download(
+                                                          context: context,
+                                                          fileName: "Data_Ringkasan.xlsx",
+                                                          data: exportData,
+                                                          format: "excel",
+                                                        );
+                                                      }
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
+                                                          backgroundColor: Colors.green,
+                                                        ),
                                                       );
-                                                    }
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text("✅ Berhasil ekspor ${exportData.length} data ke Excel"),
-                                                        backgroundColor: Colors.green,
-                                                      ),
-                                                    );
-                                                    break;
+                                                      break;
 
-                                                  case ExportFormat.pdf:
-                                                    if (kIsWeb) {
-                                                      await ExportHelper.export("pdf", exportData, CategoryType.properti);
-                                                    } else {
-                                                      await MobileDownloadHelper.download(
-                                                        context: context,
-                                                        fileName: "Data_Ringkasan.pdf",
-                                                        data: exportData,
-                                                        format: "pdf",
+                                                    case ExportFormat.pdf:
+                                                      if (kIsWeb) {
+                                                        await ExportHelper.export("pdf", exportData, CategoryType.properti);
+                                                      } else {
+                                                        await MobileDownloadHelper.download(
+                                                          context: context,
+                                                          fileName: "Data_Ringkasan.pdf",
+                                                          data: exportData,
+                                                          format: "pdf",
+                                                        );
+                                                      }
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
+                                                          backgroundColor: Colors.green,
+                                                        ),
                                                       );
-                                                    }
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text("✅ Berhasil ekspor ${exportData.length} data ke PDF"),
-                                                        backgroundColor: Colors.green,
-                                                      ),
-                                                    );
-                                                    break;
-                                                }
-                                              },
+                                                      break;
+                                                  }
+                                                },
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                                transitionBuilder: (context, animation, secondaryAnimation, child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: ScaleTransition(
-                                      scale: CurvedAnimation(
-                                        parent: animation,
-                                        curve: Curves.easeOutBack,
+                                    );
+                                  },
+                                  transitionBuilder: (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: ScaleTransition(
+                                        scale: CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.easeOutBack,
+                                        ),
+                                        child: child,
                                       ),
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
 
-                          const SizedBox(
-                              width: hPadding
-                          ),
-                          Flexible(child: PolisButton(
-                            assetPath: "assets/icons/bagikan.svg",
-                            text: "Bagikan",
-                            bgColor: Color(0xFF295EFF),
-                            borderColor: Color(0xFF5D86FF),
-                          ),)
-                        ],
+                            const SizedBox(
+                                width: hPadding
+                            ),
+
+                            PolisButton(
+                              assetPath: "assets/icons/bagikan.svg",
+                              text: "Bagikan",
+                              bgColor: Color(0xFF295EFF),
+                              borderColor: Color(0xFF5D86FF),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),

@@ -128,27 +128,54 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           ),
           const SizedBox(width: 16),
 
+          // Expanded(
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text(
+          //         'Halo, ${widget.userName}',
+          //         style: headingStyle(context, fontSize: 22),
+          //       ),
+          //       // Text(
+          //       //   widget.custType == 'C'
+          //       //       ? 'Klien JPS'
+          //       //       : 'Nasabah Biasa',
+          //       //   style: bodyTextStyle(context),
+          //       // ),
+          //       Text(
+          //         _getGreeting(),
+          //         style: bodyTextStyle(context),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+
+          widget.custType != 'C' ?
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Halo, ${widget.userName}',
+                  'Halo, ${_getGreeting()}',
                   style: headingStyle(context, fontSize: 22),
-                ),
-                // Text(
-                //   widget.custType == 'C'
-                //       ? 'Klien JPS'
-                //       : 'Nasabah Biasa',
-                //   style: bodyTextStyle(context),
-                // ),
-                Text(
-                  _getGreeting(),
-                  style: bodyTextStyle(context),
                 ),
               ],
             ),
-          ),
+          ) : Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Halo, ${widget.userName}',
+                    style: headingStyle(context, fontSize: 22),
+                  ),
+                  Text(
+                    _getGreeting(),
+                    style: bodyTextStyle(context),
+                  ),
+                ],
+              ),
+            ),
         ],
       )
     );

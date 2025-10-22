@@ -62,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
     String? email,
     String? telepon,
     Uint8List? foto,
-    required String subtitle,
+    String? subtitle,
   }) {
     return Container(
       padding: const EdgeInsets.all(1),
@@ -88,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
           borderRadius: BorderRadius.circular(cardBorderRadius - 1.5),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildAvatar(foto, _initialsFromName(nama)),
             const SizedBox(width: 16),
@@ -98,7 +98,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Text(nama, style: headingStyle(context, fontSize: 22)),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: bodyTextStyle(context)),
+                  if (subtitle != null && subtitle.trim().isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(subtitle, style: bodyTextStyle(context)),
+                  ],
                   const SizedBox(height: 4),
                   if (email != null) ...[
                     Row(
@@ -236,7 +239,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 context: context,
                                 nama: nama,
                                 foto: null,
-                                subtitle: "Nasabah Biasa",
                               );
                             },
                           );

@@ -86,7 +86,7 @@ class CompanyProfileCard extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: AppButton.iconLeft(
-                          text: 'Hubungi Kami',
+                          text: 'Dapatkan Company Profile',
                           onPressed: () {
                                 showDialog(
                                   context: context,

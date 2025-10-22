@@ -46,7 +46,7 @@ class _StatusChipState extends State<StatusChip> {
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeOut,
         child: Stack(
-          clipBehavior: Clip.antiAlias,
+          clipBehavior: Clip.none,
           children: [
             // Main chip container
             AnimatedContainer(
