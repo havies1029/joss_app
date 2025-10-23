@@ -159,32 +159,33 @@ class _RekanPicCobCariPageState extends State<RekanPicCobCariPage> {
                                   ? () async {
                                 if (widget.viewMode == 'ubah') {
                                   // ✅ mode edit → langsung update ke API
-                                  final items = rekanPicCobCariBloc.state.items;
-                                  final listCheckbox = List<RekanPicCobCariCheckboxModel>.generate(
-                                    items.length,
-                                        (index) => RekanPicCobCariCheckboxModel(
-                                      mcobId: items[index].mcobId,
-                                      isChecked: items[index].isChecked,
-                                    ),
-                                  );
-                                  listCheckbox.removeWhere((e) => !e.isChecked);
-
-                                  final repo = RekanPicCobCariRepository();
-                                  final result = await repo.rekanPicCobUpdateList(
-                                    widget.rekanPicId,
-                                    listCheckbox,
-                                  );
-
-                                  if (result.success) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("✅ Data COB berhasil disimpan")),
-                                    );
-                                    Navigator.pop(context, items);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("⚠️ Gagal menyimpan data COB")),
-                                    );
-                                  }
+                                  // final items = rekanPicCobCariBloc.state.items;
+                                  // final listCheckbox = List<RekanPicCobCariCheckboxModel>.generate(
+                                  //   items.length,
+                                  //       (index) => RekanPicCobCariCheckboxModel(
+                                  //     mcobId: items[index].mcobId,
+                                  //     isChecked: items[index].isChecked,
+                                  //   ),
+                                  // );
+                                  // listCheckbox.removeWhere((e) => !e.isChecked);
+                                  //
+                                  // final repo = RekanPicCobCariRepository();
+                                  // final result = await repo.rekanPicCobUpdateList(
+                                  //   widget.rekanPicId,
+                                  //   listCheckbox,
+                                  // );
+                                  //
+                                  // if (result.success) {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //     const SnackBar(content: Text("✅ Data COB berhasil disimpan")),
+                                  //   );
+                                  //   Navigator.pop(context, items);
+                                  // } else {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //     const SnackBar(content: Text("⚠️ Gagal menyimpan data COB")),
+                                  //   );
+                                  // }
+                                  Navigator.pop(context, state.selectedItems);
                                 } else if (widget.viewMode == 'tambah') {
                                   // ✅ mode tambah → pending simpan, belum ke API
                                   Navigator.pop(context, state.selectedItems);

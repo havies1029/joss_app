@@ -50,7 +50,7 @@ class _ClientSectionState extends State<ClientSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 🔰 Judul
+          // Judul
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -64,7 +64,7 @@ class _ClientSectionState extends State<ClientSection> {
           ),
           const SizedBox(height: 6),
 
-          // 🔶 Badge
+          // Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: hPadding, vertical: 5),
             decoration: BoxDecoration(
@@ -79,7 +79,7 @@ class _ClientSectionState extends State<ClientSection> {
           ),
           const SizedBox(height: 18),
 
-          // 🖼️ Carousel Manual 3 Gambar
+          // Carousel Manual 3 Gambar
           BlocBuilder<GallerymemberCariBloc, GallerymemberCariState>(
             builder: (context, state) {
               if (state.items.isEmpty) {
@@ -126,7 +126,7 @@ class _ClientSectionState extends State<ClientSection> {
 
           const SizedBox(height: 22),
 
-          // 📣 Sosmed
+          // Sosmed
           Text(
             "Ikuti perjalanan kami & temukan insight seputar asuransi:",
             textAlign: TextAlign.center,
@@ -137,11 +137,11 @@ class _ClientSectionState extends State<ClientSection> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SocmedIcon('assets/icons/instagram.svg', isMobile),
-              const SizedBox(width: 15),
+              const SizedBox(width: 20),
               SocmedIcon('assets/icons/tiktok.svg', isMobile),
-              const SizedBox(width: 15),
+              const SizedBox(width: 20),
               SocmedIcon('assets/icons/linkedin.svg', isMobile),
-              const SizedBox(width: 15),
+              const SizedBox(width: 20),
               SocmedIcon('assets/icons/facebook.svg', isMobile),
             ],
           ),
@@ -151,7 +151,7 @@ class _ClientSectionState extends State<ClientSection> {
   }
 }
 
-// 🧩 Card Logo
+// Card Logo
 class _ClientLogoCard extends StatelessWidget {
   final String imagePath;
   final bool isMobile;
@@ -195,7 +195,7 @@ class _ClientLogoCard extends StatelessWidget {
   }
 }
 
-// 🧿 Ikon Sosmed
+// Ikon Sosmed
 Widget SocmedIcon(String assetPath, bool isMobile) => Container(
   width: isMobile ? 40 : 48,
   height: isMobile ? 40 : 48,

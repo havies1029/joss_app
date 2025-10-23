@@ -23,10 +23,27 @@ class BaseBackgroundSidePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryBlackColor,
+
+      // ===================== FOOTER (Moved here) =====================
+      bottomNavigationBar: Container(
+        height: 46,
+        width: double.infinity,
+        color: secondaryBlackColor,
+        alignment: Alignment.center,
+        child: Text(
+          "Claim Is Simple",
+          style: headingStyle(
+            context,
+            fontSize: getResponsiveFont(context, 16),
+          ).copyWith(fontStyle: FontStyle.italic),
+        ),
+      ),
+
+      // ===================== BODY =====================
       body: SafeArea(
         child: Column(
           children: [
-            // ===================== HEADER =====================
+            // HEADER
             Container(
               height: 56,
               color: primaryBlackColor,
@@ -51,7 +68,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
               ),
             ),
 
-            // ===================== BODY + BACKGROUND =====================
+            // BODY + BACKGROUND
             Expanded(
               child: LayoutBuilder(
                 builder: (context, c) {
@@ -85,25 +102,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
 
                       // Konten utama
                       child,
-
-                      // ===================== FOOTER FIXED =====================
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          height: 46,
-                          width: double.infinity,
-                          color: secondaryBlackColor,
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Claim Is Simple",
-                            style: headingStyle(
-                              context,
-                              fontSize: getResponsiveFont(context, 16),
-
-                            ).copyWith(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
                     ],
                   );
                 },

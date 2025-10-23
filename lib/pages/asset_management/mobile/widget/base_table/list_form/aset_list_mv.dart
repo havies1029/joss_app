@@ -39,11 +39,9 @@ class AsetListMv extends StatelessWidget {
         10: IntrinsicColumnWidth(),
         11: IntrinsicColumnWidth(),
         12: IntrinsicColumnWidth(),
-        13: IntrinsicColumnWidth(),
       },
       headerCells: const [
         _HeaderCell("No", center: true),
-        _HeaderCell("ID Asset"),
         _HeaderCell("Currency"),
         _HeaderCell("Jenis MV"),
         _HeaderCell("Merk"),
@@ -58,7 +56,6 @@ class AsetListMv extends StatelessWidget {
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         _CellText("$rowNumber", center: true),
-        _CellText(item.asetMvId),
         _CellText(item.curr),
         _CellText(item.jenisMv),
         _CellText(item.merk),

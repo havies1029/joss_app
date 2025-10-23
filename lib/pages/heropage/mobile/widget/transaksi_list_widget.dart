@@ -103,7 +103,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
             ),
           ),
 
-          const SizedBox(height: vPadding * 0.5),
+          _isExpanded? const SizedBox(height: vPadding * 0.5) : const SizedBox.shrink(),
 
           // 🔹 Animasi expand/collapse pakai kombinasi AnimatedSize + Opacity
           AnimatedSize(

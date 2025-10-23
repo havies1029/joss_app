@@ -33,11 +33,9 @@ class AsetListHealth extends StatelessWidget {
         4: IntrinsicColumnWidth(),
         5: IntrinsicColumnWidth(),
         6: IntrinsicColumnWidth(),
-        7: IntrinsicColumnWidth(),
       },
       headerCells: const [
         _HeaderCell("No", center: true),
-        _HeaderCell("ID Health"),
         _HeaderCell("Nama"),
         _HeaderCell("Nomor Polis"),
         _HeaderCell("Posisi", center: true),
@@ -46,7 +44,6 @@ class AsetListHealth extends StatelessWidget {
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         _CellText("$rowNumber", center: true),
-        _CellText(item.asethealthId),
         _CellText(item.nama),
         _CellText(item.polisNo),
         _CellText(item.posisi, center: true),

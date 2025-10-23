@@ -14,6 +14,7 @@ import '../../../../../../apis/gen_profile/rekanpiccobcari_api.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
+import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import '../../../../../gen_profile/common/rekanpiccobcari_list.dart';
 import '../../../../../gen_profile/rekanpiccobmultipage.dart';
@@ -72,6 +73,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         rekanPicId: widget.mrekanpicId,
         searchText: '',
       ));
+
+
     });
 
     if (widget.initJabatanModel != null) {
@@ -104,7 +107,18 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   String _normalizeHp(String s) => s.replaceAll(' ', '');
 
-  void _save() {
+  Future<void> _save() async {
+
+    if (_selectedCobList!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.'),
+        ),
+      );
+      debugPrint('⚠️ [VALIDATION] User belum memilih COB — simpan dibatalkan.');
+      return;
+    }
+
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     ComboMJabatanModel? selected = _jabatan;
@@ -132,9 +146,27 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       isDefault: _isDefault,
     );
 
-    context.read<MRekanPicCrudBloc>().add(
-      MRekanPicCrudUbahEvent(record: record),
-    );
+    // 🔄 Setelah berhasil update PIC, kirim COB ke server
+    final cobRepo = RekanPicCobCariRepository();
+    final listCheckbox = _selectedCobList
+        !.map((e) => RekanPicCobCariCheckboxModel(
+      mcobId: e.mcobId,
+      isChecked: e.isChecked,
+    ))
+        .toList();
+
+    final cobResult = await cobRepo.rekanPicCobUpdateList(widget.mrekanpicId, listCheckbox);
+    if (cobResult.success) {
+      debugPrint('✅ [COB] ${listCheckbox.length} item berhasil diupdate ke server.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PIC & ${listCheckbox.length} COB berhasil diperbarui!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PIC tersimpan, tapi gagal update COB.')),
+      );
+    }
+
   }
 
   @override
@@ -275,32 +307,30 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
                                   GestureDetector(
                                     onTap: () async {
-                                      // 🔹 Buka halaman multi-select COB (mode UBAH)
                                       final selectedCobs = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => BlocProvider(
                                             create: (_) => RekanPicCobCariBloc(),
                                             child: RekanPicCobCariPage(
-                                              rekanPicId: widget.mrekanpicId, // ID PIC valid
-                                              viewMode: 'ubah',
+                                              rekanPicId: widget.mrekanpicId, // tetap kirim ID valid
+                                              viewMode: 'ubah', // mode edit
                                             ),
                                           ),
                                         ),
                                       );
 
-                                      // 🔹 Setelah kembali dari halaman pilih COB
+                                      // 🔹 Setelah balik dari halaman pilih COB
                                       if (selectedCobs != null && selectedCobs.isNotEmpty) {
                                         setState(() {
-                                          _selectedCobList = selectedCobs; // update daftar lokal (tampilan)
+                                          _selectedCobList = selectedCobs;
                                         });
-                                        debugPrint("✅ Daftar COB diperbarui untuk ${widget.mrekanpicId}");
+                                        debugPrint("🟠 Pending COB disimpan sementara: ${_selectedCobList?.length} item");
                                       }
                                     },
                                     child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        // 🧩 Icon kiri (pakai SVG list_cob_icon)
                                         Container(
                                           padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
@@ -311,15 +341,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                             'assets/icons/list_cob_icon.svg',
                                             width: 20,
                                             height: 20,
-                                            colorFilter: const ColorFilter.mode(
-                                              Colors.white,
-                                              BlendMode.srcIn,
-                                            ),
+                                            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                                           ),
                                         ),
                                         const SizedBox(width: 12),
-
-                                        // 📋 Konten teks & daftar chip COB
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +356,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                               ),
                                               const SizedBox(height: 4),
 
-                                              if (_selectedCobList == null || _selectedCobList!.isEmpty)
+                                              if (_selectedCobList!.isEmpty)
                                                 const Text(
                                                   'Pilih Daftar COB',
                                                   style: TextStyle(
@@ -344,8 +369,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                 Wrap(
                                                   spacing: 6,
                                                   runSpacing: 6,
-                                                  children: _selectedCobList!
-                                                      .map(
+                                                  children: _selectedCobList
+                                                      !.map(
                                                         (e) => Container(
                                                       padding: const EdgeInsets.symmetric(
                                                           horizontal: 10, vertical: 6),
@@ -371,6 +396,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       ],
                                     ),
                                   ),
+
 
                                   const SizedBox(height: 20),
 

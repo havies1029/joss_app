@@ -36,16 +36,14 @@ class AsetListPar extends StatelessWidget {
         7: IntrinsicColumnWidth(),
         8: IntrinsicColumnWidth(),
         9: IntrinsicColumnWidth(),
-        10: IntrinsicColumnWidth(),
-        11: IntrinsicColumnWidth(),
+
       },
       headerCells: const [
         _HeaderCell("No", center: true),
         _HeaderCell("Alamat"),
-        _HeaderCell("ID Aset PAR"),
         _HeaderCell("Currency"),
         _HeaderCell("Klausula Bank"),
-        _HeaderCell("Rekan ID"),
+
         _HeaderCell("Polis No"),
         _HeaderCell("Sum Insured"),
         _HeaderCell("Premi"),
@@ -55,10 +53,9 @@ class AsetListPar extends StatelessWidget {
       rowBuilder: (context, item, rowNumber, cubit) => [
         _CellText("$rowNumber", center: true),
         _CellText(item.alamat),
-        _CellText(item.asetParId),
         _CellText(item.curr),
         _CellText(item.klausulaBank),
-        _CellText(item.mrekanId),
+
         _CellText(item.polisNo),
         _CellText(
           NumberFormat.currency(locale: 'id', symbol: 'IDR ')

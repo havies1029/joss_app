@@ -54,7 +54,7 @@ class _StatusChipState extends State<StatusChip> {
               height: widget.height,
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                color: widget.isSelected ? sGrey : pGrey,
+                color: widget.isSelected ? primaryColor : pGrey,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(

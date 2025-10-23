@@ -88,11 +88,11 @@ class CompanyProfileCard extends StatelessWidget {
                         child: AppButton.iconLeft(
                           text: 'Dapatkan Company Profile',
                           onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => const ComproContactDialog(),
-                                );
-                              },
+                            showDialog(
+                              context: context,
+                              builder: (_) => const ComproContactDialog(),
+                            );
+                          },
                           icon: SvgPicture.asset(
                             'assets/icons/chat.svg',
                             height: 18,
@@ -120,68 +120,88 @@ class ComproContactDialog extends StatefulWidget {
 
 class ComproContactDialogState extends State<ComproContactDialog> {
   final TextEditingController _controller = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: pGrey,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(cardBorderRadius)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Masukan No. Telephone Anda",
-              style: bodyTextStyle(context, fontSize: 16)
-            ),
-            const SizedBox(height: 15),
-            appTextField(
-              label: "No. Telp",
-              controller: _controller,
-              keyboardType: TextInputType.phone,
-              prefix: Text(
-                  "+62 | ",
-                  style: bodyTextStyle(context, fontSize: 16)
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Masukan No. Telephone Anda",
+                style: bodyTextStyle(context, fontSize: 16),
               ),
-              hint: "Masukkan nomor telepon",
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton.iconLeft(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 16),
-                    text: "Batal",
-                    textStyle: headingStyle(context, fontSize: 16),
-                    onPressed: () => Navigator.pop(context),
-                    isOutlined: true,
-                    backgroundColor: formGrey,
-                    height: 31.58,
-                  ),
+              const SizedBox(height: 15),
+              appTextField(
+                label: "No. Telp",
+                controller: _controller,
+                keyboardType: TextInputType.phone,
+                prefix: Text(
+                  "+62 | ",
+                  style: bodyTextStyle(context, fontSize: 16),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: AppButton.iconLeft(
-                    text: "Lanjut",
-                    height: 31.58,
-                    icon: const Icon(Icons.check, color: Colors.white, size: 16),
-                    backgroundColor: primaryColor,
-                    textStyle: headingStyle(context, fontSize: 16),
-                    onPressed: () {
-                      final phone = _controller.text.trim();
-                      if (phone.isNotEmpty) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Nomor: +62 $phone')),
-                        );
-                      }
-                    },
+                hint: "Masukkan nomor telepon",
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Nomor telepon wajib diisi";
+                  }
+                  if (value.length < 9) {
+                    return "Nomor terlalu pendek";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.iconLeft(
+                      icon: const Icon(Icons.close,
+                          color: Colors.white, size: 16),
+                      text: "Batal",
+                      textStyle: headingStyle(context, fontSize: 16),
+                      onPressed: () => Navigator.pop(context),
+                      isOutlined: true,
+                      backgroundColor: formGrey,
+                      height: 31.58,
+                    ),
                   ),
-                ),
-              ],
-            )
-          ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: AppButton.iconLeft(
+                      text: "Lanjut",
+                      height: 31.58,
+                      icon:
+                      const Icon(Icons.check, color: Colors.white, size: 16),
+                      backgroundColor: primaryColor,
+                      textStyle: headingStyle(context, fontSize: 16),
+                      onPressed: () {
+                        // 🔹 Jalankan validasi form
+                        if (_formKey.currentState!.validate()) {
+                          final phone = _controller.text.trim();
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Nomor: +62 $phone')),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

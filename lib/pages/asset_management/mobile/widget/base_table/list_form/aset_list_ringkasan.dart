@@ -34,12 +34,12 @@ class AsetListRingkasan extends StatelessWidget {
         6: IntrinsicColumnWidth(),
         7: IntrinsicColumnWidth(),
         8: IntrinsicColumnWidth(),
-        9: IntrinsicColumnWidth(),
+
       },
       headerCells: const [
         _HeaderCell("No", center: true),
         _HeaderCell("Nama Aset"),
-        _HeaderCell("ID Ringkasan"),
+
         _HeaderCell("Currency"),
         _HeaderCell("Jumlah"),
         _HeaderCell("Nilai"),
@@ -50,7 +50,7 @@ class AsetListRingkasan extends StatelessWidget {
       rowBuilder: (context, item, rowNumber, cubit) => [
         _CellText("$rowNumber", center: true),
         _CellText(item.asetNama),
-        _CellText(item.asetRingkasanId),
+
         _CellText(item.curr),
         _CellText("${item.jmlAset} ${item.satuan}"),
         _CellText(NumberFormat.currency(locale: 'id', symbol: 'IDR ')
