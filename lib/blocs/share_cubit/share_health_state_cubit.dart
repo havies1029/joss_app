@@ -61,4 +61,19 @@ class ShareHealthStateCubit extends Cubit<Map<String, AsetHealthCariModel>> {
   void _updateGlobalState(Map<String, AsetHealthCariModel> current) {
     globalActive = (current.length == totalItems && totalItems > 0);
   }
+
+  List<Map<String, dynamic>> getExportData() {
+    return state.values.map((e) {
+      return {
+        'ID': e.asethealthId,
+        'Nama': e.nama,
+        'Tanggal Lahir': e.dob.toIso8601String().split('T').first,
+        'Jenis Kelamin': e.jnskel,
+        'Posisi': e.posisi,
+        'No. Polis': e.polisNo,
+        'Status': e.status,
+        'Nomor Urut': e.nomor,
+      };
+    }).toList();
+  }
 }

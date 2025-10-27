@@ -20,6 +20,8 @@ import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
 import 'package:joss_app/repositories/gen_dn1/dn1cari_repository.dart';
+import 'package:joss_app/repositories/gen_endors/endors1crud_repository.dart';
+import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim2crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanbankcrud_repository.dart';
@@ -78,6 +80,9 @@ import 'blocs/gen_berita/berita3cari_bloc.dart';
 import 'blocs/gen_berita/beritakecilcari_bloc.dart';
 import 'blocs/gen_berita/beritalaincari_bloc.dart';
 import 'blocs/gen_cob_app/cobcari_bloc.dart';
+import 'blocs/gen_endors/endors1crud_bloc.dart';
+import 'blocs/gen_endors/endors1list_bloc.dart';
+import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_klaim/klaim1crud_bloc.dart';
 import 'blocs/gen_klaim/klaim1list_bloc.dart';
 import 'blocs/gen_klaim/klaim2crud_bloc.dart';
@@ -240,6 +245,9 @@ Future<void> main() async {
         BlocProvider<CobCariBloc>(
             create: (context) => CobCariBloc()),
         BlocProvider<Dn1CariBloc>(create: (context) => Dn1CariBloc()),
+        BlocProvider(create: (context) => InviteBloc(repo: InviteRepository())),
+        BlocProvider(create: (context) => Endors1CrudBloc(repository: Endors1CrudRepository())),
+        BlocProvider(create: (context) => Endors1ListBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

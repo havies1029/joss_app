@@ -11,11 +11,27 @@ class FetchAsetParCariEvent extends AsetParCariEvents {}
 
 class RefreshAsetParCariEvent extends AsetParCariEvents {
 	final String searchText;
-  final String statusId;
+	final String statusId;
 
-	const RefreshAsetParCariEvent({required this.searchText, required this.statusId});
+	const RefreshAsetParCariEvent({
+		required this.searchText,
+		required this.statusId,
+	});
 
 	@override
 	List<Object> get props => [searchText, statusId];
 }
 
+// ✅ Event baru khusus debug (tidak mempengaruhi UI)
+class DebugFetchAsetParCariEvent extends AsetParCariEvents {
+	final String searchText;
+	final String statusId;
+
+	const DebugFetchAsetParCariEvent({
+		required this.searchText,
+		required this.statusId,
+	});
+
+	@override
+	List<Object> get props => [searchText, statusId];
+}

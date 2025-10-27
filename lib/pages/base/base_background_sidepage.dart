@@ -34,7 +34,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
           "Claim Is Simple",
           style: headingStyle(
             context,
-            fontSize: getResponsiveFont(context, 16),
+            fontSize: getResponsiveFont(context, 18),
           ).copyWith(fontStyle: FontStyle.italic),
         ),
       ),

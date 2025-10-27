@@ -19,7 +19,6 @@ import 'package:joss_app/pages/gen_status_aset/button_group_status_aset.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 class AsetCariPage extends StatefulWidget {
   const AsetCariPage({super.key});
 
@@ -44,61 +43,78 @@ class _AsetCariPageState extends State<AsetCariPage> {
     asetParCariBloc = BlocProvider.of<AsetParCariBloc>(context);
     asetMvCariBloc = BlocProvider.of<AsetMvCariBloc>(context);
     asetHealthCariBloc = BlocProvider.of<AsetHealthCariBloc>(context);
-    return BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
-      listener: (context, state) {
-        refreshData();
-      },
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            ButtonGroupCobAsetWidget(),
-            ListPageFilterBarUIWidget(
-                searchController: _searchController,
-                searchButton: buildSearchButton()),
-            ButtonGroupStatusAsetWidget(),
-            BlocConsumer<CobCariBloc, CobCariState>(
-              builder: (context, state) {
-                if (state.status == ListStatus.initial) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state.status == ListStatus.failure) {
-                  return const Center(child: Text('Failed to fetch data'));
-                }
-                if (state.items.isEmpty) {
-                  return const Center(child: Text('No items found'));
-                } else if (state.selectedCOBId == "10001") {
-                  return SizedBox(
-                      height: 400,
-                      child: AsetRingkasanCariListWidget(
-                          searchText: _searchController.text));
-                } else if (state.selectedCOBId == "10002") {
-                  return SizedBox(
-                      height: 400,
-                      child: AsetParCariListWidget(
-                          searchText: _searchController.text));
-                } else if (state.selectedCOBId == "10003") {
-                  return SizedBox(
-                      height: 400,
-                      child: AsetMvCariListWidget(
-                          searchText: _searchController.text));
-                } else if (state.selectedCOBId == "10004") {
-                  return const Center(child: Text('Belum ada Table Angkutan'));
-                } else if (state.selectedCOBId == "10005") {
-                  return SizedBox(
-                      height: 400,
-                      child: AsetHealthCariListWidget(
-                          searchText: _searchController.text));
-                } else {
-                  return Container(); // Or any other widget for default case
-                }
-              },              
-              listener: (context, state) {
-                if (state.selectedCOBId.isNotEmpty) {
-                  refreshData();
-                }
-              },
+
+    return Scaffold( // ✅ Tambahkan ini
+      backgroundColor: primaryBlackColor,
+      body: SafeArea(
+        child: BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
+          listener: (context, state) {
+            refreshData();
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const ButtonGroupCobAsetWidget(),
+                ListPageFilterBarUIWidget(
+                  searchController: _searchController,
+                  searchButton: buildSearchButton(),
+                ),
+                const ButtonGroupStatusAsetWidget(),
+                BlocConsumer<CobCariBloc, CobCariState>(
+                  builder: (context, state) {
+                    if (state.status == ListStatus.initial) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (state.status == ListStatus.failure) {
+                      return const Center(child: Text('Failed to fetch data'));
+                    }
+                    if (state.items.isEmpty) {
+                      return const Center(child: Text('No items found'));
+                    }
+
+                    if (state.selectedCOBId == "10001") {
+                      return SizedBox(
+                        height: 400,
+                        child: AsetRingkasanCariListWidget(
+                          searchText: _searchController.text,
+                        ),
+                      );
+                    } else if (state.selectedCOBId == "10002") {
+                      return SizedBox(
+                        height: 400,
+                        child: AsetParCariListWidget(
+                          searchText: _searchController.text,
+                        ),
+                      );
+                    } else if (state.selectedCOBId == "10003") {
+                      return SizedBox(
+                        height: 400,
+                        child: AsetMvCariListWidget(
+                          searchText: _searchController.text,
+                        ),
+                      );
+                    } else if (state.selectedCOBId == "10005") {
+                      return SizedBox(
+                        height: 400,
+                        child: AsetHealthCariListWidget(
+                          searchText: _searchController.text,
+                        ),
+                      );
+                    } else {
+                      return const Center(
+                        child: Text('Belum ada Table untuk COB ini'),
+                      );
+                    }
+                  },
+                  listener: (context, state) {
+                    if (state.selectedCOBId.isNotEmpty) {
+                      refreshData();
+                    }
+                  },
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -106,36 +122,35 @@ class _AsetCariPageState extends State<AsetCariPage> {
 
   IconButton buildSearchButton() {
     return IconButton(
-        icon: const Icon(
-          Icons.autorenew_rounded,
-          size: 35.0,
-        ),
-        onPressed: () {
-          refreshData();
-        });
+      icon: const Icon(Icons.autorenew_rounded, size: 35.0),
+      onPressed: refreshData,
+    );
   }
 
   void refreshData() {
     var stateCob = cobAsetBloc.state;
     var stateStatus = statusAsetBloc.state;
+
     if (stateCob.selectedCOBId == "10001") {
       asetRingkasanCariBloc.add(RefreshAsetRingkasanCariEvent(
-          statusId: stateStatus.selectedStatusId,
-          searchText: _searchController.text));
+        statusId: stateStatus.selectedStatusId,
+        searchText: _searchController.text,
+      ));
     } else if (stateCob.selectedCOBId == "10002") {
       asetParCariBloc.add(RefreshAsetParCariEvent(
-          statusId: stateStatus.selectedStatusId,
-          searchText: _searchController.text));
+        statusId: stateStatus.selectedStatusId,
+        searchText: _searchController.text,
+      ));
     } else if (stateCob.selectedCOBId == "10003") {
       asetMvCariBloc.add(RefreshAsetMvCariEvent(
-          statusId: stateStatus.selectedStatusId,
-          searchText: _searchController.text));
-    } else if (stateCob.selectedCOBId == "10004") {
-      //return const Center(child: Text('Belum ada Table Angkutan'));
+        statusId: stateStatus.selectedStatusId,
+        searchText: _searchController.text,
+      ));
     } else if (stateCob.selectedCOBId == "10005") {
       asetHealthCariBloc.add(RefreshAsetHealthCariEvent(
-          statusId: stateStatus.selectedStatusId,
-          searchText: _searchController.text));
+        statusId: stateStatus.selectedStatusId,
+        searchText: _searchController.text,
+      ));
     }
   }
 }

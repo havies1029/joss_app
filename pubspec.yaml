@@ -215,7 +215,17 @@ flutter:
     - assets/icons/logo_bantuan.jpg
     - assets/icons/refresh_cob_icon.svg
     - assets/icons/list_cob_icon.svg
-
+    - assets/icons/cs.svg
+    - assets/icons/aktif_hover.svg
+    - assets/icons/diproses_hover.svg
+    - assets/icons/jatuhtempo_hover.svg
+    - assets/icons/nonaktif_hover.svg
+    - assets/icons/aktifkan_kembali.svg
+    - assets/icons/lacak_polis.svg
+    - assets/icons/unduh_polis.svg
+    - assets/icons/perpanjangan.svg
+    - assets/icons/no_data.svg
+    - assets/icons/icons_telephone.svg
 
   fonts:
     - family: Delm-Regular

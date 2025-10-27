@@ -9,18 +9,26 @@ import '../tables/reusable_aset_table.dart';
 
 class AsetListRingkasan extends StatelessWidget {
   final String searchText;
-  const AsetListRingkasan({super.key, required this.searchText});
+  final String? statusLabel;
+
+  const AsetListRingkasan({
+    super.key,
+    required this.searchText,
+    this.statusLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ShareRingkasanStateCubit>();
 
+
     return ReusableAsetTable<
         AsetRingkasanCariBloc,
         AsetRingkasanCariState,
-        AsetRingkasanCariModel>(
+        AsetRingkasanCariModel,
+        ShareRingkasanStateCubit>(
       bloc: context.read<AsetRingkasanCariBloc>(),
-      cubit: cubit, // Cubit dengan state Map<String, dynamic>
+      cubit: cubit,
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetRingkasanId,
@@ -34,77 +42,34 @@ class AsetListRingkasan extends StatelessWidget {
         6: IntrinsicColumnWidth(),
         7: IntrinsicColumnWidth(),
         8: IntrinsicColumnWidth(),
-
       },
       headerCells: const [
-        _HeaderCell("No", center: true),
-        _HeaderCell("Nama Aset"),
-
-        _HeaderCell("Currency"),
-        _HeaderCell("Jumlah"),
-        _HeaderCell("Nilai"),
-        _HeaderCell("Premi"),
-        _HeaderCell("Nomor Urut", center: true),
-        _HeaderCell("Satuan", center: true),
+        HeaderCell("No", center: true),
+        HeaderCell("Nama Aset"),
+        HeaderCell("Currency"),
+        HeaderCell("Jumlah"),
+        HeaderCell("Nilai"),
+        HeaderCell("Premi"),
+        HeaderCell("Nomor Urut", center: true),
+        HeaderCell("Satuan", center: true),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
-        _CellText("$rowNumber", center: true),
-        _CellText(item.asetNama),
-
-        _CellText(item.curr),
-        _CellText("${item.jmlAset} ${item.satuan}"),
-        _CellText(NumberFormat.currency(locale: 'id', symbol: 'IDR ')
+        CellText("$rowNumber", center: true),
+        CellText(item.asetNama),
+        CellText(item.curr),
+        CellText("${item.jmlAset} ${item.satuan}"),
+        CellText(NumberFormat.currency(locale: 'id', symbol: 'IDR ')
             .format(item.nilaiAset)),
-        _CellText(NumberFormat.currency(locale: 'id', symbol: 'IDR ')
+        CellText(NumberFormat.currency(locale: 'id', symbol: 'IDR ')
             .format(item.nilaiPremi)),
-        _CellText("${item.noUrut}", center: true),
-        _CellText(item.satuan, center: true),
+        CellText("${item.noUrut}", center: true),
+        CellText(item.satuan, center: true),
       ],
+      onFetchMore: () {
+        context.read<AsetRingkasanCariBloc>().add(FetchAsetRingkasanCariEvent());
+      },
+      emptyStatusLabel: statusLabel,
     );
   }
 }
 
-// 🔹 Tetap bisa pakai komponen text ini buat gaya konsisten
-class _HeaderCell extends StatelessWidget {
-  final String text;
-  final bool center;
-  const _HeaderCell(this.text, {this.center = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      alignment: center ? Alignment.center : Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: getResponsiveFont(context, 16),
-          color: primaryLightColor,
-        ),
-      ),
-    );
-  }
-}
-
-class _CellText extends StatelessWidget {
-  final String text;
-  final bool center;
-  const _CellText(this.text, {this.center = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      alignment: center ? Alignment.center : Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: getResponsiveFont(context, 14),
-          color: primaryLightColor,
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-}

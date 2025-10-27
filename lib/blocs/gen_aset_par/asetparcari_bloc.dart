@@ -13,54 +13,102 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 	AsetParCariBloc() : super(const AsetParCariState()) {
 		on<FetchAsetParCariEvent>(onFetchAsetParCari);
 		on<RefreshAsetParCariEvent>(onRefreshAsetParCari);
+		on<DebugFetchAsetParCariEvent>(_onDebugFetchAsetParCari); // ✅ Tambahan event debug
 	}
 
-Future<void> onRefreshAsetParCari(
-		RefreshAsetParCariEvent event, Emitter<AsetParCariState> emit) async {
-	emit(AsetParCariState(
-		items: const [],
-		status: ListStatus.initial,
-		hal: 0,
-		searchText: event.searchText,
-		statusId: event.statusId,
-		hasReachedMax: false,
-	));
-  emit(state.copyWith( searchText: event.searchText, hal: 0, statusId: event.statusId));
-
-	add(FetchAsetParCariEvent());
-}
-
-Future<void> onFetchAsetParCari(
-		FetchAsetParCariEvent event, Emitter<AsetParCariState> emit) async {
-	if (state.hasReachedMax) return;
-
-	AsetParCariRepository repo = AsetParCariRepository();
-	if (state.status == ListStatus.initial) {
-		List<AsetParCariModel> items = await repo.getAsetParCari(state.statusId, state.searchText, 0);
-		return emit(state.copyWith(
-			items: items,
+	// 🔁 Refresh normal (update tabel)
+	Future<void> onRefreshAsetParCari(
+			RefreshAsetParCariEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(AsetParCariState(
+			items: const [],
+			status: ListStatus.initial,
+			hal: 0,
+			searchText: event.searchText,
+			statusId: event.statusId,
 			hasReachedMax: false,
-			status: ListStatus.success,
-			hal: 1));
+		));
+
+		emit(state.copyWith(
+			searchText: event.searchText,
+			hal: 0,
+			statusId: event.statusId,
+		));
+
+		add(FetchAsetParCariEvent());
 	}
-	List<AsetParCariModel> items = await repo.getAsetParCari(state.statusId, state.searchText, state.hal);
-	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
-	} else {
-		List<AsetParCariModel> asetParCari = List.of(state.items)..addAll(items);
 
-		final result = asetParCari
-			.whereWithIndex((e, index) =>
-				asetParCari.indexWhere((e2) => e2.asetParId == e.asetParId) ==
-				index)
-			.toList();
+	// 📦 Fetch normal (update UI)
+	Future<void> onFetchAsetParCari(
+			FetchAsetParCariEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		if (state.hasReachedMax) return;
 
-		return emit(state.copyWith(
-			items: result,
-			hasReachedMax: false,
-			status: ListStatus.success,
-			hal: state.hal + 1));
+		final repo = AsetParCariRepository();
+
+		if (state.status == ListStatus.initial) {
+			final items = await repo.getAsetParCari(state.statusId, state.searchText, 0);
+			return emit(state.copyWith(
+				items: items,
+				hasReachedMax: false,
+				status: ListStatus.success,
+				hal: 1,
+			));
 		}
 
+		final items = await repo.getAsetParCari(state.statusId, state.searchText, state.hal);
+		if (items.isEmpty) {
+			return emit(state.copyWith(hasReachedMax: true));
+		} else {
+			final asetParCari = List.of(state.items)..addAll(items);
+
+			final result = asetParCari
+					.whereWithIndex((e, index) =>
+			asetParCari.indexWhere((e2) => e2.asetParId == e.asetParId) == index)
+					.toList();
+
+			return emit(state.copyWith(
+				items: result,
+				hasReachedMax: false,
+				status: ListStatus.success,
+				hal: state.hal + 1,
+			));
+		}
+	}
+
+	// 🧠 Debug Fetch (tidak ubah UI, hanya tampil di console)
+	Future<void> _onDebugFetchAsetParCari(
+			DebugFetchAsetParCariEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		final repo = AsetParCariRepository();
+
+		debugPrint("🏠 [DebugFetch] Mulai ambil data PAR untuk '${event.searchText}'...");
+
+		try {
+			final results = await repo.getAsetParCari(event.statusId, event.searchText, 0);
+
+			debugPrint("✅ [DebugFetch] ${results.length} hasil ditemukan untuk '${event.searchText}'");
+			for (final i in results) {
+				debugPrint("""
+				🏠 [Data PAR]
+				──────────────────────────────
+				• Alamat       : ${i.alamat}
+				• Currency     : ${i.curr}
+				• Klausula     : ${i.klausulaBank}
+				• Polis No     : ${i.polisNo}
+				• Sum Insured  : ${i.sumInsured}
+				• Premi        : ${i.premi}
+				• Status       : ${i.status}
+				──────────────────────────────
+				""");
+			}
+			debugPrint("-----------------------------------------------------");
+		} catch (e, stack) {
+			debugPrint("💥 [DebugFetch] Error: $e");
+			debugPrint(stack.toString());
+		}
 	}
 }

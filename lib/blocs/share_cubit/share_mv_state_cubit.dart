@@ -65,4 +65,24 @@ class ShareMvStateCubit extends Cubit<Map<String, AsetMvCariModel>> {
   void _updateGlobalStatus() {
     globalActive = state.length == totalItems && totalItems > 0;
   }
+
+  /// 🔹 Data siap ekspor (versi readable untuk Excel/PDF)
+  List<Map<String, dynamic>> getExportData() {
+    return state.values.map((e) {
+      return {
+        'ID': e.asetMvId,
+        'No. Polisi': e.noPolisi,
+        'No. Polis': e.polisNo,
+        'Jenis': e.jenisMv,
+        'Merk': e.merk,
+        'Tipe': e.tipe,
+        'Tahun': e.tahun,
+        'Currency': e.curr,
+        'Sum Insured': e.sumInsured,
+        'Premi': e.premi,
+        'Status': e.status,
+        'Nomor Urut': e.nomor,
+      };
+    }).toList();
+  }
 }

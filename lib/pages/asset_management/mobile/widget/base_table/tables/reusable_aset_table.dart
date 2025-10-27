@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
 /// ✅ Universal reusable table
 /// Punya fitur: pagination, select all, item select, dan bisa dipakai di semua modul aset
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:joss_app/common/constants.dart';
+
+import '../../../../../../widgets/EmptyStateWidget.dart';
+
+/// ✅ Universal reusable table
+/// Sekarang support: pagination + select all + infinite scroll (auto fetch)
 class ReusableAsetTable<
 TBloc extends StateStreamableSource<TState>,
 TState,
-TModel> extends StatefulWidget {
+TModel,
+TCubit extends Cubit<Map<String, TModel>>> extends StatefulWidget {
   final TBloc bloc;
-  final Cubit<Map<String, dynamic>> cubit;
+  final TCubit cubit;
   final List<TModel> Function(TState state) getItems;
   final ListStatus Function(TState state) getStatus;
   final Map<int, TableColumnWidth> columnWidths;
@@ -19,8 +30,11 @@ TModel> extends StatefulWidget {
       BuildContext context,
       TModel item,
       int rowNumber,
-      Cubit<Map<String, dynamic>> cubit,
+      TCubit cubit,
       ) rowBuilder;
+
+  final VoidCallback? onFetchMore;
+  final String? emptyStatusLabel;
 
   const ReusableAsetTable({
     super.key,
@@ -32,19 +46,58 @@ TModel> extends StatefulWidget {
     required this.headerCells,
     required this.getItemId,
     required this.rowBuilder,
+    this.onFetchMore,
+    this.emptyStatusLabel,
   });
 
   @override
-  State<ReusableAsetTable<TBloc, TState, TModel>> createState() =>
-      _ReusableAsetTableState<TBloc, TState, TModel>();
+  State<ReusableAsetTable<TBloc, TState, TModel, TCubit>> createState() =>
+      _ReusableAsetTableState<TBloc, TState, TModel, TCubit>();
 }
 
 class _ReusableAsetTableState<
 TBloc extends StateStreamableSource<TState>,
 TState,
-TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
+TModel,
+TCubit extends Cubit<Map<String, TModel>>>
+    extends State<ReusableAsetTable<TBloc, TState, TModel, TCubit>> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isFetchingMore = false;
+
   int _rowsPerPage = 10;
   int _currentPage = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients || _isFetchingMore) return;
+
+    final position = _scrollController.position;
+    const threshold = 150.0;
+
+    if (position.pixels >= position.maxScrollExtent - threshold) {
+      if (widget.onFetchMore != null) {
+        _isFetchingMore = true;
+        widget.onFetchMore!();
+
+        Future.delayed(const Duration(seconds: 1), () {
+          _isFetchingMore = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +107,7 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
         final items = widget.getItems(state);
         final status = widget.getStatus(state);
 
+        // ⏳ Loading state
         if (status == ListStatus.initial) {
           return const Center(
             child: CircularProgressIndicator(
@@ -62,6 +116,7 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
           );
         }
 
+        // ✅ Success state dengan data
         if (status == ListStatus.success && items.isNotEmpty) {
           final totalItems = items.length;
           final totalPages = (totalItems / _rowsPerPage).ceil();
@@ -71,8 +126,7 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
               : _currentPage * _rowsPerPage;
           final paginatedItems = items.sublist(startIndex, endIndex);
 
-          return BlocBuilder<Cubit<Map<String, dynamic>>,
-              Map<String, dynamic>>(
+          return BlocBuilder<TCubit, Map<String, TModel>>(
             bloc: widget.cubit,
             builder: (context, selectedItems) {
               final isAllSelected =
@@ -86,18 +140,17 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: secondaryBlackColor,
-                        borderRadius:
-                        BorderRadius.circular(cardBorderRadius),
-                        border: Border.all(
-                            color: sGrey.withOpacity(0.5), width: 1),
+                        borderRadius: BorderRadius.circular(cardBorderRadius),
+                        border: Border.all(color: sGrey, width: 1),
                       ),
                       clipBehavior: Clip.hardEdge,
                       child: ScrollConfiguration(
                         behavior: ScrollConfiguration.of(context)
                             .copyWith(scrollbars: false, overscroll: false),
                         child: SingleChildScrollView(
+                          controller: _scrollController,
                           scrollDirection: Axis.vertical,
-                          physics: const ClampingScrollPhysics(),
+                          physics: const AlwaysScrollableScrollPhysics(),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             physics: const ClampingScrollPhysics(),
@@ -113,10 +166,10 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
                                 TableCellVerticalAlignment.middle,
                                 columnWidths: widget.columnWidths,
                                 children: [
-                                  // ✅ HEADER DENGAN SELECT ALL
+                                  // 🧭 HEADER
                                   TableRow(
                                     decoration:
-                                    BoxDecoration(color: formGrey),
+                                    const BoxDecoration(color: formGrey),
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.all(8),
@@ -131,14 +184,16 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
                                                   selectedItems.clear();
                                                 } else {
                                                   for (var item in items) {
-                                                    final id = widget.getItemId(item);
+                                                    final id =
+                                                    widget.getItemId(item);
                                                     selectedItems[id] = item;
                                                   }
                                                 }
                                               });
-
-                                              // 🔹 Sinkron ke cubit agar bisa diunduh
-                                              widget.cubit.emit(Map<String, dynamic>.from(selectedItems));
+                                              widget.cubit.emit(
+                                                Map<String, TModel>.from(
+                                                    selectedItems),
+                                              );
                                             },
                                             child: AnimatedSwitcher(
                                               duration: const Duration(
@@ -168,7 +223,7 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
                                     ],
                                   ),
 
-                                  // ✅ DATA ROWS
+                                  // 📊 ROWS
                                   for (int i = 0;
                                   i < paginatedItems.length;
                                   i++)
@@ -195,26 +250,29 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
           );
         }
 
-        return Center(
+        // ⚠️ Success tapi data kosong
+        if (status == ListStatus.success && items.isEmpty) {
+          return EmptyStateWidget(
+            statusLabel: widget.emptyStatusLabel ?? 'Aktif',
+          );
+        }
+
+        // ❌ Default fallback
+        return const Center(
           child: Text(
-            "No Data Available!!",
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: getResponsiveFont(context, 14),
-              fontWeight: FontWeight.bold,
-            ),
+            "Gagal memuat data.",
+            style: TextStyle(color: Colors.red),
           ),
         );
       },
     );
   }
 
-  /// ✅ Build setiap baris data dengan checkbox individual
   TableRow _buildDataRow(
       BuildContext context,
       TModel item,
       int rowNumber,
-      Map<String, dynamic> selectedItems,
+      Map<String, TModel> selectedItems,
       ) {
     final id = widget.getItemId(item);
     final isActive = selectedItems.containsKey(id);
@@ -238,8 +296,7 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
                 }
               });
 
-              // 🔹 Sinkron ke cubit
-              widget.cubit.emit(Map<String, dynamic>.from(selectedItems));
+              widget.cubit.emit(Map<String, TModel>.from(selectedItems));
             },
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 150),
@@ -261,7 +318,6 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
     );
   }
 
-  /// ✅ Pagination sederhana
   Widget _buildPagination(BuildContext context, int totalPages) {
     if (totalPages <= 1) return const SizedBox.shrink();
 
@@ -327,6 +383,116 @@ TModel> extends State<ReusableAsetTable<TBloc, TState, TModel>> {
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ActionButtonWidget extends StatelessWidget {
+  final String asset;
+  final String label;
+  final Color bgColor;
+  final VoidCallback? onTap; // 🔹 ubah dari required ke opsional
+  final double iconSize;
+
+  const ActionButtonWidget({
+    super.key,
+    required this.asset,
+    required this.label,
+    required this.bgColor,
+    this.onTap, // 🔹 karena bisa null, handler default kita bikin di bawah
+    this.iconSize = 16,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap ??
+              () => debugPrint("[ActionButtonWidget] '${label}' belum di-handle."),
+      child: Container(
+        height: 26,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.10),
+              blurRadius: 4,
+              offset: const Offset(1, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              asset,
+              width: iconSize,
+              height: iconSize,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// 🔹 Tetap bisa pakai komponen text ini buat gaya konsisten
+class HeaderCell extends StatelessWidget {
+  final String text;
+  final bool center;
+  const HeaderCell(this.text, {this.center = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      alignment: center ? Alignment.center : Alignment.centerLeft,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: getResponsiveFont(context, 16),
+          color: primaryLightColor,
+        ),
+      ),
+    );
+  }
+}
+
+class CellText extends StatelessWidget {
+  final String text;
+  final bool center;
+  const CellText(this.text, {this.center = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      alignment: center ? Alignment.center : Alignment.centerLeft,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: getResponsiveFont(context, 14),
+          color: primaryLightColor,
+        ),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

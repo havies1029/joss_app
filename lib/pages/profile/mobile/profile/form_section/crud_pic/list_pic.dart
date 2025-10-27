@@ -10,6 +10,10 @@ import 'package:joss_app/pages/profile/mobile/profile/form_section/crud_pic/tamb
 import 'package:joss_app/pages/profile/mobile/profile/form_section/crud_pic/edit_pic.dart';
 import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 
+import '../../../../../../blocs/gen_invite/invite_bloc.dart';
+import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../../repositories/gen_invite/invite_repository.dart';
+import '../../../../../../widgets/apptheme/invite_success_popup.dart';
 import '../../../../../base/base_background_sidepage.dart';
 
 
@@ -158,36 +162,37 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                         telp: it.picHp ?? '-',
                                         jabatan: it.jabatanDesc ?? '-',
                                         mrekanpicId: it.mrekanpicId!,
-                                        onEdit: () async {
-                                          final jabatanModelFromList =
-                                          ComboMJabatanModel(
-                                            mjabatanId: it.mjabatanId!.toString(),
-                                            jabatanDesc: it.jabatanDesc ?? '',
-                                          );
+                                          onEdit: () async {
+                                            final jabatanModelFromList = ComboMJabatanModel(
+                                              mjabatanId: it.mjabatanId!.toString(),
+                                              jabatanDesc: it.jabatanDesc ?? '',
+                                            );
 
-                                          final changed = await Navigator.push<bool>(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => BlocProvider.value(
-                                                value: context.read<MRekanPicCrudBloc>(),
-                                                child: EditPicWidget(
-                                                  mrekanpicId: it.mrekanpicId!,
-                                                  initNama: it.picNama,
-                                                  initEmail: it.picEmail,
-                                                  initHp: it.picHp,
-                                                  initJabatanModel:
-                                                  jabatanModelFromList,
-                                                  initIsDefault:
-                                                  it.isDefault ?? false,
+                                            final changed = await Navigator.push<bool>(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => MultiBlocProvider(
+                                                  providers: [
+                                                    BlocProvider.value(value: context.read<MRekanPicCrudBloc>()),
+                                                    BlocProvider(create: (_) => RekanPicCobCariBloc()), // ✅ Tambah ini
+                                                  ],
+                                                  child: EditPicWidget(
+                                                    mrekanpicId: it.mrekanpicId!,
+                                                    initNama: it.picNama,
+                                                    initEmail: it.picEmail,
+                                                    initHp: it.picHp,
+                                                    initJabatanModel: jabatanModelFromList,
+                                                    initIsDefault: it.isDefault ?? false,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                          if (changed == true) {
-                                            listBloc.add(FetchMRekanPicListEvent());
-                                          }
-                                        },
-                                        onDelete: () {
+                                            );
+
+                                            if (changed == true) {
+                                              listBloc.add(FetchMRekanPicListEvent());
+                                            }
+                                          },
+                                          onDelete: () {
                                           _confirmDelete(context, it.mrekanpicId);
                                         },
                                       ),
@@ -323,6 +328,64 @@ class _PicReadOnlyCardState extends State<_PicReadOnlyCard> {
                     onPressed: widget.onDelete,
                     bg: const Color(0xFFE53935),
                   ),
+                  const Spacer(),
+
+                  /// 🔹 Tombol Kirim Undangan — scoped Bloc per card
+                  BlocProvider(
+                    create: (_) => InviteBloc(repo: InviteRepository()),
+                    child: BlocConsumer<InviteBloc, InviteState>(
+                      listener: (context, state) async {
+                        if (state.isSuccess) {
+                          await showDialog(
+                            context: context,
+                            builder: (_) => const InviteSuccessPopup(),
+                          );
+                        } else if (state.message.isNotEmpty && !state.isLoading) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(state.message)),
+                          );
+                        }
+                      },
+                      builder: (context, state) {
+                        final isLoading = state.isLoading;
+
+                        return _GhostIconButtonWithLabel(
+                          label: isLoading ? "Mengirim..." : "Kirim Undangan",
+                          icon: isLoading
+                              ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                              : const Icon(Icons.send, size: 18, color: Colors.white),
+                          bg: const Color(0xFF2196F3), // biru khas undangan
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                            final userProfile =
+                                context.read<UserProfileCubit>().state;
+                            final userId = userProfile.mrekan1Id ?? '0';
+                            final email = widget.email.trim().toLowerCase();
+
+                            if (email.isEmpty || !email.contains('@')) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Email PIC tidak valid.')),
+                              );
+                              return;
+                            }
+
+                            context.read<InviteBloc>().add(
+                              SendInviteEvent(userId: userId, email: email),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -417,6 +480,51 @@ class _CobListSection extends StatelessWidget {
     );
   }
 }
+
+class _GhostIconButtonWithLabel extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final Widget icon;
+  final Color bg;
+  final String label;
+
+  const _GhostIconButtonWithLabel({
+    required this.onPressed,
+    required this.icon,
+    required this.bg,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: bg,
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon,
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 class _GhostIconButton extends StatelessWidget {
   final VoidCallback? onPressed;

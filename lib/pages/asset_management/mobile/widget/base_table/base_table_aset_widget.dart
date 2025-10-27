@@ -4,6 +4,8 @@ import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_f
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_par_widget.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_ringkasan_widget.dart';
 
+import '../../../../../common/constants.dart';
+
 class BaseTableAsetWidget extends StatelessWidget {
   final String? cobId;
   final String? cobNama;
@@ -24,30 +26,37 @@ class BaseTableAsetWidget extends StatelessWidget {
     Widget child;
 
     if (_isRingkasan) {
-      child = const TableRingkasanWidget(initialStatusId: "10001");
+      // child = const TableRingkasanWidget(initialStatusId: "10001");
+      child = const TableRingkasanWidget();
     } else if (_isPar) {
-      child = const TableParWidget(initialStatusId: "10001");
+      // child = const TableParWidget(initialStatusId: "10001");
+      child = const TableParWidget();
     } else if (_isMv) {
-      child = const TableMvWidget(initialStatusId: "10001");
+      // child = const TableMvWidget(initialStatusId: "10001");
+      child = const TableMvWidget();
     } else if (_isHealth) {
-      child = const TableHealthWidget(initialStatusId: "10001");
+      // child = const TableHealthWidget(initialStatusId: "10001");
+      child = const TableHealthWidget();
     } else {
-      child = Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: const [
-            Icon(Icons.info_outline, size: 18, color: Colors.white70),
-            SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                "Pilih COB ‘Ringkasan’ untuk melihat tabel ringkasan.",
-                style: TextStyle(color: Colors.white70),
-              ),
+      child = const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 12),
+            Text(
+              "Memuat data...",
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],
         ),
       );
     }
+
 
     return Expanded(
       child: child,

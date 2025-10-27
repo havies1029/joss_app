@@ -62,4 +62,20 @@ class ShareRingkasanStateCubit extends Cubit<Map<String, AsetRingkasanCariModel>
     emit({});
     globalActive = false;
   }
+
+  List<Map<String, dynamic>> getExportData() {
+    return state.values.map((e) {
+      return {
+        'ID': e.asetRingkasanId,
+        'Nama Aset': e.asetNama,
+        'Currency': e.curr,
+        'Jumlah Aset': e.jmlAset,
+        'Nilai Aset': e.nilaiAset,
+        'Nilai Premi': e.nilaiPremi,
+        'Satuan': e.satuan,
+        'No Urut': e.noUrut,
+      };
+    }).toList();
+  }
+
 }

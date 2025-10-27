@@ -65,4 +65,21 @@ class ShareParStateCubit extends Cubit<Map<String, AsetParCariModel>> {
   void _updateGlobalStatus() {
     globalActive = state.length == totalItems && totalItems > 0;
   }
+
+  List<Map<String, dynamic>> getExportData() {
+    return state.values.map((e) {
+      return {
+        'ID': e.asetParId,
+        'No. Polis': e.polisNo,
+        'Alamat': e.alamat,
+        'Klausula Bank': e.klausulaBank,
+        'Mitra Rekanan ID': e.mrekanId,
+        'Currency': e.curr,
+        'Premi': e.premi,
+        'Sum Insured': e.sumInsured,
+        'Status': e.status,
+        'Nomor Urut': e.nomor,
+      };
+    }).toList();
+  }
 }

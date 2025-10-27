@@ -44,7 +44,7 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
   Widget build(BuildContext context) {
     final Size screen = MediaQuery.of(context).size;
     final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    const double buttonSize = 70.0;
+    const double buttonSize = 65.0;
     const double topNavHeight = 80;
     const double bottomNavHeight = 80;
     const double floatMargin = 45;
@@ -101,50 +101,59 @@ class _DraggableChatButtonState extends State<DraggableChatButton>
           scale: scale,
           duration: const Duration(milliseconds: 120),
           curve: Curves.easeOut,
-          child: Container(
-            width: buttonSize,
-            height: buttonSize,
-            decoration: BoxDecoration(
-              color: Colors.white, // background putih clean
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.25),
-                  blurRadius: 8,
-                  offset: const Offset(2, 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 🔵 Tombol lingkaran (biarin apa adanya)
+              Container(
+                width: buttonSize,
+                height: buttonSize,
+                decoration: BoxDecoration(
+                  color: Colors.white, // background putih clean
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 8,
+                      offset: const Offset(2, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            // 🧠 Ganti SVG ke icon bawaan dulu
-            child: Center(
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/icons/logo_bantuan.jpg',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-
-
-            /*
-            child: Center(
-              child:SvgPicture.asset(
-                'assets/icons/logo_bantuan.svg',
-                width: 36,
-                height: 36,
-                colorFilter: const ColorFilter.mode(
-                  Colors.black, // ubah jadi hitam
-                  BlendMode.srcIn,
+                child: Center(
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/icons/logo_bantuan.jpg',
+                      width: 55,
+                      height: 55,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          */
+
+              const SizedBox(height: 8), // 🧱 Jarak dari tombol ke teks
+
+              // 🟢 Text di bawah tombol
+              Text(
+                "Claim Is Simple",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.4),
+                      offset: const Offset(1, 1),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
+
       ),
     );
   }

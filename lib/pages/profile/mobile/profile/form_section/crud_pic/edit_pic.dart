@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +14,7 @@ import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
 import '../../../../../../apis/gen_profile/rekanpiccobcari_api.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
+import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
@@ -46,7 +49,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
-  List<RekanPicCobCariModel>? _selectedCobList = [];
+  List<RekanPicCobCariModel> _pendingCobList = [];
+
 
   final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
   ComboMJabatanModel? _jabatan;
@@ -74,8 +78,23 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         searchText: '',
       ));
 
-
+      // tunggu state pertama kali emit data lengkap
+      late final StreamSubscription sub;
+      sub = cobBloc.stream.listen((state) {
+        if (state.items.isNotEmpty) {
+          final selected = state.items.where((e) => e.isChecked == true).toList();
+          if (selected.isNotEmpty) {
+            setState(() {
+              _pendingCobList = List.from(selected);
+            });
+            debugPrint('✅ [INIT] Loaded ${_pendingCobList.length} COB lama ke pending list');
+          }
+          sub.cancel(); // cukup ambil sekali, biar gak double trigger
+        }
+      });
     });
+
+
 
     if (widget.initJabatanModel != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -109,13 +128,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   Future<void> _save() async {
 
-    if (_selectedCobList!.isEmpty) {
+    if (_pendingCobList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.'),
-        ),
+        const SnackBar(content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.')),
       );
-      debugPrint('⚠️ [VALIDATION] User belum memilih COB — simpan dibatalkan.');
       return;
     }
 
@@ -126,8 +142,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       final st = _comboKey.currentState;
       if (selected == null) selected = st?.getSelectedItem;
     } catch (_) {}
+    final mjnsclientId = context.read<UserProfileCubit>().state.mjnsclientId ?? '';
 
-    final idJabatan = (selected?.mjabatanId ?? '').trim();
+    final idJabatan = (mjnsclientId == '10') ? '' : (selected?.mjabatanId ?? '').trim();
     if (idJabatan.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Jabatan harus dipilih')),
@@ -148,12 +165,12 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     // 🔄 Setelah berhasil update PIC, kirim COB ke server
     final cobRepo = RekanPicCobCariRepository();
-    final listCheckbox = _selectedCobList
-        !.map((e) => RekanPicCobCariCheckboxModel(
-      mcobId: e.mcobId,
-      isChecked: e.isChecked,
-    ))
-        .toList();
+
+    final listCheckbox = _pendingCobList.map((e) =>
+        RekanPicCobCariCheckboxModel(
+          mcobId: e.mcobId,
+          isChecked: e.isChecked,
+        )).toList();
 
     final cobResult = await cobRepo.rekanPicCobUpdateList(widget.mrekanpicId, listCheckbox);
     if (cobResult.success) {
@@ -166,6 +183,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         const SnackBar(content: Text('PIC tersimpan, tapi gagal update COB.')),
       );
     }
+
+    debugPrint('🧾 [SAVE] COB final dikirim: ${_pendingCobList.map((e) => e.cobNama).toList()}');
+
 
   }
 
@@ -195,6 +215,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
             title: 'Edit PIC',
             child: LayoutBuilder(
               builder: (context, constraints) {
+                final mjnsclientId = context.read<UserProfileCubit>().state.mjnsclientId ?? '';
+
                 return SingleChildScrollView(
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom + 16,
@@ -271,23 +293,26 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                   const SizedBox(height: hPadding),
 
                                   // Jabatan
-                                  ReusableComboBox<ComboMJabatanModel>(
-                                    hintText: "Jabatan",
-                                    comboKey: _comboKey,
-                                    initItem: _jabatan,
-                                    maxHeight: 180,
-                                    dataLoader: _loadJabatan,
-                                    displayText: (i) => i.jabatanDesc,
-                                    compareItems: (a, b) =>
-                                    (a.mjabatanId ?? '').trim() ==
-                                        (b.mjabatanId ?? '').trim(),
-                                    onChangedCallback: (val) =>
-                                        setState(() => _jabatan = val),
-                                    onSaveCallback: (val) =>
-                                    _jabatan = val,
-                                    validatorCallback: (val) =>
-                                    val == null ? kStringNullError : null,
-                                  ),
+
+                                  if (mjnsclientId != '10')
+                                    ReusableComboBox<ComboMJabatanModel>(
+                                      hintText: "Jabatan",
+                                      comboKey: _comboKey,
+                                      initItem: _jabatan,
+                                      maxHeight: 180,
+                                      dataLoader: _loadJabatan,
+                                      displayText: (i) => i.jabatanDesc,
+                                      compareItems: (a, b) =>
+                                      (a.mjabatanId ?? '').trim() ==
+                                          (b.mjabatanId ?? '').trim(),
+                                      onChangedCallback: (val) =>
+                                          setState(() => _jabatan = val),
+                                      onSaveCallback: (val) =>
+                                      _jabatan = val,
+                                      validatorCallback: (val) =>
+                                      val == null ? kStringNullError : null,
+                                    ),
+
                                   const SizedBox(height: hPadding),
 
                                   CheckboxListTile(
@@ -321,12 +346,31 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       );
 
                                       // 🔹 Setelah balik dari halaman pilih COB
-                                      if (selectedCobs != null && selectedCobs.isNotEmpty) {
+                                      if (selectedCobs != null) {
                                         setState(() {
-                                          _selectedCobList = selectedCobs;
+                                          // reset dulu, lalu isi ulang berdasarkan hasil pilihan baru
+                                          final combined = <RekanPicCobCariModel>[];
+
+                                          // tambahkan semua yang dicentang dari halaman pilihan
+                                          for (final cob in selectedCobs) {
+                                            if (cob.isChecked) {
+                                              combined.add(cob);
+                                            }
+                                          }
+
+                                          // tambahkan juga COB lama yang belum diubah
+                                          for (final old in _pendingCobList) {
+                                            if (!combined.any((c) => c.mcobId == old.mcobId)) {
+                                              combined.add(old);
+                                            }
+                                          }
+
+                                          _pendingCobList = combined;
                                         });
-                                        debugPrint("🟠 Pending COB disimpan sementara: ${_selectedCobList?.length} item");
+
+                                        debugPrint("🟠 Merge sukses. Total COB dalam pending: ${_pendingCobList.length}");
                                       }
+
                                     },
                                     child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +400,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                               ),
                                               const SizedBox(height: 4),
 
-                                              if (_selectedCobList!.isEmpty)
+                                              if (_pendingCobList!.isEmpty)
                                                 const Text(
                                                   'Pilih Daftar COB',
                                                   style: TextStyle(
@@ -369,7 +413,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                 Wrap(
                                                   spacing: 6,
                                                   runSpacing: 6,
-                                                  children: _selectedCobList
+                                                  children: _pendingCobList
                                                       !.map(
                                                         (e) => Container(
                                                       padding: const EdgeInsets.symmetric(

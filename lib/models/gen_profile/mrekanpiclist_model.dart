@@ -25,7 +25,6 @@ class MRekanPicListModel {
 				picNama: data['picNama']??'',
 				jabatanDesc: data['jabatanDesc']??''
 		);
-
 	}
 
 	Map<String, dynamic> toJson() =>

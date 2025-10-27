@@ -5,12 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../../../../../../blocs/share_cubit/share_par_state_cubit.dart';
+import '../../../../../../helper/action_button_helper.dart';
 import '../../../../../../models/gen_aset_par/asetparcari_model.dart';
 import '../tables/reusable_aset_table.dart';
 
 class AsetListPar extends StatelessWidget {
   final String searchText;
-  const AsetListPar({super.key, required this.searchText});
+  final String? statusLabel;
+  const AsetListPar({super.key, required this.searchText, this.statusLabel,});
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +21,10 @@ class AsetListPar extends StatelessWidget {
     return ReusableAsetTable<
         AsetParCariBloc,
         AsetParCariState,
-        AsetParCariModel>(
+        AsetParCariModel,
+        ShareParStateCubit>( // ✅ tambahkan tipe cubit di sini
       bloc: context.read<AsetParCariBloc>(),
-      cubit: cubit,
+      cubit: cubit, // ✅ sekarang match: Map<String, AsetParCariModel>
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetParId,
@@ -36,140 +39,61 @@ class AsetListPar extends StatelessWidget {
         7: IntrinsicColumnWidth(),
         8: IntrinsicColumnWidth(),
         9: IntrinsicColumnWidth(),
-
       },
       headerCells: const [
-        _HeaderCell("No", center: true),
-        _HeaderCell("Alamat"),
-        _HeaderCell("Currency"),
-        _HeaderCell("Klausula Bank"),
-
-        _HeaderCell("Polis No"),
-        _HeaderCell("Sum Insured"),
-        _HeaderCell("Premi"),
-        _HeaderCell("Status", center: true),
-        _HeaderCell("Aksi"),
+        HeaderCell("No", center: true),
+        HeaderCell("Alamat"),
+        HeaderCell("Currency"),
+        HeaderCell("Klausula Bank"),
+        HeaderCell("Polis No"),
+        HeaderCell("Sum Insured"),
+        HeaderCell("Premi"),
+        HeaderCell("Status", center: true),
+        HeaderCell("Aksi"),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
-        _CellText("$rowNumber", center: true),
-        _CellText(item.alamat),
-        _CellText(item.curr),
-        _CellText(item.klausulaBank),
-
-        _CellText(item.polisNo),
-        _CellText(
+        CellText("$rowNumber", center: true),
+        CellText(item.alamat),
+        CellText(item.curr),
+        CellText(item.klausulaBank),
+        CellText(item.polisNo),
+        CellText(
           NumberFormat.currency(locale: 'id', symbol: 'IDR ')
               .format(item.sumInsured),
         ),
-        _CellText(
+        CellText(
           NumberFormat.currency(locale: 'id', symbol: 'IDR ')
               .format(item.premi),
         ),
-        _CellText(item.status, center: true),
+        CellText(item.status, center: true),
         Padding(
           padding: const EdgeInsets.all(6),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildActionButton(
-                asset: 'assets/icons/btn_endorse.svg',
-                bgColor: const Color(0xFFFDC13C), // kuning
-                onTap: () {},
-              ),
-              _buildActionButton(
-                asset: 'assets/icons/btn_delete.svg',
-                bgColor: const Color(0xFFF85B5B), // merah
-                onTap: () {},
-              ),
-              _buildActionButton(
-                asset: 'assets/icons/btn_lacak.svg',
-                bgColor: const Color(0xFFB9B9B9), // abu
-                onTap: () {},
-              ),
-            ],
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: getActionButtonsByStatus(
+              item.status,
+              namaItem: item.alamat, // 🏠 ambil data dari alamat
+              context: context,
+              itemData: item,
+              onProcessTap: () {
+                final bloc = context.read<AsetParCariBloc>();
+                debugPrint("📡 Klik Lacak Polis untuk: ${item.alamat}");
+
+                bloc.add(
+                  DebugFetchAsetParCariEvent(
+                    searchText: item.alamat,
+                    statusId: '10001',
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  /// 🔹 Tombol aksi di kolom paling kanan
-  Widget _buildActionButton({
-    required String asset,
-    required Color bgColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 26,
-        height: 26,
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 5,
-              offset: const Offset(1, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: SvgPicture.asset(
-            asset,
-            width: 16,
-            height: 16,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ✅ Komponen teks tabel (header & cell)
-class _HeaderCell extends StatelessWidget {
-  final String text;
-  final bool center;
-  const _HeaderCell(this.text, {this.center = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      alignment: center ? Alignment.center : Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: getResponsiveFont(context, 16),
-          color: primaryLightColor,
-        ),
-      ),
-    );
-  }
-}
-
-class _CellText extends StatelessWidget {
-  final String text;
-  final bool center;
-  const _CellText(this.text, {this.center = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      alignment: center ? Alignment.center : Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: getResponsiveFont(context, 14),
-          color: primaryLightColor,
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
+      onFetchMore: () {
+        context.read<AsetParCariBloc>().add(FetchAsetParCariEvent());
+      },
+      emptyStatusLabel: statusLabel,
     );
   }
 }

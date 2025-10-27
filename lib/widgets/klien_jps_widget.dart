@@ -57,7 +57,7 @@ class _ClientSectionState extends State<ClientSection> {
               SvgPicture.asset('assets/icons/badge.svg', height: 24),
               const SizedBox(width: 6),
               Text(
-                "Resmi, Aman dan Terpercaya",
+                "Didukung oleh Mitra Kami",
                 style: bodyTextStyle(context, fontSize: 24),
               ),
             ],
@@ -73,7 +73,7 @@ class _ClientSectionState extends State<ClientSection> {
               border: Border.all(color: sGrey),
             ),
             child: Text(
-              "Terdaftar Resmi Oleh:",
+              "Bekerja Sama Dengan:",
               style: bodyTextStyle(context, fontSize: 14),
             ),
           ),
@@ -128,7 +128,7 @@ class _ClientSectionState extends State<ClientSection> {
 
           // Sosmed
           Text(
-            "Ikuti perjalanan kami & temukan insight seputar asuransi:",
+            "Didukung mitra finansial untuk pengalaman asuransi yang lebih mudah.",
             textAlign: TextAlign.center,
             style: bodyTextStyle(context),
           ),

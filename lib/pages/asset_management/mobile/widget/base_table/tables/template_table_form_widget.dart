@@ -2,99 +2,59 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
-import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/helper/expert_helper.dart';
-import 'package:joss_app/helper/mobile_expert_helper.dart';
-import 'package:joss_app/widgets/apptheme/popup_widget.dart';
-import 'package:joss_app/widgets/apptheme/polis_button.dart';
-import 'package:joss_app/widgets/apptheme/build_status_box.dart';
 
-/// ===========================
-/// 🔹 ENUM: COB Context Config
-/// ===========================
-enum COBType { ringkasan, par, mv, health }
+import '../../../../../../common/constants.dart';
+import '../../../../../../helper/expert_helper.dart';
+import '../../../../../../helper/mobile_expert_helper.dart';
+import '../../../../../../widgets/apptheme/build_status_box.dart';
+import '../../../../../../widgets/apptheme/polis_button.dart';
+import '../../../../../../widgets/apptheme/popup_widget.dart';
+import '../../../../../../widgets/listpage_filter_bar_ui.dart';
 
-extension COBTypeX on COBType {
-  String get cobId {
-    switch (this) {
-      case COBType.ringkasan:
-        return "10001";
-      case COBType.par:
-        return "10002";
-      case COBType.mv:
-        return "10003";
-      case COBType.health:
-        return "10004";
-    }
-  }
-
-  String get displayName {
-    switch (this) {
-      case COBType.ringkasan:
-        return "Ringkasan";
-      case COBType.par:
-        return "Property All Risk";
-      case COBType.mv:
-        return "Motor Vehicle";
-      case COBType.health:
-        return "Health Insurance";
-    }
-  }
-
-  CategoryType get categoryType {
-    switch (this) {
-      case COBType.ringkasan:
-        return CategoryType.ringkasan;
-      case COBType.par:
-        return CategoryType.properti;
-      case COBType.mv:
-        return CategoryType.kendaraan;
-      case COBType.health:
-        return CategoryType.kesehatan;
-    }
-  }
+abstract class TemplateAsetModel {
+  String get id;
+  Map<String, dynamic> toMap();
 }
 
-/// =====================================================
-/// 🔹 UNIVERSAL BASE TABLE WIDGET
-/// =====================================================
-class BaseAsetTableWidget<
-TModel,
-TBloc extends Bloc<dynamic, dynamic>,
-TDashboardBloc extends Bloc<dynamic, dynamic>,
-TShareCubit extends Cubit<Map<String, TModel>>>
-    extends StatefulWidget {
-  final COBType cobType;
+class TemplateTableFormWidget<
+T, // ⚙️ fleksibel — tidak lagi wajib extend TemplateAsetModel
+B extends BlocBase,
+D extends BlocBase,
+C extends Cubit<Map<String, T>>
+> extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
-  final Widget Function(String searchText) listBuilder;
-  final String Function(TModel) getId;
-  final TBloc Function(BuildContext) blocBuilder;
-  final TDashboardBloc Function(BuildContext) dashboardBuilder;
-  final TShareCubit Function() shareCubitBuilder;
+  final String initialStatusId;
+  final double? listHeight;
+  final String cobType;
 
-  const BaseAsetTableWidget({
+  final C Function() shareCubitBuilder;
+  final Widget Function(String searchText, [String? statusLabel]) listBuilder;
+  final void Function(String statusId, String searchText) onRefreshRequested;
+  final void Function(String cobAppId) onDashboardRefresh;
+
+  const TemplateTableFormWidget({
     super.key,
     required this.cobType,
-    required this.listBuilder,
-    required this.blocBuilder,
-    required this.dashboardBuilder,
     required this.shareCubitBuilder,
-    required this.getId,
+    required this.listBuilder,
+    required this.onRefreshRequested,
+    required this.onDashboardRefresh,
     this.padding,
+    this.initialStatusId = '10001',
+    this.listHeight,
   });
 
   @override
-  State<BaseAsetTableWidget> createState() =>
-      _BaseAsetTableWidgetState<TModel, TBloc, TDashboardBloc, TShareCubit>();
+  State<TemplateTableFormWidget<T, B, D, C>> createState() =>
+      _TemplateTableFormWidgetState<T, B, D, C>();
 }
 
-class _BaseAsetTableWidgetState<
-TModel,
-TBloc extends Bloc<dynamic, dynamic>,
-TDashboardBloc extends Bloc<dynamic, dynamic>,
-TShareCubit extends Cubit<Map<String, TModel>>>
-    extends State<BaseAsetTableWidget<TModel, TBloc, TDashboardBloc, TShareCubit>> {
+class _TemplateTableFormWidgetState<
+T,
+B extends BlocBase,
+D extends BlocBase,
+C extends Cubit<Map<String, T>>
+> extends State<TemplateTableFormWidget<T, B, D, C>> {
   final TextEditingController _searchController = TextEditingController();
   String? _selectedStatusId;
   Timer? _debounce;
@@ -106,23 +66,8 @@ TShareCubit extends Cubit<Map<String, TModel>>>
   }
 
   void _refreshData() {
-    try {
-      final bloc = context.read<TBloc>();
-      final dashboard = context.read<TDashboardBloc>();
-
-      bloc.add({
-        'type': 'refresh',
-        'statusId': _selectedStatusId ?? widget.cobType.cobId,
-        'searchText': _searchController.text,
-      });
-
-      dashboard.add({
-        'type': 'dashboard_refresh',
-        'cobAppId': widget.cobType.cobId,
-      });
-    } catch (e) {
-      debugPrint("⚠️ Base dispatch skipped: $e");
-    }
+    widget.onRefreshRequested(widget.initialStatusId, _searchController.text);
+    widget.onDashboardRefresh(widget.initialStatusId);
   }
 
   @override
@@ -131,6 +76,16 @@ TShareCubit extends Cubit<Map<String, TModel>>>
     _debounce?.cancel();
     super.dispose();
   }
+
+  String get _currentStatusLabel {
+    if (_selectedStatusId == null) return _getStatusLabel(StatusType.aktif);
+    final selectedType = StatusType.values.firstWhere(
+          (t) => t.id == _selectedStatusId,
+      orElse: () => StatusType.aktif,
+    );
+    return _getStatusLabel(selectedType);
+  }
+
 
   String _getStatusLabel(StatusType type) {
     switch (type) {
@@ -149,229 +104,314 @@ TShareCubit extends Cubit<Map<String, TModel>>>
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: widget.blocBuilder),
-        BlocProvider(create: widget.dashboardBuilder),
-        BlocProvider(create: (_) => widget.shareCubitBuilder()),
-      ],
-      child: BlocBuilder<TShareCubit, Map<String, TModel>>(
-        builder: (context, map) {
-          final cubit = context.read<TShareCubit>();
+    return BlocProvider(
+      create: (_) => widget.shareCubitBuilder(),
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<C, Map<String, T>>(
+            listener: (context, state) {
+              debugPrint("🧩 Selected items: ${state.length}");
+            },
+          ),
+        ],
+        child: BlocBuilder<C, Map<String, T>>(
+          builder: (context, map) {
+            final cubit = context.read<C>();
+            return Padding(
+              padding: widget.padding ?? EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
-          return Padding(
-            padding: widget.padding ?? EdgeInsets.zero,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// 🔹 Toolbar
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isCompact = constraints.maxWidth < 600;
-                    return Wrap(
-                      spacing: hPadding,
-                      runSpacing: 8,
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: hPadding / 2),
+                    child: Column(
                       children: [
-                        PolisButton(
-                          assetPath: "assets/icons/tambah_polis.svg",
-                          text: "Tambah ${widget.cobType.displayName}",
-                          bgColor: const Color(0xFFFF9D00),
-                          borderColor: const Color(0xFFFFC972),
+                        // 🔹 Divider atas
+                        Align(
+                          alignment: Alignment.center,
+                          child: FractionallySizedBox(
+                            widthFactor: 1.1,
+                            child: const Divider(
+                              color: Color(0xFF555555),
+                              thickness: 1,
+                              height: 1,
+                            ),
+                          ),
                         ),
-                        PolisButton(
-                          assetPath: "assets/icons/endorse.svg",
-                          text: "Endorse",
-                          bgColor: const Color(0xFF00BBFF),
-                          borderColor: const Color(0xFF7ADBFF),
-                        ),
-                        PolisButton(
-                          assetPath: "assets/icons/hapus.svg",
-                          text: "Hapus",
-                          bgColor: const Color(0xFFF12929),
-                          borderColor: const Color(0xFFFE5E5E),
-                        ),
-                        PolisButton(
-                          assetPath: "assets/icons/unduh.svg",
-                          text: "Unduh",
-                          bgColor: const Color(0xFFA1A1AA),
-                          borderColor: const Color(0xFFBCBCC7),
-                          onTap: () => _showExportDialog(context, cubit),
-                        ),
-                        PolisButton(
-                          assetPath: "assets/icons/bagikan.svg",
-                          text: "Bagikan",
-                          bgColor: const Color(0xFF295EFF),
-                          borderColor: const Color(0xFF5D86FF),
+
+                        // 🔹 Beri ruang ekstra biar tombol gak terlalu mepet
+                        const SizedBox(height: hPadding * 1.25), // 🔥 dari 0.75 → 1.25
+
+                        // 🔹 Tombol utama
+                        _buildActionButtons(context, cubit),
+
+                        // 🔹 Spacer bawah lebih besar sedikit biar seimbang
+                        const SizedBox(height: hPadding * 1.25),
+
+                        // 🔹 Divider bawah
+                        Align(
+                          alignment: Alignment.center,
+                          child: FractionallySizedBox(
+                            widthFactor: 1.1,
+                            child: const Divider(
+                              color: Color(0xFF555555),
+                              thickness: 1,
+                              height: 1,
+                            ),
+                          ),
                         ),
                       ],
-                    );
-                  },
-                ),
-
-                const SizedBox(height: vPadding),
-
-                /// 🔍 Search Bar
-                ListPageFilterBarUIWidget(
-                  searchController: _searchController,
-                  searchButton: IconButton(
-                    icon: const Icon(Icons.autorenew_rounded, size: 28),
-                    onPressed: _refreshData,
-                    tooltip: 'Refresh',
+                    ),
                   ),
-                  hintText: "Cari ${widget.cobType.displayName}...",
-                ),
 
-                const SizedBox(height: hPadding),
 
-                /// 📊 Status Chip
-                BlocBuilder<TDashboardBloc, dynamic>(
-                  builder: (context, state) {
-                    final bool isCompact =
-                        MediaQuery.of(context).size.width < 480;
+                  const SizedBox(height: hPadding ),
 
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: StatusType.values.asMap().entries.map((entry) {
-                          final type = entry.value;
-                          return Padding(
-                            padding:
-                            EdgeInsets.only(right: entry.key < 3 ? 8 : 0),
-                            child: StatusChip(
-                              assetPath: type.asset,
-                              label: _getStatusLabel(type),
-                              count: '-',
-                              iconColor: type.color,
-                              isSelected: _selectedStatusId == type.id,
-                              height: isCompact ? 30 : 32,
-                              iconSize: isCompact ? 14 : 16,
-                              onTap: () {
-                                setState(() => _selectedStatusId = type.id);
-                                _debounce?.cancel();
-                                _debounce = Timer(
-                                  const Duration(milliseconds: 350),
-                                  _refreshData,
-                                );
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: hPadding),
-
-                /// 📋 List View
-                Expanded(child: widget.listBuilder(_searchController.text)),
-              ],
-            ),
-          );
-        },
+                  ListPageFilterBarUIWidget(
+                    searchController: _searchController,
+                    searchButton: _buildSearchButton(),
+                    hintText: "Cari Polis...",
+                  ),
+                  const SizedBox(height: hPadding),
+                  _buildStatusChips(context),
+                  const SizedBox(height: hPadding),
+                  Expanded(
+                    child: widget.listBuilder(
+                      _searchController.text,
+                      _currentStatusLabel, // 🔥 kirim status yang sedang aktif
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
-  /// 📤 Popup Export
-  void _showExportDialog(BuildContext context, TShareCubit cubit) {
+  Widget _buildActionButtons(BuildContext context, C cubit) {
+    final List<Map<String, dynamic>> actions = [
+      {
+        'icon': "assets/icons/tambah_polis.svg",
+        'text': "Tambah",
+        'bg': const Color(0xFFFF9D00),
+        'border': const Color(0xFFFFC972),
+      },
+      {
+        'icon': "assets/icons/endorse.svg",
+        'text': "Endorse",
+        'bg': const Color(0xFF00BBFF),
+        'border': const Color(0xFF7ADBFF),
+      },
+      {
+        'icon': "assets/icons/hapus.svg",
+        'text': "Hapus",
+        'bg': const Color(0xFFF12929),
+        'border': const Color(0xFFFE5E5E),
+      },
+      {
+        'icon': "assets/icons/unduh.svg",
+        'text': "Unduh",
+        'bg': const Color(0xFFA1A1AA),
+        'border': const Color(0xFFBCBCC7),
+        'onTap': () => _showExportDialog(context, cubit),
+      },
+      {
+        'icon': "assets/icons/bagikan.svg",
+        'text': "Bagikan",
+        'bg': const Color(0xFF295EFF),
+        'border': const Color(0xFF5D86FF),
+      },
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: actions.map((a) {
+          return Row(
+            children: [
+              PolisButton(
+                assetPath: a['icon'],
+                text: a['text'],
+                bgColor: a['bg'],
+                borderColor: a['border'],
+                onTap: a['onTap'],
+              ),
+              const SizedBox(width: hPadding),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  void _showExportDialog(BuildContext context, C cubit) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
+      barrierLabel: "Tutup",
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (_, __, ___) {
+      pageBuilder: (context, animation, secondaryAnimation) {
         return BlocProvider.value(
           value: cubit,
-          child: Center(
-            child: PopupWidget(
-              title: "Pilih format file untuk diunduh",
-              subtitle: "Tersedia dalam format Excel dan PDF",
-              button1Text: "Excel",
-              button2Text: "PDF",
-              onExportSelected: (format) async {
-                // ✅ ambil semua data dari cubit.state.values
-                final rawData = cubit.state.values.toList();
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: PopupWidget(
+                title: "Pilih format file untuk diunduh",
+                subtitle: "Tersedia Excel dan PDF",
+                button1Text: "Excel",
+                button2Text: "PDF",
+                onExportSelected: (format) async {
+                  List<Map<String, dynamic>> exportData = [];
 
-                // ✅ pastikan setiap item diubah ke Map<String, dynamic>
-                final exportData = rawData.map((item) {
-                  if (item is Map<String, dynamic>) return item;
-                  if (item is dynamic && item.toJson != null) {
-                    return Map<String, dynamic>.from(item.toJson());
+                  try {
+                    final dynamic dynCubit = cubit;
+                    if (dynCubit.getExportData != null) {
+                      exportData = dynCubit.getExportData();
+                    }
+                  } catch (_) {
+                    exportData = cubit.state.values.map((e) {
+                      if (e is TemplateAsetModel) return e.toMap();
+                      if (e is dynamic && e.toJson != null) {
+                        return e.toJson() as Map<String, dynamic>;
+                      }
+                      return {'data': e.toString()};
+                    }).toList();
                   }
-                  return {'id': widget.getId(item).toString()};
-                }).toList();
 
-                if (exportData.isEmpty) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("⚠️ Tidak ada data yang bisa diekspor"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
+                  if (exportData.isEmpty) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("⚠️ Tidak ada data yang dipilih"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
 
-                Navigator.of(context).pop();
-                await _export(context, exportData,format);
-              },
+                  Navigator.pop(context);
+                  await _exportData(context, format, exportData);
+                },
+              ),
             ),
           ),
         );
       },
-      transitionBuilder: (_, anim, __, child) => FadeTransition(
-        opacity: anim,
-        child: ScaleTransition(
-          scale: CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
-          child: child,
-        ),
+      transitionBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutBack,
+              ),
+              child: child,
+            ),
+          ),
+    );
+  }
+
+  Future<void> _exportData(
+      BuildContext context,
+      ExportFormat format,
+      List<Map<String, dynamic>> data,
+      ) async {
+    final fileName =
+        "Data_${widget.cobType}_${DateTime.now().millisecondsSinceEpoch}.${format == ExportFormat.excel ? "xlsx" : "pdf"}";
+
+    if (format == ExportFormat.excel) {
+      if (kIsWeb) {
+        await ExportHelper.export("excel", data, CategoryType.ringkasan);
+      } else {
+        await MobileDownloadHelper.download(
+          context: context,
+          fileName: fileName,
+          data: data,
+          format: "excel",
+        );
+      }
+    } else {
+      if (kIsWeb) {
+        await ExportHelper.export("pdf", data, CategoryType.ringkasan);
+      } else {
+        await MobileDownloadHelper.download(
+          context: context,
+          fileName: fileName,
+          data: data,
+          format: "pdf",
+        );
+      }
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("✅ Berhasil ekspor ${data.length} item"),
+        backgroundColor: Colors.green,
       ),
     );
   }
 
-  /// ✅ ubah signature fungsi ini:
-  Future<void> _export(
-      BuildContext context,
-      List<Map<String, dynamic>> exportData,
-      ExportFormat format, // ⬅️ pakai enum langsung
-      ) async {
-    final name = widget.cobType.displayName.replaceAll(' ', '_');
+  IconButton _buildSearchButton() => IconButton(
+    icon: const Icon(Icons.autorenew_rounded, size: 28),
+    onPressed: _refreshData,
+    tooltip: 'Refresh',
+  );
 
-    try {
-      if (kIsWeb) {
-        await ExportHelper.export(
-          format.name, // ⬅️ ubah ke string di sini (karena helper butuh "excel"/"pdf")
-          exportData,
-          widget.cobType.categoryType,
-        );
-      } else {
-        await MobileDownloadHelper.download(
-          context: context,
-          fileName: "Data_$name.${format == ExportFormat.excel ? 'xlsx' : 'pdf'}",
-          data: exportData,
-          format: format.name, // ✅ cukup kirim format.name
-        );
-      }
+  Widget _buildStatusChips(BuildContext context) {
+    return BlocBuilder<D, dynamic>(
+      builder: (context, state) {
+        if (state.status == ListStatus.success && state.items.isNotEmpty) {
+          final summary = state.items.first;
+          final statusData = [
+            {'type': StatusType.aktif, 'label': 'Aktif', 'count': summary.aktifQty.toString()},
+            {'type': StatusType.onProgress, 'label': 'Diproses', 'count': summary.onProgressQty.toString()},
+            {'type': StatusType.nonAktif, 'label': 'Non Aktif', 'count': summary.nonAktifQty.toString()},
+            {'type': StatusType.berakhir, 'label': 'Jatuh Tempo', 'count': summary.berakhirQty.toString()},
+          ];
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "✅ Berhasil ekspor ${exportData.length} data ke ${format.name.toUpperCase()}",
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("❌ Gagal ekspor data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: statusData.asMap().entries.map((entry) {
+                final data = entry.value;
+                final type = data['type'] as StatusType;
+                final isSelected = _selectedStatusId == type.id;
+
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: entry.key < statusData.length - 1 ? 10 : 0,
+                  ),
+                  child: StatusChip(
+                    assetPath: type.asset,
+                    label: data['label'] as String,
+                    // count: data['count'] as String,
+                    iconColor: type.color,
+                    isSelected: isSelected,
+                    onTap: () {
+                      setState(() => _selectedStatusId = isSelected ? null : type.id);
+                      _debounce?.cancel();
+                      _debounce = Timer(const Duration(milliseconds: 350), () {
+                        widget.onRefreshRequested(
+                          _selectedStatusId ?? widget.initialStatusId,
+                          _searchController.text,
+                        );
+                      });
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
   }
-
-
 }
