@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import '../../../../../blocs/share_cubit/share_health_state_cubit.dart';
+import '../../../../../blocs/share_cubit/share_hull_state_cubit.dart';
+import '../../../../../blocs/share_cubit/share_mv_state_cubit.dart';
+import '../../../../../blocs/share_cubit/share_par_state_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../widgets/apptheme/help_contact_card_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
+import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
+import 'package:joss_app/models/gen_endors/endors2cari_model.dart';
 
 class DetailManagementPolisPage extends StatelessWidget {
   final dynamic data; // Bisa model apa pun: MV, Health, PAR
@@ -11,10 +19,37 @@ class DetailManagementPolisPage extends StatelessWidget {
     required this.data,
   });
 
+  /// 🧩 Ambil ID dari dataMap berdasarkan Cubit aktif
+  String extractAssetIdFromCubit(BuildContext context, Map<String, dynamic> dataMap) {
+    // 1️⃣ Cek jenis Cubit yang tersedia di context
+    if (context.read<ShareHullStateCubit?>() != null) {
+      return dataMap["asetHullId"]?.toString() ?? "";
+    }
+    if (context.read<ShareMvStateCubit?>() != null) {
+      return dataMap["asetMvId"]?.toString() ?? "";
+    }
+    if (context.read<ShareParStateCubit?>() != null) {
+      return dataMap["asetParId"]?.toString() ?? "";
+    }
+    if (context.read<ShareHealthStateCubit?>() != null) {
+      return dataMap["asethealthId"]?.toString() ?? "";
+    }
+
+    // 2️⃣ fallback aman — cari key yang mengandung "id"
+    final idEntry = dataMap.entries.firstWhere(
+          (e) => e.key.toLowerCase().contains("id"),
+      orElse: () => const MapEntry("id", ""),
+    );
+
+    return idEntry.value.toString();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     final Map<String, dynamic> dataMap = _toMap(data);
+    final sppa1Id = extractAssetIdFromCubit(context, dataMap);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -23,12 +58,12 @@ class DetailManagementPolisPage extends StatelessWidget {
           title: 'Detail Management Polis',
           child: Container(
             width: double.infinity,
-            height: double.infinity, // ✅ penuh layar
-            color: secondaryBlackColor, // ✅ background utama
+            height: double.infinity,
+            color: secondaryBlackColor,
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(
-                horizontal: hPadding * 1.5, // jarak kiri-kanan
-                vertical: hPadding * 1.2,
+                horizontal: hPadding * 1.5,
+                vertical: hPadding,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +149,74 @@ class DetailManagementPolisPage extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // 🔹 HELP CONTACT CARD (reusable)
+                  BlocProvider(
+                    create: (_) => Endors2CariBloc()
+                      ..add(RefreshEndors2CariEvent(sppa1Id: sppa1Id)),
+                    child: BlocBuilder<Endors2CariBloc, Endors2CariState>(
+                      builder: (context, state) {
+                        if (state.status == ListStatus.initial) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        if (state.items.isEmpty) {
+                          return Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: hPadding * 1.5,
+                              vertical: hPadding,
+                            ),
+                            decoration: BoxDecoration(
+                              border: const Border(
+                                top: BorderSide(color: sGrey),
+                                bottom: BorderSide(color: sGrey),
+                              ),
+                            ),
+                            child: const Text(
+                              "Belum ada proses endorsement",
+                              style: TextStyle(color: primaryLightColor),
+                            ),
+                          );
+                        }
+
+                        return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: hPadding * 1.5,
+                            vertical: hPadding,
+                          ),
+                          decoration: BoxDecoration(
+                            border: const Border(
+                              top: BorderSide(color: sGrey),
+                              bottom: BorderSide(color: sGrey),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ...state.items.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                Endors2CariModel item = entry.value;
+                                bool isLast = index == state.items.length - 1;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: _buildTimelineItem(item, isLast),
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 🔹 HELP CONTACT CARD
                   HelpContactCardWidget(
                     title: "Butuh bantuan?",
                     contactText:
@@ -132,7 +234,64 @@ class DetailManagementPolisPage extends StatelessWidget {
     );
   }
 
-  /// 🔧 Convert object ke Map
+  Widget _buildTimelineItem(Endors2CariModel item, bool isLast) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 82,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                DateFormat('dd MMM yyyy,').format(item.statusTgl),
+                style: TextStyle(
+                  color: isLast ? primaryLightColor : hintGrey,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                DateFormat('HH:mm:ss').format(item.statusTgl),
+                style: TextStyle(
+                  color: isLast ? primaryLightColor : hintGrey,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 5),
+        // Timeline indicator
+        Column(
+          children: [
+            Icon(
+              Icons.circle,
+              size: 12,
+              color: isLast ? primaryColor : hintGrey,
+            ),
+            if (!isLast)
+              Container(
+                width: 1.26,
+                height: 30,
+                color: hintGrey,
+              ),
+          ],
+        ),
+        const SizedBox(width: 5),
+        // Right side - Status text
+        Expanded(
+          child: Text(
+            item.statusEndors,
+            style: TextStyle(
+              color: isLast ? primaryLightColor : hintGrey,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Map<String, dynamic> _toMap(dynamic obj) {
     if (obj == null) return {};
     if (obj is Map<String, dynamic>) return obj;
@@ -150,15 +309,15 @@ class DetailManagementPolisPage extends StatelessWidget {
     }
   }
 
-  /// 🪄 Rapihin key biar enak dibaca
   String _beautifyKey(String key) {
     return key
         .replaceAllMapped(RegExp(r'([A-Z])'), (m) => ' ${m[1]}')
         .replaceAll('_', ' ')
         .trim()
         .split(' ')
-        .map((w) =>
-    w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+        .map((w) => w.isEmpty
+        ? ''
+        : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
         .join(' ');
   }
 }

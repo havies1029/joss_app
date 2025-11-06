@@ -2,7 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/gen_calmv/calmv1crud_bloc.dart';
+import 'package:joss_app/blocs/gen_calmv/calmv1list_bloc.dart';
+import 'package:joss_app/blocs/gen_calmv/calmv2form_bloc.dart';
 import 'package:joss_app/blocs/gen_dn1/dn1cari_bloc.dart';
+import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
@@ -19,6 +23,10 @@ import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.d
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
+import 'package:joss_app/repositories/gen_calmv/calmv1crud_repository.dart';
+import 'package:joss_app/repositories/gen_calmv/calmv2form_repository.dart';
+import 'package:joss_app/repositories/gen_calmv/calmv3form_repository.dart';
+import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
 import 'package:joss_app/repositories/gen_dn1/dn1cari_repository.dart';
 import 'package:joss_app/repositories/gen_endors/endors1crud_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
@@ -71,6 +79,7 @@ import 'blocs/gallery/galleryeventcari_bloc.dart';
 import 'blocs/gallery/gallerymembercari_bloc.dart';
 import 'blocs/gen_aset_dashboard/asetdashboardcari_bloc.dart';
 import 'blocs/gen_aset_health/asethealthcari_bloc.dart';
+import 'blocs/gen_aset_hull/asethullcari_bloc.dart';
 import 'blocs/gen_aset_mv/asetmvcari_bloc.dart';
 import 'blocs/gen_aset_par/asetparcari_bloc.dart';
 import 'blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
@@ -79,7 +88,9 @@ import 'blocs/gen_berita/berita2cari_bloc.dart';
 import 'blocs/gen_berita/berita3cari_bloc.dart';
 import 'blocs/gen_berita/beritakecilcari_bloc.dart';
 import 'blocs/gen_berita/beritalaincari_bloc.dart';
+import 'blocs/gen_calmv/calmv3form_bloc.dart';
 import 'blocs/gen_cob_app/cobcari_bloc.dart';
+import 'blocs/gen_compro/reqcompro_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
 import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_invite/invite_bloc.dart';
@@ -165,9 +176,13 @@ Future<void> main() async {
             create: (context) =>
                 RegUserBloc(repository: RegUserRepository(), authenticationBloc: BlocProvider.of<AuthenticationBloc>(context))),
         BlocProvider(create: (_) => MRekan1ListBloc()),
+        BlocProvider(create: (_) => Calmv1ListBloc()),
         BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
         BlocProvider(create: (_) => MRekanContactListBloc()),
         BlocProvider(create: (_) => MRekanPajakCrudBloc(repository: MRekanPajakCrudRepository())),
+        BlocProvider(create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
+        BlocProvider(create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),
+        BlocProvider(create: (_) => Calmv3FormBloc(repository: Calmv3FormRepository())),
         BlocProvider(create: (_) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralIdvCrudBloc(repository: MRekanGeneralIdvCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralCmpCrudBloc(repository: MRekanGeneralCmpCrudRepository())),
@@ -176,6 +191,9 @@ Future<void> main() async {
         ),
         BlocProvider<MRekanPicCrudBloc>(
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
+        ),
+        BlocProvider<ReqComproBloc>(
+          create: (_) => ReqComproBloc(repository: ReqComproRepository()),
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
         BlocProvider(create: (_) => ShareRingkasanStateCubit()), // hydrated
@@ -221,6 +239,7 @@ Future<void> main() async {
           create: (context) => Klaim2CrudBloc(repository: Klaim2CrudRepository()),
         ),
         BlocProvider(create: (context) => StatusAsetCariBloc()),
+        BlocProvider<AsethullCariBloc>(create: (context) => AsethullCariBloc()),
         BlocProvider<AsetRingkasanCariBloc>(create: (context) => AsetRingkasanCariBloc()),
         BlocProvider<AsetParCariBloc>(
             create: (context) => AsetParCariBloc()),
@@ -248,6 +267,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => InviteBloc(repo: InviteRepository())),
         BlocProvider(create: (context) => Endors1CrudBloc(repository: Endors1CrudRepository())),
         BlocProvider(create: (context) => Endors1ListBloc()),
+        BlocProvider(create: (context) => Endors2CariBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

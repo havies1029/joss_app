@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_health_widget.dart';
+import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_hull_widget.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_mv_widget.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_par_widget.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/base_table/table_form/table_ringkasan_widget.dart';
@@ -20,6 +21,7 @@ class BaseTableAsetWidget extends StatelessWidget {
   bool get _isPar => cobId == "10002" && cobNama == "Properti";
   bool get _isMv => cobId == "10003" && cobNama == "Kendaraan";
   bool get _isHealth => cobId == "10005" && cobNama == "Kesehatan";
+  bool get _isHull => cobId == "10004" && cobNama == "Angkutan";
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,10 @@ class BaseTableAsetWidget extends StatelessWidget {
     } else if (_isHealth) {
       // child = const TableHealthWidget(initialStatusId: "10001");
       child = const TableHealthWidget();
-    } else {
+    } else if (_isHull) {
+      // child = const TableHealthWidget(initialStatusId: "10001");
+      child = const TableHullWidget();
+    }else {
       child = const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

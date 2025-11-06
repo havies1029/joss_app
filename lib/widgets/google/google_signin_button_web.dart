@@ -20,53 +20,50 @@ Widget googleSigninButton() {
   debugPrint(
     'Google Sign-In button widget created for web platform.',
   );
-  return const StyledGoogleSignInButton();
+  return renderButton();
 }
 
-class StyledGoogleSignInButton extends StatefulWidget {
-  const StyledGoogleSignInButton({super.key});
+// class StyledGoogleSignInButton extends StatefulWidget {
+//   const StyledGoogleSignInButton({super.key});
+//
+//   @override
+//   State<StyledGoogleSignInButton> createState() => _StyledGoogleSignInButtonState();
+// }
 
-  @override
-  State<StyledGoogleSignInButton> createState() => _StyledGoogleSignInButtonState();
-}
-
-class _StyledGoogleSignInButtonState extends State<StyledGoogleSignInButton> {
-  bool _isHovering = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: sGrey,
-          ),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Transform.scale(
-            scale: 1,
-            child: SizedBox(
-              width: double.infinity,
-              child: renderButton(
-                configuration: GSIButtonConfiguration(
-                  type: GSIButtonType.standard,
-                  theme: GSIButtonTheme.outline,
-                  size: GSIButtonSize.large,
-                  text: GSIButtonText.signinWith,
-                  shape: GSIButtonShape.rectangular,
-                  logoAlignment: GSIButtonLogoAlignment.center,
-                  minimumWidth: 400,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class _StyledGoogleSignInButtonState extends State<StyledGoogleSignInButton> {
+//   bool _isHovering = false;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return MouseRegion(
+//       onEnter: (_) => setState(() => _isHovering = true),
+//       onExit: (_) => setState(() => _isHovering = false),
+//       child: AnimatedContainer(
+//         duration: const Duration(milliseconds: 200),
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(10),
+//           border: Border.all(
+//             color: sGrey,
+//           ),
+//         ),
+//         child: ClipRRect(
+//           borderRadius: BorderRadius.circular(10),
+//           child: Transform.scale(
+//             scale: 1,
+//             child: renderButton(
+//               configuration: GSIButtonConfiguration(
+//                 type: GSIButtonType.standard,
+//                 theme: GSIButtonTheme.outline,
+//                 size: GSIButtonSize.large,
+//                 text: GSIButtonText.signinWith,
+//                 shape: GSIButtonShape.rectangular,
+//                 logoAlignment: GSIButtonLogoAlignment.center,
+//                 minimumWidth: 400,
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

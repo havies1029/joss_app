@@ -14,42 +14,26 @@ class Endors2CariBloc extends Bloc<Endors2CariEvents, Endors2CariState> {
 		on<RefreshEndors2CariEvent>(onRefreshEndors2Cari);
 	}
 
-Future<void> onRefreshEndors2Cari(
-		RefreshEndors2CariEvent event, Emitter<Endors2CariState> emit) async {
-	emit(const Endors2CariState());
+	Future<void> onRefreshEndors2Cari(
+			RefreshEndors2CariEvent event, Emitter<Endors2CariState> emit) async {
+		emit(const Endors2CariState());
 
-	add(FetchEndors2CariEvent());
-}
+		emit(state.copyWith(sppa1Id: event.sppa1Id));
 
-Future<void> onFetchEndors2Cari(
-		FetchEndors2CariEvent event, Emitter<Endors2CariState> emit) async {
-	if (state.hasReachedMax) return;
-
-	Endors2CariRepository repo = Endors2CariRepository();
-	if (state.status == ListStatus.initial) {
-		List<Endors2CariModel> items = await repo.getEndors2Cari();
-		return emit(state.copyWith(
-			items: items,
-			hasReachedMax: false,
-			status: ListStatus.success,
-			));
+		add(FetchEndors2CariEvent());
 	}
-	List<Endors2CariModel> items = await repo.getEndors2Cari();
-	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
-	} else {
-		List<Endors2CariModel> endors2Cari = List.of(state.items)..addAll(items);
 
-		final result = endors2Cari
-			.whereWithIndex((e, index) =>
-				endors2Cari.indexWhere((e2) => e2.endors2Id == e.endors2Id) ==
-				index)
-			.toList();
+	Future<void> onFetchEndors2Cari(
+			FetchEndors2CariEvent event, Emitter<Endors2CariState> emit) async {
+		if (state.hasReachedMax) return;
 
-		return emit(state.copyWith(
-			items: result,
-			hasReachedMax: false,
-			status: ListStatus.success,
+		Endors2CariRepository repo = Endors2CariRepository();
+		if (state.status == ListStatus.initial) {
+			List<Endors2CariModel> items = await repo.getEndors2Cari(state.sppa1Id);
+			return emit(state.copyWith(
+				items: items,
+				hasReachedMax: false,
+				status: ListStatus.success,
 			));
 		}
 

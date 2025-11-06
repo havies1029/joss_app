@@ -7,6 +7,8 @@ import '../../../models/combobox/combocoblist_model.dart';
 import '../../../repositories/combobox/combocoblist_repository.dart';
 import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_sidepage.dart';
+import '../circular_spread.dart';
+import '../draggable_beli_polis_button.dart';
 
 class AssetManagementPage extends StatefulWidget {
   const AssetManagementPage({super.key});
@@ -39,32 +41,35 @@ class _AssetManagementPageState extends State<AssetManagementPage>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final headerSpacing = screenHeight * 0.025;
-
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor,
       body: SafeArea(
-        child: BaseBackgroundSidePage(
-          title: 'Polis',
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const HeaderCard(
-                  iconPath: "assets/icons/menu_polis.svg",
-                  title: "Polis",
-                  subtitle: "Kelola dan pantau semua polis Anda dalam satu aplikasi.",
+        child: Stack(
+          children: [
+            BaseBackgroundSidePage(
+              title: 'Polis',
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: const [
+                    HeaderCard(
+                      iconPath: "assets/icons/menu_polis.svg",
+                      title: "Polis",
+                      subtitle:
+                      "Kelola dan pantau semua polis Anda dalam satu aplikasi.",
+                    ),
+                    BaseAssetWidget(),
+                  ],
                 ),
-                BaseAssetWidget(),
-              ],
+              ),
             ),
-          ),
 
+            const DraggableBeliPolisButton(),
+            const DraggableHalfCircleButton(),
+          ],
         ),
       ),
     );
+
   }
 }

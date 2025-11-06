@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:joss_app/models/gen_endors/endors2cari_model.dart';
 
 class Endors2CariAPI{
-	Future<List<Endors2CariModel>> getEndors2CariAPI() async {
-		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/endors/endors2cari/getlist";
-
-		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint);
+	Future<List<Endors2CariModel>> getEndors2CariAPI(String sppa1Id) async {
+		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/endors/endors2list/getlist";
+		Map<String, String> queryParams = {"sppa1Id": sppa1Id};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
@@ -17,8 +17,8 @@ class Endors2CariAPI{
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-				.map<Endors2CariModel>((json) => Endors2CariModel.fromJson(json))
-				.toList();
+					.map<Endors2CariModel>((json) => Endors2CariModel.fromJson(json))
+					.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}

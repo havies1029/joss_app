@@ -102,10 +102,7 @@ class appTextField extends StatelessWidget {
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: (enabled ?? true) ? formGrey : sGrey,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 12,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: sGrey),
@@ -219,10 +216,7 @@ class _AppDateFieldState extends State<AppDateField> {
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: formGrey,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 12,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: sGrey),

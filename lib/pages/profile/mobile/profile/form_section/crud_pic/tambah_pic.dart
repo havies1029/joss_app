@@ -141,22 +141,27 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     }
 
     final mjnsclientId = context.read<UserProfileCubit>().state.mjnsclientId ?? '';
-    final idJabatan = (mjnsclientId == '10') ? '' : (_jabatan?.mjabatanId ?? '').trim();
+    final idJabatan = (mjnsclientId == '10')
+        ? ''
+        : (_jabatan?.mjabatanId?.trim().isEmpty ?? true)
+        ? '' // ✅ kirim string kosong kalau null / belum dipilih
+        : _jabatan!.mjabatanId!.trim();
+
 
     // 🧩 Validasi jabatan (kecuali clientId == 10)
-    if (mjnsclientId != '10' && idJabatan.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Jabatan harus dipilih')),
-      );
-      return;
-    }
+    // if (mjnsclientId != '10' && idJabatan.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Jabatan harus dipilih')),
+    //   );
+    //   return;
+    // }
 
     // 🚫 VALIDASI: wajib pilih minimal 1 COB
     if (_pendingCobList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.')),
       );
-      debugPrint('⚠️ [VALIDATION] User belum memilih COB — simpan dibatalkan.');
+      debugPrint('⚠ [VALIDATION] User belum memilih COB — simpan dibatalkan.');
       return;
     }
 
@@ -173,7 +178,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     debugPrint('🚀 [SAVE] Mulai simpan data PIC...');
     debugPrint('📦 Payload: ${record.toJson()}');
 
-    // 🛰️ Step 1: Simpan PIC ke API
+    // 🛰 Step 1: Simpan PIC ke API
     final repo = MRekanPicCrudRepository();
     final returnData = await repo.mRekanPicCrudTambah(record);
 
@@ -213,7 +218,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
           SnackBar(content: Text('PIC & ${listCheckbox.length} COB berhasil disimpan!')),
         );
       } else {
-        debugPrint('⚠️ [COB] Gagal update COB ke server untuk PIC $picId.');
+        debugPrint('⚠ [COB] Gagal update COB ke server untuk PIC $picId.');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('PIC tersimpan, tapi gagal update COB.')),
         );
@@ -379,25 +384,31 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
                                       if (mjnsclientId != '10')
                                         ReusableComboBox<ComboMJabatanModel>(
-                                          key: ValueKey(
-                                              'jabatan-${_jabatan?.mjabatanId ?? "none"}'),
-                                          hintText: "Jabatan",
+                                          key: ValueKey('jabatan-${_jabatan?.mjabatanId ?? "none"}'),
+                                          hintText: "Jabatan (Opsional)",
                                           comboKey: _comboKey,
                                           initItem: _jabatan,
                                           maxHeight: 180,
+                                          showClearButton: true, // ✅ tambahkan tombol clear
                                           dataLoader: _loadJabatan,
                                           displayText: (i) => i.jabatanDesc,
                                           compareItems: (a, b) =>
-                                          (a.mjabatanId ?? '').trim() ==
-                                              (b.mjabatanId ?? '').trim(),
-                                          onChangedCallback: (val) =>
-                                              setState(() => _jabatan = val),
-                                          onSaveCallback: (val) =>
-                                          _jabatan = val,
-                                          validatorCallback: (val) =>
-                                          val == null
-                                              ? kStringNullError
-                                              : null,
+                                          (a.mjabatanId ?? '').trim() == (b.mjabatanId ?? '').trim(),
+                                          onChangedCallback: (value) {
+                                            if (value != null) {
+                                              // ✅ jika user pilih jabatan baru
+                                              _jabatan = value;
+                                            } else {
+                                              // ✅ jika user hapus pilihan (clear)
+                                              _jabatan = null; // atau bisa pakai ComboMJabatanModel(mjabatanId: '0')
+                                            }
+                                            setState(() {});
+                                          },
+                                          onSaveCallback: (val) => _jabatan = val,
+                                          validatorCallback: (val) {
+                                            // Kalau lo pengen biarin bisa kosong, return null aja
+                                            return null;
+                                          },
                                         ),
                                       const SizedBox(height: hPadding),
 

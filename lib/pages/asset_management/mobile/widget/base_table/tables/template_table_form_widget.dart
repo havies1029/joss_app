@@ -17,7 +17,7 @@ abstract class TemplateAsetModel {
 }
 
 class TemplateTableFormWidget<
-T, // ⚙️ fleksibel — tidak lagi wajib extend TemplateAsetModel
+T, // ⚙ fleksibel — tidak lagi wajib extend TemplateAsetModel
 B extends BlocBase,
 D extends BlocBase,
 C extends Cubit<Map<String, T>>
@@ -123,56 +123,86 @@ C extends Cubit<Map<String, T>>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: hPadding / 2),
-                    child: Column(
-                      children: [
-                        // 🔹 Divider atas
-                        Align(
-                          alignment: Alignment.center,
-                          child: FractionallySizedBox(
-                            widthFactor: 1.1,
-                            child: const Divider(
-                              color: Color(0xFF555555),
-                              thickness: 1,
-                              height: 1,
-                            ),
-                          ),
-                        ),
-
-                        // 🔹 Beri ruang ekstra biar tombol gak terlalu mepet
-                        const SizedBox(height: hPadding * 1.25), // 🔥 dari 0.75 → 1.25
-
-                        // 🔹 Tombol utama
-                        _buildActionButtons(context, cubit),
-
-                        // 🔹 Spacer bawah lebih besar sedikit biar seimbang
-                        const SizedBox(height: hPadding * 1.25),
-
-                        // 🔹 Divider bawah
-                        Align(
-                          alignment: Alignment.center,
-                          child: FractionallySizedBox(
-                            widthFactor: 1.1,
-                            child: const Divider(
-                              color: Color(0xFF555555),
-                              thickness: 1,
-                              height: 1,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(vertical: hPadding / 2),
+                  //   child: Column(
+                  //     children: [
+                  //       // 🔹 Divider atas
+                  //       Align(
+                  //         alignment: Alignment.center,
+                  //         child: FractionallySizedBox(
+                  //           widthFactor: 1.1,
+                  //           child: const Divider(
+                  //             color: Color(0xFF555555),
+                  //             thickness: 1,
+                  //             height: 1,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //
+                  //       // 🔹 Beri ruang ekstra biar tombol gak terlalu mepet
+                  //       const SizedBox(height: hPadding * 1.25), // 🔥 dari 0.75 → 1.25
+                  //
+                  //       // 🔹 Tombol utama
+                  //       // _buildActionButtons(context, cubit),
+                  //
+                  //       // 🔹 Spacer bawah lebih besar sedikit biar seimbang
+                  //       const SizedBox(height: hPadding * 1.25),
+                  //
+                  //       // 🔹 Divider bawah
+                  //       Align(
+                  //         alignment: Alignment.center,
+                  //         child: FractionallySizedBox(
+                  //           widthFactor: 1.1,
+                  //           child: const Divider(
+                  //             color: Color(0xFF555555),
+                  //             thickness: 1,
+                  //             height: 1,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
 
 
                   const SizedBox(height: hPadding ),
 
-                  ListPageFilterBarUIWidget(
-                    searchController: _searchController,
-                    searchButton: _buildSearchButton(),
-                    hintText: "Cari Polis...",
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ListPageFilterBarUIWidget(
+                          searchController: _searchController,
+                          searchButton: _buildSearchButton(),
+                          hintText: "Cari Polis...",
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      PolisButton(
+                        assetPath: "assets/icons/unduh.svg",
+                        bgColor: const Color(0xFFA1A1AA),
+                        borderColor: const Color(0xFFBCBCC7),
+                        onTap: () => _showExportDialog(context, context.read<C>()),
+                        iconSize: 16,
+                        height: 36,
+                        width: 36,
+                      ),
+                      const SizedBox(width: 8),
+                      PolisButton(
+                        assetPath: "assets/icons/bagikan.svg",
+                        bgColor: const Color(0xFF295EFF),
+                        borderColor: const Color(0xFF5D86FF),
+                        onTap: () {
+                          debugPrint('📤 Bagikan ditekan');
+                        },
+                        iconSize: 16,
+                        height: 36,
+                        width: 36,
+                      ),
+                    ],
                   ),
+
+
                   const SizedBox(height: hPadding),
                   _buildStatusChips(context),
                   const SizedBox(height: hPadding),
@@ -288,7 +318,7 @@ C extends Cubit<Map<String, T>>
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text("⚠️ Tidak ada data yang dipilih"),
+                        content: Text("⚠ Tidak ada data yang dipilih"),
                         backgroundColor: Colors.red,
                       ),
                     );

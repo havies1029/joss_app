@@ -6,6 +6,14 @@ import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
+import '../../../gen_calmv/calmv1crud_form.dart';
+import '../../../gen_calmv/calmv1list_main.dart';
+import '../../../gen_calmv/calmv2form_form.dart';
+import '../../../gen_calmv/calmv3form_form.dart';
+import '../../../gen_calmv/calmv_main_page.dart';
+import '../../../gen_endors/endors1list_main.dart';
+import '../../../gen_endors/endors2cari_list.dart';
+import '../../../gen_endors/endors2cari_list_widget.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
@@ -36,65 +44,47 @@ class ListMenuWidget extends StatelessWidget {
               bottomRight: Radius.circular(cardBorderRadius),
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: Text(
-                "Claim Is Simple",
-                  style: headingStyle(
-                        context,
-                        fontSize: getResponsiveFont(context, 18),
-                      ).copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: primaryLightColor, // ganti sesuai warna brand lo
+          child: SizedBox(
+            height: 120,
+            child: Stack(
+              children: [
+                ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: menuItems.length,
+                  itemBuilder: (context, index) {
+                    final item = menuItems[index];
+                    return SizedBox(
+                      width: itemWidth,
+                      child: _buildMenuItem(context, item, custType),
+                    );
+                  },
+                ),
+                // Gradient kiri (gelap → transparan)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 40,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      gradient: blackFadeGradientHorizontal,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 120,
-                child: Stack(
-                  children: [
-                    ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: menuItems.length,
-                      itemBuilder: (context, index) {
-                        final item = menuItems[index];
-                        return SizedBox(
-                          width: itemWidth,
-                          child: _buildMenuItem(context, item, custType),
-                        );
-                      },
+                // Gradient kanan (transparan → gelap)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 48,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      gradient: blackFadeGradientHorizontalReversed,
                     ),
-                    // Gradient kiri (gelap → transparan)
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: 40,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: blackFadeGradientHorizontal,
-                        ),
-                      ),
-                    ),
-                    // Gradient kanan (transparan → gelap)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: 48,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: blackFadeGradientHorizontalReversed,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -303,7 +293,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      // MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -343,9 +333,9 @@ class ListMenuWidget extends StatelessWidget {
       //   }
       //   break;
 
-      // case 'Beli Polis':
-      //   Navigator.push(context, MaterialPageRoute(builder: (_) => SuccessPage()));
-      //   break;
+      case 'Test Page':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvFormPage(viewMode: 'tambah', recordId: '',)));
+        break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));

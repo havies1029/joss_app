@@ -9,5 +9,11 @@ abstract class Endors2CariEvents extends Equatable {
 
 class FetchEndors2CariEvent extends Endors2CariEvents {}
 
-class RefreshEndors2CariEvent extends Endors2CariEvents {}
+class RefreshEndors2CariEvent extends Endors2CariEvents {
+	final String sppa1Id;
+	const RefreshEndors2CariEvent({required this.sppa1Id});
+
+	@override
+	List<Object> get props => [sppa1Id];
+}
 

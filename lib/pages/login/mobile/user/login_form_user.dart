@@ -6,20 +6,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 
-import '../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../blocs/networkconnection/network_bloc.dart';
-import '../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
 
 import '../../../../helper/auth_input_router.dart';
 import '../../../../models/login/emailverification_model.dart';
 import 'package:joss_app/widgets/google/google_signin_button_stub.dart'
   if (dart.library.js_interop) 'package:joss_app/widgets/google/google_signin_button_web.dart';
-import '../../../base/base_background_firstpage.dart';
 import '../client/login_client_page.dart';
 
 const List<String> scopes = <String>[

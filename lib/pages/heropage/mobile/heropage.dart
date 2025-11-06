@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/heropage/mobile/widget/detail_premi.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
@@ -21,90 +22,100 @@ class HeroPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: primaryBlackColor,
       body: BaseBackgroundFirstPage(
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, authState) {
-                    final custType = authState is AuthenticationAuthenticated
-                        ? (authState.user.custType ?? '').toUpperCase()
-                        : '';
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Column(
+                    children: [
+                      BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                        builder: (context, authState) {
+                          final custType =
+                          authState is AuthenticationAuthenticated
+                              ? (authState.user.custType ?? '').toUpperCase()
+                              : '';
 
-                    if (custType == 'C') {
-                      // 🔹 Client → ambil dari UserProfileCubit
-                      return BlocBuilder<UserProfileCubit, UserProfileState>(
-                        buildWhen: (prev, curr) =>
-                        prev.nama != curr.nama || prev.fotoBytes != curr.fotoBytes,
-                        builder: (context, profileState) {
-                          final displayName = (profileState.nama?.trim().isNotEmpty ?? false)
-                              ? profileState.nama!.trim()
-                              : 'Client User'; // default kalau masih kosong
+                          if (custType == 'C') {
+                            // 🔹 Client → ambil dari UserProfileCubit
+                            return BlocBuilder<UserProfileCubit, UserProfileState>(
+                              buildWhen:
+                                  (prev, curr) =>
+                              prev.nama != curr.nama ||
+                                  prev.fotoBytes != curr.fotoBytes,
+                              builder: (context, profileState) {
+                                final displayName =
+                                (profileState.nama?.trim().isNotEmpty ?? false)
+                                    ? profileState.nama!.trim()
+                                    : 'Client User';
 
-                          final bytes = (profileState.fotoBytes != null &&
-                              profileState.fotoBytes!.isNotEmpty)
-                              ? profileState.fotoBytes
-                              : null; // default kalau belum ada foto
+                                final bytes =
+                                (profileState.fotoBytes != null &&
+                                    profileState.fotoBytes!.isNotEmpty)
+                                    ? profileState.fotoBytes
+                                    : null;
 
-                          return _buildHeroContent(
-                            context,
-                            displayName: displayName,
-                            custType: custType,
-                            bytes: bytes,
-                          );
+                                return _buildHeroContent(
+                                  context,
+                                  displayName: displayName,
+                                  custType: custType,
+                                  bytes: bytes,
+                                  screenHeight: screenHeight,
+                                );
+                              },
+                            );
+                          } else if (custType == 'U') {
+                            // 🔹 User baru → ambil dari RegUserProfileCubit
+                            return BlocBuilder<
+                                RegUserProfileCubit,
+                                RegUserProfileState
+                            >(
+                              buildWhen: (prev, curr) => prev.email != curr.email,
+                              builder: (context, regState) {
+                                final displayName =
+                                regState.email.isNotEmpty
+                                    ? regState.email
+                                    : 'New User';
+
+                                return _buildHeroContent(
+                                  context,
+                                  displayName: displayName,
+                                  custType: custType,
+                                  bytes: null,
+                                  screenHeight: screenHeight,
+                                );
+                              },
+                            );
+                          } else {
+                            // 🔹 CustType kosong / tidak dikenal
+                            final fallbackEmail =
+                            authState is AuthenticationAuthenticated
+                                ? (authState.user.email?.trim() ?? 'Guest User')
+                                : 'Guest User';
+
+                            return _buildHeroContent(
+                              context,
+                              displayName: fallbackEmail,
+                              custType: custType.isEmpty ? '(Unknown)' : custType,
+                              bytes: null,
+                              screenHeight: screenHeight,
+                            );
+                          }
                         },
-                      );
-                    }
-
-                    else if (custType == 'U') {
-                      // 🔹 User baru → ambil dari RegUserProfileCubit
-                      return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
-                        buildWhen: (prev, curr) => prev.email != curr.email,
-                        builder: (context, regState) {
-                          final displayName = regState.email.isNotEmpty
-                              ? regState.email
-                              : 'New User'; // default kalau email kosong
-
-                          return _buildHeroContent(
-                            context,
-                            displayName: displayName,
-                            custType: custType,
-                            bytes: null, // user baru belum ada foto
-                          );
-                        },
-                      );
-                    }
-
-                    else {
-                      // 🔹 CustType kosong / tidak dikenal → ambil dari authState langsung
-                      final fallbackEmail = authState is AuthenticationAuthenticated
-                          ? (authState.user.email?.trim() ?? 'Guest User')
-                          : 'Guest User';
-
-                      // debugPrint("⚙ [Hero Header] CustType kosong, pakai fallback email: $fallbackEmail");
-
-                      return _buildHeroContent(
-                        context,
-                        displayName: fallbackEmail,
-                        custType: custType.isEmpty ? '(Unknown)' : custType,
-                        bytes: null,
-                      );
-                    }
-                    //
-                    // // 🔹 Default (belum login / state lain) → render placeholder juga
-                    // return _buildHeroContent(
-                    //   context,
-                    //   displayName: 'Guest', // fallback
-                    //   custType: '',
-                    //   bytes: null,
-                    // );
-                  },
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -113,12 +124,15 @@ class HeroPage extends StatelessWidget {
 
   /// Helper untuk bangun HeroPage UI
   Widget _buildHeroContent(
-      BuildContext context,{
+      BuildContext context, {
         required String displayName,
         required String custType,
         Uint8List? bytes,
+        required double screenHeight,
       }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         HeroCardWidget(
           userName: displayName,
@@ -128,7 +142,9 @@ class HeroPage extends StatelessWidget {
           onDetailTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const DetailPremiPage(sppa1Id: '',)),
+              MaterialPageRoute(
+                builder: (_) => const DetailPremiPage(sppa1Id: ''),
+              ),
             );
           },
           custType: custType,
@@ -138,7 +154,37 @@ class HeroPage extends StatelessWidget {
         const SizedBox(height: vPadding - 3),
         const CarouselMenuWidget(),
         const SizedBox(height: vPadding - 3),
-        if (custType == 'C') const TransaksiListWidget(),
+
+        if (custType == 'C')
+          const TransaksiListWidget()
+        else
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: screenHeight * 0.05,
+              ),
+              Container(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Berizin dan Diawasi Oleh:',
+                      style: bodyTextStyle(context, fontSize: 14),
+                    ),
+                    const SizedBox(height: 8),
+                    Image.asset(
+                      'assets/images/ojk.png',
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }

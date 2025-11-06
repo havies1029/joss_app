@@ -15,6 +15,8 @@ enum CategoryType {
   kendaraan,
   kesehatan,
   marineKargo,
+  Angkutan,
+  hull,
   sdm,
   lain_lain,
 }

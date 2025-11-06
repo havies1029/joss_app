@@ -1,4 +1,3 @@
-
 class MRekanPicListModel {
 	bool isDefault;
 	String mjabatanId;
@@ -8,33 +7,46 @@ class MRekanPicListModel {
 	String picHp;
 	String picNama;
 	String jabatanDesc;
+	String peranan;
+	String listCob;
+	String? statusPic;
 
 	MRekanPicListModel({required this.isDefault, required this.mjabatanId,
 		required this.mrekan1Id, required this.mrekanpicId,
 		required this.picEmail, required this.picHp,
-		required this.picNama, required this.jabatanDesc});
+		required this.picNama, required this.jabatanDesc,
+		required this.peranan, required this.listCob,
+		required this.statusPic});
 
 	factory MRekanPicListModel.fromJson(Map<String, dynamic> data) {
 		return MRekanPicListModel(
-				isDefault: data['isDefault']??false,
+				isDefault:  data['isDefault']??false,
 				mjabatanId: data['mjabatanId']??'',
 				mrekan1Id: data['mrekan1Id']??'',
 				mrekanpicId: data['mrekanpicId']??'',
 				picEmail: data['picEmail']??'',
 				picHp: data['picHp']??'',
 				picNama: data['picNama']??'',
-				jabatanDesc: data['jabatanDesc']??''
+				jabatanDesc: data['jabatanDesc']??'',
+				peranan: data['peranan']??'',
+				listCob: data['listCob']??'',
+				statusPic: data['statusPic']??''
 		);
+
 	}
 
 	Map<String, dynamic> toJson() =>
-			{'isDefault': isDefault,
+			{'isDefault': isDefault.toString(),
 				'mjabatanId': mjabatanId,
 				'mrekan1Id': mrekan1Id,
 				'mrekanpicId': mrekanpicId,
 				'picEmail': picEmail,
 				'picHp': picHp,
 				'picNama': picNama,
-				'jabatanDesc': jabatanDesc};
+				'jabatanDesc': jabatanDesc,
+				'peranan': peranan,
+				'listCob': listCob,
+				'statusPic': statusPic
+			};
 
 }

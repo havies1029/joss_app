@@ -4,7 +4,7 @@ import 'package:joss_app/common/constants.dart';
 
 class PolisButton extends StatelessWidget {
   final String assetPath;
-  final String text;
+  final String? text; // 🔥 ubah jadi nullable
   final VoidCallback? onTap;
   final Color? bgColor;
   final Color? textColor;
@@ -18,7 +18,7 @@ class PolisButton extends StatelessWidget {
   const PolisButton({
     super.key,
     required this.assetPath,
-    required this.text,
+    this.text, // 🔥 gak wajib lagi
     this.onTap,
     this.bgColor,
     this.textColor,
@@ -32,18 +32,35 @@ class PolisButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = AppButton.iconLeft(
-      text: text,
-      icon: SvgPicture.asset(
-        assetPath,
-        width: iconSize,
-        height: iconSize,
-        color: textColor ?? primaryLightColor,
+    final iconWidget = SvgPicture.asset(
+      assetPath,
+      width: iconSize,
+      height: iconSize,
+      color: textColor ?? primaryLightColor,
+    );
+
+    final button = (text == null || text!.isEmpty)
+        ? IconButton( // 🔥 mode icon-only
+      onPressed: onTap,
+      icon: iconWidget,
+      style: IconButton.styleFrom(
+        backgroundColor: bgColor ?? Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          side: BorderSide(
+            color: borderColor ?? Colors.transparent,
+            width: 0.8,
+          ),
+        ),
       ),
+    )
+        : AppButton.iconLeft(
+      text: text!,
+      icon: iconWidget,
       iconTextSpacing: 4,
       onPressed: onTap,
       height: height,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       backgroundColor: bgColor ?? Colors.transparent,
       borderRadius: borderRadius,
       isOutlined: true,

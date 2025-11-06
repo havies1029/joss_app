@@ -34,7 +34,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       AppData.user = user;
       AppData.userToken = user.token!;
-
+      print("🔑 Token yang diterima: ${AppData.userToken}");
       emit(LoginPreAuthenticate());
 
       // Simpan password jika rememberMe true

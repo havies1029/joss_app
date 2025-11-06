@@ -28,6 +28,7 @@ class Endors1CrudAPI {
 		}
 		return returnData;
 	}
+
 	Future<bool> endors1CrudUbahAPI(Endors1CrudModel record) async {
 		String ubahEndpoint =
 			"${AppData.prefixEndPoint}/api/endors/endors1crud/update";

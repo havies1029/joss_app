@@ -162,37 +162,38 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                         telp: it.picHp ?? '-',
                                         jabatan: it.jabatanDesc ?? '-',
                                         mrekanpicId: it.mrekanpicId!,
-                                          onEdit: () async {
-                                            final jabatanModelFromList = ComboMJabatanModel(
-                                              mjabatanId: it.mjabatanId!.toString(),
-                                              jabatanDesc: it.jabatanDesc ?? '',
-                                            );
+                                        statusPic: it.statusPic,
+                                        onEdit: () async {
+                                          final jabatanModelFromList = ComboMJabatanModel(
+                                            mjabatanId: it.mjabatanId!.toString(),
+                                            jabatanDesc: it.jabatanDesc ?? '',
+                                          );
 
-                                            final changed = await Navigator.push<bool>(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => MultiBlocProvider(
-                                                  providers: [
-                                                    BlocProvider.value(value: context.read<MRekanPicCrudBloc>()),
-                                                    BlocProvider(create: (_) => RekanPicCobCariBloc()), // ✅ Tambah ini
-                                                  ],
-                                                  child: EditPicWidget(
-                                                    mrekanpicId: it.mrekanpicId!,
-                                                    initNama: it.picNama,
-                                                    initEmail: it.picEmail,
-                                                    initHp: it.picHp,
-                                                    initJabatanModel: jabatanModelFromList,
-                                                    initIsDefault: it.isDefault ?? false,
-                                                  ),
+                                          final changed = await Navigator.push<bool>(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => MultiBlocProvider(
+                                                providers: [
+                                                  BlocProvider.value(value: context.read<MRekanPicCrudBloc>()),
+                                                  BlocProvider(create: (_) => RekanPicCobCariBloc()), // ✅ Tambah ini
+                                                ],
+                                                child: EditPicWidget(
+                                                  mrekanpicId: it.mrekanpicId!,
+                                                  initNama: it.picNama,
+                                                  initEmail: it.picEmail,
+                                                  initHp: it.picHp,
+                                                  initJabatanModel: jabatanModelFromList,
+                                                  initIsDefault: it.isDefault ?? false,
                                                 ),
                                               ),
-                                            );
+                                            ),
+                                          );
 
-                                            if (changed == true) {
-                                              listBloc.add(FetchMRekanPicListEvent());
-                                            }
-                                          },
-                                          onDelete: () {
+                                          if (changed == true) {
+                                            listBloc.add(FetchMRekanPicListEvent());
+                                          }
+                                        },
+                                        onDelete: () {
                                           _confirmDelete(context, it.mrekanpicId);
                                         },
                                       ),
@@ -215,26 +216,26 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
     );
   }
 
-    void _confirmDelete(BuildContext context, String recordId) {
-      // if (recordId.trim().isEmpty) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(content: Text('ID PIC kosong, tidak bisa dihapus.')),
-      //   );
-      //   return;
-      // }
+  void _confirmDelete(BuildContext context, String recordId) {
+    // if (recordId.trim().isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('ID PIC kosong, tidak bisa dihapus.')),
+    //   );
+    //   return;
+    // }
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => ShowDialogHapusWidget(
-          onHapusFunction: (id) {
-            crudBloc.add(MRekanPicCrudHapusEvent(recordId: id));
-          },
-          recordId: recordId,
-        ),
-      );
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ShowDialogHapusWidget(
+        onHapusFunction: (id) {
+          crudBloc.add(MRekanPicCrudHapusEvent(recordId: id));
+        },
+        recordId: recordId,
+      ),
+    );
 
-    }
+  }
 
 }
 
@@ -249,6 +250,7 @@ class _PicReadOnlyCard extends StatefulWidget {
   final String telp;
   final String jabatan;
   final String mrekanpicId;
+  final String? statusPic; // 🔹 Tambahkan ini
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -261,7 +263,9 @@ class _PicReadOnlyCard extends StatefulWidget {
     required this.mrekanpicId,
     required this.onEdit,
     required this.onDelete,
+    this.statusPic, // 🔹 Tambahkan ini juga
   });
+
 
   @override
   State<_PicReadOnlyCard> createState() => _PicReadOnlyCardState();
@@ -331,70 +335,73 @@ class _PicReadOnlyCardState extends State<_PicReadOnlyCard> {
                   const Spacer(),
 
                   /// 🔹 Tombol Kirim Undangan — scoped Bloc per card
-                  BlocProvider(
-                    create: (_) => InviteBloc(repo: InviteRepository()),
-                    child: BlocConsumer<InviteBloc, InviteState>(
-                      listener: (context, state) async {
-                        if (state.isSuccess) {
-                          await showDialog(
-                            context: context,
-                            builder: (_) => const InviteSuccessPopup(),
-                          );
-                        } else if (state.message.isNotEmpty && !state.isLoading) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(state.message)),
-                          );
-                        }
-                      },
-                      builder: (context, state) {
-                        final isLoading = state.isLoading;
-
-                        return _GhostIconButtonWithLabel(
-                          label: isLoading ? "Mengirim..." : "Kirim Undangan",
-                          icon: isLoading
-                              ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                              : const Icon(Icons.send, size: 18, color: Colors.white),
-                          bg: const Color(0xFF2196F3), // biru khas undangan
-                          onPressed: isLoading
-                              ? null
-                              : () {
-                            final userProfile =
-                                context.read<UserProfileCubit>().state;
-                            final userId = userProfile.mrekan1Id ?? '0';
-                            final email = widget.email.trim().toLowerCase();
-
-                            if (email.isEmpty || !email.contains('@')) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Email PIC tidak valid.')),
-                              );
-                              return;
-                            }
-
-                            context.read<InviteBloc>().add(
-                              SendInviteEvent(userId: userId, email: email),
+                  // 🔹 Hanya tampil kalau statusPic bukan "sudah aksep"
+                  if (widget.statusPic?.toLowerCase() != 'sudah aksep') ...[
+                    BlocProvider(
+                      create: (_) => InviteBloc(repo: InviteRepository()),
+                      child: BlocConsumer<InviteBloc, InviteState>(
+                        listener: (context, state) async {
+                          if (state.isSuccess) {
+                            await showDialog(
+                              context: context,
+                              builder: (_) => const InviteSuccessPopup(),
                             );
-                          },
-                        );
-                      },
+                          } else if (state.message.isNotEmpty && !state.isLoading) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(state.message)),
+                            );
+                          }
+                        },
+                        builder: (context, state) {
+                          final isLoading = state.isLoading;
+
+                          return _GhostIconButtonWithLabel(
+                            label: isLoading ? "Mengirim..." : "Kirim Undangan",
+                            icon: isLoading
+                                ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : const Icon(Icons.send, size: 18, color: Colors.white),
+                            bg: const Color(0xFF2196F3),
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                              final userProfile =
+                                  context.read<UserProfileCubit>().state;
+                              final userId = userProfile.mrekan1Id ?? '0';
+                              final email = widget.email.trim().toLowerCase();
+
+                              if (email.isEmpty || !email.contains('@')) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Email PIC tidak valid.'),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              context.read<InviteBloc>().add(
+                                SendInviteEvent(userId: userId, email: email),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: hPadding),
               Divider(color: sGrey, height: 20),
               _kv('Nama PIC :', widget.nama, labelStyle, valueStyle),
               _kv('Email :', widget.email, labelStyle, valueStyle),
               _kv('No. Telp :', widget.telp, labelStyle, valueStyle),
               _kv('Jabatan :', widget.jabatan, labelStyle, valueStyle),
-              const SizedBox(height: 12),
               Divider(color: sGrey, height: 20),
               const SizedBox(height: 8),
               Text('Polis yang bisa diakses:',
@@ -447,7 +454,7 @@ class _CobListSection extends StatelessWidget {
             );
           }
           if (state.status == ListStatus.failure) {
-            return Text('⚠️ Gagal memuat COB',
+            return Text('⚠ Gagal memuat COB',
                 style: bodyTextStyle(context).copyWith(color: Colors.red));
           }
           if (state.items.isEmpty) {

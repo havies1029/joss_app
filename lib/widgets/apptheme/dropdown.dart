@@ -56,6 +56,7 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
         baseStyle: bodyTextStyle(context),
         decoration: InputDecoration(
           labelText: widget.hintText,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           labelStyle: inputTextStyle(context),
           hintText: 'Pilih ${widget.hintText}',
           hintStyle: bodyTextStyle(context).copyWith(color: hintGrey),
@@ -95,12 +96,16 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
           icon: Icon(Icons.clear, size: 16, color: primaryLightColor),
         ),
         dropdownButtonProps: DropdownButtonProps(
-          iconOpened: SvgPicture.asset("assets/icons/arrow_up.svg", width: 16),
-          iconClosed: SvgPicture.asset(
-            "assets/icons/arrow_down.svg",
-            width: 16,
-          ),
-          isVisible: true,
+          iconClosed: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
+          iconOpened:Transform.rotate(
+            angle: 180 * 3.1416 / 180,
+            child: SvgPicture.asset(
+              "assets/icons/dropdown.svg",
+              width: 16,
+            ),
+        ),
+
+        isVisible: true,
         ),
       ),
       // DROPDOWN POPUP
