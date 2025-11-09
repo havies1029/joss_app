@@ -26,9 +26,9 @@ class AppData {
 
 /*
 static bool useSSL = false;
-static String apiDomain = "http://localhost/eAssistToolsAPI/";
+static String apiDomain = "http://localhost:1234/eAssistToolsAPI/";
 static String prefixEndPoint = "/eAssistToolsAPI";
-static String httpAuthority = "localhost";
+static String httpAuthority = "localhost:1234";
 */
 
 /*

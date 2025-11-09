@@ -22,9 +22,10 @@ class AsetListPar extends StatelessWidget {
         AsetParCariBloc,
         AsetParCariState,
         AsetParCariModel,
-        ShareParStateCubit>( // ✅ tambahkan tipe cubit di sini
+        ShareParStateCubit>(
       bloc: context.read<AsetParCariBloc>(),
-      cubit: cubit, // ✅ sekarang match: Map<String, AsetParCariModel>
+      cubit: cubit,
+      hasMore: (state) => !state.hasReachedMax,
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetParId,

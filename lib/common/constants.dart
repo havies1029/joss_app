@@ -118,7 +118,8 @@ const String kStringKotaError = "Kota wajib diisi.";
 const String kStringKodeposError = "Kode Pos wajib diisi.";
 const String kString0 = "Harus lebih dari 0.";
 
-enum ListStatus { initial, success, failure }
+enum ListStatus { initial, success, failure, loadingMore }
+
 
 const kAnimationDuration = Duration(milliseconds: 200);
 

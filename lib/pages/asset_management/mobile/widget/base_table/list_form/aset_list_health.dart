@@ -31,6 +31,7 @@ class AsetListHealth extends StatelessWidget {
         ShareHealthStateCubit>(
       bloc: bloc,
       cubit: cubit,
+      hasMore: (state) => !state.hasReachedMax,
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asethealthId,

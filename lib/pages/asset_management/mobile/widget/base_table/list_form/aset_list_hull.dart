@@ -30,6 +30,7 @@ class AsetListHull extends StatelessWidget {
         ShareHullStateCubit>(
       bloc: context.read<AsethullCariBloc>(),
       cubit: cubit,
+      hasMore: (state) => !state.hasReachedMax,
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetHullId,

@@ -22,9 +22,10 @@ class AsetListMv extends StatelessWidget {
         AsetMvCariBloc,
         AsetMvCariState,
         AsetMvCariModel,
-        ShareMvStateCubit>( // ✅ tambahkan generic ke-4
+        ShareMvStateCubit>(
       bloc: context.read<AsetMvCariBloc>(),
-      cubit: cubit, // ✅ cubit dari context.read<ShareMvStateCubit>()
+      cubit: cubit,
+      hasMore: (state) => !state.hasReachedMax,
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetMvId,

@@ -29,6 +29,7 @@ class AsetListRingkasan extends StatelessWidget {
         ShareRingkasanStateCubit>(
       bloc: context.read<AsetRingkasanCariBloc>(),
       cubit: cubit,
+      hasMore: (state) => !state.hasReachedMax,
       getItems: (state) => state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetRingkasanId,
