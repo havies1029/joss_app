@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
@@ -17,18 +18,45 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 	}
 
 	Future<void> onTambahCalmv2Form(
-		Calmv2FormTambahEvent event, Emitter<Calmv2FormState> emit) async {
+			Calmv2FormTambahEvent event,
+			Emitter<Calmv2FormState> emit,
+			) async {
+		debugPrint("📩 [Bloc] onTambahCalmv2Form() DIPANGGIL");
+		debugPrint("📦 Record dikirim: ${event.record.toJson()}");
 
 		ReturnDataAPI returnData;
 		bool hasFailure = true;
+
 		emit(state.copyWith(isSaving: true, isSaved: false));
+		debugPrint("⏳ [Bloc] Emit state: isSaving=true");
+
+		// --- Panggil API
 		returnData = await repository.calmv2FormTambah(event.record);
+		debugPrint("✅ [API] Response diterima dari repository");
+
+		// --- Log detail hasil API
+		debugPrint("🔸 [ReturnDataAPI] success=${returnData.success}");
+		debugPrint("🔸 [ReturnDataAPI] data=${returnData.data}");
+		debugPrint("🔸 [ReturnDataAPI] rowcount=${returnData.rowcount}");
+
 		hasFailure = !returnData.success;
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+
+		// --- Emit hasil akhir ke UI
+		emit(
+			state.copyWith(
+				isSaving: false,
+				isSaved: true,
+				hasFailure: hasFailure,
+				returnData: returnData,
+			),
+		);
+
+		debugPrint("📤 [Bloc] Emit state akhir:");
+		debugPrint("     isSaved=${!hasFailure}");
+		debugPrint("     hasFailure=$hasFailure");
+		debugPrint("     data=${returnData.data}");
 	}
+
 
 	Future<void> onUbahCalmv2Form(
 		Calmv2FormUbahEvent event, Emitter<Calmv2FormState> emit) async {

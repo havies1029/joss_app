@@ -22,14 +22,13 @@ class AsetListHealth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ShareHealthStateCubit>();
-    final bloc = context.read<AsetHealthCariBloc>();
 
     return ReusableAsetTable<
         AsetHealthCariBloc,
         AsetHealthCariState,
         AsetHealthCariModel,
         ShareHealthStateCubit>(
-      bloc: bloc,
+      bloc: context.read<AsetHealthCariBloc>(),
       cubit: cubit,
       hasMore: (state) => !state.hasReachedMax,
       getItems: (state) => state.items,
@@ -58,24 +57,22 @@ class AsetListHealth extends StatelessWidget {
         CellText(item.polisNo),
         CellText(item.posisi, center: true),
         CellText(item.status, center: true),
-
-        // Tombol-tombol aksi
         Padding(
           padding: const EdgeInsets.all(6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: getActionButtonsByStatus(
               item.status,
-              namaItem: item.nama,
+              namaItem: item.polisNo,
               context: context,
               itemData: item,
               onProcessTap: () async {
-                debugPrint("🔍 [Lacak Polis] Request data untuk: ${item.nama}");
+                final bloc = context.read<AsetHealthCariBloc>();
+                debugPrint("🔍 [Lacak Polis] Request data untuk: ${item.polisNo}");
 
-                // ⏳ kirim event refresh (tanpa trigger rebuild UI)
                 bloc.add(
                   DebugFetchAsetHealthCariEvent(
-                    searchText: item.nama,
+                    searchText: item.polisNo,
                     statusId: '10001',
                   ),
                 );
@@ -85,7 +82,7 @@ class AsetListHealth extends StatelessWidget {
         ),
       ],
       onFetchMore: () {
-        bloc.add(FetchAsetHealthCariEvent());
+        context.read<AsetHealthCariBloc>().add(FetchAsetHealthCariEvent());
       },
       emptyStatusLabel: statusLabel,
     );

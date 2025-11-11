@@ -33,11 +33,15 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			) async {
 		if (state.hasReachedMax) return;
 
-		AsetHealthCariRepository repo = AsetHealthCariRepository();
+		final repo = AsetHealthCariRepository();
 
 		if (state.status == ListStatus.initial) {
-			List<AsetHealthCariModel> items =
-			await repo.getAsetHealthCari(state.statusId, state.searchText, 0);
+			final items = await repo.getAsetHealthCari(
+				state.statusId,
+				state.searchText,
+				0,
+			);
+
 			return emit(state.copyWith(
 				items: items,
 				hasReachedMax: false,
@@ -46,17 +50,24 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			));
 		}
 
-		List<AsetHealthCariModel> items =
-		await repo.getAsetHealthCari(state.statusId, state.searchText, state.hal);
+		final items = await repo.getAsetHealthCari(
+			state.statusId,
+			state.searchText,
+			state.hal,
+		);
+
 		if (items.isEmpty) {
 			return emit(state.copyWith(hasReachedMax: true));
 		} else {
-			List<AsetHealthCariModel> asetHealthCari =
-			List.of(state.items)..addAll(items);
+			final asetHealthCari = List.of(state.items)..addAll(items);
 
 			final result = asetHealthCari
-					.whereWithIndex((e, index) =>
-			asetHealthCari.indexWhere((e2) => e2.asethealthId == e.asethealthId) == index)
+					.whereWithIndex(
+						(e, index) =>
+				asetHealthCari.indexWhere(
+								(e2) => e2.asethealthId == e.asethealthId) ==
+						index,
+			)
 					.toList();
 
 			return emit(state.copyWith(
@@ -68,12 +79,13 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 		}
 	}
 
+
 	// 🧠 Debug Fetch (tidak mengubah state UI)
 	Future<void> _onDebugFetchAsetHealthCari(
 			DebugFetchAsetHealthCariEvent event,
 			Emitter<AsetHealthCariState> emit,
 			) async {
-		AsetHealthCariRepository repo = AsetHealthCariRepository();
+		final repo = AsetHealthCariRepository();
 
 		debugPrint("🔍 [DebugFetch] Memulai fetch debug untuk '${event.searchText}'...");
 

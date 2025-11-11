@@ -73,41 +73,26 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		Calmv1CrudModel record = await repository.calmv1CrudLihat(event.recordId);
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
 	}
-
 	Future<void> onComboMMvjnscoverChanged(
 			ComboMMvjnscoverChangedEvent event, Emitter<Calmv1CrudState> emit) async {
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-
-		ComboMMvjnscoverModel comboMMvjnscover = event.comboMMvjnscover;
-		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMMvjnscover: comboMMvjnscover));
+		debugPrint("🔄 [Bloc] Combo Jenis Cover changed: ${event.comboMMvjnscover.mmvjnscoverId}");
+		emit(state.copyWith(comboMMvjnscover: event.comboMMvjnscover));
 	}
 
 	Future<void> onComboMWilayahChanged(
 			ComboMWilayahChangedEvent event, Emitter<Calmv1CrudState> emit) async {
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-
-		ComboMWilayahModel comboMWilayah = event.comboMWilayah;
-		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMWilayah: comboMWilayah));
+		debugPrint("🔄 [Bloc] Combo Wilayah changed: ${event.comboMWilayah.mwilayahId}");
+		emit(state.copyWith(comboMWilayah: event.comboMWilayah));
 	}
 
 	Future<void> onComboMMvgrupOjkChanged(
 			ComboMMvgrupOjkChangedEvent event, Emitter<Calmv1CrudState> emit) async {
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-
-		ComboMMvgrupOjkModel comboMMvgrupOjk = event.comboMMvgrupOjk;
-		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMMvgrupOjk: comboMMvgrupOjk));
+		debugPrint("🔄 [Bloc] Combo OJK changed: ${event.comboMMvgrupOjk.mmvgrupojkId}");
+		emit(state.copyWith(comboMMvgrupOjk: event.comboMMvgrupOjk));
 	}
+
 
 }

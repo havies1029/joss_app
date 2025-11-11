@@ -69,6 +69,7 @@ class Calmv1CrudAPI {
 		}
 		return returnData.success;
 	}
+
 	Future<bool> calmv1CrudHapusAPI(String calmv1Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/delete";
 		Map<String, String> queryParams = {

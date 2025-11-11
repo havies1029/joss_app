@@ -8,6 +8,7 @@ class Calmv2FormState extends Equatable {
 	final bool isSaving;
 	final bool isSaved;
 	final bool hasFailure;
+	final ReturnDataAPI? returnData;
 	const Calmv2FormState(
 		{this.record,
 		this.isLoading = false,
@@ -15,6 +16,7 @@ class Calmv2FormState extends Equatable {
 		this.isSaving = false,
 		this.isSaved = false,
 		this.hasFailure = false,
+		this.returnData,
 });
 
 	Calmv2FormState copyWith({
@@ -24,6 +26,7 @@ class Calmv2FormState extends Equatable {
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
+		ReturnDataAPI? returnData,
 	}){
 		return Calmv2FormState(
 			record: record ?? this.record,
@@ -32,9 +35,18 @@ class Calmv2FormState extends Equatable {
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
+			returnData: returnData ?? this.returnData,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		returnData,
+	];
+
 }
