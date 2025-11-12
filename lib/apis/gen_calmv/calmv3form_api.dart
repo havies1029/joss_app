@@ -102,4 +102,37 @@ class Calmv3FormAPI {
 			throw Exception("Failed to load data: ${response.statusCode}");
 		}
 	}
+	Future<Calmv3FormModel> calmv3FormHitungPremiAPI(String calmv1Id) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv3form/hitungpremi";
+		Map<String, String> queryParams = {'calmv1Id': calmv1Id,
+			'modul_id': 'calmv3FormHitungPremiAPI'};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		final http.Response response =
+		await http.get(uri, headers: <String, String>{
+			'Content-Type': 'application/json; odata=verbos',
+			'Accept': 'application/json; odata=verbos',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		});
+
+		if (response.statusCode == 200) {
+			debugPrint("✅ [API] HitungPremi sukses");
+			debugPrint("📦 Response body: ${response.body}");
+
+			try {
+				var jsonData = jsonDecode(response.body);
+				debugPrint("🔍 Decoded JSON keys: ${jsonData.keys}");
+				var returnData = Calmv3FormModel.fromJson(jsonData);
+				debugPrint("🧩 Model parsed: ${returnData.toJson()}");
+				return returnData;
+			} catch (e) {
+				debugPrint("❌ [API] Gagal parse JSON: $e");
+				throw Exception("Invalid JSON structure: $e");
+			}
+		} else {
+			debugPrint("❌ [API] HitungPremi gagal - status: ${response.statusCode}");
+			debugPrint("Body: ${response.body}");
+			throw Exception("Failed to load data (status ${response.statusCode})");
+		}
+
+	}
 }

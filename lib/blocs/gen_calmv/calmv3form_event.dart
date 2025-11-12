@@ -51,9 +51,17 @@ class Calmv3FormHapusEvent extends Calmv3FormEvents {
 }
 
 class Calmv3FormLihatEvent extends Calmv3FormEvents {
-	final String recordId;
-	const Calmv3FormLihatEvent({required this.recordId});
+	final String calmv1Id;
+	const Calmv3FormLihatEvent({required this.calmv1Id});
 
 	@override
-	List<Object> get props => [recordId];
+	List<Object> get props => [calmv1Id];
+}
+
+class Calmv3FormHitungPremiEvent extends Calmv3FormEvents {
+	final String calmv1Id;
+	const Calmv3FormHitungPremiEvent({required this.calmv1Id});
+
+	@override
+	List<Object> get props => [calmv1Id];
 }

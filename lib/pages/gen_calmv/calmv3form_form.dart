@@ -150,9 +150,9 @@ class Calmv3FormFormPageFormState extends State<Calmv3FormFormPage> {
   }
 
   void loadData() {
-    if (widget.viewMode == "ubah") {
-      calmv3FormBloc.add(Calmv3FormLihatEvent(recordId: widget.recordId));
-    }
+    // if (widget.viewMode == "ubah") {
+    //   calmv3FormBloc.add(Calmv3FormLihatEvent(recordId: widget.recordId));
+    // }
   }
 
   Widget _buildReadOnlyField(String label, TextEditingController controller) {

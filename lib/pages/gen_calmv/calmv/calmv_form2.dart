@@ -7,6 +7,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
+import '../../../blocs/reusable_connection_flow/calmv2_id_cubit.dart';
 import '../../../blocs/reusable_connection_flow/reusable_connection_flow_bloc.dart';
 
 class CalmvForm2Section extends StatefulWidget {
@@ -32,18 +33,21 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
 
   // Controllers
   final fieldAwController = TextEditingController();
-  final fieldIsEqController = TextEditingController();
-  final fieldIsFloodController = TextEditingController();
-  final fieldIsSrccController = TextEditingController();
-  final fieldIsTbodController = TextEditingController();
-  final fieldIsTerrorismController = TextEditingController();
   final fieldPadController = TextEditingController();
   final fieldPapController = TextEditingController();
   final fieldPassangerCountController = TextEditingController();
   final fieldPllController = TextEditingController();
   final fieldTplController = TextEditingController();
 
+  // Checkbox controllers
+  final fieldIsEqController = TextEditingController();
+  final fieldIsFloodController = TextEditingController();
+  final fieldIsSrccController = TextEditingController();
+  final fieldIsTbodController = TextEditingController();
+  final fieldIsTerrorismController = TextEditingController();
+
   late final Calmv2FormBloc calmv2Bloc;
+  String? _localCalmv2Id; // local id tracker
 
   @override
   void initState() {
@@ -54,16 +58,16 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
   @override
   void dispose() {
     fieldAwController.dispose();
-    fieldIsEqController.dispose();
-    fieldIsFloodController.dispose();
-    fieldIsSrccController.dispose();
-    fieldIsTbodController.dispose();
-    fieldIsTerrorismController.dispose();
     fieldPadController.dispose();
     fieldPapController.dispose();
     fieldPassangerCountController.dispose();
     fieldPllController.dispose();
     fieldTplController.dispose();
+    fieldIsEqController.dispose();
+    fieldIsFloodController.dispose();
+    fieldIsSrccController.dispose();
+    fieldIsTbodController.dispose();
+    fieldIsTerrorismController.dispose();
     super.dispose();
   }
 
@@ -81,30 +85,34 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
           );
         }
 
+        // Prefill data
         if (state.isLoaded && state.record != null) {
           final r = state.record!;
           fieldAwController.text = r.aw.toString();
-          fieldIsEqController.text = r.isEq.toString();
-          fieldIsFloodController.text = r.isFlood.toString();
-          fieldIsSrccController.text = r.isSrcc.toString();
-          fieldIsTbodController.text = r.isTbod.toString();
-          fieldIsTerrorismController.text = r.isTerrorism.toString();
           fieldPadController.text = NumberFormat("#,###").format(r.pad);
           fieldPapController.text = NumberFormat("#,###").format(r.pap);
           fieldPassangerCountController.text = r.passangerCount.toString();
           fieldPllController.text = NumberFormat("#,###").format(r.pll);
           fieldTplController.text = NumberFormat("#,###").format(r.tpl);
+          fieldIsEqController.text = r.isEq.toString();
+          fieldIsFloodController.text = r.isFlood.toString();
+          fieldIsSrccController.text = r.isSrcc.toString();
+          fieldIsTbodController.text = r.isTbod.toString();
+          fieldIsTerrorismController.text = r.isTerrorism.toString();
         }
 
+        // Insert/Update success
         if (state.isSaved && !state.hasFailure) {
-          final rawData = state.returnData?.data ?? "";
-          final dataPremi =
-          rawData.contains("|") ? rawData.split("|") : rawData.split(";");
+          final calmv2Id = state.returnData?.data ?? '';
+          if (calmv2Id.isNotEmpty) {
+            setState(() => _localCalmv2Id = calmv2Id);
 
-          flow.moveTo("form3", data: dataPremi);
+            // 🔹 kirim ke Cubit biar diketahui ibu file
+            context.read<Calmv2IdCubit>().setCalmv2Id(calmv2Id);
+          }
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('✅ Perlindungan berhasil disimpan')),
+            SnackBar(content: Text('✅ Perlindungan tersimpan (ID: $calmv2Id)')),
           );
         }
 
@@ -119,18 +127,20 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
         child: Column(
           children: [
             ListTile(
-              title:
-              Text('Perlindungan Tambahan', style: bodyTextStyle(context)),
+              title: Text('Perlindungan Tambahan', style: bodyTextStyle(context)),
               trailing: AnimatedRotation(
                 turns: widget.isExpanded ? 0.5 : 0.0,
                 duration: const Duration(milliseconds: 250),
-                child: SvgPicture.asset(
-                  'assets/icons/dropdown.svg',
-                  width: 16,
-                  height: 16,
-                ),
+                child: SvgPicture.asset('assets/icons/dropdown.svg', width: 16, height: 16),
               ),
-              onTap: () => widget.onToggle(!widget.isExpanded),
+              onTap: () async {
+                final willCollapse = widget.isExpanded;
+                if (willCollapse) {
+                  debugPrint("🧩 [Form2] Auto-save triggered on collapse");
+                  await _autoSaveIfNeeded();
+                }
+                widget.onToggle(!widget.isExpanded);
+              },
             ),
             if (widget.isExpanded && widget.calmv1Id != null)
               Padding(
@@ -184,12 +194,6 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
                           Flexible(flex: 1, child: _buildFieldIsTbod()),
                           const Flexible(flex: 1, child: SizedBox.shrink()),
                         ],
-                      ),
-                      const SizedBox(height: 20),
-                      AppButton.primary(
-                        text: 'Simpan',
-                        onPressed: _save,
-                        backgroundColor: primaryColor,
                       ),
                     ],
                   ),
@@ -305,26 +309,24 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     };
   }
 
-  // --- SAVE Logic ---
-  void _save() {
-    final flow = context.read<ReusableConnectionFlow>();
-
-    if (flow.state.isTransitioning || flow.state.isLoading) return;
-
-    if (widget.calmv1Id == null || widget.calmv1Id!.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(errorSnackBar("⚠️ Simpan Data Kendaraan terlebih dahulu"));
-      return;
-    }
-
+  // --- AUTO SAVE Logic ---
+  Future<void> _autoSaveIfNeeded() async {
     if (!_formKey2.currentState!.validate()) {
       debugPrint("⚠️ [Form2] Validasi gagal — form belum lengkap");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(errorSnackBar("Lengkapi Perlindungan Tambahan terlebih dahulu."));
       return;
     }
 
+    final flow = context.read<ReusableConnectionFlow>();
+    if (flow.state.isTransitioning || flow.state.isLoading) return;
+
+    final currentId = _localCalmv2Id ?? '';
+    final isTambah = currentId.isEmpty;
+
     final record = Calmv2FormModel(
-      calmv2Id: '',
-      calmv1Id: widget.calmv1Id!,
+      calmv2Id: currentId,
+      calmv1Id: widget.calmv1Id ?? '',
       aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
@@ -333,19 +335,17 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
       pad: double.tryParse(fieldPadController.text.replaceAll(',', '')) ?? 0,
       pap: double.tryParse(fieldPapController.text.replaceAll(',', '')) ?? 0,
-      passangerCount:
-      int.tryParse(fieldPassangerCountController.text.replaceAll(',', '')) ??
-          0,
+      passangerCount: int.tryParse(fieldPassangerCountController.text.replaceAll(',', '')) ?? 0,
       pll: double.tryParse(fieldPllController.text.replaceAll(',', '')) ?? 0,
       tpl: double.tryParse(fieldTplController.text.replaceAll(',', '')) ?? 0,
     );
 
-    debugPrint("📦 [Form2] Record dibuat: ${record.toJson()}");
+    debugPrint("🧱 [Form2] Record dibuat: ${record.toJson()}");
+    debugPrint("🧱 [Form2] Mode = ${isTambah ? 'TAMBAH' : 'UBAH'}");
 
-    if (widget.viewMode == "tambah") {
-      calmv2Bloc.add(Calmv2FormTambahEvent(record: record));
-    } else {
-      calmv2Bloc.add(Calmv2FormUbahEvent(record: record));
-    }
+    final event = isTambah
+        ? Calmv2FormTambahEvent(record: record)
+        : Calmv2FormUbahEvent(record: record);
+    calmv2Bloc.add(event);
   }
 }

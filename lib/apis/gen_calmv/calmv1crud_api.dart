@@ -109,4 +109,26 @@ class Calmv1CrudAPI {
 			return throw Exception("Failed to load data");
 		}
 	}
+
+	Future<bool> calmMvToRegMvAPI(String calmv1Id) async {
+		String calMvToRegMvEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/calmvtoregmv";
+		Map<String, String> queryParams = {
+			'calmv1Id': calmv1Id,
+			'modul_id': 'calmMvToRegMvAPI'};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, calMvToRegMvEndpoint, queryParams);
+		final http.Response response =
+		await http.get(uri, headers: <String, String>{
+			'Content-Type': 'application/json; odata=verbos',
+			'Accept': 'application/json; odata=verbos',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		});
+
+		ReturnDataAPI returnData;
+		if (response.statusCode == 200) {
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		}
+		return returnData.success;
+	}
 }
