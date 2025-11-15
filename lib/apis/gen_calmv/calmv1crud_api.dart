@@ -111,24 +111,67 @@ class Calmv1CrudAPI {
 	}
 
 	Future<bool> calmMvToRegMvAPI(String calmv1Id) async {
-		String calMvToRegMvEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/calmvtoregmv";
+		debugPrint("==============================================");
+		debugPrint("🚀 [API] calmMvToRegMvAPI DIPANGGIL");
+		debugPrint("📌 calmv1Id = $calmv1Id");
+
+		String endpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/calmvtoregmv";
+
 		Map<String, String> queryParams = {
 			'calmv1Id': calmv1Id,
-			'modul_id': 'calmMvToRegMvAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, calMvToRegMvEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+			'modul_id': 'calmMvToRegMvAPI',
+		};
 
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+		debugPrint("🌐 FINAL URL: $uri");
+		debugPrint("🧩 Query Params: ${queryParams.toString()}");
+
+		try {
+			debugPrint("📤 [API] GET REQUEST DIKIRIM...");
+			final response = await http.get(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}',
+				},
+			);
+
+			debugPrint("⬅️ [API] RESPONSE DITERIMA");
+			debugPrint("🔢 Status Code: ${response.statusCode}");
+			debugPrint("📦 Raw Body: ${response.body}");
+
+			if (response.statusCode == 200) {
+				// DEBUG JSON PARSE
+				try {
+					final decoded = jsonDecode(response.body);
+					debugPrint("🔍 Decoded JSON: $decoded");
+
+					final returnData = ReturnDataAPI.fromDatabaseJson(decoded);
+
+					debugPrint("📄 Parsed ReturnDataAPI:");
+					debugPrint("   ➡️ success = ${returnData.success}");
+					debugPrint("   ➡️ data    = ${returnData.data}");
+					debugPrint("   ➡️ rowcount= ${returnData.rowcount}");
+					debugPrint("==============================================");
+
+					return returnData.success;
+				} catch (e) {
+					debugPrint("❌ ERROR PARSING JSON: $e");
+					debugPrint("==============================================");
+					return false;
+				}
+			} else {
+				debugPrint("❌ API ERROR (status: ${response.statusCode})");
+				debugPrint("==============================================");
+				return false;
+			}
+		} catch (e) {
+			debugPrint("❌ EXCEPTION: $e");
+			debugPrint("==============================================");
+			return false;
 		}
-		return returnData.success;
 	}
+
 }

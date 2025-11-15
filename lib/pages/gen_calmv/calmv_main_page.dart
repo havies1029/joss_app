@@ -1,23 +1,16 @@
+// lib/pages/calmv/calmv_form_main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/form_error.dart';
-import 'package:joss_app/blocs/gen_calmv/calmv1crud_bloc.dart';
-import 'package:joss_app/blocs/gen_calmv/calmv2form_bloc.dart';
-import 'package:joss_app/blocs/gen_calmv/calmv3form_bloc.dart';
-import 'package:joss_app/repositories/gen_calmv/calmv1crud_repository.dart';
-import 'package:joss_app/repositories/gen_calmv/calmv2form_repository.dart';
-// import 'package:joss_app/repositories/gen_calmv/calmv3form_repository.dart';
 
-import '../../blocs/reusable_connection_flow/calmv2_id_cubit.dart';
-import '../../blocs/reusable_connection_flow/reusable_connection_flow_bloc.dart';
-import '../../blocs/reusable_connection_flow/reusable_connection_flow_state.dart';
-import '../../widgets/apptheme/header_card_polis.dart';
-import '../base/base_background_sidepage.dart';
+import '../../blocs/gen_calmv/calmv1crud_bloc.dart';
+import '../../blocs/gen_calmv/calmv3form_bloc.dart';
+import '../../blocs/reusable_connection_flow/flow_parent_cubit.dart';
+import '../../blocs/reusable_connection_flow/flow_parent_state.dart';
 import 'calmv/calmv_form1.dart';
 import 'calmv/calmv_form2.dart';
 import 'calmv/calmv_form3.dart';
-
 
 class CalmvFormMain extends StatefulWidget {
   final String viewMode;
@@ -35,177 +28,201 @@ class CalmvFormMain extends StatefulWidget {
 
 class _CalmvFormMainState extends State<CalmvFormMain> {
   final List<String> errors = [];
-  final GlobalKey<CalmvForm1SectionState> form1Key =
-  GlobalKey<CalmvForm1SectionState>();
+  Key _formMainKey = UniqueKey();
+  String? _savedCalmv1Id;
 
-  Future<void> _onHitungPremi(BuildContext context) async {
-    final flow = context.read<ReusableConnectionFlow>();
-    final calmv1Id = flow.state.activeId;
-    final calmv2Id = context.read<Calmv2IdCubit>().state;
+  final form1Key = GlobalKey<CalmvForm1SectionState>();
+  final form2Key = GlobalKey<CalmvForm2SectionState>();
+  final form3Key = GlobalKey<CalmvForm3SectionState>();
 
-    if (calmv1Id == null || calmv1Id.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(errorSnackBar("⚠️ Data kendaraan belum lengkap."));
-      return;
-    }
-
-    if (calmv2Id == null || calmv2Id.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(errorSnackBar("⚠️ Data perlindungan belum disimpan."));
-      return;
-    }
-
-    debugPrint("🧮 [Main] Hitung premi untuk calmv1Id=$calmv1Id");
-
-    final bloc = context.read<Calmv3FormBloc>();
-    bloc.add(Calmv3FormHitungPremiEvent(calmv1Id: calmv1Id));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("🔄 Menghitung premi, mohon tunggu...")),
-    );
-
-    /// 🔥 Dengarkan hasil bloc dan lempar ke flow
-    bloc.stream.listen((state) {
-      if (state.isLoaded && state.record != null) {
-        final r = state.record!;
-        debugPrint("✅ [Main] Premi diterima: ${r.toJson()}");
-
-        /// kirim ke flow.sharedData supaya form3 bisa render
-        flow.moveTo("form3", data: [
-          r.premiDiskon?.toString() ?? "0",
-          r.premiNet?.toString() ?? "0",
-          r.premiSubtotal?.toString() ?? "0",
-        ]);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✅ Premi berhasil dihitung!")),
-        );
-      }
+  void _resetAllForms() {
+    setState(() {
+      // reset kunci widget agar form rebuild ulang
+      _formMainKey = UniqueKey();
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => ReusableConnectionFlow()),
-        BlocProvider(create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
-        BlocProvider(create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),
-        // BlocProvider(create: (_) => Calmv3FormBloc(repository: Calmv3FormRepository())),
-        BlocProvider(create: (_) => Calmv2IdCubit()), // ✅ Cubit ditambahkan
-      ],
-      child: BlocConsumer<ReusableConnectionFlow, ReusableConnectionFlowState>(
-        listener: (context, flow) {
-          if (flow.hasError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              errorSnackBar(flow.errorMessage ?? 'Terjadi kesalahan'),
-            );
+    return BlocProvider(
+      create: (_) => FlowParentCubit(),
+      child: BlocConsumer<FlowParentCubit, FlowParentState>(
+        listenWhen: (prev, curr) => prev.uiEvent != curr.uiEvent,
+        listener: (context, state) {
+          final event = state.uiEvent;
+
+          // VALIDATE REQUEST
+          if (event.type == FlowUiEventType.validateStep &&
+              event.stepIndex != null) {
+            if (event.stepIndex == 0) form1Key.currentState?.validateSelf();
+            if (event.stepIndex == 1) form2Key.currentState?.validateSelf();
+          }
+
+          // SAVE REQUEST
+          if (event.type == FlowUiEventType.saveStep &&
+              event.stepIndex != null) {
+            if (event.stepIndex == 0) form1Key.currentState?.saveSelf();
+            if (event.stepIndex == 1) form2Key.currentState?.saveSelf();
+          }
+
+          // ACTIVATE STEP
+          if (event.type == FlowUiEventType.activateStep &&
+              event.stepIndex != null) {
+
+          final id = state.steps[0].id;
+          if (id != null && id.isNotEmpty) {
+          _savedCalmv1Id = id;
+          debugPrint("💾 [UI] calmv1Id DISIMPAN LOKAL = $_savedCalmv1Id");
+          }
+
+            switch (event.stepIndex) {
+              case 0:
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  form1Key.currentState?.activate();
+                });
+                break;
+
+              case 1:
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (state.steps[1].isActive) {
+                    form2Key.currentState?.activate();
+                  }
+                });
+                break;
+
+              case 3:
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  form3Key.currentState?.activate();
+
+                  if (event.payload != null) {
+                    form3Key.currentState?.injectPayload(event.payload!);
+                  }
+
+                });
+                break;
+
+            }
+          }
+
+          // FLOW COMPLETED → RESET
+          if (event.type == FlowUiEventType.flowCompleted) {
+            _resetAllForms();
           }
         },
-        builder: (context, flow) {
-          return BaseBackgroundSidePage(
-            title: "Kendaraan",
-            child: SingleChildScrollView(
+        builder: (context, state) {
+          final cubit = context.read<FlowParentCubit>();
+
+          final form1Active = state.steps[0].isActive;
+          final form2Active = state.steps[1].isActive;
+          final buttonActive = state.steps[2].isActive;
+          final form3Active = state.steps[3].isActive;
+
+          return Scaffold(
+            key: _formMainKey,
+            appBar: AppBar(title: const Text("Kendaraan")),
+            body: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Container(
-                width: double.infinity,
-                constraints:
-                BoxConstraints(minHeight: MediaQuery.of(context).size.height),
                 color: secondaryBlackColor,
                 padding: const EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FormSectionHeader(
-                      iconPath: "assets/icons/kendaraan.svg",
-                      title: "Beli Polis",
-                      subtitle: "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
-                    ),
-                    const SizedBox(height: vPadding),
-
                     // ================= FORM 1 =================
                     CalmvForm1Section(
                       key: form1Key,
-                      externalKey: form1Key,
                       viewMode: widget.viewMode,
                       recordId: widget.recordId,
-                      isExpanded: flow.activeStage == "form1",
-                      onToggle: (v) {
-                        if (v) {
-                          context.read<ReusableConnectionFlow>().moveTo("form1");
-                        }
+                      isExpanded: form1Active,
+                      onToggle: (_) {
+                        cubit.requestOpenStep(0);
                       },
                     ),
                     const SizedBox(height: 12),
 
                     // ================= FORM 2 =================
                     CalmvForm2Section(
+                      key: form2Key,
                       viewMode: widget.viewMode,
-                      calmv1Id: flow.activeId,
-                      isExpanded: flow.activeStage == "form2",
-                      onToggle: (v) async {
-                        final flowCubit = context.read<ReusableConnectionFlow>();
-                        final form1State = form1Key.currentState;
-                        if (form1State == null) return;
+                      calmv1Id: state.steps[0].id ?? widget.recordId,
+                      isExpanded: form2Active,
+                      onToggle: (_) {
+                        cubit.requestOpenStep(1);
+                      },
+                    ),
+                    const SizedBox(height: 12),
 
-                        if (flowCubit.state.isForm1Saving ||
-                            flowCubit.state.isTransitioning) return;
+                    // ================= TOMBOL HITUNG PREMI =================
+                    if (buttonActive)
+                      AppButton.primary(
+                        text: "Hitung Premi",
+                        onPressed: () async {
+                          debugPrint("🔥 [UI] ==== BUTTON HITUNG PREMI DIKLIK ====");
+                          debugPrint("🔥 [UI] currentActiveIndex = ${cubit.state.currentActiveIndex}");
+                          debugPrint("🔥 [UI] step[0] ID (calmv1) = ${cubit.state.steps[0].id}");
+                          debugPrint("🔥 [UI] step[1] ID (calmv2) = ${cubit.state.steps[1].id}");
 
-                        if (!flowCubit.state.isForm1Saved ||
-                            flowCubit.state.activeId == null) {
-                          final isValid = form1State.validateFormFields();
-                          flowCubit.markForm1Valid(isValid);
-                          if (!isValid) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              errorSnackBar("Lengkapi Data Kendaraan terlebih dahulu."),
-                            );
+                          final calmv1Id = _savedCalmv1Id ?? cubit.state.steps[0].id;
+
+
+                          if (calmv1Id == null || calmv1Id.isEmpty) {
+                            debugPrint("❌ [UI] Tidak bisa hitung premi — calmv1Id kosong");
                             return;
                           }
 
-                          flowCubit.markForm1Saving();
-                          await form1State.autoSaveWithFlow();
+                          // 👉 PANGGIL API HARI INI YA INI YG PENTING
+                          context.read<Calmv3FormBloc>().add(
+                            Calmv3FormHitungPremiEvent(calmv1Id: calmv1Id),
+                          );
 
-                          if (v && flowCubit.state.isForm1Saved) {
-                            flowCubit.moveTo("form2", id: flowCubit.state.activeId);
-                          }
-                          return;
-                        }
+                          debugPrint("🚀 [UI] Event HitungPremi dikirim dengan calmv1Id=$calmv1Id");
 
-                        flowCubit.markForm1Valid(true);
-                        if (v) {
-                          await form1State.autoSaveWithFlow();
-                          flowCubit.moveTo("form2", id: flowCubit.state.activeId);
-                        }
-                      },
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ================= HITUNG PREMI BUTTON =================
-                    BlocBuilder<Calmv2IdCubit, String?>(
-                      builder: (context, calmv2Id) {
-                        final flow = context.watch<ReusableConnectionFlow>();
-                        final calmv1Id = flow.state.activeId;
-                        final isEnabled = (calmv1Id != null && calmv1Id.isNotEmpty) &&
-                            (calmv2Id != null && calmv2Id.isNotEmpty);
-
-                        return AppButton.primary(
-                          text: "Hitung Premi",
-                          backgroundColor: isEnabled ? sBlue : pGrey,
-                          onPressed: isEnabled
-                              ? () async => await _onHitungPremi(context)
-                              : null,
-                        );
-                      },
-                    ),
+                          // cubit → berpindah ke form3 seperti biasa
+                          cubit.onButtonTriggered(
+                            index: 2,
+                            payload: {}, // payload kosong → nanti API yg update field
+                          );
+                        },
+                      )
+                    else
+                      AppButton.primary(
+                        text: "Hitung Premi",
+                        onPressed: () {
+                          // user klik → minta buka step button
+                          cubit.requestOpenStep(2);
+                        },
+                      ),
 
                     const SizedBox(height: 12),
 
                     // ================= FORM 3 =================
                     CalmvForm3Section(
-                      isExpanded: flow.activeStage == "form3",
+                      key: form3Key,
+                      isExpanded: form3Active,
                     ),
+
+                    const SizedBox(height: 12),
+
+                    if (form3Active)
+                      AppButton.primary(
+                        text: "Lanjutkan",
+                        onPressed: () async {
+                          final calmv1Id = _savedCalmv1Id ?? state.steps[0].id;
+
+                          // panggil API ke RegMv
+                          context.read<Calmv1CrudBloc>().add(
+                            CalmvtoRegMvEvent(recordId: calmv1Id!),
+                          );
+
+                          // Beritahu parent (opsional)
+                          cubit.onButtonTriggered(index: 4, payload: {});
+                        },
+                      )else
+                      AppButton.primary(
+                        text: "Lanjutkan",
+                        onPressed: null,                 // disable
+                        textColor: pGrey,                    // warna disabled
+                      ),
 
                     const SizedBox(height: 25),
                     FormError(errors: errors, key: null),

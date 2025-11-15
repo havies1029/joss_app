@@ -57,3 +57,10 @@ class ComboMMvgrupOjkChangedEvent extends Calmv1CrudEvents{
 
 	@override	List<Object> get props => [comboMMvgrupOjk];}
 
+class CalmvtoRegMvEvent extends Calmv1CrudEvents {
+	final String recordId;
+	const CalmvtoRegMvEvent({required this.recordId});
+
+	@override
+	List<Object> get props => [recordId];
+}

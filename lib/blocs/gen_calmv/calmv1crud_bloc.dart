@@ -18,6 +18,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		on<Calmv1CrudTambahEvent>(onTambahCalmv1Crud);
 		on<Calmv1CrudHapusEvent>(onHapusCalmv1Crud);
 		on<Calmv1CrudLihatEvent>(onLihatCalmv1Crud);
+		on<CalmvtoRegMvEvent>(onCalmvToReg);
 		on<ComboMMvjnscoverChangedEvent>(onComboMMvjnscoverChanged);
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
 		on<ComboMMvgrupOjkChangedEvent>(onComboMMvgrupOjkChanged);
@@ -73,6 +74,14 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		Calmv1CrudModel record = await repository.calmv1CrudLihat(event.recordId);
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
 	}
+
+	Future<void> onCalmvToReg(
+			CalmvtoRegMvEvent event, Emitter<Calmv1CrudState> emit) async {
+		emit(state.copyWith(isSaving: true, isSaved: false));
+		bool hasFailure = !await repository.calmMvToRegMv(event.recordId);
+		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+	}
+
 	Future<void> onComboMMvjnscoverChanged(
 			ComboMMvjnscoverChangedEvent event, Emitter<Calmv1CrudState> emit) async {
 

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_calmv/calmv2form_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
-import '../../../blocs/reusable_connection_flow/calmv2_id_cubit.dart';
-import '../../../blocs/reusable_connection_flow/reusable_connection_flow_bloc.dart';
+
+import '../../../blocs/reusable_connection_flow/flow_parent_cubit.dart';
 
 class CalmvForm2Section extends StatefulWidget {
   final String viewMode;
@@ -25,10 +25,10 @@ class CalmvForm2Section extends StatefulWidget {
   });
 
   @override
-  State<CalmvForm2Section> createState() => _CalmvForm2SectionState();
+  State<CalmvForm2Section> createState() => CalmvForm2SectionState();
 }
 
-class _CalmvForm2SectionState extends State<CalmvForm2Section> {
+class CalmvForm2SectionState extends State<CalmvForm2Section> {
   final _formKey2 = GlobalKey<FormState>();
 
   // Controllers
@@ -39,7 +39,6 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
   final fieldPllController = TextEditingController();
   final fieldTplController = TextEditingController();
 
-  // Checkbox controllers
   final fieldIsEqController = TextEditingController();
   final fieldIsFloodController = TextEditingController();
   final fieldIsSrccController = TextEditingController();
@@ -47,7 +46,7 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
   final fieldIsTerrorismController = TextEditingController();
 
   late final Calmv2FormBloc calmv2Bloc;
-  String? _localCalmv2Id; // local id tracker
+  String? _localCalmv2Id;
 
   @override
   void initState() {
@@ -63,6 +62,7 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     fieldPassangerCountController.dispose();
     fieldPllController.dispose();
     fieldTplController.dispose();
+
     fieldIsEqController.dispose();
     fieldIsFloodController.dispose();
     fieldIsSrccController.dispose();
@@ -71,29 +71,43 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     super.dispose();
   }
 
+  Future<void> validateSelf() async {
+    final isValid = _formKey2.currentState?.validate() ?? false;
+
+    context.read<FlowParentCubit>().onValidationResult(
+      index: 1,
+      isValid: isValid,
+    );
+  }
+
+  Future<void> saveSelf() async {
+    _saveForm();
+  }
+
+  void activate() {
+    setState(() {});
+
+    // HANYA load ulang data jika form2 baru pertama kali dibuka
+    if (_localCalmv2Id != null && widget.isExpanded) {
+      calmv2Bloc.add(Calmv2FormLihatEvent(recordId: _localCalmv2Id!));
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    final flow = context.read<ReusableConnectionFlow>();
-
     return BlocListener<Calmv2FormBloc, Calmv2FormState>(
       listener: (context, state) {
-        debugPrint("📡 [Form2] state change → isSaved=${state.isSaved}, isLoaded=${state.isLoaded}");
-
-        if (state.isLoading) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('⏳ Menyimpan Perlindungan Tambahan...')),
-          );
-        }
-
-        // Prefill data
-        if (state.isLoaded && state.record != null) {
+        if (widget.isExpanded && state.isLoaded && state.record != null) {
           final r = state.record!;
+
           fieldAwController.text = r.aw.toString();
           fieldPadController.text = NumberFormat("#,###").format(r.pad);
           fieldPapController.text = NumberFormat("#,###").format(r.pap);
           fieldPassangerCountController.text = r.passangerCount.toString();
           fieldPllController.text = NumberFormat("#,###").format(r.pll);
           fieldTplController.text = NumberFormat("#,###").format(r.tpl);
+
           fieldIsEqController.text = r.isEq.toString();
           fieldIsFloodController.text = r.isFlood.toString();
           fieldIsSrccController.text = r.isSrcc.toString();
@@ -101,26 +115,31 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
           fieldIsTerrorismController.text = r.isTerrorism.toString();
         }
 
-        // Insert/Update success
         if (state.isSaved && !state.hasFailure) {
-          final calmv2Id = state.returnData?.data ?? '';
-          if (calmv2Id.isNotEmpty) {
-            setState(() => _localCalmv2Id = calmv2Id);
+          final returnedId = state.returnData?.data ?? "";
 
-            // 🔹 kirim ke Cubit biar diketahui ibu file
-            context.read<Calmv2IdCubit>().setCalmv2Id(calmv2Id);
+          // INSERT → id selalu dari returnData
+          if (returnedId.isNotEmpty) {
+            _localCalmv2Id = returnedId;
+          }
+
+          // UPDATE → server tidak mengirim ID → gunakan ID lama
+          else if (_localCalmv2Id == null) {
+            _localCalmv2Id = state.record?.calmv2Id; // fallback
+          }
+
+          if (_localCalmv2Id != null) {
+            context.read<FlowParentCubit>().onSaveResult(
+              index: 1,
+              id: _localCalmv2Id!,
+            );
           }
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('✅ Perlindungan tersimpan (ID: $calmv2Id)')),
+            const SnackBar(content: Text("Perlindungan tambahan disimpan")),
           );
         }
 
-        if (state.hasFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('❌ Gagal menyimpan Perlindungan Tambahan')),
-          );
-        }
       },
       child: Card(
         color: pGrey,
@@ -131,18 +150,12 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
               trailing: AnimatedRotation(
                 turns: widget.isExpanded ? 0.5 : 0.0,
                 duration: const Duration(milliseconds: 250),
-                child: SvgPicture.asset('assets/icons/dropdown.svg', width: 16, height: 16),
+                child: SvgPicture.asset('assets/icons/dropdown.svg', width: 16),
               ),
-              onTap: () async {
-                final willCollapse = widget.isExpanded;
-                if (willCollapse) {
-                  debugPrint("🧩 [Form2] Auto-save triggered on collapse");
-                  await _autoSaveIfNeeded();
-                }
-                widget.onToggle(!widget.isExpanded);
-              },
+              onTap: () => widget.onToggle(!widget.isExpanded),
             ),
-            if (widget.isExpanded && widget.calmv1Id != null)
+
+            if (widget.isExpanded)
               Padding(
                 padding: const EdgeInsets.all(15),
                 child: Form(
@@ -151,50 +164,61 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
                     children: [
                       Row(
                         children: [
-                          Flexible(flex: 1, child: _buildFieldPLL()),
+                          Flexible(child: _buildFieldPLL()),
                           const SizedBox(width: 8),
-                          Flexible(flex: 1, child: _buildFieldTPL()),
+                          Flexible(child: _buildFieldTPL()),
                         ],
                       ),
                       const SizedBox(height: 12),
+
                       Row(
                         children: [
-                          Flexible(flex: 1, child: _buildFieldPAD()),
+                          Flexible(child: _buildFieldPAD()),
                           const SizedBox(width: 8),
-                          Flexible(flex: 1, child: _buildFieldPAP()),
+                          Flexible(child: _buildFieldPAP()),
                         ],
                       ),
                       const SizedBox(height: 12),
+
                       Row(
                         children: [
-                          Flexible(flex: 1, child: _buildFieldPassangerCount()),
+                          Flexible(child: _buildFieldPassangerCount()),
                           const SizedBox(width: 8),
-                          Flexible(flex: 1, child: _buildFieldAW()),
+                          Flexible(child: _buildFieldAW()),
                         ],
                       ),
                       const SizedBox(height: 12),
+
                       Row(
                         children: [
-                          Flexible(flex: 1, child: _buildFieldIsEq()),
+                          Flexible(child: _buildFieldIsEq()),
                           const SizedBox(width: 8),
-                          Flexible(flex: 1, child: _buildFieldIsFlood()),
+                          Flexible(child: _buildFieldIsFlood()),
                         ],
                       ),
                       const SizedBox(height: 12),
+
                       Row(
                         children: [
-                          Flexible(flex: 1, child: _buildFieldIsSrcc()),
+                          Flexible(child: _buildFieldIsSrcc()),
                           const SizedBox(width: 8),
-                          Flexible(flex: 1, child: _buildFieldIsTerrorism()),
+                          Flexible(child: _buildFieldIsTerrorism()),
                         ],
                       ),
                       const SizedBox(height: 12),
+
                       Row(
                         children: [
-                          Flexible(flex: 1, child: _buildFieldIsTbod()),
-                          const Flexible(flex: 1, child: SizedBox.shrink()),
+                          Flexible(child: _buildFieldIsTbod()),
+                          const Flexible(child: SizedBox.shrink()),
                         ],
                       ),
+
+                      const SizedBox(height: 15),
+                      // AppButton.primary(
+                      //   text: "Simpan",
+                      //   onPressed: _saveForm,
+                      // ),
                     ],
                   ),
                 ),
@@ -205,7 +229,39 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     );
   }
 
-  // --- Field Builders ---
+  // ----------------- SAVE -----------------
+  void _saveForm() {
+    if (!_formKey2.currentState!.validate()) return;
+
+    final id = _localCalmv2Id ?? "";
+
+    final record = Calmv2FormModel(
+      calmv2Id: id,
+      calmv1Id: widget.calmv1Id ?? "",
+      aw: double.tryParse(fieldAwController.text.replaceAll(",", "")) ?? 0,
+      isEq: toBoolean(fieldIsEqController.text),
+      isFlood: toBoolean(fieldIsFloodController.text),
+      isSrcc: toBoolean(fieldIsSrccController.text),
+      isTbod: toBoolean(fieldIsTbodController.text),
+      isTerrorism: toBoolean(fieldIsTerrorismController.text),
+      pad: double.tryParse(fieldPadController.text.replaceAll(",", "")) ?? 0,
+      pap: double.tryParse(fieldPapController.text.replaceAll(",", "")) ?? 0,
+      passangerCount: int.tryParse(fieldPassangerCountController.text.replaceAll(",", "")) ?? 0,
+      pll: double.tryParse(fieldPllController.text.replaceAll(",", "")) ?? 0,
+      tpl: double.tryParse(fieldTplController.text.replaceAll(",", "")) ?? 0,
+    );
+
+    final isTambah = id.isEmpty;
+
+    calmv2Bloc.add(
+      isTambah
+          ? Calmv2FormTambahEvent(record: record)
+          : Calmv2FormUbahEvent(record: record),
+    );
+  }
+
+  // ----------------- FIELDS -----------------
+
   Widget _buildFieldAW() => appTextField(
     label: "Authorized Workshop (%)",
     controller: fieldAwController,
@@ -213,9 +269,9 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     suffix: Text("%", style: bodyTextStyle(context)),
     validator: (v) {
       if (v == null || v.isEmpty) return null;
-      final value = double.tryParse(v);
-      if (value == null) return "Format AW tidak valid";
-      if (value < 0 || value > 100) return "AW harus antara 0–100%";
+      final x = double.tryParse(v);
+      if (x == null) return "Format tidak valid";
+      if (x < 0 || x > 100) return "0–100%";
       return null;
     },
   );
@@ -225,7 +281,7 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     controller: fieldPadController,
     keyboardType: TextInputType.number,
     suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator("PA Driver"),
+    validator: _moneyValidator(),
   );
 
   Widget _buildFieldPAP() => appTextField(
@@ -233,7 +289,7 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     controller: fieldPapController,
     keyboardType: TextInputType.number,
     suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator("PA Passenger"),
+    validator: _moneyValidator(),
   );
 
   Widget _buildFieldPassangerCount() => appTextField(
@@ -242,8 +298,8 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     keyboardType: TextInputType.number,
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;
-      final val = int.tryParse(v.replaceAll(",", ""));
-      if (val == null || val <= 0) return "Jumlah penumpang minimal 1";
+      final x = int.tryParse(v.replaceAll(",", ""));
+      if (x == null || x <= 0) return "Min 1";
       return null;
     },
   );
@@ -253,7 +309,7 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     controller: fieldPllController,
     keyboardType: TextInputType.number,
     suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator("Passenger Liability"),
+    validator: _moneyValidator(),
   );
 
   Widget _buildFieldTPL() => appTextField(
@@ -261,7 +317,7 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     controller: fieldTplController,
     keyboardType: TextInputType.number,
     suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator("TPL"),
+    validator: _moneyValidator(),
   );
 
   Widget _buildFieldIsEq() => CheckboxWidget(
@@ -299,53 +355,13 @@ class _CalmvForm2SectionState extends State<CalmvForm2Section> {
     leftLabel: "",
   );
 
-  String? Function(String?) _moneyValidator(String label) {
+  String? Function(String?) _moneyValidator() {
     return (v) {
       if (v == null || v.isEmpty) return kStringNullError;
       final clean = v.replaceAll(",", "");
-      final val = double.tryParse(clean);
-      if (val == null || val < 0) return "$label tidak valid";
+      final x = double.tryParse(clean);
+      if (x == null || x < 0) return "Tidak valid";
       return null;
     };
-  }
-
-  // --- AUTO SAVE Logic ---
-  Future<void> _autoSaveIfNeeded() async {
-    if (!_formKey2.currentState!.validate()) {
-      debugPrint("⚠️ [Form2] Validasi gagal — form belum lengkap");
-      ScaffoldMessenger.of(context)
-          .showSnackBar(errorSnackBar("Lengkapi Perlindungan Tambahan terlebih dahulu."));
-      return;
-    }
-
-    final flow = context.read<ReusableConnectionFlow>();
-    if (flow.state.isTransitioning || flow.state.isLoading) return;
-
-    final currentId = _localCalmv2Id ?? '';
-    final isTambah = currentId.isEmpty;
-
-    final record = Calmv2FormModel(
-      calmv2Id: currentId,
-      calmv1Id: widget.calmv1Id ?? '',
-      aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
-      isEq: toBoolean(fieldIsEqController.text),
-      isFlood: toBoolean(fieldIsFloodController.text),
-      isSrcc: toBoolean(fieldIsSrccController.text),
-      isTbod: toBoolean(fieldIsTbodController.text),
-      isTerrorism: toBoolean(fieldIsTerrorismController.text),
-      pad: double.tryParse(fieldPadController.text.replaceAll(',', '')) ?? 0,
-      pap: double.tryParse(fieldPapController.text.replaceAll(',', '')) ?? 0,
-      passangerCount: int.tryParse(fieldPassangerCountController.text.replaceAll(',', '')) ?? 0,
-      pll: double.tryParse(fieldPllController.text.replaceAll(',', '')) ?? 0,
-      tpl: double.tryParse(fieldTplController.text.replaceAll(',', '')) ?? 0,
-    );
-
-    debugPrint("🧱 [Form2] Record dibuat: ${record.toJson()}");
-    debugPrint("🧱 [Form2] Mode = ${isTambah ? 'TAMBAH' : 'UBAH'}");
-
-    final event = isTambah
-        ? Calmv2FormTambahEvent(record: record)
-        : Calmv2FormUbahEvent(record: record);
-    calmv2Bloc.add(event);
   }
 }
