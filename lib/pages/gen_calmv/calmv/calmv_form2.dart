@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -8,11 +9,13 @@ import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 
-import '../../../blocs/reusable_connection_flow/flow_parent_cubit.dart';
+import '../../../widgets/apptheme/numeric_to_one_decimal_formatter.dart';
 
 class CalmvForm2Section extends StatefulWidget {
   final String viewMode;
   final String? calmv1Id;
+  final String? calmv2Id;
+  final String? recordId;
   final bool isExpanded;
   final Function(bool) onToggle;
 
@@ -22,11 +25,14 @@ class CalmvForm2Section extends StatefulWidget {
     required this.isExpanded,
     required this.onToggle,
     this.calmv1Id,
+    this.calmv2Id,
+    this.recordId,
   });
 
   @override
   State<CalmvForm2Section> createState() => CalmvForm2SectionState();
 }
+
 
 class CalmvForm2SectionState extends State<CalmvForm2Section> {
   final _formKey2 = GlobalKey<FormState>();
@@ -35,7 +41,6 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
   final fieldAwController = TextEditingController();
   final fieldPadController = TextEditingController();
   final fieldPapController = TextEditingController();
-  final fieldPassangerCountController = TextEditingController();
   final fieldPllController = TextEditingController();
   final fieldTplController = TextEditingController();
 
@@ -45,8 +50,14 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
   final fieldIsTbodController = TextEditingController();
   final fieldIsTerrorismController = TextEditingController();
 
+  String selectedPassengerCount = "";
+
+  String cleanNum(num value) {
+    final f = NumberFormat("#,###", "en_US");
+    return f.format(value);
+  }
+
   late final Calmv2FormBloc calmv2Bloc;
-  String? _localCalmv2Id;
 
   @override
   void initState() {
@@ -59,7 +70,6 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
     fieldAwController.dispose();
     fieldPadController.dispose();
     fieldPapController.dispose();
-    fieldPassangerCountController.dispose();
     fieldPllController.dispose();
     fieldTplController.dispose();
 
@@ -71,172 +81,134 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
     super.dispose();
   }
 
-  Future<void> validateSelf() async {
-    final isValid = _formKey2.currentState?.validate() ?? false;
-
-    context.read<FlowParentCubit>().onValidationResult(
-      index: 1,
-      isValid: isValid,
-    );
-  }
-
-  Future<void> saveSelf() async {
-    _saveForm();
-  }
-
-  void activate() {
-    setState(() {});
-
-    // HANYA load ulang data jika form2 baru pertama kali dibuka
-    if (_localCalmv2Id != null && widget.isExpanded) {
-      calmv2Bloc.add(Calmv2FormLihatEvent(recordId: _localCalmv2Id!));
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<Calmv2FormBloc, Calmv2FormState>(
+      listenWhen: (prev, curr) =>
+      prev.isLoaded != curr.isLoaded && curr.isLoaded == true,
       listener: (context, state) {
-        if (widget.isExpanded && state.isLoaded && state.record != null) {
-          final r = state.record!;
-
-          fieldAwController.text = r.aw.toString();
-          fieldPadController.text = NumberFormat("#,###").format(r.pad);
-          fieldPapController.text = NumberFormat("#,###").format(r.pap);
-          fieldPassangerCountController.text = r.passangerCount.toString();
-          fieldPllController.text = NumberFormat("#,###").format(r.pll);
-          fieldTplController.text = NumberFormat("#,###").format(r.tpl);
-
-          fieldIsEqController.text = r.isEq.toString();
-          fieldIsFloodController.text = r.isFlood.toString();
-          fieldIsSrccController.text = r.isSrcc.toString();
-          fieldIsTbodController.text = r.isTbod.toString();
-          fieldIsTerrorismController.text = r.isTerrorism.toString();
+        if (state.record != null) {
+          _injectPayload(state.record!);
         }
-
-        if (state.isSaved && !state.hasFailure) {
-          final returnedId = state.returnData?.data ?? "";
-
-          // INSERT → id selalu dari returnData
-          if (returnedId.isNotEmpty) {
-            _localCalmv2Id = returnedId;
-          }
-
-          // UPDATE → server tidak mengirim ID → gunakan ID lama
-          else if (_localCalmv2Id == null) {
-            _localCalmv2Id = state.record?.calmv2Id; // fallback
-          }
-
-          if (_localCalmv2Id != null) {
-            context.read<FlowParentCubit>().onSaveResult(
-              index: 1,
-              id: _localCalmv2Id!,
-            );
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Perlindungan tambahan disimpan")),
-          );
-        }
-
       },
       child: Card(
         color: pGrey,
         child: Column(
           children: [
-            ListTile(
-              title: Text('Perlindungan Tambahan', style: bodyTextStyle(context)),
-              trailing: AnimatedRotation(
-                turns: widget.isExpanded ? 0.5 : 0.0,
-                duration: const Duration(milliseconds: 250),
-                child: SvgPicture.asset('assets/icons/dropdown.svg', width: 16),
-              ),
-              onTap: () => widget.onToggle(!widget.isExpanded),
-            ),
-
-            if (widget.isExpanded)
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: Form(
-                  key: _formKey2,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(child: _buildFieldPLL()),
-                          const SizedBox(width: 8),
-                          Flexible(child: _buildFieldTPL()),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Flexible(child: _buildFieldPAD()),
-                          const SizedBox(width: 8),
-                          Flexible(child: _buildFieldPAP()),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Flexible(child: _buildFieldPassangerCount()),
-                          const SizedBox(width: 8),
-                          Flexible(child: _buildFieldAW()),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Flexible(child: _buildFieldIsEq()),
-                          const SizedBox(width: 8),
-                          Flexible(child: _buildFieldIsFlood()),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Flexible(child: _buildFieldIsSrcc()),
-                          const SizedBox(width: 8),
-                          Flexible(child: _buildFieldIsTerrorism()),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Flexible(child: _buildFieldIsTbod()),
-                          const Flexible(child: SizedBox.shrink()),
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-                      // AppButton.primary(
-                      //   text: "Simpan",
-                      //   onPressed: _saveForm,
-                      // ),
-                    ],
-                  ),
-                ),
-              ),
+            _buildHeader(),
+            if (widget.isExpanded) _buildForm(),
           ],
         ),
       ),
     );
   }
 
-  // ----------------- SAVE -----------------
-  void _saveForm() {
-    if (!_formKey2.currentState!.validate()) return;
+  void _injectPayload(Calmv2FormModel record) {
+    debugPrint("🔥 [Form2] Injecting payload...");
 
-    final id = _localCalmv2Id ?? "";
+    // Numeric Controllers
+    fieldAwController.text       = cleanNum(record.aw);
+    fieldPadController.text      = cleanNum(record.pad);
+    fieldPapController.text      = cleanNum(record.pap);
+    fieldPllController.text      = cleanNum(record.pll);
+    fieldTplController.text      = cleanNum(record.tpl);
 
+    // Boolean -> checkbox controllers
+    fieldIsEqController.text         = record.isEq.toString();
+    fieldIsFloodController.text      = record.isFlood.toString();
+    fieldIsSrccController.text       = record.isSrcc.toString();
+    fieldIsTbodController.text       = record.isTbod.toString();
+    fieldIsTerrorismController.text  = record.isTerrorism.toString();
+    selectedPassengerCount = record.passangerCount.toString();
+
+    setState(() {});
+  }
+
+  Widget _buildHeader() {
+    return ListTile(
+      title: Text('Perlindungan Tambahan', style: bodyTextStyle(context)),
+      trailing: AnimatedRotation(
+        turns: widget.isExpanded ? 0.5 : 0.0,
+        duration: const Duration(milliseconds: 250),
+        child: SvgPicture.asset('assets/icons/dropdown.svg', width: 16),
+      ),
+      onTap: () => widget.onToggle(!widget.isExpanded),
+    );
+  }
+
+  Widget _buildForm(){
+    return Padding(
+      padding: const EdgeInsets.all(15),
+      child: Form(
+        key: _formKey2,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Flexible(child: _buildFieldPLL()),
+                const SizedBox(width: 8),
+                Flexible(child: _buildFieldTPL()),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Flexible(child: _buildFieldPAD()),
+                const SizedBox(width: 8),
+                Flexible(child: _buildFieldPAP()),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Flexible(child: _buildFieldPassengerCountCombo()),
+                const SizedBox(width: 8),
+                Flexible(child: _buildFieldAW()),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Flexible(child: _buildFieldIsEq()),
+                const SizedBox(width: 8),
+                Flexible(child: _buildFieldIsFlood()),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Flexible(child: _buildFieldIsSrcc()),
+                const SizedBox(width: 8),
+                Flexible(child: _buildFieldIsTerrorism()),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Flexible(child: _buildFieldIsTbod()),
+                const Flexible(child: SizedBox.shrink()),
+              ],
+            ),
+
+            const SizedBox(height: 15),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> validateAndReturn() async {
+    return _formKey2.currentState?.validate() ?? false;
+  }
+
+  Future<void> saveForm2() async {
     final record = Calmv2FormModel(
-      calmv2Id: id,
+      calmv2Id: widget.recordId ?? "",
       calmv1Id: widget.calmv1Id ?? "",
       aw: double.tryParse(fieldAwController.text.replaceAll(",", "")) ?? 0,
       isEq: toBoolean(fieldIsEqController.text),
@@ -246,122 +218,175 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
       pad: double.tryParse(fieldPadController.text.replaceAll(",", "")) ?? 0,
       pap: double.tryParse(fieldPapController.text.replaceAll(",", "")) ?? 0,
-      passangerCount: int.tryParse(fieldPassangerCountController.text.replaceAll(",", "")) ?? 0,
+      passangerCount: int.tryParse(selectedPassengerCount) ?? 0,
       pll: double.tryParse(fieldPllController.text.replaceAll(",", "")) ?? 0,
       tpl: double.tryParse(fieldTplController.text.replaceAll(",", "")) ?? 0,
     );
 
-    final isTambah = id.isEmpty;
-
-    calmv2Bloc.add(
-      isTambah
-          ? Calmv2FormTambahEvent(record: record)
-          : Calmv2FormUbahEvent(record: record),
-    );
+    if (widget.viewMode == "tambah") {
+      debugPrint("ini tambah loh di trigger di form2");
+      calmv2Bloc.add(Calmv2FormTambahEvent(record: record));
+    } else {
+      debugPrint("ini ubah loh di trigger di form2");
+      calmv2Bloc.add(Calmv2FormUbahEvent(record: record));
+    }
   }
 
   // ----------------- FIELDS -----------------
 
   Widget _buildFieldAW() => appTextField(
-    label: "Authorized Workshop (%)",
+    label: "Bengkel Resmi",
     controller: fieldAwController,
     keyboardType: TextInputType.number,
     suffix: Text("%", style: bodyTextStyle(context)),
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+    inputFormatters: [
+      FilteringTextInputFormatter.digitsOnly,
+      NumericToOneDecimalFormatter(),
+    ],
     validator: (v) {
       if (v == null || v.isEmpty) return null;
+      final plain = v.replaceAll(".", "");
+      if (plain.length > 3) {
+        return "Maks 3 digit (100%)";
+      }
+      
       final x = double.tryParse(v);
       if (x == null) return "Format tidak valid";
-      if (x < 0 || x > 100) return "0–100%";
+      if (x > 100) return "Max 100%";
+
       return null;
     },
   );
 
+
   Widget _buildFieldPAD() => appTextField(
-    label: "PA Driver",
+    label: "Kecelakaan Diri Pengemudi",
     controller: fieldPadController,
     keyboardType: TextInputType.number,
-    suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator(),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    validator: (v) {
+      if (v == null || v.isEmpty) return kStringNullError;
+      final clean = v.replaceAll(",", "");
+      final angka = double.tryParse(clean);
+      if (angka == null || angka <= 0) return kString0;
+      return null;
+    },
   );
 
   Widget _buildFieldPAP() => appTextField(
-    label: "PA Passenger",
+    label: "Kecelakaan Diri Penumpang",
     controller: fieldPapController,
     keyboardType: TextInputType.number,
-    suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator(),
-  );
-
-  Widget _buildFieldPassangerCount() => appTextField(
-    label: "Passenger Count",
-    controller: fieldPassangerCountController,
-    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;
-      final x = int.tryParse(v.replaceAll(",", ""));
-      if (x == null || x <= 0) return "Min 1";
+      final clean = v.replaceAll(",", "");
+      final angka = double.tryParse(clean);
+      if (angka == null || angka <= 0) return kString0;
       return null;
     },
   );
 
+  Widget _buildFieldPassengerCountCombo() {
+    // List angka 1 sampai 7
+    final counts = List<String>.generate(7, (i) => (i + 1).toString());
+
+    return ReusableComboBox<String>(
+      hintText: "Jumlah Penumpang",
+      initItem: selectedPassengerCount.isNotEmpty ? selectedPassengerCount : null,
+      dataLoader: () async => counts,
+      displayText: (item) => item,
+      compareItems: (a, b) => a == b,
+
+      validatorCallback: (value) {
+        if (value == null || value.isEmpty) return kStringNullError;
+        return null;
+      },
+
+      onChangedCallback: (value) {
+        selectedPassengerCount = value ?? "";
+      },
+
+      onSaveCallback: (value) {
+        selectedPassengerCount = value ?? "";
+      },
+    );
+  }
+
+
   Widget _buildFieldPLL() => appTextField(
-    label: "Passenger Liability",
+    label: "Tanggung Jawab Penumpang",
     controller: fieldPllController,
     keyboardType: TextInputType.number,
-    suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator(),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    validator: (v) {
+      if (v == null || v.isEmpty) return kStringNullError;
+      final clean = v.replaceAll(",", "");
+      final angka = double.tryParse(clean);
+      if (angka == null || angka <= 0) return kString0;
+      return null;
+    },
   );
 
   Widget _buildFieldTPL() => appTextField(
-    label: "TPL",
+    label: "Tanggung Jawab Pihak Ketiga",
     controller: fieldTplController,
     keyboardType: TextInputType.number,
-    suffix: Text(",000,000,-", style: bodyTextStyle(context)),
-    validator: _moneyValidator(),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    validator: (v) {
+      if (v == null || v.isEmpty) return kStringNullError;
+      final clean = v.replaceAll(",", "");
+      final angka = double.tryParse(clean);
+      if (angka == null || angka <= 0) return kString0;
+      return null;
+    },
   );
 
   Widget _buildFieldIsEq() => CheckboxWidget(
-    rightLabel: "EQ",
+    rightLabel: "Gempa Bumi",
     initialValue: toBoolean(fieldIsEqController.text),
     callback: (v) => fieldIsEqController.text = v.toString(),
     leftLabel: "",
   );
 
   Widget _buildFieldIsFlood() => CheckboxWidget(
-    rightLabel: "Flood",
+    rightLabel: "Banjir",
     initialValue: toBoolean(fieldIsFloodController.text),
     callback: (v) => fieldIsFloodController.text = v.toString(),
     leftLabel: "",
   );
 
   Widget _buildFieldIsSrcc() => CheckboxWidget(
-    rightLabel: "SRCC",
+    rightLabel: "Kerusuhan",
     initialValue: toBoolean(fieldIsSrccController.text),
     callback: (v) => fieldIsSrccController.text = v.toString(),
     leftLabel: "",
   );
 
   Widget _buildFieldIsTbod() => CheckboxWidget(
-    rightLabel: "TBOD",
+    rightLabel: "Kerusakan Barang Pihak ketiga",
     initialValue: toBoolean(fieldIsTbodController.text),
     callback: (v) => fieldIsTbodController.text = v.toString(),
     leftLabel: "",
   );
 
   Widget _buildFieldIsTerrorism() => CheckboxWidget(
-    rightLabel: "Terrorism",
+    rightLabel: "Terorisme",
     initialValue: toBoolean(fieldIsTerrorismController.text),
     callback: (v) => fieldIsTerrorismController.text = v.toString(),
     leftLabel: "",
   );
-
-  String? Function(String?) _moneyValidator() {
-    return (v) {
-      if (v == null || v.isEmpty) return kStringNullError;
-      final clean = v.replaceAll(",", "");
-      final x = double.tryParse(clean);
-      if (x == null || x < 0) return "Tidak valid";
-      return null;
-    };
-  }
 }

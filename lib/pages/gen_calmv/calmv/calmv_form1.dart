@@ -1,8 +1,6 @@
-// lib/pages/calmv/calmv_form1.dart
-// (versi kamu + tambahan method di bawah)
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +15,8 @@ import 'package:joss_app/repositories/combobox/combommvjnscover_repository.dart'
 import 'package:joss_app/repositories/combobox/combomwilayah_repository.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
-import '../../../blocs/reusable_connection_flow/flow_parent_cubit.dart';
+import '../../../models/combobox/combormatauang_model.dart';
+import '../../../repositories/combobox/combormatauang_repository.dart';
 
 
 class CalmvForm1Section extends StatefulWidget {
@@ -45,20 +44,20 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
   final fieldCoverBulanController = TextEditingController();
   final fieldCurrIdController = TextEditingController();
   final fieldHargaController = TextEditingController();
-  final fieldThnBuatController = TextEditingController();
 
   ComboMMvgrupOjkModel? fieldComboMMvgrupOjk;
   ComboMMvjnscoverModel? fieldComboMMvjnscover;
   ComboMWilayahModel? fieldComboMWilayah;
+  ComboRMatauangModel? fieldComboUang;
+
+  String selectedYear = "";
 
   late final Calmv1CrudBloc calmv1Bloc;
-  String? _localCalmv1Id;
 
   @override
   void initState() {
     super.initState();
     calmv1Bloc = context.read<Calmv1CrudBloc>();
-    _localCalmv1Id = widget.recordId;
     Future.microtask(_loadData);
   }
 
@@ -73,68 +72,18 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     fieldCoverBulanController.dispose();
     fieldCurrIdController.dispose();
     fieldHargaController.dispose();
-    fieldThnBuatController.dispose();
     super.dispose();
   }
 
-  void activate() {
-    setState(() {});
-
-    // Load ulang data HANYA saat card sedang dibuka
-    if (_localCalmv1Id != null && widget.isExpanded) {
-      calmv1Bloc.add(Calmv1CrudLihatEvent(recordId: _localCalmv1Id!));
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
-      listener: (context, state) {
-        // LOAD
-        if (widget.isExpanded && state.isLoaded && state.record != null) {
-          final r = state.record!;
-          fieldCoverBulanController.text = r.coverBulan.toString();
-          fieldCurrIdController.text = r.currId;
-          fieldHargaController.text = NumberFormat("#,###").format(r.harga);
-          fieldThnBuatController.text = r.thnBuat.toString();
-
-          fieldComboMMvgrupOjk = state.comboMMvgrupOjk;
-          fieldComboMMvjnscover = state.comboMMvjnscover;
-          fieldComboMWilayah = state.comboMWilayah;
-        }
-
-        // SAVE SUCCESS
-        if (state.isSaved && !state.hasFailure) {
-          _localCalmv1Id = state.record?.calmv1Id;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Data kendaraan disimpan!")),
-          );
-
-          // beritahu ibu kalau save sukses
-          if (_localCalmv1Id != null) {
-            context.read<FlowParentCubit>().onSaveResult(
-              index: 0,
-              id: _localCalmv1Id!,
-            );
-          }
-        }
-
-        // FAIL
-        if (state.hasFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Gagal menyimpan data kendaraan")),
-          );
-        }
-      },
-      child: Card(
-        color: pGrey,
-        child: Column(
-          children: [
-            _buildHeader(),
-            if (widget.isExpanded) _buildForm(),
-          ],
-        ),
+    return Card(
+      color: pGrey,
+      child: Column(
+        children: [
+          _buildHeader(),
+          if (widget.isExpanded) _buildForm(),
+        ],
       ),
     );
   }
@@ -155,90 +104,97 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
   }
 
   Widget _buildForm() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-      child: Form(
-        key: _formKey1,
-        child: Column(
-          children: [
-            _buildComboMMvgrupOjk(),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Flexible(child: _buildComboMMvjnscover()),
-                const SizedBox(width: 8),
-                Flexible(child: _buildHarga()),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Flexible(child: _buildCurrId()),
-                const SizedBox(width: 8),
-                Flexible(child: _buildThnBuat()),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _buildComboMWilayah(),
-            const SizedBox(height: 12),
-            _buildCoverBulan(),
+    return BlocBuilder<Calmv1CrudBloc, Calmv1CrudState>(
+      buildWhen: (prev, curr) => curr.isLoaded == true,
+      builder: (context, state) {
+        if (state.isLoaded && state.record != null) {
+          _injectPayload(state.record!);
+        }
 
-            const SizedBox(height: 15),
-            // AppButton.primary(
-            //   text: "Simpan",
-            //   onPressed: _saveForm,
-            // ),
-          ],
-        ),
-      ),
+        return Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+          child: Form(
+            key: _formKey1,
+            child: Column(
+              children: [
+                _buildComboMMvgrupOjk(),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Flexible(child: _buildComboMMvjnscover()),
+                    const SizedBox(width: 8),
+                    Flexible(child: _buildHarga()),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Flexible(child: _buildComboCurddId()),
+                    const SizedBox(width: 8),
+                    Flexible(child: buildFieldComboTahun()),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildComboMWilayah(),
+                const SizedBox(height: 15),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  // ========= DIPAKAI IBU =========
+  void _injectPayload(Calmv1CrudModel record) {
+    debugPrint("🔥 Injecting payload into Form1...");
 
-  Future<void> validateSelf() async {
-    final isValid = _formKey1.currentState?.validate() ?? false;
+    // Text Controllers
+    fieldCoverBulanController.text = record.coverBulan.toString();
+    fieldCurrIdController.text = record.currId.toString();
+    fieldHargaController.text = record.harga.toString();
+    selectedYear = record.thnBuat.toString();
 
-    context.read<FlowParentCubit>().onValidationResult(
-      index: 0,
-      isValid: isValid,
-    );
+    // Dropdown Values
+    fieldComboMMvgrupOjk = record.comboMMvgrupOjk;
+    fieldComboMMvjnscover = record.comboMMvjnscover;
+    fieldComboMWilayah = record.comboMWilayah;
+
+    // Currency combo (jaga-jaga)
+    // fieldComboUang = record.currId.toString();
+    // Kalau backend punya field lain untuk currency,
+    // ganti ke record.comboMmataUang / record.comboCurrId
+    // sesuai design API
+
+    setState(() {});
   }
 
-  Future<void> saveSelf() async {
-    _saveForm();
+
+
+  Future<bool> validateAndReturn() async {
+    return _formKey1.currentState?.validate() ?? false;
   }
 
-  // ========= SAVE INTERNAL =========
 
-  void _saveForm() {
-    if (!_formKey1.currentState!.validate()) {
-      context.read<FlowParentCubit>().onValidationResult(
-        index: 0,
-        isValid: false,
-      );
-      return;
-    }
-
-    final id = _localCalmv1Id ?? "";
+  Future<void> saveForm1() async {
     final record = Calmv1CrudModel(
-      calmv1Id: id,
+      calmv1Id: widget.recordId!,
       harga: double.tryParse(fieldHargaController.text.replaceAll(",", "")) ?? 0,
-      currId: fieldCurrIdController.text,
-      coverBulan: int.tryParse(fieldCoverBulanController.text.replaceAll(",", "")) ?? 0,
-      thnBuat: int.tryParse(fieldThnBuatController.text.replaceAll(",", "")) ?? 0,
+      currId: fieldComboUang?.rmatauangKode ?? "",
+      coverBulan: int.tryParse(fieldCoverBulanController.text.replaceAll(",", "")) ?? 12,
+      thnBuat: int.tryParse(selectedYear) ?? 0,
       mmvgrupojkId: fieldComboMMvgrupOjk?.mmvgrupojkId,
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
     );
 
-    final isTambah = id.isEmpty;
+    if (widget.viewMode == "tambah") {
+      debugPrint("ini tambah loh di trigger di form1");
+      calmv1Bloc.add(Calmv1CrudTambahEvent(record: record));
+    } else {
+      debugPrint("ini ubah loh di trigger di form1");
+      calmv1Bloc.add(Calmv1CrudUbahEvent(record: record));
+    }
 
-    calmv1Bloc.add(
-      isTambah
-          ? Calmv1CrudTambahEvent(record: record)
-          : Calmv1CrudUbahEvent(record: record),
-    );
   }
 
   // --- UI COMPONENTS (sama seperti punyamu) ---
@@ -275,11 +231,58 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
 
+  Widget _buildComboCurddId() => ReusableComboBox<ComboRMatauangModel>(
+    hintText: "Mata Uang",
+    initItem: fieldComboUang,
+    dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
+    displayText: (item) => item.rmatauangNama,
+    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) => fieldComboUang = v,
+    onSaveCallback: (value) => fieldComboUang = value,
+  );
+
+  Widget buildFieldComboTahun() {
+    // Buat list tahun dari sekarang → 1980
+    final yearNow = DateTime.now().year;
+    final years = List<String>.generate(
+      yearNow - 1980 + 1,
+          (i) => (yearNow - i).toString(),
+    );
+
+    return ReusableComboBox<String>(
+      hintText: "Tahun Pembuatan",
+      initItem: selectedYear.isNotEmpty ? selectedYear : null, // kalau mode ubah
+      dataLoader: () async => years,
+      displayText: (item) => item,
+      compareItems: (a, b) => a == b,
+
+      // Validator
+      validatorCallback: (value) {
+        if (value == null || value.isEmpty) {
+          return kStringNullError;
+        }
+        return null;
+      },
+
+      onChangedCallback: (value) {
+        selectedYear = value ?? "";
+      },
+
+      onSaveCallback: (value) {
+        selectedYear = value ?? "";
+      },
+    );
+  }
+
   Widget _buildHarga() => appTextField(
     label: "Harga Kendaraan",
     controller: fieldHargaController,
     keyboardType: TextInputType.number,
-    inputFormatters: [ThousandsSeparatorInputFormatter()],
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+        ThousandsSeparatorInputFormatter(),
+      ],
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;
       final clean = v.replaceAll(",", "");
@@ -289,30 +292,4 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     },
   );
 
-  Widget _buildCurrId() => appTextField(
-    label: "Currency",
-    controller: fieldCurrIdController,
-    validator: (v) => v == null || v.isEmpty ? kStringNullError : null,
-  );
-
-  Widget _buildThnBuat() => appTextField(
-    label: "Tahun Buat",
-    controller: fieldThnBuatController,
-    keyboardType: TextInputType.number,
-    validator: (v) => v == null || v.isEmpty ? kStringNullError : null,
-  );
-
-  Widget _buildCoverBulan() => appTextField(
-    label: "Lama Cover",
-    controller: fieldCoverBulanController,
-    keyboardType: TextInputType.number,
-    validator: (v) {
-      if (v == null || v.isEmpty) return kStringNullError;
-      final clean = v.replaceAll(",", "");
-      final lama = int.tryParse(clean);
-      if (lama == null || lama <= 0) return "Harus lebih dari 0 bulan";
-      if (lama > 120) return "Maksimal 120 bulan";
-      return null;
-    },
-  );
 }

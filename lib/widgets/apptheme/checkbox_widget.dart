@@ -39,12 +39,20 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
     return Row(
       children: [
         if (widget.leftLabel.isNotEmpty) ...[
-          Text(
-            widget.leftLabel,
-            style: bodyTextStyle(context, fontSize: 16),
+          GestureDetector(
+            onTap: () {
+              setState(() => _checkbox = !_checkbox);
+              widget.callback(_checkbox);
+            },
+            child: Text(
+              widget.leftLabel,
+              style: bodyTextStyle(context, fontSize: 16),
+            ),
           ),
           const SizedBox(width: 14),
         ],
+
+        // CHECKBOX
         GestureDetector(
           onTap: () {
             setState(() => _checkbox = !_checkbox);
@@ -62,18 +70,22 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: _checkbox
-                ? const Icon(
-              Icons.check,
-              size: 12.8,
-            )
+                ? const Icon(Icons.check, size: 12.8)
                 : null,
           ),
         ),
+
         if (widget.rightLabel.isNotEmpty) ...[
           const SizedBox(width: 14),
-          Text(
-            widget.rightLabel,
-            style: bodyTextStyle(context, fontSize: 16),
+          GestureDetector(
+            onTap: () {
+              setState(() => _checkbox = !_checkbox);
+              widget.callback(_checkbox);
+            },
+            child: Text(
+              widget.rightLabel,
+              style: bodyTextStyle(context, fontSize: 16),
+            ),
           ),
         ],
       ],

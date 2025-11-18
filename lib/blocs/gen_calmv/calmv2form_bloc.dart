@@ -16,47 +16,45 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		on<Calmv2FormHapusEvent>(onHapusCalmv2Form);
 		on<Calmv2FormLihatEvent>(onLihatCalmv2Form);
 	}
-
 	Future<void> onTambahCalmv2Form(
 			Calmv2FormTambahEvent event,
 			Emitter<Calmv2FormState> emit,
 			) async {
-		debugPrint("📩 [Bloc] onTambahCalmv2Form() DIPANGGIL");
-		debugPrint("📦 Record dikirim: ${event.record.toJson()}");
-
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-
 		emit(state.copyWith(isSaving: true, isSaved: false));
-		debugPrint("⏳ [Bloc] Emit state: isSaving=true");
 
-		// --- Panggil API
-		returnData = await repository.calmv2FormTambah(event.record);
-		debugPrint("✅ [API] Response diterima dari repository");
+		final ReturnDataAPI returnData = await repository.calmv2FormTambah(event.record);
 
-		// --- Log detail hasil API
-		debugPrint("🔸 [ReturnDataAPI] success=${returnData.success}");
-		debugPrint("🔸 [ReturnDataAPI] data=${returnData.data}");
-		debugPrint("🔸 [ReturnDataAPI] rowcount=${returnData.rowcount}");
+		final hasFailure = !returnData.success;
 
-		hasFailure = !returnData.success;
+		// ✔ ID yang dikembalikan API
+		final newId = returnData.data?.toString() ?? "";
 
-		// --- Emit hasil akhir ke UI
-		emit(
-			state.copyWith(
-				isSaving: false,
-				isSaved: true,
-				hasFailure: hasFailure,
-				returnData: returnData,
-			),
+		// ✔ Build record final dengan ID baru
+		final savedRecord = Calmv2FormModel(
+			calmv2Id: newId,
+			calmv1Id: event.record.calmv1Id,
+			aw: event.record.aw,
+			isEq: event.record.isEq,
+			isFlood: event.record.isFlood,
+			isSrcc: event.record.isSrcc,
+			isTbod: event.record.isTbod,
+			isTerrorism: event.record.isTerrorism,
+			pad: event.record.pad,
+			pap: event.record.pap,
+			passangerCount: event.record.passangerCount,
+			pll: event.record.pll,
+			tpl: event.record.tpl,
 		);
 
-		debugPrint("📤 [Bloc] Emit state akhir:");
-		debugPrint("     isSaved=${!hasFailure}");
-		debugPrint("     hasFailure=$hasFailure");
-		debugPrint("     data=${returnData.data}");
+		// ✔ Emit ke UI
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: hasFailure,
+			record: savedRecord,
+			returnData: returnData,
+		));
 	}
-
 
 	Future<void> onUbahCalmv2Form(
 		Calmv2FormUbahEvent event, Emitter<Calmv2FormState> emit) async {

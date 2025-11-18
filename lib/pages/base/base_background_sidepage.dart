@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../common/constants.dart';
@@ -10,6 +11,9 @@ class BaseBackgroundSidePage extends StatelessWidget {
   final String title;
   final VoidCallback? onBack;
 
+  /// 🔥 PARAMETER BARU — opsional
+  final List<BlocListener>? blocListeners;
+
   const BaseBackgroundSidePage({
     super.key,
     required this.child,
@@ -17,14 +21,15 @@ class BaseBackgroundSidePage extends StatelessWidget {
     this.onBack,
     this.fadeHeight = 300,
     this.backgroundAsset = "assets/images/background_gradient.png",
+    this.blocListeners,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    // 🔥 Buat UI asli TANPA perubahan
+    final Widget page = Scaffold(
       backgroundColor: primaryBlackColor,
 
-      // ===================== FOOTER (Moved here) =====================
       bottomNavigationBar: Container(
         height: 46,
         width: double.infinity,
@@ -39,7 +44,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
         ),
       ),
 
-      // ===================== BODY =====================
       body: SafeArea(
         child: Column(
           children: [
@@ -73,6 +77,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, c) {
                   final double height = c.maxHeight * 0.45;
+
                   return Stack(
                     children: [
                       // Background fade
@@ -110,6 +115,17 @@ class BaseBackgroundSidePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+
+    // 🔥 Jika TIDAK ada listeners → langsung return page
+    if (blocListeners == null || blocListeners!.isEmpty) {
+      return page;
+    }
+
+    // 🔥 Jika ADA listeners → bungkus dengan MultiBlocListener
+    return MultiBlocListener(
+      listeners: blocListeners!,
+      child: page,
     );
   }
 }

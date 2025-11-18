@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:path/path.dart';
-import '../../../blocs/gen_calmv/calmv3form_bloc.dart';
-import '../../../blocs/reusable_connection_flow/flow_parent_state.dart';
-import '../../../blocs/reusable_connection_flow/flow_parent_cubit.dart';
 
 class CalmvForm3Section extends StatefulWidget {
   final bool isExpanded;
 
+  /// PARAMETER BARU — supaya parent bisa kirim kumpulan data
+  final Map<String, dynamic>? initialPayload;
+
   const CalmvForm3Section({
     super.key,
     required this.isExpanded,
+    this.initialPayload,
   });
 
   @override
@@ -22,7 +21,18 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
   final diskonPremiCtrl = TextEditingController();
   final netCtrl = TextEditingController();
   final subtotalCtrl = TextEditingController();
+
   Map<String, dynamic>? _lastPayload;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Jika parent pertama kali ngirim payload → inject
+    if (widget.initialPayload != null) {
+      injectPayload(widget.initialPayload!);
+    }
+  }
 
   @override
   void dispose() {
@@ -31,102 +41,75 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
     subtotalCtrl.dispose();
     super.dispose();
   }
+
+  // DIPANGGIL OLEH PARENT
   void injectPayload(Map<String, dynamic> payload) {
     _lastPayload = payload;
+
     setState(() {
-      diskonPremiCtrl.text = payload["diskonPremi"].toString();
-      netCtrl.text = payload["netPremi"].toString();
-      subtotalCtrl.text = payload["subtotalPremi"].toString();
+      diskonPremiCtrl.text = payload["diskonPremi"]?.toString() ?? "0";
+      netCtrl.text = payload["netPremi"]?.toString() ?? "0";
+      subtotalCtrl.text = payload["subtotalPremi"]?.toString() ?? "0";
     });
-  }
-
-
-  void activate() {
-    setState(() {});
-    if (_lastPayload != null) {
-      injectPayload(_lastPayload!);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<Calmv3FormBloc, Calmv3FormState>(
-      listener: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          final r = state.record!;
-          debugPrint("🔥 [Form3] Listener nerima data premi: ${r.toJson()}");
-
-          injectPayload({
-            "diskonPremi": r.premiDiskon ?? 0,
-            "netPremi": r.premiNet ?? 0,
-            "subtotalPremi": r.premiSubtotal ?? 0,
-          });
-
-          debugPrint("🔥 [Form3] Inject sukses → "
-              "diskon=${r.premiDiskon}, net=${r.premiNet}, subtotal=${r.premiSubtotal}");
-
-          context.read<FlowParentCubit>().onSaveResult(
-            index: 3,
-            id: r.calmv3Id ?? "DONE", // kasih simbol saja
-          );
-        }
-      },
-      child: Card(
-        color: pGrey,
-        child: Column(
-          children: [
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-              title: Text(
-                'Hasil Perhitungan Premi',
-                style: bodyTextStyle(context),
-              ),
-              trailing: AnimatedRotation(
-                turns: widget.isExpanded ? 0.5 : 0.0,
-                duration: const Duration(milliseconds: 250),
-                child: const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              onTap: () {
-                // kalau butuh toggle nanti isi
-              },
+    return Card(
+      color: pGrey,
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+            title: Text(
+              'Hasil Perhitungan Premi',
+              style: bodyTextStyle(context),
             ),
-
-            if (widget.isExpanded)
-              Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-                child: Column(
-                  children: [
-                    appTextField(
-                      label: 'Premi Diskon',
-                      controller: diskonPremiCtrl,
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 12),
-
-                    appTextField(
-                      label: 'Net Premi',
-                      controller: netCtrl,
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 12),
-
-                    appTextField(
-                      label: 'Subtotal Premi',
-                      controller: subtotalCtrl,
-                      enabled: false,
-                    ),
-                  ],
-                ),
+            trailing: AnimatedRotation(
+              turns: widget.isExpanded ? 0.5 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              child: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.white,
+                size: 20,
               ),
-          ],
-        ),
+            ),
+            onTap: () {
+              // toggle kalau nanti mau
+            },
+          ),
+
+          if (widget.isExpanded)
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+              child: Column(
+                children: [
+                  appTextField(
+                    label: 'Subtotal Premi',
+                    controller: subtotalCtrl,
+                    enabled: false,
+                  ),
+
+                  const SizedBox(height: hPadding * 1.5),
+
+                  appTextField(
+                    label: 'Premi Diskon',
+                    controller: diskonPremiCtrl,
+                    enabled: false,
+                  ),
+
+                  const SizedBox(height: hPadding * 1.5),
+
+                  appTextField(
+                    label: 'Premi Bersih',
+                    controller: netCtrl,
+                    enabled: false,
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }
-
-
 }

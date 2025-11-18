@@ -41,6 +41,7 @@ class Calmv2FormState extends Equatable {
 
 	@override
 	List<Object?> get props => [
+		record,
 		isLoading,
 		isLoaded,
 		isSaving,
@@ -48,5 +49,6 @@ class Calmv2FormState extends Equatable {
 		hasFailure,
 		returnData,
 	];
+
 
 }

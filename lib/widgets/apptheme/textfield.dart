@@ -20,6 +20,7 @@ class appTextField extends StatelessWidget {
   final double? height;
   final ValueChanged<String>? onChanged;
   final TextInputAction? textInputAction;
+  final AutovalidateMode? autovalidateMode;
 
   const appTextField({
     super.key,
@@ -42,6 +43,7 @@ class appTextField extends StatelessWidget {
     this.padding,
     this.height,
     this.textInputAction,
+    this.autovalidateMode,
   });
 
   List<TextInputFormatter>? _getDefaultFormatters() {
@@ -90,6 +92,7 @@ class appTextField extends StatelessWidget {
       inputFormatters: _getDefaultFormatters(), 
       onTap: onTap,
       onChanged: onChanged,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.disabled,
       textInputAction: textInputAction,
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
