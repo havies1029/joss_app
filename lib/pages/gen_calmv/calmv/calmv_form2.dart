@@ -208,7 +208,7 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
 
   Future<void> saveForm2() async {
     final record = Calmv2FormModel(
-      calmv2Id: widget.recordId ?? "",
+      calmv2Id: widget.calmv2Id ?? "",
       calmv1Id: widget.calmv1Id ?? "",
       aw: double.tryParse(fieldAwController.text.replaceAll(",", "")) ?? 0,
       isEq: toBoolean(fieldIsEqController.text),
