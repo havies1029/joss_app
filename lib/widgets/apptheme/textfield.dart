@@ -148,6 +148,7 @@ class AppDateField extends StatefulWidget {
   final ValueChanged<DateTime?>? onChanged;
   final EdgeInsets? padding;
   final double? height;
+  final bool enabled;
 
   const AppDateField({
     super.key,
@@ -159,6 +160,7 @@ class AppDateField extends StatefulWidget {
     this.onChanged,
     this.padding,
     this.height,
+    this.enabled = true,
   });
 
   @override
@@ -204,6 +206,7 @@ class _AppDateFieldState extends State<AppDateField> {
   @override
   Widget build(BuildContext context) {
     Widget field = TextFormField(
+      enabled: widget.enabled,
       readOnly: true,
       controller: TextEditingController(
         text: selectedDate != null
@@ -240,7 +243,7 @@ class _AppDateFieldState extends State<AppDateField> {
         }
         return null;
       },
-      onTap: () => _pickDate(context),
+      onTap: widget.enabled ? () => _pickDate(context) : null,
     );
 
     if (widget.height != null) {

@@ -9,12 +9,11 @@ import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 
-import '../../../widgets/apptheme/numeric_to_one_decimal_formatter.dart';
+import '../../../../widgets/apptheme/numeric_to_one_decimal_formatter.dart';
 
 class CalmvForm2Section extends StatefulWidget {
   final String viewMode;
   final String? calmv1Id;
-  final String? calmv2Id;
   final String? recordId;
   final bool isExpanded;
   final Function(bool) onToggle;
@@ -25,7 +24,6 @@ class CalmvForm2Section extends StatefulWidget {
     required this.isExpanded,
     required this.onToggle,
     this.calmv1Id,
-    this.calmv2Id,
     this.recordId,
   });
 
@@ -35,7 +33,7 @@ class CalmvForm2Section extends StatefulWidget {
 
 
 class CalmvForm2SectionState extends State<CalmvForm2Section> {
-  final _formKey2 = GlobalKey<FormState>();
+  final _calmvform2key = GlobalKey<FormState>();
 
   // Controllers
   final fieldAwController = TextEditingController();
@@ -63,6 +61,13 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
   void initState() {
     super.initState();
     calmv2Bloc = context.read<Calmv2FormBloc>();
+    Future.microtask(_loadData);
+  }
+
+  void _loadData() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      calmv2Bloc.add(Calmv2FormLihatEvent(recordId: widget.recordId!));
+    }
   }
 
   @override
@@ -140,7 +145,7 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Form(
-        key: _formKey2,
+        key: _calmvform2key,
         child: Column(
           children: [
             Row(
@@ -203,12 +208,12 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
   }
 
   Future<bool> validateAndReturn() async {
-    return _formKey2.currentState?.validate() ?? false;
+    return _calmvform2key.currentState?.validate() ?? false;
   }
 
   Future<void> saveForm2() async {
     final record = Calmv2FormModel(
-      calmv2Id: widget.calmv2Id ?? "",
+      calmv2Id: widget.recordId ?? "",
       calmv1Id: widget.calmv1Id ?? "",
       aw: double.tryParse(fieldAwController.text.replaceAll(",", "")) ?? 0,
       isEq: toBoolean(fieldIsEqController.text),

@@ -542,7 +542,7 @@ class SppamvFormPageState extends State<SppamvFormPage> {
 			comboKey: comboMMvtipeKey,
 			initItem: fieldComboMMvtipe,
 			dataLoader: () async {
-				return await ComboMMvtipeRepository().getComboMMvtipe('');
+				return await ComboMMvtipeRepository().getComboMMvtipe(AutofillHints.addressCity,AutofillHints.addressCity); //tadinya kosong
 			},
 			displayText: (item) => item.nmTipe,
 			compareItems: (a, b) => a.mmvtipeId == b.mmvtipeId,

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
+import 'package:joss_app/pages/gen_regmv/mobile/regmv_main_page.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
@@ -10,7 +11,7 @@ import '../../../gen_calmv/calmv1crud_form.dart';
 import '../../../gen_calmv/calmv1list_main.dart';
 import '../../../gen_calmv/calmv2form_form.dart';
 import '../../../gen_calmv/calmv3form_form.dart';
-import '../../../gen_calmv/calmv_main_page.dart';
+import '../../../gen_calmv/mobile/calmv_main_page.dart';
 import '../../../gen_endors/endors1list_main.dart';
 import '../../../gen_endors/endors2cari_list.dart';
 import '../../../gen_endors/endors2cari_list_widget.dart';
@@ -334,7 +335,7 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvFormMain(viewMode: 'tambah', recordId: '',)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => RegmvFormMain(viewMode: 'tambah', recordId: '',)));
         break;
 
       case 'Klaim':

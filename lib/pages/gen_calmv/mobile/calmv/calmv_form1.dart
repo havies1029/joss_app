@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:joss_app/blocs/gen_calmv/calmv1crud_bloc.dart';
 import 'package:joss_app/models/gen_calmv/calmv1crud_model.dart';
 import 'package:joss_app/models/combobox/combommvgrupojk_model.dart';
@@ -13,10 +14,10 @@ import 'package:joss_app/models/combobox/combomwilayah_model.dart';
 import 'package:joss_app/repositories/combobox/combommvgrupojk_repository.dart';
 import 'package:joss_app/repositories/combobox/combommvjnscover_repository.dart';
 import 'package:joss_app/repositories/combobox/combomwilayah_repository.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
-import '../../../models/combobox/combormatauang_model.dart';
-import '../../../repositories/combobox/combormatauang_repository.dart';
+
+import '../../../../models/combobox/combormatauang_model.dart';
+import '../../../../repositories/combobox/combormatauang_repository.dart';
 
 
 class CalmvForm1Section extends StatefulWidget {
@@ -38,7 +39,7 @@ class CalmvForm1Section extends StatefulWidget {
 }
 
 class CalmvForm1SectionState extends State<CalmvForm1Section> {
-  final _formKey1 = GlobalKey<FormState>();
+  final _calmvform1key = GlobalKey<FormState>();
 
   // Controllers
   final fieldCoverBulanController = TextEditingController();
@@ -114,7 +115,7 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
         return Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Form(
-            key: _formKey1,
+            key: _calmvform1key,
             child: Column(
               children: [
                 _buildComboMMvgrupOjk(),
@@ -168,10 +169,8 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     setState(() {});
   }
 
-
-
   Future<bool> validateAndReturn() async {
-    return _formKey1.currentState?.validate() ?? false;
+    return _calmvform1key.currentState?.validate() ?? false;
   }
 
 

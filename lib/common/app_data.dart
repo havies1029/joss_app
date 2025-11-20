@@ -17,18 +17,18 @@ class AppData {
 
 
 
-  // static bool useSSL = false;
-  // static String apiDomain =
-  //     "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
-  // static String prefixEndPoint = "";
-  // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
-  //
+  static bool useSSL = false;
+  static String apiDomain =
+      "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
+  static String prefixEndPoint = "";
+  static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
 
 
-static bool useSSL = false;
-static String apiDomain = "http://localhost:1234/eAssistToolsAPI/";
-static String prefixEndPoint = "/eAssistToolsAPI";
-static String httpAuthority = "localhost:1234";
+//
+// static bool useSSL = false;
+// static String apiDomain = "http://localhost:1234/eAssistToolsAPI/";
+// static String prefixEndPoint = "/eAssistToolsAPI";
+// static String httpAuthority = "localhost:1234";
 
 
 /*

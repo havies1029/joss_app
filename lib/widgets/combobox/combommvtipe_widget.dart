@@ -7,10 +7,11 @@ DropdownSearch<ComboMMvtipeModel> buildFieldComboMMvtipe({
 	required String labelText,
 	GlobalKey<DropdownSearchState<ComboMMvtipeModel>>? comboKey,
 	ComboMMvtipeModel? initItem,
+	required String mvmerkId,
 	Function(ComboMMvtipeModel?)? onChangedCallback,
 	required Function(ComboMMvtipeModel?) onSaveCallback,
 	Function(ComboMMvtipeModel?)? validatorCallback
-	}) {
+}) {
 	return DropdownSearch<ComboMMvtipeModel>(
 		key: comboKey,
 		selectedItem: initItem,
@@ -20,51 +21,51 @@ DropdownSearch<ComboMMvtipeModel> buildFieldComboMMvtipe({
 				labelText: labelText,
 			),
 		),
-			items: (filter, infiniteScrollProps) async {
-				return ComboMMvtipeRepository().getComboMMvtipe(filter);
-			},
-			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
-			popupProps: const PopupPropsMultiSelection.modalBottomSheet(
-				disableFilter: true,
-				showSelectedItems: true,
-				showSearchBox: true,
-				itemBuilder: itemBuilderComboMMvtipe,
-			),
-			compareFn: (item, sItem) => item.mmvtipeId == sItem.mmvtipeId,
-			itemAsString: (item) {
-				return item.nmTipe;
-			},
-			onChanged: (value) {
-				if (onChangedCallback != null) {
-					onChangedCallback(value);
+		items: (filter, infiniteScrollProps) async {
+			return ComboMMvtipeRepository().getComboMMvtipe(mvmerkId, filter);
+		},
+		suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
+		popupProps: const PopupPropsMultiSelection.modalBottomSheet(
+			disableFilter: true,
+			showSelectedItems: true,
+			showSearchBox: true,
+			itemBuilder: itemBuilderComboMMvtipe,
+		),
+		compareFn: (item, sItem) => item.mmvtipeId == sItem.mmvtipeId,
+		itemAsString: (item) {
+			return item.nmTipe;
+		},
+		onChanged: (value) {
+			if (onChangedCallback != null) {
+				onChangedCallback(value);
+			}
+		},
+		onSaved: (value) {
+			onSaveCallback(value);
+		},
+		validator: (value) {
+			if (validatorCallback != null) {
+				validatorCallback(value);
+				if (value == null) {
+					return "";
 				}
-			},
-			onSaved: (value) {
-				onSaveCallback(value);
-			},
-			validator: (value) {
-				if (validatorCallback != null) {
-					validatorCallback(value);
-					if (value == null) {
-						return "";
-					}
-				}
-				return null;
-			},
-		);
+			}
+			return null;
+		},
+	);
 }
 
 Widget itemBuilderComboMMvtipe(
-	BuildContext context, ComboMMvtipeModel item, bool isSelected, bool isDisabled) {
+		BuildContext context, ComboMMvtipeModel item, bool isSelected, bool isDisabled) {
 	return Container(
 		margin: const EdgeInsets.symmetric(horizontal: 8),
 		decoration: !isSelected
-			? null
-			: BoxDecoration(
-				border: Border.all(color: Theme.of(context).primaryColor),
-				borderRadius: BorderRadius.circular(5),
-				color: Colors.white,
-			),
+				? null
+				: BoxDecoration(
+			border: Border.all(color: Theme.of(context).primaryColor),
+			borderRadius: BorderRadius.circular(5),
+			color: Colors.white,
+		),
 		child: ListTile(
 			selected: isSelected,
 			title: Text(item.nmTipe),

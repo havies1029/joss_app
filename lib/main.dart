@@ -38,6 +38,12 @@ import 'package:joss_app/repositories/gen_profile/mrekangeneralidvcrud_repositor
 import 'package:joss_app/repositories/gen_profile/mrekanpajakcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiccrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiclist_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv1crud_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv2form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv3form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv4form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv5form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv6form_repository.dart';
 import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
@@ -99,6 +105,13 @@ import 'blocs/gen_klaim/klaim1list_bloc.dart';
 import 'blocs/gen_klaim/klaim2crud_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
+import 'blocs/gen_regmv/regmv1crud_bloc.dart';
+import 'blocs/gen_regmv/regmv1list_bloc.dart';
+import 'blocs/gen_regmv/regmv2form_bloc.dart';
+import 'blocs/gen_regmv/regmv3form_bloc.dart';
+import 'blocs/gen_regmv/regmv4form_bloc.dart';
+import 'blocs/gen_regmv/regmv5form_bloc.dart';
+import 'blocs/gen_regmv/regmv6form_bloc.dart';
 import 'blocs/gen_sppamv/sppamvcrud_bloc.dart';
 import 'blocs/gen_sppamv/sppamvlist_bloc.dart';
 import 'blocs/gen_sppapar/sppaparcrud_bloc.dart';
@@ -268,6 +281,14 @@ Future<void> main() async {
         BlocProvider(create: (context) => Endors1CrudBloc(repository: Endors1CrudRepository())),
         BlocProvider(create: (context) => Endors1ListBloc()),
         BlocProvider(create: (context) => Endors2CariBloc()),
+        BlocProvider(create:(context) => Regmv1ListBloc()),
+        BlocProvider(create:(context) => Regmv1CrudBloc(repository: Regmv1CrudRepository())),
+        BlocProvider(create:(context) => Regmv2FormBloc(repository: Regmv2FormRepository())),
+        BlocProvider(create:(context) => Regmv3FormBloc(repository: Regmv3FormRepository())),
+        BlocProvider(create:(context) => Regmv4FormBloc(repository: Regmv4FormRepository())),
+        BlocProvider(create:(context) => Regmv5FormBloc(repository: Regmv5FormRepository())),
+        BlocProvider(create:(context) => Regmv6FormBloc(repository: Regmv6FormRepository())),
+        BlocProvider(create: (context) => SppamvCrudBloc(repository: SppamvCrudRepository())),
       ],
       child: MultiBlocListener(
         listeners: [

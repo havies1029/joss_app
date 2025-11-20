@@ -3,8 +3,8 @@ import 'package:joss_app/models/combobox/combommvtipe_model.dart';
 
 class ComboMMvtipeRepository {
 
-	Future<List<ComboMMvtipeModel>> getComboMMvtipe(String filter) async {
+	Future<List<ComboMMvtipeModel>> getComboMMvtipe(String mvmerkId, String filter) async {
 		ComboMMvtipeAPI api = ComboMMvtipeAPI();
-		return await api.getComboMMvtipeAPI(filter);
+		return await api.getComboMMvtipeAPI(mvmerkId, filter);
 	}
 }

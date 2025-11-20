@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
-import 'package:joss_app/models/combobox/combommvtipe_model.dart';
+import 'package:joss_app/models/combobox/combommvpakai_model.dart';
 
-class ComboMMvtipeAPI {
+class ComboMMvpakaiAPI {
 
-	Future<List<ComboMMvtipeModel>> getComboMMvtipeAPI(String mvmerkId, String filter) async {
-		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mmvtipecombobox/getlist";
+	Future<List<ComboMMvpakaiModel>> getComboMMvpakaiAPI(String filter) async {
+		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mmvpakaicombobox/getlist";
 
-		Map<String, String> queryParams = {"mvmerkId": mvmerkId, "filter": filter};
+		Map<String, String> queryParams = {"filter": filter};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
@@ -19,8 +19,8 @@ class ComboMMvtipeAPI {
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-					.map<ComboMMvtipeModel>((json) => ComboMMvtipeModel.fromJson(json))
-					.toList();
+				.map<ComboMMvpakaiModel>((json) => ComboMMvpakaiModel.fromJson(json))
+				.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}
