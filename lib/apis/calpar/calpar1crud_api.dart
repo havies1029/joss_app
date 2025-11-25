@@ -1,47 +1,37 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
-import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
+import 'package:joss_app/models/calpar/calpar1crud_model.dart';
 
-class Calmv2FormAPI {
+class Calpar1CrudAPI {
 
-	Future<ReturnDataAPI> calmv2FormTambahAPI(Calmv2FormModel record) async {
+	Future<ReturnDataAPI> calpar1CrudTambahAPI(Calpar1CrudModel record) async {
 		String tambahEndpoint =
-				"${AppData.prefixEndPoint}/api/calmv/calmv2form/create";
-		Map<String, String> queryParams = {"modul_id": "calmv2FormTambahAPI"};
+			"${AppData.prefixEndPoint}/api/calpar/calpar1crud/create";
+		Map<String, String> queryParams = {"modul_id": "calpar1CrudTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
 		ReturnDataAPI returnData;
+		final http.Response response = await http.post(uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}'
+			},
+			body: jsonEncode(record.toJson()));
 
-		try {
-			final http.Response response = await http.post(
-				uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
-				body: jsonEncode(record.toJson()),
-			);
-
-			if (response.statusCode == 200) {
-				returnData =
-						ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-			} else {
-				returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-			}
-		} catch (e, stacktrace) {
-			returnData = ReturnDataAPI(success: false, data: e.toString(), rowcount: 0);
+		if (response.statusCode == 200) {
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
 		return returnData;
 	}
-
-	Future<bool> calmv2FormUbahAPI(Calmv2FormModel record) async {
+	Future<bool> calpar1CrudUbahAPI(Calpar1CrudModel record) async {
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/calmv/calmv2form/update";
-		Map<String, String> queryParams = {"modul_id": "calmv2FormUbahAPI"};
+			"${AppData.prefixEndPoint}/api/calpar/calpar1crud/update";
+		Map<String, String> queryParams = {"modul_id": "calpar1CrudUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
@@ -61,11 +51,11 @@ class Calmv2FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<bool> calmv2FormHapusAPI(String calmv2Id) async {
-		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv2form/delete";
+	Future<bool> calpar1CrudHapusAPI(String calpar1Id) async {
+		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar1crud/delete";
 		Map<String, String> queryParams = {
-			'calmv2Id': calmv2Id,
-			'modul_id': 'calmv2FormHapusAPI'};
+			'calpar1Id': calpar1Id,
+			'modul_id': 'calpar1CrudHapusAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
 		final http.Response response =
 			await http.get(uri, headers: <String, String>{
@@ -82,9 +72,9 @@ class Calmv2FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Calmv2FormModel> calmv2FormLihatAPI(String calmv2Id) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv2form/read";
-		Map<String, String> queryParams = {'calmv2Id': calmv2Id};
+	Future<Calpar1CrudModel> calpar1CrudLihatAPI(String calpar1Id) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar1crud/read";
+		Map<String, String> queryParams = {'calpar1Id': calpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
 			await http.get(uri, headers: <String, String>{
@@ -94,7 +84,7 @@ class Calmv2FormAPI {
 		});
 
 		if (response.statusCode == 200) {
-			var returnData = Calmv2FormModel.fromJson(jsonDecode(response.body));
+			var returnData = Calpar1CrudModel.fromJson(jsonDecode(response.body));
 			return returnData;
 		} else {
 			return throw Exception("Failed to load data");

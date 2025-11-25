@@ -9,6 +9,7 @@ import 'package:joss_app/blocs/gen_dn1/dn1cari_bloc.dart';
 import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import 'package:joss_app/blocs/gen_regmv/regmv1list_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
@@ -23,6 +24,10 @@ import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.d
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
+import 'package:joss_app/repositories/calpar/calpar1crud_repository.dart';
+import 'package:joss_app/repositories/calpar/calpar2form_repository.dart';
+import 'package:joss_app/repositories/calpar/calpar3form_repository.dart';
+import 'package:joss_app/repositories/calpar/calpar4form_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv1crud_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv2form_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv3form_repository.dart';
@@ -80,6 +85,11 @@ import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'blocs/calpar/calpar1crud_bloc.dart';
+import 'blocs/calpar/calpar1list_bloc.dart';
+import 'blocs/calpar/calpar2form_bloc.dart';
+import 'blocs/calpar/calpar3form_bloc.dart';
+import 'blocs/calpar/calpar4form_bloc.dart';
 import 'blocs/gallery/galleryeventcari_bloc.dart';
 
 import 'blocs/gallery/gallerymembercari_bloc.dart';
@@ -106,7 +116,6 @@ import 'blocs/gen_klaim/klaim2crud_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
 import 'blocs/gen_regmv/regmv1crud_bloc.dart';
-import 'blocs/gen_regmv/regmv1list_bloc.dart';
 import 'blocs/gen_regmv/regmv2form_bloc.dart';
 import 'blocs/gen_regmv/regmv3form_bloc.dart';
 import 'blocs/gen_regmv/regmv4form_bloc.dart';
@@ -190,12 +199,17 @@ Future<void> main() async {
                 RegUserBloc(repository: RegUserRepository(), authenticationBloc: BlocProvider.of<AuthenticationBloc>(context))),
         BlocProvider(create: (_) => MRekan1ListBloc()),
         BlocProvider(create: (_) => Calmv1ListBloc()),
+        BlocProvider(create: (_) => Calpar1ListBloc()),
         BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
         BlocProvider(create: (_) => MRekanContactListBloc()),
         BlocProvider(create: (_) => MRekanPajakCrudBloc(repository: MRekanPajakCrudRepository())),
         BlocProvider(create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
         BlocProvider(create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),
         BlocProvider(create: (_) => Calmv3FormBloc(repository: Calmv3FormRepository())),
+        BlocProvider(create: (_) => Calpar1CrudBloc(repository: Calpar1CrudRepository())),
+        BlocProvider(create: (_) => Calpar2FormBloc(repository: Calpar2FormRepository())),
+        BlocProvider(create: (_) => Calpar3FormBloc(repository: Calpar3FormRepository())),
+        BlocProvider(create: (_) => Calpar4FormBloc(repository: Calpar4FormRepository())),
         BlocProvider(create: (_) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralIdvCrudBloc(repository: MRekanGeneralIdvCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralCmpCrudBloc(repository: MRekanGeneralCmpCrudRepository())),
@@ -264,6 +278,13 @@ Future<void> main() async {
         BlocProvider(create: (context) => Promo1CariBloc()),
         BlocProvider(create: (context) => Promo2CariBloc()),
         BlocProvider(create:(context) => SppamvListBloc()),
+        BlocProvider(create:(context) => Regmv1ListBloc()),
+        BlocProvider(create:(context) => Regmv1CrudBloc(repository: Regmv1CrudRepository())),
+        BlocProvider(create:(context) => Regmv2FormBloc(repository: Regmv2FormRepository())),
+        BlocProvider(create:(context) => Regmv3FormBloc(repository: Regmv3FormRepository())),
+        BlocProvider(create:(context) => Regmv4FormBloc(repository: Regmv4FormRepository())),
+        BlocProvider(create:(context) => Regmv5FormBloc(repository: Regmv5FormRepository())),
+        BlocProvider(create:(context) => Regmv6FormBloc(repository: Regmv6FormRepository())),
         BlocProvider(create: (context) => SppamvCrudBloc(repository: SppamvCrudRepository())),
         BlocProvider(create: (context) => SppaparListBloc()),
         BlocProvider(create: (context) => SppaparCrudBloc(repository: SppaparCrudRepository())),

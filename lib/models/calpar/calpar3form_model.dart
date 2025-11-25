@@ -1,0 +1,74 @@
+import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
+import 'package:joss_app/models/combobox/combomwilayah_model.dart';
+
+class Calpar3FormModel {
+	String calpar3Id;
+	String calpar1Id;
+	bool isEq;
+	bool isTsfwd;
+	double rateEqvet;
+	double rateOther;
+	double ratePar;
+	double rateRsmdcc;
+	double rateTotal;
+	double rateTsfwd;
+	String? kab2zonagempaId;
+	ComboMKabZonaGempaModel? comboMKabZonaGempa;
+	String? mwilayahId;
+	ComboMWilayahModel? comboMWilayah;
+
+	Calpar3FormModel({required this.calpar3Id,required this.calpar1Id, required this.isEq,
+		required this.isTsfwd, required this.rateEqvet, 
+		required this.rateOther, required this.ratePar, 
+		required this.rateRsmdcc, required this.rateTotal, 
+		required this.rateTsfwd, this.kab2zonagempaId, this.comboMKabZonaGempa, 
+		this.mwilayahId, this.comboMWilayah});
+
+	factory Calpar3FormModel.fromJson(Map<String, dynamic> data) {
+		ComboMKabZonaGempaModel? comboMKabZonaGempa;
+		if (data['comboMKabZonaGempa'] != null) {
+			comboMKabZonaGempa = ComboMKabZonaGempaModel.fromJson(data['comboMKabZonaGempa']);
+		}
+
+		ComboMWilayahModel? comboMWilayah;
+		if (data['comboMWilayah'] != null) {
+			comboMWilayah = ComboMWilayahModel.fromJson(data['comboMWilayah']);
+		}
+
+		return Calpar3FormModel(
+			calpar3Id: data['calpar3Id']??'',
+			calpar1Id: data['calpar1Id']??'',
+			isEq: data['isEq']??'',
+			isTsfwd: data['isTsfwd']??'',
+			rateEqvet: double.tryParse(data['rateEqvet'].toString())??0,
+			rateOther: double.tryParse(data['rateOther'].toString())??0,
+			ratePar: double.tryParse(data['ratePar'].toString())??0,
+			rateRsmdcc: double.tryParse(data['rateRsmdcc'].toString())??0,
+			rateTotal: double.tryParse(data['rateTotal'].toString())??0,
+			rateTsfwd: double.tryParse(data['rateTsfwd'].toString())??0,
+			kab2zonagempaId: data['kab2zonagempaId']??'',
+			comboMKabZonaGempa: comboMKabZonaGempa,
+			mwilayahId: data['mwilayahId']??'',
+			comboMWilayah: comboMWilayah
+		);
+
+	}
+
+	Map<String, dynamic> toJson() =>
+		{
+			'calpar3Id': calpar3Id,
+			'calpar1Id': calpar1Id,
+		'isEq': isEq,
+		'isTsfwd': isTsfwd,
+		'rateEqvet': rateEqvet.toString(),
+		'rateOther': rateOther.toString(),
+		'ratePar': ratePar.toString(),
+		'rateRsmdcc': rateRsmdcc.toString(),
+		'rateTotal': rateTotal.toString(),
+		'rateTsfwd': rateTsfwd.toString(),
+		'kab2zonagempaId': kab2zonagempaId,
+		'comboMKabZonaGempa': comboMKabZonaGempa?.toJson(),
+		'mwilayahId': mwilayahId,
+		'comboMWilayah': comboMWilayah?.toJson()};
+
+}

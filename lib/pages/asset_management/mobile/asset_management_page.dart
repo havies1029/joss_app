@@ -23,6 +23,10 @@ class _AssetManagementPageState extends State<AssetManagementPage>
 
   final _formKey = GlobalKey<FormState>();
 
+  void onTambahData() {
+    debugPrint("🔥 Tambah data ditekan");
+    // nanti lu isi navigasi, popup, atau logic tambah data
+  }
 
   @override
   void initState() {
@@ -63,9 +67,11 @@ class _AssetManagementPageState extends State<AssetManagementPage>
                 ),
               ),
             ),
-
-            const DraggableBeliPolisButton(),
-            const DraggableHalfCircleButton(),
+            // FloatingMenuMasterWidget(
+            //   onTambah: onTambahData,
+            // ),
+            // const DraggableBeliPolisButton(),
+            // const MenuPolisCircular(),
           ],
         ),
       ),

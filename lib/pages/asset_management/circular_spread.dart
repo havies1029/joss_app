@@ -1,342 +1,316 @@
-import 'dart:math';
+// import 'package:flutter/material.dart';
+//
+// class FloatingMenuMasterWidget extends StatefulWidget {
+//   final VoidCallback? onTambah;
+//
+//   const FloatingMenuMasterWidget({
+//     super.key,
+//     this.onTambah,
+//   });
+//
+//   @override
+//   State<FloatingMenuMasterWidget> createState() =33
+//       _FloatingMenuMasterWidgetState();
+// }
+//
+// class _FloatingMenuMasterWidgetState extends State<FloatingMenuMasterWidget>
+//     with SingleTickerProviderStateMixin {
+//   late AnimationController _controller;
+//   late Animation<double> _scaleAnimation;
+//   late Animation<double> _fadeAnimation;
+//
+//   bool _isOpen = false;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _controller = AnimationController(
+//       duration: const Duration(milliseconds: 300),
+//       vsync: this,
+//     );
+//     _scaleAnimation = CurvedAnimation(
+//       parent: _controller,
+//       curve: Curves.easeOutCubic,
+//     );
+//     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+//       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+//     );
+//   }
+//
+//   @override
+//   void dispose() {
+//     _controller.dispose();
+//     super.dispose();
+//   }
+//
+//   void toggleMenu() {
+//     setState(() {
+//       _isOpen = !_isOpen;
+//       _isOpen ? _controller.forward() : _controller.reverse();
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Positioned(
+//       right: 16,
+//       bottom: 16,
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         crossAxisAlignment: CrossAxisAlignment.end,
+//         children: [
+//           // Menu items
+//           ..._buildMenuItems(),
+//
+//           const SizedBox(height: 16),
+//
+//           // Main FAB with shadow and modern design
+//           Container(
+//             decoration: BoxDecoration(
+//               shape: BoxShape.circle,
+//               boxShadow: [
+//                 BoxShadow(
+//                   color: Colors.black.withOpacity(0.15),
+//                   blurRadius: 12,
+//                   offset: const Offset(0, 4),
+//                 ),
+//               ],
+//             ),
+//             child: FloatingActionButton(
+//               elevation: 0,
+//               backgroundColor: const Color(0xFF6366F1),
+//               onPressed: toggleMenu,
+//               child: AnimatedRotation(
+//                 duration: const Duration(milliseconds: 300),
+//                 turns: _isOpen ? 0.125 : 0,
+//                 child: Icon(
+//                   _isOpen ? Icons.close_rounded : Icons.add_rounded,
+//                   size: 28,
+//                   color: Colors.white,
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+//
+//   List<Widget> _buildMenuItems() {
+//     final items = [
+//       _MenuItemData(
+//         icon: Icons.shopping_bag_outlined,
+//         color: const Color(0xFFF59E0B),
+//         label: "Beli Polis",
+//         onTap: () => debugPrint("🔥 Beli Polis"),
+//       ),
+//       _MenuItemData(
+//         icon: Icons.edit_outlined,
+//         color: const Color(0xFF3B82F6),
+//         label: "Endorse",
+//         onTap: () => debugPrint("🔥 Endorse"),
+//       ),
+//       _MenuItemData(
+//         icon: Icons.search_rounded,
+//         color: const Color(0xFF6B7280),
+//         label: "Lacak",
+//         onTap: () => debugPrint("🔥 Lacak Polis"),
+//       ),
+//       _MenuItemData(
+//         icon: Icons.autorenew_rounded,
+//         color: const Color(0xFF06B6D4),
+//         label: "Perpanjang",
+//         onTap: () => debugPrint("🔥 Perpanjangan"),
+//       ),
+//       _MenuItemData(
+//         icon: Icons.power_settings_new_rounded,
+//         color: const Color(0xFFEC4899),
+//         label: "Aktifkan",
+//         onTap: () => debugPrint("🔥 Aktifkan"),
+//       ),
+//       _MenuItemData(
+//         icon: Icons.download_outlined,
+//         color: const Color(0xFF10B981),
+//         label: "Unduh",
+//         onTap: () => debugPrint("🔥 Unduh Polis"),
+//       ),
+//     ];
+//
+//     return items.asMap().entries.map((entry) {
+//       final index = entry.key;
+//       final item = entry.value;
+//       final delay = index * 0.05;
+//
+//       return ScaleTransition(
+//         scale: _scaleAnimation,
+//         child: FadeTransition(
+//           opacity: _fadeAnimation,
+//           child: Padding(
+//             padding: const EdgeInsets.only(bottom: 12),
+//             child: _buildMenuItem(item, delay),
+//           ),
+//         ),
+//       );
+//     }).toList().reversed.toList();
+//   }
+//
+//   Widget _buildMenuItem(_MenuItemData item, double delay) {
+//     return TweenAnimationBuilder<double>(
+//       duration: Duration(milliseconds: (300 + delay * 1000).toInt()),
+//       tween: Tween(begin: 0.0, end: _isOpen ? 1.0 : 0.0),
+//       builder: (context, value, child) {
+//         return Transform.translate(
+//           offset: Offset(0, (1 - value) * 20),
+//           child: Opacity(
+//             opacity: value,
+//             child: child,
+//           ),
+//         );
+//       },
+//       child: Row(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           // Label chip
+//           if (_isOpen)
+//             Container(
+//               margin: const EdgeInsets.only(right: 12),
+//               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+//               decoration: BoxDecoration(
+//                 color: Colors.white,
+//                 borderRadius: BorderRadius.circular(20),
+//                 boxShadow: [
+//                   BoxShadow(
+//                     color: Colors.black.withOpacity(0.1),
+//                     blurRadius: 8,
+//                     offset: const Offset(0, 2),
+//                   ),
+//                 ],
+//               ),
+//               child: Text(
+//                 item.label,
+//                 style: const TextStyle(
+//                   fontSize: 13,
+//                   fontWeight: FontWeight.w500,
+//                   color: Color(0xFF1F2937),
+//                 ),
+//               ),
+//             ),
+//
+//           // Button
+//           Material(
+//             color: Colors.transparent,
+//             child: InkWell(
+//               onTap: () {
+//                 item.onTap?.call();
+//                 toggleMenu();
+//               },
+//               borderRadius: BorderRadius.circular(20),
+//               child: Container(
+//                 width: 40,
+//                 height: 40,
+//                 decoration: BoxDecoration(
+//                   color: item.color,
+//                   shape: BoxShape.circle,
+//                   boxShadow: [
+//                     BoxShadow(
+//                       color: item.color.withOpacity(0.3),
+//                       blurRadius: 8,
+//                       offset: const Offset(0, 2),
+//                     ),
+//                   ],
+//                 ),
+//                 child: Icon(
+//                   item.icon,
+//                   color: Colors.white,
+//                   size: 20,
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+//
+// class _MenuItemData {
+//   final IconData icon;
+//   final Color color;
+//   final String label;
+//   final VoidCallback? onTap;
+//
+//   _MenuItemData({
+//     required this.icon,
+//     required this.color,
+//     required this.label,
+//     this.onTap,
+//   });
+// }
+
 import 'package:flutter/material.dart';
+import 'package:circular_menu/circular_menu.dart';
 
-class DraggableHalfCircleButton extends StatefulWidget {
-  const DraggableHalfCircleButton({super.key});
-
-  @override
-  State<DraggableHalfCircleButton> createState() =>
-      _DraggableHalfCircleButtonState();
-}
-
-class _DraggableHalfCircleButtonState extends State<DraggableHalfCircleButton>
-    with SingleTickerProviderStateMixin {
-  Offset position = Offset.zero;
-  late AnimationController _controller;
-  bool isOpen = false;
-  bool isDragging = false;
-  double scale = 1.0;
-
-  final List<_ButtonItem> buttons = [
-    _ButtonItem(icon: Icons.home, label: "Home", color: Colors.blue),
-    _ButtonItem(icon: Icons.search, label: "Search", color: Colors.green),
-    _ButtonItem(icon: Icons.notifications, label: "Notif", color: Colors.amber),
-    _ButtonItem(icon: Icons.settings, label: "Settings", color: Colors.purple),
-    _ButtonItem(icon: Icons.favorite, label: "Fav", color: Colors.pink),
-    _ButtonItem(icon: Icons.person, label: "Profile", color: Colors.indigo),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  // REVISI 1: Sudut dan Radius yang Presisi
-  Offset getPosition(int index, double progress) {
-    const double startAngle = 180; // Mulai dari sisi kiri
-    const double endAngle = 0;     // Berakhir di sisi kanan
-    final double angle =
-        (startAngle + (endAngle - startAngle) * (index / (buttons.length - 1))) *
-            pi /
-            -180;
-    const double radius = 100; // Radius 100 untuk hasil yang lebih renggang
-    return Offset(cos(angle) * radius * progress, sin(angle) * radius * progress);
-  }
+class MenuPolisCircular extends StatelessWidget {
+  const MenuPolisCircular({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
-
-    // posisi awal di kanan bawah
-    if (position == Offset.zero) {
-      position = Offset(screen.width - 100, screen.height - 200);
-    }
-
-    return Stack(
-      children: [
-        // tombol-tombol kecil
-        ..._buildFloatingMenu(),
-        // tombol utama draggable
-        Positioned(
-          left: position.dx,
-          top: position.dy,
-          child: GestureDetector(
-            onTapDown: (_) => setState(() => scale = 0.9),
-            onTapUp: (_) => setState(() => scale = 1.0),
-            onTapCancel: () => setState(() => scale = 1.0),
-            onTap: () {
-              if (!isDragging) {
-                setState(() {
-                  isOpen = !isOpen;
-                  isOpen ? _controller.forward() : _controller.reverse();
-                });
-              }
-            },
-            onPanStart: (_) => setState(() => isDragging = true),
-            onPanUpdate: (details) {
-              setState(() => position += details.delta);
-            },
-            onPanEnd: (_) => setState(() => isDragging = false),
-            child: AnimatedScale(
-              scale: scale,
-              duration: const Duration(milliseconds: 150),
-              curve: Curves.easeOutBack,
-              child: AnimatedRotation(
-                turns: isOpen ? 0.125 : 0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Colors.orange, Colors.red],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 12,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 32),
-                ),
-              ),
-            ),
-          ),
+    return CircularMenu(
+      alignment: Alignment.bottomCenter,
+      radius: 100,
+      toggleButtonSize: 50,
+      toggleButtonColor: const Color(0xFF1A1A2E),
+      toggleButtonIconColor: Colors.white,
+      toggleButtonPadding: 12,
+      toggleButtonMargin: 12,
+      curve: Curves.easeInOutCubic,
+      reverseCurve: Curves.easeInOutCubic,
+      animationDuration: const Duration(milliseconds: 400),
+      toggleButtonBoxShadow: [
+        BoxShadow(
+          color: const Color(0xFF1A1A2E).withOpacity(0.4),
+          blurRadius: 20,
+          offset: const Offset(0, 8),
         ),
       ],
-    );
-  }
-
-  List<Widget> _buildFloatingMenu() {
-    final progress = Curves.easeOutCubic.transform(_controller.value);
-
-    // daftar tombol (muter)
-    // Penentuan LabelPosition disesuaikan berdasarkan letak di busur:
-    // Index 0, 1, 2 berada di busur kiri (Label di Kiri)
-    // Index 3, 4, 5 berada di busur kanan (Label di Kanan)
-    final buttons = [
-      _buildButtonItem(0, progress, this.buttons[0].icon, this.buttons[0].color, this.buttons[0].label, LabelPosition.left),  // Home
-      _buildButtonItem(1, progress, this.buttons[1].icon, this.buttons[1].color, this.buttons[1].label, LabelPosition.left),  // Search
-      _buildButtonItem(2, progress, this.buttons[2].icon, this.buttons[2].color, this.buttons[2].label, LabelPosition.left),  // Notif
-      _buildButtonItem(3, progress, this.buttons[3].icon, this.buttons[3].color, this.buttons[3].label, LabelPosition.right), // Settings
-      _buildButtonItem(4, progress, this.buttons[4].icon, this.buttons[4].color, this.buttons[4].label, LabelPosition.right), // Fav
-      _buildButtonItem(5, progress, this.buttons[5].icon, this.buttons[5].color, this.buttons[5].label, LabelPosition.right), // Profile
-    ];
-
-    // ambil semua widget tombol dan label, lalu gabungkan ke Stack
-    return buttons.expand((pair) => pair).toList();
-  }
-
-  // REVISI 2: Perhitungan Posisi Horizontal yang Presisi
-  List<Widget> _buildButtonItem(
-      int index,
-      double progress,
-      IconData icon,
-      Color color,
-      String label,
-      LabelPosition labelPosition,
-      ) {
-    final pos = getPosition(index, progress);
-
-    const double buttonSize = 50.0;
-    const double mainButtonSize = 70.0;
-    const double mainButtonRadius = mainButtonSize / 2;
-    const double buttonRadius = buttonSize / 2;
-    const double spacing = 10.0;
-
-    // Pusat tombol utama
-    final double centerBaseX = position.dx + mainButtonRadius;
-    final double centerBaseY = position.dy + mainButtonRadius;
-
-    // --- Perkiraan Lebar Label (Heuristik) ---
-    // Diperlukan untuk menghitung pergeseran yang tepat saat label di Kiri.
-    // Disesuaikan: 6.5 per karakter + 18 (padding & sedikit margin).
-    final double estimatedLabelWidth = label.length * 6.5 + 18.0;
-    final double estimatedShift = estimatedLabelWidth + spacing;
-
-    // Pusat Posisi Tombol Kecil
-    final double finalLeftAnchor = centerBaseX + pos.dx;
-    final double finalTopAnchor = centerBaseY + pos.dy;
-
-    // Tombol
-    final buttonWidget = Container(
-      width: buttonSize,
-      height: buttonSize,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, 4))
-        ],
-      ),
-      child: Icon(icon, color: Colors.white, size: 22),
-    );
-
-    // Label
-    final labelWidget = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 11),
-      ),
-    );
-
-    // tombol + label disusun horizontal
-    final combinedRow = Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      textDirection:
-      labelPosition == LabelPosition.left ? TextDirection.rtl : TextDirection.ltr,
-      children: [
-        buttonWidget,
-        const SizedBox(width: spacing),
-        labelWidget,
-      ],
-    );
-
-    double finalLeft;
-    if (labelPosition == LabelPosition.left) {
-      // Tombol di kanan (RTL). Geser seluruh Row ke KIRI sejauh lebar label + spasi + radius tombol
-      finalLeft = finalLeftAnchor - (estimatedShift + buttonRadius);
-    } else {
-      // Tombol di kiri (LTR). Cukup geser ke KIRI sejauh radius tombol (dari pusat ke tepi kiri).
-      finalLeft = finalLeftAnchor - buttonRadius;
-    }
-
-    // `finalTop` mengatur pusat vertikal Row yang tingginya `buttonSize`.
-    final double finalTop = finalTopAnchor - buttonRadius;
-
-
-    return [
-      Positioned(
-        left: finalLeft,
-        top: finalTop,
-        child: Opacity(
-          opacity: progress,
-          child: Transform.scale(
-            scale: progress,
-            alignment: Alignment.center,
-            child: combinedRow,
-          ),
+      items: [
+        CircularMenuItem(
+          icon: Icons.search_rounded,
+          color: const Color(0xFF6C63FF),
+          iconColor: Colors.white,
+          onTap: () => debugPrint("Lacak Polis"),
         ),
-      ),
-    ];
-  }
-}
-
-class _ButtonItem {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _ButtonItem({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-}
-
-enum LabelPosition { bottom, left, right }
-
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final LabelPosition labelPosition;
-  final VoidCallback? onTap;
-
-  const _ActionButton({
-    required this.icon,
-    required this.color,
-    required this.label,
-    this.labelPosition = LabelPosition.bottom,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Widget iconWidget = Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, 4))
-        ],
-      ),
-      child: Icon(icon, color: Colors.white, size: 22),
-    );
-
-    Widget labelWidget = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.75),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 11),
-      ),
-    );
-
-    Widget content;
-    switch (labelPosition) {
-      case LabelPosition.left:
-        content = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            labelWidget,
-            const SizedBox(width: 6),
-            iconWidget,
-          ],
-        );
-        break;
-
-      case LabelPosition.right:
-        content = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            iconWidget,
-            const SizedBox(width: 6),
-            labelWidget,
-          ],
-        );
-        break;
-
-      default:
-        content = Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            iconWidget,
-            const SizedBox(height: 6),
-            labelWidget,
-          ],
-        );
-    }
-
-    return GestureDetector(
-      onTap: onTap,
-      child: content,
+        CircularMenuItem(
+          icon: Icons.refresh_rounded,
+          color: const Color(0xFF00D9FF),
+          iconColor: Colors.white,
+          onTap: () => debugPrint("Perpanjangan"),
+        ),
+        CircularMenuItem(
+          icon: Icons.power_settings_new_rounded,
+          color: const Color(0xFFFF6B9D),
+          iconColor: Colors.white,
+          onTap: () => debugPrint("Aktifkan"),
+        ),
+        CircularMenuItem(
+          icon: Icons.edit_rounded,
+          color: const Color(0xFF4A90E2),
+          iconColor: Colors.white,
+          onTap: () => debugPrint("Endorse"),
+        ),
+        CircularMenuItem(
+          icon: Icons.shopping_cart_rounded,
+          color: const Color(0xFFFFC107),
+          iconColor: Colors.white,
+          onTap: () => debugPrint("Beli Polis"),
+        ),
+        CircularMenuItem(
+          icon: Icons.file_download_rounded,
+          color: const Color(0xFF4CAF50),
+          iconColor: Colors.white,
+          onTap: () => debugPrint("Unduh Polis"),
+        ),
+      ],
     );
   }
 }
