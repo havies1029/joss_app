@@ -13,8 +13,11 @@ import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+<<<<<<< HEAD
 import '../../../../models/combobox/combomjnscoverpar_model.dart';
 import '../../../../repositories/combobox/combomjnscoverpar_repository.dart';
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 import '../../../../repositories/combobox/combomkabzonagempa_repository.dart';
 import '../../../../repositories/combobox/combomwilayah_repository.dart';
 
@@ -48,7 +51,10 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   final fieldRateTotalController = TextEditingController();
   final fieldRateTsfwdController = TextEditingController();
 
+<<<<<<< HEAD
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
   ComboMWilayahModel? fieldComboMWilayah;
 
@@ -119,8 +125,13 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     fieldRateTsfwdController.text      = cleanNum(record.rateTsfwd);
 
     fieldIsEqController.text         = record.isEq.toString();
+<<<<<<< HEAD
 
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
+=======
+    fieldIsTsfwdController.text      = record.isTsfwd.toString();
+
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
     fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
     fieldComboMWilayah = record.comboMWilayah;
 
@@ -146,8 +157,11 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
         key: _calparform3key,
         child: Column(
           children: [
+<<<<<<< HEAD
             buildFieldMjnscoverparId(),
             const SizedBox(height: 12),
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
             Row(
               children: [
                 Flexible(child: buildFieldIsEq()),
@@ -185,7 +199,10 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
       isEq: toBoolean(fieldIsEqController.text),
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
       kab2zonagempaId: fieldComboMKabZonaGempa?.mkabzonagempaId,
+<<<<<<< HEAD
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       rateEqvet: double.tryParse(fieldRateEqvetController.text.replaceAll(',', '')) ?? 0,
       rateOther: double.tryParse(fieldRateOtherController.text.replaceAll(',', '')) ?? 0,
@@ -196,10 +213,17 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     );
 
     if (widget.viewMode == "tambah") {
+<<<<<<< HEAD
       debugPrint("ini tambah loh di trigger di form3");
       calpar3Bloc.add(Calpar3FormTambahEvent(record: record));
     } else {
       debugPrint("ini ubah loh di trigger di form3");
+=======
+      debugPrint("ini tambah loh di trigger di form2");
+      calpar3Bloc.add(Calpar3FormTambahEvent(record: record));
+    } else {
+      debugPrint("ini ubah loh di trigger di form2");
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       calpar3Bloc.add(Calpar3FormUbahEvent(record: record));
     }
   }
@@ -245,6 +269,7 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
 
+<<<<<<< HEAD
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
     hintText: "Wilayah Objek",
     initItem: fieldComboMJnscoverPar,
@@ -256,6 +281,8 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     onSaveCallback: (value) => fieldComboMJnscoverPar = value,
   );
 
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
   Widget buildFieldRateEqvet() => appTextField(
     label: "rateEqvet",
     controller: fieldRateEqvetController,
@@ -357,6 +384,9 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     //   return null;
     // },
   );
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 }

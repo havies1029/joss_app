@@ -3,7 +3,10 @@ import 'package:joss_app/models/combobox/comborkonstruksiojk_model.dart';
 import 'package:joss_app/models/combobox/comborokupasi_model.dart';
 
 class Calpar1CrudModel {
+<<<<<<< HEAD
 	String? regpar1Id;
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	String calpar1Id;
 	int coverBulan;
 	String? mjnscoverparId;
@@ -13,7 +16,11 @@ class Calpar1CrudModel {
 	String? rokupasiId;
 	ComboROkupasiModel? comboROkupasi;
 
+<<<<<<< HEAD
 	Calpar1CrudModel({this.regpar1Id,required this.calpar1Id, required this.coverBulan,
+=======
+	Calpar1CrudModel({required this.calpar1Id, required this.coverBulan, 
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		this.mjnscoverparId, this.comboMJnscoverPar, this.rkonstruksiojkId, this.comboRKonstruksiojk, 
 		this.rokupasiId, this.comboROkupasi});
 
@@ -34,7 +41,10 @@ class Calpar1CrudModel {
 		}
 
 		return Calpar1CrudModel(
+<<<<<<< HEAD
 			regpar1Id: data['regpar1Id']??'',
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 			calpar1Id: data['calpar1Id']??'',
 			coverBulan: int.tryParse(data['coverBulan'].toString())??0,
 			mjnscoverparId: data['mjnscoverparId']??'',
@@ -48,9 +58,13 @@ class Calpar1CrudModel {
 	}
 
 	Map<String, dynamic> toJson() =>
+<<<<<<< HEAD
 		{
 		'regpar1Id' : regpar1Id,
 		'calpar1Id': calpar1Id,
+=======
+		{'calpar1Id': calpar1Id,
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		'coverBulan': coverBulan.toString(),
 		'mjnscoverparId': mjnscoverparId,
 		'comboMJnscoverPar': comboMJnscoverPar?.toJson(),
@@ -60,7 +74,10 @@ class Calpar1CrudModel {
 		'comboROkupasi': comboROkupasi?.toJson()};
 
 	Calpar1CrudModel copyWith({
+<<<<<<< HEAD
 		String? regpar1Id,
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		String? calpar1Id,
 		int? coverBulan,
 		String? mjnscoverparId,
@@ -71,7 +88,10 @@ class Calpar1CrudModel {
 		ComboROkupasiModel? comboROkupasi,
 	}) {
 		return Calpar1CrudModel(
+<<<<<<< HEAD
 			regpar1Id: regpar1Id ?? this.regpar1Id,
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 			calpar1Id: calpar1Id ?? this.calpar1Id,
 			coverBulan: coverBulan ?? this.coverBulan,
 			mjnscoverparId: mjnscoverparId ?? this.mjnscoverparId,

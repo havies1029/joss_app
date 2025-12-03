@@ -14,7 +14,10 @@ class Calpar4FormBloc extends Bloc<Calpar4FormEvents, Calpar4FormState> {
 		on<Calpar4FormTambahEvent>(onTambahCalpar4Form);
 		on<Calpar4FormHapusEvent>(onHapusCalpar4Form);
 		on<Calpar4FormLihatEvent>(onLihatCalpar4Form);
+<<<<<<< HEAD
 		on<Calpar4FormHitungPremiEvent>(onHitungPremiCalpar4Form);
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	}
 
 	Future<void> onTambahCalpar4Form(

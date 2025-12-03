@@ -117,8 +117,13 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
             key: _calparform1key,
             child: Column(
               children: [
+<<<<<<< HEAD
                 // buildFieldCoverBulan(),
                 // const SizedBox(height: 12),
+=======
+                buildFieldCoverBulan(),
+                const SizedBox(height: 12),
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                 buildFieldMjnscoverparId(),
                 const SizedBox(height: 12),
                 buildFieldRkonstruksiojkId(),
@@ -152,7 +157,11 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
   Future<void> saveForm1() async {
     final record = Calpar1CrudModel(
       calpar1Id: widget.recordId!,
+<<<<<<< HEAD
       coverBulan: int.tryParse(fieldCoverBulanController.text.replaceAll(",", "")) ?? 12,
+=======
+      coverBulan: int.parse(fieldCoverBulanController.text),
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,
       rokupasiId: fieldComboROkupasi?.rokupasiId,
@@ -167,6 +176,7 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
     }
   }
 
+<<<<<<< HEAD
   // // Fields
   // Widget buildFieldCoverBulan() => appTextField(
   //   label: "Lama Cover",
@@ -184,6 +194,25 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
   //     return null;
   //   },
   // );
+=======
+  // Fields
+  Widget buildFieldCoverBulan() => appTextField(
+    label: "Lama Cover",
+    controller: fieldCoverBulanController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    validator: (v) {
+      if (v == null || v.isEmpty) return kStringNullError;
+      final clean = v.replaceAll(",", "");
+      final angka = double.tryParse(clean);
+      if (angka == null || angka <= 0) return kString0;
+      return null;
+    },
+  );
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
     hintText: "Jenis Cover",

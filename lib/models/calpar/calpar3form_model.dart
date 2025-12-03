@@ -1,6 +1,9 @@
 import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
+<<<<<<< HEAD
 import 'package:joss_app/models/combobox/combomjnscoverpar_model.dart';
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 
 class Calpar3FormModel {
 	String calpar3Id;
@@ -15,16 +18,26 @@ class Calpar3FormModel {
 	double rateTsfwd;
 	String? kab2zonagempaId;
 	ComboMKabZonaGempaModel? comboMKabZonaGempa;
+<<<<<<< HEAD
 	String? mjnscoverparId;
 	ComboMJnscoverParModel? comboMJnscoverPar;
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	String? mwilayahId;
 	ComboMWilayahModel? comboMWilayah;
 
 	Calpar3FormModel({required this.calpar3Id,required this.calpar1Id, required this.isEq,
+<<<<<<< HEAD
 		required this.isTsfwd, required this.rateEqvet,
 		required this.rateOther, required this.ratePar,
 		required this.rateRsmdcc, required this.rateTotal,
 		required this.rateTsfwd, this.kab2zonagempaId, this.comboMKabZonaGempa, this.mjnscoverparId, this.comboMJnscoverPar,
+=======
+		required this.isTsfwd, required this.rateEqvet, 
+		required this.rateOther, required this.ratePar, 
+		required this.rateRsmdcc, required this.rateTotal, 
+		required this.rateTsfwd, this.kab2zonagempaId, this.comboMKabZonaGempa, 
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		this.mwilayahId, this.comboMWilayah});
 
 	factory Calpar3FormModel.fromJson(Map<String, dynamic> data) {
@@ -33,11 +46,14 @@ class Calpar3FormModel {
 			comboMKabZonaGempa = ComboMKabZonaGempaModel.fromJson(data['comboMKabZonaGempa']);
 		}
 
+<<<<<<< HEAD
 		ComboMJnscoverParModel? comboMJnscoverPar;
 		if (data['comboMJnscoverPar'] != null) {
 			comboMJnscoverPar = ComboMJnscoverParModel.fromJson(data['comboMJnscoverPar']);
 		}
 
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		ComboMWilayahModel? comboMWilayah;
 		if (data['comboMWilayah'] != null) {
 			comboMWilayah = ComboMWilayahModel.fromJson(data['comboMWilayah']);
@@ -56,8 +72,11 @@ class Calpar3FormModel {
 			rateTsfwd: double.tryParse(data['rateTsfwd'].toString())??0,
 			kab2zonagempaId: data['kab2zonagempaId']??'',
 			comboMKabZonaGempa: comboMKabZonaGempa,
+<<<<<<< HEAD
 			mjnscoverparId: data['mjnscoverparId']??'',
 			comboMJnscoverPar: comboMJnscoverPar,
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 			mwilayahId: data['mwilayahId']??'',
 			comboMWilayah: comboMWilayah
 		);
@@ -66,8 +85,13 @@ class Calpar3FormModel {
 
 	Map<String, dynamic> toJson() =>
 		{
+<<<<<<< HEAD
 		'calpar3Id': calpar3Id,
 		'calpar1Id': calpar1Id,
+=======
+			'calpar3Id': calpar3Id,
+			'calpar1Id': calpar1Id,
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		'isEq': isEq,
 		'isTsfwd': isTsfwd,
 		'rateEqvet': rateEqvet.toString(),
@@ -78,8 +102,11 @@ class Calpar3FormModel {
 		'rateTsfwd': rateTsfwd.toString(),
 		'kab2zonagempaId': kab2zonagempaId,
 		'comboMKabZonaGempa': comboMKabZonaGempa?.toJson(),
+<<<<<<< HEAD
 		'mjnscoverparId': mjnscoverparId,
 		'comboMJnscoverPar': comboMJnscoverPar?.toJson(),
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		'mwilayahId': mwilayahId,
 		'comboMWilayah': comboMWilayah?.toJson()};
 

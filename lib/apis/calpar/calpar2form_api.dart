@@ -8,18 +8,31 @@ class Calpar2FormAPI {
 
 	Future<ReturnDataAPI> calpar2FormTambahAPI(Calpar2FormModel record) async {
 		String tambahEndpoint =
+<<<<<<< HEAD
 				"${AppData.prefixEndPoint}/api/calpar/calpar2form/create";
+=======
+			"${AppData.prefixEndPoint}/api/calpar/calpar2form/create";
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		Map<String, String> queryParams = {"modul_id": "calpar2FormTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
+<<<<<<< HEAD
 				headers: <String, String>{
 					'Content-Type': 'application/json; odata=verbos',
 					'Accept': 'application/json; odata=verbos',
 					'Authorization': 'Bearer ${AppData.userToken}'
 				},
 				body: jsonEncode(record.toJson()));
+=======
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}'
+			},
+			body: jsonEncode(record.toJson()));
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -30,18 +43,31 @@ class Calpar2FormAPI {
 	}
 	Future<bool> calpar2FormUbahAPI(Calpar2FormModel record) async {
 		String ubahEndpoint =
+<<<<<<< HEAD
 				"${AppData.prefixEndPoint}/api/calpar/calpar2form/update";
+=======
+			"${AppData.prefixEndPoint}/api/calpar/calpar2form/update";
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		Map<String, String> queryParams = {"modul_id": "calpar2FormUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
 		final http.Response response = await http.post(uri,
+<<<<<<< HEAD
 				headers: <String, String>{
 					'Content-Type': 'application/json; odata=verbos',
 					'Accept': 'application/json; odata=verbos',
 					'Authorization': 'Bearer ${AppData.userToken}'
 				},
 				body: jsonEncode(record.toJson()));
+=======
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}'
+			},
+			body: jsonEncode(record.toJson()));
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
@@ -58,7 +84,11 @@ class Calpar2FormAPI {
 			'modul_id': 'calpar2FormHapusAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
 		final http.Response response =
+<<<<<<< HEAD
 		await http.get(uri, headers: <String, String>{
+=======
+			await http.get(uri, headers: <String, String>{
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -72,12 +102,21 @@ class Calpar2FormAPI {
 		}
 		return returnData.success;
 	}
+<<<<<<< HEAD
 	Future<Calpar2FormModel> calpar2FormLihatAPI(String calpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar2form/read";
 		Map<String, String> queryParams = {'calpar1Id': calpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
 		await http.get(uri, headers: <String, String>{
+=======
+	Future<Calpar2FormModel> calpar2FormLihatAPI(String calpar2Id) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar2form/read";
+		Map<String, String> queryParams = {'calpar2Id': calpar2Id};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		final http.Response response =
+			await http.get(uri, headers: <String, String>{
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'

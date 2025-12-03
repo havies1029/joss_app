@@ -8,7 +8,10 @@ import '../../../blocs/calpar/calpar4form_bloc.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
+<<<<<<< HEAD
 import '../../regpar/mobile/regpar_main_page.dart';
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 import 'calpar_form/calpar_form1.dart';
 import 'calpar_form/calpar_form2.dart';
 import 'calpar_form/calpar_form3.dart';
@@ -46,7 +49,10 @@ class _CalparFormMainState extends State<CalparFormMain> {
   String form3ViewMode = "tambah";
 
   bool isHitungPremiClicked = false;
+<<<<<<< HEAD
   bool isLanjutkanlicked = false;
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 
   double getProgressValue() {
     double p = 0.0;
@@ -72,11 +78,16 @@ class _CalparFormMainState extends State<CalparFormMain> {
 
               if (newId != null && newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calpar1 saved → result ID = $newId");
+<<<<<<< HEAD
                 final regpar = state.record!.regpar1Id;
+=======
+
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                 setState(() {
                   calpar1Id = newId;
                 });
 
+<<<<<<< HEAD
                 if (isLanjutkanlicked == true){
                   isLanjutkanlicked = false;
                   debugPrint("woy ini new ID" + regpar!);
@@ -99,6 +110,18 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   } else {
                     simulateToggleForm2();
                   }
+=======
+                if (form1ViewMode == "ubah") {
+                  form1ViewMode = "tambah";
+                  if (isHitungPremiClicked == true) {
+                    isHitungPremiClicked = false;
+                    onHitungPremi();
+                  } else {
+                    simulateToggleForm2();
+                  }
+                } else {
+                  simulateToggleForm2();
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                 }
               }
             }
@@ -120,6 +143,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
 
                 if (form2ViewMode == "ubah") {
                   form2ViewMode = "tambah";
+<<<<<<< HEAD
                   if (isHitungPremiClicked == true) {
                     isHitungPremiClicked = false;
                     onHitungPremi();
@@ -130,6 +154,12 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   simulateToggleForm3();
                 }
 
+=======
+                  onHitungPremi();
+                } else {
+                  onHitungPremi();
+                }
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
               }
             }
           },
@@ -148,6 +178,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   calpar3Id = newId;
                 });
 
+<<<<<<< HEAD
                 if (form3ViewMode == "ubah") {
                   form3ViewMode = "tambah";
                   debugPrint("listener form3 abis tambah");
@@ -156,6 +187,11 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   debugPrint("listener form3");
                   onHitungPremi();
                 }
+=======
+                context.read<Calpar4FormBloc>().add(
+                  Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
+                );
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
               }
             }
           },
@@ -249,7 +285,13 @@ class _CalparFormMainState extends State<CalparFormMain> {
                       ? const SizedBox.shrink()
                       : AppButton.primary(
                     text: "Lanjutkan",
+<<<<<<< HEAD
                     onPressed: onLanjutkanPressed,
+=======
+                    onPressed: () {
+                      // tambahin aksi mu
+                    },
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                   ),
 
                   const SizedBox(height: 25),
@@ -335,6 +377,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
   }
 
   Future<void> onToggleForm3(bool _) async {
+<<<<<<< HEAD
     final isValidForm1 = await calparform1key.currentState?.validateAndReturn();
     final isValidForm2 = await calparform2key.currentState?.validateAndReturn();
 
@@ -361,6 +404,22 @@ class _CalparFormMainState extends State<CalparFormMain> {
     } else if (isValidForm1 == true) {
       await calparform1key.currentState?.saveForm1();
     }else if (isValidForm2 == true){
+=======
+    final isValidForm2 = await calparform2key.currentState?.validateAndReturn();
+
+    if (calpar2Id != null) {
+      form3ViewMode = "tambah";
+
+      if (form2ViewMode == "ubah") {
+        await calparform2key.currentState?.saveForm2();
+      } else {
+        if (calpar3Id != null) {
+          form3ViewMode = "ubah";
+        }
+        openForm3();
+      }
+    } else if (isValidForm2 == true) {
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       await calparform2key.currentState?.saveForm2();
     }
   }
@@ -390,6 +449,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
         isHitungPremiClicked = true;
         await calparform1key.currentState?.saveForm1();
       } else {
+<<<<<<< HEAD
         if (form2ViewMode == "ubah") {
           isHitungPremiClicked = true;
           await calparform2key.currentState?.saveForm2();
@@ -402,6 +462,14 @@ class _CalparFormMainState extends State<CalparFormMain> {
               Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
             );
           }
+=======
+        if (form3ViewMode == "ubah") {
+          await calparform3key.currentState?.saveForm3();
+        } else {
+          context.read<Calpar4FormBloc>().add(
+            Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
+          );
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
         }
       }
     } else if (calpar1Id == null) {
@@ -422,6 +490,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
     }
   }
 
+<<<<<<< HEAD
   Future<void> onLanjutkanPressed() async {
     isLanjutkanlicked = true;
 
@@ -430,6 +499,8 @@ class _CalparFormMainState extends State<CalparFormMain> {
     // );
   }
 
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
   // ========================= OPEN FORMS =========================
 
   void openForm1() {

@@ -45,12 +45,15 @@ class ComboMWilayahChangedEvent extends Calpar3FormEvents{
 
 	@override	List<Object> get props => [comboMWilayah];}
 
+<<<<<<< HEAD
 class ComboMJnscoverParChangedEvent extends Calpar3FormEvents{
 	final ComboMJnscoverParModel comboMJnscoverPar;
 	const ComboMJnscoverParChangedEvent({required this.comboMJnscoverPar});
 
 	@override	List<Object> get props => [comboMJnscoverPar];}
 
+=======
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 class ComboMKabZonaGempaChangedEvent extends Calpar3FormEvents{
 	final ComboMKabZonaGempaModel comboMKabZonaGempa;
 	const ComboMKabZonaGempaChangedEvent({required this.comboMKabZonaGempa});

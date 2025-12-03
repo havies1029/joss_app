@@ -23,6 +23,10 @@ class _AssetManagementPageState extends State<AssetManagementPage>
 
   final _formKey = GlobalKey<FormState>();
 
+  void onTambahData() {
+    debugPrint("🔥 Tambah data ditekan");
+    // nanti lu isi navigasi, popup, atau logic tambah data
+  }
 
   @override
   void initState() {
@@ -63,6 +67,7 @@ class _AssetManagementPageState extends State<AssetManagementPage>
                 ),
               ),
             ),
+<<<<<<< HEAD
 
             // const DraggableBeliPolisButton(),
           Stack(
@@ -112,6 +117,14 @@ class _AssetManagementPageState extends State<AssetManagementPage>
             ],
           ),
         ],
+=======
+            // FloatingMenuMasterWidget(
+            //   onTambah: onTambahData,
+            // ),
+            // const DraggableBeliPolisButton(),
+            // const MenuPolisCircular(),
+          ],
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
         ),
       ),
     );

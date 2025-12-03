@@ -11,7 +11,11 @@ import 'package:joss_app/repositories/calpar/calpar1crud_repository.dart';
 part 'calpar1crud_event.dart';
 part 'calpar1crud_state.dart';
 
+<<<<<<< HEAD
 class 	Calpar1CrudBloc extends Bloc<Calpar1CrudEvents, Calpar1CrudState> {
+=======
+class Calpar1CrudBloc extends Bloc<Calpar1CrudEvents, Calpar1CrudState> {
+>>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	final Calpar1CrudRepository repository;
 	Calpar1CrudBloc({required this.repository}) : super(const Calpar1CrudState()) {
 		on<Calpar1CrudUbahEvent>(onUbahCalpar1Crud);
