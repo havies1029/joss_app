@@ -1,7 +1,11 @@
 
 class AsetParCariModel {
-	String alamat;
 	String asetParId;
+	String tertanggung;
+	String alamat;
+	String periodeMulai;
+	String periodeAkhir;
+	String periode;
 	String curr;
 	String klausulaBank;
 	String mrekanId;
@@ -11,7 +15,13 @@ class AsetParCariModel {
 	String status;
 	double sumInsured;
 
-	AsetParCariModel({required this.alamat, required this.asetParId, 
+	AsetParCariModel({
+		required this.asetParId,
+		required this.tertanggung,
+		required this.alamat,
+		required this.periodeMulai,
+		required this.periodeAkhir,
+		required this.periode,
 		required this.curr, 
 		required this.klausulaBank, required this.mrekanId, 
 		required this.nomor, 
@@ -20,8 +30,12 @@ class AsetParCariModel {
 
 	factory AsetParCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetParCariModel(
-			alamat: data['alamat']??'',
 			asetParId: data['asetParId']??'',
+			tertanggung: data['tertanggung']??'',
+			alamat: data['alamat']??'',
+			periodeMulai: data['periodeMulai']??'',
+			periodeAkhir: data['periodeAkhir']??'',
+			periode: data['periode']??'',
 			curr: data['curr']??'',
 			klausulaBank: data['klausulaBank']??'',
 			mrekanId: data['mrekanId']??'',
@@ -35,8 +49,13 @@ class AsetParCariModel {
 	}
 
 	Map<String, dynamic> toJson() =>
-		{'alamat': alamat,
+		{
 		'asetParId': asetParId,
+		'tertanggung': tertanggung,
+		'alamat': alamat,
+		'periodeMulai' : periodeMulai,
+		'periodeAkhir' : periodeAkhir,
+		'periode' : periode,
 		'curr': curr,
 		'klausulaBank': klausulaBank,
 		'mrekanId': mrekanId,

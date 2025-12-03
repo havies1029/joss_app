@@ -15,19 +15,19 @@ class Regmv3FormState extends Equatable {
 	final ComboMWarnaModel? comboMWarna;
 	final ComboMMvpakaiModel? comboMMvpakai;
 	const Regmv3FormState(
-		{this.record,
-		this.isLoading = false,
-		this.isLoaded = false,
-		this.isSaving = false,
-		this.isSaved = false,
-		this.hasFailure = false,
-		this.comboMWilayah,
-		this.comboMMvmerk,
-		this.comboMMvtipe,
-		this.comboMMvmodel,
-		this.comboMWarna,
-		this.comboMMvpakai,
-});
+			{this.record,
+				this.isLoading = false,
+				this.isLoaded = false,
+				this.isSaving = false,
+				this.isSaved = false,
+				this.hasFailure = false,
+				this.comboMWilayah,
+				this.comboMMvmerk,
+				this.comboMMvtipe,
+				this.comboMMvmodel,
+				this.comboMWarna,
+				this.comboMMvpakai,
+			});
 
 	Regmv3FormState copyWith({
 		Regmv3FormModel? record,
@@ -60,5 +60,5 @@ class Regmv3FormState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? ''];
 }

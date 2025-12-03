@@ -40,22 +40,24 @@ class AsetListHealth extends StatelessWidget {
         2: IntrinsicColumnWidth(),
         3: IntrinsicColumnWidth(),
         4: IntrinsicColumnWidth(),
-        5: IntrinsicColumnWidth(),
-        6: IntrinsicColumnWidth(),
+        // 5: IntrinsicColumnWidth(),
+        // 6: IntrinsicColumnWidth(),
       },
       headerCells: const [
         HeaderCell("No", center: true),
         HeaderCell("Nama"),
-        HeaderCell("Nomor Polis"),
-        HeaderCell("Posisi", center: true),
+        HeaderCell("Benefit"),
+        // HeaderCell("Nomor Polis"),
+        // HeaderCell("Posisi", center: true),
         HeaderCell("Status", center: true),
         HeaderCell("Aksi"),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         CellText("$rowNumber", center: true),
         CellText(item.nama),
-        CellText(item.polisNo),
-        CellText(item.posisi, center: true),
+        CellText(item.benefit),
+        // CellText(item.polisNo),
+        // CellText(item.posisi, center: true),
         CellText(item.status, center: true),
         Padding(
           padding: const EdgeInsets.all(6),
@@ -63,16 +65,16 @@ class AsetListHealth extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: getActionButtonsByStatus(
               item.status,
-              namaItem: item.polisNo,
+              namaItem: item.nama,
               context: context,
               itemData: item,
               onProcessTap: () async {
                 final bloc = context.read<AsetHealthCariBloc>();
-                debugPrint("🔍 [Lacak Polis] Request data untuk: ${item.polisNo}");
+                debugPrint("🔍 [Lacak Nama] Request data untuk: ${item.nama}");
 
                 bloc.add(
                   DebugFetchAsetHealthCariEvent(
-                    searchText: item.polisNo,
+                    searchText: item.nama,
                     statusId: '10001',
                   ),
                 );

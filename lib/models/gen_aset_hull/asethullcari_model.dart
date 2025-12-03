@@ -1,5 +1,6 @@
 
 class AsethullCariModel {
+	String tertanggung;
 	String asetHullId;
 	String curr;
 	String namaKapal;
@@ -8,13 +9,14 @@ class AsethullCariModel {
 	String status;
 	double tsi;
 
-	AsethullCariModel({required this.asetHullId, required this.curr, 
-		required this.namaKapal, required this.polisNo, 
-		required this.premi, required this.status, 
+	AsethullCariModel({required this.asetHullId, required this.tertanggung, required this.curr,
+		required this.namaKapal, required this.polisNo,
+		required this.premi, required this.status,
 		required this.tsi});
 
 	factory AsethullCariModel.fromJson(Map<String, dynamic> data) {
 		return AsethullCariModel(
+			tertanggung: data['tertanggung']??'',
 			asetHullId: data['asetHullId']??'',
 			curr: data['curr']??'',
 			namaKapal: data['namaKapal']??'',
@@ -27,7 +29,9 @@ class AsethullCariModel {
 	}
 
 	Map<String, dynamic> toJson() =>
-		{'asetHullId': asetHullId,
+		{
+		'tertanggung': tertanggung,
+		'asetHullId': asetHullId,
 		'curr': curr,
 		'namaKapal': namaKapal,
 		'polisNo': polisNo,

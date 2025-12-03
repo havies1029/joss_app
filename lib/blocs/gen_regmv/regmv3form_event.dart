@@ -73,5 +73,53 @@ class ComboMMvpakaiChangedEvent extends Regmv3FormEvents{
 	final ComboMMvpakaiModel comboMMvpakai;
 	const ComboMMvpakaiChangedEvent({required this.comboMMvpakai});
 
-	@override	List<Object> get props => [comboMMvpakai];}
+	@override	List<Object> get props => [comboMMvpakai];
+}
 
+class FieldThnBuatChangedEvent extends Regmv3FormEvents {
+	final String thnBuat;
+	const FieldThnBuatChangedEvent({required this.thnBuat});
+
+	@override
+	List<Object> get props => [thnBuat];
+}
+
+class FieldAksesorisChangedEvent extends Regmv3FormEvents {
+	final String aksesoris;
+	const FieldAksesorisChangedEvent({required this.aksesoris});
+
+	@override
+	List<Object> get props => [aksesoris];
+}
+
+class FieldHargaChangedEvent extends Regmv3FormEvents {
+	final String harga;
+	const FieldHargaChangedEvent({required this.harga});
+
+	@override
+	List<Object> get props => [harga];
+}
+
+class FieldMesinNoChangedEvent extends Regmv3FormEvents {
+	final String mesinNo;
+	const FieldMesinNoChangedEvent({required this.mesinNo});
+
+	@override
+	List<Object> get props => [mesinNo];
+}
+
+class FieldPlatNoChangedEvent extends Regmv3FormEvents {
+	final String platNo;
+	const FieldPlatNoChangedEvent({required this.platNo});
+
+	@override
+	List<Object> get props => [platNo];
+}
+
+class FieldRangkaNoChangedEvent extends Regmv3FormEvents {
+	final String rangkaNo;
+	const FieldRangkaNoChangedEvent({required this.rangkaNo});
+
+	@override
+	List<Object> get props => [rangkaNo];
+}

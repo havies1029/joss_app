@@ -31,3 +31,12 @@ class UbahCalmv1ListEvent extends Calmv1ListEvents {
 class TambahCalmv1ListEvent extends Calmv1ListEvents{}
 class HapusCalmv1ListEvent extends Calmv1ListEvents{}
 class CloseDialogCalmv1ListEvent extends Calmv1ListEvents{}
+
+class CalMv2RegMvEvent extends Calmv1ListEvents {
+	final String calmv1Id;
+
+	const CalMv2RegMvEvent({required this.calmv1Id});
+
+	@override
+	List<Object> get props => [calmv1Id];
+}

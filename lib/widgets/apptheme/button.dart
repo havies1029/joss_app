@@ -213,10 +213,11 @@ class AppButton extends StatefulWidget {
     double? elevation,
     EdgeInsets? padding,
     TextStyle? textStyle,
-    double iconTextSpacing = 4.0,
+    double iconTextSpacing = 8.0,
     bool isLoading = false,
     bool hasAnimation = true,
     bool isOutlined = false,
+    BorderSide? borderSide,
   }) {
     return AppButton(
       text: text,
@@ -234,6 +235,7 @@ class AppButton extends StatefulWidget {
       isLoading: isLoading,
       hasAnimation: hasAnimation,
       isOutlined: isOutlined,
+      borderSide: borderSide,
       layoutType: ButtonLayoutType.iconTop,
     );
   }

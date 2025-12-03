@@ -68,6 +68,8 @@ RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
 /// Color Palette
 const Color primaryColor = Color(0xFFEF7A28);
 const Color primaryLightColor = Color(0xFFF7F7F7);
+  const Color labelLightColor = Color(0xFF5E5E5E);
+
 
 const Color primaryBlackColor = Color(0xFF121212);
 const Color secondaryBlackColor = Color(0xFF181818);
@@ -88,6 +90,45 @@ const Color pDarkRed = Color(0xFFDC1C1C);
 
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
+
+// 🔥 Direct LinearGradients (Light → Dark, top → bottom)
+
+const LinearGradient yellowGradient = LinearGradient(
+  colors: [Color(0xFFFFCA46), Color(0xFFD59900)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+const LinearGradient blueGradient = LinearGradient(
+  colors: [Color(0xFF61C8FF), Color(0xFF0486CD)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+const LinearGradient cyanGradient = LinearGradient(
+  colors: [Color(0xFF48E0FF), Color(0xFF02B1D5)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+const LinearGradient purpleGradient = LinearGradient(
+  colors: [Color(0xFF9B82FF), Color(0xFF533BB6)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+const LinearGradient redGradient = LinearGradient(
+  colors: [Color(0xFFFF393D), Color(0xFFAC0A0D)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+const LinearGradient greenGradient = LinearGradient(
+  colors: [Color(0xFF42EF48), Color(0xFF05AD0A)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
 
 /// Padding & Spacing
 const double hPadding = 10.0;

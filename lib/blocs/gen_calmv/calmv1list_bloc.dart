@@ -16,6 +16,7 @@ class Calmv1ListBloc extends Bloc<Calmv1ListEvents, Calmv1ListState> {
 		on<TambahCalmv1ListEvent>(onTambahCalmv1List);
 		on<HapusCalmv1ListEvent>(onHapusCalmv1List);
 		on<CloseDialogCalmv1ListEvent>(onCloseDialogCalmv1List);
+		on<CalMv2RegMvEvent>(onCalMv2RegMv);
 	}
 
 	Future<void> onRefreshCalmv1List(
@@ -34,10 +35,10 @@ class Calmv1ListBloc extends Bloc<Calmv1ListEvents, Calmv1ListState> {
 		if (state.status == ListStatus.initial) {
 			List<Calmv1ListModel> items = await repo.getCalmv1List(state.searchText, 0);
 			return emit(state.copyWith(
-				items: items,
-				hasReachedMax: false,
-				status: ListStatus.success,
-				hal: 1));
+					items: items,
+					hasReachedMax: false,
+					status: ListStatus.success,
+					hal: 1));
 		}
 		List<Calmv1ListModel> items = await repo.getCalmv1List(state.searchText, state.hal);
 		if (items.isEmpty) {
@@ -46,40 +47,54 @@ class Calmv1ListBloc extends Bloc<Calmv1ListEvents, Calmv1ListState> {
 			List<Calmv1ListModel> calmv1List = List.of(state.items)..addAll(items);
 
 			final result = calmv1List
-				.whereWithIndex((e, index) =>
-					calmv1List.indexWhere((e2) => e2.calmv1Id == e.calmv1Id) ==
+					.whereWithIndex((e, index) =>
+			calmv1List.indexWhere((e2) => e2.calmv1Id == e.calmv1Id) ==
 					index)
-				.toList();
+					.toList();
 
 			return emit(state.copyWith(
-				items: result,
-				hasReachedMax: false,
-				status: ListStatus.success,
-				hal: state.hal + 1));
+					items: result,
+					hasReachedMax: false,
+					status: ListStatus.success,
+					hal: state.hal + 1));
 		}
 	}
 
 	Future<void> onHapusCalmv1List(
-		HapusCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
+			HapusCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "hapus"));
 	}
 
 	Future<void> onCloseDialogCalmv1List(
-		CloseDialogCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
+			CloseDialogCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 	}
 
 	Future<void> onTambahCalmv1List(
-		TambahCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
+			TambahCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "tambah"));
 	}
 
 	Future<void> onUbahCalmv1List(
-		UbahCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
+			UbahCalmv1ListEvent event, Emitter<Calmv1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "ubah", recordId: event.recordId));
 	}
+
+	Future<void> onCalMv2RegMv(
+			CalMv2RegMvEvent event, Emitter<Calmv1ListState> emit) async {
+		emit(state.copyWith(isProcessing: true, isProcessed: false));
+		Calmv1ListRepository repo = Calmv1ListRepository();
+		final result = await repo.calmv2Regmv(event.calmv1Id);
+		bool hasFailure = !result.success;
+		emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: true,
+				hasFailure: hasFailure,
+				processMessage: result.data.toString()));
+	}
+
 
 }

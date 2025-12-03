@@ -41,6 +41,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
   final _regmvform2key = GlobalKey<FormState>();
 
   late final Regmv2FormBloc regmv2Bloc;
+  bool _isPayloadInjected = false;
 
 
   final fieldAwController = TextEditingController();
@@ -64,12 +65,18 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
   ComboMMvjnscoverModel? fieldComboMMvjnscover;
 
   DateTime? kejadianMulaiTgl;
-  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-
   DateTime? kejadianBerakhirTgl;
-  final _years = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  final DateTime _today = DateTime.now();
 
   String selectedPassengerCount = "";
+
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      debugPrint("🔥 Form2 dibuka parent → trigger lihat event ${widget.recordId}");
+      regmv2Bloc.add(Regmv2FormLihatEvent(recordId: widget.regmv1Id!));
+    }
+  }
 
   @override
   void initState() {
@@ -80,7 +87,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
 
   void _loadData() {
     if (widget.viewMode == "ubah" && widget.recordId != null) {
-      regmv2Bloc.add(Regmv2FormLihatEvent(recordId: widget.recordId!));
+      regmv2Bloc.add(Regmv2FormLihatEvent(recordId: widget.regmv1Id!));
     }
   }
 
@@ -136,100 +143,100 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
   }
 
   Widget _buildForm() {
-    return BlocBuilder<Regmv2FormBloc, Regmv2FormState>(
-      buildWhen: (prev, curr) => curr.isLoaded == true,
-      builder: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          _injectPayload(state.record!);
-        }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<Regmv2FormBloc, Regmv2FormState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
+          listener: (context, state) {
+            _injectPayload(state.record!);
+            _isPayloadInjected = true;
+          },
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+        child: Form(
+          key: _regmvform2key,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Flexible(child: buildFieldPolisMulai()),
+                  const SizedBox(width: 8),
+                  Flexible(child: buildFieldPolisBerakhir()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-        return Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-          child: Form(
-            key: _regmvform2key,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Flexible(child: buildFieldPolisMulai()),
-                    const SizedBox(width: 8),
-                    Flexible(child: buildFieldPolisBerakhir()),
-                  ],
-                ),
-                const SizedBox(height: 12),
+              Row(
+                children: [
+                  Flexible(child: _buildComboCurddId()),
+                  const SizedBox(width: 8),
+                  const Flexible(child: SizedBox.shrink()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-                Row(
-                  children: [
-                    Flexible(child: _buildComboCurddId()),
-                    const SizedBox(width: 8),
-                    const Flexible(child: SizedBox.shrink()),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _buildComboMMvjnscover(),
+              _buildComboMMvjnscover(),
+              const SizedBox(height: 12),
 
-                const SizedBox(height: 12),
+              Row(
+                children: [
+                  Flexible(child: _buildFieldIsEq()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildFieldIsFlood()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldIsEq()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildFieldIsFlood()),
-                  ],
-                ),
-                const SizedBox(height: 12),
+              Row(
+                children: [
+                  Flexible(child: _buildFieldIsSrcc()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildFieldIsTerrorism()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldIsSrcc()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildFieldIsTerrorism()),
-                  ],
-                ),
-                const SizedBox(height: 12),
+              Row(
+                children: [
+                  Flexible(child: _buildFieldIsTbod()),
+                  const Flexible(child: SizedBox.shrink()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldIsTbod()),
-                    const Flexible(child: SizedBox.shrink()),
-                  ],
-                ),
+              Row(
+                children: [
+                  Flexible(child: _buildFieldPLL()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildFieldTPL()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-                const SizedBox(height: 12),
+              Row(
+                children: [
+                  Flexible(child: _buildFieldPAD()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildFieldPAP()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldPLL()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildFieldTPL()),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldPAD()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildFieldPAP()),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldPassengerCountCombo()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildFieldAW()),
-                  ],
-                ),
-
-
-                const SizedBox(height: 15),
-              ],
-            ),
+              Row(
+                children: [
+                  Flexible(child: _buildFieldPassengerCountCombo()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildFieldAW()),
+                ],
+              ),
+              const SizedBox(height: 15),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -238,7 +245,6 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
 
     // Text Controllers
     fieldAwController.text = record.aw.toString();
-    fieldCoverLamaController.text = record.coverLama.toString();
 
     fieldIsEqController.text = record.isEq.toString();
     fieldIsFloodController.text = record.isFlood.toString();
@@ -274,7 +280,6 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
   Future<void> saveForm2() async {
     final record = Regmv2FormModel(
       aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
-      coverLama: int.parse(fieldCoverLamaController.text),
       currId: fieldComboRMatauang?.rmatauangKode,
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
@@ -284,13 +289,13 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
       pad: double.tryParse(fieldPadController.text.replaceAll(',', ''))  ?? 0,
       pap: double.tryParse(fieldPapController.text.replaceAll(',', ''))  ?? 0,
-      passangerCount: int.parse(selectedPassengerCount) ?? 0,
+      passangerCount: int.tryParse(selectedPassengerCount ?? '') ?? 0,
       pll: double.tryParse(fieldPllController.text.replaceAll(',', ''))  ?? 0,
-      polisMulai: kejadianMulaiTgl!,
-      polisAkhir: kejadianBerakhirTgl!,
-      regmv2Id: widget.recordId ?? "",
+      polisMulai: kejadianMulaiTgl ?? DateTime.now(),
+      polisAkhir: kejadianBerakhirTgl ?? DateTime.now().add(Duration(days: 365)),
+      regmv2Id: widget.regmv1Id ?? "",
       tpl: double.tryParse(fieldTplController.text.replaceAll(',', '')) ?? 0,
-      regmv1Id: widget.regmv1Id ?? "",
+        regmv1Id: widget.regmv1Id ?? "",
     );
 
     if (widget.viewMode == "tambah") {
@@ -308,23 +313,17 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     return AppDateField(
       label: 'Tanggal Mulai',
       initialValue: kejadianMulaiTgl ?? _today,
-      firstDate: DateTime(2000, 1, 1),
-      lastDate: (kejadianMulaiTgl != null && kejadianMulaiTgl!.isAfter(_today))
-          ? kejadianMulaiTgl!
-          : _today,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
       validator: (dt) => (dt == null) ? kStringNullError : null,
-      onChanged: (dt) => setState(() {
-        kejadianMulaiTgl = dt != null ? DateTime(dt.year, dt.month, dt.day) : null;
-
-        if (kejadianMulaiTgl != null) {
-          kejadianBerakhirTgl = DateTime(
-            kejadianMulaiTgl!.year + 1,
-            kejadianMulaiTgl!.month,
-            kejadianMulaiTgl!.day,
-          );
-        }
-      }),
-
+      onChanged: (dt) {
+        setState(() {
+          kejadianMulaiTgl = dt;
+          kejadianBerakhirTgl = dt != null
+              ? DateTime(dt.year + 1, dt.month, dt.day)
+              : null;
+        });
+      },
     );
   }
 
@@ -332,11 +331,11 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     return AppDateField(
       label: 'Tanggal Berakhir',
       enabled: false,
-      initialValue: kejadianBerakhirTgl ?? _years,
-      firstDate: DateTime(2000, 1, 1),
-      lastDate: DateTime(2100, 1, 1),
+      initialValue: kejadianBerakhirTgl ?? (_today.add(const Duration(days: 365))),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
       validator: (dt) => (dt == null) ? kStringNullError : null,
-      onChanged: (_) {}, // tidak dipakai lagi
+      onChanged: (_) {},
     );
   }
 

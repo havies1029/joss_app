@@ -1,5 +1,8 @@
 
 class AsetMvCariModel {
+	String tertanggung;
+	String periode;
+
 	String asetMvId;
 	String curr;
 	String jenisMv;
@@ -14,7 +17,7 @@ class AsetMvCariModel {
 	String status;
 
 
-	AsetMvCariModel({required this.asetMvId, required this.curr, 
+	AsetMvCariModel({required this.asetMvId,required this.tertanggung,required this.periode, required this.curr,
 		required this.jenisMv, required this.merk, 
 		required this.noPolisi, required this.nomor, 
 		required this.polisNo, required this.premi, 
@@ -24,6 +27,8 @@ class AsetMvCariModel {
 	factory AsetMvCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetMvCariModel(
 			asetMvId: data['asetMvId']??'',
+			tertanggung: data['tertanggung']??'',
+			periode: data['periode']??'',
 			curr: data['curr']??'',
 			jenisMv: data['jenisMv']??'',
 			merk: data['merk']??'',
@@ -41,6 +46,8 @@ class AsetMvCariModel {
 
 	Map<String, dynamic> toJson() =>
 		{'asetMvId': asetMvId,
+		'tertanggung': tertanggung,
+		'periode': periode,
 		'curr': curr,
 		'jenisMv': jenisMv,
 		'merk': merk,

@@ -16,7 +16,9 @@ import 'package:joss_app/repositories/combobox/combommvjnscover_repository.dart'
 import 'package:joss_app/repositories/combobox/combomwilayah_repository.dart';
 
 
+import '../../../../models/combobox/combommvpakai_model.dart';
 import '../../../../models/combobox/combormatauang_model.dart';
+import '../../../../repositories/combobox/combommvpakai_repository.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
 
 
@@ -50,6 +52,8 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
   ComboMMvjnscoverModel? fieldComboMMvjnscover;
   ComboMWilayahModel? fieldComboMWilayah;
   ComboRMatauangModel? fieldComboUang;
+  ComboMMvpakaiModel? fieldComboMMvpakai;
+  // final comboMMvpakaiKey = GlobalKey<DropdownSearchState<ComboMMvpakaiModel>>();
 
   String selectedYear = "";
 
@@ -136,7 +140,13 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _buildComboMWilayah(),
+                Row(
+                  children: [
+                    Flexible(child: _buildFieldMmvpakaiId()),
+                    const SizedBox(width: 8),
+                    Flexible(child: _buildComboMWilayah()),
+                  ],
+                ),
                 const SizedBox(height: 15),
               ],
             ),
@@ -183,6 +193,7 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
       thnBuat: int.tryParse(selectedYear) ?? 0,
       mmvgrupojkId: fieldComboMMvgrupOjk?.mmvgrupojkId,
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
+      mmvpakaiId: fieldComboMMvpakai?.mmvpakaiId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
     );
 
@@ -241,6 +252,17 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     onSaveCallback: (value) => fieldComboUang = value,
   );
 
+  Widget _buildFieldMmvpakaiId() => ReusableComboBox<ComboMMvpakaiModel>(
+    hintText: "Penggunaan",
+    initItem: fieldComboMMvpakai,
+    dataLoader: () => ComboMMvpakaiRepository().getComboMMvpakai(),
+    displayText: (item) => item.pakaiNama,
+    compareItems: (a, b) => a.mmvpakaiId == b.mmvpakaiId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) => fieldComboMMvpakai = v,
+    onSaveCallback: (value) => fieldComboMMvpakai = value,
+  );
+
   Widget buildFieldComboTahun() {
     // Buat list tahun dari sekarang → 1980
     final yearNow = DateTime.now().year;
@@ -290,5 +312,7 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
       return null;
     },
   );
+
+
 
 }

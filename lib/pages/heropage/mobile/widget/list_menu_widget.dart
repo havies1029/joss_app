@@ -7,6 +7,8 @@ import 'package:joss_app/pages/gen_regmv/mobile/regmv_main_page.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
+import '../../../calpar/mobile/calpar_form/calpar_form3.dart';
+import '../../../calpar/mobile/calpar_main_page.dart';
 import '../../../gen_calmv/calmv1crud_form.dart';
 import '../../../gen_calmv/calmv1list_main.dart';
 import '../../../gen_calmv/calmv2form_form.dart';
@@ -22,6 +24,8 @@ import '../../../register/mobile/client/register_client_page.dart';
 
 
 import 'package:confetti/confetti.dart';
+
+import '../../../regpar/mobile/regpar_main_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String custType;
@@ -335,7 +339,7 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => RegmvFormMain(viewMode: 'tambah', recordId: '',)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvFormMain(viewMode: 'tambah', recordId: '',)));
         break;
 
       case 'Klaim':

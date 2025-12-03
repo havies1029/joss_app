@@ -18,7 +18,7 @@ class Calmv1CrudRepository {
 	Future<Calmv1CrudModel> calmv1CrudLihat(String calmv1Id) async {
 		return await api.calmv1CrudLihatAPI(calmv1Id);
 	}
-	Future<bool> calmMvToRegMv(String calmv1Id) async {
+	Future<ReturnDataAPI> calmMvToRegMv(String calmv1Id) async {
 		return await api.calmMvToRegMvAPI(calmv1Id);
 	}
 }

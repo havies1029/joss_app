@@ -35,9 +35,7 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
       vsync: this,
     );
 
-    // Ambil data COB
     _cobFuture = ComboCobListRepository().getComboCobList().then((list) {
-      // cari COB default dengan ID 10001
       final defaultCob = list.firstWhere(
             (e) => e.mCobApp1Id.toString() == "10001",
         orElse: () => list.isNotEmpty
@@ -51,7 +49,7 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
         });
 
         if (defaultCob.mCobApp1Id != "0") {
-          _fetchDashboard(defaultCob.mCobApp1Id); // langsung fetch dashboard
+          _fetchDashboard(defaultCob.mCobApp1Id);
         }
       }
 
@@ -123,46 +121,6 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
 
             const SizedBox(height: hPadding),
 
-            // // tampilkan loading / hasil dashboard
-            // if (_loadingDashboard)
-            //   const Center(child: CircularProgressIndicator())
-            // else if (_dashboard != null && _dashboard!.isNotEmpty)
-            //   Padding(
-            //     padding: const EdgeInsets.symmetric(horizontal: hPadding),
-            //     child: Row(
-            //       children: [
-            //         _buildStatusBox(
-            //           assetPath: "assets/icons/correct.svg",
-            //           value: _dashboard!.first.aktifQty,
-            //           bgColor: Colors.green,
-            //         ),
-            //         const SizedBox(width: vPadding), // jarak antar box
-            //         _buildStatusBox(
-            //           assetPath: "assets/icons/clock.svg",
-            //           value: _dashboard!.first.berakhirQty,
-            //           bgColor: Colors.orange,
-            //         ),
-            //         const SizedBox(width: vPadding),
-            //         _buildStatusBox(
-            //           assetPath: "assets/icons/exit.svg",
-            //           value: _dashboard!.first.nonAktifQty,
-            //           bgColor: Colors.red,
-            //         ),
-            //         const SizedBox(width: vPadding),
-            //         _buildStatusBox(
-            //           assetPath: "assets/icons/calender.svg",
-            //           value: _dashboard!.first.onProgressQty,
-            //           bgColor: Colors.blue,
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            //
-            // const SizedBox(height: vPadding),
-            // BaseTableAsetWidget(
-            //   cobId: _formData['cobId'],
-            //   cobNama: _formData['cobNama'],
-            // ),
             BaseTableAsetWidget(
               cobId: _selectedCob?.mCobApp1Id,
               cobNama: _selectedCob?.cobNama,

@@ -75,34 +75,26 @@ class Regmv2FormBloc extends Bloc<Regmv2FormEvents, Regmv2FormState> {
 	}
 
 	Future<void> onLihatRegmv2Form(
-		Regmv2FormLihatEvent event, Emitter<Regmv2FormState> emit) async {
+			Regmv2FormLihatEvent event, Emitter<Regmv2FormState> emit) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Regmv2FormModel record = await repository.regmv2FormLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+		emit(state.copyWith(isLoading: false, isLoaded: true, record: record, comboMMvjnscover: record.comboMMvjnscover, comboRMatauang: record.comboRMatauang));
 	}
 
 	Future<void> onComboMMvjnscoverChanged(
 			ComboMMvjnscoverChangedEvent event, Emitter<Regmv2FormState> emit) async {
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-
 		ComboMMvjnscoverModel comboMMvjnscover = event.comboMMvjnscover;
 		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMMvjnscover: comboMMvjnscover));
+				comboMMvjnscover: comboMMvjnscover));
 	}
 
 	Future<void> onComboRMatauangChanged(
 			ComboRMatauangChangedEvent event, Emitter<Regmv2FormState> emit) async {
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-
 		ComboRMatauangModel comboRMatauang = event.comboRMatauang;
 		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboRMatauang: comboRMatauang));
+				comboRMatauang: comboRMatauang));
 	}
 
 }

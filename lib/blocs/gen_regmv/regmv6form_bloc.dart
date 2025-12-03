@@ -15,7 +15,7 @@ class Regmv6FormBloc extends Bloc<Regmv6FormEvents, Regmv6FormState> {
 		on<Regmv6FormTambahEvent>(onTambahRegmv6Form);
 		on<Regmv6FormHapusEvent>(onHapusRegmv6Form);
 		on<Regmv6FormLihatEvent>(onLihatRegmv6Form);
-		on<CalPremiRegMvEvent>(onCalPremiRegMv);
+		on<Regmv6FormHitungPremiEvent>(onHitungPremiRegmv6Form);
 	}
 
 	Future<void> onTambahRegmv6Form(
@@ -53,17 +53,11 @@ class Regmv6FormBloc extends Bloc<Regmv6FormEvents, Regmv6FormState> {
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
 	}
 
-	Future<void> onCalPremiRegMv(
-			CalPremiRegMvEvent event, Emitter<Regmv6FormState> emit) async {
-		debugPrint("[Regmv6FormBloc] onCalPremiRegMv -> regmv1Id=${event.regmv1Id}");
-		emit(state.copyWith(isLoading: true, isLoaded: false, hasFailure: false));
-		try {
-			final record = await repository.calPremiRegMv(event.regmv1Id);
-			debugPrint("[Regmv6FormBloc] onCalPremiRegMv sukses, premiNet=${record.premiNet}");
-			emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
-		} catch (e) {
-			debugPrint("[Regmv6FormBloc] onCalPremiRegMv ERROR: $e");
-			emit(state.copyWith(isLoading: false, isLoaded: false, hasFailure: true));
-		}
+	Future<void> onHitungPremiRegmv6Form(
+			Regmv6FormHitungPremiEvent event, Emitter<Regmv6FormState> emit) async {
+		emit(state.copyWith(isCalculating: true, isCalculated: false));
+		Regmv6FormModel record = await repository.regmv6FormHitungPremi(event.regmv1Id);
+		emit(state.copyWith(isCalculating: false, isCalculated: true, record: record));
 	}
+
 }

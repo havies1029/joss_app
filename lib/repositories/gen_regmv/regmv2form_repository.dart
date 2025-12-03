@@ -12,10 +12,10 @@ class Regmv2FormRepository {
 	Future<bool> regmv2FormUbah(Regmv2FormModel record) async {
 		return await api.regmv2FormUbahAPI(record);
 	}
-	Future<bool> regmv2FormHapus(String regmv2Id) async {
-		return await api.regmv2FormHapusAPI(regmv2Id);
+	Future<bool> regmv2FormHapus(String regmv1Id) async {
+		return await api.regmv2FormHapusAPI(regmv1Id);
 	}
-	Future<Regmv2FormModel> regmv2FormLihat(String regmv2Id) async {
-		return await api.regmv2FormLihatAPI(regmv2Id);
+	Future<Regmv2FormModel> regmv2FormLihat(String regmv1Id) async {
+		return await api.regmv2FormLihatAPI(regmv1Id);
 	}
 }

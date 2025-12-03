@@ -23,6 +23,10 @@ import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.d
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
+import 'package:joss_app/repositories/calpar/calpar1crud_repository.dart';
+import 'package:joss_app/repositories/calpar/calpar2form_repository.dart';
+import 'package:joss_app/repositories/calpar/calpar3form_repository.dart';
+import 'package:joss_app/repositories/calpar/calpar4form_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv1crud_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv2form_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv3form_repository.dart';
@@ -44,8 +48,16 @@ import 'package:joss_app/repositories/gen_regmv/regmv3form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv4form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv5form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv6form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_acc_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_mobil_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv_upload_stnk_repository.dart';
 import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
 import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
@@ -80,6 +92,11 @@ import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'blocs/calpar/calpar1crud_bloc.dart';
+import 'blocs/calpar/calpar1list_bloc.dart';
+import 'blocs/calpar/calpar2form_bloc.dart';
+import 'blocs/calpar/calpar3form_bloc.dart';
+import 'blocs/calpar/calpar4form_bloc.dart';
 import 'blocs/gallery/galleryeventcari_bloc.dart';
 
 import 'blocs/gallery/gallerymembercari_bloc.dart';
@@ -112,6 +129,9 @@ import 'blocs/gen_regmv/regmv3form_bloc.dart';
 import 'blocs/gen_regmv/regmv4form_bloc.dart';
 import 'blocs/gen_regmv/regmv5form_bloc.dart';
 import 'blocs/gen_regmv/regmv6form_bloc.dart';
+import 'blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
+import 'blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
+import 'blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
 import 'blocs/gen_sppamv/sppamvcrud_bloc.dart';
 import 'blocs/gen_sppamv/sppamvlist_bloc.dart';
 import 'blocs/gen_sppapar/sppaparcrud_bloc.dart';
@@ -124,8 +144,18 @@ import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
+import 'blocs/regpar/regpar1crud_bloc.dart';
+import 'blocs/regpar/regpar1list_bloc.dart';
+import 'blocs/regpar/regpar2form_bloc.dart';
+import 'blocs/regpar/regpar3form_bloc.dart';
+import 'blocs/regpar/regpar4form_bloc.dart';
+import 'blocs/regpar/regpar5form_bloc.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
+import 'blocs/share_cubit/share_health_state_cubit.dart';
+import 'blocs/share_cubit/share_hull_state_cubit.dart';
+import 'blocs/share_cubit/share_mv_state_cubit.dart';
+import 'blocs/share_cubit/share_par_state_cubit.dart';
 import 'blocs/simulmv/simulmvcrud_bloc.dart';
 import 'blocs/simulpar/simulparcrud_bloc.dart';
 import 'blocs/hasil_simul_par_cubit/hasil_simul_par_cubit.dart';
@@ -210,6 +240,11 @@ Future<void> main() async {
         ),
         BlocProvider(create: (_) => UserProfileCubit()), // hydrated
         BlocProvider(create: (_) => ShareRingkasanStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareParStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareMvStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareHealthStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareHullStateCubit()), // hydrated
+
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
 
@@ -288,7 +323,24 @@ Future<void> main() async {
         BlocProvider(create:(context) => Regmv4FormBloc(repository: Regmv4FormRepository())),
         BlocProvider(create:(context) => Regmv5FormBloc(repository: Regmv5FormRepository())),
         BlocProvider(create:(context) => Regmv6FormBloc(repository: Regmv6FormRepository())),
+
+        BlocProvider(create:(context) => Regpar1ListBloc()),
+        BlocProvider(create:(context) => Regpar1CrudBloc(repository: Regpar1CrudRepository())),
+        BlocProvider(create:(context) => Regpar2FormBloc(repository: Regpar2FormRepository())),
+        BlocProvider(create:(context) => Regpar3FormBloc(repository: Regpar3FormRepository())),
+        BlocProvider(create:(context) => Regpar4FormBloc(repository: Regpar4FormRepository())),
+        BlocProvider(create:(context) => Regpar5FormBloc(repository: Regpar5FormRepository())),
+
         BlocProvider(create: (context) => SppamvCrudBloc(repository: SppamvCrudRepository())),
+        BlocProvider(create: (_) => Calpar3FormBloc(repository: Calpar3FormRepository())),
+        BlocProvider(create: (_) => Calpar4FormBloc(repository: Calpar4FormRepository())),
+        BlocProvider(create: (_) => Calpar2FormBloc(repository: Calpar2FormRepository())),
+        BlocProvider(create: (_) => Calpar1CrudBloc(repository: Calpar1CrudRepository())),
+        BlocProvider(create: (_) => Calpar1ListBloc()),
+
+        BlocProvider(create: (context) => RegmvUploadStnkBloc(repository: RegmvUploadStnkRepository())),
+        BlocProvider(create: (context) => RegmvUploadFotoMobilBloc(repository: RegmvUploadFotoMobilRepository())),
+        BlocProvider(create: (context) => RegmvUploadFotoAccBloc(repository: RegmvUploadFotoAccRepository())),
       ],
       child: MultiBlocListener(
         listeners: [

@@ -27,6 +27,12 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 		on<ComboMMvmodelChangedEvent>(onComboMMvmodelChanged);
 		on<ComboMWarnaChangedEvent>(onComboMWarnaChanged);
 		on<ComboMMvpakaiChangedEvent>(onComboMMvpakaiChanged);
+		on<FieldThnBuatChangedEvent>(onFieldThnBuatChanged);
+		on<FieldAksesorisChangedEvent>(onFieldAksesorisChanged);
+		on<FieldHargaChangedEvent>(onFieldHargaChanged);
+		on<FieldMesinNoChangedEvent>(onFieldMesinNoChanged);
+		on<FieldPlatNoChangedEvent>(onFieldPlatNoChanged);
+		on<FieldRangkaNoChangedEvent>(onFieldRangkaNoChanged);
 	}
 
 	Future<void> onTambahRegmv3Form(
@@ -159,6 +165,68 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 			isLoading: false,
 			isLoaded: true,
 			comboMMvpakai: comboMMvpakai));
+	}
+
+	Future<void> onFieldThnBuatChanged(
+			FieldThnBuatChangedEvent event, Emitter<Regmv3FormState> emit) async {
+
+		Regmv3FormModel? record = state.record;
+		int thnBuat = int.tryParse(event.thnBuat) ?? 0;
+		record = record?.copyWith(thnBuat: thnBuat);
+
+		emit(state.copyWith(
+				record: record));
+	}
+
+	Future<void> onFieldAksesorisChanged(
+			FieldAksesorisChangedEvent event, Emitter<Regmv3FormState> emit) async {
+
+		Regmv3FormModel? record = state.record;
+		record = record?.copyWith(aksesoris: event.aksesoris);
+
+		emit(state.copyWith(
+				record: record));
+	}
+
+	Future<void> onFieldHargaChanged(
+			FieldHargaChangedEvent event, Emitter<Regmv3FormState> emit) async {
+
+		Regmv3FormModel? record = state.record;
+		double harga = double.tryParse(event.harga) ?? 0.0;
+		record = record?.copyWith(harga: harga);
+
+		emit(state.copyWith(
+				record: record));
+	}
+
+	Future<void> onFieldMesinNoChanged(
+			FieldMesinNoChangedEvent event, Emitter<Regmv3FormState> emit) async {
+
+		Regmv3FormModel? record = state.record;
+		record = record?.copyWith(mesinNo: event.mesinNo);
+
+		emit(state.copyWith(
+				record: record));
+	}
+
+	Future<void> onFieldPlatNoChanged(
+			FieldPlatNoChangedEvent event, Emitter<Regmv3FormState> emit) async {
+
+		Regmv3FormModel? record = state.record;
+		record = record?.copyWith(platNo: event.platNo);
+
+		emit(state.copyWith(
+				record: record));
+	}
+
+	Future<void> onFieldRangkaNoChanged(
+			FieldRangkaNoChangedEvent event, Emitter<Regmv3FormState> emit) async {
+
+		Regmv3FormModel? record = state.record;
+		record = record?.copyWith(rangkaNo: event.rangkaNo);
+
+		emit(state.copyWith(
+				record: record));
 	}
 
 }

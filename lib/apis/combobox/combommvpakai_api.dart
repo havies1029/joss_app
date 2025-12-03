@@ -5,11 +5,10 @@ import 'package:joss_app/models/combobox/combommvpakai_model.dart';
 
 class ComboMMvpakaiAPI {
 
-	Future<List<ComboMMvpakaiModel>> getComboMMvpakaiAPI(String filter) async {
+	Future<List<ComboMMvpakaiModel>> getComboMMvpakaiAPI() async {
 		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mmvpakaicombobox/getlist";
 
-		Map<String, String> queryParams = {"filter": filter};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
+		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
@@ -19,8 +18,8 @@ class ComboMMvpakaiAPI {
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-				.map<ComboMMvpakaiModel>((json) => ComboMMvpakaiModel.fromJson(json))
-				.toList();
+					.map<ComboMMvpakaiModel>((json) => ComboMMvpakaiModel.fromJson(json))
+					.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}

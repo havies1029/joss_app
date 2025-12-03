@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../blocs/gen_calmv/calmv1crud_bloc.dart';
+import '../../../blocs/gen_calmv/calmv1list_bloc.dart';
 import '../../../blocs/gen_calmv/calmv2form_bloc.dart';
 import '../../../blocs/gen_calmv/calmv3form_bloc.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../gen_regmv/mobile/regmv_main_page.dart';
 import 'calmv/calmv_form1.dart';
 import 'calmv/calmv_form2.dart';
 import 'calmv/calmv_form3.dart';
@@ -62,10 +64,10 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
           listener: (context, state) {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calmv1Id;
-
+              debugPrint("ini id apaan dh " + newId);
               if (newId != null && newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calmv1 saved → result ID = $newId");
-
+                final regmv = state.record!.regmv1Id;
                 setState(() {
                   calmv1Id = newId;
                 });
@@ -138,6 +140,38 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
             }
           },
         ),
+
+        BlocListener<Calmv1ListBloc, Calmv1ListState>(
+            listener: (context, state) {
+              if (state.isProcessing) {
+                // Tampilkan loading
+                showDialog(
+                  context: context,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (state.isProcessed) {
+                Navigator.pop(context); // nutup loading
+
+
+                if (state.hasFailure) {
+                  // Jika gagal
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Gagal: ${state.processMessage}")),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegmvFormMain(recordId: state.processMessage, viewMode: 'ubah',),
+                    ),
+                  );
+                  debugPrint("hasil debug ${state.processMessage}");
+                }
+              }
+            },
+        )
       ],
 
       child: _buildForm(),
@@ -212,11 +246,7 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
                       ? const SizedBox.shrink()
                       : AppButton.primary(
                     text: "Lanjutkan",
-                    onPressed: () async {
-                      context.read<Calmv1CrudBloc>().add(
-                        CalmvtoRegMvEvent(recordId: calmv1Id ?? ""),
-                      );
-                    },
+                    onPressed: onLanjutkanPressed,
                   ),
 
                   const SizedBox(height: 25),
@@ -352,6 +382,13 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
       }
     }
   }
+
+  Future<void> onLanjutkanPressed() async {
+    context.read<Calmv1ListBloc>().add(
+      CalMv2RegMvEvent(calmv1Id: calmv1Id!),
+    );
+  }
+
 
   void openForm1() {
     setState(() {

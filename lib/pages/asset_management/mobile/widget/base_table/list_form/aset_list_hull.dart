@@ -43,14 +43,16 @@ class AsetListHull extends StatelessWidget {
         5: IntrinsicColumnWidth(),
         6: IntrinsicColumnWidth(),
         7: IntrinsicColumnWidth(),
-        8: IntrinsicColumnWidth(),
+        // 8: IntrinsicColumnWidth(),
+        // 9: IntrinsicColumnWidth(),
       },
       headerCells: const [
         HeaderCell("No", center: true),
-        HeaderCell("Nama Kapal"),
-        HeaderCell("Currency"),
-        HeaderCell("Polis No"),
-        HeaderCell("TSI"),
+        HeaderCell("Tertanggung"),
+        HeaderCell("Detail Rangka Kapal"),
+        // HeaderCell("Mata Uang"),
+        // HeaderCell("Polis No"),
+        HeaderCell("Nilai Tertanggung"),
         HeaderCell("Premi"),
         HeaderCell("Status", center: true),
         HeaderCell("Aksi"),
@@ -58,15 +60,17 @@ class AsetListHull extends StatelessWidget {
       rowBuilder: (context, item, rowNumber, cubit) => [
         /// Kolom 1: Nomor urut
         CellText("$rowNumber", center: true),
+        
+        CellText(item.tertanggung),
 
         /// Kolom 2: Nama kapal
         CellText(item.namaKapal),
 
         /// Kolom 3: Currency
-        CellText(item.curr),
+        // CellText(item.curr),
 
         /// Kolom 4: No polis
-        CellText(item.polisNo),
+        // CellText(item.polisNo),
 
         /// Kolom 5: TSI (Total Sum Insured)
         CellText(

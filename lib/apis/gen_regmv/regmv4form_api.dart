@@ -1,140 +1,56 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:joss_app/common/app_data.dart';
-import 'package:joss_app/models/image/downloadfileinfo64.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
+import 'package:joss_app/models/gen_regmv/regmv4form_model.dart';
 
 class Regmv4FormAPI {
 
-	Future<ReturnDataAPI> uploadFileFotoSTNK(
-			String regmv1Id, String filePath) async {
-		String base = AppData.apiDomain;
-		String uploadFotoEndpoint = "api/regmv/regmv4form/uploadfilestnk";
-		String uploadFotoURL = base + uploadFotoEndpoint;
+	Future<ReturnDataAPI> regmv4FormTambahAPI(Regmv4FormModel record) async {
+		String tambahEndpoint =
+				"${AppData.prefixEndPoint}/api/regmv/regmv4form/create";
+		Map<String, String> queryParams = {"modul_id": "regmv4FormTambahAPI"};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		ReturnDataAPI returnData =
-		ReturnDataAPI(success: false, data: "", rowcount: 0);
-
-		var request = http.MultipartRequest('POST', Uri.parse(uploadFotoURL));
-		request.headers.addAll(AppData.httpHeaders);
-		request.fields['regmv1Id'] = regmv1Id;
-
-		request.files
-				.add(await http.MultipartFile.fromPath('image_file', filePath));
-		await request.send().then((response) {
-			if (response.statusCode == 200) {
-				debugPrint("Success send Image");
-				returnData.success = true;
-
-				response.stream.transform(utf8.decoder).listen((value) {
-					debugPrint(value);
-				});
-				//returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.));
-			} else {
-				debugPrint("Error send Image");
-			}
-		});
-		return returnData;
-	}
-
-	Future<ReturnDataAPI> uploadBinaryFotoSTNK(
-			String regmv1Id, String fileName, Uint8List bytes) async {
-		debugPrint("==============================================");
-		debugPrint("🚀 [API] uploadBinaryFotoSTNK DIPANGGIL");
-		debugPrint("📌 regmv1Id   = $regmv1Id");
-		debugPrint("📎 fileName   = $fileName");
-		debugPrint("💾 bytes size = ${bytes.length} bytes");
-
-		String base = AppData.apiDomain;
-		String uploadFotoEndpoint = "api/regmv/regmv4form/uploadbinarystnk";
-		String uploadFotoURL = base + uploadFotoEndpoint;
-
-		debugPrint("🌐 FINAL URL: $uploadFotoURL");
-
-		ReturnDataAPI returnData =
-		ReturnDataAPI(success: false, data: "", rowcount: 0);
-
-		try {
-			var request = http.MultipartRequest('POST', Uri.parse(uploadFotoURL));
-			request.headers.addAll(AppData.httpHeaders);
-			request.fields['regmv1Id'] = regmv1Id;
-			request.fields['filename'] = fileName;
-
-			// attach file
-			request.files.add(
-				http.MultipartFile.fromBytes('image_file', bytes, filename: fileName),
-			);
-
-			debugPrint("📤 [API] POST REQUEST DIKIRIM...");
-			final streamedResponse = await request.send();
-
-			debugPrint("⬅️ [API] RESPONSE DITERIMA");
-			debugPrint("🔢 Status Code: ${streamedResponse.statusCode}");
-
-			// ✔️ wajib convert stream ke Response untuk baca body JSON
-			final response = await http.Response.fromStream(streamedResponse);
-			debugPrint("📦 Raw Body: ${response.body}");
-
-			if (response.statusCode == 200) {
-				try {
-					final decoded = jsonDecode(response.body);
-					debugPrint("🔍 Decoded JSON: $decoded");
-
-					returnData = ReturnDataAPI.fromDatabaseJson(decoded);
-
-					debugPrint("📄 Parsed ReturnDataAPI:");
-					debugPrint("   ➡️ success = ${returnData.success}");
-					debugPrint("   ➡️ data    = ${returnData.data}");
-					debugPrint("   ➡️ rowcount= ${returnData.rowcount}");
-				} catch (e) {
-					debugPrint("❌ ERROR PARSING JSON: $e");
-				}
-			} else {
-				debugPrint("❌ API ERROR (status: ${response.statusCode})");
-			}
-		} catch (e) {
-			debugPrint("❌ EXCEPTION: $e");
-		}
-
-		debugPrint("==============================================");
-		return returnData;
-	}
-
-
-	Future<DownloadFileInfo64Model?> downloadFotoStnkAPI(
-			String regmv4Id) async {
-		DownloadFileInfo64Model? fileInfo;
-
-		String urlGetFileEndPoint =
-				"${AppData.prefixEndPoint}/api/regmv/regmv4form/getfotostnk";
-
-		Map<String, String> queryParams = {
-			"regmv4Id": regmv4Id,
-		};
-
-		debugPrint("downloadFotoStnkAPI #10");
-
-		var uri =
-		AppData.uriHtpp(AppData.httpAuthority, urlGetFileEndPoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: AppData.httpHeaders);
-
-		//debugPrint("downloadFotoJobRealAPI #20");
-
-		//debugPrint("downloadFotoJobRealAPI response.statusCode : ${response.statusCode}");
+		ReturnDataAPI returnData;
+		final http.Response response = await http.post(uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		if (response.statusCode == 200) {
-			//debugPrint("downloadFotoJobRealAPI -> response.body #30: ${response.body}");
-
-			fileInfo = DownloadFileInfo64Model.fromJson(jsonDecode(response.body));
-
-			//debugPrint("fileInfo.namafile : ${fileInfo.namafile}");
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
-		return fileInfo;
+		return returnData;
 	}
+	Future<bool> regmv4FormUbahAPI(Regmv4FormModel record) async {
+		String ubahEndpoint =
+				"${AppData.prefixEndPoint}/api/regmv/regmv4form/update";
+		Map<String, String> queryParams = {"modul_id": "regmv4FormUbahAPI"};
 
+		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
+
+		final http.Response response = await http.post(uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
+
+		ReturnDataAPI returnData;
+		if (response.statusCode == 200) {
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		}
+		return returnData.success;
+	}
 	Future<bool> regmv4FormHapusAPI(String regmv4Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv4form/delete";
 		Map<String, String> queryParams = {
@@ -156,5 +72,22 @@ class Regmv4FormAPI {
 		}
 		return returnData.success;
 	}
+	Future<Regmv4FormModel> regmv4FormLihatAPI(String regmv4Id) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv4form/read";
+		Map<String, String> queryParams = {'regmv4Id': regmv4Id};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		final http.Response response =
+		await http.get(uri, headers: <String, String>{
+			'Content-Type': 'application/json; odata=verbos',
+			'Accept': 'application/json; odata=verbos',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		});
 
+		if (response.statusCode == 200) {
+			var returnData = Regmv4FormModel.fromJson(jsonDecode(response.body));
+			return returnData;
+		} else {
+			return throw Exception("Failed to load data");
+		}
+	}
 }

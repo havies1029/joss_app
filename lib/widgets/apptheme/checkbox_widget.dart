@@ -33,61 +33,48 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
       _checkbox = widget.initialValue;
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start, // penting!
-      children: [
-        // LEFT LABEL (opsional)
-        if (widget.leftLabel.isNotEmpty) ...[
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4), // biar stabil tinggi
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center, // ❗ sejajarkan vertikal
+        children: [
+          // Kotak checkbox
           GestureDetector(
             onTap: _toggleCheck,
-            child: Text(
-              widget.leftLabel,
-              style: bodyTextStyle(context, fontSize: 16),
-            ),
-          ),
-          const SizedBox(width: 14),
-        ],
-
-        // CHECKBOX
-        GestureDetector(
-          onTap: _toggleCheck,
-          child: Container(
-            width: 16,
-            height: 16,
-            margin: const EdgeInsets.only(top: 3),
-            // biar sejajar dengan text wrap
-            decoration: BoxDecoration(
-              color: _checkbox ? primaryColor : Colors.transparent,
-              border: Border.all(
-                color: _checkbox ? primaryColor : sGrey,
-                width: 0.5,
+            child: Container(
+              width: 18, // sedikit diperbesar biar proporsional
+              height: 18,
+              decoration: BoxDecoration(
+                color: _checkbox ? primaryColor : Colors.transparent,
+                border: Border.all(
+                  color: _checkbox ? primaryColor : sGrey,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(4),
               ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: _checkbox
-                ? const Icon(Icons.check, size: 12.8)
-                : null,
-          ),
-        ),
-
-        const SizedBox(width: 14),
-
-        // RIGHT LABEL — FIX : expanded biar WRAP 🔥
-        Expanded(
-          child: GestureDetector(
-            onTap: _toggleCheck,
-            child: Text(
-              widget.rightLabel,
-              style: bodyTextStyle(context, fontSize: 16),
-              softWrap: true,
-              overflow: TextOverflow.visible,
+              child: _checkbox
+                  ? const Icon(Icons.check, size: 14)
+                  : null,
             ),
           ),
-        ),
-      ],
+
+          const SizedBox(width: 10),
+
+          // Label — tidak lagi Expanded (biar tidak stretchy!)
+          Flexible(
+            child: GestureDetector(
+              onTap: _toggleCheck,
+              child: Text(
+                widget.rightLabel,
+                style: bodyTextStyle(context, fontSize: 15.5),
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

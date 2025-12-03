@@ -31,7 +31,7 @@ class RegmvForm3Section extends StatefulWidget {
   final String? recordId;
   final bool isExpanded;
   final Function(bool) onToggle;
-  final String? regmv1id;
+  final String? regmv1Id;
 
   const RegmvForm3Section({
     super.key,
@@ -39,7 +39,7 @@ class RegmvForm3Section extends StatefulWidget {
     required this.isExpanded,
     required this.onToggle,
     this.recordId,
-    this.regmv1id,
+    this.regmv1Id,
   });
 
   @override
@@ -74,6 +74,13 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
   String selectedYear = "";
   late final Regmv3FormBloc regmv3Bloc;
 
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      debugPrint("🔥 Form3 dibuka parent → trigger lihat event");
+      regmv3Bloc.add(Regmv3FormLihatEvent(recordId: widget.regmv1Id!));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -83,7 +90,7 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
 
   void _loadData() {
     if (widget.viewMode == "ubah" && widget.recordId != null) {
-      regmv3Bloc.add(Regmv3FormLihatEvent(recordId: widget.recordId!));
+      regmv3Bloc.add(Regmv3FormLihatEvent(recordId: widget.regmv1Id!));
     }
   }
 
@@ -128,56 +135,67 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
   }
 
   Widget _buildForm() {
-    return BlocBuilder<Regmv3FormBloc, Regmv3FormState>(
-      buildWhen: (prev, curr) => curr.isLoaded == true,
-      builder: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          _injectPayload(state.record!);
-        }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<Regmv3FormBloc, Regmv3FormState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded == true && curr.record != null,
+          listener: (context, state) {
+            _injectPayload(state.record!); // inject ke controller & variable
+          },
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+        child: Form(
+          key: _regmvform3key,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Flexible(child: _buildFieldComboTahun()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildHargaMobil()),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-        return Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-          child: Form(
-            key: _regmvform3key,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldComboTahun()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildHargaMobil()),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _buildComboMWilayah(),
-                const SizedBox(height: 12),
-                _buildFieldPlatNo(),
-                const SizedBox(height: 12),
-                _buildFieldRangkaNo(),
-                const SizedBox(height: 12),
-                _buildFieldMesinNo(),
-                const SizedBox(height: 12),
-                _buildFieldMmvmerkId(),
-                const SizedBox(height: 12),
-                _buildComboTipeId(),
-                const SizedBox(height: 12),
-                _buildFieldMmvmodelId(),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldMmvsubmodelId()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildComboWarnaId()),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _buildFieldAksesoris(),
-                const SizedBox(height: 15),
-              ],
-            ),
+              _buildComboMWilayah(),
+              const SizedBox(height: 12),
+
+              _buildFieldPlatNo(),
+              const SizedBox(height: 12),
+
+              _buildFieldRangkaNo(),
+              const SizedBox(height: 12),
+
+              _buildFieldMesinNo(),
+              const SizedBox(height: 12),
+
+              _buildFieldMmvmerkId(),
+              const SizedBox(height: 12),
+
+              _buildComboTipeId(),
+              const SizedBox(height: 12),
+
+              _buildFieldMmvmodelId(),
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Flexible(child: _buildFieldMmvsubmodelId()),
+                  const SizedBox(width: 8),
+                  Flexible(child: _buildComboWarnaId()),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              _buildFieldAksesoris(),
+              const SizedBox(height: 15),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -213,7 +231,7 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
 
   Future<void> saveForm3() async {
     final record = Regmv3FormModel(
-      regmv1Id: widget.regmv1id ?? "",
+      regmv1Id: widget.regmv1Id ?? "",
       aksesoris: fieldAksesorisController.text,
       harga: double.parse(fieldHargaController.text.replaceAll(',', '')),
       mesinNo: fieldMesinNoController.text,
@@ -419,7 +437,7 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     hintText: "Penggunaan",
     comboKey: comboMMvpakaiKey,
     initItem: fieldComboMMvpakai,
-    dataLoader: () => ComboMMvpakaiRepository().getComboMMvpakai(""),
+    dataLoader: () => ComboMMvpakaiRepository().getComboMMvpakai(),
     displayText: (i) => i.pakaiNama,
     compareItems: (a, b) => a.mmvpakaiId == b.mmvpakaiId,
     validatorCallback: (v) => v == null ? kStringNullError : null,

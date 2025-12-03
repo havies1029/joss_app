@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:js' as js;
+import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 import 'web_view_registry.dart'; // ⬅️ Ini wajib: conditional wrapper untuk platformViewRegistry
@@ -42,12 +43,11 @@ class _GoogleSignInWebState extends State<GoogleSignInWeb> {
         js.JsObject.jsify({
           'client_id':
           '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
-          'callback': js.allowInterop((response) {
+          'callback': ((response) {
             final idToken = response['credential'];
             final user = _decodeJwt(idToken);
-            debugPrint("✅ Google Sign-In berhasil, token diterima.");
             widget.onSuccess(idToken, user);
-          }),
+          }).toJS,
         })
       ]);
 

@@ -104,176 +104,93 @@ C extends Cubit<Map<String, T>>
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => widget.shareCubitBuilder(),
-      child: MultiBlocListener(
-        listeners: [
-          BlocListener<C, Map<String, T>>(
-            listener: (context, state) {
-              debugPrint("🧩 Selected items: ${state.length}");
-            },
-          ),
-        ],
-        child: BlocBuilder<C, Map<String, T>>(
-          builder: (context, map) {
-            final cubit = context.read<C>();
-            return Padding(
-              padding: widget.padding ?? EdgeInsets.zero,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+    return MultiBlocListener(
+      listeners: [
+        // Listener untuk memantau data terpilih (selected items)
+        BlocListener<C, Map<String, T>>(
+          listener: (context, state) {
+            debugPrint("🔹 Total item terpilih: ${state.length}");
 
-                  // Padding(
-                  //   padding: EdgeInsets.symmetric(vertical: hPadding / 2),
-                  //   child: Column(
-                  //     children: [
-                  //       // 🔹 Divider atas
-                  //       Align(
-                  //         alignment: Alignment.center,
-                  //         child: FractionallySizedBox(
-                  //           widthFactor: 1.1,
-                  //           child: const Divider(
-                  //             color: Color(0xFF555555),
-                  //             thickness: 1,
-                  //             height: 1,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //
-                  //       // 🔹 Beri ruang ekstra biar tombol gak terlalu mepet
-                  //       const SizedBox(height: hPadding * 1.25), // 🔥 dari 0.75 → 1.25
-                  //
-                  //       // 🔹 Tombol utama
-                  //       // _buildActionButtons(context, cubit),
-                  //
-                  //       // 🔹 Spacer bawah lebih besar sedikit biar seimbang
-                  //       const SizedBox(height: hPadding * 1.25),
-                  //
-                  //       // 🔹 Divider bawah
-                  //       Align(
-                  //         alignment: Alignment.center,
-                  //         child: FractionallySizedBox(
-                  //           widthFactor: 1.1,
-                  //           child: const Divider(
-                  //             color: Color(0xFF555555),
-                  //             thickness: 1,
-                  //             height: 1,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
+            if (state.isEmpty) {
+              debugPrint("🚫 Tidak ada item yang dipilih");
+              return;
+            }
 
+            debugPrint("📌 IDs terpilih: ${state.keys.toList()}");
 
-                  const SizedBox(height: hPadding ),
+            for (var entry in state.entries) {
+              debugPrint("🧩 ID: ${entry.key}");
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ListPageFilterBarUIWidget(
-                          searchController: _searchController,
-                          searchButton: _buildSearchButton(),
-                          hintText: "Cari Polis...",
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      PolisButton(
-                        assetPath: "assets/icons/unduh.svg",
-                        bgColor: const Color(0xFFA1A1AA),
-                        borderColor: const Color(0xFFBCBCC7),
-                        onTap: () => _showExportDialog(context, context.read<C>()),
-                        iconSize: 16,
-                        height: 36,
-                        width: 36,
-                      ),
-                      const SizedBox(width: 8),
-                      PolisButton(
-                        assetPath: "assets/icons/bagikan.svg",
-                        bgColor: const Color(0xFF295EFF),
-                        borderColor: const Color(0xFF5D86FF),
-                        onTap: () {
-                          debugPrint('📤 Bagikan ditekan');
-                        },
-                        iconSize: 16,
-                        height: 36,
-                        width: 36,
-                      ),
-                    ],
-                  ),
-
-
-                  const SizedBox(height: hPadding),
-                  _buildStatusChips(context),
-                  const SizedBox(height: hPadding),
-                  Expanded(
-                    child: widget.listBuilder(
-                      _searchController.text,
-                      _currentStatusLabel, // 🔥 kirim status yang sedang aktif
-                    ),
-                  ),
-                ],
-              ),
-            );
+              try {
+                final json = (entry.value as dynamic).toJson();
+                debugPrint("   📦 Data: $json");
+              } catch (_) {
+                debugPrint("   📦 Data (fallback): ${entry.value.toString()}");
+              }
+            }
           },
         ),
-      ),
-    );
-  }
+      ],
 
-  Widget _buildActionButtons(BuildContext context, C cubit) {
-    final List<Map<String, dynamic>> actions = [
-      {
-        'icon': "assets/icons/tambah_polis.svg",
-        'text': "Tambah",
-        'bg': const Color(0xFFFF9D00),
-        'border': const Color(0xFFFFC972),
-      },
-      {
-        'icon': "assets/icons/endorse.svg",
-        'text': "Endorse",
-        'bg': const Color(0xFF00BBFF),
-        'border': const Color(0xFF7ADBFF),
-      },
-      {
-        'icon': "assets/icons/hapus.svg",
-        'text': "Hapus",
-        'bg': const Color(0xFFF12929),
-        'border': const Color(0xFFFE5E5E),
-      },
-      {
-        'icon': "assets/icons/unduh.svg",
-        'text': "Unduh",
-        'bg': const Color(0xFFA1A1AA),
-        'border': const Color(0xFFBCBCC7),
-        'onTap': () => _showExportDialog(context, cubit),
-      },
-      {
-        'icon': "assets/icons/bagikan.svg",
-        'text': "Bagikan",
-        'bg': const Color(0xFF295EFF),
-        'border': const Color(0xFF5D86FF),
-      },
-    ];
+      child: BlocBuilder<C, Map<String, T>>(
+        builder: (context, map) {
+          final cubit = context.read<C>();   // 🟢 Cubit global, tidak dibuat ulang
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: actions.map((a) {
-          return Row(
-            children: [
-              PolisButton(
-                assetPath: a['icon'],
-                text: a['text'],
-                bgColor: a['bg'],
-                borderColor: a['border'],
-                onTap: a['onTap'],
-              ),
-              const SizedBox(width: hPadding),
-            ],
+          return Padding(
+            padding: widget.padding ?? EdgeInsets.zero,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: hPadding),
+
+                // 🔎 Search bar & action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: ListPageFilterBarUIWidget(
+                        searchController: _searchController,
+                        searchButton: _buildSearchButton(),
+                        hintText: "Cari Polis...",
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    PolisButton(
+                      assetPath: "assets/icons/unduh.svg",
+                      bgColor: const Color(0xFFA1A1AA),
+                      borderColor: const Color(0xFFBCBCC7),
+                      onTap: () => _showExportDialog(context, cubit),
+                      iconSize: 16,
+                      height: 36,
+                      width: 36,
+                    ),
+                    const SizedBox(width: 8),
+                    PolisButton(
+                      assetPath: "assets/icons/bagikan.svg",
+                      bgColor: const Color(0xFF295EFF),
+                      borderColor: const Color(0xFF5D86FF),
+                      onTap: () => debugPrint('📤 Bagikan ditekan'),
+                      iconSize: 16,
+                      height: 36,
+                      width: 36,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: hPadding),
+                _buildStatusChips(context),   // 🧮 Filter status (Aktif / Diproses / Berakhir)
+                const SizedBox(height: hPadding),
+
+                // 📋 Ini tempat tabel/list ditampilkan
+                Expanded(
+                  child: widget.listBuilder(
+                    _searchController.text,
+                    _currentStatusLabel,
+                  ),
+                ),
+              ],
+            ),
           );
-        }).toList(),
+        },
       ),
     );
   }

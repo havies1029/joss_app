@@ -110,7 +110,7 @@ class Calmv1CrudAPI {
 		}
 	}
 
-	Future<bool> calmMvToRegMvAPI(String calmv1Id) async {
+	Future<ReturnDataAPI> calmMvToRegMvAPI(String calmv1Id) async {
 		debugPrint("==============================================");
 		debugPrint("🚀 [API] calmMvToRegMvAPI DIPANGGIL");
 		debugPrint("📌 calmv1Id = $calmv1Id");
@@ -124,54 +124,25 @@ class Calmv1CrudAPI {
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
 
-		debugPrint("🌐 FINAL URL: $uri");
-		debugPrint("🧩 Query Params: ${queryParams.toString()}");
+		final http.Response response = await http.get(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}',
+			},
+		);
 
-		try {
-			debugPrint("📤 [API] GET REQUEST DIKIRIM...");
-			final response = await http.get(
-				uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}',
-				},
-			);
+		ReturnDataAPI returnData;
 
-			debugPrint("⬅️ [API] RESPONSE DITERIMA");
-			debugPrint("🔢 Status Code: ${response.statusCode}");
-			debugPrint("📦 Raw Body: ${response.body}");
-
-			if (response.statusCode == 200) {
-				// DEBUG JSON PARSE
-				try {
-					final decoded = jsonDecode(response.body);
-					debugPrint("🔍 Decoded JSON: $decoded");
-
-					final returnData = ReturnDataAPI.fromDatabaseJson(decoded);
-
-					debugPrint("📄 Parsed ReturnDataAPI:");
-					debugPrint("   ➡️ success = ${returnData.success}");
-					debugPrint("   ➡️ data    = ${returnData.data}");
-					debugPrint("   ➡️ rowcount= ${returnData.rowcount}");
-					debugPrint("==============================================");
-
-					return returnData.success;
-				} catch (e) {
-					debugPrint("❌ ERROR PARSING JSON: $e");
-					debugPrint("==============================================");
-					return false;
-				}
-			} else {
-				debugPrint("❌ API ERROR (status: ${response.statusCode})");
-				debugPrint("==============================================");
-				return false;
-			}
-		} catch (e) {
-			debugPrint("❌ EXCEPTION: $e");
-			debugPrint("==============================================");
-			return false;
+		if (response.statusCode == 200) {
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
+
+		return returnData; // ⬅️ bedanya hanya ini!
 	}
+
 
 }

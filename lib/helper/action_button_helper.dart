@@ -3,7 +3,7 @@ import '../pages/asset_management/mobile/widget/base_table/tables/reusable_aset_
 import '../pages/asset_management/mobile/widget/detail_management_page/detail_management_widget.dart';
 import '../pages/gen_endors/endors1crud_form.dart';
 
-List<ActionButtonWidget> getActionButtonsByStatus(
+  List<ActionButtonWidget> getActionButtonsByStatus(
     String status, {
       VoidCallback? onProcessTap,
       String? namaItem,

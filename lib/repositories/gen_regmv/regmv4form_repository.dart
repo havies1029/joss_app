@@ -4,31 +4,22 @@ import 'package:joss_app/models/image/downloadfileinfo64.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/apis/gen_regmv/regmv4form_api.dart';
 
+import '../../models/gen_regmv/regmv4form_model.dart';
+
 class Regmv4FormRepository {
+
 	Regmv4FormAPI api = Regmv4FormAPI();
 
-	Future<ReturnDataAPI> uploadFileFotoSTNK(
-			String regmv1Id,
-			String filePath,
-			) async {
-		return await api.uploadFileFotoSTNK(regmv1Id, filePath);
+	Future<ReturnDataAPI> regmv4FormTambah(Regmv4FormModel record) async {
+		return await api.regmv4FormTambahAPI(record);
 	}
-
-	Future<ReturnDataAPI> uploadBinaryFotoSTNK(
-			String regmv1Id,
-			String fileName,
-			Uint8List bytes,
-			) async {
-		return await api.uploadBinaryFotoSTNK(regmv1Id, fileName, bytes);
+	Future<bool> regmv4FormUbah(Regmv4FormModel record) async {
+		return await api.regmv4FormUbahAPI(record);
 	}
-
-	Future<DownloadFileInfo64Model?> downloadFotoStnkAPI(
-			String regmv4Id,
-			) async {
-		return await api.downloadFotoStnkAPI(regmv4Id);
-	}
-
 	Future<bool> regmv4FormHapus(String regmv4Id) async {
 		return await api.regmv4FormHapusAPI(regmv4Id);
+	}
+	Future<Regmv4FormModel> regmv4FormLihat(String regmv4Id) async {
+		return await api.regmv4FormLihatAPI(regmv4Id);
 	}
 }

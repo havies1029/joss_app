@@ -8,6 +8,9 @@ class Regmv6FormState extends Equatable {
 	final bool isSaving;
 	final bool isSaved;
 	final bool hasFailure;
+	final bool isCalculating;
+	final bool isCalculated;
+
 	const Regmv6FormState(
 			{this.record,
 				this.isLoading = false,
@@ -15,6 +18,8 @@ class Regmv6FormState extends Equatable {
 				this.isSaving = false,
 				this.isSaved = false,
 				this.hasFailure = false,
+				this.isCalculating = false,
+				this.isCalculated = false,
 			});
 
 	Regmv6FormState copyWith({
@@ -24,6 +29,8 @@ class Regmv6FormState extends Equatable {
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
+		bool? isCalculating,
+		bool? isCalculated,
 	}){
 		return Regmv6FormState(
 			record: record ?? this.record,
@@ -32,9 +39,11 @@ class Regmv6FormState extends Equatable {
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
+			isCalculating: isCalculating ?? this.isCalculating,
+			isCalculated: isCalculated ?? this.isCalculated,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isCalculating, isCalculated];
 }

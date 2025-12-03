@@ -21,13 +21,13 @@ DropdownSearch<ComboMMvpakaiModel> buildFieldComboMMvpakai({
       ),
     ),
     items: (filter, infiniteScrollProps) async {
-      return ComboMMvpakaiRepository().getComboMMvpakai(filter);
+      return ComboMMvpakaiRepository().getComboMMvpakai();
     },
     suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
     popupProps: const PopupPropsMultiSelection.modalBottomSheet(
       disableFilter: true,
       showSelectedItems: true,
-      showSearchBox: true,
+      showSearchBox: false,
       itemBuilder: itemBuilderComboMMvpakai,
     ),
     compareFn: (item, sItem) => item.mmvpakaiId == sItem.mmvpakaiId,

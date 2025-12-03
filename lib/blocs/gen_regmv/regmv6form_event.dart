@@ -32,17 +32,16 @@ class Regmv6FormHapusEvent extends Regmv6FormEvents {
 }
 
 class Regmv6FormLihatEvent extends Regmv6FormEvents {
-	final String recordId; // regmv6Id
+	final String recordId;
 	const Regmv6FormLihatEvent({required this.recordId});
 
 	@override
 	List<Object> get props => [recordId];
 }
 
-/// 🔥 dipakai untuk hitungpremi, PARAMETER = regmv1Id
-class CalPremiRegMvEvent extends Regmv6FormEvents {
+class Regmv6FormHitungPremiEvent extends Regmv6FormEvents {
 	final String regmv1Id;
-	const CalPremiRegMvEvent({required this.regmv1Id});
+	const Regmv6FormHitungPremiEvent({required this.regmv1Id});
 
 	@override
 	List<Object> get props => [regmv1Id];

@@ -8,18 +8,18 @@ class Regmv2FormAPI {
 
 	Future<ReturnDataAPI> regmv2FormTambahAPI(Regmv2FormModel record) async {
 		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/regmv/regmv2form/create";
+				"${AppData.prefixEndPoint}/api/regmv/regmv2form/create";
 		Map<String, String> queryParams = {"modul_id": "regmv2FormTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -30,18 +30,18 @@ class Regmv2FormAPI {
 	}
 	Future<bool> regmv2FormUbahAPI(Regmv2FormModel record) async {
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/regmv/regmv2form/update";
+				"${AppData.prefixEndPoint}/api/regmv/regmv2form/update";
 		Map<String, String> queryParams = {"modul_id": "regmv2FormUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
@@ -51,14 +51,14 @@ class Regmv2FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<bool> regmv2FormHapusAPI(String regmv2Id) async {
+	Future<bool> regmv2FormHapusAPI(String regmv1Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv2form/delete";
 		Map<String, String> queryParams = {
-			'regmv2Id': regmv2Id,
+			'regmv1Id': regmv1Id,
 			'modul_id': 'regmv2FormHapusAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -72,12 +72,12 @@ class Regmv2FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Regmv2FormModel> regmv2FormLihatAPI(String regmv2Id) async {
+	Future<Regmv2FormModel> regmv2FormLihatAPI(String regmv1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv2form/read";
-		Map<String, String> queryParams = {'regmv2Id': regmv2Id};
+		Map<String, String> queryParams = {'regmv1Id': regmv1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'

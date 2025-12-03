@@ -46,10 +46,10 @@ class AsetListRingkasan extends StatelessWidget {
       },
       headerCells: const [
         HeaderCell("No", center: true),
-        HeaderCell("Nama Aset"),
+        HeaderCell("Jenis Polis"),
         HeaderCell("Currency"),
         HeaderCell("Jumlah"),
-        HeaderCell("Nilai"),
+        HeaderCell("Total Per"),
         HeaderCell("Premi"),
         HeaderCell("Nomor Urut", center: true),
         HeaderCell("Satuan", center: true),

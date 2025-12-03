@@ -1,6 +1,8 @@
 
 class AsetHealthCariModel {
 	String asethealthId;
+	String namaPeserta;
+	String benefit;
 	DateTime dob;
 	String jnskel;
 	String nama;
@@ -9,7 +11,7 @@ class AsetHealthCariModel {
 	String posisi;
 	String status;
 
-	AsetHealthCariModel({required this.asethealthId, required this.dob, 
+	AsetHealthCariModel({required this.asethealthId, required this.namaPeserta, required this.benefit ,required this.dob,
 		required this.jnskel, required this.nama, 
 		required this.nomor, required this.polisNo, 
 		required this.posisi, required this.status});
@@ -17,6 +19,8 @@ class AsetHealthCariModel {
 	factory AsetHealthCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetHealthCariModel(
 			asethealthId: data['asethealthId']??'',
+			namaPeserta: data['namaPeserta']??'',
+			benefit: data['benefit']??'',
 			dob: DateTime.tryParse(data['dob'].toString())??DateTime.now(),
 			jnskel: data['jnskel']??'',
 			nama: data['nama']??'',
@@ -29,13 +33,17 @@ class AsetHealthCariModel {
 	}
 
 	Map<String, dynamic> toJson() =>
-		{'asethealthId': asethealthId,
+		{
+		'asethealthId': asethealthId,
+		'namaPeserta' : namaPeserta,
+		'benefit' : benefit,
 		'dob': dob.toIso8601String(),
 		'jnskel': jnskel,
 		'nama': nama,
 		'nomor': nomor.toString(),
 		'polisNo': polisNo,
 		'posisi': posisi,
-		'status': status};
+		'status': status
+		};
 
 }

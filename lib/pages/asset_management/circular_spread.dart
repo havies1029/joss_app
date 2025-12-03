@@ -1,342 +1,280 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-
-class DraggableHalfCircleButton extends StatefulWidget {
-  const DraggableHalfCircleButton({super.key});
-
-  @override
-  State<DraggableHalfCircleButton> createState() =>
-      _DraggableHalfCircleButtonState();
-}
-
-class _DraggableHalfCircleButtonState extends State<DraggableHalfCircleButton>
-    with SingleTickerProviderStateMixin {
-  Offset position = Offset.zero;
-  late AnimationController _controller;
-  bool isOpen = false;
-  bool isDragging = false;
-  double scale = 1.0;
-
-  final List<_ButtonItem> buttons = [
-    _ButtonItem(icon: Icons.home, label: "Home", color: Colors.blue),
-    _ButtonItem(icon: Icons.search, label: "Search", color: Colors.green),
-    _ButtonItem(icon: Icons.notifications, label: "Notif", color: Colors.amber),
-    _ButtonItem(icon: Icons.settings, label: "Settings", color: Colors.purple),
-    _ButtonItem(icon: Icons.favorite, label: "Fav", color: Colors.pink),
-    _ButtonItem(icon: Icons.person, label: "Profile", color: Colors.indigo),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
+  import 'dart:math' as Math;
+  import 'package:flutter/material.dart';
+  import 'package:flutter_svg/flutter_svg.dart';
+  import '../../common/constants.dart';
+  
+  class MiniActionButton {
+    final String iconPath;
+    final Color? color;
+    final Gradient? gradient;
+    final Color? borderColor;
+    final String label;
+    final VoidCallback onTap;
+  
+    MiniActionButton({
+      required this.iconPath,
+      this.color,
+      this.gradient,
+      this.borderColor,
+      required this.label,
+      required this.onTap,
+    }) : assert(color != null || gradient != null,
+    'MiniActionButton must have either a color or gradient.');
   }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  
+  class BottomCenterAddButton extends StatefulWidget {
+    final double size;
+    final VoidCallback? onTap;
+    final List<MiniActionButton>? actions;
+  
+    const BottomCenterAddButton({
+      super.key,
+      this.size = 70,
+      this.onTap,
+      this.actions,
+    });
+  
+    @override
+    State<BottomCenterAddButton> createState() => _BottomCenterAddButtonState();
   }
-
-  // REVISI 1: Sudut dan Radius yang Presisi
-  Offset getPosition(int index, double progress) {
-    const double startAngle = 180; // Mulai dari sisi kiri
-    const double endAngle = 0;     // Berakhir di sisi kanan
-    final double angle =
-        (startAngle + (endAngle - startAngle) * (index / (buttons.length - 1))) *
-            pi /
-            -180;
-    const double radius = 100; // Radius 100 untuk hasil yang lebih renggang
-    return Offset(cos(angle) * radius * progress, sin(angle) * radius * progress);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
-
-    // posisi awal di kanan bawah
-    if (position == Offset.zero) {
-      position = Offset(screen.width - 100, screen.height - 200);
-    }
-
-    return Stack(
-      children: [
-        // tombol-tombol kecil
-        ..._buildFloatingMenu(),
-        // tombol utama draggable
-        Positioned(
-          left: position.dx,
-          top: position.dy,
-          child: GestureDetector(
-            onTapDown: (_) => setState(() => scale = 0.9),
-            onTapUp: (_) => setState(() => scale = 1.0),
-            onTapCancel: () => setState(() => scale = 1.0),
-            onTap: () {
-              if (!isDragging) {
-                setState(() {
-                  isOpen = !isOpen;
-                  isOpen ? _controller.forward() : _controller.reverse();
-                });
-              }
-            },
-            onPanStart: (_) => setState(() => isDragging = true),
-            onPanUpdate: (details) {
-              setState(() => position += details.delta);
-            },
-            onPanEnd: (_) => setState(() => isDragging = false),
-            child: AnimatedScale(
-              scale: scale,
-              duration: const Duration(milliseconds: 150),
-              curve: Curves.easeOutBack,
-              child: AnimatedRotation(
-                turns: isOpen ? 0.125 : 0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Colors.orange, Colors.red],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 12,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
+  
+    class _BottomCenterAddButtonState extends State<BottomCenterAddButton> {
+      bool isToggled = false;
+  
+      @override
+      Widget build(BuildContext context) {
+        final screen = MediaQuery.of(context).size;
+        final centerX = screen.width / 2;
+        final baseY = screen.height * 0.86;
+  
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            if (isToggled) ..._buildSmallButtons(centerX, baseY),
+  
+            // 🌟 TOMBOL UTAMA
+            Positioned(
+              top: baseY,
+              left: centerX - widget.size / 2,
+              child: _buildMainButton(),
+            ),
+          ],
+        );
+      }
+  
+      // 🎯 MAIN BUTTON (ADD / CLOSE)
+      Widget _buildMainButton() {
+        return GestureDetector(
+          onTap: () {
+            setState(() => isToggled = !isToggled);
+            widget.onTap?.call();
+          },
+          child: AnimatedScale(
+            scale: isToggled ? 0.9 : 1,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOut,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              width: widget.size,
+              height: widget.size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: isToggled
+                    ? null
+                    : const LinearGradient(
+                  colors: [Colors.orange, Colors.red],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                color: isToggled ? formGrey : null,
+                border: isToggled
+                    ? Border.all(color: unselectedColor, width: 2)
+                    : null,
+                boxShadow: const [
+                  BoxShadow(
+                    color: secondaryBlackColor,
+                    blurRadius: 12,
+                    offset: Offset(0, 5),
                   ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 32),
+                ],
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, anim) =>
+                    ScaleTransition(scale: anim, child: child),
+                child: Icon(
+                  isToggled ? Icons.close : Icons.add,
+                  key: ValueKey(isToggled),
+                  color: primaryLightColor,
+                  size: isToggled ? 32 : 38,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+  
+    // 🟡 MINI BUTTON + LABEL (PAKET PER INDEX)
+    List<Widget> _buildSmallButtons(double centerX, double baseY) {
+      final actions = widget.actions ?? [];
+      final count = actions.length;
+      if (count == 0) return [];
+  
+      final List<Widget> children = [];
+  
+      final double radius = 95;          // jarak button dari pusat
+      final double btnSize = 50;
+      final double verticalOffset = 25;
+      final double horizontalFactor = 0.9;
+      final double gapFromButton = 38;   // jarak label dari button (konstan)
+  
+      // pusat arc (titik referensi radial)
+      final double centerYArc = baseY + verticalOffset;
+  
+      for (var i = 0; i < count; i++) {
+        final item = actions[i];
+  
+        // sudut 180° → 0°
+        final double angleDeg = 180 - (i * 180 / (count - 1));
+        final double angle = angleDeg * (Math.pi / 180);
+  
+        final double dx = radius * Math.cos(angle) * horizontalFactor;
+        final double dy = radius * Math.sin(angle);
+  
+        // posisi CENTER button
+        final double btnCenterX = centerX + dx;
+        final double btnCenterY = centerYArc - dy;
+  
+        // vektor dari pusat arc → button (di koordinat UI)
+        final double vx = dx;
+        final double vy = btnCenterY - centerYArc; // (y button - y center)
+  
+        final double len = Math.sqrt(vx * vx + vy * vy);
+        final double ux = vx / (len == 0 ? 1 : len);
+        final double uy = vy / (len == 0 ? 1 : len);
+  
+        // posisi CENTER label, menjauh dari button sejauh gapFromButton
+        final double labelCenterX = btnCenterX + ux * gapFromButton;
+        final double labelCenterY = btnCenterY + uy * gapFromButton;
+  
+        // posisi TOP-LEFT untuk Positioned
+        final double btnTop = btnCenterY - btnSize / 2;
+        final double btnLeft = btnCenterX - btnSize / 2;
+  
+        // asumsi tinggi label ~ 24
+        const double labelHeightApprox = 24;
+        final double labelTop = labelCenterY - labelHeightApprox / 2;
+        final double labelLeft = labelCenterX - 9999; // akan dibungkus Align? nope -> kita pakai width dynamic
+  
+        // BUTTON
+        children.add(
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOutBack,
+            top: btnTop,
+            left: btnLeft,
+            child: _buildMiniButton(item, btnSize),
+          ),
+        );
+  
+        // LABEL – pakai Positioned normal, tapi pakai centerX/Y yang udah dihitung
+        children.add(
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOut,
+            top: labelTop,
+            left: labelCenterX,
+            child: _buildLabel(item.label, vx < 0), // ✔️ cek apakah tombol di kiri/kanan
+          ),
+        );
+  
+      }
+  
+      return children;
+    }
+  
+    // 🟢 MINI BUTTON TANPA LABEL
+    Widget _buildMiniButton(MiniActionButton item, double size) {
+      return AnimatedScale(
+        scale: isToggled ? 1 : 0.6,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeInOut,
+        child: AnimatedOpacity(
+          opacity: isToggled ? 1 : 0,
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeInOut,
+          child: GestureDetector(
+            onTap: item.onTap,
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: item.gradient,
+                color: item.gradient == null ? item.color : null,
+                border: Border.all(
+                  color: item.borderColor ?? primaryLightColor,
+                  width: 1,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: secondaryBlackColor,
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  item.iconPath,
+                  width: size * 0.45,
+                  height: size * 0.45,
+                  colorFilter: const ColorFilter.mode(
+                    primaryLightColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  List<Widget> _buildFloatingMenu() {
-    final progress = Curves.easeOutCubic.transform(_controller.value);
-
-    // daftar tombol (muter)
-    // Penentuan LabelPosition disesuaikan berdasarkan letak di busur:
-    // Index 0, 1, 2 berada di busur kiri (Label di Kiri)
-    // Index 3, 4, 5 berada di busur kanan (Label di Kanan)
-    final buttons = [
-      _buildButtonItem(0, progress, this.buttons[0].icon, this.buttons[0].color, this.buttons[0].label, LabelPosition.left),  // Home
-      _buildButtonItem(1, progress, this.buttons[1].icon, this.buttons[1].color, this.buttons[1].label, LabelPosition.left),  // Search
-      _buildButtonItem(2, progress, this.buttons[2].icon, this.buttons[2].color, this.buttons[2].label, LabelPosition.left),  // Notif
-      _buildButtonItem(3, progress, this.buttons[3].icon, this.buttons[3].color, this.buttons[3].label, LabelPosition.right), // Settings
-      _buildButtonItem(4, progress, this.buttons[4].icon, this.buttons[4].color, this.buttons[4].label, LabelPosition.right), // Fav
-      _buildButtonItem(5, progress, this.buttons[5].icon, this.buttons[5].color, this.buttons[5].label, LabelPosition.right), // Profile
-    ];
-
-    // ambil semua widget tombol dan label, lalu gabungkan ke Stack
-    return buttons.expand((pair) => pair).toList();
-  }
-
-  // REVISI 2: Perhitungan Posisi Horizontal yang Presisi
-  List<Widget> _buildButtonItem(
-      int index,
-      double progress,
-      IconData icon,
-      Color color,
-      String label,
-      LabelPosition labelPosition,
-      ) {
-    final pos = getPosition(index, progress);
-
-    const double buttonSize = 50.0;
-    const double mainButtonSize = 70.0;
-    const double mainButtonRadius = mainButtonSize / 2;
-    const double buttonRadius = buttonSize / 2;
-    const double spacing = 10.0;
-
-    // Pusat tombol utama
-    final double centerBaseX = position.dx + mainButtonRadius;
-    final double centerBaseY = position.dy + mainButtonRadius;
-
-    // --- Perkiraan Lebar Label (Heuristik) ---
-    // Diperlukan untuk menghitung pergeseran yang tepat saat label di Kiri.
-    // Disesuaikan: 6.5 per karakter + 18 (padding & sedikit margin).
-    final double estimatedLabelWidth = label.length * 6.5 + 18.0;
-    final double estimatedShift = estimatedLabelWidth + spacing;
-
-    // Pusat Posisi Tombol Kecil
-    final double finalLeftAnchor = centerBaseX + pos.dx;
-    final double finalTopAnchor = centerBaseY + pos.dy;
-
-    // Tombol
-    final buttonWidget = Container(
-      width: buttonSize,
-      height: buttonSize,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, 4))
-        ],
-      ),
-      child: Icon(icon, color: Colors.white, size: 22),
-    );
-
-    // Label
-    final labelWidget = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 11),
-      ),
-    );
-
-    // tombol + label disusun horizontal
-    final combinedRow = Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      textDirection:
-      labelPosition == LabelPosition.left ? TextDirection.rtl : TextDirection.ltr,
-      children: [
-        buttonWidget,
-        const SizedBox(width: spacing),
-        labelWidget,
-      ],
-    );
-
-    double finalLeft;
-    if (labelPosition == LabelPosition.left) {
-      // Tombol di kanan (RTL). Geser seluruh Row ke KIRI sejauh lebar label + spasi + radius tombol
-      finalLeft = finalLeftAnchor - (estimatedShift + buttonRadius);
-    } else {
-      // Tombol di kiri (LTR). Cukup geser ke KIRI sejauh radius tombol (dari pusat ke tepi kiri).
-      finalLeft = finalLeftAnchor - buttonRadius;
+      );
     }
-
-    // `finalTop` mengatur pusat vertikal Row yang tingginya `buttonSize`.
-    final double finalTop = finalTopAnchor - buttonRadius;
-
-
-    return [
-      Positioned(
-        left: finalLeft,
-        top: finalTop,
-        child: Opacity(
-          opacity: progress,
-          child: Transform.scale(
-            scale: progress,
-            alignment: Alignment.center,
-            child: combinedRow,
+  
+    // 📝 LABEL KECIL ABU-ABU
+    Widget _buildLabel(String text, bool isLeftSide) {
+      return AnimatedOpacity(
+        opacity: isToggled ? 1 : 0,
+        duration: const Duration(milliseconds: 260),
+        child: Transform.translate(
+          offset: Offset(
+            isLeftSide ? -60 : 0, // ⬅️ dinamis: jika kiri geser ke kiri, jika kanan geser ke kanan
+            0,
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: labelLightColor.withOpacity(0.88),
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.18),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 12,
+                color: primaryLightColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ),
-      ),
-    ];
-  }
-}
-
-class _ButtonItem {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _ButtonItem({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-}
-
-enum LabelPosition { bottom, left, right }
-
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final LabelPosition labelPosition;
-  final VoidCallback? onTap;
-
-  const _ActionButton({
-    required this.icon,
-    required this.color,
-    required this.label,
-    this.labelPosition = LabelPosition.bottom,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Widget iconWidget = Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, 4))
-        ],
-      ),
-      child: Icon(icon, color: Colors.white, size: 22),
-    );
-
-    Widget labelWidget = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.75),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 11),
-      ),
-    );
-
-    Widget content;
-    switch (labelPosition) {
-      case LabelPosition.left:
-        content = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            labelWidget,
-            const SizedBox(width: 6),
-            iconWidget,
-          ],
-        );
-        break;
-
-      case LabelPosition.right:
-        content = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            iconWidget,
-            const SizedBox(width: 6),
-            labelWidget,
-          ],
-        );
-        break;
-
-      default:
-        content = Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            iconWidget,
-            const SizedBox(height: 6),
-            labelWidget,
-          ],
-        );
+      );
     }
-
-    return GestureDetector(
-      onTap: onTap,
-      child: content,
-    );
+  
   }
-}

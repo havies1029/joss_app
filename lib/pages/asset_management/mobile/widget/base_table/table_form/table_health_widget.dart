@@ -8,7 +8,6 @@ import '../../../../../../models/gen_aset_health/asethealthcari_model.dart';
 import '../list_form/aset_list_health.dart';
 import '../tables/template_table_form_widget.dart';
 
-
 class TableHealthWidget extends StatelessWidget {
   const TableHealthWidget({super.key});
 

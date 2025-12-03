@@ -143,7 +143,7 @@ class Regmv2FormFormPageFormState extends State<Regmv2FormFormPage> {
 					if (state.isLoaded) {
 						if (state.record != null){
 							fieldAwController.text = NumberFormat("#,###").format(state.record!.aw);
-							fieldCoverLamaController.text = state.record!.coverLama.toString();
+							// fieldCoverLamaController.text = state.record!.coverLama.toString();
 							fieldIsEqController.text = state.record!.isEq.toString();
 							fieldIsFloodController.text = state.record!.isFlood.toString();
 							fieldIsSrccController.text = state.record!.isSrcc.toString();
@@ -516,7 +516,6 @@ class Regmv2FormFormPageFormState extends State<Regmv2FormFormPage> {
 			_formKey.currentState!.save();
 			Regmv2FormModel record = Regmv2FormModel(
 				aw: double.parse(fieldAwController.text.replaceAll(',', '')),
-				coverLama: int.parse(fieldCoverLamaController.text),
 				currId: fieldComboRMatauang?.rmatauangKode,
 				isEq: toBoolean(fieldIsEqController.text),
 				isFlood: toBoolean(fieldIsFloodController.text),

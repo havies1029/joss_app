@@ -250,7 +250,7 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
       NumericToOneDecimalFormatter(),
     ],
     validator: (v) {
-      if (v == null || v.isEmpty) return null;
+      if (v == null || v.isEmpty) return kStringNullError;
       final plain = v.replaceAll(".", "");
       if (plain.length > 3) {
         return "Maks 3 digit (100%)";

@@ -64,9 +64,54 @@ class _AssetManagementPageState extends State<AssetManagementPage>
               ),
             ),
 
-            const DraggableBeliPolisButton(),
-            const DraggableHalfCircleButton(),
-          ],
+            // const DraggableBeliPolisButton(),
+          Stack(
+            children: [
+              // konten halaman lain...
+
+              BottomCenterAddButton(
+                  actions: [
+                    MiniActionButton(
+                      iconPath: 'assets/icons/beli_polis1.svg',
+                      gradient: yellowGradient,
+                      label: "Beli Polis",
+                      onTap: () {},
+                    ),
+                    MiniActionButton(
+                      iconPath: 'assets/icons/endorse1.svg',
+                      gradient: blueGradient ,
+                      label: "Endorse",
+                      onTap: () {},
+                    ),
+                    MiniActionButton(
+                      iconPath: 'assets/icons/lacak_polis1.svg',
+                      gradient: cyanGradient,
+                      label: "Lacak Polis",
+                      onTap: () {},
+                    ),
+                    MiniActionButton(
+                      iconPath: 'assets/icons/perpanjangan1.svg',
+                      gradient: purpleGradient,
+                      label: "Perpanjang",
+                      onTap: () {},
+                    ),
+                    MiniActionButton(
+                      iconPath: 'assets/icons/aktifkan1.svg',
+                      gradient: redGradient,
+                      label: "Aktifkan",
+                      onTap: () {},
+                    ),
+                    MiniActionButton(
+                      iconPath: 'assets/icons/unduh_polis1.svg',
+                      gradient: greenGradient,
+                      label: "Unduh Polis",
+                      onTap: () {},
+                    ),
+                  ],
+              ),
+            ],
+          ),
+        ],
         ),
       ),
     );

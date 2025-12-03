@@ -53,6 +53,13 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
     }
   }
 
+  /// 🚀 Dipanggil setiap kali parent membuka form ini.
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      debugPrint("🔥 Form1 dibuka parent → trigger lihat event");
+      regmv1Bloc.add(Regmv1CrudLihatEvent(recordId: widget.recordId!));
+    }
+  }
 
   @override
   void dispose() {
@@ -91,29 +98,32 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
   }
 
   Widget _buildForm() {
-    return BlocBuilder<Regmv1CrudBloc, Regmv1CrudState>(
-      buildWhen: (prev, curr) => curr.isLoaded == true,
-      builder: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          _injectPayload(state.record!);
-        }
-        return Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-          child: Form(
-            key: _regmvform1key,
-            child: Column(
-              children: [
-                buildFieldCalmv1Id(),
-                const SizedBox(height: 12),
-                buildFieldTtgAlamat(),
-                const SizedBox(height: 12),
-                buildFieldTtgNama(),
-                const SizedBox(height: 15),
-              ],
-            ),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded == true && curr.record != null,
+          listener: (context, state) {
+            _injectPayload(state.record!); // isi ke field/controller
+          },
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+        child: Form(
+          key: _regmvform1key,
+          child: Column(
+            children: [
+              // buildFieldCalmv1Id(),
+              // const SizedBox(height: 12),
+              buildFieldTtgAlamat(),
+              const SizedBox(height: 12),
+              buildFieldTtgNama(),
+              const SizedBox(height: 15),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -125,7 +135,7 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
     fieldTtgAlamatController.text = record.ttgAlamat.toString();
     fieldTtgNamaController.text = record.ttgNama.toString();
 
-    setState(() {});
+    // setState(() {});
   }
 
 
@@ -136,7 +146,7 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
 
   Future<void> saveForm1() async {
     final record = Regmv1CrudModel(
-      calmv1Id: widget.recordId!,
+      calmv1Id: fieldCalmv1IdController.text ?? "",
       regmv1Id: widget.recordId!, //nanti diganti ini jadi nerima parameter dari parents
       ttgAlamat: fieldTtgAlamatController.text ?? "",
       ttgNama: fieldTtgNamaController.text ?? "",
@@ -152,23 +162,22 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
 
   }
 
-  Widget buildFieldCalmv1Id() => appTextField(
-    label: "No SPPA",
-    controller: fieldCalmv1IdController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    validator: (v) {
-      if (v == null || v.isEmpty) return kStringNullError;
-      return null;
-    },
-  );
+  // Widget buildFieldCalmv1Id() => appTextField(
+  //   label: "No SPPA",
+  //   controller: fieldCalmv1IdController,
+  //   keyboardType: TextInputType.text,
+  //   inputFormatters: [
+  //     FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+  //   ],
+  //   validator: (v) {
+  //     if (v == null || v.isEmpty) return kStringNullError;
+  //     return null;
+  //   },
+  // );
 
   Widget buildFieldTtgAlamat() => appTextField(
     label: "Nama Tertanggung",
-    controller: fieldTtgAlamatController,
+    controller: fieldTtgNamaController,
     keyboardType: TextInputType.text,
     inputFormatters: [
       FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
@@ -181,7 +190,7 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
 
   Widget buildFieldTtgNama() => appTextField(
     label: "Alamat Tertanggung",
-    controller: fieldTtgNamaController,
+    controller: fieldTtgAlamatController,
     keyboardType: TextInputType.text,
     inputFormatters: [
       FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
