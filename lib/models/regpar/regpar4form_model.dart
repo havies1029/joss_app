@@ -1,7 +1,7 @@
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 
 class Regpar4FormModel {
-	String regpar4Id;
+	String regpar1Id;
 	double siBuilding;
 	double siContent;
 	double siMachinery;
@@ -10,7 +10,7 @@ class Regpar4FormModel {
 	String? currId;
 	ComboRMatauangModel? comboRMatauang;
 
-	Regpar4FormModel({required this.regpar4Id, required this.siBuilding, 
+	Regpar4FormModel({required this.regpar1Id, required this.siBuilding, 
 		required this.siContent, required this.siMachinery, 
 		required this.siOther, required this.siStock, 
 		this.currId, this.comboRMatauang});
@@ -22,7 +22,7 @@ class Regpar4FormModel {
 		}
 
 		return Regpar4FormModel(
-			regpar4Id: data['regpar4Id']??'',
+			regpar1Id: data['regpar1Id']??'',
 			siBuilding: double.tryParse(data['siBuilding'].toString())??0,
 			siContent: double.tryParse(data['siContent'].toString())??0,
 			siMachinery: double.tryParse(data['siMachinery'].toString())??0,
@@ -35,7 +35,7 @@ class Regpar4FormModel {
 	}
 
 	Map<String, dynamic> toJson() =>
-		{'regpar4Id': regpar4Id,
+		{'regpar1Id': regpar1Id,
 		'siBuilding': siBuilding.toString(),
 		'siContent': siContent.toString(),
 		'siMachinery': siMachinery.toString(),

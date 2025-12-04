@@ -261,7 +261,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
 
     kejadianMulaiTgl = record.polisMulai;
     kejadianBerakhirTgl = record.polisAkhir;
-
+    selectedPassengerCount = record.passangerCount.toString();
     fieldTplController.text = record.tpl.toString();
 
     // Dropdown Values

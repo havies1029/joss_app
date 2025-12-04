@@ -15,7 +15,10 @@ class Regpar5FormRepository {
 	Future<bool> regpar5FormHapus(String regpar5Id) async {
 		return await api.regpar5FormHapusAPI(regpar5Id);
 	}
-	Future<Regpar5FormModel> regpar5FormLihat(String regpar5Id) async {
-		return await api.regpar5FormLihatAPI(regpar5Id);
+	Future<Regpar5FormModel> regpar5FormLihat(String regpar1Id) async {
+		return await api.regpar5FormLihatAPI(regpar1Id);
+	}
+	Future<Regpar5FormModel> regpar5FormHitungPremi(String regpar5Id) async {
+		return await api.regpar5FormHitungPremiAPI(regpar5Id);
 	}
 }

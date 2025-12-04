@@ -15,7 +15,7 @@ import '../../../../repositories/combobox/combormatauang_repository.dart';
 
 class Calpar2FormPage extends StatefulWidget {
   final String viewMode;
-  final String recordId;
+  final String? recordId;
   final String? calpar1Id;
   final bool isExpanded;
   final Function(bool) onToggle;
@@ -183,6 +183,32 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
     return _calparform2key.currentState?.validate() ?? false;
   }
 
+  Future<void> saveForm2() async {
+    final record = Calpar2FormModel(
+      calpar2Id: widget.recordId ?? "",
+      calpar1Id: widget.calpar1Id ?? "",
+      biIndexRate: double.tryParse(fieldBiIndexRateController.text.replaceAll(',', '')) ?? 0,
+      biTotal: double.tryParse(fieldBiTotalController.text.replaceAll(',', '')) ?? 0,
+      siBi: double.tryParse(fieldSiBiController.text.replaceAll(',', '')) ?? 0,
+      stockAdjustable: double.tryParse(fieldStockAdjustableController.text.replaceAll(',', '')) ?? 0,
+      mbiindemnityojkId: fieldComboMBiindemnityOjk?.mbiindemnityojkId,
+      rmatauangKode: fieldComboRMatauang?.rmatauangKode,
+      siBuilding: double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
+      siContent: double.parse(fieldSiContentController.text.replaceAll(',', '')),
+      siMachinery: double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
+      siOther: double.parse(fieldSiOtherController.text.replaceAll(',', '')),
+      siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
+    );
+
+    if (widget.viewMode == "tambah") {
+      debugPrint("ini tambah loh di trigger di form2");
+      calpar2Bloc.add(Calpar2FormTambahEvent(record: record));
+    } else {
+      debugPrint("ini ubah loh di trigger di form2");
+      calpar2Bloc.add(Calpar2FormUbahEvent(record: record));
+    }
+  }
+
   Widget buildFieldBiIndexRate() => appTextField(
     label: "BI Index Rate",
     controller: fieldBiIndexRateController,
@@ -216,32 +242,6 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
     //   return null;
     // },
   );
-
-  Future<void> saveForm2() async {
-    final record = Calpar2FormModel(
-      calpar2Id: widget.recordId ?? "",
-      calpar1Id: widget.calpar1Id ?? "",
-      biIndexRate: double.tryParse(fieldBiIndexRateController.text.replaceAll(',', '')) ?? 0,
-      biTotal: double.tryParse(fieldBiTotalController.text.replaceAll(',', '')) ?? 0,
-      siBi: double.tryParse(fieldSiBiController.text.replaceAll(',', '')) ?? 0,
-      stockAdjustable: double.tryParse(fieldStockAdjustableController.text.replaceAll(',', '')) ?? 0,
-      mbiindemnityojkId: fieldComboMBiindemnityOjk?.mbiindemnityojkId,
-      rmatauangKode: fieldComboRMatauang?.rmatauangKode,
-      siBuilding: double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
-      siContent: double.parse(fieldSiContentController.text.replaceAll(',', '')),
-      siMachinery: double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
-      siOther: double.parse(fieldSiOtherController.text.replaceAll(',', '')),
-      siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
-    );
-
-    if (widget.viewMode == "tambah") {
-      debugPrint("ini tambah loh di trigger di form2");
-      calpar2Bloc.add(Calpar2FormTambahEvent(record: record));
-    } else {
-      debugPrint("ini ubah loh di trigger di form2");
-      calpar2Bloc.add(Calpar2FormUbahEvent(record: record));
-    }
-  }
   
   Widget buildFieldMbiindemnityojkId() => ReusableComboBox<ComboMBiindemnityOjkModel>(
     hintText: "Indemnity",

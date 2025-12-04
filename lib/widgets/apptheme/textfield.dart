@@ -89,7 +89,7 @@ class appTextField extends StatelessWidget {
       enabled: enabled,
       maxLines: maxLines ?? 1,
       keyboardType: keyboardType,
-      inputFormatters: _getDefaultFormatters(), 
+      inputFormatters: _getDefaultFormatters(),
       onTap: onTap,
       onChanged: onChanged,
       autovalidateMode: autovalidateMode ?? AutovalidateMode.disabled,
@@ -105,7 +105,7 @@ class appTextField extends StatelessWidget {
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
         fillColor: (enabled ?? true) ? formGrey : sGrey,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        contentPadding: const EdgeInsets.all(10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: sGrey),

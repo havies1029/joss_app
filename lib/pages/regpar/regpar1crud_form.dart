@@ -58,8 +58,8 @@ class Regpar1CrudFormPageFormState extends State<Regpar1CrudFormPage> {
 											),
 										),
 										const SizedBox(height: 25),
-										buildFieldTtgAlamat(),
 										buildFieldTtgNama(),
+										buildFieldTtgAlamat(),
 										const SizedBox(height: 25),
 										FormError(
 											errors: errors,

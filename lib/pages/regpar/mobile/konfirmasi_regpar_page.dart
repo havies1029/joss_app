@@ -155,27 +155,19 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   )),
                   _buildRegpar2Card(regpar2Record ?? Regpar2FormModel(
                     regpar2Id: "-",
-                    coverLama: 0,
                     polisMulai: DateTime.now(),
-                    polisAkhir: DateTime.now(),
+                    polisAkhir: DateTime.now(), regpar1Id: widget.recordId!, objectAlamat: '',
                   )),
                   _buildRegpar3Card(regpar3Record ?? Regpar3FormModel(
                     regpar3Id: "-",
-                    isEq: false,
-                    rateEqvet: 0,
-                    rateOther: 0,
-                    ratePar: 0,
-                    rateRsmdcc: 0,
-                    rateTsfwd: 0,
-                    rateTotal: 0,
+                    isEq: false, regpar1Id: widget.recordId!,
                   )),
                   _buildRegpar4Card(regpar4Record ?? Regpar4FormModel(
-                    regpar4Id: "-",
                     siBuilding: 0,
                     siContent: 0,
                     siMachinery: 0,
                     siOther: 0,
-                    siStock: 0,
+                    siStock: 0, regpar1Id: widget.recordId!,
                   )),
                   const SizedBox(height: hPadding),
 
@@ -256,9 +248,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   "${DateFormat('dd MMM yyyy').format(data.polisAkhir)}"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("Lama Pertanggungan", "${data.coverLama} Bulan"),
-          kDivider(color: sGrey),
-
           _buildDetailRow("Konstruksi Bangunan",
               data.comboRKonstruksiojk?.kelasNama ?? "-"),
           kDivider(color: sGrey),
@@ -290,10 +279,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           _buildDetailRow("ID Rate", data.regpar3Id),
           kDivider(color: sGrey),
 
-          _buildDetailRow("Zona Gempa",
-              data.comboMZonaGempa?.zonaNama ?? "-"),
-          kDivider(color: sGrey),
-
           _buildDetailRow("Jenis Cover",
               data.comboMJnscoverPar?.jenisNama ?? "-"),
           kDivider(color: sGrey),
@@ -302,18 +287,18 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               data.comboMWilayah?.wilayahNama ?? "-"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("Rate EQ (Gempa)", "${data.rateEqvet}%"),
-          kDivider(color: sGrey),
-          _buildDetailRow("Rate PAR", "${data.ratePar}%"),
-          kDivider(color: sGrey),
-          _buildDetailRow("Rate RSMDCC", "${data.rateRsmdcc}%"),
-          kDivider(color: sGrey),
-          _buildDetailRow("Rate TSFWD", "${data.rateTsfwd}%"),
-          kDivider(color: sGrey),
-          _buildDetailRow("Rate Other", "${data.rateOther}%"),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("Total Rate", "${data.rateTotal}%"),
+          // _buildDetailRow("Rate EQ (Gempa)", "${data.rateEqvet}%"),
+          // kDivider(color: sGrey),
+          // _buildDetailRow("Rate PAR", "${data.ratePar}%"),
+          // kDivider(color: sGrey),
+          // _buildDetailRow("Rate RSMDCC", "${data.rateRsmdcc}%"),
+          // kDivider(color: sGrey),
+          // _buildDetailRow("Rate TSFWD", "${data.rateTsfwd}%"),
+          // kDivider(color: sGrey),
+          // _buildDetailRow("Rate Other", "${data.rateOther}%"),
+          // kDivider(color: sGrey),
+          //
+          // _buildDetailRow("Total Rate", "${data.rateTotal}%"),
         ],
       ),
     );
@@ -336,8 +321,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           _buildSectionHeader("Nilai Pertanggungan"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("ID Pertanggungan", data.regpar4Id),
-          kDivider(color: sGrey),
+          // _buildDetailRow("ID Pertanggungan", data.regpar4Id),
+          // kDivider(color: sGrey),
 
           _buildDetailRowIcon("SI Building", data.siBuilding),
           kDivider(color: sGrey),

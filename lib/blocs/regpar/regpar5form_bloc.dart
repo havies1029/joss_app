@@ -14,6 +14,7 @@ class Regpar5FormBloc extends Bloc<Regpar5FormEvents, Regpar5FormState> {
 		on<Regpar5FormTambahEvent>(onTambahRegpar5Form);
 		on<Regpar5FormHapusEvent>(onHapusRegpar5Form);
 		on<Regpar5FormLihatEvent>(onLihatRegpar5Form);
+		on<Regpar5FormHitungPremiEvent>(onHitungPremiRegpar5Form);
 	}
 
 	Future<void> onTambahRegpar5Form(
@@ -49,6 +50,14 @@ class Regpar5FormBloc extends Bloc<Regpar5FormEvents, Regpar5FormState> {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Regpar5FormModel record = await repository.regpar5FormLihat(event.recordId);
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+	}
+
+	Future<void> onHitungPremiRegpar5Form(
+			Regpar5FormHitungPremiEvent event, Emitter<Regpar5FormState> emit) async {
+		emit(state.copyWith(isCalculating: true, isCalculated: false));
+		// Simulate premi calculation logic here
+		Regpar5FormModel record = await repository.regpar5FormHitungPremi(event.recordId);
+		emit(state.copyWith(isCalculating: false, isCalculated: true, record: record));
 	}
 
 }

@@ -16,6 +16,7 @@ class Calpar1ListBloc extends Bloc<Calpar1ListEvents, Calpar1ListState> {
 		on<TambahCalpar1ListEvent>(onTambahCalpar1List);
 		on<HapusCalpar1ListEvent>(onHapusCalpar1List);
 		on<CloseDialogCalpar1ListEvent>(onCloseDialogCalpar1List);
+		on<CalPar2RegParEvent>(onCalPar2RegPar);
 	}
 
 	Future<void> onRefreshCalpar1List(
@@ -81,5 +82,19 @@ class Calpar1ListBloc extends Bloc<Calpar1ListEvents, Calpar1ListState> {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "ubah", recordId: event.recordId));
 	}
+
+	Future<void> onCalPar2RegPar(
+			CalPar2RegParEvent event, Emitter<Calpar1ListState> emit) async {
+		emit(state.copyWith(isProcessing: true, isProcessed: false));
+		Calpar1ListRepository repo = Calpar1ListRepository();
+		final result = await repo.calpar2Regpar(event.calpar1Id);
+		bool hasFailure = !result.success;
+		emit(state.copyWith(
+				isProcessing: false,
+				isProcessed: true,
+				hasFailure: hasFailure,
+				processMessage: result.data.toString()));
+	}
+
 
 }

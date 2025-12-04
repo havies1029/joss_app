@@ -72,9 +72,9 @@ class Regpar5FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Regpar5FormModel> regpar5FormLihatAPI(String regpar5Id) async {
+	Future<Regpar5FormModel> regpar5FormLihatAPI(String regpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regpar/regpar5form/read";
-		Map<String, String> queryParams = {'regpar5Id': regpar5Id};
+		Map<String, String> queryParams = {'regpar1Id': regpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
 			await http.get(uri, headers: <String, String>{
@@ -90,4 +90,25 @@ class Regpar5FormAPI {
 			return throw Exception("Failed to load data");
 		}
 	}
+
+	Future<Regpar5FormModel> regpar5FormHitungPremiAPI(String regpar1Id) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regpar/regpar5form/hitungpremi";
+		Map<String, String> queryParams = {'regpar1Id': regpar1Id,
+			'modul_id': 'regpar5FormHitungPremiAPI'};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		final http.Response response =
+		await http.get(uri, headers: <String, String>{
+			'Content-Type': 'application/json; odata=verbos',
+			'Accept': 'application/json; odata=verbos',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		});
+
+		if (response.statusCode == 200) {
+			var returnData = Regpar5FormModel.fromJson(jsonDecode(response.body));
+			return returnData;
+		} else {
+			return throw Exception("Failed to load data");
+		}
+	}
+
 }

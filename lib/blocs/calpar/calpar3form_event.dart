@@ -39,21 +39,20 @@ class Calpar3FormLihatEvent extends Calpar3FormEvents {
 	List<Object> get props => [recordId];
 }
 
-class ComboMWilayahChangedEvent extends Calpar3FormEvents{
-	final ComboMWilayahModel comboMWilayah;
-	const ComboMWilayahChangedEvent({required this.comboMWilayah});
-
-	@override	List<Object> get props => [comboMWilayah];}
-
 class ComboMJnscoverParChangedEvent extends Calpar3FormEvents{
 	final ComboMJnscoverParModel comboMJnscoverPar;
 	const ComboMJnscoverParChangedEvent({required this.comboMJnscoverPar});
 
 	@override	List<Object> get props => [comboMJnscoverPar];}
 
+class ComboMWilayahChangedEvent extends Calpar3FormEvents{
+	final ComboMWilayahModel comboMWilayah;
+	const ComboMWilayahChangedEvent({required this.comboMWilayah});
+
+	@override	List<Object> get props => [comboMWilayah];}
+
 class ComboMKabZonaGempaChangedEvent extends Calpar3FormEvents{
 	final ComboMKabZonaGempaModel comboMKabZonaGempa;
 	const ComboMKabZonaGempaChangedEvent({required this.comboMKabZonaGempa});
 
 	@override	List<Object> get props => [comboMKabZonaGempa];}
-

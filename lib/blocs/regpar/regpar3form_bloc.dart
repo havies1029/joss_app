@@ -1,9 +1,9 @@
+import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combomjnscoverpar_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
-import 'package:joss_app/models/combobox/combomzonagempa_model.dart';
 import 'package:joss_app/models/regpar/regpar3form_model.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
 
@@ -19,11 +19,11 @@ class Regpar3FormBloc extends Bloc<Regpar3FormEvents, Regpar3FormState> {
 		on<Regpar3FormLihatEvent>(onLihatRegpar3Form);
 		on<ComboMJnscoverParChangedEvent>(onComboMJnscoverParChanged);
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
-		on<ComboMZonaGempaChangedEvent>(onComboMZonaGempaChanged);
+		on<ComboMKabZonaGempaChangedEvent>(onComboMKabZonaGempaChanged);
 	}
 
 	Future<void> onTambahRegpar3Form(
-		Regpar3FormTambahEvent event, Emitter<Regpar3FormState> emit) async {
+			Regpar3FormTambahEvent event, Emitter<Regpar3FormState> emit) async {
 
 		ReturnDataAPI returnData;
 		bool hasFailure = true;
@@ -31,30 +31,33 @@ class Regpar3FormBloc extends Bloc<Regpar3FormEvents, Regpar3FormState> {
 		returnData = await repository.regpar3FormTambah(event.record);
 		hasFailure = !returnData.success;
 		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+				isSaving: false,
+				isSaved: true,
+				hasFailure: hasFailure));
 	}
 
 	Future<void> onUbahRegpar3Form(
-		Regpar3FormUbahEvent event, Emitter<Regpar3FormState> emit) async {
+			Regpar3FormUbahEvent event, Emitter<Regpar3FormState> emit) async {
 		emit(state.copyWith(isSaving: true, isSaved: false));
 		bool hasFailure = !await repository.regpar3FormUbah(event.record);
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
 	Future<void> onHapusRegpar3Form(
-		Regpar3FormHapusEvent event, Emitter<Regpar3FormState> emit) async {
+			Regpar3FormHapusEvent event, Emitter<Regpar3FormState> emit) async {
 		emit(state.copyWith(isSaving: true, isSaved: false));
 		bool hasFailure = !await repository.regpar3FormHapus(event.recordId);
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
 	Future<void> onLihatRegpar3Form(
-		Regpar3FormLihatEvent event, Emitter<Regpar3FormState> emit) async {
+			Regpar3FormLihatEvent event, Emitter<Regpar3FormState> emit) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Regpar3FormModel record = await repository.regpar3FormLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+		emit(state.copyWith(isLoading: false, isLoaded: true, record: record,
+				comboMJnscoverPar: record.comboMJnscoverPar,
+				comboMWilayah: record.comboMWilayah,
+				comboMKabZonaGempa: record.comboMKabZonaGempa));
 	}
 
 	Future<void> onComboMJnscoverParChanged(
@@ -63,10 +66,18 @@ class Regpar3FormBloc extends Bloc<Regpar3FormEvents, Regpar3FormState> {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 
 		ComboMJnscoverParModel comboMJnscoverPar = event.comboMJnscoverPar;
+		var record = state.record;
+		record?.isEq = comboMJnscoverPar.isEq;
+		record?.isFlexas = comboMJnscoverPar.isFlexas;
+		record?.isOther = comboMJnscoverPar.isOther;
+		record?.isRsmdcc = comboMJnscoverPar.isRsmdcc;
+		record?.isTsfwd = comboMJnscoverPar.isTsfwd;
+
 		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMJnscoverPar: comboMJnscoverPar));
+				isLoading: false,
+				isLoaded: true,
+				comboMJnscoverPar: comboMJnscoverPar,
+				record: record));
 	}
 
 	Future<void> onComboMWilayahChanged(
@@ -76,21 +87,21 @@ class Regpar3FormBloc extends Bloc<Regpar3FormEvents, Regpar3FormState> {
 
 		ComboMWilayahModel comboMWilayah = event.comboMWilayah;
 		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMWilayah: comboMWilayah));
+				isLoading: false,
+				isLoaded: true,
+				comboMWilayah: comboMWilayah));
 	}
 
-	Future<void> onComboMZonaGempaChanged(
-			ComboMZonaGempaChangedEvent event, Emitter<Regpar3FormState> emit) async {
+	Future<void> onComboMKabZonaGempaChanged(
+			ComboMKabZonaGempaChangedEvent event, Emitter<Regpar3FormState> emit) async {
 
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 
-		ComboMZonaGempaModel comboMZonaGempa = event.comboMZonaGempa;
+		ComboMKabZonaGempaModel comboMKabZonaGempa = event.comboMKabZonaGempa;
 		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMZonaGempa: comboMZonaGempa));
+				isLoading: false,
+				isLoaded: true,
+				comboMKabZonaGempa: comboMKabZonaGempa));
 	}
 
 }

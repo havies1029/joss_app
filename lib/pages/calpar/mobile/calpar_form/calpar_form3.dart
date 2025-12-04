@@ -21,7 +21,7 @@ import '../../../../repositories/combobox/combomwilayah_repository.dart';
 
 class Calpar3FormPage extends StatefulWidget {
   final String viewMode;
-  final String recordId;
+  final String? recordId;
   final String? calpar1Id;
   final bool isExpanded;
   final Function(bool) onToggle;
@@ -35,12 +35,15 @@ class Calpar3FormPage extends StatefulWidget {
 class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   final _calparform3key = GlobalKey<FormState>();
 
-  final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
 
   // Controllers
   final fieldIsEqController = TextEditingController();
   final fieldIsTsfwdController = TextEditingController();
+  final fieldIsFlexasController = TextEditingController();
+  final fieldIsOtherController = TextEditingController();
+  final fieldIsRsmdccController = TextEditingController();
+
   final fieldRateEqvetController = TextEditingController();
   final fieldRateOtherController = TextEditingController();
   final fieldRateParController = TextEditingController();
@@ -76,6 +79,10 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   void dispose() {
     fieldIsEqController.dispose();
     fieldIsTsfwdController.dispose();
+    fieldIsFlexasController.dispose();
+    fieldIsOtherController.dispose();
+    fieldIsRsmdccController.dispose();
+
     fieldRateEqvetController.dispose();
     fieldRateOtherController.dispose();
     fieldRateParController.dispose();
@@ -110,16 +117,12 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
 
   void _injectPayload(Calpar3FormModel record) {
     debugPrint("🔥 [Form3] Injecting payload...");
+    fieldIsFlexasController.text = record.isFlexas.toString();
+    fieldIsOtherController.text = record.isOther.toString();
+    fieldIsRsmdccController.text = record.isRsmdcc.toString();
+    fieldIsTsfwdController.text = record.isTsfwd.toString();
 
-    fieldRateEqvetController.text       = cleanNum(record.rateEqvet);
-    fieldRateOtherController.text      = cleanNum(record.rateOther);
-    fieldRateParController.text      = cleanNum(record.ratePar);
-    fieldRateRsmdccController.text      = cleanNum(record.rateRsmdcc);
-    fieldRateTotalController.text      = cleanNum(record.rateTotal);
-    fieldRateTsfwdController.text      = cleanNum(record.rateTsfwd);
-
-    fieldIsEqController.text         = record.isEq.toString();
-
+    fieldIsEqController.text = record.isEq.toString();
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
     fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
     fieldComboMWilayah = record.comboMWilayah;
@@ -156,6 +159,21 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
               ],
             ),
             const SizedBox(height: 12),
+            Row(
+              children: [
+                Flexible(child: buildFieldIsFlexas()),
+                const SizedBox(width: 8),
+                Flexible(child: buildFieldIsRsmdcc()),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Flexible(child: buildFieldIsOther()),
+                const Flexible(child: SizedBox.shrink()),
+              ],
+            ),
+            const SizedBox(height: 12),
             buildFieldMwilayahId(),
             const SizedBox(height: 12),
             buildFieldKab2zonagempaId(),
@@ -184,15 +202,12 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
       calpar1Id: widget.calpar1Id ?? "",
       isEq: toBoolean(fieldIsEqController.text),
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
+      isFlexas: toBoolean(fieldIsFlexasController.text),
+      isOther: toBoolean(fieldIsOtherController.text),
+      isRsmdcc: toBoolean(fieldIsRsmdccController.text),
       kab2zonagempaId: fieldComboMKabZonaGempa?.mkabzonagempaId,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
-      rateEqvet: double.tryParse(fieldRateEqvetController.text.replaceAll(',', '')) ?? 0,
-      rateOther: double.tryParse(fieldRateOtherController.text.replaceAll(',', '')) ?? 0,
-      ratePar: double.tryParse(fieldRateParController.text.replaceAll(',', '')) ?? 0,
-      rateRsmdcc: double.tryParse(fieldRateRsmdccController.text.replaceAll(',', '')) ?? 0,
-      rateTotal: double.tryParse(fieldRateTotalController.text.replaceAll(',', '')) ?? 0,
-      rateTsfwd: double.tryParse(fieldRateTsfwdController.text.replaceAll(',', '')) ?? 0,
     );
 
     if (widget.viewMode == "tambah") {
@@ -220,6 +235,27 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     rightLabel: "Banjir",
     initialValue: toBoolean(fieldIsTsfwdController.text),
     callback: (v) => fieldIsTsfwdController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget buildFieldIsFlexas()=> CheckboxWidget(
+    rightLabel: "Kebakaran/Petir",
+    initialValue: toBoolean(fieldIsFlexasController.text),
+    callback: (v) => fieldIsFlexasController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget buildFieldIsOther()=> CheckboxWidget(
+    rightLabel: "Lainnya",
+    initialValue: toBoolean(fieldIsOtherController.text),
+    callback: (v) => fieldIsOtherController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget buildFieldIsRsmdcc()=> CheckboxWidget(
+    rightLabel: "Huru Hara/Kerusuhan",
+    initialValue: toBoolean(fieldIsRsmdccController.text),
+    callback: (v) => fieldIsRsmdccController.text = v.toString(),
     leftLabel: "",
   );
 

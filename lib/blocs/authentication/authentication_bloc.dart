@@ -67,7 +67,13 @@ class AuthenticationBloc
 
     debugPrint("hasToken ?");
     if (token.isNotEmpty) {
-      final user = await userRepository.getUserByToken(token);
+      var user = await userRepository.getUserByToken(token);
+
+      if (user == null) {
+        debugPrint("Invalid token, proceed to unauthenticated");
+        emit(AuthenticationUnauthenticated());
+        return;
+      }
 
       AppData.user = user;
       AppData.userToken = token;

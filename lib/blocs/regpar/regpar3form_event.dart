@@ -51,9 +51,8 @@ class ComboMWilayahChangedEvent extends Regpar3FormEvents{
 
 	@override	List<Object> get props => [comboMWilayah];}
 
-class ComboMZonaGempaChangedEvent extends Regpar3FormEvents{
-	final ComboMZonaGempaModel comboMZonaGempa;
-	const ComboMZonaGempaChangedEvent({required this.comboMZonaGempa});
+class ComboMKabZonaGempaChangedEvent extends Regpar3FormEvents{
+	final ComboMKabZonaGempaModel comboMKabZonaGempa;
+	const ComboMKabZonaGempaChangedEvent({required this.comboMKabZonaGempa});
 
-	@override	List<Object> get props => [comboMZonaGempa];}
-
+	@override	List<Object> get props => [comboMKabZonaGempa];}

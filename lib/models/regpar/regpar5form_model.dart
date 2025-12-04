@@ -1,5 +1,6 @@
 
 class Regpar5FormModel {
+	String regpar1Id;
 	double diskonNilai;
 	double diskonPersen;
 	double premiEqvet;
@@ -15,7 +16,7 @@ class Regpar5FormModel {
 		required this.premiEqvet, required this.premiNet, 
 		required this.premiOther, required this.premiPar, 
 		required this.premiRsmdcc, required this.premiTotal, 
-		required this.premiTsfwd, required this.regpar5Id});
+		required this.premiTsfwd, required this.regpar5Id, required this.regpar1Id});
 
 	factory Regpar5FormModel.fromJson(Map<String, dynamic> data) {
 		return Regpar5FormModel(
@@ -28,7 +29,8 @@ class Regpar5FormModel {
 			premiRsmdcc: double.tryParse(data['premiRsmdcc'].toString())??0,
 			premiTotal: double.tryParse(data['premiTotal'].toString())??0,
 			premiTsfwd: double.tryParse(data['premiTsfwd'].toString())??0,
-			regpar5Id: data['regpar5Id']??''
+			regpar5Id: data['regpar5Id']??'',
+			regpar1Id: data['regpar1Id']??''
 		);
 
 	}
@@ -43,6 +45,6 @@ class Regpar5FormModel {
 		'premiRsmdcc': premiRsmdcc.toString(),
 		'premiTotal': premiTotal.toString(),
 		'premiTsfwd': premiTsfwd.toString(),
-		'regpar5Id': regpar5Id};
-
+		'regpar5Id': regpar5Id,
+		'regpar1Id': regpar1Id};
 }

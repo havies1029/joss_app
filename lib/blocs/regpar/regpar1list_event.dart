@@ -31,3 +31,4 @@ class UbahRegpar1ListEvent extends Regpar1ListEvents {
 class TambahRegpar1ListEvent extends Regpar1ListEvents{}
 class HapusRegpar1ListEvent extends Regpar1ListEvents{}
 class CloseDialogRegpar1ListEvent extends Regpar1ListEvents{}
+

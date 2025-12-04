@@ -4,7 +4,6 @@ import 'package:joss_app/common/constants.dart';
 class CalmvForm3Section extends StatefulWidget {
   final bool isExpanded;
 
-  /// PARAMETER BARU — supaya parent bisa kirim kumpulan data
   final Map<String, dynamic>? initialPayload;
 
   const CalmvForm3Section({

@@ -6,7 +6,6 @@ import 'package:joss_app/blocs/regpar/regpar5form_bloc.dart';
 import 'package:joss_app/models/regpar/regpar5form_model.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
 
 class Regpar5FormFormPage extends StatefulWidget {
@@ -47,105 +46,104 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 		return BlocConsumer<Regpar5FormBloc, Regpar5FormState>(
 			builder: (context, state) {
 				return Dialog(
-					shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-					child: SingleChildScrollView(
-						child: Padding(
-							padding: const EdgeInsets.all(8.0),
-							child: Form(
-								key: _formKey,
-								child: Column(
-									children: [
-										const SizedBox(height: 10),
-										Text(
-											"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} Perhitungan Premi",
-											style: const TextStyle(
-												fontSize: 20.0,
-												color: Color(0xffff6101),
-												fontWeight: FontWeight.w600,
-												fontFamily: 'Hind',
-												fontStyle: FontStyle.italic,
-												decoration: TextDecoration.underline,
-											),
-										),
-										const SizedBox(height: 25),
-										buildFieldDiskonNilai(),
-										buildFieldDiskonPersen(),
-										buildFieldPremiEqvet(),
-										buildFieldPremiNet(),
-										buildFieldPremiOther(),
-										buildFieldPremiPar(),
-										buildFieldPremiRsmdcc(),
-										buildFieldPremiTotal(),
-										buildFieldPremiTsfwd(),
-										buildFieldRegpar1Id(),
-										const SizedBox(height: 25),
-										FormError(
-											errors: errors,
-											key: null,
-										),
-										Row(
-											mainAxisAlignment: MainAxisAlignment.spaceAround,
+						shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+						child: SingleChildScrollView(
+							child: Padding(
+								padding: const EdgeInsets.all(8.0),
+								child: Form(
+										key: _formKey,
+										child: Column(
 											children: [
-												SizedBox(
-													width: MediaQuery.of(context).size.width * 0.3,
-													height: 60,
-													child: Padding(
-														padding: const EdgeInsets.only(top: 30.0),
-														child: ElevatedButton(
-															onPressed: () {
-																_dismissDialog();
-															},
-															child: const Text(
-																'Close',
-																style: TextStyle(fontSize: 13.0),
-															),
-														),
+												const SizedBox(height: 10),
+												Text(
+													"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} Perhitungan Premi",
+													style: const TextStyle(
+														fontSize: 20.0,
+														color: Color(0xffff6101),
+														fontWeight: FontWeight.w600,
+														fontFamily: 'Hind',
+														fontStyle: FontStyle.italic,
+														decoration: TextDecoration.underline,
 													),
 												),
-												SizedBox(
-													width: MediaQuery.of(context).size.width * 0.3,
-													height: 60,
-													child: Padding(
-														padding: const EdgeInsets.only(top: 30.0),
-														child: ElevatedButton(
-															onPressed: () {
-																onSaveForm();
-															},
-															child: const Text(
-																'Save',
-																style: TextStyle(fontSize: 13.0),
+												const SizedBox(height: 25),
+												buildFieldDiskonNilai(),
+												buildFieldDiskonPersen(),
+												buildFieldPremiEqvet(),
+												buildFieldPremiNet(),
+												buildFieldPremiOther(),
+												buildFieldPremiPar(),
+												buildFieldPremiRsmdcc(),
+												buildFieldPremiTotal(),
+												buildFieldPremiTsfwd(),
+												const SizedBox(height: 25),
+												FormError(
+													errors: errors,
+													key: null,
+												),
+												Row(
+													mainAxisAlignment: MainAxisAlignment.spaceAround,
+													children: [
+														SizedBox(
+															width: MediaQuery.of(context).size.width * 0.3,
+															height: 60,
+															child: Padding(
+																padding: const EdgeInsets.only(top: 30.0),
+																child: ElevatedButton(
+																	onPressed: () {
+																		_dismissDialog();
+																	},
+																	child: const Text(
+																		'Close',
+																		style: TextStyle(fontSize: 13.0),
+																	),
+																),
 															),
 														),
-													),
+														SizedBox(
+															width: MediaQuery.of(context).size.width * 0.3,
+															height: 60,
+															child: Padding(
+																padding: const EdgeInsets.only(top: 30.0),
+																child: ElevatedButton(
+																	onPressed: () {
+																		onSaveForm();
+																	},
+																	child: const Text(
+																		'Save',
+																		style: TextStyle(fontSize: 13.0),
+																	),
+																),
+															),
+														),
+													],
 												),
 											],
-										),
-									],
-								)),
-						),
-					));
-				},
-				listener: (context, state) {
-					if (state.isLoaded) {
-						if (state.record != null){
-							fieldDiskonNilaiController.text = NumberFormat("#,###").format(state.record!.diskonNilai);
-							fieldDiskonPersenController.text = NumberFormat("#,###").format(state.record!.diskonPersen);
-							fieldPremiEqvetController.text = NumberFormat("#,###").format(state.record!.premiEqvet);
-							fieldPremiNetController.text = NumberFormat("#,###").format(state.record!.premiNet);
-							fieldPremiOtherController.text = NumberFormat("#,###").format(state.record!.premiOther);
-							fieldPremiParController.text = NumberFormat("#,###").format(state.record!.premiPar);
-							fieldPremiRsmdccController.text = NumberFormat("#,###").format(state.record!.premiRsmdcc);
-							fieldPremiTotalController.text = NumberFormat("#,###").format(state.record!.premiTotal);
-							fieldPremiTsfwdController.text = NumberFormat("#,###").format(state.record!.premiTsfwd);
-						}
+										)),
+							),
+						));
+			},
+			listener: (context, state) {
+				if (state.isLoaded) {
+					if (state.record != null){
+						fieldDiskonNilaiController.text = NumberFormat("#,###").format(state.record!.diskonNilai);
+						fieldDiskonPersenController.text = NumberFormat("#,###").format(state.record!.diskonPersen);
+						fieldPremiEqvetController.text = NumberFormat("#,###").format(state.record!.premiEqvet);
+						fieldPremiNetController.text = NumberFormat("#,###").format(state.record!.premiNet);
+						fieldPremiOtherController.text = NumberFormat("#,###").format(state.record!.premiOther);
+						fieldPremiParController.text = NumberFormat("#,###").format(state.record!.premiPar);
+						fieldPremiRsmdccController.text = NumberFormat("#,###").format(state.record!.premiRsmdcc);
+						fieldPremiTotalController.text = NumberFormat("#,###").format(state.record!.premiTotal);
+						fieldPremiTsfwdController.text = NumberFormat("#,###").format(state.record!.premiTsfwd);
 					}
-				},
-			);
-		}
+				}
+			},
+		);
+	}
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-		regpar5FormBloc.add(
-			Regpar5FormLihatEvent(recordId: widget.recordId));
+			regpar5FormBloc.add(
+					Regpar5FormLihatEvent(recordId: widget.recordId));
 		}
 	}
 
@@ -160,7 +158,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -185,7 +183,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -210,7 +208,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -235,7 +233,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -260,7 +258,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -285,7 +283,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -310,7 +308,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -335,7 +333,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -360,7 +358,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -374,11 +372,6 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 		);
 	}
 
-	Widget buildFieldRegpar1Id(){
-		return TextFormField(
-		);
-	}
-
 	void _dismissDialog() {
 		Navigator.pop(context);
 	}
@@ -387,6 +380,7 @@ class Regpar5FormFormPageFormState extends State<Regpar5FormFormPage> {
 		if (_formKey.currentState!.validate()) {
 			_formKey.currentState!.save();
 			Regpar5FormModel record = Regpar5FormModel(
+				regpar1Id: widget.recordId,
 				diskonNilai: double.parse(fieldDiskonNilaiController.text.replaceAll(',', '')),
 				diskonPersen: double.parse(fieldDiskonPersenController.text.replaceAll(',', '')),
 				premiEqvet: double.parse(fieldPremiEqvetController.text.replaceAll(',', '')),

@@ -163,6 +163,26 @@ import 'blocs/share_cubit/share_ringkasan_state_cubit.dart';
 import 'package:joss_app/blocs/hasil_simul_mv_cubit/hasil_simul_mv_cubit.dart';
 import 'helper/app_prefs.dart';
 import 'models/reguser/reguser_model.dart';
+import 'blocs/regother/regother1crud_bloc.dart';
+import 'blocs/regother/regother1list_bloc.dart';
+import 'blocs/regother/regother2form_bloc.dart';
+
+
+import 'package:joss_app/repositories/regother/regother1crud_repository.dart';
+import 'package:joss_app/repositories/regother/regother2form_repository.dart';
+
+import 'package:joss_app/blocs/regpar/regpar1crud_bloc.dart';
+import 'package:joss_app/blocs/regpar/regpar1list_bloc.dart';
+import 'package:joss_app/blocs/regpar/regpar2form_bloc.dart';
+import 'package:joss_app/blocs/regpar/regpar3form_bloc.dart';
+import 'package:joss_app/blocs/regpar/regpar4form_bloc.dart';
+import 'package:joss_app/blocs/regpar/regpar5form_bloc.dart';
+
+import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -247,6 +267,10 @@ Future<void> main() async {
 
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
+
+        BlocProvider(create: (_) => Regother2FormBloc(repository: Regother2FormRepository())),
+        BlocProvider(create: (_) => Regother1CrudBloc(repository: Regother1CrudRepository())),
+        BlocProvider(create: (_) => Regother1ListBloc()),
 
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
@@ -341,7 +365,14 @@ Future<void> main() async {
         BlocProvider(create: (context) => RegmvUploadStnkBloc(repository: RegmvUploadStnkRepository())),
         BlocProvider(create: (context) => RegmvUploadFotoMobilBloc(repository: RegmvUploadFotoMobilRepository())),
         BlocProvider(create: (context) => RegmvUploadFotoAccBloc(repository: RegmvUploadFotoAccRepository())),
-      ],
+
+        BlocProvider(create: (context) => Regpar1ListBloc()),
+        BlocProvider(create: (context) => Regpar1CrudBloc(repository: Regpar1CrudRepository())),
+        BlocProvider(create: (context) => Regpar2FormBloc( repository: Regpar2FormRepository())),
+        BlocProvider(create: (context) => Regpar3FormBloc( repository: Regpar3FormRepository())),
+        BlocProvider(create: (context) => Regpar4FormBloc( repository: Regpar4FormRepository())),
+        BlocProvider(create: (context) => Regpar5FormBloc( repository: Regpar5FormRepository())),
+     ],
       child: MultiBlocListener(
         listeners: [
           // Debug listener untuk Rekan

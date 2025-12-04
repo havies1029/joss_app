@@ -46,4 +46,3 @@ class Calpar4FormHitungPremiEvent extends Calpar4FormEvents {
 	@override
 	List<Object> get props => [calpar1Id];
 }
-

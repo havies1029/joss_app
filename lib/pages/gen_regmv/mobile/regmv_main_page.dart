@@ -44,6 +44,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
   final regmvform3key = GlobalKey<RegmvForm3SectionState>();
   final regmvform4key = GlobalKey<RegmvForm4SectionState>();
   final regmvform5key = GlobalKey<RegmvForm5SectionState>();
+  final regmvform6key = GlobalKey<RegmvForm6SectionState>();
   final regmvform7key = GlobalKey<RegmvForm7SectionState>();
 
   String? regmv1Id;
@@ -160,17 +161,45 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         ),
 
         BlocListener<Regmv6FormBloc, Regmv6FormState>(
+          listenWhen: (prev, curr) {
+            final changed = prev.isLoaded != curr.isLoaded;
+            debugPrint("🟦 [LISTENWHEN] prev.isLoaded=${prev.isLoaded}, curr.isLoaded=${curr.isLoaded}, changed=$changed");
+            return changed && curr.isLoaded && curr.record != null;
+          },
+
           listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              final String newId = state.record!.regmv6Id; // ini String biasa
+            debugPrint("🟨 [LISTENER] MASUK LISTENER FORM6");
 
-              if (newId.isNotEmpty) {
-                setState(() {
-                  regmv6Id = newId; // masukkan ke list
-                });
+            if (state.isLoaded && state.record != null) {
+              final r = state.record!;
 
-                onHitungPremi();
+              debugPrint("🔥 [LISTENER] State LOADED. Record diterima = ${r.toJson()}");
+
+              final payload = {
+                "subtotalPremi": r.premiSubtotal ?? 0,
+                "diskonPremi": r.premiDiskon ?? 0,
+                "netPremi": r.premiNet ?? 0,
+              };
+
+              debugPrint("🟪 [LISTENER] Payload disiapkan: $payload");
+
+              // update UI form6
+              if (regmvform6key.currentState != null) {
+                debugPrint("🟧 [LISTENER] injectPayload() dipanggil ke Form6");
+                regmvform6key.currentState!.injectPayload(payload);
+              } else {
+                debugPrint("⛔ [LISTENER] regmvform6key.currentState == null, injectPayload DILEWATI");
               }
+
+              debugPrint("🟩 [LISTENER] Membuka Form6 via openForm6()");
+              openForm6();
+
+              setState(() {
+                debugPrint("🟫 [LISTENER] setState() dijalankan. Payload disimpan ke _form6Payload");
+                _form6Payload = payload;
+              });
+
+              debugPrint("🟨 [LISTENER] AKHIR listener Form6");
             }
           },
         ),
@@ -443,7 +472,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
   }
 
   Future<void> simulateToggleForm7() async {
-    await onToggleForm5(true);
+    await onToggleForm7(true);
   }
 
 
@@ -473,9 +502,9 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
       0: () async => regmvform1key.currentState?.validateAndReturn() ?? false,
       1: () async => regmvform2key.currentState?.validateAndReturn() ?? false,
       2: () async => regmvform3key.currentState?.validateAndReturn() ?? false,
-      3: () async => regmvform4key.currentState?.validateAndReturn() ?? false,
-      4: () async => regmvform5key.currentState?.validateAndReturn() ?? false,
-      5: () async => regmvform7key.currentState?.validateAndReturn() ?? false,
+      // 3: () async => regmvform4key.currentState?.validateAndReturn() ?? false,
+      // 4: () async => regmvform5key.currentState?.validateAndReturn() ?? false,
+      // 5: () async => regmvform7key.currentState?.validateAndReturn() ?? false,
     };
 
     // SAVERS
@@ -483,9 +512,9 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
       0: () async => await regmvform1key.currentState?.saveForm1(),
       1: () async => await regmvform2key.currentState?.saveForm2(),
       2: () async => await regmvform3key.currentState?.saveForm3(),
-      3: () async => {}, // upload STNK = auto di Bloc
-      4: () async => {}, // upload mobil = auto di Bloc
-      5: () async => {}, // upload acc = auto di Bloc
+      // 3: () async => {}, // upload STNK = auto di Bloc
+      // 4: () async => {}, // upload mobil = auto di Bloc
+      // 5: () async => {}, // upload acc = auto di Bloc
     };
 
     print("🔎 Cek semua form sebelum pindah ke Form 6...");

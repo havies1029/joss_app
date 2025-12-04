@@ -8,18 +8,18 @@ class Regpar3FormAPI {
 
 	Future<ReturnDataAPI> regpar3FormTambahAPI(Regpar3FormModel record) async {
 		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/regpar/regpar3form/create";
+				"${AppData.prefixEndPoint}/api/regpar/regpar3form/create";
 		Map<String, String> queryParams = {"modul_id": "regpar3FormTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -30,18 +30,18 @@ class Regpar3FormAPI {
 	}
 	Future<bool> regpar3FormUbahAPI(Regpar3FormModel record) async {
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/regpar/regpar3form/update";
+				"${AppData.prefixEndPoint}/api/regpar/regpar3form/update";
 		Map<String, String> queryParams = {"modul_id": "regpar3FormUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
@@ -58,7 +58,7 @@ class Regpar3FormAPI {
 			'modul_id': 'regpar3FormHapusAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -72,12 +72,12 @@ class Regpar3FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Regpar3FormModel> regpar3FormLihatAPI(String regpar3Id) async {
+	Future<Regpar3FormModel> regpar3FormLihatAPI(String regpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regpar/regpar3form/read";
-		Map<String, String> queryParams = {'regpar3Id': regpar3Id};
+		Map<String, String> queryParams = {'regpar1Id': regpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'

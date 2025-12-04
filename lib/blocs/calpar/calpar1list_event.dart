@@ -31,3 +31,12 @@ class UbahCalpar1ListEvent extends Calpar1ListEvents {
 class TambahCalpar1ListEvent extends Calpar1ListEvents{}
 class HapusCalpar1ListEvent extends Calpar1ListEvents{}
 class CloseDialogCalpar1ListEvent extends Calpar1ListEvents{}
+
+class CalPar2RegParEvent extends Calpar1ListEvents {
+	final String calpar1Id;
+
+	const CalPar2RegParEvent({required this.calpar1Id});
+
+	@override
+	List<Object> get props => [calpar1Id];
+}

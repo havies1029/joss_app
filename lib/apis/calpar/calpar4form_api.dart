@@ -72,9 +72,10 @@ class Calpar4FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Calpar4FormModel> calpar4FormLihatAPI(String calpar4Id) async {
+
+	Future<Calpar4FormModel> calpar4FormLihatAPI(String calpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar4form/read";
-		Map<String, String> queryParams = {'calpar4Id': calpar4Id};
+		Map<String, String> queryParams = {'calpar1Id': calpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
 			await http.get(uri, headers: <String, String>{
@@ -91,22 +92,25 @@ class Calpar4FormAPI {
 		}
 	}
 
-  Future<Calpar4FormModel> calpar4FormHitungPremiAPI(String calpar1Id) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar4form/hitungpremi";
-		Map<String, String> queryParams = {'calpar1Id': calpar1Id, "modul_id": "calpar4FormHitungPremiAPI"};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+	Future<Calpar4FormModel> calpar4FormHitungPremiAPI(String calpar1Id) async {
+		String hitungPremiEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar4form/hitungpremi";
+		Map<String, String> queryParams = {
+			'calpar1Id': calpar1Id,
+			'modul_id': 'calpar4FormHitungPremiAPI'};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, hitungPremiEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
 		});
 
+		Calpar4FormModel returnData;
 		if (response.statusCode == 200) {
-			var returnData = Calpar4FormModel.fromJson(jsonDecode(response.body));
-			return returnData;
+			returnData = Calpar4FormModel.fromJson(jsonDecode(response.body));
 		} else {
-			return throw Exception("Failed to load data");
+			return throw Exception("Failed to hitung premi");
 		}
+		return returnData;
 	}
 }
