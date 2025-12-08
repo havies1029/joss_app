@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -93,24 +94,47 @@ class Calpar4FormAPI {
 	}
 
 	Future<Calpar4FormModel> calpar4FormHitungPremiAPI(String calpar1Id) async {
-		String hitungPremiEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar4form/hitungpremi";
+		String hitungPremiEndpoint =
+				"${AppData.prefixEndPoint}/api/calpar/calpar4form/hitungpremi";
+
 		Map<String, String> queryParams = {
 			'calpar1Id': calpar1Id,
-			'modul_id': 'calpar4FormHitungPremiAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, hitungPremiEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+			'modul_id': 'calpar4FormHitungPremiAPI',
+		};
+
+		var uri =
+		AppData.uriHtpp(AppData.httpAuthority, hitungPremiEndpoint, queryParams);
+
+		// 🔍 DEBUG PRINT
+		debugPrint("🔵 [HITUNG PREMI] URI => $uri");
+
+		final http.Response response = await http.get(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}',
+			},
+		);
+
+		debugPrint("🟣 [HITUNG PREMI] Status Code => ${response.statusCode}");
+		debugPrint("🟣 [HITUNG PREMI] Raw Response => ${response.body}");
 
 		Calpar4FormModel returnData;
+
 		if (response.statusCode == 200) {
-			returnData = Calpar4FormModel.fromJson(jsonDecode(response.body));
+			final decoded = jsonDecode(response.body);
+
+			// optional tapi sangat membantu
+			debugPrint("🟢 [HITUNG PREMI] Decoded JSON => $decoded");
+
+			returnData = Calpar4FormModel.fromJson(decoded);
 		} else {
-			return throw Exception("Failed to hitung premi");
+			debugPrint("🔴 [HITUNG PREMI] ERROR => ${response.statusCode}");
+			throw Exception("Failed to hitung premi");
 		}
+
 		return returnData;
 	}
+
 }

@@ -73,4 +73,36 @@ class Calpar3FormModel {
 				'mwilayahId': mwilayahId,
 				'comboMWilayah': comboMWilayah?.toJson()};
 
+	Calpar3FormModel copyWith({
+		String? calpar1Id,
+		String? calpar3Id,
+		bool? isEq,
+		bool? isFlexas,
+		bool? isOther,
+		bool? isRsmdcc,
+		bool? isTsfwd,
+		String? kab2zonagempaId,
+		ComboMKabZonaGempaModel? comboMKabZonaGempa,
+		String? mjnscoverparId,
+		ComboMJnscoverParModel? comboMJnscoverPar,
+		String? mwilayahId,
+		ComboMWilayahModel? comboMWilayah,
+	}) {
+		return Calpar3FormModel(
+			calpar1Id: calpar1Id ?? this.calpar1Id,
+			calpar3Id: calpar3Id ?? this.calpar3Id,
+			isEq: isEq ?? this.isEq,
+			isFlexas: isFlexas ?? this.isFlexas,
+			isOther: isOther ?? this.isOther,
+			isRsmdcc: isRsmdcc ?? this.isRsmdcc,
+			isTsfwd: isTsfwd ?? this.isTsfwd,
+			kab2zonagempaId: kab2zonagempaId ?? this.kab2zonagempaId,
+			comboMKabZonaGempa: comboMKabZonaGempa ?? this.comboMKabZonaGempa,
+			mjnscoverparId: mjnscoverparId ?? this.mjnscoverparId,
+			comboMJnscoverPar: comboMJnscoverPar ?? this.comboMJnscoverPar,
+			mwilayahId: mwilayahId ?? this.mwilayahId,
+			comboMWilayah: comboMWilayah ?? this.comboMWilayah,
+		);
+	}
 }
+

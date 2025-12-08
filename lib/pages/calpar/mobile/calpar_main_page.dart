@@ -153,19 +153,16 @@ class _CalparFormMainState extends State<CalparFormMain> {
         // =================== LISTENER FORM 4 (PREMI) ===================
         BlocListener<Calpar4FormBloc, Calpar4FormState>(
           listener: (context, state) {
-            if (state.isLoaded && state.record != null) {
+            if (state.isCalculated && state.record != null) {
               final r = state.record!;
-              debugPrint("🔥 [LISTENER FORM4] Premi diterima: ${r.toJson()}");
 
               final payload = {
-                "subtotalPremi": r.premiOther ?? 0,
-                "diskonPremi": r.discNilai ?? 0,
-                "netPremi": r.premiNet ?? 0,
+                "premiOther": r.premiOther,
+                "discNilai": r.discNilai,
+                "premiNet": r.premiNet,
               };
 
-              if (calparform4key.currentState != null) {
-                calparform4key.currentState!.injectPayload(payload);
-              }
+              calparform4key.currentState?.injectPayload(payload);
 
               openForm4();
 
@@ -196,12 +193,12 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   SnackBar(content: Text("Gagal: ${state.processMessage}")),
                 );
               } else {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => RegparFormMain(recordId: state.processMessage, viewMode: 'ubah',),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegparFormMain(recordId: state.processMessage, viewMode: 'ubah',),
+                  ),
+                );
                 debugPrint("hasil debug ${state.processMessage}");
               }
             }
@@ -428,7 +425,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
             });
             await calparform3key.currentState?.saveForm3();
           }else {
-            debugPrint("hitungpar dikliik");
+            debugPrint("hitungpar dikliik ${calpar1Id}");
             context.read<Calpar4FormBloc>().add(
               Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
             );

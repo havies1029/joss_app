@@ -49,11 +49,12 @@ class Calpar4FormPageFormState extends State<Calpar4FormPage> {
     _lastPayload = payload;
 
     setState(() {
-      diskonPremiCtrl.text = payload["diskonPremi"]?.toString() ?? "0";
-      netCtrl.text = payload["netPremi"]?.toString() ?? "0";
-      subtotalCtrl.text = payload["subtotalPremi"]?.toString() ?? "0";
+      diskonPremiCtrl.text = payload["discPersen"]?.toString() ?? "0";
+      netCtrl.text = payload["premiNet"]?.toString() ?? "0";
+      subtotalCtrl.text = payload["premiOther"]?.toString() ?? "0";
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Card(

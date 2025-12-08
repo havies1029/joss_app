@@ -104,9 +104,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
           listener: (context, state) {
             if (state.isSaved && !state.hasFailure && state.record != null){
 
-              if (isHitungPremiClicked == true){
 
-              }
 
             }
           },
