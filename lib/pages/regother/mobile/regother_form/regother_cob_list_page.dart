@@ -21,7 +21,7 @@ class _CobCariPageState extends State<CobCariPage> {
   @override
   void initState() {
     super.initState();
-    futureData = ComboMCobApp1Repository().getComboMCobApp1();
+    futureData = ComboMCobApp1Repository().getComboMCobApp1("");
   }
 
   @override

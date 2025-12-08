@@ -10,10 +10,10 @@ class Regother1CrudMainPage extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		return MobileDesignWidget(
-			child: Scaffold(
-				appBar: AppBar(
-					title: Text('${viewMode == "tambah"?"Tambah":"Ubah"} Reg Other #1'),
-				),
-				body: Regother1CrudFormPage(viewMode: viewMode, recordId: recordId)));
+				child: Scaffold(
+						appBar: AppBar(
+							title: Text('${viewMode == "tambah"?"Tambah":"Ubah"} Reg Other'),
+						),
+						body: Regother1CrudFormPage(viewMode: viewMode, recordId: recordId)));
 	}
 }

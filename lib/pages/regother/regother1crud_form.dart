@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
@@ -6,6 +8,8 @@ import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
 import 'package:joss_app/models/regother/regother1crud_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
+import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+import 'package:joss_app/widgets/combobox/combomcobapp1_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -27,6 +31,8 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 	final List<String> errors = [];
 	ComboRMatauangModel? fieldComboRMatauang;
 	final comboRMatauangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
+	ComboMCobApp1Model? fieldComboMCobApp1;
+	final comboMCobApp1Key = GlobalKey<DropdownSearchState<ComboMCobApp1Model>>();
 	var fieldRemarkController = TextEditingController();
 	var fieldTsiController = TextEditingController();
 
@@ -44,93 +50,94 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 		return BlocConsumer<Regother1CrudBloc, Regother1CrudState>(
 			builder: (context, state) {
 				return Dialog(
-					shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-					child: SingleChildScrollView(
-						child: Padding(
-							padding: const EdgeInsets.all(8.0),
-							child: Form(
-								key: _formKey,
-								child: Column(
-									children: [
-										const SizedBox(height: 10),
-										Text(
-											"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} Reg Other #1",
-											style: const TextStyle(
-												fontSize: 20.0,
-												color: Color(0xffff6101),
-												fontWeight: FontWeight.w600,
-												fontFamily: 'Hind',
-												fontStyle: FontStyle.italic,
-												decoration: TextDecoration.underline,
-											),
-										),
-										const SizedBox(height: 25),
-										buildFieldCurrId(),
-										buildFieldMcobId(),
-										buildFieldRemark(),
-										buildFieldTsi(),
-										const SizedBox(height: 25),
-										FormError(
-											errors: errors,
-											key: null,
-										),
-										Row(
-											mainAxisAlignment: MainAxisAlignment.spaceAround,
+						shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+						child: SingleChildScrollView(
+							child: Padding(
+								padding: const EdgeInsets.all(8.0),
+								child: Form(
+										key: _formKey,
+										child: Column(
 											children: [
-												SizedBox(
-													width: MediaQuery.of(context).size.width * 0.3,
-													height: 60,
-													child: Padding(
-														padding: const EdgeInsets.only(top: 30.0),
-														child: ElevatedButton(
-															onPressed: () {
-																_dismissDialog();
-															},
-															child: const Text(
-																'Close',
-																style: TextStyle(fontSize: 13.0),
-															),
-														),
+												const SizedBox(height: 10),
+												Text(
+													"${widget.viewMode == "tambah" ? "Tambah" : "Ubah"} Reg Other",
+													style: const TextStyle(
+														fontSize: 20.0,
+														color: Color(0xffff6101),
+														fontWeight: FontWeight.w600,
+														fontFamily: 'Hind',
+														fontStyle: FontStyle.italic,
+														decoration: TextDecoration.underline,
 													),
 												),
-												SizedBox(
-													width: MediaQuery.of(context).size.width * 0.3,
-													height: 60,
-													child: Padding(
-														padding: const EdgeInsets.only(top: 30.0),
-														child: ElevatedButton(
-															onPressed: () {
-																onSaveForm();
-															},
-															child: const Text(
-																'Save',
-																style: TextStyle(fontSize: 13.0),
+												const SizedBox(height: 25),
+												buildFieldMcobId(),
+												buildFieldCurrId(),
+												buildFieldRemark(),
+												buildFieldTsi(),
+												const SizedBox(height: 25),
+												FormError(
+													errors: errors,
+													key: null,
+												),
+												Row(
+													mainAxisAlignment: MainAxisAlignment.spaceAround,
+													children: [
+														SizedBox(
+															width: MediaQuery.of(context).size.width * 0.3,
+															height: 60,
+															child: Padding(
+																padding: const EdgeInsets.only(top: 30.0),
+																child: ElevatedButton(
+																	onPressed: () {
+																		_dismissDialog();
+																	},
+																	child: const Text(
+																		'Close',
+																		style: TextStyle(fontSize: 13.0),
+																	),
+																),
 															),
 														),
-													),
+														SizedBox(
+															width: MediaQuery.of(context).size.width * 0.3,
+															height: 60,
+															child: Padding(
+																padding: const EdgeInsets.only(top: 30.0),
+																child: ElevatedButton(
+																	onPressed: () {
+																		onSaveForm();
+																	},
+																	child: const Text(
+																		'Save',
+																		style: TextStyle(fontSize: 13.0),
+																	),
+																),
+															),
+														),
+													],
 												),
 											],
-										),
-									],
-								)),
-						),
-					));
-				},
-				listener: (context, state) {
-					if (state.isLoaded) {
-						if (state.record != null){
-							fieldRemarkController.text = state.record!.remark;
-							fieldTsiController.text = NumberFormat("#,###").format(state.record!.tsi);
-						}
-						fieldComboRMatauang = state.comboRMatauang;
+										)),
+							),
+						));
+			},
+			listener: (context, state) {
+				if (state.isLoaded) {
+					if (state.record != null){
+						fieldRemarkController.text = state.record!.remark;
+						fieldTsiController.text = NumberFormat("#,###").format(state.record!.tsi);
 					}
-				},
-			);
-		}
+					fieldComboRMatauang = state.comboRMatauang;
+					fieldComboMCobApp1 = state.comboMCobApp1;
+				}
+			},
+		);
+	}
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-		regother1CrudBloc.add(
-			Regother1CrudLihatEvent(recordId: widget.recordId));
+			regother1CrudBloc.add(
+					Regother1CrudLihatEvent(recordId: widget.recordId));
 		}
 	}
 
@@ -142,7 +149,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-						error: "Field ComboRMatauang tidak boleh kosong.");
+							error: "Field ComboRMatauang tidak boleh kosong.");
 					regother1CrudBloc.add(ComboRMatauangChangedEvent(comboRMatauang: value));
 				}
 			},
@@ -154,14 +161,35 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-						error: "Field ComboRMatauang tidak boleh kosong.");
+							error: "Field ComboRMatauang tidak boleh kosong.");
 				}
 			},
 		);
 	}
 
 	Widget buildFieldMcobId(){
-		return TextFormField(
+		return buildFieldComboMCobApp1(
+			comboKey: comboMCobApp1Key,
+			labelText: 'mcobId',
+			initItem: fieldComboMCobApp1,
+			onChangedCallback: (value) {
+				if (value != null) {
+					removeError(
+							error: "Field ComboMCobApp1 tidak boleh kosong.");
+					regother1CrudBloc.add(ComboMCobApp1ChangedEvent(comboMCobApp1: value));
+				}
+			},
+			onSaveCallback: (value) {
+				if (value != null) {
+					fieldComboMCobApp1 = value;
+				}
+			},
+			validatorCallback: (value) {
+				if (value == null) {
+					addError(
+							error: "Field ComboMCobApp1 tidak boleh kosong.");
+				}
+			},
 		);
 	}
 
@@ -177,7 +205,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -201,7 +229,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
 			},
 			validator: (value) {
@@ -224,9 +252,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 			_formKey.currentState!.save();
 			Regother1CrudModel record = Regother1CrudModel(
 				currId: fieldComboRMatauang?.rmatauangKode,
+				mcobId: fieldComboMCobApp1?.mCobApp1Id,
 				regother1Id: '',
 				remark: fieldRemarkController.text,
-				tsi: double.parse(fieldTsiController.text.replaceAll(',', '')), mCobApp1Id: '',
+				tsi: double.parse(fieldTsiController.text.replaceAll(',', '')),
 			);
 			if (widget.viewMode == "tambah") {
 				regother1CrudBloc.add(Regother1CrudTambahEvent(record: record));

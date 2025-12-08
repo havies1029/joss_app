@@ -34,10 +34,10 @@ class Regother1ListBloc extends Bloc<Regother1ListEvents, Regother1ListState> {
 		if (state.status == ListStatus.initial) {
 			List<Regother1ListModel> items = await repo.getRegother1List(state.searchText, 0);
 			return emit(state.copyWith(
-				items: items,
-				hasReachedMax: false,
-				status: ListStatus.success,
-				hal: 1));
+					items: items,
+					hasReachedMax: false,
+					status: ListStatus.success,
+					hal: 1));
 		}
 		List<Regother1ListModel> items = await repo.getRegother1List(state.searchText, state.hal);
 		if (items.isEmpty) {
@@ -46,38 +46,38 @@ class Regother1ListBloc extends Bloc<Regother1ListEvents, Regother1ListState> {
 			List<Regother1ListModel> regother1List = List.of(state.items)..addAll(items);
 
 			final result = regother1List
-				.whereWithIndex((e, index) =>
-					regother1List.indexWhere((e2) => e2.regother1Id == e.regother1Id) ==
+					.whereWithIndex((e, index) =>
+			regother1List.indexWhere((e2) => e2.regother1Id == e.regother1Id) ==
 					index)
-				.toList();
+					.toList();
 
 			return emit(state.copyWith(
-				items: result,
-				hasReachedMax: false,
-				status: ListStatus.success,
-				hal: state.hal + 1));
+					items: result,
+					hasReachedMax: false,
+					status: ListStatus.success,
+					hal: state.hal + 1));
 		}
 	}
 
 	Future<void> onHapusRegother1List(
-		HapusRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
+			HapusRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "hapus"));
 	}
 
 	Future<void> onCloseDialogRegother1List(
-		CloseDialogRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
+			CloseDialogRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 	}
 
 	Future<void> onTambahRegother1List(
-		TambahRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
+			TambahRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "tambah"));
 	}
 
 	Future<void> onUbahRegother1List(
-		UbahRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
+			UbahRegother1ListEvent event, Emitter<Regother1ListState> emit) async {
 		emit(state.copyWith(viewMode: ""));
 		emit(state.copyWith(viewMode: "ubah", recordId: event.recordId));
 	}

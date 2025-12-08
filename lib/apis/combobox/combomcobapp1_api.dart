@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
-import '../../models/combobox/combomcobapp1_model.dart';
+import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
 
 class ComboMCobApp1API {
 
-  Future<List<ComboMCobApp1Model>> getComboMCobApp1API() async {
+  Future<List<ComboMCobApp1Model>> getComboMCobApp1API(String filter) async {
     String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mcobapp1combobox/getlist";
 
-    var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint);
+    Map<String, String> queryParams = {"filter": filter};
+    var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
     final http.Response response = await http.get(uri, headers: <String, String>{
       'Content-Type': 'application/json; odata=verbos',
       'Accept': 'application/json; odata=verbos',

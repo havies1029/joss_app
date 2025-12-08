@@ -11,30 +11,30 @@ class Regother1ListState extends Equatable {
 	final String recordId;
 
 	const Regother1ListState(
-		{this.status = ListStatus.initial,
-		this.items = const <Regother1ListModel>[],
-		this.hasReachedMax = false,
-		this.hal = 0,
-		this.viewMode = "",
-		this.searchText = "",
-		this.recordId = ""});
+			{this.status = ListStatus.initial,
+				this.items = const <Regother1ListModel>[],
+				this.hasReachedMax = false,
+				this.hal = 0,
+				this.viewMode = "",
+				this.searchText = "",
+				this.recordId = ""});
 
 	Regother1ListState copyWith(
-		{List<Regother1ListModel>? items,
-		bool? hasReachedMax,
-		ListStatus? status,
-		int? hal,
-		String? viewMode,
-		String? searchText,
-		String? recordId}) {
+			{List<Regother1ListModel>? items,
+				bool? hasReachedMax,
+				ListStatus? status,
+				int? hal,
+				String? viewMode,
+				String? searchText,
+				String? recordId}) {
 		return Regother1ListState(
-			items: items ?? this.items,
-			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-			status: status ?? this.status,
-			hal: hal ?? this.hal,
-			viewMode: viewMode ?? this.viewMode,
-			searchText: searchText ?? this.searchText,
-			recordId: recordId ?? this.recordId);
+				items: items ?? this.items,
+				hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+				status: status ?? this.status,
+				hal: hal ?? this.hal,
+				viewMode: viewMode ?? this.viewMode,
+				searchText: searchText ?? this.searchText,
+				recordId: recordId ?? this.recordId);
 	}
 
 	@override

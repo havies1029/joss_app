@@ -18,8 +18,8 @@ class Regother1ListAPI{
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-				.map<Regother1ListModel>((json) => Regother1ListModel.fromJson(json))
-				.toList();
+					.map<Regother1ListModel>((json) => Regother1ListModel.fromJson(json))
+					.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}

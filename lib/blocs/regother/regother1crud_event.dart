@@ -39,14 +39,18 @@ class Regother1CrudLihatEvent extends Regother1CrudEvents {
 	List<Object> get props => [recordId];
 }
 
-class ComboRMatauangChangedEvent extends Regother1CrudEvents{
-	final ComboRMatauangModel comboRMatauang;
-	const ComboRMatauangChangedEvent({required this.comboRMatauang});
-
-	@override	List<Object> get props => [comboRMatauang];}
-
 class ComboMCobApp1ChangedEvent extends Regother1CrudEvents{
 	final ComboMCobApp1Model comboMCobApp1;
 	const ComboMCobApp1ChangedEvent({required this.comboMCobApp1});
 
 	@override	List<Object> get props => [comboMCobApp1];}
+
+class ComboRMatauangChangedEvent extends Regother1CrudEvents{
+	final ComboRMatauangModel comboRMatauang;
+	const ComboRMatauangChangedEvent({required this.comboRMatauang});
+
+	@override	List<Object> get props => [comboRMatauang];
+}
+
+class ResetRegother1CrudEvent extends Regother1CrudEvents {}
+
