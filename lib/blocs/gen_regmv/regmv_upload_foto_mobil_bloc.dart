@@ -20,6 +20,40 @@ class RegmvUploadFotoMobilBloc
       emit(UploadFotoMobilPreview(event.imageBytes, event.fileName));
     });
 
+    on<UploadFotoMobilSelectedList>((event, emit) {
+      emit(UploadFotoMobilListPreview(
+        List.from(event.images),
+        List.from(event.fileNames),
+      ));
+    });
+
+    on<ResetFotoMobilPreview>((event, emit) {
+      emit(UploadFotoMobilListPreview([], []));
+    });
+
+    on<UploadFotoMobilBatchSubmit>((event, emit) async {
+      emit(UploadFotoMobilLoading());
+      for (int i = 0; i < event.images.length; i++) {
+        final img = event.images[i];
+        final name = event.names[i];
+        _selectedImage = img;
+        _fileName = name;
+        final success = await repository.uploadFotoMobil(
+          event.regmv1Id,
+          "", // caption kosong
+          img,
+          name,
+        );
+
+        if (!success) {
+          emit(UploadFotoMobilFailure("Gagal upload foto ke-${i + 1} ($name)"));
+          return;
+        }
+      }
+      emit(UploadFotoMobilSuccess());
+      add(ResetFotoMobilPreview());
+    });
+
     on<UploadFotoMobilSubmitted>((event, emit) async {
       emit(UploadFotoMobilLoading());
 

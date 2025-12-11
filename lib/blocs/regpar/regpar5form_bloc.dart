@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/regpar/regpar5form_model.dart';
@@ -53,11 +54,56 @@ class Regpar5FormBloc extends Bloc<Regpar5FormEvents, Regpar5FormState> {
 	}
 
 	Future<void> onHitungPremiRegpar5Form(
-			Regpar5FormHitungPremiEvent event, Emitter<Regpar5FormState> emit) async {
+			Regpar5FormHitungPremiEvent event,
+			Emitter<Regpar5FormState> emit) async {
+
+		debugPrint("🔵 [REGPAR5 BLoC] onHitungPremiRegpar5Form DIPANGGIL");
+		debugPrint("Event.recordId : ${event.recordId}");
+		debugPrint("State sebelum   : isCalculating=${state.isCalculating}, isCalculated=${state.isCalculated}");
+
 		emit(state.copyWith(isCalculating: true, isCalculated: false));
-		// Simulate premi calculation logic here
-		Regpar5FormModel record = await repository.regpar5FormHitungPremi(event.recordId);
-		emit(state.copyWith(isCalculating: false, isCalculated: true, record: record));
+		debugPrint("🟠 State setelah set calculating: ${{
+			'isCalculating': true,
+			'isCalculated': false
+		}}");
+
+		try {
+			// 🔍 Debug sebelum call repository
+			debugPrint("🔵 [REGPAR5 BLoC] Memanggil repository.regpar5FormHitungPremi...");
+
+			Regpar5FormModel record = await repository.regpar5FormHitungPremi(event.recordId);
+
+			// 🔍 Debug hasil
+			debugPrint("🟢 [REGPAR5 BLoC] Hasil API (record): $record");
+
+			emit(state.copyWith(
+				isCalculating: false,
+				isCalculated: true,
+				record: record,
+			));
+
+			debugPrint("🟢 State setelah sukses hitung premi: ${{
+				'isCalculating': false,
+				'isCalculated': true,
+				'record': record
+			}}");
+
+		} catch (e) {
+			debugPrint("🔴 [REGPAR5 BLoC] ERROR hitung premi: $e");
+
+			// Emit state error kalau kamu punya field errorMessage
+			emit(state.copyWith(
+				isCalculating: false,
+				isCalculated: false,
+			));
+
+			debugPrint("🔴 State setelah error: ${{
+				'isCalculating': false,
+				'isCalculated': false,
+				'errorMessage': e.toString(),
+			}}");
+		}
 	}
+
 
 }

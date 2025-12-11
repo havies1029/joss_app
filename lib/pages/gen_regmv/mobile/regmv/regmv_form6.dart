@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../blocs/gen_regmv/regmv6form_bloc.dart';
+import '../../../../models/gen_regmv/regmv6form_model.dart';
 
 
 class RegmvForm6Section extends StatefulWidget {
+  final String viewMode;
+  final String? recordId;
   final bool isExpanded;
-
-  /// PARAMETER BARU — supaya parent bisa kirim kumpulan data
-  final Map<String, dynamic>? initialPayload;
+  final Function(bool) onToggle;
+  final String? regmv1Id;
 
   const RegmvForm6Section({
     super.key,
+    required this.viewMode,
     required this.isExpanded,
-    this.initialPayload,
+    required this.onToggle,
+    this.recordId,
+    this.regmv1Id,
   });
 
   @override
@@ -20,20 +29,18 @@ class RegmvForm6Section extends StatefulWidget {
 
 
 class RegmvForm6SectionState extends State<RegmvForm6Section> {
+  final _regmvform6key = GlobalKey<FormState>();
   final diskonPremiCtrl = TextEditingController();
   final netCtrl = TextEditingController();
   final subtotalCtrl = TextEditingController();
 
-  Map<String, dynamic>? _lastPayload;
+  bool _isPayloadInjected = false;
+  late final Regmv6FormBloc regmv6Bloc;
 
   @override
   void initState() {
     super.initState();
-
-    // Jika parent pertama kali ngirim payload → inject
-    if (widget.initialPayload != null) {
-      injectPayload(widget.initialPayload!);
-    }
+    regmv6Bloc = context.read<Regmv6FormBloc>();
   }
 
   @override
@@ -44,16 +51,22 @@ class RegmvForm6SectionState extends State<RegmvForm6Section> {
     super.dispose();
   }
 
-  void injectPayload(Map<String, dynamic> payload) {
-    _lastPayload = payload;
-
-    setState(() {
-      diskonPremiCtrl.text = payload["diskonPremi"]?.toString() ?? "0";
-      netCtrl.text = payload["netPremi"]?.toString() ?? "0";
-      subtotalCtrl.text = payload["subtotalPremi"]?.toString() ?? "0";
-    });
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+      regmv6Bloc.add(Regmv6FormLihatEvent(recordId: widget.regmv1Id!));
+    }
   }
 
+  void _injectPayload(Regmv6FormModel record) {
+    debugPrint("🔥 Injecting payload into Form1...");
+
+      diskonPremiCtrl.text = record.premiDiskon.toString();
+      netCtrl.text = record.premiNet.toString();
+      subtotalCtrl.text = record.premiSubtotal.toString();
+
+    setState(() {});
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,57 +74,72 @@ class RegmvForm6SectionState extends State<RegmvForm6Section> {
       color: pGrey,
       child: Column(
         children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            title: Text(
-              'Hasil Perhitungan Premi',
-              style: bodyTextStyle(context),
-            ),
-            trailing: AnimatedRotation(
-              turns: widget.isExpanded ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onTap: () {
-              // toggle kalau nanti mau
-            },
-          ),
-
-          if (widget.isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-              child: Column(
-                children: [
-                  appTextField(
-                    label: 'Subtotal Premi',
-                    controller: subtotalCtrl,
-                    enabled: false,
-                  ),
-
-                  const SizedBox(height: hPadding * 1.5),
-
-                  appTextField(
-                    label: 'Premi Diskon',
-                    controller: diskonPremiCtrl,
-                    enabled: false,
-                  ),
-
-                  const SizedBox(height: hPadding * 1.5),
-
-                  appTextField(
-                    label: 'Premi Bersih',
-                    controller: netCtrl,
-                    enabled: false,
-                  ),
-                ],
-              ),
-            ),
+          _buildHeader(),
+          if (widget.isExpanded) _buildForm(),
         ],
       ),
     );
   }
+
+  Widget _buildHeader() {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+      title: Text("Hasil Perhitungan Premi", style: bodyTextStyle(context)),
+      trailing: AnimatedRotation(
+        turns: widget.isExpanded ? 0.5 : 0,
+        duration: const Duration(milliseconds: 250),
+        child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
+      ),
+      onTap: () {
+        widget.onToggle(!widget.isExpanded);
+      },
+    );
+  }
+
+  Widget _buildForm() {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<Regmv6FormBloc, Regmv6FormState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
+          listener: (context, state) {
+            _injectPayload(state.record!);
+            _isPayloadInjected = true;
+          },
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+        child: Form(
+          key: _regmvform6key,
+          child: Column(
+            children: [
+              appTextField(
+                label: 'Diskon Premi',
+                controller: diskonPremiCtrl,
+                enabled: false,
+              ),
+
+              const SizedBox(height: hPadding * 1.5),
+
+              appTextField(
+                label: 'Net Premi',
+                controller: netCtrl,
+                enabled: false,
+              ),
+
+              const SizedBox(height: hPadding * 1.5),
+
+              appTextField(
+                label: 'Sub total',
+                controller: subtotalCtrl,
+                enabled: false,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }

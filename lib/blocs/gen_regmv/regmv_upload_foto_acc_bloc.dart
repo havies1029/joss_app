@@ -14,10 +14,45 @@ class RegmvUploadFotoAccBloc
 
   RegmvUploadFotoAccBloc({required this.repository})
       : super(UploadFotoAccInitial()) {
+
     on<UploadFotoAccSelected>((event, emit) {
       _selectedImage = event.imageBytes;
       _fileName = event.fileName;
       emit(UploadFotoAccPreview(event.imageBytes, event.fileName));
+    });
+
+    on<UploadFotoAccSelectedList>((event, emit) {
+      emit(UploadFotoAccListPreview(
+        List.from(event.images),
+        List.from(event.fileNames),
+      ));
+    });
+
+    on<ResetFotoAccPreview>((event, emit) {
+      emit(UploadFotoAccListPreview([], []));
+    });
+
+    on<UploadFotoAccBatchSubmit>((event, emit) async {
+      emit(UploadFotoAccLoading());
+      for (int i = 0; i < event.images.length; i++) {
+        final img = event.images[i];
+        final name = event.names[i];
+        _selectedImage = img;
+        _fileName = name;
+        final success = await repository.uploadFotoAcc(
+          event.regmv1Id,
+          "", // caption kosong
+          img,
+          name,
+        );
+
+        if (!success) {
+          emit(UploadFotoAccFailure("Gagal upload foto ke-${i + 1} ($name)"));
+          return;
+        }
+      }
+      emit(UploadFotoAccSuccess());
+      add(ResetFotoAccPreview());
     });
 
     on<UploadFotoAccSubmitted>((event, emit) async {

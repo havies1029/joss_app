@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -13,9 +14,14 @@ import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
+import '../../../../blocs/gen_regmv/regmv7cari_bloc.dart';
+import '../../../../blocs/gen_regmv/regmv7form_bloc.dart';
+import '../../../../common/app_data.dart';
+import '../../../../models/gen_regmv/regmv7cari_model.dart';
+
 class RegmvForm7Section extends StatefulWidget {
   final String viewMode;
-  final List<String?>? recordId;
+  final String? recordId;
   final bool isExpanded;
   final Function(bool) onToggle;
   final String? regmv1Id;
@@ -34,33 +40,55 @@ class RegmvForm7Section extends StatefulWidget {
 }
 
 class RegmvForm7SectionState extends State<RegmvForm7Section> {
-  final _regmvform4key = GlobalKey<FormState>();
+  final _regmvform7key = GlobalKey<FormState>();
   bool _showError = false;
   List<Uint8List> _images = [];
   List<String> _fileNames = [];
+  late final Regmv7CariBloc  regmv7CariBloc;
+  List<Regmv7CariModel> _serverPhotos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    regmv7CariBloc = context.read<Regmv7CariBloc>();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegmvUploadFotoAccBloc, RegmvUploadFotoAccState>(
-      builder: (context, state) {
-        if (state is UploadFotoAccPreview) {
-          if (!_fileNames.contains(state.fileName)) {
-            _images.add(state.imageBytes);
-            _fileNames.add(state.fileName);
-          }
+    return BlocListener<Regmv7CariBloc, Regmv7CariState>(
+      listener: (context, state) {
+        if (state.status == ListStatus.success) {
+          setState(() {
+            _serverPhotos = List.from(state.items);
+          });
         }
-
-        return Card(
-          color: pGrey,
-          child: Column(
-            children: [
-              _buildHeader(),
-              if (widget.isExpanded) _buildForm(),
-            ],
-          ),
-        );
       },
+      child: BlocBuilder<RegmvUploadFotoAccBloc, RegmvUploadFotoAccState>(
+        builder: (context, state) {
+          if (state is UploadFotoAccListPreview) {
+            _images = List.from(state.images);
+            _fileNames = List.from(state.fileNames);
+          }
+
+          return Card(
+            color: pGrey,
+            child: Column(
+              children: [
+                _buildHeader(),
+                if (widget.isExpanded) _buildForm(),
+              ],
+            ),
+          );
+        },
+      ),
     );
+  }
+
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+      debugPrint("🔥 Form7 dibuka parent → trigger lihat event ${widget.regmv1Id}");
+      regmv7CariBloc.add(RefreshRegmv7CariEvent(regmv1Id: widget.regmv1Id!));
+    }
   }
 
   Widget _buildHeader() {
@@ -95,22 +123,41 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
   }
 
   Future<bool> validateAndReturn() async {
-    if (_images.isEmpty) {
-      setState(() => _showError = true);
+    final hasLocalPhotos = _images.isNotEmpty;
+    final hasServerPhotos = _serverPhotos.isNotEmpty;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Harap unggah minimal 1 foto Aksesoris."),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return false;
+    if (hasLocalPhotos || hasServerPhotos) {
+      return true;
     }
-    setState(() => _showError = false);
-    return true;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Harap unggah minimal 1 foto Aksesoris."),
+        backgroundColor: Colors.red,
+      ),
+    );
+
+    return false;
   }
 
   Widget _uploadInstructionBox() {
+    final blocState = context.watch<RegmvUploadFotoAccBloc>().state;
+
+    List<Uint8List> previewImages = [];
+    List<String> previewNames = [];
+
+    if (blocState is UploadFotoAccListPreview) {
+      _images = List.from(blocState.images);
+      _fileNames = List.from(blocState.fileNames);
+
+      previewImages = _images;
+      previewNames = _fileNames;
+    }
+
+    final bool hasServer = _serverPhotos.isNotEmpty;
+    final bool hasPreview = previewImages.isNotEmpty;
+    final bool showIntro = !hasServer && !hasPreview;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -122,127 +169,245 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (_images.isNotEmpty) ...[
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _images.length,
-                itemBuilder: (context, index) {
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        width: 200,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: MemoryImage(_images[index]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 18,
-                        child: GestureDetector(
-                          onTap: () {
-                            final deletedFileName = _fileNames[index];
-                            // _deleteImage(deletedFileName);
-                          },
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundColor: Colors.black54,
-                            child: const Icon(Icons.close, size: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-/*            const SizedBox(height: 10),
-            Text("${_images.length} foto terunggah"), */
-            // ]
-          ] else ...[
-            Icon(
-              Icons.upload,
-              size: 40,
-              color: _showError ? Colors.red : primaryLightColor,
-            ),
-            const SizedBox(height: 14),
-            Text(
-              "Unggah Foto Aksesoris",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: primaryLightColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Pastikan foto Aksesoris jelas, terang, dan tidak buram untuk memudahkan verifikasi.",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: cardGrey),
-            ),
-          ],
+
+          if (!showIntro)
+            _buildGallery(previewImages),
+
+          if (showIntro)
+            _buildIntro(),
 
           const SizedBox(height: hPadding),
 
-          Row(
-            children: [
-              Expanded(
-                child: AppButton.primary(
-                  text: 'Ambil dari Galeri',
-                  onPressed: () {
-                    _pickFromGallery(context);
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: AppButton.primary(
-                  text: 'Ambil Foto',
-                  onPressed: () {
-                    _pickFromCamera(context);
-                  },
-                ),
-              ),
-            ],
-          ),
+          _buildActionButtons(previewImages.length),
+
+          const SizedBox(height: hPadding),
+
+          _buildLocalUploadButton(),
         ],
       ),
     );
   }
-  //
-  // Future<void> _deleteImage(String deletedFileName) async {
-  //   context.read<Regmv4FormBloc>().add(
-  //     Regmv4FormHapusEvent(recordId: deletedFileName),
-  //   );
-  // }
 
+  Widget _buildGallery(List<Uint8List> previewImages) {
+    final total = previewImages.length + _serverPhotos.length;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: total,
+            itemBuilder: (context, index) {
+
+              // PREVIEW FOTO (selalu kiri)
+              if (index < previewImages.length) {
+                return _buildPhotoTile(
+                  content: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      previewImages[index],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  onDelete: () => _deletePreview(index),
+                );
+              }
+
+              // FOTO SERVER
+              final serverIndex = index - previewImages.length;
+              final item = _serverPhotos[serverIndex];
+              final url = "${AppData.apiDomain}api/regmv/regmv7cari/fotoacc/getfoto/${item.regmv7Id}";
+
+              return _buildPhotoTile(
+                content: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: url,
+                    httpHeaders: {
+                      "Authorization": "Bearer ${AppData.userToken}",
+                      "Accept": "*/*",
+                    },
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+                    errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+                  ),
+                ),
+                onDelete: () => _deleteServerPhoto(item.regmv7Id),
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+  
+  void _deletePreview(int index) {
+    debugPrint("🗑 delete preview at $index");
+
+    _images.removeAt(index);
+    _fileNames.removeAt(index);
+
+    context.read<RegmvUploadFotoAccBloc>().add(
+      UploadFotoAccSelectedList(List.from(_images), List.from(_fileNames)),
+    );
+
+    setState(() {});
+  }
+
+  void _deleteServerPhoto(String regmv7Id) {
+    debugPrint("🗑 delete server photo $regmv7Id");
+
+    setState(() {
+      _serverPhotos.removeWhere((x) => x.regmv7Id == regmv7Id);
+    });
+
+    context.read<Regmv7FormBloc>().add(
+      Regmv7FormHapusEvent(recordId: regmv7Id),
+    );
+  }
+
+  Widget _buildIntro() {
+    return Column(
+      children: [
+        Icon(Icons.upload, size: 40, color: primaryLightColor),
+        const SizedBox(height: 14),
+        Text(
+          "Unggah Foto Aksesoris",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: primaryLightColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Pastikan foto Aksesoris jelas, terang, dan tidak buram.",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14, color: cardGrey),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildPhotoTile({
+    required Widget content,
+    required VoidCallback onDelete,
+  }) {
+    return Stack(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(right: 10),
+          width: 200,
+          height: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: content,
+        ),
+
+        Positioned(
+          top: 20,
+          right: 20,
+          child: GestureDetector(
+            onTap: onDelete,
+            child: _buildDeleteCircle(),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(int previewCount) {
+    return Row(
+      children: [
+        Expanded(
+          child: AppButton.primary(
+            text: 'Ambil dari Galeri',
+            onPressed: previewCount >= 10
+                ? () => _maxReached()
+                : () => _pickFromGallery(context),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: AppButton.primary(
+            text: 'Ambil Foto',
+            onPressed: previewCount >= 10
+                ? () => _maxReached()
+                : () => _pickFromCamera(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _maxReached() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Maksimal 10 foto."),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+
+  Widget _buildLocalUploadButton() {
+    final hasImages = _images.isNotEmpty;
+
+    return SizedBox(
+      height: 0,
+      width: 0,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          minimumSize: Size(0, 0),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+        ),
+        onPressed: hasImages ? () => saveForm7() : null,
+        child: const SizedBox.shrink(),
+      ),
+    );
+  }
 
   Future<void> _pickFromGallery(BuildContext context) async {
-    final bloc = context.read<RegmvUploadFotoAccBloc>(); // ambil dulu di sini!
-
-    if (kIsWeb) {
-      final result = await FilePicker.platform.pickFiles(type: FileType.image);
-      if (result != null && result.files.single.bytes != null) {
-        bloc.add(
-          UploadFotoAccSelected(
-            result.files.single.bytes!,
-            result.files.single.name,
-          ),
-        );
-      }
-    } else {
-      final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (picked != null) {
-        final bytes = await picked.readAsBytes();
-        bloc.add(UploadFotoAccSelected(bytes, picked.name));
-      }
+    final bloc = context.read<RegmvUploadFotoAccBloc>();
+    if (_images.length >= 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Maksimal 10 foto."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
     }
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+    );
+
+    if (result == null) return;
+
+    for (var file in result.files) {
+      if (_images.length >= 10) break;
+      if (file.bytes == null) continue;
+
+      _images.add(file.bytes!);
+      _fileNames.add(file.name);
+    }
+
+    bloc.add(
+      UploadFotoAccSelectedList(
+        List.from(_images),
+        List.from(_fileNames),
+      ),
+    );
   }
 
   Future<void> _pickFromCamera(BuildContext context) async {
@@ -254,25 +419,74 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
       );
       return;
     }
+
     final picked = await ImagePicker().pickImage(source: ImageSource.camera);
+
     if (picked != null) {
       final bytes = await picked.readAsBytes();
-      bloc.add(UploadFotoAccSelected(bytes, picked.name));
+
+      _images.add(bytes);
+      _fileNames.add(picked.name);
+
+      bloc.add(UploadFotoAccSelectedList(List.from(_images), List.from(_fileNames)));
     }
   }
 
-// Future<void> saveForm4() async {
-//   if (_images.isEmpty) return; // minimal 1 foto
-//
-//   for (int i = 0; i < _images.length; i++) {
-//     context.read<Regmv4FormBloc>().add(
-//       UploadBinaryAksesorisEvent(
-//         regmv1Id: widget.regmv1Id ?? "251100001",
-//         fileName: "foto-Aksesoris-${i + 1}.jpg",
-//         bytes: _images[i],
-//         imageSource: "uploaded",
-//       ),
-//     );
-//   }
-// }
+  Widget _buildDeleteCircle() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.5),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.close,
+        color: Colors.white,
+        size: 18,
+      ),
+    );
+  }
+
+  Future<bool> saveForm7() async {
+    final hasLocalPhotos = _images.isNotEmpty;
+    final hasServerPhotos = _serverPhotos.isNotEmpty;
+
+    debugPrint("===== VALIDASI FORM 7 =====");
+    debugPrint("Local photos  : $hasLocalPhotos (count=${_images.length})");
+    debugPrint("Server photos : $hasServerPhotos (count=${_serverPhotos.length})");
+    debugPrint("================================");
+
+    // ❌ Tidak ada foto sama sekali → gagal
+    if (!hasLocalPhotos && !hasServerPhotos) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap unggah minimal 1 foto ACC."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+
+    // Jika tidak ada foto lokal (hanya foto server), maka tidak upload apa-apa
+    if (!hasLocalPhotos) {
+      debugPrint("✔ Hanya ada foto server → tidak upload ulang");
+      return true;
+    }
+
+    // 🔥 Kalau ada foto lokal → trigger batch upload
+    debugPrint("🔥 TRIGGER UPLOAD FOTO ACC --- total local: ${_images.length}");
+
+    context.read<RegmvUploadFotoAccBloc>().add(
+      UploadFotoAccBatchSubmit(
+        regmv1Id: widget.regmv1Id ?? "",
+        images: List.from(_images),
+        names: List.from(_fileNames),
+      ),
+    );
+
+    return true;
+  }
+
+
 }

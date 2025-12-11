@@ -18,6 +18,17 @@ class UploadFotoMobilPreview extends RegmvUploadFotoMobilState {
   List<Object?> get props => [imageBytes, fileName];
 }
 
+class UploadFotoMobilListPreview extends RegmvUploadFotoMobilState {
+  final List<Uint8List> images;
+  final List<String> fileNames;
+
+  const UploadFotoMobilListPreview(this.images, this.fileNames);
+
+  @override
+  List<Object?> get props => [images, fileNames];
+}
+
+
 class UploadFotoMobilLoading extends RegmvUploadFotoMobilState {}
 
 class UploadFotoMobilSuccess extends RegmvUploadFotoMobilState {}

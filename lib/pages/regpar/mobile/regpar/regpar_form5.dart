@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/regpar/regpar5form_bloc.dart';
+import '../../../../models/regpar/regpar5form_model.dart';
 
 
 class RegparForm6Section extends StatefulWidget {
+  final String viewMode;
+  final String? recordId;
   final bool isExpanded;
-
-  /// PARAMETER BARU — supaya parent bisa kirim kumpulan data
-  final Map<String, dynamic>? initialPayload;
+  final Function(bool) onToggle;
+  final String? regpar1Id;
 
   const RegparForm6Section({
     super.key,
+    required this.viewMode,
     required this.isExpanded,
-    this.initialPayload,
+    required this.onToggle,
+    this.recordId,
+    this.regpar1Id,
   });
 
   @override
@@ -20,38 +28,48 @@ class RegparForm6Section extends StatefulWidget {
 
 
 class RegparForm6SectionState extends State<RegparForm6Section> {
-  final diskonPremiCtrl = TextEditingController();
-  final netCtrl = TextEditingController();
-  final subtotalCtrl = TextEditingController();
-
-  Map<String, dynamic>? _lastPayload;
+  final _regparform6key = GlobalKey<FormState>();
+  final diskonNilaiCtrl = TextEditingController();
+  final premiNetCtrl = TextEditingController();
+  final premiCtrl = TextEditingController();
+  bool _isPayloadInjected = false;
+  late final Regpar5FormBloc regpar5Bloc;
 
   @override
   void initState() {
     super.initState();
+    regpar5Bloc = context.read<Regpar5FormBloc>();
+    // Future.microtask(_loadData);
+  }
 
-    // Jika parent pertama kali ngirim payload → inject
-    if (widget.initialPayload != null) {
-      injectPayload(widget.initialPayload!);
+  void _loadData() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      regpar5Bloc.add(Regpar5FormLihatEvent(recordId: widget.regpar1Id!));
     }
   }
 
   @override
   void dispose() {
-    diskonPremiCtrl.dispose();
-    netCtrl.dispose();
-    subtotalCtrl.dispose();
+    diskonNilaiCtrl.dispose();
+    premiNetCtrl.dispose();
+    premiCtrl.dispose();
     super.dispose();
   }
 
-  void injectPayload(Map<String, dynamic> payload) {
-    _lastPayload = payload;
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
+      regpar5Bloc.add(Regpar5FormLihatEvent(recordId: widget.regpar1Id!));
+    }
+  }
 
-    setState(() {
-      diskonPremiCtrl.text = payload["diskonPremi"]?.toString() ?? "0";
-      netCtrl.text = payload["netPremi"]?.toString() ?? "0";
-      subtotalCtrl.text = payload["subtotalPremi"]?.toString() ?? "0";
-    });
+  void _injectPayload(Regpar5FormModel record) {
+    debugPrint("🔥 Injecting payload into Form1...");
+
+    diskonNilaiCtrl.text = record.diskonNilai.toString();
+    premiNetCtrl.text = record.premiNet.toString();
+    premiCtrl.text = record.premiTotal.toString();
+
+    setState(() {});
   }
 
 
@@ -61,56 +79,70 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
       color: pGrey,
       child: Column(
         children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            title: Text(
-              'Hasil Perhitungan Premi',
-              style: bodyTextStyle(context),
-            ),
-            trailing: AnimatedRotation(
-              turns: widget.isExpanded ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onTap: () {
-              // toggle kalau nanti mau
-            },
-          ),
-
-          if (widget.isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-              child: Column(
-                children: [
-                  appTextField(
-                    label: 'Subtotal Premi',
-                    controller: subtotalCtrl,
-                    enabled: false,
-                  ),
-
-                  const SizedBox(height: hPadding * 1.5),
-
-                  appTextField(
-                    label: 'Premi Diskon',
-                    controller: diskonPremiCtrl,
-                    enabled: false,
-                  ),
-
-                  const SizedBox(height: hPadding * 1.5),
-
-                  appTextField(
-                    label: 'Premi Bersih',
-                    controller: netCtrl,
-                    enabled: false,
-                  ),
-                ],
-              ),
-            ),
+          _buildHeader(),
+          if (widget.isExpanded) _buildForm(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+      title: Text("Hasil Perhitungan Premi", style: bodyTextStyle(context)),
+      trailing: AnimatedRotation(
+        turns: widget.isExpanded ? 0.5 : 0,
+        duration: const Duration(milliseconds: 250),
+        child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
+      ),
+      onTap: () {
+        widget.onToggle(!widget.isExpanded);
+      },
+    );
+  }
+
+  Widget _buildForm() {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<Regpar5FormBloc, Regpar5FormState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
+          listener: (context, state) {
+            _injectPayload(state.record!);
+            _isPayloadInjected = true;
+          },
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+        child: Form(
+          key: _regparform6key,
+          child: Column(
+            children: [
+              appTextField(
+                label: 'Premi',
+                controller: premiCtrl,
+                enabled: false,
+              ),
+
+              const SizedBox(height: hPadding * 1.5),
+
+              appTextField(
+                label: 'Diskon',
+                controller: diskonNilaiCtrl,
+                enabled: false,
+              ),
+
+              const SizedBox(height: hPadding * 1.5),
+
+              appTextField(
+                label: 'Net Premi',
+                controller: premiNetCtrl,
+                enabled: false,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

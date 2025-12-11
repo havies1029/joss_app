@@ -15,6 +15,17 @@ class UploadFotoAccSelected extends RegmvUploadFotoAccEvent {
   List<Object?> get props => [imageBytes, fileName];
 }
 
+class UploadFotoAccSelectedList extends RegmvUploadFotoAccEvent {
+  final List<Uint8List> images;
+  final List<String> fileNames;
+
+  const UploadFotoAccSelectedList(this.images, this.fileNames);
+
+  @override
+  List<Object?> get props => [images, fileNames];
+}
+
+
 class UploadFotoAccSubmitted extends RegmvUploadFotoAccEvent {
   final String regmv1Id;
   final String caption;
@@ -24,6 +35,23 @@ class UploadFotoAccSubmitted extends RegmvUploadFotoAccEvent {
   @override
   List<Object?> get props => [regmv1Id, caption];
 }
+
+class UploadFotoAccBatchSubmit extends RegmvUploadFotoAccEvent {
+  final String regmv1Id;
+  final List<Uint8List> images;
+  final List<String> names;
+
+  const UploadFotoAccBatchSubmit({
+    required this.regmv1Id,
+    required this.images,
+    required this.names,
+  });
+
+  @override
+  List<Object?> get props => [regmv1Id, images, names];
+}
+
+class ResetFotoAccPreview extends RegmvUploadFotoAccEvent {}
 
 class CekIsFotoAccUploaded extends RegmvUploadFotoAccEvent {
   final String mrekanId;

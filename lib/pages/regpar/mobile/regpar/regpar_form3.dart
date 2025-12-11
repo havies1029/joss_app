@@ -63,7 +63,7 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
   void initState() {
     super.initState();
     regpar3Bloc = context.read<Regpar3FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
@@ -191,6 +191,7 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
 
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
     fieldComboMWilayah = record.comboMWilayah;
+    // fieldComboMZonaGempa = record.comboMKabZonaGempa;
 
     setState(() {});
   }

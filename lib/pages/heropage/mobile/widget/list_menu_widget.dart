@@ -25,6 +25,7 @@ import '../../../register/mobile/client/register_client_page.dart';
 
 import 'package:confetti/confetti.dart';
 
+import '../../../regother/mobile/regother_form/regother_form1.dart';
 import '../../../regpar/mobile/regpar_main_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
@@ -339,7 +340,7 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalparFormMain(viewMode: 'tambah', recordId: '',)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvFormMain(viewMode: 'tambah', recordId: '',)));
         break;
 
       case 'Klaim':

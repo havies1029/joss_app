@@ -9,9 +9,17 @@ import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 
 import '../../../../blocs/regpar/regpar2form_bloc.dart';
+import '../../../../models/combobox/combomkecamatan_model.dart';
+import '../../../../models/combobox/combomkelurahan_model.dart';
+import '../../../../models/combobox/combomkota_model.dart';
+import '../../../../models/combobox/combompropinsi_model.dart';
 import '../../../../models/combobox/comborkonstruksiojk_model.dart';
 import '../../../../models/combobox/comborokupasi_model.dart';
 import '../../../../models/regpar/regpar2form_model.dart';
+import '../../../../repositories/combobox/combomkecamatan_repository.dart';
+import '../../../../repositories/combobox/combomkelurahan_repository.dart';
+import '../../../../repositories/combobox/combomkota_repository.dart';
+import '../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../repositories/combobox/comborkonstruksiojk_repository.dart';
 import '../../../../repositories/combobox/comborokupasi_repository.dart';
 
@@ -51,12 +59,22 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
   final comboRKonstruksiojkKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
   ComboROkupasiModel? fieldComboROkupasi;
   final comboROkupasiKey = GlobalKey<DropdownSearchState<ComboROkupasiModel>>();
+  ComboMKecamatanModel? fieldComboMKecamatan;
+  final comboMKecamatanKey = GlobalKey<DropdownSearchState<ComboMKecamatanModel>>();
+  ComboMKelurahanModel? fieldComboMKelurahan;
+  final comboMKelurahanKey = GlobalKey<DropdownSearchState<ComboMKelurahanModel>>();
+  ComboMKotaModel? fieldComboMKota;
+  final comboMKotaKey = GlobalKey<DropdownSearchState<ComboMKotaModel>>();
+  ComboMPropinsiModel? fieldComboMPropinsi;
+  final comboMPropinsiKey = GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
+
 
   DateTime? kejadianMulaiTgl;
-  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-
   DateTime? kejadianBerakhirTgl;
-  final _years = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  final DateTime _today = DateTime.now().copyWith(
+    hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0,
+  );
 
   String selectedPassengerCount = "";
 
@@ -64,7 +82,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
   void initState() {
     super.initState();
     regpar2Bloc = context.read<Regpar2FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
@@ -72,6 +90,14 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
       regpar2Bloc.add(Regpar2FormLihatEvent(recordId: widget.regpar1Id!));
     }
   }
+
+  DateTime addOneYearSafe(DateTime dt) {
+    final nextYear = dt.year + 1;
+    final maxDay = DateUtils.getDaysInMonth(nextYear, dt.month);
+
+    return DateTime(nextYear, dt.month, dt.day > maxDay ? maxDay : dt.day);
+  }
+
 
   @override
   void dispose() {
@@ -135,19 +161,28 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
           key: _regparform2key,
           child: Column(
             children: [
-              buildFieldObjectAlamat(),
-              const SizedBox(width: 8,),
               Row(
                 children: [
                   Flexible(child: buildFieldPolisMulai()),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: hPadding,),
                   Flexible(child: buildFieldPolisBerakhir()),
                 ],
               ),
-              const SizedBox(height: hPadding),
+              const SizedBox(height: hPadding,),
+              const SizedBox(width: hPadding,),
               buildFieldRkonstruksiojkId(),
               const SizedBox(height: hPadding),
               buildFieldRokupasiId(),
+              const SizedBox(height: hPadding),
+              buildFieldObjectAlamat(),
+              const SizedBox(height: hPadding),
+              buildFieldObjectPropinsiId(),
+              const SizedBox(height: hPadding),
+              buildFieldObjectKotaId(),
+              const SizedBox(height: hPadding),
+              buildFieldObjectKecamatanId(),
+              const SizedBox(height: hPadding),
+              buildFieldObjectKelurahanId(),
             ],
           ),
         ),
@@ -160,12 +195,16 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
 
     // Text Controllers
     // fieldCoverLamaController.text = record.coverLama.toString();
-    fieldPolisAkhirController.text = record.polisAkhir.toString();
-    fieldPolisMulaiController.text = record.polisMulai.toString();
+    kejadianMulaiTgl = record.polisAkhir;
+    kejadianBerakhirTgl  = record.polisMulai;
     fieldObjectAlamatController.text = record.objectAlamat.toString();
     // Dropdown Values
     fieldComboRKonstruksiojk = record.comboRKonstruksiojk;
     fieldComboROkupasi = record.comboROkupasi;
+    fieldComboMPropinsi = record.comboMPropinsi;
+    fieldComboMKota = record.comboMKota;
+    fieldComboMKecamatan = record.comboMKecamatan;
+    fieldComboMKelurahan = record.comboMKelurahan;
 
     setState(() {});
   }
@@ -178,11 +217,16 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
   Future<void> saveForm2() async {
     final record = Regpar2FormModel(
       // coverLama: int.parse(fieldCoverLamaController.text),
-      polisAkhir: DateTime.parse(fieldPolisAkhirController.text),
-      polisMulai: DateTime.parse(fieldPolisMulaiController.text),
+      polisAkhir: kejadianMulaiTgl ?? _today,
+      polisMulai: kejadianBerakhirTgl ?? addOneYearSafe(_today),
       regpar2Id: widget.regpar1Id! ?? widget.recordId!,
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,
       rokupasiId: fieldComboROkupasi?.rokupasiId, regpar1Id: widget.regpar1Id!, objectAlamat: fieldObjectAlamatController.text ?? '',
+      objectPropinsiId: fieldComboMPropinsi?.mpropinsiId,
+      objectKotaId: fieldComboMKota?.mkotaId,
+      objectKecamatanId: fieldComboMKecamatan?.mkecamatanId,
+      objectKelurahanId: fieldComboMKelurahan?.mkelurahanId,
+
     );
 
     if (widget.viewMode == "tambah") {
@@ -198,37 +242,33 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
     return AppDateField(
       label: 'Tanggal Mulai',
       initialValue: kejadianMulaiTgl ?? _today,
-      firstDate: DateTime(2000, 1, 1),
-      lastDate: (kejadianMulaiTgl != null && kejadianMulaiTgl!.isAfter(_today))
-          ? kejadianMulaiTgl!
-          : _today,
-      validator: (dt) => (dt == null) ? kStringNullError : null,
-      onChanged: (dt) => setState(() {
-        kejadianMulaiTgl = dt != null ? DateTime(dt.year, dt.month, dt.day) : null;
-
-        if (kejadianMulaiTgl != null) {
-          kejadianBerakhirTgl = DateTime(
-            kejadianMulaiTgl!.year + 1,
-            kejadianMulaiTgl!.month,
-            kejadianMulaiTgl!.day,
-          );
-        }
-      }),
-
+      firstDate: _today,
+      lastDate: DateTime(2100, 1, 1),
+      validator: (dt) => dt == null ? kStringNullError : null,
+      onChanged: (dt) {
+        if (dt == null) return;
+        setState(() {
+          kejadianMulaiTgl = DateTime(dt.year, dt.month, dt.day);
+          kejadianBerakhirTgl = addOneYearSafe(kejadianMulaiTgl!);
+        });
+      },
     );
   }
-
   Widget buildFieldPolisBerakhir() {
     return AppDateField(
       label: 'Tanggal Berakhir',
       enabled: false,
-      initialValue: kejadianBerakhirTgl ?? _years,
-      firstDate: DateTime(2000, 1, 1),
+
+      // realtime mengikuti variabel state
+      initialValue: kejadianBerakhirTgl
+          ?? addOneYearSafe(kejadianMulaiTgl ?? _today),
+
+      firstDate: _today,
       lastDate: DateTime(2100, 1, 1),
-      validator: (dt) => (dt == null) ? kStringNullError : null,
-      onChanged: (_) {},
+      validator: (dt) => dt == null ? kStringNullError : null,
     );
   }
+
 
   Widget buildFieldRkonstruksiojkId() => ReusableComboBox<ComboRKonstruksiojkModel>(
     hintText: "Kelas Konstruksi",
@@ -262,7 +302,6 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
 
   Widget buildFieldObjectAlamat() => appTextField(
     label: "Alamat Rumah",
-    maxLines: 3,
     controller: fieldObjectAlamatController,
     keyboardType: TextInputType.text,
     inputFormatters: [
@@ -272,6 +311,88 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
       if (v == null || v.isEmpty) return kStringNullError;
       return null;
     },
+  );
+
+  Widget buildFieldObjectPropinsiId() => ReusableComboBox<ComboMPropinsiModel>(
+    hintText: "Provinsi",
+    comboKey: comboMPropinsiKey,
+    initItem: fieldComboMPropinsi,
+    dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
+    displayText: (item) => item.propinsiNama,
+    compareItems: (a, b) => a.mpropinsiId == b.mwilayahId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        regpar2Bloc.add(ComboMPropinsiChangedEvent(comboMPropinsi: v)
+        );
+        comboMKotaKey.currentState?.clear();
+        comboMKecamatanKey.currentState?.clear();
+        comboMKelurahanKey.currentState?.clear();
+      }
+      fieldComboMPropinsi = v;
+    },
+    onSaveCallback: (value) => fieldComboMPropinsi = value,
+  );
+
+  Widget buildFieldObjectKotaId() => ReusableComboBox<ComboMKotaModel>(
+    hintText: "Kota",
+    comboKey: comboMKotaKey,
+    initItem: fieldComboMKota,
+    dataLoader: () => ComboMKotaRepository().getComboMKota(fieldComboMPropinsi?.mpropinsiId ?? ""),
+    displayText: (item) => item.kotaDesc,
+    compareItems: (a, b) => a.mkotaId == b.mkotaId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        regpar2Bloc.add(ComboMKotaChangedEvent(comboMKota: v)
+        );
+        comboMKecamatanKey.currentState?.clear();
+        comboMKelurahanKey.currentState?.clear();
+      }
+      fieldComboMKota = v;
+    },
+    onSaveCallback: (value) => fieldComboMKota = value,
+  );
+
+  Widget buildFieldObjectKecamatanId() => ReusableComboBox<ComboMKecamatanModel>(
+    hintText: "Kecamatan",
+    comboKey: comboMKecamatanKey,
+    initItem: fieldComboMKecamatan,
+    dataLoader: () => ComboMKecamatanRepository().getComboMKecamatan(fieldComboMKota?.mkotaId ?? ""),
+    displayText: (item) => item.kecamatanNama,
+    compareItems: (a, b) => a.mkecamatanId == b.mkecamatanId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        regpar2Bloc.add(ComboMKecamatanChangedEvent(comboMKecamatan: v)
+        );
+      }
+      comboMKelurahanKey.currentState?.clear();
+      fieldComboMKecamatan = v;
+    },
+    onSaveCallback: (value) => fieldComboMKecamatan = value,
+  );
+
+  Widget buildFieldObjectKelurahanId() => ReusableComboBox<ComboMKelurahanModel>(
+    hintText: "Kelurahan",
+    comboKey: comboMKelurahanKey,
+    initItem: fieldComboMKelurahan,
+    dataLoader: () => ComboMKelurahanRepository().getComboMKelurahan(fieldComboMKecamatan?.mkecamatanId ?? ""),
+    displayText: (item) => item.kelurahanNama,
+    compareItems: (a, b) => a.mkelurahanId == b.mkelurahanId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        regpar2Bloc.add(ComboMKelurahanChangedEvent(comboMKelurahan: v)
+        );
+      }
+      fieldComboMKelurahan = v;
+    },
+    onSaveCallback: (value) => fieldComboMKelurahan = value,
   );
 
   void removeError({required String error}) {
