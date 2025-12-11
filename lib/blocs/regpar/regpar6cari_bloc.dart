@@ -17,7 +17,7 @@ class Regpar6CariBloc extends Bloc<Regpar6CariEvents, Regpar6CariState> {
 Future<void> onRefreshRegpar6Cari(
 		RefreshRegpar6CariEvent event, Emitter<Regpar6CariState> emit) async {
 
-  emit(state.copyWith(regpar1Id: event.regpar1Id));
+	emit(Regpar6CariState(regpar1Id: event.regpar1Id));
 
 	add(FetchRegpar6CariEvent());
 }

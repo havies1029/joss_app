@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/gen_regmv/regmv7cari_model.dart';
@@ -14,13 +15,25 @@ class Regmv7CariBloc extends Bloc<Regmv7CariEvents, Regmv7CariState> {
     on<Regmv7CariResetEvent>((event, emit) => emit(const Regmv7CariState.reset()));
 	}
 
-Future<void> onRefreshRegmv7Cari(
-		RefreshRegmv7CariEvent event, Emitter<Regmv7CariState> emit) async {
-	
-  emit(state.copyWith(regmv1Id: event.regmv1Id));
+	Future<void> onRefreshRegmv7Cari(
+			RefreshRegmv7CariEvent event,
+			Emitter<Regmv7CariState> emit,
+			) async {
 
-	add(FetchRegmv7CariEvent());
-}
+		debugPrint("🔄 [onRefreshRegmv7Cari] CALLED");
+		debugPrint("👉 Event.regmv1Id = ${event.regmv1Id}");
+		debugPrint("📦 State sebelum update: regmv1Id = ${state.regmv1Id}");
+
+		emit(Regmv7CariState(regmv1Id: event.regmv1Id));
+
+		debugPrint("✅ State sesudah update: regmv1Id = ${state.regmv1Id}");
+		debugPrint("➡️ Trigger FetchRegmv7CariEvent");
+
+		add(FetchRegmv7CariEvent());
+
+		debugPrint("📨 FetchRegmv7CariEvent DIKIRIM");
+	}
+
 
 Future<void> onFetchRegmv7Cari(
 		FetchRegmv7CariEvent event, Emitter<Regmv7CariState> emit) async {

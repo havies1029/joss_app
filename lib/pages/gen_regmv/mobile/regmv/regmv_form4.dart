@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -42,6 +43,8 @@ class RegmvForm4Section extends StatefulWidget {
 class RegmvForm4SectionState extends State<RegmvForm4Section> {
   final _regmvform4key = GlobalKey<FormState>();
   bool _showError = false;
+  Completer<bool>? _validationCompleter;
+
   List<Uint8List> _images = [];
   List<String> _fileNames = [];
   late final Regmv4CariBloc  regmv4CariBloc;
@@ -61,6 +64,23 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
           setState(() {
             _serverPhotos = List.from(state.items);
           });
+
+          final hasServer = _serverPhotos.isNotEmpty;
+          final hasLocal = _images.isNotEmpty;
+
+          if (_validationCompleter != null && !_validationCompleter!.isCompleted) {
+            if (hasServer || hasLocal) {
+              _validationCompleter!.complete(true);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Harap unggah minimal 1 foto STNK."),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              _validationCompleter!.complete(false);
+            }
+          }
         }
       },
       child: BlocBuilder<RegmvUploadStnkBloc, RegmvUploadStnkState>(
@@ -124,23 +144,18 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
   }
 
   Future<bool> validateAndReturn() async {
-    final hasLocalPhotos = _images.isNotEmpty;
-    final hasServerPhotos = _serverPhotos.isNotEmpty;
+    _validationCompleter = Completer<bool>();
 
-    if (hasLocalPhotos || hasServerPhotos) {
-      return true;
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+      regmv4CariBloc.add(
+        RefreshRegmv4CariEvent(regmv1Id: widget.regmv1Id!),
+      );
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Harap unggah minimal 1 foto STNK."),
-        backgroundColor: Colors.red,
-      ),
-    );
+    final result = await _validationCompleter!.future;
 
-    return false;
+    return result;
   }
-
 
   Widget _uploadInstructionBox() {
     final blocState = context.watch<RegmvUploadStnkBloc>().state;
@@ -216,7 +231,6 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
                 );
               }
 
-              // FOTO SERVER
               final serverIndex = index - previewImages.length;
               final item = _serverPhotos[serverIndex];
               final url = "${AppData.apiDomain}api/regmv/regmv4cari/stnk/getfoto/${item.regmv4Id}";
@@ -224,15 +238,19 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
               return _buildPhotoTile(
                 content: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: url,
-                    httpHeaders: {
+                  child: Image.network(
+                    url,
+                    headers: {
                       "Authorization": "Bearer ${AppData.userToken}",
-                      "Accept": "*/*",
                     },
                     fit: BoxFit.cover,
-                    placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
-                    errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.broken_image, color: Colors.red, size: 48);
+                    },
                   ),
                 ),
                 onDelete: () => _deleteServerPhoto(item.regmv4Id),
@@ -436,17 +454,27 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
   }
 
   Future<bool> saveForm4() async {
-    if (_images.isEmpty) {
+    final hasLocalPhotos = _images.isNotEmpty;
+    final hasServerPhotos = _serverPhotos.isNotEmpty;
+
+    debugPrint("=== VALIDASI SAVE FORM 5 ===");
+    debugPrint("Local Photos   : ${_images.length}");
+    debugPrint("Server Photos  : ${_serverPhotos.length}");
+    debugPrint("Valid? (ada salah satu): ${hasLocalPhotos || hasServerPhotos}");
+    debugPrint("====================================");
+
+    // ❌ kalau dua-duanya kosong → TIDAK VALID
+    if (!hasLocalPhotos && !hasServerPhotos) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Harap unggah minimal 1 foto STNKKK."),
+          content: Text("Harap unggah minimal 1 foto Mobil."),
           backgroundColor: Colors.red,
         ),
       );
       return false;
     }
 
-    // 🔥 Trigger batch upload
+    // 🟩 kalau valid → upload hanya foto baru (local photos)
     context.read<RegmvUploadStnkBloc>().add(
       UploadStnkBatchSubmit(
         regmv1Id: widget.regmv1Id ?? "",

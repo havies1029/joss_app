@@ -7,6 +7,7 @@ import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form2.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form3.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form4.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form5.dart';
+import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form6.dart';
 import '../../../blocs/regpar/regpar5form_bloc.dart';
 import '../../../helper/form_exit_guard.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
@@ -37,6 +38,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
   final regparform2key = GlobalKey<RegparForm2SectionState>();
   final regparform3key = GlobalKey<RegparForm3SectionState>();
   final  regparform4key = GlobalKey<RegparForm4SectionState>();
+  final regparform5key = GlobalKey<RegparForm5SectionState>();
   final regparform6key = GlobalKey<RegparForm6SectionState>();
 
   String? regpar1Id;
@@ -177,6 +179,13 @@ class _RegparFormMainState extends State<RegparFormMain> {
             const SizedBox(height: hPadding),
 
             Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
+              child: buildForm6Section(),
+            ),
+
+            const SizedBox(height: hPadding),
+
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: AppButton.iconRight(
                 text: "Lanjutkan",
@@ -288,9 +297,9 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
   //========================= form5 =========================
   Widget buildForm5Section() {
-    return RegparForm6Section(
-      key: regparform6key,
-      viewMode: form6ViewMode,
+    return RegparForm5Section(
+      key: regparform5key,
+      viewMode: form5ViewMode,
       regpar1Id: widget.recordId ?? "",
       recordId: regpar5Id,
       isExpanded: expanded[4],
@@ -305,6 +314,30 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
   Future<void> simulateToggleForm5() async {
     await onToggleForm5(true);
+  }
+
+
+
+
+  //========================= form6 =========================
+  Widget buildForm6Section() {
+    return RegparForm6Section(
+      key: regparform6key,
+      viewMode: form6ViewMode,
+      regpar1Id: widget.recordId ?? "",
+      recordId: regpar6Id,
+      isExpanded: expanded[5],
+      onToggle: (value) => onToggleForm5(value),
+    );
+  }
+
+  Future<void> onToggleForm6(bool _) async {
+    openForm6();
+
+  }
+
+  Future<void> simulateToggleForm6() async {
+    await onToggleForm6(true);
   }
 
 
@@ -337,8 +370,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
       1: () async => regparform2key.currentState?.validateAndReturn() ?? false,
       2: () async => regparform3key.currentState?.validateAndReturn() ?? false,
       3: () async => regparform4key.currentState?.validateAndReturn() ?? false,
-      // 4: () async => regparform5key.currentState?.validateAndReturn() ?? false,
-      // 5: () async => regparform7key.currentState?.validateAndReturn() ?? false,
+      4: () async => regparform5key.currentState?.validateAndReturn() ?? false,
     };
 
     // SAVERS
@@ -347,8 +379,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
       1: () async => await regparform2key.currentState?.saveForm2(),
       2: () async => await regparform3key.currentState?.saveForm3(),
       3: () async => await regparform4key.currentState?.saveForm4(),
-      // 4: () async => {}, // upload mobil = auto di Bloc
-      // 5: () async => {}, // upload acc = auto di Bloc
+      4: () async => await regparform5key.currentState?.saveForm5(),
     };
 
     print("🔎 Cek semua form sebelum pindah ke Form 6...");
@@ -403,6 +434,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
         2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -410,6 +442,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.saveForm2(),
         2: () async => await regparform3key.currentState?.saveForm3(),
         3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
       },
     );
 
@@ -437,6 +470,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
         2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -444,6 +478,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.saveForm2(),
         2: () async => await regparform3key.currentState?.saveForm3(),
         3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
       },
     );
 
@@ -471,6 +506,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
         2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -478,6 +514,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.saveForm2(),
         2: () async => await regparform3key.currentState?.saveForm3(),
         3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
       },
     );
 
@@ -485,9 +522,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
     setState(() {
       expanded = newState;
-      debugPrint("kesini1");
       if (expanded[3] == true) {
-        debugPrint("kesini4");
         regparform4key.currentState?.onOpenedByParent();
       }
     });
@@ -509,6 +544,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
         2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -516,17 +552,16 @@ class _RegparFormMainState extends State<RegparFormMain> {
         1: () async => await regparform2key.currentState?.saveForm2(),
         2: () async => await regparform3key.currentState?.saveForm3(),
         3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
       },
     );
 
     if (!allowed) return;
 
     setState(() {
-      debugPrint("kesini1");
       expanded = newState;
       if (expanded[4] == true) {
-        debugPrint("kesini2");
-        regparform6key.currentState?.onOpenedByParent();
+        regparform5key.currentState?.onOpenedByParent();
       }
     });
   }

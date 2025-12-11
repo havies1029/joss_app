@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -42,6 +43,8 @@ class RegmvForm5Section extends StatefulWidget {
 class RegmvForm5SectionState extends State<RegmvForm5Section> {
   final _regmvform5key = GlobalKey<FormState>();
   bool _showError = false;
+  Completer<bool>? _validationCompleter;
+
   List<Uint8List> _images = [];
   List<String> _fileNames = [];
   late final Regmv5CariBloc  regmv5CariBloc;
@@ -61,6 +64,24 @@ class RegmvForm5SectionState extends State<RegmvForm5Section> {
           setState(() {
             _serverPhotos = List.from(state.items);
           });
+
+
+          final hasServer = _serverPhotos.isNotEmpty;
+          final hasLocal = _images.isNotEmpty;
+
+          if (_validationCompleter != null && !_validationCompleter!.isCompleted) {
+            if (hasServer || hasLocal) {
+              _validationCompleter!.complete(true);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Harap unggah minimal 1 foto Mobil."),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              _validationCompleter!.complete(false);
+            }
+          }
         }
       },
       child: BlocBuilder<RegmvUploadFotoMobilBloc, RegmvUploadFotoMobilState>(
@@ -123,21 +144,17 @@ class RegmvForm5SectionState extends State<RegmvForm5Section> {
   }
 
   Future<bool> validateAndReturn() async {
-    final hasLocalPhotos = _images.isNotEmpty;
-    final hasServerPhotos = _serverPhotos.isNotEmpty;
+    _validationCompleter = Completer<bool>();
 
-    if (hasLocalPhotos || hasServerPhotos) {
-      return true;
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+      regmv5CariBloc.add(
+        RefreshRegmv5CariEvent(regmv1Id: widget.regmv1Id!),
+      );
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Harap unggah minimal 1 foto Mobilaaaa."),
-        backgroundColor: Colors.red,
-      ),
-    );
+    final result = await _validationCompleter!.future;
 
-    return false;
+    return result;
   }
 
   Widget _uploadInstructionBox() {
@@ -222,15 +239,20 @@ class RegmvForm5SectionState extends State<RegmvForm5Section> {
               return _buildPhotoTile(
                 content: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: url,
-                    httpHeaders: {
+                  child: Image.network(
+                    url,
+                    headers: {
                       "Authorization": "Bearer ${AppData.userToken}",
-                      "Accept": "*/*",
                     },
                     fit: BoxFit.cover,
-                    placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
-                    errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      debugPrint("❌ Error load foto RMV5: $error");
+                      return const Icon(Icons.broken_image, color: Colors.red, size: 48);
+                    },
                   ),
                 ),
                 onDelete: () => _deleteServerPhoto(item.regmv5Id),

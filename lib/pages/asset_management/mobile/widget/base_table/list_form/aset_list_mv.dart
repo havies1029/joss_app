@@ -48,6 +48,7 @@ class AsetListMv extends StatelessWidget {
         // 13: IntrinsicColumnWidth(),
         // 14: IntrinsicColumnWidth(),
       },
+      currentStatusFilter: statusLabel,
       headerCells: const [
         HeaderCell("No", center: true),
         // HeaderCell("Currency"),
@@ -62,7 +63,7 @@ class AsetListMv extends StatelessWidget {
         // HeaderCell("Tahun", center: true),
         // HeaderCell("Tipe", center: true),
         HeaderCell("Status", center: true),
-        HeaderCell("Aksi"),
+        // HeaderCell("Aksi"),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         CellText("$rowNumber", center: true),
@@ -84,29 +85,29 @@ class AsetListMv extends StatelessWidget {
         // CellText("${item.tahun}", center: true),
         // CellText(item.tipe, center: true),
         CellText(item.status, center: true),
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: getActionButtonsByStatus(
-              item.status,
-              namaItem: item.noPolisi,
-              context: context,
-              itemData: item,
-              onProcessTap: () async {
-                final bloc = context.read<AsetMvCariBloc>();
-                debugPrint("📡 Klik Lacak Polis untuk: ${item.noPolisi}");
-
-                bloc.add(
-                  DebugFetchAsetMvCariEvent(
-                    searchText: item.noPolisi,
-                    statusId: '10001',
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(6),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: getActionButtonsByStatus(
+        //       item.status,
+        //       namaItem: item.noPolisi,
+        //       context: context,
+        //       itemData: item,
+        //       onProcessTap: () async {
+        //         final bloc = context.read<AsetMvCariBloc>();
+        //         debugPrint("📡 Klik Lacak Polis untuk: ${item.noPolisi}");
+        //
+        //         bloc.add(
+        //           DebugFetchAsetMvCariEvent(
+        //             searchText: item.noPolisi,
+        //             statusId: '10001',
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
 
       ],
       onFetchMore: () {

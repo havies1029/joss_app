@@ -33,7 +33,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   Regmv1CrudModel? regmv1Record;
   Regmv2FormModel? regmv2Record;
   Regmv3FormModel? regmv3Record;
-  Regmv4FormModel? regmv4Record;
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -291,7 +290,6 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
           ),
           kDivider(color: sGrey),
 
-          // 🔹 Status Perlindungan Tambahan (pakai ikon centang / kosong)
           _buildSectionHeader("Perluasan Pertanggungan"),
           kDivider(color: sGrey),
 

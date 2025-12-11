@@ -186,7 +186,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
 
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: hPadding),
-                child: buildForm7Section()
+                child: buildForm6Section()
             ),
 
             const SizedBox(height: hPadding),
@@ -204,7 +204,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
 
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: hPadding),
-                child: buildForm6Section()
+                child: buildForm7Section()
             ),
 
             const SizedBox(height: hPadding),
@@ -344,23 +344,23 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
   //========================= form6 =========================
 
 
-  Widget buildForm7Section() {
-    return RegmvForm7Section(
-      key: regmvform7key,
-      viewMode: form7ViewMode,
+  Widget buildForm6Section() {
+    return RegmvForm6Section(
+      key: regmvform6key,
+      viewMode: form6ViewMode,
       regmv1Id: widget.recordId ?? "",
-      recordId: regmv7Id ?? "",
+      recordId: regmv6Id ?? "",
       isExpanded: expanded[5],
-      onToggle: (value) => onToggleForm7(value),
+      onToggle: (value) => onToggleForm6(value),
     );
   }
 
-  Future<void> onToggleForm7(bool _) async {
-    openForm7();
+  Future<void> onToggleForm6(bool _) async {
+    openForm6();
   }
 
-  Future<void> simulateToggleForm7() async {
-    await onToggleForm7(true);
+  Future<void> simulateToggleForm6() async {
+    await onToggleForm6(true);
   }
 
 
@@ -383,7 +383,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
     final oldExpanded = List<bool>.from(expanded);
 
     // Mau tutup semua kecuali Form 6 (index 5)
-    final newExpanded = [false, false, false, false, false, true, false];
+    final newExpanded = [false, false, false, false, false, false, true];
 
     // VALIDATOR
     final validators = <int, Future<bool> Function()>{
@@ -392,7 +392,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
       2: () async => regmvform3key.currentState?.validateAndReturn() ?? false,
       3: () async => regmvform4key.currentState?.validateAndReturn() ?? false,
       4: () async => regmvform5key.currentState?.validateAndReturn() ?? false,
-      5: () async => regmvform7key.currentState?.validateAndReturn() ?? false,
+      5: () async => regmvform6key.currentState?.validateAndReturn() ?? false,
     };
 
     // SAVERS
@@ -402,7 +402,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
       2: () async => await regmvform3key.currentState?.saveForm3(),
       3: () async => await regmvform4key.currentState?.saveForm4(),
       4: () async => await regmvform5key.currentState?.saveForm5(),
-      5: () async => await regmvform7key.currentState?.saveForm7(),
+      5: () async => await regmvform6key.currentState?.saveForm6(),
     };
 
     print("🔎 Cek semua form sebelum pindah ke Form 6...");
@@ -439,23 +439,23 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
 
   //========================= form7 =========================
 
-  Widget buildForm6Section() {
-    return RegmvForm6Section(
-      key: regmvform6key,
-      viewMode: form6ViewMode,
+  Widget buildForm7Section() {
+    return RegmvForm7Section(
+      key: regmvform7key,
+      viewMode: form7ViewMode,
       regmv1Id: widget.recordId ?? "",
       recordId: regmv7Id,
       isExpanded: expanded[6],
-      onToggle: (value) => onToggleForm6(value),
+      onToggle: (value) => onToggleForm7(value),
     );
   }
 
-  Future<void> onToggleForm6(bool _) async {
-    openForm6;
+  Future<void> onToggleForm7(bool _) async {
+    openForm7;
   }
 
-  Future<void> simulateToggleForm6() async {
-    await onToggleForm6(true);
+  Future<void> simulateToggleForm7() async {
+    await onToggleForm7(true);
   }
 
 
@@ -476,21 +476,21 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
 
       validators: {
         0: () async => await regmvform1key.currentState?.validateAndReturn() ?? false,
-        // 1: () async => await regmvform2key.currentState?.validateAndReturn() ?? false,
+        1: () async => await regmvform2key.currentState?.validateAndReturn() ?? false,
         2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regmvform4key.currentState?.validateAndReturn() ?? false,
         4: () async => await regmvform5key.currentState?.validateAndReturn() ?? false,
-        5: () async => await regmvform7key.currentState?.validateAndReturn() ?? false,
+        5: () async => await regmvform6key.currentState?.validateAndReturn() ?? false,
 
       },
 
       savers: {
         0: () async => await regmvform1key.currentState?.saveForm1(),
-        // 1: () async => await regmvform2key.currentState?.saveForm2(),
+        1: () async => await regmvform2key.currentState?.saveForm2(),
         2: () async => await regmvform3key.currentState?.saveForm3(),
         3: () async => await regmvform4key.currentState?.saveForm4(),
         4: () async => await regmvform5key.currentState?.saveForm5(),
-        5: () async => await regmvform7key.currentState?.saveForm7(),
+        5: () async => await regmvform6key.currentState?.saveForm6(),
       },
     );
 
@@ -515,19 +515,19 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
       validators: {
         0: () async => await regmvform1key.currentState?.validateAndReturn() ?? false,
         1: () async => await regmvform2key.currentState?.validateAndReturn() ?? false,
-        // 2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
+        2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regmvform4key.currentState?.validateAndReturn() ?? false,
         4: () async => await regmvform5key.currentState?.validateAndReturn() ?? false,
-        5: () async => await regmvform7key.currentState?.validateAndReturn() ?? false,
+        5: () async => await regmvform6key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
         0: () async => await regmvform1key.currentState?.saveForm1(),
         1: () async => await regmvform2key.currentState?.saveForm2(),
-        // 2: () async => await regmvform3key.currentState?.saveForm3(),
+        2: () async => await regmvform3key.currentState?.saveForm3(),
         3: () async => await regmvform4key.currentState?.saveForm4(),
         4: () async => await regmvform5key.currentState?.saveForm5(),
-        5: () async => await regmvform7key.currentState?.saveForm7(),
+        5: () async => await regmvform6key.currentState?.saveForm6(),
       },
     );
 
@@ -556,7 +556,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
         // 3: () async => await regmvform4key.currentState?.validateAndReturn() ?? false,
         4: () async => await regmvform5key.currentState?.validateAndReturn() ?? false,
-        5: () async => await regmvform7key.currentState?.validateAndReturn() ?? false,
+        5: () async => await regmvform6key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -565,7 +565,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         2: () async => await regmvform3key.currentState?.saveForm3(),
         // 3: () async => await regmvform4key.currentState?.saveForm4(),
         4: () async => await regmvform5key.currentState?.saveForm5(),
-        5: () async => await regmvform7key.currentState?.saveForm7(),
+        5: () async => await regmvform6key.currentState?.saveForm6(),
       },
     );
 
@@ -594,7 +594,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regmvform4key.currentState?.validateAndReturn() ?? false,
         // 4: () async => await regmvform5key.currentState?.validateAndReturn() ?? false,
-        5: () async => await regmvform7key.currentState?.validateAndReturn() ?? false,
+        5: () async => await regmvform6key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -603,7 +603,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         2: () async => await regmvform3key.currentState?.saveForm3(),
         3: () async => await regmvform4key.currentState?.saveForm4(),
         // 4: () async => await regmvform5key.currentState?.saveForm5(),
-        5: () async => await regmvform7key.currentState?.saveForm7(),
+        5: () async => await regmvform6key.currentState?.saveForm6(),
       },
     );
 
@@ -617,13 +617,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
     });
   }
 
-  void openForm6() {
-    setState(() {
-      expanded = [false, false, false, false, false, false, true];
-    });
-  }
-
-  Future<void> openForm7() async {
+  Future<void> openForm6() async {
     final oldState = List<bool>.from(expanded);
     final newState = [false, false, false, false, false, true, false];
 
@@ -637,7 +631,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
         3: () async => await regmvform4key.currentState?.validateAndReturn() ?? false,
         4: () async => await regmvform5key.currentState?.validateAndReturn() ?? false,
-        // 5: () async => await regmvform7key.currentState?.validateAndReturn() ?? false,
+        // 6: () async => await regmvform7key.currentState?.validateAndReturn() ?? false,
       },
 
       savers: {
@@ -646,7 +640,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
         2: () async => await regmvform3key.currentState?.saveForm3(),
         3: () async => await regmvform4key.currentState?.saveForm4(),
         4: () async => await regmvform5key.currentState?.saveForm5(),
-        // 5: () async => await regmvform7key.currentState?.saveForm7(),
+        // 6: () async => await regmvform7key.currentState?.saveForm7(),
       },
     );
 
@@ -655,8 +649,14 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
     setState(() {
       expanded = newState;
       if (expanded[5] == true) {
-        regmvform7key.currentState?.onOpenedByParent();
+        regmvform6key.currentState?.onOpenedByParent();
       }
+    });
+  }
+
+  void openForm7() {
+    setState(() {
+      expanded = [false, false, false, false, false, false, true];
     });
   }
 }
