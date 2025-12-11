@@ -43,6 +43,7 @@ class AsetListHealth extends StatelessWidget {
         // 5: IntrinsicColumnWidth(),
         // 6: IntrinsicColumnWidth(),
       },
+      currentStatusFilter: statusLabel,
       headerCells: const [
         HeaderCell("No", center: true),
         HeaderCell("Nama"),
@@ -50,7 +51,7 @@ class AsetListHealth extends StatelessWidget {
         // HeaderCell("Nomor Polis"),
         // HeaderCell("Posisi", center: true),
         HeaderCell("Status", center: true),
-        HeaderCell("Aksi"),
+        // HeaderCell("Aksi"),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         CellText("$rowNumber", center: true),
@@ -59,29 +60,29 @@ class AsetListHealth extends StatelessWidget {
         // CellText(item.polisNo),
         // CellText(item.posisi, center: true),
         CellText(item.status, center: true),
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: getActionButtonsByStatus(
-              item.status,
-              namaItem: item.nama,
-              context: context,
-              itemData: item,
-              onProcessTap: () async {
-                final bloc = context.read<AsetHealthCariBloc>();
-                debugPrint("🔍 [Lacak Nama] Request data untuk: ${item.nama}");
-
-                bloc.add(
-                  DebugFetchAsetHealthCariEvent(
-                    searchText: item.nama,
-                    statusId: '10001',
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(6),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: getActionButtonsByStatus(
+        //       item.status,
+        //       namaItem: item.nama,
+        //       context: context,
+        //       itemData: item,
+        //       onProcessTap: () async {
+        //         final bloc = context.read<AsetHealthCariBloc>();
+        //         debugPrint("🔍 [Lacak Nama] Request data untuk: ${item.nama}");
+        //
+        //         bloc.add(
+        //           DebugFetchAsetHealthCariEvent(
+        //             searchText: item.nama,
+        //             statusId: '10001',
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
       ],
       onFetchMore: () {
         context.read<AsetHealthCariBloc>().add(FetchAsetHealthCariEvent());

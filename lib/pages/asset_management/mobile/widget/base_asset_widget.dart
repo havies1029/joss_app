@@ -2,11 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/asset_management/mobile/widget/asset_list_widget.dart';
 import '../../../../../../common/constants.dart';
-import '../../../../models/combobox/combocoblist_model.dart';
+// import '../../../../models/combobox/combocoblist_model.dart';
 import '../../../../models/gen_aset_dashboard/asetdashboardcari_model.dart';
-import '../../../../repositories/combobox/combocoblist_repository.dart';
+// import '../../../../repositories/combobox/combocoblist_repository.dart';
 import '../../../../repositories/gen_aset_dashboard/asetdashboardcari_repository.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+import 'package:joss_app/repositories/combobox/combomcobapp1_repository.dart';
 
 import 'base_table/base_table_aset_widget.dart';
 
@@ -19,9 +22,9 @@ class BaseAssetWidget extends StatefulWidget {
 class _BaseAssetWidgetState extends State<BaseAssetWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  ComboCobListModel? _selectedCob;
+  ComboMCobApp1Model? _selectedCob;
   final Map<String, dynamic> _formData = {};
-  late final Future<List<ComboCobListModel>> _cobFuture;
+  late final Future<List<ComboMCobApp1Model>> _cobFuture;
 
   // Tambah state buat hasil dashboard
   List<AsetDashboardCariModel>? _dashboard;
@@ -35,12 +38,12 @@ class _BaseAssetWidgetState extends State<BaseAssetWidget>
       vsync: this,
     );
 
-    _cobFuture = ComboCobListRepository().getComboCobList().then((list) {
+    _cobFuture = ComboMCobApp1Repository().getComboMCobApp1("").then((list) {
       final defaultCob = list.firstWhere(
-            (e) => e.mCobApp1Id.toString() == "10001",
+            (e) => e.mCobApp1Id.toString() == "10002",
         orElse: () => list.isNotEmpty
             ? list.first
-            : ComboCobListModel(mCobApp1Id: "0", cobNama: "Kosong"),
+            : ComboMCobApp1Model(mCobApp1Id: "0", cobNama: "Kosong"),
       );
 
       if (mounted) {

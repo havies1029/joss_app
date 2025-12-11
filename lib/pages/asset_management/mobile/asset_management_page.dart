@@ -7,8 +7,7 @@ import '../../../models/combobox/combocoblist_model.dart';
 import '../../../repositories/combobox/combocoblist_repository.dart';
 import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_sidepage.dart';
-import '../circular_spread.dart';
-import '../draggable_beli_polis_button.dart';
+import '../floating_action_menu_widget.dart';
 
 class AssetManagementPage extends StatefulWidget {
   const AssetManagementPage({super.key});
@@ -63,54 +62,6 @@ class _AssetManagementPageState extends State<AssetManagementPage>
                 ),
               ),
             ),
-
-            // const DraggableBeliPolisButton(),
-          Stack(
-            children: [
-              // konten halaman lain...
-
-              BottomCenterAddButton(
-                  actions: [
-                    MiniActionButton(
-                      iconPath: 'assets/icons/beli_polis1.svg',
-                      gradient: yellowGradient,
-                      label: "Beli Polis",
-                      onTap: () {},
-                    ),
-                    MiniActionButton(
-                      iconPath: 'assets/icons/endorse1.svg',
-                      gradient: blueGradient ,
-                      label: "Endorse",
-                      onTap: () {},
-                    ),
-                    MiniActionButton(
-                      iconPath: 'assets/icons/lacak_polis1.svg',
-                      gradient: cyanGradient,
-                      label: "Lacak Polis",
-                      onTap: () {},
-                    ),
-                    MiniActionButton(
-                      iconPath: 'assets/icons/perpanjangan1.svg',
-                      gradient: purpleGradient,
-                      label: "Perpanjang",
-                      onTap: () {},
-                    ),
-                    MiniActionButton(
-                      iconPath: 'assets/icons/aktifkan1.svg',
-                      gradient: redGradient,
-                      label: "Aktifkan",
-                      onTap: () {},
-                    ),
-                    MiniActionButton(
-                      iconPath: 'assets/icons/unduh_polis1.svg',
-                      gradient: greenGradient,
-                      label: "Unduh Polis",
-                      onTap: () {},
-                    ),
-                  ],
-              ),
-            ],
-          ),
         ],
         ),
       ),

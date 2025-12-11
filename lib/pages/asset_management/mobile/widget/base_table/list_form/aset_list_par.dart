@@ -41,6 +41,7 @@ class AsetListPar extends StatelessWidget {
         8: IntrinsicColumnWidth(),
         // 9: IntrinsicColumnWidth(),
       },
+      currentStatusFilter: statusLabel,
       headerCells: const [
         HeaderCell("No", center: true),
         HeaderCell("Tertanggung"),
@@ -52,7 +53,7 @@ class AsetListPar extends StatelessWidget {
         HeaderCell("Nilai Pertanggungan"),
         HeaderCell("Premi"),
         HeaderCell("Status", center: true),
-        HeaderCell("Aksi"),
+        // HeaderCell("Aksi"),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         CellText("$rowNumber", center: true),
@@ -71,29 +72,29 @@ class AsetListPar extends StatelessWidget {
               .format(item.premi),
         ),
         CellText(item.status, center: true),
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: getActionButtonsByStatus(
-              item.status,
-              namaItem: item.alamat, // 🏠 ambil data dari alamat
-              context: context,
-              itemData: item,
-              onProcessTap: () {
-                final bloc = context.read<AsetParCariBloc>();
-                debugPrint("📡 Klik Lacak Polis untuk: ${item.alamat}");
-
-                bloc.add(
-                  DebugFetchAsetParCariEvent(
-                    searchText: item.alamat,
-                    statusId: '10001',
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(6),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: getActionButtonsByStatus(
+        //       item.status,
+        //       namaItem: item.alamat, // 🏠 ambil data dari alamat
+        //       context: context,
+        //       itemData: item,
+        //       onProcessTap: () {
+        //         final bloc = context.read<AsetParCariBloc>();
+        //         debugPrint("📡 Klik Lacak Polis untuk: ${item.alamat}");
+        //
+        //         bloc.add(
+        //           DebugFetchAsetParCariEvent(
+        //             searchText: item.alamat,
+        //             statusId: '10001',
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
       ],
       onFetchMore: () {
         context.read<AsetParCariBloc>().add(FetchAsetParCariEvent());
