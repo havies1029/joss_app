@@ -85,7 +85,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
           listener: (context, state) {
             if(isHitungPremiClicked == true){
               isHitungPremiClicked = false;
-              simulateToggleForm5();
+              simulateToggleForm6();
             }
 
           },
@@ -164,12 +164,6 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
             const SizedBox(height: hPadding),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding),
-              child: buildButtonHitungPremi(),
-            ),
-
-            const SizedBox(height: hPadding),
 
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
@@ -177,6 +171,14 @@ class _RegparFormMainState extends State<RegparFormMain> {
             ),
 
             const SizedBox(height: hPadding),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
+              child: buildButtonHitungPremi(),
+            ),
+
+            const SizedBox(height: hPadding),
+
 
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
@@ -361,8 +363,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
     final oldExpanded = List<bool>.from(expanded);
     isHitungPremiClicked = true;
-    // Mau tutup semua kecuali Form 6 (index 5)
-    final newExpanded = [false, false, false, false, true, false];
+    final newExpanded = [false, false, false, false, false,true];
 
     // VALIDATOR
     final validators = <int, Future<bool> Function()>{

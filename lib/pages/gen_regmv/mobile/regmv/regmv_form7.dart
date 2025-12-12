@@ -29,7 +29,7 @@ class RegmvForm7Section extends StatefulWidget {
 
 
 class RegmvForm7SectionState extends State<RegmvForm7Section> {
-  final _regmvform6key = GlobalKey<FormState>();
+  final _regmvform7key = GlobalKey<FormState>();
   final diskonPremiCtrl = TextEditingController();
   final netCtrl = TextEditingController();
   final subtotalCtrl = TextEditingController();
@@ -51,14 +51,14 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
     super.dispose();
   }
 
-  void onOpenedByParent() {
-    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
-      regmv6Bloc.add(Regmv6FormLihatEvent(recordId: widget.regmv1Id!));
-    }
-  }
+  // void onOpenedByParent() {
+  //   if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+  //     regmv6Bloc.add(Regmv6FormLihatEvent(recordId: widget.regmv1Id!));
+  //   }
+  // }
 
   void _injectPayload(Regmv6FormModel record) {
-    debugPrint("🔥 Injecting payload into Form1...");
+    debugPrint("🔥 Injecting payload into Form6...");
 
     diskonPremiCtrl.text = record.premiDiskon.toString();
     netCtrl.text = record.premiNet.toString();
@@ -101,7 +101,7 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
       listeners: [
         BlocListener<Regmv6FormBloc, Regmv6FormState>(
           listenWhen: (prev, curr) =>
-          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
+          curr.record != null && !_isPayloadInjected,
           listener: (context, state) {
             _injectPayload(state.record!);
             _isPayloadInjected = true;
@@ -111,7 +111,7 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
         child: Form(
-          key: _regmvform6key,
+          key: _regmvform7key,
           child: Column(
             children: [
               appTextField(

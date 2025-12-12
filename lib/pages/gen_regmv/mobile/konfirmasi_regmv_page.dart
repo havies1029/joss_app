@@ -454,14 +454,14 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   }
 
   Widget siValueWidget(dynamic value) {
-    if (value == 1) {
+    if (value == true) {
       return SvgPicture.asset(
         'assets/icons/dipilih.svg',
         width: 30,
         height: 30,
         fit: BoxFit.contain,
       );
-    } else if (value == 0) {
+    } else if (value == false) {
       return SvgPicture.asset(
         'assets/icons/tidak_dipilih.svg',
         width: 30,

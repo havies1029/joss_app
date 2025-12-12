@@ -56,14 +56,14 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
     super.dispose();
   }
 
-  void onOpenedByParent() {
-    if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
-      regpar5Bloc.add(Regpar5FormLihatEvent(recordId: widget.regpar1Id!));
-    }
-  }
+  // void onOpenedByParent() {
+  //   if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
+  //     regpar5Bloc.add(Regpar5FormLihatEvent(recordId: widget.regpar1Id!));
+  //   }
+  // }
 
   void _injectPayload(Regpar5FormModel record) {
-    debugPrint("🔥 Injecting payload into Form1...");
+    debugPrint("🔥 Injecting payload into Form6...");
 
     diskonNilaiCtrl.text = record.diskonNilai.toString();
     premiNetCtrl.text = record.premiNet.toString();
@@ -106,7 +106,7 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
       listeners: [
         BlocListener<Regpar5FormBloc, Regpar5FormState>(
           listenWhen: (prev, curr) =>
-          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
+          curr.record != null && !_isPayloadInjected,
           listener: (context, state) {
             _injectPayload(state.record!);
             _isPayloadInjected = true;

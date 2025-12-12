@@ -476,13 +476,6 @@ class RegmvForm5SectionState extends State<RegmvForm5Section> {
     final hasLocalPhotos = _images.isNotEmpty;
     final hasServerPhotos = _serverPhotos.isNotEmpty;
 
-    debugPrint("=== VALIDASI SAVE FORM 5 ===");
-    debugPrint("Local Photos   : ${_images.length}");
-    debugPrint("Server Photos  : ${_serverPhotos.length}");
-    debugPrint("Valid? (ada salah satu): ${hasLocalPhotos || hasServerPhotos}");
-    debugPrint("====================================");
-
-    // ❌ kalau dua-duanya kosong → TIDAK VALID
     if (!hasLocalPhotos && !hasServerPhotos) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -493,7 +486,6 @@ class RegmvForm5SectionState extends State<RegmvForm5Section> {
       return false;
     }
 
-    // 🟩 kalau valid → upload hanya foto baru (local photos)
     context.read<RegmvUploadFotoMobilBloc>().add(
       UploadFotoMobilBatchSubmit(
         regmv1Id: widget.regmv1Id ?? "",

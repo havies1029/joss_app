@@ -95,7 +95,7 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
           listener: (context, state) {
             if(isHitungPremiClicked == true){
               isHitungPremiClicked = false;
-              // simulateToggleForm5();
+              simulateToggleForm7();
             }
 
           },
@@ -655,8 +655,41 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
   }
 
   void openForm7() {
-    setState(() {
-      expanded = [false, false, false, false, false, false, true];
+    setState(() async {
+      final oldState = List<bool>.from(expanded);
+      final newState = [false, false, false, false, false, false, true];
+
+      final allowed = await FormExitGuard.multiCheck(
+        oldExpanded: oldState,
+        newExpanded: newState,
+
+        validators: {
+          0: () async => await regmvform1key.currentState?.validateAndReturn() ?? false,
+          1: () async => await regmvform2key.currentState?.validateAndReturn() ?? false,
+          2: () async => await regmvform3key.currentState?.validateAndReturn() ?? false,
+          3: () async => await regmvform4key.currentState?.validateAndReturn() ?? false,
+          4: () async => await regmvform5key.currentState?.validateAndReturn() ?? false,
+          5: () async => await regmvform6key.currentState?.validateAndReturn() ?? false,
+        },
+
+        savers: {
+          0: () async => await regmvform1key.currentState?.saveForm1(),
+          1: () async => await regmvform2key.currentState?.saveForm2(),
+          2: () async => await regmvform3key.currentState?.saveForm3(),
+          3: () async => await regmvform4key.currentState?.saveForm4(),
+          4: () async => await regmvform5key.currentState?.saveForm5(),
+          5: () async => await regmvform6key.currentState?.saveForm6(),
+        },
+      );
+
+      if (!allowed) return;
+
+      setState(() {
+        expanded = newState;
+        // if (expanded[6] == true) {
+        //   regmvform7key.currentState?.onOpenedByParent();
+        // }
+      });
     });
   }
 }
