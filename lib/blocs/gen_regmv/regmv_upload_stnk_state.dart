@@ -18,6 +18,17 @@ class UploadStnkPreview extends RegmvUploadStnkState {
   List<Object?> get props => [imageBytes, fileName];
 }
 
+class UploadStnkListPreview extends RegmvUploadStnkState {
+  final List<Uint8List> images;
+  final List<String> fileNames;
+
+  const UploadStnkListPreview(this.images, this.fileNames);
+
+  @override
+  List<Object?> get props => [images, fileNames];
+}
+
+
 class UploadStnkLoading extends RegmvUploadStnkState {}
 
 class UploadStnkSuccess extends RegmvUploadStnkState {}

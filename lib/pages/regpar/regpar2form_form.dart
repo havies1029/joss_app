@@ -145,7 +145,7 @@ class Regpar2FormFormPageFormState extends State<Regpar2FormFormPage> {
 			},
 			listener: (context, state) {
 				if (state.isLoaded) {
-					if (state.record != null){fieldObjectAlamatController.text = state.record!.objectAlamat;
+					if (state.record != null){fieldObjectAlamatController.text = state.record!.objectAlamat ?? "";
 					fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
 					fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
 					}

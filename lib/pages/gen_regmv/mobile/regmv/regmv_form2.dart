@@ -21,7 +21,7 @@ class RegmvForm2Section extends StatefulWidget {
   final String? recordId;
   final bool isExpanded;
   final Function(bool) onToggle;
-  final String? regmv1Id; // ini didapat dari parents
+  final String? regmv1Id;
 
   const RegmvForm2Section({
     super.key,
@@ -39,50 +39,43 @@ class RegmvForm2Section extends StatefulWidget {
 
 class RegmvForm2SectionState extends State<RegmvForm2Section> {
   final _regmvform2key = GlobalKey<FormState>();
-
+  final List<String> errors = [];
   late final Regmv2FormBloc regmv2Bloc;
   bool _isPayloadInjected = false;
 
-
+  final fieldPolisAkhirController = TextEditingController();
+  final fieldPolisMulaiController = TextEditingController();
   final fieldAwController = TextEditingController();
   final fieldCoverLamaController = TextEditingController();
-
   final fieldIsEqController = TextEditingController();
   final fieldIsFloodController = TextEditingController();
   final fieldIsSrccController = TextEditingController();
   final fieldIsTbodController = TextEditingController();
   final fieldIsTerrorismController = TextEditingController();
-
   final fieldPadController = TextEditingController();
   final fieldPapController = TextEditingController();
   final fieldPassangerCountController = TextEditingController();
   final fieldPllController = TextEditingController();
-  // final fieldPolisAkhirController = TextEditingController(text: DateTime.now().toIso8601String());
-  // final fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
   final fieldTplController = TextEditingController();
 
   ComboRMatauangModel? fieldComboRMatauang;
+  final comboRMatauangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
   ComboMMvjnscoverModel? fieldComboMMvjnscover;
+  final comboMMvjnscoverKey = GlobalKey<DropdownSearchState<ComboMMvjnscoverModel>>();
 
   DateTime? kejadianMulaiTgl;
-  DateTime? kejadianBerakhirTgl;
+  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-  final DateTime _today = DateTime.now();
+  DateTime? kejadianBerakhirTgl;
+  final _years = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
   String selectedPassengerCount = "";
-
-  void onOpenedByParent() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
-      debugPrint("🔥 Form2 dibuka parent → trigger lihat event ${widget.recordId}");
-      regmv2Bloc.add(Regmv2FormLihatEvent(recordId: widget.regmv1Id!));
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     regmv2Bloc = context.read<Regmv2FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
@@ -106,13 +99,20 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     fieldPapController.dispose();
     fieldPassangerCountController.dispose();
     fieldPllController.dispose();
-    // fieldPolisAkhirController.dispose();
-    // fieldPolisMulaiController.dispose();
+    fieldPolisAkhirController.dispose();
+    fieldPolisMulaiController.dispose();
     fieldTplController.dispose();
 
     super.dispose();
   }
 
+
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+      debugPrint("🔥 Form2 dibuka parent → trigger lihat event ${widget.regmv1Id}");
+      regmv2Bloc.add(Regmv2FormLihatEvent(recordId: widget.regmv1Id!));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,8 +256,8 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     fieldPapController.text = record.pap.toString();
     fieldPassangerCountController.text = record.passangerCount.toString();
     fieldPllController.text = record.pll.toString();
-    // fieldPolisMulaiController.text = record.polisMulai.toIso8601String();
-    // fieldPolisAkhirController.text = record.polisAkhir.toIso8601String();
+    fieldPolisMulaiController.text = record.polisMulai.toIso8601String();
+    fieldPolisAkhirController.text = record.polisAkhir.toIso8601String();
 
     kejadianMulaiTgl = record.polisMulai;
     kejadianBerakhirTgl = record.polisAkhir;

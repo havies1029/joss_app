@@ -59,10 +59,11 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   void initState() {
     super.initState();
     regpar4Bloc = context.read<Regpar4FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
+    debugPrint("Regpar4FormLihatEvent trigger");
     if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
       regpar4Bloc.add(Regpar4FormLihatEvent(recordId: widget.regpar1Id!));
     }
@@ -80,6 +81,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   }
 
   void onOpenedByParent() {
+    debugPrint("Regpar4FormLihatEvent trigger");
     if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
       debugPrint("🔥 Form4 dibuka parent → trigger lihat event");
       regpar4Bloc.add(Regpar4FormLihatEvent(recordId: widget.regpar1Id!));

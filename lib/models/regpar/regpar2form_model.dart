@@ -7,7 +7,7 @@ import 'package:joss_app/models/combobox/combomkelurahan_model.dart';
 
 class Regpar2FormModel {
 	String regpar1Id;
-	String objectAlamat;
+	String? objectAlamat;
 	DateTime polisAkhir;
 	DateTime polisMulai;
 	String regpar2Id;

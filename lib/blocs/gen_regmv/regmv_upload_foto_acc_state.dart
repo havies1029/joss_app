@@ -18,6 +18,16 @@ class UploadFotoAccPreview extends RegmvUploadFotoAccState {
   List<Object?> get props => [imageBytes, fileName];
 }
 
+class UploadFotoAccListPreview extends RegmvUploadFotoAccState {
+  final List<Uint8List> images;
+  final List<String> fileNames;
+
+  const UploadFotoAccListPreview(this.images, this.fileNames);
+
+  @override
+  List<Object?> get props => [images, fileNames];
+}
+
 class UploadFotoAccLoading extends RegmvUploadFotoAccState {}
 
 class UploadFotoAccSuccess extends RegmvUploadFotoAccState {}

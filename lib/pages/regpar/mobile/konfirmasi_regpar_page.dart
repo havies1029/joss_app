@@ -323,20 +323,19 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
           // _buildDetailRow("ID Pertanggungan", data.regpar4Id),
           // kDivider(color: sGrey),
-
-          _buildDetailRowIcon("SI Building", data.siBuilding),
+          _buildDetailRow("SI Building", toCurrency(data.siBuilding)),
           kDivider(color: sGrey),
 
-          _buildDetailRowIcon("SI Machinery", data.siMachinery),
+          _buildDetailRow("SI Machinery", toCurrency(data.siMachinery)),
           kDivider(color: sGrey),
 
-          _buildDetailRowIcon("SI Stock", data.siStock),
+          _buildDetailRow("SI Stock", toCurrency(data.siStock)),
           kDivider(color: sGrey),
 
-          _buildDetailRowIcon("SI Content", data.siContent),
+          _buildDetailRow("SI Content", toCurrency(data.siContent)),
           kDivider(color: sGrey),
 
-          _buildDetailRowIcon("SI Other", data.siOther),
+          _buildDetailRow("SI Other", toCurrency(data.siOther)),
           kDivider(color: sGrey),
 
           _buildDetailRow("Mata Uang",

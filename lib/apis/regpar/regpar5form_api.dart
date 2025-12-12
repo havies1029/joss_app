@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -92,23 +93,50 @@ class Regpar5FormAPI {
 	}
 
 	Future<Regpar5FormModel> regpar5FormHitungPremiAPI(String regpar1Id) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regpar/regpar5form/hitungpremi";
-		Map<String, String> queryParams = {'regpar1Id': regpar1Id,
-			'modul_id': 'regpar5FormHitungPremiAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+		debugPrint('[PAR API] HITUNG PREMI CALLED');
+		debugPrint('[PAR API] regpar1Id = $regpar1Id');
+
+		final String endpoint =
+				"${AppData.prefixEndPoint}/api/regpar/regpar5form/hitungpremi";
+
+		final queryParams = {
+			'regpar1Id': regpar1Id,
+			'modul_id': 'regpar5FormHitungPremiAPI',
+		};
+
+		final uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			endpoint,
+			queryParams,
+		);
+
+		debugPrint('[PAR API] URI = $uri');
+
+		final response = await http.get(
+			uri,
+			headers: {
+				'Authorization': 'Bearer ${AppData.userToken}',
+				'Accept': 'application/json',
+			},
+		);
+
+		debugPrint('[PAR API] STATUS = ${response.statusCode}');
+		debugPrint('[PAR API] BODY = ${response.body}');
 
 		if (response.statusCode == 200) {
-			var returnData = Regpar5FormModel.fromJson(jsonDecode(response.body));
-			return returnData;
+			final json = jsonDecode(response.body);
+			debugPrint('[PAR API] JSON = $json');
+
+			final model = Regpar5FormModel.fromJson(json);
+			debugPrint('[PAR API] MODEL = ${model.toJson()}');
+
+			return model;
 		} else {
-			return throw Exception("Failed to load data");
+			throw Exception(
+				'Hitung premi gagal: ${response.statusCode} ${response.body}',
+			);
 		}
 	}
+
 
 }

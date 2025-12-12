@@ -48,6 +48,9 @@ import 'package:joss_app/repositories/gen_regmv/regmv3form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv4form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv5form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv6form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv_download_fotoacc_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv_download_fotomobil_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv_download_stnk_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_acc_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_mobil_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_stnk_repository.dart';
@@ -59,6 +62,8 @@ import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar_download_fotoobject_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
 import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
@@ -128,9 +133,15 @@ import 'blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'blocs/gen_regmv/regmv1list_bloc.dart';
 import 'blocs/gen_regmv/regmv2form_bloc.dart';
 import 'blocs/gen_regmv/regmv3form_bloc.dart';
+import 'blocs/gen_regmv/regmv4cari_bloc.dart';
 import 'blocs/gen_regmv/regmv4form_bloc.dart';
+import 'blocs/gen_regmv/regmv5cari_bloc.dart';
 import 'blocs/gen_regmv/regmv5form_bloc.dart';
 import 'blocs/gen_regmv/regmv6form_bloc.dart';
+import 'blocs/gen_regmv/regmv7cari_bloc.dart';
+import 'blocs/gen_regmv/regmv_download_foto_acc_bloc.dart';
+import 'blocs/gen_regmv/regmv_download_foto_mobil_bloc.dart';
+import 'blocs/gen_regmv/regmv_download_foto_stnk_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
@@ -153,6 +164,9 @@ import 'blocs/regpar/regpar2form_bloc.dart';
 import 'blocs/regpar/regpar3form_bloc.dart';
 import 'blocs/regpar/regpar4form_bloc.dart';
 import 'blocs/regpar/regpar5form_bloc.dart';
+import 'blocs/regpar/regpar6cari_bloc.dart';
+import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
+import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
 import 'blocs/share_cubit/share_health_state_cubit.dart';
@@ -386,6 +400,17 @@ Future<void> main() async {
         BlocProvider(create: (context) => Regpar3FormBloc( repository: Regpar3FormRepository())),
         BlocProvider(create: (context) => Regpar4FormBloc( repository: Regpar4FormRepository())),
         BlocProvider(create: (context) => Regpar5FormBloc( repository: Regpar5FormRepository())),
+
+        BlocProvider(create: (context) => Regmv4CariBloc()),
+        BlocProvider(create: (context) => RegmvDownloadFotoStnkBloc(repository: RegmvDownloadStnkRepository())),
+        BlocProvider(create: (context) => Regmv5CariBloc()),
+        BlocProvider(create: (context) => RegmvDownloadFotoMobilBloc(repository: RegmvDownloadFotoMobilRepository())),
+        BlocProvider(create: (context) => Regmv7CariBloc()),
+        BlocProvider(create: (context) => RegmvDownloadFotoAccBloc(repository: RegmvDownloadFotoAccRepository())),
+
+        BlocProvider(create: (context) => RegparUploadFotoObjectBloc(repository: RegparUploadFotoObjectRepository())),
+        BlocProvider(create: (context) => RegparDownloadFotoObjectBloc(repository: RegparDownloadFotoObjectRepository())),
+        BlocProvider(create: (context) => Regpar6CariBloc()),
      ],
       child: MultiBlocListener(
         listeners: [

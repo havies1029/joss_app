@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/gen_regmv/regmv4form_model.dart';
@@ -38,11 +39,26 @@ class Regmv4FormBloc extends Bloc<Regmv4FormEvents, Regmv4FormState> {
 	}
 
 	Future<void> onHapusRegmv4Form(
-			Regmv4FormHapusEvent event, Emitter<Regmv4FormState> emit) async {
+			Regmv4FormHapusEvent event,
+			Emitter<Regmv4FormState> emit,
+			) async {
+
+		debugPrint("📥 BLOC DELETE EVENT → regmv4Id: ${event.recordId}");
 		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.regmv4FormHapus(event.recordId);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+
+		bool success = await repository.regmv4FormHapus(event.recordId);
+
+		debugPrint("📤 API DELETE RESULT → success: $success");
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: !success,
+		));
+
+		debugPrint("📦 BLOC STATE UPDATED → isSaved: true, hasFailure: ${!success}");
 	}
+
 
 	Future<void> onLihatRegmv4Form(
 			Regmv4FormLihatEvent event, Emitter<Regmv4FormState> emit) async {
