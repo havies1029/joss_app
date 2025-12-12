@@ -53,6 +53,7 @@ import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_mobil_reposito
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_stnk_repository.dart';
 import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
+import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
@@ -92,6 +93,7 @@ import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'apis/payment/paymentmethodcari_api.dart';
 import 'blocs/calpar/calpar1crud_bloc.dart';
 import 'blocs/calpar/calpar1list_bloc.dart';
 import 'blocs/calpar/calpar2form_bloc.dart';
@@ -144,6 +146,7 @@ import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
+import 'blocs/payment/paymentmethodcari_bloc.dart';
 import 'blocs/regpar/regpar1crud_bloc.dart';
 import 'blocs/regpar/regpar1list_bloc.dart';
 import 'blocs/regpar/regpar2form_bloc.dart';
@@ -183,6 +186,10 @@ import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
+
+import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
+import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
+import 'package:joss_app/blocs/payment/dnsppamvcari_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -271,6 +278,13 @@ Future<void> main() async {
         BlocProvider(create: (_) => Regother2FormBloc(repository: Regother2FormRepository())),
         BlocProvider(create: (_) => Regother1CrudBloc(repository: Regother1CrudRepository())),
         BlocProvider(create: (_) => Regother1ListBloc()),
+
+        BlocProvider(create: (context) => DnrekapcobCariBloc()),
+        BlocProvider(create:  (context) => DnsppaCariBloc()),
+        BlocProvider(create:  (context) => DnsppamvCariBloc()),
+        BlocProvider(create: (context) => DnsppaCariBloc()),
+        BlocProvider(create: (context) => DnsppamvCariBloc()),
+        BlocProvider(create: (context) => PaymentMethodCariBloc(repository: PaymentMethodCariRepository(api: PaymentMethodCariAPI()))),
 
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),

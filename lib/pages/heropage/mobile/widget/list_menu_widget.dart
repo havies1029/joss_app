@@ -20,6 +20,10 @@ import '../../../gen_endors/endors2cari_list_widget.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../payment/dnrekapcobcari_list.dart';
+import '../../../payment/dnsppacari_list.dart';
+import '../../../payment/dnsppamvcari_list.dart';
+import '../../../payment/paymentmethodcari_list.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 
@@ -27,6 +31,7 @@ import 'package:confetti/confetti.dart';
 
 import '../../../regother/mobile/regother_form/regother_form1.dart';
 import '../../../regpar/mobile/regpar_main_page.dart';
+import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String custType;
@@ -338,13 +343,29 @@ class ListMenuWidget extends StatelessWidget {
       //     );
       //   }
       //   break;
-
+      //
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+      // //   break;
+      //
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppaCariPage(listcobId: '', currId: '',)));
+      //   break;
+      // //
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppamvCariPage(sppa1Id: '',)));
+      //   break;
+      //
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => Regother1CrudFormPage(viewMode: 'tambah', recordId: '',)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
         break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));
+        break;
+
+      case 'Tagihan Pembayaran':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage()));
         break;
 
       default:
