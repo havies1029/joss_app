@@ -85,7 +85,17 @@ class Calpar4FormPageFormState extends State<Calpar4FormPage> {
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    "(Perhitungan 1 tahun)",
+                    style: bodyTextStyle(context).copyWith(
+                      color: primaryColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: hPadding * 1.5),
+
                   appTextField(
                     label: 'Subtotal Premi',
                     controller: subtotalCtrl,

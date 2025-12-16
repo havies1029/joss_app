@@ -10,12 +10,12 @@ import 'package:string_validator/string_validator.dart';
 
 import '../../../../blocs/regpar/regpar3form_bloc.dart';
 import '../../../../models/combobox/combomjnscoverpar_model.dart';
+import '../../../../models/combobox/combomkabzonagempa_model.dart';
 import '../../../../models/combobox/combomwilayah_model.dart';
-import '../../../../models/combobox/combomzonagempa_model.dart';
 import '../../../../models/regpar/regpar3form_model.dart';
 import '../../../../repositories/combobox/combomjnscoverpar_repository.dart';
+import '../../../../repositories/combobox/combomkabzonagempa_repository.dart';
 import '../../../../repositories/combobox/combomwilayah_repository.dart';
-import '../../../../repositories/combobox/combomzonagempa_repository.dart';
 
 class RegparForm3Section extends StatefulWidget {
   final String viewMode;
@@ -42,15 +42,13 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
   final List<String> errors = [];
 
   final fieldIsEqController = TextEditingController();
-  final fieldRateEqvetController = TextEditingController();
-  final fieldRateOtherController = TextEditingController();
-  final fieldRateParController = TextEditingController();
-  final fieldRateRsmdccController = TextEditingController();
-  final fieldRateTotalController = TextEditingController();
-  final fieldRateTsfwdController = TextEditingController();
+  final fieldIsFlexasController = TextEditingController();
+  final fieldIsOtherController = TextEditingController();
+  final fieldIsRsmdccController = TextEditingController();
+  final fieldIsTsfwdController = TextEditingController();
 
-  ComboMZonaGempaModel? fieldComboMZonaGempa;
-  final comboMZonaGempaKey = GlobalKey<DropdownSearchState<ComboMZonaGempaModel>>();
+  ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
+  final comboMKabZonaGempaKey = GlobalKey<DropdownSearchState<ComboMKabZonaGempaModel>>();
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
   final comboMJnscoverParKey = GlobalKey<DropdownSearchState<ComboMJnscoverParModel>>();
   ComboMWilayahModel? fieldComboMWilayah;
@@ -74,19 +72,16 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
 
   @override
   void dispose() {
-    fieldRateEqvetController.dispose();
-    fieldRateOtherController.dispose();
-    fieldRateParController.dispose();
-
-    fieldRateRsmdccController.dispose();
-    fieldRateTotalController.dispose();
-    fieldRateTsfwdController.dispose();
+    fieldIsEqController.dispose();
+    fieldIsFlexasController.dispose();
+    fieldIsOtherController.dispose();
+    fieldIsRsmdccController.dispose();
+    fieldIsTsfwdController.dispose();
     super.dispose();
   }
 
   void onOpenedByParent() {
     if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
-      debugPrint("🔥 Form3 dibuka parent → trigger lihat event");
       regpar3Bloc.add(Regpar3FormLihatEvent(recordId: widget.regpar1Id!));
     }
   }
@@ -138,20 +133,29 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
             children: [
               buildFieldMjnscoverparId(),
               const SizedBox(height: hPadding),
+              Text(
+                "Jenis asuransi All Risk mencakup:",
+                style: bodyTextStyle(context).copyWith(
+                  color: primaryLightColor,
+                  fontSize: getResponsiveFont(context, 16),
+                ),
+              ),
+              const SizedBox(height: hPadding),
+
               Row(
                 children: [
-                  Flexible(child: buildFieldRateEqvet()),
+                  Flexible(child: buildFieldIsFlexas()),
                   const SizedBox(width: 8),
-                  Flexible(child: _buildFieldIsEq()),
+                  Flexible(child: buildFieldIsEq()),
                 ],
               ),
               const SizedBox(height: hPadding),
 
               Row(
                 children: [
-                  Flexible(child: buildFieldRateOther()),
+                  Flexible(child: buildFieldIsRsmdcc()),
                   const SizedBox(width: 8),
-                  Flexible(child: buildFieldRatePar()),
+                  Flexible(child: buildFieldIsTsfwd()),
                 ],
               ),
               const SizedBox(height: hPadding),
@@ -167,7 +171,7 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
 
               Row(
                 children: [
-                  Flexible(child: buildFieldRateTsfwd()),
+                  Flexible(child: buildFieldIsOther()),
                   const SizedBox(width: 8),
                   const Flexible(child: SizedBox.shrink()),
                 ],
@@ -188,14 +192,17 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
 
     // Text Controllers
     fieldIsEqController.text = record.isEq.toString();
+    fieldIsFlexasController.text = record.isEq.toString();
+    fieldIsOtherController.text = record.isEq.toString();
+    fieldIsRsmdccController.text = record.isEq.toString();
+    fieldIsTsfwdController.text = record.isEq.toString();
 
+    fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
     fieldComboMWilayah = record.comboMWilayah;
-    // fieldComboMZonaGempa = record.comboMKabZonaGempa;
 
     setState(() {});
   }
-
 
   Future<bool> validateAndReturn() async {
     return _regparform3key.currentState?.validate() ?? false;
@@ -205,7 +212,11 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
   Future<void> saveForm3() async {
     final record = Regpar3FormModel(
       isEq: toBoolean(fieldIsEqController.text),
-      kab2zonagempaId: fieldComboMZonaGempa?.mzonagempaId,
+      isFlexas: toBoolean(fieldIsFlexasController.text),
+      isOther: toBoolean(fieldIsOtherController.text),
+      isRsmdcc: toBoolean(fieldIsRsmdccController.text),
+      isTsfwd: toBoolean(fieldIsTsfwdController.text),
+      kab2zonagempaId: fieldComboMKabZonaGempa?.mzonagempaId,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       regpar3Id: widget.recordId!,regpar1Id: widget.regpar1Id!
@@ -243,83 +254,51 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
   );
 
 
-  Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMZonaGempaModel>(
+  Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
     hintText: "Zona gempa Bumi",
-    initItem: fieldComboMZonaGempa,
-    dataLoader: () => ComboMZonaGempaRepository().getComboMZonaGempa(),
-    displayText: (i) => i.zonaNama,
-    compareItems: (a, b) => a.mzonagempaId == b.mzonagempaId,
+    initItem: fieldComboMKabZonaGempa,
+    dataLoader: () => ComboMKabZonaGempaRepository().getComboMKabZonaGempa(fieldComboMWilayah?.mwilayahId ?? ""),
+    displayText: (i) => i.kabupaten,
+    compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
-    onChangedCallback: (v) => fieldComboMZonaGempa = v,
-    onSaveCallback: (value) => fieldComboMZonaGempa = value,
+    onChangedCallback: (v) => fieldComboMKabZonaGempa = v,
+    onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
   );
 
 
-  Widget _buildFieldIsEq() => CheckboxWidget(
+  Widget buildFieldIsEq() => CheckboxWidget(
     rightLabel: "Gempa Bumi",
     initialValue: toBoolean(fieldIsEqController.text),
     callback: (v) => fieldIsEqController.text = v.toString(),
     leftLabel: "",
   );
 
-  Widget buildFieldRateEqvet() => IgnorePointer(
-    ignoring: true,
-    child: CheckboxWidget(
+  Widget buildFieldIsFlexas() => CheckboxWidget(
+      leftLabel: "",
       rightLabel: "Kebakaran/Petir",
-      initialValue: true,
-      callback: (_) {},
-      leftLabel: "",
-    ),
+      initialValue: toBoolean(fieldIsFlexasController.text),
+      callback: (v) => fieldIsFlexasController.text = v.toString(),
   );
 
-  Widget buildFieldRateOther() => IgnorePointer(
-    ignoring: true,
-    child: CheckboxWidget(
-      rightLabel: "Kerusuhan",
-      initialValue: true,
-      callback: (_) {},
-      leftLabel: "",
-    ),
+  Widget buildFieldIsOther() => CheckboxWidget(
+    leftLabel: "",
+    rightLabel: "Lain-Lain",
+    initialValue: toBoolean(fieldIsOtherController.text),
+    callback: (v) => fieldIsOtherController.text = v.toString(),
   );
 
-  Widget buildFieldRatePar() => IgnorePointer(
-    ignoring: true,
-    child: CheckboxWidget(
-      rightLabel: "Banjir",
-      initialValue: true,
-      callback: (_) {},
-      leftLabel: "",
-    ),
+  Widget buildFieldIsRsmdcc() => CheckboxWidget(
+    leftLabel: "",
+    rightLabel: "Kerusuhan",
+    initialValue: toBoolean(fieldIsRsmdccController.text),
+    callback: (v) => fieldIsRsmdccController.text = v.toString(),
   );
 
-  Widget buildFieldRateRsmdcc() => IgnorePointer(
-    ignoring: true,
-    child: CheckboxWidget(
-      rightLabel: "RSMDCC",
-      initialValue: true,
-      callback: (_) {},
-      leftLabel: "",
-    ),
-  );
-
-  Widget buildFieldRateTotal() => IgnorePointer(
-    ignoring: true,
-    child: CheckboxWidget(
-      rightLabel: "Total Rate",
-      initialValue: true,
-      callback: (_) {},
-      leftLabel: "",
-    ),
-  );
-
-  Widget buildFieldRateTsfwd() => IgnorePointer(
-    ignoring: true,
-    child: CheckboxWidget(
-      rightLabel: "Lain-Lain",
-      initialValue: true,
-      callback: (_) {},
-      leftLabel: "",
-    ),
+  Widget buildFieldIsTsfwd() => CheckboxWidget(
+    leftLabel: "",
+    rightLabel: "Banjir",
+    initialValue: toBoolean(fieldIsTsfwdController.text),
+    callback: (v) => fieldIsTsfwdController.text = v.toString(),
   );
 
   void removeError({required String error}) {

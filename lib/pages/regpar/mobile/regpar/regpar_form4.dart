@@ -145,7 +145,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
                 children: [
                   Flexible(child: buildFieldSiBuilding()),
                   const SizedBox(width: 8),
-                  Flexible(child: buildFieldSiOther()),
+                  Flexible(child: buildFieldSiContent()),
                 ],
               ),
               const SizedBox(height: hPadding),
@@ -153,7 +153,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
                 children: [
                   Flexible(child: buildFieldSiStock()),
                   const SizedBox(width: 8),
-                  Flexible(child: buildFieldSiContent()),
+                  Flexible(child: buildFieldSiOther()),
                 ],
               ),
               // Row(
@@ -247,7 +247,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   );
 
   Widget buildFieldSiContent() => appTextField(
-    label: "Konten",
+    label: "Inventaris",
     controller: fieldSiContentController,
     keyboardType: TextInputType.number,
     inputFormatters: [
@@ -281,7 +281,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   );
 
   Widget buildFieldSiOther() => appTextField(
-    label: "Lainnya",
+    label: "Total",
     controller: fieldSiOtherController,
     keyboardType: TextInputType.number,
     inputFormatters: [
@@ -298,7 +298,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   );
 
   Widget buildFieldSiStock() => appTextField(
-    label: "Lainnya",
+    label: "Stok",
     controller: fieldSiStockController,
     keyboardType: TextInputType.number,
     inputFormatters: [

@@ -44,13 +44,6 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   final fieldIsOtherController = TextEditingController();
   final fieldIsRsmdccController = TextEditingController();
 
-  final fieldRateEqvetController = TextEditingController();
-  final fieldRateOtherController = TextEditingController();
-  final fieldRateParController = TextEditingController();
-  final fieldRateRsmdccController = TextEditingController();
-  final fieldRateTotalController = TextEditingController();
-  final fieldRateTsfwdController = TextEditingController();
-
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
   ComboMWilayahModel? fieldComboMWilayah;
@@ -70,8 +63,8 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   }
 
   void _loadData() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
-      calpar3Bloc.add(Calpar3FormLihatEvent(recordId: widget.recordId!));
+    if (widget.viewMode == "ubah" && widget.calpar1Id != null) {
+      calpar3Bloc.add(Calpar3FormLihatEvent(recordId: widget.calpar1Id!));
     }
   }
 
@@ -82,14 +75,6 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     fieldIsFlexasController.dispose();
     fieldIsOtherController.dispose();
     fieldIsRsmdccController.dispose();
-
-    fieldRateEqvetController.dispose();
-    fieldRateOtherController.dispose();
-    fieldRateParController.dispose();
-    fieldRateRsmdccController.dispose();
-    fieldRateTotalController.dispose();
-    fieldRateTsfwdController.dispose();
-
     super.dispose();
   }
 
@@ -116,13 +101,12 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   }
 
   void _injectPayload(Calpar3FormModel record) {
-    debugPrint("🔥 [Form3] Injecting payload...");
     fieldIsFlexasController.text = record.isFlexas.toString();
     fieldIsOtherController.text = record.isOther.toString();
     fieldIsRsmdccController.text = record.isRsmdcc.toString();
     fieldIsTsfwdController.text = record.isTsfwd.toString();
-
     fieldIsEqController.text = record.isEq.toString();
+
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
     fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
     fieldComboMWilayah = record.comboMWilayah;
@@ -210,14 +194,13 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
       mwilayahId: fieldComboMWilayah?.mwilayahId,
     );
 
-    if (widget.viewMode == "tambah") {
-      debugPrint("ini tambah loh di trigger di form3");
-      calpar3Bloc.add(Calpar3FormTambahEvent(record: record));
-    } else {
-      debugPrint("ini ubah loh di trigger di form3");
-      calpar3Bloc.add(Calpar3FormUbahEvent(record: record));
-    }
+    debugPrint("saveForm3 → FORCE UB AH event (viewMode diabaikan)");
+
+    calpar3Bloc.add(
+      Calpar3FormUbahEvent(record: record),
+    );
   }
+
 
   Widget buildFieldCalpar1Id(){
     return TextFormField(
@@ -291,108 +274,5 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     onChangedCallback: (v) => fieldComboMJnscoverPar = v,
     onSaveCallback: (value) => fieldComboMJnscoverPar = value,
   );
-
-  Widget buildFieldRateEqvet() => appTextField(
-    label: "rateEqvet",
-    controller: fieldRateEqvetController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    // validator: (v) {
-    //   if (v == null || v.isEmpty) return kStringNullError;
-    //   final clean = v.replaceAll(",", "");
-    //   final angka = double.tryParse(clean);
-    //   if (angka == null || angka <= 0) return kString0;
-    //   return null;
-    // },
-  );
-
-  Widget buildFieldRateOther() => appTextField(
-    label: "rateOther",
-    controller: fieldRateOtherController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    // validator: (v) {
-    //   if (v == null || v.isEmpty) return kStringNullError;
-    //   final clean = v.replaceAll(",", "");
-    //   final angka = double.tryParse(clean);
-    //   if (angka == null || angka <= 0) return kString0;
-    //   return null;
-    // },
-  );
-
-  Widget buildFieldRatePar() => appTextField(
-    label: "rateOther",
-    controller: fieldRateParController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    // validator: (v) {
-    //   if (v == null || v.isEmpty) return kStringNullError;
-    //   final clean = v.replaceAll(",", "");
-    //   final angka = double.tryParse(clean);
-    //   if (angka == null || angka <= 0) return kString0;
-    //   return null;
-    // },
-  );
-
-  Widget buildFieldRateRsmdcc() => appTextField(
-    label: "rateRsmdcc",
-    controller: fieldRateRsmdccController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    // validator: (v) {
-    //   if (v == null || v.isEmpty) return kStringNullError;
-    //   final clean = v.replaceAll(",", "");
-    //   final angka = double.tryParse(clean);
-    //   if (angka == null || angka <= 0) return kString0;
-    //   return null;
-    // },
-  );
-
-  Widget buildFieldRateTotal() => appTextField(
-    label: "rateRsmdcc",
-    controller: fieldRateTotalController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    // validator: (v) {
-    //   if (v == null || v.isEmpty) return kStringNullError;
-    //   final clean = v.replaceAll(",", "");
-    //   final angka = double.tryParse(clean);
-    //   if (angka == null || angka <= 0) return kString0;
-    //   return null;
-    // },
-  );
-
-  Widget buildFieldRateTsfwd() => appTextField(
-    label: "rateRsmdcc",
-    controller: fieldRateTsfwdController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    // validator: (v) {
-    //   if (v == null || v.isEmpty) return kStringNullError;
-    //   final clean = v.replaceAll(",", "");
-    //   final angka = double.tryParse(clean);
-    //   if (angka == null || angka <= 0) return kString0;
-    //   return null;
-    // },
-  );
-
 
 }

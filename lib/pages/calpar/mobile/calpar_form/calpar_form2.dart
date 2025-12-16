@@ -58,8 +58,8 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
   }
 
   void _loadData() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
-      calpar2Bloc.add(Calpar2FormLihatEvent(recordId: widget.recordId!));
+    if (widget.viewMode == "ubah" && widget.calpar1Id != null) {
+      calpar2Bloc.add(Calpar2FormLihatEvent(recordId: widget.calpar1Id!));
     }
   }
 
@@ -202,7 +202,7 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
 
     if (widget.viewMode == "tambah") {
       debugPrint("ini tambah loh di trigger di form2");
-      calpar2Bloc.add(Calpar2FormTambahEvent(record: record));
+      calpar2Bloc.add(Calpar2FormUbahEvent(record: record));
     } else {
       debugPrint("ini ubah loh di trigger di form2");
       calpar2Bloc.add(Calpar2FormUbahEvent(record: record));

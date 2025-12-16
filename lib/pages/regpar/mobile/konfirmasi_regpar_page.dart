@@ -18,6 +18,7 @@ import '../../../models/regpar/regpar4form_model.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../payment/mobile/paymentFormPage.dart';
 
 
 
@@ -66,38 +67,43 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           onPayload: (record) {
             setState(() => regpar1Record = record);
 
-            // 🔥 Setelah Form1 load → load Form2
-            context.read<Regpar2FormBloc>()
-                .add(Regpar2FormLihatEvent(recordId: record.regpar1Id));
+            context.read<Regpar2FormBloc>().add(
+              Regpar2FormLihatEvent(recordId: record.regpar1Id),
+            );
           },
         ),
+
         _buildGenericListener<Regpar2FormBloc, Regpar2FormState, Regpar2FormModel>(
           onPayload: (record) {
             setState(() => regpar2Record = record);
 
-            // 🔥 Trigger Form3
-            context.read<Regpar3FormBloc>()
-                .add(Regpar3FormLihatEvent(recordId: regpar1Record!.regpar1Id));
+            context.read<Regpar3FormBloc>().add(
+              Regpar3FormLihatEvent(recordId: record.regpar1Id),
+            );
           },
         ),
+
         _buildGenericListener<Regpar3FormBloc, Regpar3FormState, Regpar3FormModel>(
           onPayload: (record) {
             setState(() => regpar3Record = record);
 
-            // 🔥 Trigger Form4
-            context.read<Regpar4FormBloc>()
-                .add(Regpar4FormLihatEvent(recordId: regpar1Record!.regpar1Id));
+            // Form3 → Form4 (PAKAI record)
+            context.read<Regpar4FormBloc>().add(
+              Regpar4FormLihatEvent(recordId: record.regpar1Id),
+            );
           },
         ),
+
         _buildGenericListener<Regpar4FormBloc, Regpar4FormState, Regpar4FormModel>(
-          onPayload: (record) => setState(() => regpar4Record = record),
+          onPayload: (record) {
+            setState(() => regpar4Record = record);
+          },
         ),
       ],
       child: _buildForm(),
     );
   }
 
-  // 🔹 Generic listener tetap jalan seperti semula
   BlocListener<B, S> _buildGenericListener<B extends StateStreamable<S>, S, M>({
     required void Function(M record) onPayload,
   }) {
@@ -153,15 +159,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     ttgNama: "-",
                     ttgAlamat: "-",
                   )),
+
                   _buildRegpar2Card(regpar2Record ?? Regpar2FormModel(
                     regpar2Id: "-",
                     polisMulai: DateTime.now(),
                     polisAkhir: DateTime.now(), regpar1Id: widget.recordId!, objectAlamat: '',
                   )),
-                  _buildRegpar3Card(regpar3Record ?? Regpar3FormModel(
-                    regpar3Id: "-",
-                    isEq: false, regpar1Id: widget.recordId!,
-                  )),
+
                   _buildRegpar4Card(regpar4Record ?? Regpar4FormModel(
                     siBuilding: 0,
                     siContent: 0,
@@ -169,7 +173,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     siOther: 0,
                     siStock: 0, regpar1Id: widget.recordId!,
                   )),
+
+                  _buildRegpar3Card(regpar3Record ?? Regpar3FormModel(
+                    regpar3Id: "-",
+                    isEq: false, regpar1Id: widget.recordId!,
+                  )),
                   const SizedBox(height: hPadding),
+
 
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
@@ -179,9 +189,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => KonfirmasiRegParPage(
-                              recordId: widget.recordId ?? '',
-                              viewMode: 'ubah',
+                            builder: (context) => PaymentMethodsCariListPage(
+                              // recordId: widget.recordId ?? '',
+                              // viewMode: 'ubah',
                             ),
                           ),
                         );
@@ -212,11 +222,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
         children: [
           _buildSectionHeader("Data Tertanggung"),
           kDivider(color: sGrey),
-          _buildDetailRow("ID Tertanggung", data.regpar1Id),
-          kDivider(color: sGrey),
-          _buildDetailRow("Nama", data.ttgNama),
-          kDivider(color: sGrey),
-          _buildDetailRow("Alamat", data.ttgAlamat),
+          _buildDetailRow("NO SPPA:", data.regpar1Id),
+          _buildDetailRow("Nama Tertanggung:", data.ttgNama),
+          _buildDetailRow("Alamat Tertanggung:", data.ttgAlamat),
         ],
       ),
     );
@@ -240,20 +248,31 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           _buildSectionHeader("Informasi Polis"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("ID Polis", data.regpar2Id),
-          kDivider(color: sGrey),
+          // _buildDetailRow("ID Polis", data.regpar2Id),
+          // kDivider(color: sGrey),
 
-          _buildDetailRow("Periode Polis",
-              "${DateFormat('dd MMM yyyy').format(data.polisMulai)} - "
-                  "${DateFormat('dd MMM yyyy').format(data.polisAkhir)}"),
-          kDivider(color: sGrey),
+          _buildDetailRow(
+            "Tanggal Mulai:",
+            DateFormat('dd MMM yyyy').format(data.polisMulai),
+          ),
+          _buildDetailRow(
+            "Tanggal Berakhir:",
+            DateFormat('dd MMM yyyy').format(data.polisAkhir),
+          ),
 
-          _buildDetailRow("Konstruksi Bangunan",
-              data.comboRKonstruksiojk?.kelasNama ?? "-"),
-          kDivider(color: sGrey),
+          // _buildDetailRow("Periode Polis",
+          //     "${DateFormat('dd MMM yyyy').format(data.polisMulai)} - "
+          //         "${DateFormat('dd MMM yyyy').format(data.polisAkhir)}"),
+          // kDivider(color: sGrey),
 
-          _buildDetailRow("Okupasi",
+          _buildDetailRow("Okupasi:",
               data.comboROkupasi?.okupasiDesc ?? "-"),
+
+          _buildDetailRow("Kelas Kontruksi:",
+              data.comboRKonstruksiojk?.kelasNama ?? "-"),
+
+          _buildDetailRow("Alamat Lokasi Risiko:", data.objectAlamat),
+
         ],
       ),
     );
@@ -273,32 +292,30 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader(" Perhitungan Tarif"),
+          _buildSectionHeader("Perhitungan Tarif"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("ID Rate", data.regpar3Id),
-          kDivider(color: sGrey),
+          // _buildDetailRow("ID Rate", data.regpar3Id),
+          // kDivider(color: sGrey),
 
-          _buildDetailRow("Jenis Cover",
+          _buildDetailRow("Jenis Jaminan:",
               data.comboMJnscoverPar?.jenisNama ?? "-"),
-          kDivider(color: sGrey),
 
-          _buildDetailRow("Wilayah Pertanggungan",
+          _buildDetailRowIcon("Kebakaran/Petir:", data.isFlexas),
+
+          _buildDetailRowIcon("Gempa Bumi:", data.isEq),
+
+          _buildDetailRowIcon("Kerusuhan:", data.isRsmdcc),
+
+          _buildDetailRowIcon("Banjir:", data.isTsfwd),
+
+          _buildDetailRowIcon("Lain-lainnya:", data.isOther),
+
+          _buildDetailRow("Banjir:",
               data.comboMWilayah?.wilayahNama ?? "-"),
-          kDivider(color: sGrey),
 
-          // _buildDetailRow("Rate EQ (Gempa)", "${data.rateEqvet}%"),
-          // kDivider(color: sGrey),
-          // _buildDetailRow("Rate PAR", "${data.ratePar}%"),
-          // kDivider(color: sGrey),
-          // _buildDetailRow("Rate RSMDCC", "${data.rateRsmdcc}%"),
-          // kDivider(color: sGrey),
-          // _buildDetailRow("Rate TSFWD", "${data.rateTsfwd}%"),
-          // kDivider(color: sGrey),
-          // _buildDetailRow("Rate Other", "${data.rateOther}%"),
-          // kDivider(color: sGrey),
-          //
-          // _buildDetailRow("Total Rate", "${data.rateTotal}%"),
+          _buildDetailRow("Gempa Bumi:",
+              data.comboMKabZonaGempa?.kabupaten ?? "-"),
         ],
       ),
     );
@@ -321,36 +338,31 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
           _buildSectionHeader("Nilai Pertanggungan"),
           kDivider(color: sGrey),
 
-          // _buildDetailRow("ID Pertanggungan", data.regpar4Id),
-          // kDivider(color: sGrey),
-          _buildDetailRow("SI Building", toCurrency(data.siBuilding)),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("SI Machinery", toCurrency(data.siMachinery)),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("SI Stock", toCurrency(data.siStock)),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("SI Content", toCurrency(data.siContent)),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("SI Other", toCurrency(data.siOther)),
-          kDivider(color: sGrey),
-
           _buildDetailRow("Mata Uang",
               data.comboRMatauang?.rmatauangNama ?? "-"),
+
+          // _buildDetailRow("ID Pertanggungan", data.regpar4Id),
+          // kDivider(color: sGrey),
+          _buildDetailRow("Mesin:", toCurrency(data.siMachinery)),
+
+          _buildDetailRow("Bangunan:", toCurrency(data.siBuilding)),
+
+          _buildDetailRow("Inventaris:", toCurrency(data.siContent)),
+
+          _buildDetailRow("Stok:", toCurrency(data.siStock)),
+
+          _buildDetailRow("Total:", toCurrency(data.siOther)),
+
         ],
       ),
     );
   }
 
-  // ======= UI Builders =======
   Widget _buildDetailRow(String label, dynamic value) {
     String displayValue;
 
     if (value == null || value.toString().trim().isEmpty) {
-      displayValue = "-"; // dummy default
+      displayValue = "-";
     } else {
       displayValue = value.toString();
     }
@@ -358,15 +370,30 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: hPadding),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: bodyTextStyle(context).copyWith(color: hintGrey)),
-          Flexible(
+          // Label kiri
+          Expanded(
+            flex: 4,
             child: Text(
-              displayValue,
-              style: bodyTextStyle(context),
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
+              label,
+              style: bodyTextStyle(context).copyWith(color: hintGrey),
+            ),
+          ),
+
+          const SizedBox(width: 8),
+
+          Expanded(
+            flex: 6,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Text(
+                displayValue,
+                style: bodyTextStyle(context),
+                textAlign: TextAlign.right,
+                softWrap: true,
+                maxLines: null,
+              ),
             ),
           ),
         ],
@@ -374,12 +401,13 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     );
   }
 
+
   Widget _buildDetailRowIcon(String label, dynamic value) {
     Widget iconWidget;
 
-    if (value == 1) {
+    if (value == 1 || value == true) {
       iconWidget = SvgPicture.asset('assets/icons/dipilih.svg', width: 24, height: 24);
-    } else if (value == 0) {
+    } else if (value == 0 || value == false) {
       iconWidget = SvgPicture.asset('assets/icons/tidak_dipilih.svg', width: 24, height: 24);
     } else {
       iconWidget = const Text("-");

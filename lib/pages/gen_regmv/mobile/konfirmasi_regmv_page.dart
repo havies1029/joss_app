@@ -14,6 +14,7 @@ import '../../../models/gen_regmv/regmv4form_model.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../payment/mobile/paymentFormPage.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {
   final String viewMode;
@@ -39,6 +40,12 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         .format(value);
   }
 
+  String toPercent1(double value) {
+    return '${value.toStringAsFixed(1)}%';
+  }
+
+
+
   @override
   void initState() {
     super.initState();
@@ -59,33 +66,36 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
           onPayload: (record) {
             setState(() => regmv1Record = record);
 
-            // 🔥 Setelah Form1 load → load Form2
-            context.read<Regmv2FormBloc>()
-                .add(Regmv2FormLihatEvent(recordId: record.regmv1Id));
+            // Form1 → Form2
+            context.read<Regmv2FormBloc>().add(
+              Regmv2FormLihatEvent(recordId: record.regmv1Id),
+            );
           },
         ),
+
         _buildGenericListener<Regmv2FormBloc, Regmv2FormState, Regmv2FormModel>(
           onPayload: (record) {
             setState(() => regmv2Record = record);
 
-            // 🔥 Trigger Form3
-            context.read<Regmv3FormBloc>()
-                .add(Regmv3FormLihatEvent(recordId: regmv1Record!.regmv1Id));
+            // Form2 → Form3 (PAKAI record.regmv1Id)
+            context.read<Regmv3FormBloc>().add(
+              Regmv3FormLihatEvent(recordId: record.regmv1Id),
+            );
           },
         ),
+
         _buildGenericListener<Regmv3FormBloc, Regmv3FormState, Regmv3FormModel>(
           onPayload: (record) {
             setState(() => regmv3Record = record);
-            //
-            // // 🔥 Trigger Form4
-            // context.read<Regmv4FormBloc>()
-            //     .add(Regmv4FormLihatEvent(recordId: regmv1Record!.regmv1Id));
+
+            // kalau mau lanjut Form4 nanti:
+            // context.read<Regmv4FormBloc>().add(
+            //   Regmv4FormLihatEvent(recordId: record.regmv1Id),
+            // );
           },
         ),
-        // _buildGenericListener<Regmv4FormBloc, Regmv4FormState, Regmv4FormModel>(
-        //   onPayload: (record) => setState(() => regmv4Record = record),
-        // ),
       ],
+
       child: _buildForm(),
     );
   }
@@ -209,9 +219,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => KonfirmasiRegMvPage(
-                              recordId: widget.recordId ?? '',
-                              viewMode: 'ubah',
+                            builder: (context) => PaymentMethodsCariListPage(
+                              // recordId: widget.recordId ?? '',
+                              // viewMode: 'ubah',
                             ),
                           ),
                         );
@@ -242,11 +252,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         children: [
           _buildSectionHeader("Data Tertanggung"),
           kDivider(color: sGrey),
-          _buildDetailRow("ID Tertanggung", data.regmv1Id),
-          kDivider(color: sGrey),
-          _buildDetailRow("Nama", data.ttgNama),
-          kDivider(color: sGrey),
-          _buildDetailRow("Alamat", data.ttgAlamat),
+          _buildDetailRow("NO SPPA:", data.regmv1Id),
+          _buildDetailRow("Nama Tertanggung:", data.ttgNama),
+          _buildDetailRow("Alamat:", data.ttgAlamat),
         ],
       ),
     );
@@ -265,44 +273,47 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader("Informasi Polis"),
+          _buildSectionHeader("Data Polis"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("ID Polis", data.regmv2Id),
-          kDivider(color: sGrey),
+          // _buildDetailRow("ID Polis", data.regmv2Id),
+          // kDivider(color: sGrey),
 
           _buildDetailRow(
-            "Periode Polis",
-            "${DateFormat('dd MMM yyyy').format(data.polisMulai)} - "
-                "${DateFormat('dd MMM yyyy').format(data.polisAkhir)}",
+            "Tanggal Mulai:",
+            DateFormat('dd MMM yyyy').format(data.polisMulai),
           ),
-          kDivider(color: sGrey),
-
           _buildDetailRow(
-            "Jenis Cover",
-            data.comboMMvjnscover?.coverName ?? "-",
+            "Tanggal Berakhir:",
+            DateFormat('dd MMM yyyy').format(data.polisAkhir),
           ),
-          kDivider(color: sGrey),
+
+          // _buildDetailRow(
+          //   "Periode Polis",
+          //   "${DateFormat('dd MMM yyyy').format(data.polisMulai)} - "
+          //       "${DateFormat('dd MMM yyyy').format(data.polisAkhir)}",
+          // ),
 
           _buildDetailRow(
-            "Mata Uang",
+            "Mata Uang:",
             data.comboRMatauang?.rmatauangNama ?? "-",
           ),
-          kDivider(color: sGrey),
 
-          _buildSectionHeader("Perluasan Pertanggungan"),
-          kDivider(color: sGrey),
-
-          _buildDetailRowIcon("Gempa Bumi (EQ)", data.isEq),
-          kDivider(color: sGrey),
-          _buildDetailRowIcon("Banjir (Flood)", data.isFlood),
-          kDivider(color: sGrey),
-          _buildDetailRowIcon("SRCC", data.isSrcc),
-          kDivider(color: sGrey),
-          _buildDetailRowIcon("Terrorism", data.isTerrorism),
-          kDivider(color: sGrey),
-          _buildDetailRowIcon("TBOD", data.isTbod),
-          kDivider(color: sGrey),
+          _buildDetailRow(
+            "Jenis Cover:",
+            data.comboMMvjnscover?.coverName ?? "-",
+          ),
+          _buildDetailRowIcon("Gempa Bumi:", data.isEq),
+          _buildDetailRowIcon("Banjir:", data.isFlood),
+          _buildDetailRowIcon("Kerusuhan:", data.isSrcc),
+          _buildDetailRowIcon("Terrorism:", data.isTerrorism),
+          _buildDetailRowIcon("Kerusakan Barang Pihak ketiga:", data.isTbod),
+          _buildDetailRow("Tanggung Jawab Penumpang:", toCurrency(data.pll)),
+          _buildDetailRow("Tanggung Jawab Pihak Ketiga:", toCurrency(data.tpl)),
+          _buildDetailRow("Kecelakaan Diri Pengemudi:", toCurrency(data.pad)),
+          _buildDetailRow("Kecelakaan Diri Penumpang:", toCurrency(data.pap)),
+          _buildDetailRow("Jumlah Penumpang:", data.passangerCount),
+          _buildDetailRow("Bengkel Resmi:", toPercent1(data.aw)),
         ],
       ),
     );
@@ -321,65 +332,51 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          _buildSectionHeader("Informasi Kendaraan"),
+          _buildSectionHeader("Data Kendaraan"),
           kDivider(color: sGrey),
 
-          _buildDetailRow("ID Kendaraan", data.regmv3Id),
-          kDivider(color: sGrey),
+          _buildDetailRow("Harga Kendaraan:", toCurrency(data.harga)),
 
-          _buildDetailRow("Nomor Polisi", data.platNo),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("Nomor Mesin", data.mesinNo),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("Nomor Rangka", data.rangkaNo),
-          kDivider(color: sGrey),
-
-          _buildDetailRow("Tahun Pembuatan", data.thnBuat.toString()),
-          kDivider(color: sGrey),
+          _buildDetailRow("Tahun Pembuatan:", data.thnBuat.toString()),
 
           _buildDetailRow(
-            "Merk Kendaraan",
-            data.comboMMvmerk?.nmMerk ?? "-",
-          ),
-          kDivider(color: sGrey),
-
-          _buildDetailRow(
-            "Model Kendaraan",
-            data.comboMMvmodel?.nmModel ?? "-",
-          ),
-          kDivider(color: sGrey),
-
-          _buildDetailRow(
-            "Tipe Kendaraan",
-            data.comboMMvtipe?.nmTipe ?? "-",
-          ),
-          kDivider(color: sGrey),
-
-          _buildDetailRow(
-            "Penggunaan Kendaraan",
-            data.comboMMvpakai?.pakaiNama ?? "-",
-          ),
-          kDivider(color: sGrey),
-
-          _buildDetailRow(
-            "Warna Kendaraan",
-            data.comboMWarna?.warnaDesc ?? "-",
-          ),
-          kDivider(color: sGrey),
-
-          _buildDetailRow(
-            "Wilayah Pertanggungan",
+            "Wilayah Pertanggungan:",
             data.comboMWilayah?.wilayahNama ?? "-",
           ),
-          kDivider(color: sGrey),
 
-          _buildDetailRow("Harga Kendaraan", toCurrency(data.harga)),
-          kDivider(color: sGrey),
+          _buildDetailRow("No Polisi:", data.platNo),
+
+          _buildDetailRow("No Mesin:", data.mesinNo),
+
+          _buildDetailRow("No Rangka:", data.rangkaNo),
 
           _buildDetailRow(
-            "Aksesoris Tambahan",
+            "Merk:",
+            data.comboMMvmerk?.nmMerk ?? "-",
+          ),
+
+          _buildDetailRow(
+            "Model:",
+            data.comboMMvtipe?.nmTipe ?? "-",
+          ),
+
+          _buildDetailRow(
+            "Sub Model:",
+            data.comboMMvmodel?.nmModel ?? "-",
+          ),
+
+          _buildDetailRow(
+            "Warna:",
+            data.comboMWarna?.warnaDesc ?? "-",
+          ),
+
+          _buildDetailRow(
+            "Penggunaan:",
+            data.comboMMvpakai?.pakaiNama ?? "-",
+          ),
+
+          _buildDetailRow(
+            "Aksesoris:",
             data.aksesoris.trim().isEmpty ? "-" : data.aksesoris,
           ),
         ],
@@ -387,12 +384,11 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     );
   }
 
-  // ======= UI Builders =======
   Widget _buildDetailRow(String label, dynamic value) {
     String displayValue;
 
     if (value == null || value.toString().trim().isEmpty) {
-      displayValue = "-"; // dummy default
+      displayValue = "-";
     } else {
       displayValue = value.toString();
     }
@@ -400,15 +396,30 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: hPadding),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: bodyTextStyle(context).copyWith(color: hintGrey)),
-          Flexible(
+          // Label kiri
+          Expanded(
+            flex: 4,
             child: Text(
-              displayValue,
-              style: bodyTextStyle(context),
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
+              label,
+              style: bodyTextStyle(context).copyWith(color: hintGrey),
+            ),
+          ),
+
+          const SizedBox(width: 8),
+
+          Expanded(
+            flex: 6,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Text(
+                displayValue,
+                style: bodyTextStyle(context),
+                textAlign: TextAlign.right,
+                softWrap: true,
+                maxLines: null,
+              ),
             ),
           ),
         ],
@@ -419,9 +430,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   Widget _buildDetailRowIcon(String label, dynamic value) {
     Widget iconWidget;
 
-    if (value == 1) {
+    if (value == 1 || value == true) {
       iconWidget = SvgPicture.asset('assets/icons/dipilih.svg', width: 24, height: 24);
-    } else if (value == 0) {
+    } else if (value == 0 || value == false) {
       iconWidget = SvgPicture.asset('assets/icons/tidak_dipilih.svg', width: 24, height: 24);
     } else {
       iconWidget = const Text("-");
@@ -454,14 +465,14 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   }
 
   Widget siValueWidget(dynamic value) {
-    if (value == true) {
+    if (value == true || value == 1) {
       return SvgPicture.asset(
         'assets/icons/dipilih.svg',
         width: 30,
         height: 30,
         fit: BoxFit.contain,
       );
-    } else if (value == false) {
+    } else if (value == false || value == 0) {
       return SvgPicture.asset(
         'assets/icons/tidak_dipilih.svg',
         width: 30,

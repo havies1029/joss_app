@@ -6,12 +6,17 @@ class CheckboxWidget extends StatefulWidget {
   final bool initialValue;
   final Function(bool) callback;
 
-  const CheckboxWidget(
-      {super.key,
-        required this.leftLabel,
-        required this.rightLabel,
-        required this.initialValue,
-        required this.callback});
+  // 🔥 BARU
+  final bool forceActive;
+
+  const CheckboxWidget({
+    super.key,
+    required this.leftLabel,
+    required this.rightLabel,
+    required this.initialValue,
+    required this.callback,
+    this.forceActive = false, 
+  });
 
   @override
   CheckboxWidgetState createState() => CheckboxWidgetState();
@@ -23,16 +28,20 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
   @override
   void initState() {
     super.initState();
-    _checkbox = widget.initialValue;
+    _checkbox = widget.forceActive ? true : widget.initialValue;
   }
 
   @override
   void didUpdateWidget(CheckboxWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialValue != widget.initialValue) {
+
+    if (widget.forceActive) {
+      _checkbox = true;
+    } else if (oldWidget.initialValue != widget.initialValue) {
       _checkbox = widget.initialValue;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,12 +53,16 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
           GestureDetector(
             onTap: _toggleCheck,
             child: Container(
-              width: 18, // sedikit diperbesar biar proporsional
+              width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: _checkbox ? primaryColor : Colors.transparent,
+                color: _checkbox
+                    ? (widget.forceActive ? pGrey : primaryColor)
+                    : Colors.transparent,
                 border: Border.all(
-                  color: _checkbox ? primaryColor : sGrey,
+                  color: _checkbox
+                      ? (widget.forceActive ? pGrey : primaryColor)
+                      : sGrey,
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(4),
@@ -80,6 +93,7 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
 
 // biar gak ulang2 kode
   void _toggleCheck() {
+    if (widget.forceActive) return; // 🔒 KUNCI
     setState(() => _checkbox = !_checkbox);
     widget.callback(_checkbox);
   }

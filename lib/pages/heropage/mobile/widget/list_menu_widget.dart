@@ -23,7 +23,8 @@ import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../payment/dnrekapcobcari_list.dart';
 import '../../../payment/dnsppacari_list.dart';
 import '../../../payment/dnsppamvcari_list.dart';
-import '../../../payment/paymentmethodcari_list.dart';
+import '../../../payment/mobile/paymentFormPage.dart';
+import '../../../payment/paymentmethodcari_list.dart' hide PaymentMethodsCariListPage;
 import '../../../register/mobile/client/register_client_page.dart';
 
 
@@ -344,10 +345,10 @@ class ListMenuWidget extends StatelessWidget {
       //   }
       //   break;
       //
-      // case 'Test Page':
-      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-      // //   break;
-      //
+      case 'Test Page':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+        break;
+
       // case 'Test Page':
       //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppaCariPage(listcobId: '', currId: '',)));
       //   break;
@@ -356,9 +357,9 @@ class ListMenuWidget extends StatelessWidget {
       //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppamvCariPage(sppa1Id: '',)));
       //   break;
       //
-      case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
-        break;
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
+      //   break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));

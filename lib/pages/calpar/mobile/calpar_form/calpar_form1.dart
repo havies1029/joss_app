@@ -36,12 +36,12 @@ class Calpar1CrudFormPage extends StatefulWidget {
 class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
   final _calparform1key = GlobalKey<FormState>();
   ComboRKonstruksiojkModel? previousKonstruksi;
-  final konstruksiKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
 
   //Controllers
-  final fieldCoverBulanController = TextEditingController();
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
+  final fieldCoverBulanController = TextEditingController();
   ComboRKonstruksiojkModel? fieldComboRKonstruksiojk;
+  final konstruksiKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
   ComboROkupasiModel? fieldComboROkupasi;
 
   late final Calpar1CrudBloc calpar1Bloc;

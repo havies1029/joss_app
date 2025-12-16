@@ -263,13 +263,28 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   ),
 
                   const SizedBox(height: hPadding),
-
-                  (_form4Payload == null)
-                      ? const SizedBox.shrink()
-                      : AppButton.primary(
-                    text: "Lanjutkan",
-                    onPressed: onLanjutkanPressed,
-                  ),
+                  if (_form4Payload != null) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "*Dengan melanjutkan, Anda akan diminta mengisi detail tambahan terkait kategori yang dipilih untuk memastikan data polis lebih akurat.",
+                            style: bodyTextStyle(context).copyWith(
+                              color: primaryLightColor,
+                              fontSize: getResponsiveFont(context, 14),
+                            ),
+                          ),
+                          const SizedBox(height: hPadding),
+                          AppButton.primary(
+                            text: "Lanjutkan",
+                            onPressed: onLanjutkanPressed,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: 25),
                 ],

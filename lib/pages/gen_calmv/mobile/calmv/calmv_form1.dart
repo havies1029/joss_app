@@ -45,13 +45,13 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
 
   // Controllers
   final fieldCoverBulanController = TextEditingController();
-  final fieldCurrIdController = TextEditingController();
   final fieldHargaController = TextEditingController();
 
   ComboMMvgrupOjkModel? fieldComboMMvgrupOjk;
   ComboMMvjnscoverModel? fieldComboMMvjnscover;
   ComboMWilayahModel? fieldComboMWilayah;
   ComboRMatauangModel? fieldComboUang;
+  final fieldCurrIdController = TextEditingController();
   ComboMMvpakaiModel? fieldComboMMvpakai;
   // final comboMMvpakaiKey = GlobalKey<DropdownSearchState<ComboMMvpakaiModel>>();
 

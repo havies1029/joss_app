@@ -164,6 +164,8 @@ flutter:
     - assets/icons/share_data_polis.svg
     - assets/icons/others_icon_polis.svg
     - assets/icons/select_icon_polis.svg
+    - assets/icons/checklist.svg
+    - assets/icons/checklist2.svg
     # images
     - assets/images/jps-image.png
     - assets/images/vector-1.png
