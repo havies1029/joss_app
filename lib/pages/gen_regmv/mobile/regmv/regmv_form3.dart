@@ -49,11 +49,10 @@ class RegmvForm3Section extends StatefulWidget {
 class RegmvForm3SectionState extends State<RegmvForm3Section> {
   final _regmvform3key = GlobalKey<FormState>();
   final List<String> errors = [];
-  // Controllers
+
   final fieldAksesorisController = TextEditingController();
   final fieldHargaController = TextEditingController();
   final fieldMesinNoController = TextEditingController();
-
   final fieldPlatNoController = TextEditingController();
   final fieldRangkaNoController = TextEditingController();
   final fieldThnBuatController = TextEditingController();
@@ -73,23 +72,17 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
 
   String selectedYear = "";
   late final Regmv3FormBloc regmv3Bloc;
-
-  void onOpenedByParent() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
-      debugPrint("🔥 Form3 dibuka parent → trigger lihat event");
-      regmv3Bloc.add(Regmv3FormLihatEvent(recordId: widget.regmv1Id!));
-    }
-  }
+  bool _isPayloadInjected = false;
 
   @override
   void initState() {
     super.initState();
     regmv3Bloc = context.read<Regmv3FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
       regmv3Bloc.add(Regmv3FormLihatEvent(recordId: widget.regmv1Id!));
     }
   }
@@ -104,6 +97,13 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     fieldRangkaNoController.dispose();
     fieldThnBuatController.dispose();
     super.dispose();
+  }
+
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.regmv1Id != null) {
+      debugPrint("🔥 Form3 dibuka parent → trigger lihat event");
+      regmv3Bloc.add(Regmv3FormLihatEvent(recordId: widget.regmv1Id!));
+    }
   }
 
   @override
@@ -139,9 +139,10 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
       listeners: [
         BlocListener<Regmv3FormBloc, Regmv3FormState>(
           listenWhen: (prev, curr) =>
-          curr.isLoaded == true && curr.record != null,
+          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
           listener: (context, state) {
-            _injectPayload(state.record!); // inject ke controller & variable
+            _injectPayload(state.record!);
+            _isPayloadInjected = true;
           },
         ),
       ],
@@ -158,28 +159,28 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
                   Flexible(child: _buildHargaMobil()),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildComboMWilayah(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildFieldPlatNo(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildFieldRangkaNo(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildFieldMesinNo(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildFieldMmvmerkId(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildComboTipeId(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildFieldMmvmodelId(),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               Row(
                 children: [
@@ -188,10 +189,10 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
                   Flexible(child: _buildComboWarnaId()),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: hPadding),
 
               _buildFieldAksesoris(),
-              const SizedBox(height: 15),
+              const SizedBox(height: hPadding),
             ],
           ),
         ),
@@ -209,13 +210,16 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
 
     fieldPlatNoController.text = record.platNo.toString();
     fieldRangkaNoController.text = record.rangkaNo.toString();
-    fieldThnBuatController.text = record.thnBuat.toString();
+    // fieldThnBuatController.text = record.thnBuat.toString();
+
+    selectedYear = record.thnBuat.toString();
+
     // Dropdown Values
     fieldComboMMvmerk = record.comboMMvmerk;
-    fieldComboMMvmodel = record.comboMMvmodel;
-
-    fieldComboMMvpakai = record.comboMMvpakai;
     fieldComboMMvtipe = record.comboMMvtipe;
+
+    fieldComboMMvmodel = record.comboMMvmodel;
+    fieldComboMMvpakai = record.comboMMvpakai;
 
     fieldComboMWarna = record.comboMWarna;
     fieldComboMWilayah = record.comboMWilayah;
@@ -244,7 +248,7 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
       platNo: fieldPlatNoController.text,
       rangkaNo: fieldRangkaNoController.text,
       regmv3Id: widget.recordId ?? "",
-      thnBuat: int.parse(fieldThnBuatController.text),
+      thnBuat: int.parse(selectedYear),
     );
 
     if (widget.viewMode == "tambah") {
@@ -313,7 +317,9 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     displayText: (i) => i.wilayahNama,
     compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
-    onChangedCallback: (v) => fieldComboMWilayah = v,
+    onChangedCallback: (v) {
+      fieldComboMWilayah = v;
+    },
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
 
@@ -368,21 +374,19 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     },
   );
 
-  Widget _buildFieldMmvmerkId() => ReusableComboBox<ComboMMvmerkModel>(
+  Widget _buildFieldMmvmerkId() =>  ReusableComboBox<ComboMMvmerkModel>(
     hintText: "Merek",
     comboKey: comboMMvmerkKey,
     initItem: fieldComboMMvmerk,
-    dataLoader: () => ComboMMvmerkRepository().getComboMMvmerk(""),
-    displayText: (i) => i.nmMerk,
-    compareItems: (a, b) => a.mmvmerkId == b.mmvmerkId,
+    dataLoader: () =>  ComboMMvmerkRepository().getComboMMvmerk(""),
+    displayText: (item) => item.nmMerk,
+    compareItems: (a ,b) => a.mmvmerkId == b.mmvmerkId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
     onChangedCallback: (v) {
       if (v != null){
         removeError(error: kStringNullError);
-        regmv3Bloc.add(
-          ComboMMvmerkChangedEvent(comboMMvmerk: v),
+        regmv3Bloc.add(ComboMMvmerkChangedEvent(comboMMvmerk: v)
         );
-
         comboMMvtipeKey.currentState?.clear();
         comboMMvmodelKey.currentState?.clear();
       }
@@ -396,16 +400,14 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     comboKey: comboMMvtipeKey,
     initItem: fieldComboMMvtipe,
     dataLoader: () => ComboMMvtipeRepository().getComboMMvtipe(fieldComboMMvmerk?.mmvmerkId ?? "", ""),
-    displayText: (i) => i.nmTipe,
+    displayText: (item) => item.nmTipe,
     compareItems: (a, b) => a.mmvtipeId == b.mmvtipeId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
     onChangedCallback: (v) {
       if (v != null){
         removeError(error: kStringNullError);
-        regmv3Bloc.add(
-          ComboMMvtipeChangedEvent(comboMMvtipe: v),
+        regmv3Bloc.add(ComboMMvtipeChangedEvent(comboMMvtipe: v)
         );
-
         comboMMvmodelKey.currentState?.clear();
       }
       fieldComboMMvtipe = v;
@@ -418,14 +420,13 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     comboKey: comboMMvmodelKey,
     initItem: fieldComboMMvmodel,
     dataLoader: () => ComboMMvmodelRepository().getComboMMvmodel(fieldComboMMvtipe?.mmvtipeId ?? "",""),
-    displayText: (i) => i.nmModel,
+    displayText: (item) => item.nmModel,
     compareItems: (a, b) => a.mmvmodelId == b.mmvmodelId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
     onChangedCallback: (v) {
       if (v != null){
         removeError(error: kStringNullError);
-        regmv3Bloc.add(
-          ComboMMvmodelChangedEvent(comboMMvmodel: v),
+        regmv3Bloc.add(ComboMMvmodelChangedEvent(comboMMvmodel: v)
         );
       }
       fieldComboMMvmodel = v;
@@ -481,7 +482,6 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     keyboardType: TextInputType.text,
     inputFormatters: [
       FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-      ThousandsSeparatorInputFormatter(),
     ],
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;

@@ -51,6 +51,13 @@ class RegparForm1SectionState extends State<RegparForm1Section> {
     }
   }
 
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      debugPrint("🔥 Form1 dibuka parent → trigger lihat event");
+      regpar1Bloc.add(Regpar1CrudLihatEvent(recordId: widget.recordId!));
+    }
+  }
+
 
   @override
   void dispose() {

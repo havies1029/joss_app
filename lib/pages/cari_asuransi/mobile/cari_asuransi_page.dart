@@ -3,8 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 import '../../../common/constants.dart';
+import '../../../widgets/section/polis/simul_polis/simul_mv/simul_mv_page.dart';
+import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../base/base_background_firstpage.dart';
+import '../../calpar/mobile/calpar_main_page.dart';
+import '../../gen_calmv/mobile/calmv_main_page.dart';
+import '../../regother/mobile/regother_form/regother_form1.dart';
 
 enum CariAsuransiType { page, menu }
 
@@ -77,11 +82,7 @@ class CariAsuransiWidget extends StatelessWidget {
         ),
         Container(
           color: primaryBlackColor,
-          child: Column(
-            children: [
-              _buildKategoriSection(context),
-            ],
-          ),
+          child: Column(children: [_buildKategoriSection(context)]),
         ),
       ],
     );
@@ -99,15 +100,16 @@ class CariAsuransiWidget extends StatelessWidget {
                 "Kategori Asuransi",
                 style: bodyTextStyle(context),
                 textAlign:
-                    type == CariAsuransiType.page
-                        ? TextAlign.center
-                        : TextAlign.left,
+                type == CariAsuransiType.page
+                    ? TextAlign.center
+                    : TextAlign.left,
               ),
               const SizedBox(height: 10),
               kDivider(),
             ],
           ),
         ),
+
         Container(
           padding: EdgeInsets.symmetric(
             vertical: hPadding,
@@ -117,20 +119,39 @@ class CariAsuransiWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCategoryRow(context, [
-                ("assets/icons/kendaraan.svg", "Kendaraan"),
-                ("assets/icons/properti.svg", "Rumah & Property"),
-              ]),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCategory(
+                      context,
+                      "assets/icons/kendaraan.svg",
+                      "Kendaraan",
+                      const CalmvFormMain(viewMode: '',),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildCategory(
+                      context,
+                      "assets/icons/properti.svg",
+                      "Properti",
+                      const CalparFormMain(viewMode: '',),
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 12),
-              _buildCategoryRow(context, [
-                ("assets/icons/kesehatan.svg", "Kesehatan"),
-                ("assets/icons/perjalanan.svg", "Perjalanan"),
-              ]),
-              const SizedBox(height: 12),
-              _buildCategoryRow(context, [
-                ("assets/icons/pendidikan.svg", "Pendidikan"),
-                ("assets/icons/jiwa.svg", "Jiwa"),
-              ]),
+
+              _buildCategory(
+                context,
+                "null",
+                "Lainnya",
+                const Regother1CrudFormPage(
+                  viewMode: 'tambah',
+                  recordId: '',
+                ),
+              ),
             ],
           ),
         ),
@@ -138,39 +159,48 @@ class CariAsuransiWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryRow(
-    BuildContext context,
-    List<(String, String)> categories,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildCategory(context, categories[0].$1, categories[0].$2),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildCategory(context, categories[1].$1, categories[1].$2),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildCategory(BuildContext context, String svgPath, String label) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: pGrey,
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(color: sGrey),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SvgPicture.asset(svgPath, width: 40, height: 40),
-          const SizedBox(width: 10),
-          Flexible(child: Text(label, style: bodyTextStyle(context))),
-        ],
+  Widget _buildCategory(
+      BuildContext context,
+      String svgPath,
+      String label,
+      Widget? targetPage,
+      ) {
+    final bool hasIcon = svgPath != "null" && svgPath.trim().isNotEmpty;
+
+    return InkWell(
+      onTap: targetPage == null
+          ? null
+          : () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => targetPage),
+        );
+      },
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: pGrey,
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          border: Border.all(color: sGrey),
+        ),
+
+        child: hasIcon
+            ? Row(
+          children: [
+            SvgPicture.asset(svgPath, width: 40, height: 40),
+            const SizedBox(width: 10),
+            Expanded(child: Text(label, style: bodyTextStyle(context))),
+          ],
+        )
+            : Center(
+          child: Text(
+            label,
+            style: bodyTextStyle(context),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }

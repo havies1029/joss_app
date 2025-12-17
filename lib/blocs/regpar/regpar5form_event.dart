@@ -39,3 +39,10 @@ class Regpar5FormLihatEvent extends Regpar5FormEvents {
 	List<Object> get props => [recordId];
 }
 
+class Regpar5FormHitungPremiEvent extends Regpar5FormEvents {
+	final String recordId;
+	const Regpar5FormHitungPremiEvent({required this.recordId});
+
+	@override
+	List<Object> get props => [recordId];
+}

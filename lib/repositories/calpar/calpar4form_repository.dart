@@ -15,11 +15,10 @@ class Calpar4FormRepository {
 	Future<bool> calpar4FormHapus(String calpar4Id) async {
 		return await api.calpar4FormHapusAPI(calpar4Id);
 	}
-	Future<Calpar4FormModel> calpar4FormLihat(String calpar4Id) async {
-		return await api.calpar4FormLihatAPI(calpar4Id);
+	Future<Calpar4FormModel> calpar4FormLihat(String calpar1Id) async {
+		return await api.calpar4FormLihatAPI(calpar1Id);
 	}
-
-  Future<Calpar4FormModel> calpar4FormHitungPremi(String calpar1Id) async {
-		return await api.calpar4FormHitungPremiAPI(calpar1Id);
+	Future<Calpar4FormModel> calpar4FormHitungPremi(String calmv1Id) async {
+		return await api.calpar4FormHitungPremiAPI(calmv1Id);
 	}
 }

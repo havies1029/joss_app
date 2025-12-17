@@ -3,17 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
-import 'package:joss_app/pages/calpar/mobile/calpar_form/calpar_form3.dart';
 import 'package:joss_app/pages/gen_regmv/mobile/regmv_main_page.dart';
 
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
-<<<<<<< HEAD
 import '../../../calpar/mobile/calpar_form/calpar_form3.dart';
-=======
-import '../../../calpar/mobile/calpar_form/calpar_form1.dart';
-import '../../../calpar/mobile/calpar_form/calpar_form2.dart';
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 import '../../../calpar/mobile/calpar_main_page.dart';
 import '../../../gen_calmv/calmv1crud_form.dart';
 import '../../../gen_calmv/calmv1list_main.dart';
@@ -26,12 +20,18 @@ import '../../../gen_endors/endors2cari_list_widget.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../payment/dnrekapcobcari_list.dart';
+import '../../../payment/dnsppacari_list.dart';
+import '../../../payment/dnsppamvcari_list.dart';
+import '../../../payment/paymentmethodcari_list.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 
 import 'package:confetti/confetti.dart';
 
+import '../../../regother/mobile/regother_form/regother_form1.dart';
 import '../../../regpar/mobile/regpar_main_page.dart';
+import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String custType;
@@ -343,25 +343,29 @@ class ListMenuWidget extends StatelessWidget {
       //     );
       //   }
       //   break;
-
+      //
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+      // //   break;
+      //
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppaCariPage(listcobId: '', currId: '',)));
+      //   break;
+      // //
+      // case 'Test Page':
+      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppamvCariPage(sppa1Id: '',)));
+      //   break;
+      //
       case 'Test Page':
-<<<<<<< HEAD
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvFormMain(viewMode: 'tambah', recordId: '',)));
-=======
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CalparFormMain(
-              viewMode: 'tambah',
-              recordId: '',
-            ),
-          ),
-        );
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
+        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
         break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));
+        break;
+
+      case 'Tagihan Pembayaran':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage()));
         break;
 
       default:

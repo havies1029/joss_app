@@ -63,11 +63,11 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
   void initState() {
     super.initState();
     regpar3Bloc = context.read<Regpar3FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
+    if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
       regpar3Bloc.add(Regpar3FormLihatEvent(recordId: widget.regpar1Id!));
     }
   }
@@ -82,6 +82,13 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
     fieldRateTotalController.dispose();
     fieldRateTsfwdController.dispose();
     super.dispose();
+  }
+
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
+      debugPrint("🔥 Form3 dibuka parent → trigger lihat event");
+      regpar3Bloc.add(Regpar3FormLihatEvent(recordId: widget.regpar1Id!));
+    }
   }
 
   @override
@@ -181,17 +188,10 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
 
     // Text Controllers
     fieldIsEqController.text = record.isEq.toString();
-    fieldRateEqvetController.text = record.rateEqvet.toString();
-    fieldRateOtherController.text = record.rateOther.toString();
-    fieldRateParController.text = record.ratePar.toString();
 
-    fieldRateRsmdccController.text = record.rateRsmdcc.toString();
-    fieldRateTotalController.text = record.rateTotal.toString();
-    fieldRateTsfwdController.text = record.rateTsfwd.toString();
-    // Dropdown Values
-    fieldComboMZonaGempa = record.comboMZonaGempa;
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
     fieldComboMWilayah = record.comboMWilayah;
+    // fieldComboMZonaGempa = record.comboMKabZonaGempa;
 
     setState(() {});
   }
@@ -208,13 +208,7 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
       kab2zonagempaId: fieldComboMZonaGempa?.mzonagempaId,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
-      rateEqvet: /*double.parse(fieldRateEqvetController.text.replaceAll(',', ''))*/ 1,
-      rateOther: /*double.parse(fieldRateOtherController.text.replaceAll(',', ''))*/1,
-      ratePar: /*double.parse(fieldRateParController.text.replaceAll(',', ''))*/1,
-      rateRsmdcc: /*double.parse(fieldRateRsmdccController.text.replaceAll(',', ''))*/1,
-      rateTotal: /*double.parse(fieldRateTotalController.text.replaceAll(',', ''))*/1,
-      rateTsfwd: /*double.parse(fieldRateTsfwdController.text.replaceAll(',', ''))*/1,
-      regpar3Id: '',
+      regpar3Id: widget.recordId!,regpar1Id: widget.regpar1Id!
     );
 
     if (widget.viewMode == "tambah") {

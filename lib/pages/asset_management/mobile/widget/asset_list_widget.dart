@@ -3,16 +3,18 @@
   import '../../../../common/constants.dart';
   import '../../../../models/combobox/combocoblist_model.dart';
   import '../../../../repositories/combobox/combocoblist_repository.dart';
+  import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+  import 'package:joss_app/repositories/combobox/combomcobapp1_repository.dart';
 
-  class AssetListWidget extends FormField<ComboCobListModel?> {
+  class AssetListWidget extends FormField<ComboMCobApp1Model?> {
     AssetListWidget({
       super.key,
       required String labelText,
-      ComboCobListModel? initItem,
-      ValueChanged<ComboCobListModel?>? onChangedCallback,
-      required ValueChanged<ComboCobListModel?> onSaveCallback,
-      String? Function(ComboCobListModel?)? validatorCallback,
-      Future<List<ComboCobListModel>> Function()? loader,
+      ComboMCobApp1Model? initItem,
+      ValueChanged<ComboMCobApp1Model?>? onChangedCallback,
+      required ValueChanged<ComboMCobApp1Model?> onSaveCallback,
+      String? Function(ComboMCobApp1Model?)? validatorCallback,
+      Future<List<ComboMCobApp1Model>> Function()? loader,
       bool horizontalScroll = true,
       bool allowDeselect = false,
     }) : super(
@@ -34,7 +36,7 @@
           );
         }
 
-        return FutureBuilder<List<ComboCobListModel>>(
+        return FutureBuilder<List<ComboMCobApp1Model>>(
           future: loader(),   // 🔥 Hapus fallback ke repository
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -54,7 +56,7 @@
               );
             }
 
-            final items = snapshot.data ?? const <ComboCobListModel>[];
+            final items = snapshot.data ?? const <ComboMCobApp1Model>[];
             if (items.isEmpty) {
               return Text(
                 'Data COB kosong',
@@ -86,7 +88,7 @@
                     vertical: 5,
                   ),
                   onSelected: (isNowSelected) {
-                    ComboCobListModel? next;
+                    ComboMCobApp1Model? next;
 
                     if (isNowSelected) {
                       next = item;

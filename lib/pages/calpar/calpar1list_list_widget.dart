@@ -39,84 +39,83 @@ class Calpar1ListListWidgetState extends State<Calpar1ListListWidget> {
 		calpar1ListBloc = BlocProvider.of<Calpar1ListBloc>(context);
 		calpar1CrudBloc = BlocProvider.of<Calpar1CrudBloc>(context);
 		return BlocConsumer<Calpar1ListBloc, Calpar1ListState>(
-			builder: (context, state) {
-			if (state.status == ListStatus.success) {
-			return state.items.isNotEmpty
-				? Flexible(
-					child: ListView.builder(
-						padding: EdgeInsets.zero,
-						controller: _scrollController,
-						itemCount: state.items.length,
-						itemBuilder: (_, index) => Container(
-							margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-							padding: const EdgeInsets.all(0.2),
-							decoration: BoxDecoration(
-								borderRadius: BorderRadius.circular(15.0)),
-							child: Column(
-								children: <Widget>[
-									Slidable(
-										endActionPane: ActionPane(
-											motion: const BehindMotion(),
-												children: [
-													SlidableAction(
-														onPressed: (context) {
-															calpar1ListBloc.add(
-																UbahCalpar1ListEvent(
-																	recordId: state
-																		.items[index]
-																		.calpar1Id));
-														},
-														backgroundColor: Colors.green,
-														icon: Icons.edit,
-														label: "Edit",
-													),
-													SlidableAction(
-														onPressed: (context) {
-															showDialogHapus(
-																state.items[index].calpar1Id);
-														},
-														backgroundColor: Colors.red,
-														icon: Icons.delete,
-														label: "Delete",
-													),
-												]),
-											child: Calpar1ListTileWidget(
-												calpar1Id: state.items[index].calpar1Id,
-												coverBulan: state.items[index].coverBulan,
-												jenisNama: state.items[index].jenisNama,
-												kelasNama: state.items[index].kelasNama,
-												okupasiDesc: state.items[index].okupasiDesc,
-											)),
-							],
-						),
-					)),
-				)
-			: const Center(
-				child: Padding(
-					padding: EdgeInsets.only(top: 80.0),
-					child: Text(
-						'No Data Available!!',
-						style: TextStyle(
-							color: Colors.red,
-							fontSize: 12.0,
-							fontWeight: FontWeight.bold),
-					),
-				),
-			);
-		} else {
-			return const Center(
-					child: Text(
-						'No Data Available!!',
-						style: TextStyle(
-							color: Colors.red,
-							fontSize: 12.0,
-							fontWeight: FontWeight.bold),
-					),
-				);
-			}
-			}, buildWhen: (previous, current) {
-				return (current.status == ListStatus.success);
-			}, listener: (context, state) {}
+				builder: (context, state) {
+					if (state.status == ListStatus.success) {
+						return state.items.isNotEmpty
+								? Flexible(
+							child: ListView.builder(
+									padding: EdgeInsets.zero,
+									controller: _scrollController,
+									itemCount: state.items.length,
+									itemBuilder: (_, index) => Container(
+										margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+										padding: const EdgeInsets.all(0.2),
+										decoration: BoxDecoration(
+												borderRadius: BorderRadius.circular(15.0)),
+										child: Column(
+											children: <Widget>[
+												Slidable(
+														endActionPane: ActionPane(
+																motion: const BehindMotion(),
+																children: [
+																	SlidableAction(
+																		onPressed: (context) {
+																			calpar1ListBloc.add(
+																					UbahCalpar1ListEvent(
+																							recordId: state
+																									.items[index]
+																									.calpar1Id));
+																		},
+																		backgroundColor: Colors.green,
+																		icon: Icons.edit,
+																		label: "Edit",
+																	),
+																	SlidableAction(
+																		onPressed: (context) {
+																			showDialogHapus(
+																					state.items[index].calpar1Id);
+																		},
+																		backgroundColor: Colors.red,
+																		icon: Icons.delete,
+																		label: "Delete",
+																	),
+																]),
+														child: Calpar1ListTileWidget(
+															calpar1Id: state.items[index].calpar1Id,
+															coverBulan: state.items[index].coverBulan,
+															kelasNama: state.items[index].kelasNama,
+															okupasiDesc: state.items[index].okupasiDesc,
+														)),
+											],
+										),
+									)),
+						)
+								: const Center(
+							child: Padding(
+								padding: EdgeInsets.only(top: 80.0),
+								child: Text(
+									'No Data Available!!',
+									style: TextStyle(
+											color: Colors.red,
+											fontSize: 12.0,
+											fontWeight: FontWeight.bold),
+								),
+							),
+						);
+					} else {
+						return const Center(
+							child: Text(
+								'No Data Available!!',
+								style: TextStyle(
+										color: Colors.red,
+										fontSize: 12.0,
+										fontWeight: FontWeight.bold),
+							),
+						);
+					}
+				}, buildWhen: (previous, current) {
+			return (current.status == ListStatus.success);
+		}, listener: (context, state) {}
 		);
 	}
 	void _onScroll() {
@@ -133,11 +132,11 @@ class Calpar1ListListWidgetState extends State<Calpar1ListListWidget> {
 
 	void showDialogHapus(String recordId) {
 		showDialog(
-			context: context,
-			barrierDismissible: false,
-			builder: (BuildContext context) {
-				return ShowDialogHapusWidget(onHapusFunction: onHapusFunction, recordId: recordId);
-			}
+				context: context,
+				barrierDismissible: false,
+				builder: (BuildContext context) {
+					return ShowDialogHapusWidget(onHapusFunction: onHapusFunction, recordId: recordId);
+				}
 		).then((value) {
 			calpar1ListBloc.add(CloseDialogCalpar1ListEvent());
 		});

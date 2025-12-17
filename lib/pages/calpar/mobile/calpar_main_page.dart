@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../blocs/calpar/calpar1crud_bloc.dart';
+import '../../../blocs/calpar/calpar1list_bloc.dart';
 import '../../../blocs/calpar/calpar2form_bloc.dart';
 import '../../../blocs/calpar/calpar3form_bloc.dart';
 import '../../../blocs/calpar/calpar4form_bloc.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
-<<<<<<< HEAD
 import '../../regpar/mobile/regpar_main_page.dart';
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 import 'calpar_form/calpar_form1.dart';
 import 'calpar_form/calpar_form2.dart';
 import 'calpar_form/calpar_form3.dart';
@@ -49,10 +47,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
   String form3ViewMode = "tambah";
 
   bool isHitungPremiClicked = false;
-<<<<<<< HEAD
-  bool isLanjutkanlicked = false;
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 
   double getProgressValue() {
     double p = 0.0;
@@ -70,7 +64,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
     return BaseBackgroundSidePage(
       title: "Properti",
       blocListeners: [
-        // =================== LISTENER FORM 1 ===================
         BlocListener<Calpar1CrudBloc, Calpar1CrudState>(
           listener: (context, state) {
             if (state.isSaved && !state.hasFailure && state.record != null) {
@@ -78,42 +71,15 @@ class _CalparFormMainState extends State<CalparFormMain> {
 
               if (newId != null && newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calpar1 saved → result ID = $newId");
-<<<<<<< HEAD
                 final regpar = state.record!.regpar1Id;
-=======
-
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                 setState(() {
                   calpar1Id = newId;
                 });
 
-<<<<<<< HEAD
-                if (isLanjutkanlicked == true){
-                  isLanjutkanlicked = false;
-                  debugPrint("woy ini new ID" + regpar!);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RegparFormMain(recordId: state.record!.regpar1Id, viewMode: 'ubah',),
-                    ),
-                  );
-                }else {
-                  if (form1ViewMode == "ubah") {
-                    form1ViewMode = "tambah";
-                    if (isHitungPremiClicked == true) {
-                      debugPrint("isHitungPremiClicked");
-                      isHitungPremiClicked = false;
-                      onHitungPremi();
-                    } else {
-                      simulateToggleForm2();
-                    }
-                  } else {
-                    simulateToggleForm2();
-                  }
-=======
                 if (form1ViewMode == "ubah") {
                   form1ViewMode = "tambah";
                   if (isHitungPremiClicked == true) {
+                    debugPrint("isHitungPremiClicked");
                     isHitungPremiClicked = false;
                     onHitungPremi();
                   } else {
@@ -121,7 +87,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   }
                 } else {
                   simulateToggleForm2();
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                 }
               }
             }
@@ -143,8 +108,8 @@ class _CalparFormMainState extends State<CalparFormMain> {
 
                 if (form2ViewMode == "ubah") {
                   form2ViewMode = "tambah";
-<<<<<<< HEAD
                   if (isHitungPremiClicked == true) {
+                    debugPrint("isHitungPremiClicked");
                     isHitungPremiClicked = false;
                     onHitungPremi();
                   } else {
@@ -154,12 +119,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   simulateToggleForm3();
                 }
 
-=======
-                  onHitungPremi();
-                } else {
-                  onHitungPremi();
-                }
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
               }
             }
           },
@@ -178,7 +137,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   calpar3Id = newId;
                 });
 
-<<<<<<< HEAD
                 if (form3ViewMode == "ubah") {
                   form3ViewMode = "tambah";
                   debugPrint("listener form3 abis tambah");
@@ -187,11 +145,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   debugPrint("listener form3");
                   onHitungPremi();
                 }
-=======
-                context.read<Calpar4FormBloc>().add(
-                  Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
-                );
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
               }
             }
           },
@@ -200,24 +153,54 @@ class _CalparFormMainState extends State<CalparFormMain> {
         // =================== LISTENER FORM 4 (PREMI) ===================
         BlocListener<Calpar4FormBloc, Calpar4FormState>(
           listener: (context, state) {
-            if (state.isLoaded && state.record != null) {
+            if (state.isCalculated && state.record != null) {
               final r = state.record!;
 
               final payload = {
-                "subtotalPremi": r.premiOther ?? 0,
-                "diskonPremi": r.discNilai ?? 0,
-                "netPremi": r.premiNet ?? 0,
+                "premiOther": r.premiOther,
+                "discNilai": r.discNilai,
+                "premiNet": r.premiNet,
               };
 
-              if (calparform4key.currentState != null) {
-                calparform4key.currentState!.injectPayload(payload);
-              }
+              calparform4key.currentState?.injectPayload(payload);
 
               openForm4();
 
               setState(() {
                 _form4Payload = payload;
               });
+            }
+          },
+        ),
+
+        BlocListener<Calpar1ListBloc, Calpar1ListState>(
+          listener: (context, state) {
+            if (state.isProcessing) {
+              // Tampilkan loading
+              showDialog(
+                context: context,
+                builder: (_) => const Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (state.isProcessed) {
+              Navigator.pop(context); // nutup loading
+
+
+              if (state.hasFailure) {
+                // Jika gagal
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Gagal: ${state.processMessage}")),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegparFormMain(recordId: state.processMessage, viewMode: 'ubah',),
+                  ),
+                );
+                debugPrint("hasil debug ${state.processMessage}");
+              }
             }
           },
         ),
@@ -285,13 +268,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
                       ? const SizedBox.shrink()
                       : AppButton.primary(
                     text: "Lanjutkan",
-<<<<<<< HEAD
                     onPressed: onLanjutkanPressed,
-=======
-                    onPressed: () {
-                      // tambahin aksi mu
-                    },
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
                   ),
 
                   const SizedBox(height: 25),
@@ -317,8 +294,11 @@ class _CalparFormMainState extends State<CalparFormMain> {
   Future<void> onToggleForm1(bool _) async {
     if (calpar1Id != null) {
       form1ViewMode = "ubah";
+      debugPrint("🔥 Mode ubah aktif karena calmv1Id ada");
     } else {
       form1ViewMode = "tambah";
+      debugPrint("🔥 Mode tambah aktif karena calmv1Id kosong");
+
     }
     openForm1();
   }
@@ -349,8 +329,10 @@ class _CalparFormMainState extends State<CalparFormMain> {
       if (form1ViewMode == "ubah") {
         await calparform1key.currentState?.saveForm1();
       } else {
+        debugPrint("🔥 Mode tambah aktif karena calmv1Id ada");
         if (calpar2Id != null) {
           form2ViewMode = "ubah";
+          debugPrint("🔥 Mode ubah aktif karena calmv2Id tidak kosong");
         }
         openForm2();
       }
@@ -377,7 +359,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
   }
 
   Future<void> onToggleForm3(bool _) async {
-<<<<<<< HEAD
     final isValidForm1 = await calparform1key.currentState?.validateAndReturn();
     final isValidForm2 = await calparform2key.currentState?.validateAndReturn();
 
@@ -385,9 +366,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
       form3ViewMode = "tambah";
 
       if (form1ViewMode == "ubah"){
-        setState(() {
-          isHitungPremiClicked = true;
-        });
         await calparform1key.currentState?.saveForm1();
       }else {
         if (form2ViewMode == "ubah"){
@@ -404,22 +382,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
     } else if (isValidForm1 == true) {
       await calparform1key.currentState?.saveForm1();
     }else if (isValidForm2 == true){
-=======
-    final isValidForm2 = await calparform2key.currentState?.validateAndReturn();
-
-    if (calpar2Id != null) {
-      form3ViewMode = "tambah";
-
-      if (form2ViewMode == "ubah") {
-        await calparform2key.currentState?.saveForm2();
-      } else {
-        if (calpar3Id != null) {
-          form3ViewMode = "ubah";
-        }
-        openForm3();
-      }
-    } else if (isValidForm2 == true) {
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       await calparform2key.currentState?.saveForm2();
     }
   }
@@ -446,30 +408,28 @@ class _CalparFormMainState extends State<CalparFormMain> {
 
     if (calpar1Id != null && calpar2Id != null && calpar3Id != null) {
       if (form1ViewMode == "ubah") {
-        isHitungPremiClicked = true;
+        setState(() {
+          isHitungPremiClicked = true;
+        });
         await calparform1key.currentState?.saveForm1();
       } else {
-<<<<<<< HEAD
         if (form2ViewMode == "ubah") {
-          isHitungPremiClicked = true;
+          setState(() {
+            isHitungPremiClicked = true;
+          });
           await calparform2key.currentState?.saveForm2();
         }else{
           if (form3ViewMode == "ubah"){
+            setState(() {
+              isHitungPremiClicked = true;
+            });
             await calparform3key.currentState?.saveForm3();
           }else {
-            debugPrint("hitungpar dikliik");
+            debugPrint("hitungpar dikliik ${calpar1Id}");
             context.read<Calpar4FormBloc>().add(
               Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
             );
           }
-=======
-        if (form3ViewMode == "ubah") {
-          await calparform3key.currentState?.saveForm3();
-        } else {
-          context.read<Calpar4FormBloc>().add(
-            Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
-          );
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
         }
       }
     } else if (calpar1Id == null) {
@@ -490,17 +450,12 @@ class _CalparFormMainState extends State<CalparFormMain> {
     }
   }
 
-<<<<<<< HEAD
   Future<void> onLanjutkanPressed() async {
-    isLanjutkanlicked = true;
-
-    // context.read<Calpar1CrudBloc>().add(
-    //   CalpartoRegMvEvent(recordId: calpar1Id!),
-    // );
+    context.read<Calpar1ListBloc>().add(
+      CalPar2RegParEvent(calpar1Id: calpar1Id!),
+    );
   }
 
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
   // ========================= OPEN FORMS =========================
 
   void openForm1() {

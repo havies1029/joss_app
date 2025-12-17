@@ -59,11 +59,12 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   void initState() {
     super.initState();
     regpar4Bloc = context.read<Regpar4FormBloc>();
-    Future.microtask(_loadData);
+    // Future.microtask(_loadData);
   }
 
   void _loadData() {
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
+    debugPrint("Regpar4FormLihatEvent trigger");
+    if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
       regpar4Bloc.add(Regpar4FormLihatEvent(recordId: widget.regpar1Id!));
     }
   }
@@ -77,6 +78,14 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
     fieldSiOtherController.dispose();
     fieldSiStockController.dispose();
     super.dispose();
+  }
+
+  void onOpenedByParent() {
+    debugPrint("Regpar4FormLihatEvent trigger");
+    if (widget.viewMode == "ubah" && widget.regpar1Id != null) {
+      debugPrint("🔥 Form4 dibuka parent → trigger lihat event");
+      regpar4Bloc.add(Regpar4FormLihatEvent(recordId: widget.regpar1Id!));
+    }
   }
 
   @override
@@ -189,10 +198,10 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   }
 
 
-  Future<void> saveForm3() async {
+  Future<void> saveForm4() async {
     final record = Regpar4FormModel(
+      regpar1Id: widget.regpar1Id!,
       currId: fieldComboRMatauang?.rmatauangKode,
-      regpar4Id: '',
       siBuilding: double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
       siContent: double.parse(fieldSiContentController.text.replaceAll(',', '')),
       siMachinery: double.parse(fieldSiMachineryController.text.replaceAll(',', '')),

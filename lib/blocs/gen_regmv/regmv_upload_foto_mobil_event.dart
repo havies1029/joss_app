@@ -15,6 +15,16 @@ class UploadFotoMobilSelected extends RegmvUploadFotoMobilEvent {
   List<Object?> get props => [imageBytes, fileName];
 }
 
+class UploadFotoMobilSelectedList extends RegmvUploadFotoMobilEvent {
+  final List<Uint8List> images;
+  final List<String> fileNames;
+
+  const UploadFotoMobilSelectedList(this.images, this.fileNames);
+
+  @override
+  List<Object?> get props => [images, fileNames];
+}
+
 class UploadFotoMobilSubmitted extends RegmvUploadFotoMobilEvent {
   final String regmv1Id;
   final String caption;
@@ -24,6 +34,24 @@ class UploadFotoMobilSubmitted extends RegmvUploadFotoMobilEvent {
   @override
   List<Object?> get props => [regmv1Id, caption];
 }
+
+class UploadFotoMobilBatchSubmit extends RegmvUploadFotoMobilEvent {
+  final String regmv1Id;
+  final List<Uint8List> images;
+  final List<String> names;
+
+  const UploadFotoMobilBatchSubmit({
+    required this.regmv1Id,
+    required this.images,
+    required this.names,
+  });
+
+  @override
+  List<Object?> get props => [regmv1Id, images, names];
+}
+
+class ResetFotoMobilPreview extends RegmvUploadFotoMobilEvent {}
+
 
 class CekIsFotoMobilUploaded extends RegmvUploadFotoMobilEvent {
   final String mrekanId;

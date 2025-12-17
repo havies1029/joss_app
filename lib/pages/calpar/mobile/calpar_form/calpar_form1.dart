@@ -17,7 +17,7 @@ import '../../../../repositories/combobox/comborokupasi_repository.dart';
 
 class Calpar1CrudFormPage extends StatefulWidget {
   final String viewMode;
-  final String recordId;
+  final String? recordId;
   final bool isExpanded;
   final Function(bool) onToggle;
 
@@ -139,12 +139,12 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
   }
 
   void _injectPayload(Calpar1CrudModel record) {
-    fieldCoverBulanController.text = record.coverBulan.toString();
+    debugPrint("🔥 Injecting payload into Form1...");
 
+    fieldCoverBulanController.text = record.coverBulan.toString();
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
     fieldComboRKonstruksiojk = record.comboRKonstruksiojk;
     fieldComboROkupasi = record.comboROkupasi;
-
     previousKonstruksi = record.comboRKonstruksiojk;
 
     setState(() {});

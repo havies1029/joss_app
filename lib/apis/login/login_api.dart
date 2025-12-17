@@ -80,7 +80,7 @@ class LoginApi {
     }
   }
 
-  Future<User> getUserByTokenAPI(String token) async {
+  Future<User?> getUserByTokenAPI(String token) async {
     String urlGetUserEndPoint = "${AppData.prefixEndPoint}/api/login/getuser";
 
     var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetUserEndPoint);

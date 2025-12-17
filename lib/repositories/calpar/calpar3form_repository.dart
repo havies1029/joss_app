@@ -15,7 +15,7 @@ class Calpar3FormRepository {
 	Future<bool> calpar3FormHapus(String calpar3Id) async {
 		return await api.calpar3FormHapusAPI(calpar3Id);
 	}
-	Future<Calpar3FormModel> calpar3FormLihat(String calpar3Id) async {
-		return await api.calpar3FormLihatAPI(calpar3Id);
+	Future<Calpar3FormModel> calpar3FormLihat(String calpar1Id) async {
+		return await api.calpar3FormLihatAPI(calpar1Id);
 	}
 }

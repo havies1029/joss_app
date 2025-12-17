@@ -6,10 +6,13 @@ import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form1.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form2.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form3.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form4.dart';
+import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form5.dart';
+import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form6.dart';
+import '../../../blocs/regpar/regpar5form_bloc.dart';
+import '../../../helper/form_exit_guard.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
-import '../../gen_regmv/mobile/regmv/regmv_form6.dart';
 import 'konfirmasi_regpar_page.dart';
 
 
@@ -34,23 +37,27 @@ class _RegparFormMainState extends State<RegparFormMain> {
   final regparform1key = GlobalKey<RegparForm1SectionState>();
   final regparform2key = GlobalKey<RegparForm2SectionState>();
   final regparform3key = GlobalKey<RegparForm3SectionState>();
-  final regparform4key = GlobalKey<RegparForm4SectionState>();
+  final  regparform4key = GlobalKey<RegparForm4SectionState>();
+  final regparform5key = GlobalKey<RegparForm5SectionState>();
+  final regparform6key = GlobalKey<RegparForm6SectionState>();
 
-  String? regpar1Id = "251200001";
+  String? regpar1Id;
   String? regpar2Id;
   String? regpar3Id;
   String? regpar4Id;
   String? regpar5Id;
   String? regpar6Id;
 
-  Map<String, dynamic>? _form6Payload;
+  Map<String, dynamic>? _form5Payload;
 
   String form1ViewMode = "ubah";
   String form2ViewMode = "ubah";
   String form3ViewMode = "ubah";
-  String form4ViewMode = "tambah";
-  String form5ViewMode = "tambah";
-  String form6ViewMode = "tambah";
+  String form4ViewMode = "ubah";
+  String form5ViewMode = "ubah";
+  String form6ViewMode = "ubah";
+
+  bool isHitungPremiClicked = false;
 
   double getProgressValue() {
     double p = 0.0;
@@ -65,25 +72,22 @@ class _RegparFormMainState extends State<RegparFormMain> {
     return p;
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Properti",
       blocListeners: [
-        BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
+        BlocListener<Regpar5FormBloc, Regpar5FormState>(
+          listenWhen: (prev, curr) {
+            return true;
+          },
+
           listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              final newId = state.record!.regpar1Id;
-
-              if (newId != null && newId.isNotEmpty) {
-                debugPrint("🔥 [LISTENER] regpar1 saved → result ID = $newId");
-
-              }
+            if(isHitungPremiClicked == true){
+              isHitungPremiClicked = false;
+              simulateToggleForm6();
             }
+
           },
         ),
       ],
@@ -124,7 +128,6 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
             const SizedBox(height: hPadding * 1.5),
 
-            // 🧩 FORM BODY UTAMA
             // ------------------ FORM 1 ------------------
 
             Padding(
@@ -151,7 +154,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
             const SizedBox(height: hPadding),
 
-            // ------------------ FORM 3 (PREMI) ------------------
+            // ------------------ FORM 3 ------------------
 
 
             Padding(
@@ -161,12 +164,25 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
             const SizedBox(height: hPadding),
 
+
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
-              child: RegmvForm6Section(
-                isExpanded: expanded[5],
-                initialPayload: _form6Payload,
-              ),
+              child: buildForm5Section(),
+            ),
+
+            const SizedBox(height: hPadding),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
+              child: buildButtonHitungPremi(),
+            ),
+
+            const SizedBox(height: hPadding),
+
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
+              child: buildForm6Section(),
             ),
 
             const SizedBox(height: hPadding),
@@ -199,19 +215,12 @@ class _RegparFormMainState extends State<RegparFormMain> {
   Widget buildForm1Section() => RegparForm1Section(
     key: regparform1key,
     viewMode: form1ViewMode,
-    recordId: regpar1Id ?? "",
+    recordId: widget.recordId ?? "",
     isExpanded: expanded[0],
     onToggle: (value) => onToggleForm1(value),
   );
 
   Future<void> onToggleForm1(bool _) async {
-    if (regpar1Id != null) {
-      form1ViewMode = "ubah";
-      debugPrint("🔥 Mode ubah aktif karena calpar1Id ada");
-    } else {
-      form1ViewMode = "tambah";
-      debugPrint("🔥 Mode tambah aktif karena calpar1Id kosong");
-    }
     openForm1();
   }
 
@@ -227,7 +236,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
     return RegparForm2Section(
       key: regparform2key,
       viewMode: form2ViewMode,
-      regpar1Id: regpar1Id ?? "",
+      regpar1Id: widget.recordId ?? "",
       recordId: regpar2Id ?? "",
       isExpanded: expanded[1],
       onToggle: (value) => onToggleForm2(value),
@@ -235,27 +244,9 @@ class _RegparFormMainState extends State<RegparFormMain> {
   }
 
   Future<void> onToggleForm2(bool _) async {
-    final isValidForm1 = await regparform1key.currentState?.validateAndReturn();
-    if (regpar1Id != null) {
-
-      if (form1ViewMode == "ubah"){
-        //update form`1
-        await regparform1key.currentState?.saveForm1();
-      }else {
-        debugPrint("🔥 Mode tambah aktif karena regpar1Id ada");
-        if (regpar2Id != null){
-          form2ViewMode = "ubah";
-          debugPrint("🔥 Mode ubah aktif karena regpar2Id tidak kosong");
-        }
-        openForm2();
-      }
-
-
-    }else if (isValidForm1 == true) {
-      await regparform1key.currentState?.saveForm1();
-    }
+    openForm2();
   }
-  
+
   Future<void> simulateToggleForm2() async {
     await onToggleForm2(true);
   }
@@ -267,7 +258,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
     return RegparForm3Section(
       key: regparform3key,
       viewMode: form3ViewMode,
-      regpar1Id: regpar1Id ?? "",
+      regpar1Id: widget.recordId ?? "",
       recordId: regpar3Id ?? "",
       isExpanded: expanded[2],
       onToggle: (value) => onToggleForm3(value),
@@ -275,33 +266,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
   }
 
   Future<void> onToggleForm3(bool _) async {
-    final isValidForm1 = await regparform1key.currentState?.validateAndReturn();
-    final isValidForm2 = await regparform2key.currentState?.validateAndReturn();
-
-    if (regpar1Id != null) {
-      if (form1ViewMode == "ubah"){
-        //update form`1
-        await regparform1key.currentState?.saveForm1();
-      }else {
-        debugPrint("🔥 Mode tambah aktif karena regpar1Id ada");
-        if (form2ViewMode == "ubah"){
-          await regparform2key.currentState?.saveForm2();
-
-          debugPrint("🔥 Mode ubah aktif karena regpar2Id tidak kosong");
-        }else {
-          if (regpar3Id != null){
-            form3ViewMode = "ubah";
-          }
-          openForm3();
-        }
-      }
-
-
-    }else if (isValidForm1 == true) {
-      await regparform1key.currentState?.saveForm1();
-    }else if (isValidForm2 == true) {
-      await regparform2key.currentState?.saveForm2();
-    }
+    openForm3();
   }
 
   Future<void> simulateToggleForm3() async {
@@ -315,7 +280,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
     return RegparForm4Section(
       key: regparform4key,
       viewMode: form4ViewMode,
-      regpar1Id: regpar1Id ?? "",
+      regpar1Id: widget.recordId ?? "",
       recordId: regpar4Id,
       isExpanded: expanded[3],
       onToggle: (value) => onToggleForm4(value),
@@ -323,39 +288,8 @@ class _RegparFormMainState extends State<RegparFormMain> {
   }
 
   Future<void> onToggleForm4(bool _) async {
-    final isValidForm1 = await regparform1key.currentState?.validateAndReturn();
-    final isValidForm2 = await regparform2key.currentState?.validateAndReturn();
-    final isValidForm3 = await regparform3key.currentState?.validateAndReturn();
+    openForm4();
 
-    if (regpar1Id != null) {
-      if (form1ViewMode == "ubah"){
-        await regparform1key.currentState?.saveForm1();
-      }else {
-        if (form2ViewMode == "ubah"){
-          await regparform2key.currentState?.saveForm2();
-
-        }else {
-          debugPrint("🔥 Mode tambah aktif karena regpar1Id ada");
-
-          if (form3ViewMode == "ubah"){
-            await regparform3key.currentState?.saveForm3();
-            debugPrint("🔥 Mode ubah aktif karena regpar3Id tidak kosong");
-          }else {
-            if (regpar4Id != null) {
-              form4ViewMode = "ubah";
-            }
-            openForm4();
-          }
-        }
-      }
-
-    }else if (isValidForm1 == true) {
-      await regparform1key.currentState?.saveForm1();
-    }else if (isValidForm2 == true) {
-      await regparform2key.currentState?.saveForm2();
-    }else if (isValidForm3 == true) {
-      await regparform3key.currentState?.saveForm3();
-    }
   }
 
   Future<void> simulateToggleForm4() async {
@@ -363,34 +297,273 @@ class _RegparFormMainState extends State<RegparFormMain> {
   }
 
 
+  //========================= form5 =========================
+  Widget buildForm5Section() {
+    return RegparForm5Section(
+      key: regparform5key,
+      viewMode: form5ViewMode,
+      regpar1Id: widget.recordId ?? "",
+      recordId: regpar5Id,
+      isExpanded: expanded[4],
+      onToggle: (value) => onToggleForm5(value),
+    );
+  }
+
+  Future<void> onToggleForm5(bool _) async {
+    openForm5();
+
+  }
+
+  Future<void> simulateToggleForm5() async {
+    await onToggleForm5(true);
+  }
+
+
+
+
+  //========================= form6 =========================
+  Widget buildForm6Section() {
+    return RegparForm6Section(
+      key: regparform6key,
+      viewMode: form6ViewMode,
+      regpar1Id: widget.recordId ?? "",
+      recordId: regpar6Id,
+      isExpanded: expanded[5],
+      onToggle: (value) => onToggleForm5(value),
+    );
+  }
+
+  Future<void> onToggleForm6(bool _) async {
+    openForm6();
+
+  }
+
+  Future<void> simulateToggleForm6() async {
+    await onToggleForm6(true);
+  }
+
+
+
+
+  //========================= hitung premi =========================
+
+
+
+
+  Widget buildButtonHitungPremi() => Padding(
+    padding: EdgeInsets.symmetric(horizontal: 4),
+    child: AppButton.primary(
+      text: "Hitung Premi",
+      onPressed: onHitungPremi,
+    ),
+  );
+
+  Future<void> onHitungPremi() async {
+    print("🔥 Tombol Hitung Premi ditekan");
+
+    final oldExpanded = List<bool>.from(expanded);
+    isHitungPremiClicked = true;
+    final newExpanded = [false, false, false, false, false,true];
+
+    // VALIDATOR
+    final validators = <int, Future<bool> Function()>{
+      0: () async => regparform1key.currentState?.validateAndReturn() ?? false,
+      1: () async => regparform2key.currentState?.validateAndReturn() ?? false,
+      2: () async => regparform3key.currentState?.validateAndReturn() ?? false,
+      3: () async => regparform4key.currentState?.validateAndReturn() ?? false,
+      4: () async => regparform5key.currentState?.validateAndReturn() ?? false,
+    };
+
+    // SAVERS
+    final savers = <int, Future<void> Function()>{
+      0: () async => await regparform1key.currentState?.saveForm1(),
+      1: () async => await regparform2key.currentState?.saveForm2(),
+      2: () async => await regparform3key.currentState?.saveForm3(),
+      3: () async => await regparform4key.currentState?.saveForm4(),
+      4: () async => await regparform5key.currentState?.saveForm5(),
+    };
+
+    print("🔎 Cek semua form sebelum pindah ke Form 6...");
+
+    final allow = await FormExitGuard.multiCheck(
+      oldExpanded: oldExpanded,
+      newExpanded: newExpanded,
+      validators: validators,
+      savers: savers,
+    );
+
+    if (!allow) {
+      print("⛔ GA BOLEH pindah, karena ada form invalid.");
+      return;
+    }
+
+    print("✅ Semua valid & saved → lanjut hitung premi");
+
+    // Update UI
+    setState(() => expanded = newExpanded);
+
+    // Trigger Hitung Premi
+    if (widget.recordId != null) {
+      context.read<Regpar5FormBloc>().add(
+        Regpar5FormHitungPremiEvent(
+          recordId: widget.recordId!,
+        ),
+      );
+      print("🚀 Event HitungPremi DIKIRIM");
+    } else {
+      print("❌ regpar1Id NULL atau kosong. Premi batal.");
+    }
+  }
 
   void openForm1() {
     setState(() {
       expanded = [true, false, false, false, false, false];
+      regparform1key.currentState?.onOpenedByParent();
     });
   }
 
-  void openForm2() {
+  void openForm2() async{
+    final oldState = List<bool>.from(expanded);
+    final newState = [false, true, false, false, false, false];
+
+    final allowed = await FormExitGuard.multiCheck(
+      oldExpanded: oldState,
+      newExpanded: newState,
+
+      validators: {
+        0: () async => await regparform1key.currentState?.validateAndReturn() ?? false,
+        1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
+        2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
+        3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
+      },
+
+      savers: {
+        0: () async => await regparform1key.currentState?.saveForm1(),
+        1: () async => await regparform2key.currentState?.saveForm2(),
+        2: () async => await regparform3key.currentState?.saveForm3(),
+        3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
+      },
+    );
+
+    if (!allowed) return;
+
     setState(() {
-      expanded = [false, true, false, false, false, false];
+      expanded = newState;
+      if (expanded[1] == true) {
+        regparform2key.currentState?.onOpenedByParent();
+      }
     });
   }
 
-  void openForm3() {
+  void openForm3() async{
+    final oldState = List<bool>.from(expanded);
+
+    final newState = [false, false, true, false, false, false];
+
+    final allowed = await FormExitGuard.multiCheck(
+      oldExpanded: oldState,
+      newExpanded: newState,
+
+      validators: {
+        0: () async => await regparform1key.currentState?.validateAndReturn() ?? false,
+        1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
+        2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
+        3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
+      },
+
+      savers: {
+        0: () async => await regparform1key.currentState?.saveForm1(),
+        1: () async => await regparform2key.currentState?.saveForm2(),
+        2: () async => await regparform3key.currentState?.saveForm3(),
+        3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
+      },
+    );
+
+    if (!allowed) return;
+
     setState(() {
-      expanded = [false, false, true, false, false, false];
+      expanded = newState;
+      if (expanded[2] == true) {
+        regparform3key.currentState?.onOpenedByParent();
+      }
     });
   }
 
-  void openForm4() {
+  void openForm4() async{
+    final oldState = List<bool>.from(expanded);
+    final newState = [false, false, false, true, false, false];
+
+
+    final allowed = await FormExitGuard.multiCheck(
+      oldExpanded: oldState,
+      newExpanded: newState,
+
+      validators: {
+        0: () async => await regparform1key.currentState?.validateAndReturn() ?? false,
+        1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
+        2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
+        3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
+      },
+
+      savers: {
+        0: () async => await regparform1key.currentState?.saveForm1(),
+        1: () async => await regparform2key.currentState?.saveForm2(),
+        2: () async => await regparform3key.currentState?.saveForm3(),
+        3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
+      },
+    );
+
+    if (!allowed) return;
+
     setState(() {
-      expanded = [false, false, false, true, false, false];
+      expanded = newState;
+      if (expanded[3] == true) {
+        regparform4key.currentState?.onOpenedByParent();
+      }
     });
+
   }
 
-  void openForm5() {
+  Future<void> openForm5() async {
+
+    final oldState = List<bool>.from(expanded);
+
+    final newState = [false, false, false, false, true, false];
+
+    final allowed = await FormExitGuard.multiCheck(
+      oldExpanded: oldState,
+      newExpanded: newState,
+
+      validators: {
+        0: () async => await regparform1key.currentState?.validateAndReturn() ?? false,
+        1: () async => await regparform2key.currentState?.validateAndReturn() ?? false,
+        2: () async => await regparform3key.currentState?.validateAndReturn() ?? false,
+        3: () async => await regparform4key.currentState?.validateAndReturn() ?? false,
+        4: () async => await regparform5key.currentState?.validateAndReturn() ?? false,
+      },
+
+      savers: {
+        0: () async => await regparform1key.currentState?.saveForm1(),
+        1: () async => await regparform2key.currentState?.saveForm2(),
+        2: () async => await regparform3key.currentState?.saveForm3(),
+        3: () async => await regparform4key.currentState?.saveForm4(),
+        4: () async => await regparform5key.currentState?.saveForm5(),
+      },
+    );
+
+    if (!allowed) return;
+
     setState(() {
-      expanded = [false, false, false, false, true, false];
+      expanded = newState;
+      if (expanded[4] == true) {
+        regparform5key.currentState?.onOpenedByParent();
+      }
     });
   }
 

@@ -320,8 +320,6 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
         }
         openForm2();
       }
-
-
     }else if (isValidForm1 == true) {
       await calmvform1key.currentState?.saveForm1();
     }
@@ -388,7 +386,6 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
       CalMv2RegMvEvent(calmv1Id: calmv1Id!),
     );
   }
-
 
   void openForm1() {
     setState(() {

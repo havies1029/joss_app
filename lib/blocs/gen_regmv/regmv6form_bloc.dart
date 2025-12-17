@@ -54,10 +54,38 @@ class Regmv6FormBloc extends Bloc<Regmv6FormEvents, Regmv6FormState> {
 	}
 
 	Future<void> onHitungPremiRegmv6Form(
-			Regmv6FormHitungPremiEvent event, Emitter<Regmv6FormState> emit) async {
+			Regmv6FormHitungPremiEvent event,
+			Emitter<Regmv6FormState> emit,
+			) async {
+		debugPrint('[Regmv6] HITUNG PREMI TRIGGERED');
+		debugPrint('[Regmv6] regmv1Id: ${event.regmv1Id}');
+
 		emit(state.copyWith(isCalculating: true, isCalculated: false));
-		Regmv6FormModel record = await repository.regmv6FormHitungPremi(event.regmv1Id);
-		emit(state.copyWith(isCalculating: false, isCalculated: true, record: record));
+
+		try {
+			debugPrint('[Regmv6] CALLING repository.regmv6FormHitungPremi');
+
+			final record =
+			await repository.regmv6FormHitungPremi(event.regmv1Id);
+
+			debugPrint('[Regmv6] HITUNG PREMI SUCCESS');
+			debugPrint('[Regmv6] record: $record');
+
+			emit(state.copyWith(
+				isCalculating: false,
+				isCalculated: true,
+				record: record,
+			));
+		} catch (e, st) {
+			debugPrint('[Regmv6] HITUNG PREMI ERROR: $e');
+			debugPrintStack(stackTrace: st);
+
+			emit(state.copyWith(
+				isCalculating: false,
+				isCalculated: false,
+			));
+		}
 	}
+
 
 }

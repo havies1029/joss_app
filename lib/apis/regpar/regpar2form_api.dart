@@ -72,9 +72,10 @@ class Regpar2FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Regpar2FormModel> regpar2FormLihatAPI(String regpar2Id) async {
+
+	Future<Regpar2FormModel> regpar2FormLihatAPI(String regpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regpar/regpar2form/read";
-		Map<String, String> queryParams = {'regpar2Id': regpar2Id};
+		Map<String, String> queryParams = {'regpar1Id': regpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
 			await http.get(uri, headers: <String, String>{

@@ -53,9 +53,10 @@ class UserRepository {
     await api.uploadImage2API(fileFoto.path);    
   }
 
-  Future<User> getUserByToken(String token) async {
+  Future<User?> getUserByToken(String token) async {
+    debugPrint("getUserByToken : $token");
     LoginApi loginApi = LoginApi();
-    User user = await loginApi.getUserByTokenAPI(token);
+    User? user = await loginApi.getUserByTokenAPI(token);
     return user;
   }
 }

@@ -2,7 +2,9 @@
   import 'package:flutter_bloc/flutter_bloc.dart';
   import 'package:flutter_svg/svg.dart';
   import 'package:joss_app/common/constants.dart';
-  import '../../../../../../widgets/EmptyStateWidget.dart';
+  import '../../../../../../helper/fab_action_helper.dart';
+import '../../../../../../widgets/EmptyStateWidget.dart';
+import '../../../../floating_action_menu_widget.dart';
 
   class ReusableAsetTable<
   TBloc extends StateStreamableSource<TState>,
@@ -27,6 +29,7 @@
 
     final VoidCallback? onFetchMore;
     final String? emptyStatusLabel;
+    final String? currentStatusFilter;
 
     const ReusableAsetTable({
       super.key,
@@ -41,6 +44,7 @@
       required this.rowBuilder,
       this.onFetchMore,
       this.emptyStatusLabel,
+      this.currentStatusFilter,
     });
 
     @override
@@ -122,156 +126,179 @@
                   final totalItems = items.length;
                   final isAllSelected =
                       selectedItems.length == totalItems && totalItems > 0;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  final selectedItemsList = selectedItems.values.toList();
+                  final availableActions = FabActionHelper.getAvailableActions(
+                    currentStatusFilter: widget.currentStatusFilter,
+                    selectedItems: selectedItemsList,
+                  );
+                  return Stack(
                     children: [
-                      Flexible(
-                        fit: FlexFit.loose,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: secondaryBlackColor,
-                            borderRadius: BorderRadius.circular(cardBorderRadius),
-                            border: Border.all(color: sGrey, width: 1),
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                          child: ScrollbarTheme(
-                            data: ScrollbarThemeData(
-                              thumbColor: MaterialStateProperty.all(Colors.white.withOpacity(0.25)),
-                              trackColor: MaterialStateProperty.all(Colors.white.withOpacity(0.05)),
-                              radius: const Radius.circular(cardBorderRadius),
-                              thickness: MaterialStateProperty.all(6),
-                            ),
-                            child: ScrollConfiguration(
-                              behavior: ScrollConfiguration.of(context)
-                                  .copyWith(scrollbars: false, overscroll: false),
-                              child: Scrollbar(
-                                controller: _scrollController, // vertical scrollbar
-                                thumbVisibility: true,
-                                trackVisibility: false,
-                                radius: const Radius.circular(10),
-                                thickness: 6,
-                                interactive: true,
-                                child: SingleChildScrollView(
-                                  controller: _scrollController,
-                                  scrollDirection: Axis.vertical,
-                                  physics: const AlwaysScrollableScrollPhysics(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: secondaryBlackColor,
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                border: Border.all(color: sGrey, width: 1),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              child: ScrollbarTheme(
+                                data: ScrollbarThemeData(
+                                  thumbColor: MaterialStateProperty.all(Colors.white.withOpacity(0.25)),
+                                  trackColor: MaterialStateProperty.all(Colors.white.withOpacity(0.05)),
+                                  radius: const Radius.circular(cardBorderRadius),
+                                  thickness: MaterialStateProperty.all(6),
+                                ),
+                                child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(scrollbars: false, overscroll: false),
                                   child: Scrollbar(
-                                    controller: _horizontalController, // horizontal scrollbar
+                                    controller: _scrollController, // vertical scrollbar
                                     thumbVisibility: true,
                                     trackVisibility: false,
                                     radius: const Radius.circular(10),
                                     thickness: 6,
                                     interactive: true,
-                                    notificationPredicate: (notif) => notif.metrics.axis == Axis.horizontal,
                                     child: SingleChildScrollView(
-                                      controller: _horizontalController,
-                                      scrollDirection: Axis.horizontal,
-                                      physics: const ClampingScrollPhysics(),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(cardBorderRadius),
-                                        child: Table(
-                                          border: TableBorder.all(
-                                            color: Colors.white.withOpacity(0.08),
-                                            width: 0.6,
-                                          ),
-                                          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                                          columnWidths: widget.columnWidths,
-                                          children: [
-                                            // 🧭 HEADER
-                                            TableRow(
-                                              decoration: const BoxDecoration(
-                                                color: formGrey,
+                                      controller: _scrollController,
+                                      scrollDirection: Axis.vertical,
+                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      child: Scrollbar(
+                                        controller: _horizontalController, // horizontal scrollbar
+                                        thumbVisibility: true,
+                                        trackVisibility: false,
+                                        radius: const Radius.circular(10),
+                                        thickness: 6,
+                                        interactive: true,
+                                        notificationPredicate: (notif) => notif.metrics.axis == Axis.horizontal,
+                                        child: SingleChildScrollView(
+                                          controller: _horizontalController,
+                                          scrollDirection: Axis.horizontal,
+                                          physics: const ClampingScrollPhysics(),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(cardBorderRadius),
+                                            child: Table(
+                                              border: TableBorder.all(
+                                                color: Colors.white.withOpacity(0.08),
+                                                width: 0.6,
                                               ),
+                                              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                                              columnWidths: widget.columnWidths,
                                               children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(8),
-                                                  child: Tooltip(
-                                                    message: isAllSelected
-                                                        ? "Batalkan semua pilihan"
-                                                        : "Pilih semua data",
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          if (isAllSelected) {
-                                                            selectedItems.clear();
-                                                          } else {
-                                                            for (var item in items) {
-                                                              final id = widget.getItemId(item);
-                                                              selectedItems[id] = item;
-                                                            }
-                                                          }
-                                                        });
-                                                        widget.cubit.emit(
-                                                          Map<String, TModel>.from(selectedItems),
-                                                        );
-                                                      },
-                                                      child: AnimatedSwitcher(
-                                                        duration: const Duration(milliseconds: 150),
-                                                        transitionBuilder: (child, anim) =>
-                                                            ScaleTransition(scale: anim, child: child),
-                                                        child: Icon(
-                                                          isAllSelected
-                                                              ? Icons.check_box
-                                                              : Icons.check_box_outline_blank,
-                                                          key: ValueKey(isAllSelected),
-                                                          color: isAllSelected
-                                                              ? primaryLightColor
-                                                              : sGrey,
-                                                          size: 20,
+                                                // HEADER
+                                                TableRow(
+                                                  decoration: const BoxDecoration(
+                                                    color: formGrey,
+                                                  ),
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(8),
+                                                      child: Tooltip(
+                                                        message: isAllSelected
+                                                            ? "Batalkan semua pilihan"
+                                                            : "Pilih semua data",
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              if (isAllSelected) {
+                                                                selectedItems.clear();
+                                                              } else {
+                                                                for (var item in items) {
+                                                                  final id = widget.getItemId(item);
+                                                                  selectedItems[id] = item;
+                                                                }
+                                                              }
+                                                            });
+                                                            widget.cubit.emit(
+                                                              Map<String, TModel>.from(selectedItems),
+                                                            );
+                                                          },
+                                                          child: AnimatedSwitcher(
+                                                            duration: const Duration(milliseconds: 150),
+                                                            transitionBuilder: (child, anim) =>
+                                                                ScaleTransition(scale: anim, child: child),
+                                                            child: Icon(
+                                                              isAllSelected
+                                                                  ? Icons.check_box
+                                                                  : Icons.check_box_outline_blank,
+                                                              key: ValueKey(isAllSelected),
+                                                              color: isAllSelected
+                                                                  ? primaryLightColor
+                                                                  : sGrey,
+                                                              size: 20,
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
+                                                    ...widget.headerCells,
+                                                  ],
                                                 ),
-                                                ...widget.headerCells,
+
+                                                // 📊 ROWS
+                                                for (int i = 0; i < items.length; i++)
+                                                  _buildDataRow(
+                                                    context,
+                                                    items[i],
+                                                    i + 1,
+                                                    selectedItems,
+                                                  ),
                                               ],
                                             ),
-
-                                            // 📊 ROWS
-                                            for (int i = 0; i < items.length; i++)
-                                              _buildDataRow(
-                                                context,
-                                                items[i],
-                                                i + 1,
-                                                selectedItems,
-                                              ),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
+
                             ),
                           ),
 
-                        ),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: vPadding * 1.5,
-                          horizontal: hPadding,
-                        ),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 250),
-                            opacity: (_showBottomLoader && canLoadMore) ? 1.0 : 0.0,
-                            child: IgnorePointer(
-                              ignoring: !(_showBottomLoader && canLoadMore),
-                              child: SizedBox(
-                                height: 28,
-                                width: 28,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.2,
-                                  valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: vPadding * 1.5,
+                              horizontal: hPadding,
+                            ),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 250),
+                                opacity: (_showBottomLoader && canLoadMore) ? 1.0 : 0.0,
+                                child: IgnorePointer(
+                                  ignoring: !(_showBottomLoader && canLoadMore),
+                                  child: SizedBox(
+                                    height: 28,
+                                    width: 28,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.2,
+                                      valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
+                      ),
+                      FloatingActionMenuWidget(
+                        availableActions: availableActions,
+                        selectedItems: selectedItemsList,
+                        onActionTap: (actionType, selectedItems) {
+                          FabActionHelper.handleAction(
+                            context: context,
+                            actionType: actionType,
+                            selectedItems: selectedItems,
+                            onActionComplete: () {
+                              widget.cubit.emit(Map<String, TModel>.from({}));
+                              if (widget.onFetchMore != null) widget.onFetchMore!();
+                            },
+                          );
+                        },
                       ),
                     ],
                   );
@@ -279,14 +306,12 @@
               );
             }
 
-            // ⚠️ Data kosong
             if (status == ListStatus.success && items.isEmpty) {
               return EmptyStateWidget(
                 statusLabel: widget.emptyStatusLabel ?? 'Aktif',
               );
             }
 
-            // ❌ Fallback
             return const Center(
               child: Text(
                 "Gagal memuat data.",

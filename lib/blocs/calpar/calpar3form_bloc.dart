@@ -1,16 +1,13 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
+import 'package:joss_app/models/combobox/combomjnscoverpar_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
 import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
 import 'package:joss_app/models/calpar/calpar3form_model.dart';
 import 'package:joss_app/repositories/calpar/calpar3form_repository.dart';
 
-<<<<<<< HEAD
-import '../../models/combobox/combomjnscoverpar_model.dart';
-
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 part 'calpar3form_event.dart';
 part 'calpar3form_state.dart';
 
@@ -21,146 +18,116 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 		on<Calpar3FormTambahEvent>(onTambahCalpar3Form);
 		on<Calpar3FormHapusEvent>(onHapusCalpar3Form);
 		on<Calpar3FormLihatEvent>(onLihatCalpar3Form);
-<<<<<<< HEAD
 		on<ComboMJnscoverParChangedEvent>(onComboMJnscoverParChanged);
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
 		on<ComboMKabZonaGempaChangedEvent>(onComboMKabZonaGempaChanged);
 	}
 
-<<<<<<< HEAD
-=======
-	// Future<void> onTambahCalpar3Form(
-	// 	Calpar3FormTambahEvent event, Emitter<Calpar3FormState> emit) async {
-	//
-	// 	ReturnDataAPI returnData;
-	// 	bool hasFailure = true;
-	// 	emit(state.copyWith(isSaving: true, isSaved: false));
-	// 	returnData = await repository.calpar3FormTambah(event.record);
-	// 	hasFailure = !returnData.success;
-	// 	emit(state.copyWith(
-	// 		isSaving: false,
-	// 		isSaved: true,
-	// 		hasFailure: hasFailure));
-	// }
-
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	Future<void> onTambahCalpar3Form(
 			Calpar3FormTambahEvent event,
 			Emitter<Calpar3FormState> emit,
 			) async {
+		debugPrint("=== [BLOC] CALPAR3 FORM TAMBAH ===");
+
+		debugPrint("Event diterima: Calpar3FormTambahEvent");
+		debugPrint("Record dikirim (toJson): ${event.record.toJson()}");
+
+		ReturnDataAPI returnData;
+		bool hasFailure = true;
+
+		// SEBELUM SAVING
 		emit(state.copyWith(isSaving: true, isSaved: false));
+		debugPrint("State: isSaving=true, isSaved=false");
 
-<<<<<<< HEAD
-		final returnData = await repository.calpar3FormTambah(event.record);
-		final hasFailure = !returnData.success;
+		try {
+			debugPrint("Memanggil repository.calpar3FormTambah...");
+			returnData = await repository.calpar3FormTambah(event.record);
 
-		// Ambil ID baru dari response API (biasanya 'data')
-		final newId = returnData.data?.toString() ?? "";
+			debugPrint("=== [API RESPONSE] CALPAR3 FORM TAMBAH ===");
+			debugPrint("Success   : ${returnData.success}");
+			debugPrint("Row Count : ${returnData.rowcount}");
+			debugPrint("Data      : ${returnData.data}");
+			debugPrint("=========================================");
 
-		// Build record final dengan ID yang baru disimpan
-		final savedRecord = Calpar3FormModel(
-			calpar3Id: newId,
-			calpar1Id: event.record.calpar1Id,
-=======
-		final ReturnDataAPI returnData = await repository.calpar3FormTambah(event.record);
+			hasFailure = !returnData.success;
 
-		final hasFailure = !returnData.success;
+			// 🔥 UPDATE RECORD DENGAN ID BARU DARI API
+			Calpar3FormModel updatedRecord = event.record.copyWith(
+				calpar3Id: returnData.data.toString(),
+			);
 
-		final newId = returnData.data?.toString() ?? "";
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: true,
+				hasFailure: hasFailure,
+				record: updatedRecord,
+			));
 
-		final savedRecord = Calpar3FormModel(
-			calpar3Id: newId,
-			calpar1Id: event.record.calpar1Id,
 
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
-			isEq: event.record.isEq,
-			isTsfwd: event.record.isTsfwd,
-			rateEqvet: event.record.rateEqvet,
-			rateOther: event.record.rateOther,
-			ratePar: event.record.ratePar,
-			rateRsmdcc: event.record.rateRsmdcc,
-			rateTotal: event.record.rateTotal,
-			rateTsfwd: event.record.rateTsfwd,
-<<<<<<< HEAD
-			kab2zonagempaId: event.record.kab2zonagempaId,
-			comboMKabZonaGempa: event.record.comboMKabZonaGempa,
-			mjnscoverparId: event.record.mjnscoverparId,
-			comboMJnscoverPar: event.record.comboMJnscoverPar,
-			mwilayahId: event.record.mwilayahId,
-=======
+		} catch (e, stack) {
+			debugPrint("=== [BLOC ERROR] CALPAR3 FORM TAMBAH ===");
+			debugPrint("Error : $e");
+			debugPrint("Stack : $stack");
+			debugPrint("========================================");
 
-			comboMKabZonaGempa: event.record.comboMKabZonaGempa,
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
-			comboMWilayah: event.record.comboMWilayah,
-		);
+			hasFailure = true;
 
-		emit(state.copyWith(
-			isSaving: false,
-<<<<<<< HEAD
-			isSaved: !hasFailure,
-			hasFailure: hasFailure,
-			record: savedRecord,
-		));
+			// emit tetap, tapi record null
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: true,
+				hasFailure: true,
+				record: null,
+			));
+		}
+
+		debugPrint("=== [BLOC END] CALPAR3 FORM TAMBAH ===\n");
 	}
 
 
 	Future<void> onUbahCalpar3Form(
 			Calpar3FormUbahEvent event, Emitter<Calpar3FormState> emit) async {
-=======
-			isSaved: true,
-			hasFailure: hasFailure,
-			record: savedRecord,
-			returnData: returnData,
-		));
-	}
-
-	Future<void> onUbahCalpar3Form(
-		Calpar3FormUbahEvent event, Emitter<Calpar3FormState> emit) async {
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		emit(state.copyWith(isSaving: true, isSaved: false));
 		bool hasFailure = !await repository.calpar3FormUbah(event.record);
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
 	Future<void> onHapusCalpar3Form(
-<<<<<<< HEAD
 			Calpar3FormHapusEvent event, Emitter<Calpar3FormState> emit) async {
-=======
-		Calpar3FormHapusEvent event, Emitter<Calpar3FormState> emit) async {
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		emit(state.copyWith(isSaving: true, isSaved: false));
 		bool hasFailure = !await repository.calpar3FormHapus(event.recordId);
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
 	Future<void> onLihatCalpar3Form(
-<<<<<<< HEAD
 			Calpar3FormLihatEvent event, Emitter<Calpar3FormState> emit) async {
-=======
-		Calpar3FormLihatEvent event, Emitter<Calpar3FormState> emit) async {
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Calpar3FormModel record = await repository.calpar3FormLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+		emit(state.copyWith(isLoading: false, isLoaded: true, record: record,
+				comboMJnscoverPar: record.comboMJnscoverPar,
+				comboMWilayah: record.comboMWilayah,
+				comboMKabZonaGempa: record.comboMKabZonaGempa));
 	}
 
-<<<<<<< HEAD
 	Future<void> onComboMJnscoverParChanged(
 			ComboMJnscoverParChangedEvent event, Emitter<Calpar3FormState> emit) async {
 
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 
 		ComboMJnscoverParModel comboMJnscoverPar = event.comboMJnscoverPar;
+		var record = state.record;
+		record?.isEq = comboMJnscoverPar.isEq;
+		record?.isFlexas = comboMJnscoverPar.isFlexas;
+		record?.isOther = comboMJnscoverPar.isOther;
+		record?.isRsmdcc = comboMJnscoverPar.isRsmdcc;
+		record?.isTsfwd = comboMJnscoverPar.isTsfwd;
 		emit(state.copyWith(
 				isLoading: false,
 				isLoaded: true,
+				record: record,
 				comboMJnscoverPar: comboMJnscoverPar));
 	}
 
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	Future<void> onComboMWilayahChanged(
 			ComboMWilayahChangedEvent event, Emitter<Calpar3FormState> emit) async {
 
@@ -168,15 +135,9 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 
 		ComboMWilayahModel comboMWilayah = event.comboMWilayah;
 		emit(state.copyWith(
-<<<<<<< HEAD
 				isLoading: false,
 				isLoaded: true,
 				comboMWilayah: comboMWilayah));
-=======
-			isLoading: false,
-			isLoaded: true,
-			comboMWilayah: comboMWilayah));
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	}
 
 	Future<void> onComboMKabZonaGempaChanged(
@@ -186,15 +147,9 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 
 		ComboMKabZonaGempaModel comboMKabZonaGempa = event.comboMKabZonaGempa;
 		emit(state.copyWith(
-<<<<<<< HEAD
 				isLoading: false,
 				isLoaded: true,
 				comboMKabZonaGempa: comboMKabZonaGempa));
-=======
-			isLoading: false,
-			isLoaded: true,
-			comboMKabZonaGempa: comboMKabZonaGempa));
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 	}
 
 }

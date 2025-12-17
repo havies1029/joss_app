@@ -9,6 +9,10 @@ class Calpar1ListState extends Equatable {
 	final String viewMode;
 	final String searchText;
 	final String recordId;
+	final bool isProcessing;
+	final bool isProcessed;
+	final bool hasFailure;
+	final String processMessage;
 
 	const Calpar1ListState(
 		{this.status = ListStatus.initial,
@@ -17,7 +21,11 @@ class Calpar1ListState extends Equatable {
 		this.hal = 0,
 		this.viewMode = "",
 		this.searchText = "",
-		this.recordId = ""});
+		this.recordId = "",
+		this.isProcessing = false,
+		this.isProcessed = false,
+		this.hasFailure = false,
+		this.processMessage = "",});
 
 	Calpar1ListState copyWith(
 		{List<Calpar1ListModel>? items,
@@ -26,7 +34,11 @@ class Calpar1ListState extends Equatable {
 		int? hal,
 		String? viewMode,
 		String? searchText,
-		String? recordId}) {
+		String? recordId,
+		bool? isProcessing,
+		bool? isProcessed,
+		bool? hasFailure,
+		String? processMessage,}) {
 		return Calpar1ListState(
 			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
@@ -34,9 +46,14 @@ class Calpar1ListState extends Equatable {
 			hal: hal ?? this.hal,
 			viewMode: viewMode ?? this.viewMode,
 			searchText: searchText ?? this.searchText,
-			recordId: recordId ?? this.recordId);
+			recordId: recordId ?? this.recordId,
+			isProcessing: isProcessing ?? this.isProcessing,
+			isProcessed: isProcessed ?? this.isProcessed,
+			hasFailure: hasFailure ?? this.hasFailure,
+			processMessage: processMessage ?? this.processMessage,
+		);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, viewMode, recordId, searchText];
+	List<Object> get props => [status, items, hasReachedMax, hal, viewMode, recordId, searchText, isProcessing, isProcessed, hasFailure, processMessage];
 }

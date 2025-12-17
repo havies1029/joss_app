@@ -46,6 +46,7 @@ class AsetListHull extends StatelessWidget {
         // 8: IntrinsicColumnWidth(),
         // 9: IntrinsicColumnWidth(),
       },
+      currentStatusFilter: statusLabel,
       headerCells: const [
         HeaderCell("No", center: true),
         HeaderCell("Tertanggung"),
@@ -55,7 +56,7 @@ class AsetListHull extends StatelessWidget {
         HeaderCell("Nilai Tertanggung"),
         HeaderCell("Premi"),
         HeaderCell("Status", center: true),
-        HeaderCell("Aksi"),
+        // HeaderCell("Aksi"),
       ],
       rowBuilder: (context, item, rowNumber, cubit) => [
         /// Kolom 1: Nomor urut
@@ -88,29 +89,29 @@ class AsetListHull extends StatelessWidget {
         CellText(item.status, center: true),
 
         /// Kolom 8: Aksi tombol
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: getActionButtonsByStatus(
-              item.status,
-              namaItem: item.namaKapal, // ⚓ nama kapal jadi identifier
-              context: context,
-              itemData: item,
-              onProcessTap: () {
-                final bloc = context.read<AsethullCariBloc>();
-                debugPrint("📡 Klik Lacak Polis untuk kapal: ${item.namaKapal}");
-
-                bloc.add(
-                  DebugFetchAsethullCariEvent(
-                    searchText: item.namaKapal,
-                    statusId: '10001',
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(6),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: getActionButtonsByStatus(
+        //       item.status,
+        //       namaItem: item.namaKapal, // ⚓ nama kapal jadi identifier
+        //       context: context,
+        //       itemData: item,
+        //       onProcessTap: () {
+        //         final bloc = context.read<AsethullCariBloc>();
+        //         debugPrint("📡 Klik Lacak Polis untuk kapal: ${item.namaKapal}");
+        //
+        //         bloc.add(
+        //           DebugFetchAsethullCariEvent(
+        //             searchText: item.namaKapal,
+        //             statusId: '10001',
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
       ],
       onFetchMore: () {
         context.read<AsethullCariBloc>().add(FetchAsethullCariEvent());

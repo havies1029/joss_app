@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -72,9 +73,9 @@ class Regpar5FormAPI {
 		}
 		return returnData.success;
 	}
-	Future<Regpar5FormModel> regpar5FormLihatAPI(String regpar5Id) async {
+	Future<Regpar5FormModel> regpar5FormLihatAPI(String regpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regpar/regpar5form/read";
-		Map<String, String> queryParams = {'regpar5Id': regpar5Id};
+		Map<String, String> queryParams = {'regpar1Id': regpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
 			await http.get(uri, headers: <String, String>{
@@ -90,4 +91,52 @@ class Regpar5FormAPI {
 			return throw Exception("Failed to load data");
 		}
 	}
+
+	Future<Regpar5FormModel> regpar5FormHitungPremiAPI(String regpar1Id) async {
+		debugPrint('[PAR API] HITUNG PREMI CALLED');
+		debugPrint('[PAR API] regpar1Id = $regpar1Id');
+
+		final String endpoint =
+				"${AppData.prefixEndPoint}/api/regpar/regpar5form/hitungpremi";
+
+		final queryParams = {
+			'regpar1Id': regpar1Id,
+			'modul_id': 'regpar5FormHitungPremiAPI',
+		};
+
+		final uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			endpoint,
+			queryParams,
+		);
+
+		debugPrint('[PAR API] URI = $uri');
+
+		final response = await http.get(
+			uri,
+			headers: {
+				'Authorization': 'Bearer ${AppData.userToken}',
+				'Accept': 'application/json',
+			},
+		);
+
+		debugPrint('[PAR API] STATUS = ${response.statusCode}');
+		debugPrint('[PAR API] BODY = ${response.body}');
+
+		if (response.statusCode == 200) {
+			final json = jsonDecode(response.body);
+			debugPrint('[PAR API] JSON = $json');
+
+			final model = Regpar5FormModel.fromJson(json);
+			debugPrint('[PAR API] MODEL = ${model.toJson()}');
+
+			return model;
+		} else {
+			throw Exception(
+				'Hitung premi gagal: ${response.statusCode} ${response.body}',
+			);
+		}
+	}
+
+
 }

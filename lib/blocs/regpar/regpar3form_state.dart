@@ -10,18 +10,18 @@ class Regpar3FormState extends Equatable {
 	final bool hasFailure;
 	final ComboMJnscoverParModel? comboMJnscoverPar;
 	final ComboMWilayahModel? comboMWilayah;
-	final ComboMZonaGempaModel? comboMZonaGempa;
+	final ComboMKabZonaGempaModel? comboMKabZonaGempa;
 	const Regpar3FormState(
-		{this.record,
-		this.isLoading = false,
-		this.isLoaded = false,
-		this.isSaving = false,
-		this.isSaved = false,
-		this.hasFailure = false,
-		this.comboMJnscoverPar,
-		this.comboMWilayah,
-		this.comboMZonaGempa,
-});
+			{this.record,
+				this.isLoading = false,
+				this.isLoaded = false,
+				this.isSaving = false,
+				this.isSaved = false,
+				this.hasFailure = false,
+				this.comboMJnscoverPar,
+				this.comboMWilayah,
+				this.comboMKabZonaGempa,
+			});
 
 	Regpar3FormState copyWith({
 		Regpar3FormModel? record,
@@ -32,7 +32,7 @@ class Regpar3FormState extends Equatable {
 		bool? hasFailure,
 		ComboMJnscoverParModel? comboMJnscoverPar,
 		ComboMWilayahModel? comboMWilayah,
-		ComboMZonaGempaModel? comboMZonaGempa,
+		ComboMKabZonaGempaModel? comboMKabZonaGempa,
 	}){
 		return Regpar3FormState(
 			record: record ?? this.record,
@@ -43,7 +43,7 @@ class Regpar3FormState extends Equatable {
 			hasFailure: hasFailure ?? this.hasFailure,
 			comboMJnscoverPar: comboMJnscoverPar?? this.comboMJnscoverPar,
 			comboMWilayah: comboMWilayah?? this.comboMWilayah,
-			comboMZonaGempa: comboMZonaGempa?? this.comboMZonaGempa,
+			comboMKabZonaGempa: comboMKabZonaGempa?? this.comboMKabZonaGempa,
 		);
 	}
 

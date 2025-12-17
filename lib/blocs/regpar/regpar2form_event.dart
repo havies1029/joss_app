@@ -51,3 +51,50 @@ class ComboRKonstruksiojkChangedEvent extends Regpar2FormEvents{
 
 	@override	List<Object> get props => [comboRKonstruksiojk];}
 
+class ComboMPropinsiChangedEvent extends Regpar2FormEvents{
+	final ComboMPropinsiModel comboMPropinsi;
+	const ComboMPropinsiChangedEvent({required this.comboMPropinsi});
+
+	@override	List<Object> get props => [comboMPropinsi];}
+
+class ComboMKotaChangedEvent extends Regpar2FormEvents{
+	final ComboMKotaModel comboMKota;
+	const ComboMKotaChangedEvent({required this.comboMKota});
+
+	@override	List<Object> get props => [comboMKota];}
+
+class ComboMKecamatanChangedEvent extends Regpar2FormEvents{
+	final ComboMKecamatanModel comboMKecamatan;
+	const ComboMKecamatanChangedEvent({required this.comboMKecamatan});
+
+	@override	List<Object> get props => [comboMKecamatan];}
+
+class ComboMKelurahanChangedEvent extends Regpar2FormEvents{
+	final ComboMKelurahanModel comboMKelurahan;
+	const ComboMKelurahanChangedEvent({required this.comboMKelurahan});
+
+	@override	List<Object> get props => [comboMKelurahan];}
+
+class FieldPolisMulaiChangedEvent extends Regpar2FormEvents {
+	final DateTime polisMulai;
+	const FieldPolisMulaiChangedEvent({required this.polisMulai});
+
+	@override
+	List<Object> get props => [polisMulai];
+}
+
+class FieldPolisAkhirChangedEvent extends Regpar2FormEvents {
+	final DateTime polisAkhir;
+	const FieldPolisAkhirChangedEvent({required this.polisAkhir});
+
+	@override
+	List<Object> get props => [polisAkhir];
+}
+
+class FieldObjectAlamatChangedEvent extends Regpar2FormEvents {
+	final String objectAlamat;
+	const FieldObjectAlamatChangedEvent({required this.objectAlamat});
+
+	@override
+	List<Object> get props => [objectAlamat];
+}

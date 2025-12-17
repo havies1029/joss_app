@@ -13,18 +13,15 @@ import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-<<<<<<< HEAD
 import '../../../../models/combobox/combomjnscoverpar_model.dart';
 import '../../../../repositories/combobox/combomjnscoverpar_repository.dart';
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 import '../../../../repositories/combobox/combomkabzonagempa_repository.dart';
 import '../../../../repositories/combobox/combomwilayah_repository.dart';
 
 
 class Calpar3FormPage extends StatefulWidget {
   final String viewMode;
-  final String recordId;
+  final String? recordId;
   final String? calpar1Id;
   final bool isExpanded;
   final Function(bool) onToggle;
@@ -38,12 +35,15 @@ class Calpar3FormPage extends StatefulWidget {
 class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   final _calparform3key = GlobalKey<FormState>();
 
-  final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
 
   // Controllers
   final fieldIsEqController = TextEditingController();
   final fieldIsTsfwdController = TextEditingController();
+  final fieldIsFlexasController = TextEditingController();
+  final fieldIsOtherController = TextEditingController();
+  final fieldIsRsmdccController = TextEditingController();
+
   final fieldRateEqvetController = TextEditingController();
   final fieldRateOtherController = TextEditingController();
   final fieldRateParController = TextEditingController();
@@ -51,10 +51,7 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   final fieldRateTotalController = TextEditingController();
   final fieldRateTsfwdController = TextEditingController();
 
-<<<<<<< HEAD
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
   ComboMWilayahModel? fieldComboMWilayah;
 
@@ -82,6 +79,10 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   void dispose() {
     fieldIsEqController.dispose();
     fieldIsTsfwdController.dispose();
+    fieldIsFlexasController.dispose();
+    fieldIsOtherController.dispose();
+    fieldIsRsmdccController.dispose();
+
     fieldRateEqvetController.dispose();
     fieldRateOtherController.dispose();
     fieldRateParController.dispose();
@@ -116,22 +117,13 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
 
   void _injectPayload(Calpar3FormModel record) {
     debugPrint("🔥 [Form3] Injecting payload...");
+    fieldIsFlexasController.text = record.isFlexas.toString();
+    fieldIsOtherController.text = record.isOther.toString();
+    fieldIsRsmdccController.text = record.isRsmdcc.toString();
+    fieldIsTsfwdController.text = record.isTsfwd.toString();
 
-    fieldRateEqvetController.text       = cleanNum(record.rateEqvet);
-    fieldRateOtherController.text      = cleanNum(record.rateOther);
-    fieldRateParController.text      = cleanNum(record.ratePar);
-    fieldRateRsmdccController.text      = cleanNum(record.rateRsmdcc);
-    fieldRateTotalController.text      = cleanNum(record.rateTotal);
-    fieldRateTsfwdController.text      = cleanNum(record.rateTsfwd);
-
-    fieldIsEqController.text         = record.isEq.toString();
-<<<<<<< HEAD
-
+    fieldIsEqController.text = record.isEq.toString();
     fieldComboMJnscoverPar = record.comboMJnscoverPar;
-=======
-    fieldIsTsfwdController.text      = record.isTsfwd.toString();
-
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
     fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
     fieldComboMWilayah = record.comboMWilayah;
 
@@ -157,16 +149,28 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
         key: _calparform3key,
         child: Column(
           children: [
-<<<<<<< HEAD
             buildFieldMjnscoverparId(),
             const SizedBox(height: 12),
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
             Row(
               children: [
                 Flexible(child: buildFieldIsEq()),
                 const SizedBox(width: 8),
                 Flexible(child: buildFieldIsTsfwd()),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Flexible(child: buildFieldIsFlexas()),
+                const SizedBox(width: 8),
+                Flexible(child: buildFieldIsRsmdcc()),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Flexible(child: buildFieldIsOther()),
+                const Flexible(child: SizedBox.shrink()),
               ],
             ),
             const SizedBox(height: 12),
@@ -198,32 +202,19 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
       calpar1Id: widget.calpar1Id ?? "",
       isEq: toBoolean(fieldIsEqController.text),
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
+      isFlexas: toBoolean(fieldIsFlexasController.text),
+      isOther: toBoolean(fieldIsOtherController.text),
+      isRsmdcc: toBoolean(fieldIsRsmdccController.text),
       kab2zonagempaId: fieldComboMKabZonaGempa?.mkabzonagempaId,
-<<<<<<< HEAD
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       mwilayahId: fieldComboMWilayah?.mwilayahId,
-      rateEqvet: double.tryParse(fieldRateEqvetController.text.replaceAll(',', '')) ?? 0,
-      rateOther: double.tryParse(fieldRateOtherController.text.replaceAll(',', '')) ?? 0,
-      ratePar: double.tryParse(fieldRateParController.text.replaceAll(',', '')) ?? 0,
-      rateRsmdcc: double.tryParse(fieldRateRsmdccController.text.replaceAll(',', '')) ?? 0,
-      rateTotal: double.tryParse(fieldRateTotalController.text.replaceAll(',', '')) ?? 0,
-      rateTsfwd: double.tryParse(fieldRateTsfwdController.text.replaceAll(',', '')) ?? 0,
     );
 
     if (widget.viewMode == "tambah") {
-<<<<<<< HEAD
       debugPrint("ini tambah loh di trigger di form3");
       calpar3Bloc.add(Calpar3FormTambahEvent(record: record));
     } else {
       debugPrint("ini ubah loh di trigger di form3");
-=======
-      debugPrint("ini tambah loh di trigger di form2");
-      calpar3Bloc.add(Calpar3FormTambahEvent(record: record));
-    } else {
-      debugPrint("ini ubah loh di trigger di form2");
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
       calpar3Bloc.add(Calpar3FormUbahEvent(record: record));
     }
   }
@@ -244,6 +235,27 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     rightLabel: "Banjir",
     initialValue: toBoolean(fieldIsTsfwdController.text),
     callback: (v) => fieldIsTsfwdController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget buildFieldIsFlexas()=> CheckboxWidget(
+    rightLabel: "Kebakaran/Petir",
+    initialValue: toBoolean(fieldIsFlexasController.text),
+    callback: (v) => fieldIsFlexasController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget buildFieldIsOther()=> CheckboxWidget(
+    rightLabel: "Lainnya",
+    initialValue: toBoolean(fieldIsOtherController.text),
+    callback: (v) => fieldIsOtherController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget buildFieldIsRsmdcc()=> CheckboxWidget(
+    rightLabel: "Huru Hara/Kerusuhan",
+    initialValue: toBoolean(fieldIsRsmdccController.text),
+    callback: (v) => fieldIsRsmdccController.text = v.toString(),
     leftLabel: "",
   );
 
@@ -269,7 +281,6 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
 
-<<<<<<< HEAD
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
     hintText: "Wilayah Objek",
     initItem: fieldComboMJnscoverPar,
@@ -281,8 +292,6 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     onSaveCallback: (value) => fieldComboMJnscoverPar = value,
   );
 
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
   Widget buildFieldRateEqvet() => appTextField(
     label: "rateEqvet",
     controller: fieldRateEqvetController,
@@ -384,9 +393,6 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     //   return null;
     // },
   );
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 4c71cf7a2c4b0aea542dd4d1b7fb25b42ec91398
 }
