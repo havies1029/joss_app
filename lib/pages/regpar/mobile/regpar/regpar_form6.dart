@@ -32,7 +32,6 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
   final diskonNilaiCtrl = TextEditingController();
   final premiNetCtrl = TextEditingController();
   final premiCtrl = TextEditingController();
-  bool _isPayloadInjected = false;
   late final Regpar5FormBloc regpar5Bloc;
 
   @override
@@ -106,10 +105,9 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
       listeners: [
         BlocListener<Regpar5FormBloc, Regpar5FormState>(
           listenWhen: (prev, curr) =>
-          curr.record != null && !_isPayloadInjected,
+          curr.record != null,
           listener: (context, state) {
             _injectPayload(state.record!);
-            _isPayloadInjected = true;
           },
         ),
       ],

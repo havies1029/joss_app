@@ -63,6 +63,13 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
     }
   }
 
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.calpar1Id != null) {
+      calpar2Bloc.add(Calpar2FormLihatEvent(recordId: widget.calpar1Id!));
+    }
+  }
+
+
   @override
   void dispose() {
     fieldBiIndexRateController.dispose();
@@ -200,13 +207,8 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
       siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
     );
 
-    if (widget.viewMode == "tambah") {
-      debugPrint("ini tambah loh di trigger di form2");
-      calpar2Bloc.add(Calpar2FormUbahEvent(record: record));
-    } else {
-      debugPrint("ini ubah loh di trigger di form2");
-      calpar2Bloc.add(Calpar2FormUbahEvent(record: record));
-    }
+    calpar2Bloc.add(Calpar2FormUbahEvent(record: record));
+
   }
 
   Widget buildFieldBiIndexRate() => appTextField(

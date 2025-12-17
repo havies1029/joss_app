@@ -59,6 +59,12 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
     }
   }
 
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.recordId != null) {
+      calpar1Bloc.add(Calpar1CrudLihatEvent(recordId: widget.recordId!));
+    }
+  }
+
   @override
   void dispose() {
     fieldCoverBulanController.dispose();

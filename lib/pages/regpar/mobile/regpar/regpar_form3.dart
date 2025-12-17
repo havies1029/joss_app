@@ -266,7 +266,7 @@ class RegparForm3SectionState extends State<RegparForm3Section> {
   );
 
 
-  Widget buildFieldIsEq() => CheckboxWidget(
+  Widget  buildFieldIsEq() => CheckboxWidget(
     rightLabel: "Gempa Bumi",
     initialValue: toBoolean(fieldIsEqController.text),
     callback: (v) => fieldIsEqController.text = v.toString(),

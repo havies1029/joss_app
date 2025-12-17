@@ -6,6 +6,7 @@ import '../../../blocs/calpar/calpar1list_bloc.dart';
 import '../../../blocs/calpar/calpar2form_bloc.dart';
 import '../../../blocs/calpar/calpar3form_bloc.dart';
 import '../../../blocs/calpar/calpar4form_bloc.dart';
+import '../../../helper/form_exit_guard.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
@@ -45,6 +46,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
   String form1ViewMode = "tambah";
   String form2ViewMode = "tambah";
   String form3ViewMode = "tambah";
+  String form4ViewMode = "tambah";
 
   bool isHitungPremiClicked = false;
 
@@ -70,105 +72,18 @@ class _CalparFormMainState extends State<CalparFormMain> {
               final newId = state.record!.calpar1Id;
 
               if (newId != null && newId.isNotEmpty) {
-                debugPrint("🔥 [LISTENER] calpar1 saved → result ID = $newId");
-                final regpar = state.record!.regpar1Id;
                 setState(() {
                   calpar1Id = newId;
                 });
-
-                if (form1ViewMode == "ubah") {
-                  form1ViewMode = "tambah";
-                  if (isHitungPremiClicked == true) {
-                    debugPrint("isHitungPremiClicked");
-                    isHitungPremiClicked = false;
-                    onHitungPremi();
-                  } else {
-                    simulateToggleForm2();
-                  }
-                } else {
-                  simulateToggleForm2();
-                }
               }
             }
           },
         ),
 
-        // =================== LISTENER FORM 2 ===================
-        BlocListener<Calpar2FormBloc, Calpar2FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              final newId = state.record!.calpar2Id;
-
-              if (newId != null && newId.isNotEmpty) {
-                debugPrint("🔥 [LISTENER] calpar2 saved → result ID = $newId");
-
-                setState(() {
-                  calpar2Id = newId;
-                });
-
-                if (form2ViewMode == "ubah") {
-                  form2ViewMode = "tambah";
-                  if (isHitungPremiClicked == true) {
-                    debugPrint("isHitungPremiClicked");
-                    isHitungPremiClicked = false;
-                    onHitungPremi();
-                  } else {
-                    simulateToggleForm3();
-                  }
-                } else {
-                  simulateToggleForm3();
-                }
-
-              }
-            }
-          },
-        ),
-
-        // =================== LISTENER FORM 3 ===================
-        BlocListener<Calpar3FormBloc, Calpar3FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              final newId = state.record!.calpar3Id;
-
-              if (newId != null && newId.isNotEmpty) {
-                debugPrint("🔥 [LISTENER] calpar3 saved → result ID = $newId");
-
-                setState(() {
-                  calpar3Id = newId;
-                });
-
-                if (form3ViewMode == "ubah") {
-                  form3ViewMode = "tambah";
-                  debugPrint("listener form3 abis tambah");
-                  onHitungPremi();
-                } else {
-                  debugPrint("listener form3");
-                  onHitungPremi();
-                }
-              }
-            }
-          },
-        ),
-
-        // =================== LISTENER FORM 4 (PREMI) ===================
         BlocListener<Calpar4FormBloc, Calpar4FormState>(
           listener: (context, state) {
-            if (state.isCalculated && state.record != null) {
-              final r = state.record!;
-
-              final payload = {
-                "premiOther": r.premiOther,
-                "discNilai": r.discNilai,
-                "premiNet": r.premiNet,
-              };
-
-              calparform4key.currentState?.injectPayload(payload);
-
-              openForm4();
-
-              setState(() {
-                _form4Payload = payload;
-              });
+            if(isHitungPremiClicked == true){
+              simulateToggleForm4();
             }
           },
         ),
@@ -176,7 +91,6 @@ class _CalparFormMainState extends State<CalparFormMain> {
         BlocListener<Calpar1ListBloc, Calpar1ListState>(
           listener: (context, state) {
             if (state.isProcessing) {
-              // Tampilkan loading
               showDialog(
                 context: context,
                 builder: (_) => const Center(child: CircularProgressIndicator()),
@@ -184,7 +98,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
             }
 
             if (state.isProcessed) {
-              Navigator.pop(context); // nutup loading
+              Navigator.pop(context);
 
 
               if (state.hasFailure) {
@@ -256,14 +170,10 @@ class _CalparFormMainState extends State<CalparFormMain> {
                   buildButtonHitungPremi(),
                   const SizedBox(height: hPadding),
 
-                  Calpar4FormPage(
-                    key: calparform4key,
-                    isExpanded: expanded[3],
-                    initialPayload: _form4Payload,
-                  ),
+                  buildForm4Section(),
 
                   const SizedBox(height: hPadding),
-                  if (_form4Payload != null) ...[
+                  if (isHitungPremiClicked == true) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Column(
@@ -307,14 +217,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
   );
 
   Future<void> onToggleForm1(bool _) async {
-    if (calpar1Id != null) {
-      form1ViewMode = "ubah";
-      debugPrint("🔥 Mode ubah aktif karena calmv1Id ada");
-    } else {
-      form1ViewMode = "tambah";
-      debugPrint("🔥 Mode tambah aktif karena calmv1Id kosong");
-
-    }
+    isHitungPremiClicked = false;
     openForm1();
   }
 
@@ -336,24 +239,8 @@ class _CalparFormMainState extends State<CalparFormMain> {
   }
 
   Future<void> onToggleForm2(bool _) async {
-    final isValidForm1 = await calparform1key.currentState?.validateAndReturn();
-
-    if (calpar1Id != null) {
-      form2ViewMode = "tambah";
-
-      if (form1ViewMode == "ubah") {
-        await calparform1key.currentState?.saveForm1();
-      } else {
-        debugPrint("🔥 Mode tambah aktif karena calmv1Id ada");
-        if (calpar2Id != null) {
-          form2ViewMode = "ubah";
-          debugPrint("🔥 Mode ubah aktif karena calmv2Id tidak kosong");
-        }
-        openForm2();
-      }
-    } else if (isValidForm1 == true) {
-      await calparform1key.currentState?.saveForm1();
-    }
+    isHitungPremiClicked = false;
+    openForm2();
   }
 
   Future<void> simulateToggleForm2() async {
@@ -374,35 +261,31 @@ class _CalparFormMainState extends State<CalparFormMain> {
   }
 
   Future<void> onToggleForm3(bool _) async {
-    final isValidForm1 = await calparform1key.currentState?.validateAndReturn();
-    final isValidForm2 = await calparform2key.currentState?.validateAndReturn();
-
-    if (calpar1Id != null && calpar2Id != null) {
-      form3ViewMode = "tambah";
-
-      if (form1ViewMode == "ubah"){
-        await calparform1key.currentState?.saveForm1();
-      }else {
-        if (form2ViewMode == "ubah"){
-          await calparform2key.currentState?.saveForm2();
-        }else {
-          debugPrint("🔥 Mode tambah aktif karena calpar1Id ada di form3");
-          if (calpar3Id != null){
-            form3ViewMode = "ubah";
-            debugPrint("🔥 Mode ubah aktif karena calpar3Id tidak kosong");
-          }
-          openForm3();
-        }
-      }
-    } else if (isValidForm1 == true) {
-      await calparform1key.currentState?.saveForm1();
-    }else if (isValidForm2 == true){
-      await calparform2key.currentState?.saveForm2();
-    }
+    isHitungPremiClicked = false;
+    openForm3();
   }
 
   Future<void> simulateToggleForm3() async {
     await onToggleForm3(true);
+  }
+
+  Widget buildForm4Section(){
+    return Calpar4FormPage(
+      key: calparform4key,
+      viewMode: form3ViewMode,
+      calpar1Id: calpar1Id ?? "",
+      recordId: calpar3Id ?? "",
+      isExpanded: expanded[3],
+      onToggle: (value) => onToggleForm3(value),
+    );
+  }
+
+  Future<void> onToggleForm4(bool _) async {
+    openForm4();
+  }
+
+  Future<void> simulateToggleForm4() async {
+    await onToggleForm4(true);
   }
 
   // ========================= hitung premi =========================
@@ -417,51 +300,46 @@ class _CalparFormMainState extends State<CalparFormMain> {
   );
 
   Future<void> onHitungPremi() async {
-    final isValidForm1 = await calparform1key.currentState?.validateAndReturn();
-    final isValidForm2 = await calparform2key.currentState?.validateAndReturn();
-    final isValidForm3 = await calparform3key.currentState?.validateAndReturn();
 
-    if (calpar1Id != null && calpar2Id != null && calpar3Id != null) {
-      if (form1ViewMode == "ubah") {
-        setState(() {
-          isHitungPremiClicked = true;
-        });
-        await calparform1key.currentState?.saveForm1();
-      } else {
-        if (form2ViewMode == "ubah") {
-          setState(() {
-            isHitungPremiClicked = true;
-          });
-          await calparform2key.currentState?.saveForm2();
-        }else{
-          if (form3ViewMode == "ubah"){
-            setState(() {
-              isHitungPremiClicked = true;
-            });
-            await calparform3key.currentState?.saveForm3();
-          }else {
-            debugPrint("hitungpar dikliik ${calpar1Id}");
-            context.read<Calpar4FormBloc>().add(
-              Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
-            );
-          }
-        }
-      }
-    } else if (calpar1Id == null) {
-      if (isValidForm1 == true) {
-        await calparform1key.currentState?.saveForm1();
-        openForm2();
-      } else {
-        openForm1();
-      }
-    } else if (calpar2Id == null) {
-      if (isValidForm2 == true) {
-        await calparform2key.currentState?.saveForm2();
-      }
-    } else if (calpar3Id == null) {
-      if (isValidForm3 == true) {
-        await calparform3key.currentState?.saveForm3();
-      }
+    final oldExpanded = List<bool>.from(expanded);
+    isHitungPremiClicked = true;
+    final newExpanded = [false, false, false,true];
+
+    // VALIDATOR
+    final validators = <int, Future<bool> Function()>{
+      0: () async => await calparform1key.currentState?.validateAndReturn() ?? false,
+      1: () async => await calparform2key.currentState?.validateAndReturn() ?? false,
+      2: () async => await calparform3key.currentState?.validateAndReturn() ?? false,
+    };
+
+    // SAVERS
+    final savers = <int, Future<void> Function()>{
+      0: () async => await calparform1key.currentState?.saveForm1(),
+      1: () async => await calparform2key.currentState?.saveForm2(),
+      2: () async => await calparform3key.currentState?.saveForm3(),
+    };
+
+    print("🔎 Cek semua form sebelum pindah ke Form 6...");
+
+    final allow = await FormExitGuard.multiCheck(
+      oldExpanded: oldExpanded,
+      newExpanded: newExpanded,
+      validators: validators,
+      savers: savers,
+    );
+
+    if (!allow) {
+      print("⛔ GA BOLEH pindah, karena ada form invalid.");
+      return;
+    }
+
+    print("✅ Semua valid & saved → lanjut hitung premi");
+
+    setState(() => expanded = newExpanded);
+    if (calpar1Id != null) {
+      context.read<Calpar4FormBloc>().add(
+        Calpar4FormHitungPremiEvent(calpar1Id: calpar1Id ?? ""),
+      );
     }
   }
 
@@ -476,18 +354,69 @@ class _CalparFormMainState extends State<CalparFormMain> {
   void openForm1() {
     setState(() {
       expanded = [true, false, false, false];
+      calparform1key.currentState?.onOpenedByParent();
     });
   }
 
-  void openForm2() {
+  Future<void> openForm2() async {
+    final oldState = List<bool>.from(expanded);
+    final newState = [false, true, false, false];
+    final allowed = await FormExitGuard.multiCheck(
+      oldExpanded: oldState,
+      newExpanded: newState,
+
+      validators: {
+        0: () async => await calparform1key.currentState?.validateAndReturn() ?? false,
+        1: () async => await calparform2key.currentState?.validateAndReturn() ?? false,
+        2: () async => await calparform3key.currentState?.validateAndReturn() ?? false,
+      },
+
+      savers: {
+        0: () async => await calparform1key.currentState?.saveForm1(),
+        1: () async => await calparform2key.currentState?.saveForm2(),
+        2: () async => await calparform3key.currentState?.saveForm3(),
+      },
+    );
+
+    if (!allowed) return;
+
     setState(() {
-      expanded = [false, true, false, false];
+      expanded = newState;
+      if (expanded[1] == true) {
+        calparform2key.currentState?.onOpenedByParent();
+      }
     });
   }
 
-  void openForm3() {
+  Future<void> openForm3() async {
+    final oldState = List<bool>.from(expanded);
+
+    final newState = [false, false, true, false];
+
+    final allowed = await FormExitGuard.multiCheck(
+      oldExpanded: oldState,
+      newExpanded: newState,
+
+      validators: {
+        0: () async => await calparform1key.currentState?.validateAndReturn() ?? false,
+        1: () async => await calparform2key.currentState?.validateAndReturn() ?? false,
+        2: () async => await calparform3key.currentState?.validateAndReturn() ?? false,
+      },
+
+      savers: {
+        0: () async => await calparform1key.currentState?.saveForm1(),
+        1: () async => await calparform2key.currentState?.saveForm2(),
+        2: () async => await calparform3key.currentState?.saveForm3(),
+      },
+    );
+
+    if (!allowed) return;
+
     setState(() {
-      expanded = [false, false, true, false];
+      expanded = newState;
+      if (expanded[2] == true) {
+        calparform3key.currentState?.onOpenedByParent();
+      }
     });
   }
 

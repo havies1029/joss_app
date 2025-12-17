@@ -187,24 +187,26 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
             const SizedBox(height: hPadding),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: AppButton.iconRight(
-                text: "Lanjutkan",
-                icon: Icon(Icons.arrow_forward),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => KonfirmasiRegParPage(
-                        recordId: widget.recordId ?? '',
-                        viewMode: 'ubah',
+            if (isHitungPremiClicked == true) ...[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                child: AppButton.iconRight(
+                  text: "Lanjutkan",
+                  icon: Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => KonfirmasiRegParPage(
+                          recordId: widget.recordId ?? '',
+                          viewMode: 'ubah',
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
+            ]
           ],
         ),
       ),

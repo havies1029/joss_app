@@ -68,6 +68,14 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     }
   }
 
+  void onOpenedByParent() {
+    if (widget.viewMode == "ubah" && widget.calpar1Id != null) {
+      debugPrint("🔥 Form1 dibuka parent → trigger lihat event");
+      calpar3Bloc.add(Calpar3FormLihatEvent(recordId: widget.calpar1Id!));
+    }
+  }
+
+
   @override
   void dispose() {
     fieldIsEqController.dispose();
