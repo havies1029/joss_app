@@ -1,5 +1,5 @@
 import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
-import 'package:joss_app/pages/payment/dnsppacari_list.dart';
+import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list.dart';
 import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
 import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
 import 'package:joss_app/pages/payment/paymentsuccess_form.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
-import 'package:joss_app/pages/payment/dnrekapcobcari_list_widget.dart';
+import 'package:joss_app/pages/payment/ringkasan/dnrekapcobcari_list_widget.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class DnrekapcobCariPage extends StatefulWidget {

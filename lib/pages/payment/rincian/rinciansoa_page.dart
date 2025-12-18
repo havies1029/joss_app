@@ -3,7 +3,7 @@ import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
 import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
 import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
 import 'package:joss_app/pages/payment/paymentsuccess_form.dart';
-import 'package:joss_app/pages/payment/rinciansoa_widget.dart';
+import 'package:joss_app/pages/payment/rincian/rinciansoa_widget.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +39,7 @@ class _RincianSoaPageState extends State<RincianSoaPage> {
         if (state.isProcessed){
           if (state.paymentStatus == "20"){
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.')),
+              const SnackBar(content: Text('Silakan lanjutkan ke metode pembayaran.')),
             );
             onViewPaymentMethods();
           } 

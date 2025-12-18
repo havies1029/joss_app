@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/pages/payment/mobile/paymetlist.dart';
-import '../../../blocs/payment/paymentmethodcari_bloc.dart';
-import '../../../blocs/payment/paymentmethodcari_event.dart';
-import '../../../blocs/payment/paymentmethodcari_state.dart';
-import '../../../common/constants.dart';
-import '../../base/base_background_sidepage.dart';
+import 'package:joss_app/pages/payment/mobile/payment_page/paymetlist.dart';
+import '../../../../blocs/payment/paymentmethodcari_bloc.dart';
+import '../../../../blocs/payment/paymentmethodcari_event.dart';
+import '../../../../blocs/payment/paymentmethodcari_state.dart';
+import '../../../../common/constants.dart';
+import '../../../base/base_background_sidepage.dart';
 
 class PaymentMethodsCariListPage extends StatefulWidget {
   const PaymentMethodsCariListPage({super.key});

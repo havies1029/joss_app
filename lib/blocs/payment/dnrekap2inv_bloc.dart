@@ -50,7 +50,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
     }
   }
 
-  Future<void> onDnToInvByListDnProcess(
+  Future<void>  onDnToInvByListDnProcess(
       DnToInvByListDnProcessEvent event, Emitter<DnRekap2invState> emit) async {
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
 

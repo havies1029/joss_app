@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/payment/pay1list_list.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay1list_list.dart';
 
 class Pay1ListMainPage extends StatelessWidget {
 	const Pay1ListMainPage({super.key});

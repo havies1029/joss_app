@@ -21,9 +21,9 @@ import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../payment/dnrekapcobcari_list.dart';
-import '../../../payment/dnsppacari_list.dart';
+import '../../../payment/ringkasan/detail/dnsppacari_list.dart';
 import '../../../payment/dnsppamvcari_list.dart';
-import '../../../payment/mobile/paymentFormPage.dart';
+import '../../../payment/mobile/payment_page/paymentFormPage.dart';
 import '../../../payment/paymentmethodcari_list.dart' hide PaymentMethodsCariListPage;
 import '../../../register/mobile/client/register_client_page.dart';
 

@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
-import 'package:joss_app/pages/payment/dnrekapcobcari_tile_widget.dart';
-import 'package:joss_app/models/payment/dnrekapcobcari_model.dart';
+import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay2cari_tile_widget.dart';
+import 'package:joss_app/models/payment/pay2cari_model.dart';
 
-class DnrekapcobCariListWidget extends StatefulWidget {
-	final String searchText;
-	const DnrekapcobCariListWidget({super.key, required this.searchText});
+class Pay2CariListWidget extends StatefulWidget {
+	const Pay2CariListWidget({super.key});
 
 	@override
-	DnrekapcobCariListWidgetState createState() => DnrekapcobCariListWidgetState();
+	Pay2CariListWidgetState createState() => Pay2CariListWidgetState();
 }
 
-class DnrekapcobCariListWidgetState extends State<DnrekapcobCariListWidget> {
-	late DnrekapcobCariBloc dnrekapcobCariBloc;
-	List<DnrekapcobCariModel> dnrekapcobCari = [];
+class Pay2CariListWidgetState extends State<Pay2CariListWidget> {
+	late Pay2CariBloc pay2CariBloc;
+	List<Pay2CariModel> pay2Cari = [];
 	final ScrollController _scrollController = ScrollController();
 
 	@override
@@ -34,12 +33,12 @@ class DnrekapcobCariListWidgetState extends State<DnrekapcobCariListWidget> {
 
 	@override
 	Widget build(BuildContext context) {
-		dnrekapcobCariBloc = BlocProvider.of<DnrekapcobCariBloc>(context);
-		return BlocConsumer<DnrekapcobCariBloc, DnrekapcobCariState>(
+		pay2CariBloc = BlocProvider.of<Pay2CariBloc>(context);
+		return BlocConsumer<Pay2CariBloc, Pay2CariState>(
 			builder: (context, state) {
 		if (state.status == ListStatus.success) {
 			if (!state.hasReachedMax) {
-				dnrekapcobCari.addAll(state.items);
+				pay2Cari.addAll(state.items);
 			}
 
 		return state.items.isNotEmpty
@@ -54,22 +53,15 @@ class DnrekapcobCariListWidgetState extends State<DnrekapcobCariListWidget> {
 						borderRadius: BorderRadius.circular(15.0)),
 					child: Column(
 						children: <Widget>[
-							DnrekapcobCariTileWidget(
-								cobId: state.items[index].cobId,
-								cobNama: state.items[index].cobNama,
-								currId: state.items[index].currId,
-								currSimbol: state.items[index].currSimbol,
-								dnrekapcobId: state.items[index].dnrekapcobId,
-								polisAmount: state.items[index].polisAmount,
-								polisCount: state.items[index].polisCount,
-                tsi: state.items[index].tsi,
-                isChecked: state.selectedIds.contains(state.items[index].cobId),
-                onChecked: (_) {
-                  context.read<DnrekapcobCariBloc>().add(
-                    ToggleSelectItemEvent(state.items[index].cobId),
-                  );
-                },
-
+							Pay2CariTileWidget(
+								ar1Id: state.items[index].ar1Id,
+								ar2Id: state.items[index].ar2Id,
+								dnOs: state.items[index].dnOs,
+								nourut: state.items[index].nourut,
+								periodeAkhir: state.items[index].periodeAkhir,
+								periodeMulai: state.items[index].periodeMulai,
+								sppaNoref: state.items[index].sppaNoref,
+								sppa1Id: state.items[index].sppa1Id,
 							)
 						],
 					),
@@ -106,7 +98,7 @@ class DnrekapcobCariListWidgetState extends State<DnrekapcobCariListWidget> {
 		if (!_scrollController.hasClients) return;
 		if (_scrollController.position.pixels ==
 				_scrollController.position.maxScrollExtent) {
-			dnrekapcobCariBloc.add(FetchDnrekapcobCariEvent());
+			pay2CariBloc.add(FetchPay2CariEvent());
 		}
 	}
 

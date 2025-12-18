@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
-import 'package:joss_app/pages/payment/pay2cari_list_widget.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay2cari_list_widget.dart';
 
 class Pay2CariPage extends StatefulWidget {
 	final String ar1Id;

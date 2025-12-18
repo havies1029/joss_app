@@ -4,8 +4,8 @@ import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/widgets/floatingmenumaster_widget.dart';
 import 'package:joss_app/blocs/payment/pay1list_bloc.dart';
 import 'package:joss_app/blocs/payment/pay1crud_bloc.dart';
-import 'package:joss_app/pages/payment/pay1crud_form.dart';
-import 'package:joss_app/pages/payment/pay1list_list_widget.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay1crud_form.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay1list_list_widget.dart';
 
 class Pay1ListPage extends StatefulWidget {
 	const Pay1ListPage({super.key});

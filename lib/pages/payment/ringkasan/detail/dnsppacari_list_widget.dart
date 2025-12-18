@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
-import 'package:joss_app/pages/payment/pay2cari_tile_widget.dart';
-import 'package:joss_app/models/payment/pay2cari_model.dart';
+import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
+import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_tile_widget.dart';
+import 'package:joss_app/models/payment/dnsppacari_model.dart';
 
-class Pay2CariListWidget extends StatefulWidget {
-	const Pay2CariListWidget({super.key});
+class DnsppaCariListWidget extends StatefulWidget {
+	const DnsppaCariListWidget({super.key});
 
 	@override
-	Pay2CariListWidgetState createState() => Pay2CariListWidgetState();
+	DnsppaCariListWidgetState createState() => DnsppaCariListWidgetState();
 }
 
-class Pay2CariListWidgetState extends State<Pay2CariListWidget> {
-	late Pay2CariBloc pay2CariBloc;
-	List<Pay2CariModel> pay2Cari = [];
+class DnsppaCariListWidgetState extends State<DnsppaCariListWidget> {
+	late DnsppaCariBloc dnsppaCariBloc;
+	List<DnsppaCariModel> dnsppaCari = [];
 	final ScrollController _scrollController = ScrollController();
 
 	@override
@@ -33,12 +33,12 @@ class Pay2CariListWidgetState extends State<Pay2CariListWidget> {
 
 	@override
 	Widget build(BuildContext context) {
-		pay2CariBloc = BlocProvider.of<Pay2CariBloc>(context);
-		return BlocConsumer<Pay2CariBloc, Pay2CariState>(
+		dnsppaCariBloc = BlocProvider.of<DnsppaCariBloc>(context);
+		return BlocConsumer<DnsppaCariBloc, DnsppaCariState>(
 			builder: (context, state) {
 		if (state.status == ListStatus.success) {
 			if (!state.hasReachedMax) {
-				pay2Cari.addAll(state.items);
+				dnsppaCari.addAll(state.items);
 			}
 
 		return state.items.isNotEmpty
@@ -53,14 +53,14 @@ class Pay2CariListWidgetState extends State<Pay2CariListWidget> {
 						borderRadius: BorderRadius.circular(15.0)),
 					child: Column(
 						children: <Widget>[
-							Pay2CariTileWidget(
-								ar1Id: state.items[index].ar1Id,
-								ar2Id: state.items[index].ar2Id,
+							DnsppaCariTileWidget(
+								currSimbol: state.items[index].currSimbol,
 								dnOs: state.items[index].dnOs,
-								nourut: state.items[index].nourut,
-								periodeAkhir: state.items[index].periodeAkhir,
-								periodeMulai: state.items[index].periodeMulai,
-								sppaNoref: state.items[index].sppaNoref,
+								dn1Id: state.items[index].dn1Id,
+								noPolis: state.items[index].noPolis,
+								objectDesc: state.items[index].objectDesc,
+								polisAkhir: state.items[index].polisAkhir,
+								polisMulai: state.items[index].polisMulai,
 								sppa1Id: state.items[index].sppa1Id,
 							)
 						],
@@ -98,7 +98,7 @@ class Pay2CariListWidgetState extends State<Pay2CariListWidget> {
 		if (!_scrollController.hasClients) return;
 		if (_scrollController.position.pixels ==
 				_scrollController.position.maxScrollExtent) {
-			pay2CariBloc.add(FetchPay2CariEvent());
+			dnsppaCariBloc.add(FetchDnsppaCariEvent());
 		}
 	}
 

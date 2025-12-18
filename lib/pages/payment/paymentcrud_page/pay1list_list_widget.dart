@@ -5,7 +5,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 import 'package:joss_app/blocs/payment/pay1list_bloc.dart';
 import 'package:joss_app/blocs/payment/pay1crud_bloc.dart';
-import 'package:joss_app/pages/payment/pay1list_tile_widget.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay1list_tile_widget.dart';
 
 class Pay1ListListWidget extends StatefulWidget {
 	final String searchText;

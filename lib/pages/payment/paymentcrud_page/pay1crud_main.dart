@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/widgets/mobiledesign_widget.dart';
-import 'package:joss_app/pages/payment/pay1crud_form.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay1crud_form.dart';
 
 class Pay1CrudMainPage extends StatelessWidget {
 	final String viewMode;

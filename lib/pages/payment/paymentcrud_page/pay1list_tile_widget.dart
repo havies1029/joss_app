@@ -1,5 +1,5 @@
 import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
-import 'package:joss_app/pages/payment/pay2cari_list.dart';
+import 'package:joss_app/pages/payment/paymentcrud_page/pay2cari_list.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';

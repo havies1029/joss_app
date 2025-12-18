@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
-import 'package:joss_app/pages/payment/dnsppacari_tile_widget.dart';
-import 'package:joss_app/models/payment/dnsppacari_model.dart';
+import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
+import 'package:joss_app/pages/payment/ringkasan/dnrekapcobcari_tile_widget.dart';
+import 'package:joss_app/models/payment/dnrekapcobcari_model.dart';
 
-class DnsppaCariListWidget extends StatefulWidget {
-	const DnsppaCariListWidget({super.key});
+class DnrekapcobCariListWidget extends StatefulWidget {
+	final String searchText;
+	const DnrekapcobCariListWidget({super.key, required this.searchText});
 
 	@override
-	DnsppaCariListWidgetState createState() => DnsppaCariListWidgetState();
+	DnrekapcobCariListWidgetState createState() => DnrekapcobCariListWidgetState();
 }
 
-class DnsppaCariListWidgetState extends State<DnsppaCariListWidget> {
-	late DnsppaCariBloc dnsppaCariBloc;
-	List<DnsppaCariModel> dnsppaCari = [];
+class DnrekapcobCariListWidgetState extends State<DnrekapcobCariListWidget> {
+	late DnrekapcobCariBloc dnrekapcobCariBloc;
+	List<DnrekapcobCariModel> dnrekapcobCari = [];
 	final ScrollController _scrollController = ScrollController();
 
 	@override
@@ -33,12 +34,12 @@ class DnsppaCariListWidgetState extends State<DnsppaCariListWidget> {
 
 	@override
 	Widget build(BuildContext context) {
-		dnsppaCariBloc = BlocProvider.of<DnsppaCariBloc>(context);
-		return BlocConsumer<DnsppaCariBloc, DnsppaCariState>(
+		dnrekapcobCariBloc = BlocProvider.of<DnrekapcobCariBloc>(context);
+		return BlocConsumer<DnrekapcobCariBloc, DnrekapcobCariState>(
 			builder: (context, state) {
 		if (state.status == ListStatus.success) {
 			if (!state.hasReachedMax) {
-				dnsppaCari.addAll(state.items);
+				dnrekapcobCari.addAll(state.items);
 			}
 
 		return state.items.isNotEmpty
@@ -53,15 +54,22 @@ class DnsppaCariListWidgetState extends State<DnsppaCariListWidget> {
 						borderRadius: BorderRadius.circular(15.0)),
 					child: Column(
 						children: <Widget>[
-							DnsppaCariTileWidget(
+							DnrekapcobCariTileWidget(
+								cobId: state.items[index].cobId,
+								cobNama: state.items[index].cobNama,
+								currId: state.items[index].currId,
 								currSimbol: state.items[index].currSimbol,
-								dnOs: state.items[index].dnOs,
-								dn1Id: state.items[index].dn1Id,
-								noPolis: state.items[index].noPolis,
-								objectDesc: state.items[index].objectDesc,
-								polisAkhir: state.items[index].polisAkhir,
-								polisMulai: state.items[index].polisMulai,
-								sppa1Id: state.items[index].sppa1Id,
+								dnrekapcobId: state.items[index].dnrekapcobId,
+								polisAmount: state.items[index].polisAmount,
+								polisCount: state.items[index].polisCount,
+                tsi: state.items[index].tsi,
+                isChecked: state.selectedIds.contains(state.items[index].cobId),
+                onChecked: (_) {
+                  context.read<DnrekapcobCariBloc>().add(
+                    ToggleSelectItemEvent(state.items[index].cobId),
+                  );
+                },
+
 							)
 						],
 					),
@@ -98,7 +106,7 @@ class DnsppaCariListWidgetState extends State<DnsppaCariListWidget> {
 		if (!_scrollController.hasClients) return;
 		if (_scrollController.position.pixels ==
 				_scrollController.position.maxScrollExtent) {
-			dnsppaCariBloc.add(FetchDnsppaCariEvent());
+			dnrekapcobCariBloc.add(FetchDnrekapcobCariEvent());
 		}
 	}
 
