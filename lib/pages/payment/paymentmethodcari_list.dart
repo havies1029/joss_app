@@ -1,3 +1,4 @@
+import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/paymentmethodcari_bloc.dart';
 import 'package:joss_app/blocs/payment/paymentmethodcari_event.dart';
 import 'package:joss_app/blocs/payment/paymentmethodcari_state.dart';
@@ -85,6 +86,11 @@ class _PaymentMethodsCariListPageState extends State<PaymentMethodsCariListPage>
                 );
                 return;
               }
+
+              context.read<DnRekap2invBloc>().add(Invoice2PaymentViaVAEvent(
+                invoiceId: context.read<DnRekap2invBloc>().state.invoiceId, 
+                methodId: selected,
+              ));
 
               Navigator.pop(context, selected);
             },

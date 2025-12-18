@@ -56,6 +56,9 @@ import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_mobil_reposito
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_stnk_repository.dart';
 import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
+import 'package:joss_app/repositories/payment/invbayarvaform_repository.dart';
+import 'package:joss_app/repositories/payment/pay1crud_repository.dart';
+import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
 import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
@@ -98,6 +101,7 @@ import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'apis/payment/paymentdn_api.dart';
 import 'apis/payment/paymentmethodcari_api.dart';
 import 'blocs/calpar/calpar1crud_bloc.dart';
 import 'blocs/calpar/calpar1list_bloc.dart';
@@ -157,6 +161,11 @@ import 'blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
+import 'blocs/payment/dnrekap2inv_bloc.dart';
+import 'blocs/payment/invbayarvaform_bloc.dart';
+import 'blocs/payment/pay1crud_bloc.dart';
+import 'blocs/payment/pay1list_bloc.dart';
+import 'blocs/payment/pay2cari_bloc.dart';
 import 'blocs/payment/paymentmethodcari_bloc.dart';
 import 'blocs/regpar/regpar1crud_bloc.dart';
 import 'blocs/regpar/regpar1list_bloc.dart';
@@ -187,19 +196,6 @@ import 'blocs/regother/regother2form_bloc.dart';
 
 import 'package:joss_app/repositories/regother/regother1crud_repository.dart';
 import 'package:joss_app/repositories/regother/regother2form_repository.dart';
-
-import 'package:joss_app/blocs/regpar/regpar1crud_bloc.dart';
-import 'package:joss_app/blocs/regpar/regpar1list_bloc.dart';
-import 'package:joss_app/blocs/regpar/regpar2form_bloc.dart';
-import 'package:joss_app/blocs/regpar/regpar3form_bloc.dart';
-import 'package:joss_app/blocs/regpar/regpar4form_bloc.dart';
-import 'package:joss_app/blocs/regpar/regpar5form_bloc.dart';
-
-import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
-import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
-import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
-import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
-import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
 
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
 import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
@@ -298,8 +294,12 @@ Future<void> main() async {
         BlocProvider(create:  (context) => DnsppamvCariBloc()),
         BlocProvider(create: (context) => DnsppaCariBloc()),
         BlocProvider(create: (context) => DnsppamvCariBloc()),
-        BlocProvider(create: (context) => PaymentMethodCariBloc(repository: PaymentMethodCariRepository(api: PaymentMethodCariAPI()))),
-
+        BlocProvider(create: (context) => PaymentMethodCariBloc(repository: PaymentDnRepository(api: PaymentDnAPI()))),
+        BlocProvider(create: (context) => DnRekap2invBloc()),
+        BlocProvider(create: (context) => InvbayarvaFormBloc(repository: InvbayarvaFormRepository())),
+        BlocProvider(create:  (context) => Pay1ListBloc()),
+        BlocProvider(create: (context) => Pay1CrudBloc(repository: Pay1CrudRepository())),
+        BlocProvider(create: (context) => Pay2CariBloc()),
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),

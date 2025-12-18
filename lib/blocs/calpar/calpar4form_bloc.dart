@@ -19,7 +19,7 @@ class Calpar4FormBloc extends Bloc<Calpar4FormEvents, Calpar4FormState> {
 	}
 
 	Future<void> onTambahCalpar4Form(
-		Calpar4FormTambahEvent event, Emitter<Calpar4FormState> emit) async {
+			Calpar4FormTambahEvent event, Emitter<Calpar4FormState> emit) async {
 
 		ReturnDataAPI returnData;
 		bool hasFailure = true;
@@ -27,27 +27,27 @@ class Calpar4FormBloc extends Bloc<Calpar4FormEvents, Calpar4FormState> {
 		returnData = await repository.calpar4FormTambah(event.record);
 		hasFailure = !returnData.success;
 		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+				isSaving: false,
+				isSaved: true,
+				hasFailure: hasFailure));
 	}
 
 	Future<void> onUbahCalpar4Form(
-		Calpar4FormUbahEvent event, Emitter<Calpar4FormState> emit) async {
+			Calpar4FormUbahEvent event, Emitter<Calpar4FormState> emit) async {
 		emit(state.copyWith(isSaving: true, isSaved: false));
 		bool hasFailure = !await repository.calpar4FormUbah(event.record);
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
 	Future<void> onHapusCalpar4Form(
-		Calpar4FormHapusEvent event, Emitter<Calpar4FormState> emit) async {
+			Calpar4FormHapusEvent event, Emitter<Calpar4FormState> emit) async {
 		emit(state.copyWith(isSaving: true, isSaved: false));
 		bool hasFailure = !await repository.calpar4FormHapus(event.recordId);
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
 	Future<void> onLihatCalpar4Form(
-		Calpar4FormLihatEvent event, Emitter<Calpar4FormState> emit) async {
+			Calpar4FormLihatEvent event, Emitter<Calpar4FormState> emit) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Calpar4FormModel record = await repository.calpar4FormLihat(event.recordId);
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));

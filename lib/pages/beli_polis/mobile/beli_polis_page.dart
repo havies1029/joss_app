@@ -6,6 +6,8 @@ import 'package:joss_app/widgets/apptheme/header_card.dart';
 import '../../../common/constants.dart';
 import '../../../widgets/section/polis/simul_polis/simul_mv/simul_mv_page.dart';
 import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart';
+import '../../calpar/mobile/calpar_main_page.dart';
+import '../../gen_calmv/mobile/calmv_main_page.dart';
 
 class BeliPolisPage extends StatelessWidget {
   const BeliPolisPage({super.key});
@@ -88,9 +90,9 @@ class BeliPolisPage extends StatelessWidget {
       ) {
     return Row(
       children: [
-        Expanded(child: _buildCategory(context, categories[0].$1, categories[0].$2, const SimulMvPage())),
+        Expanded(child: _buildCategory(context, categories[0].$1, categories[0].$2, const CalmvFormMain(viewMode: '',),)),
         const SizedBox(width: 12),
-        Expanded(child: _buildCategory(context, categories[1].$1, categories[1].$2, const SimulParPage())),
+        Expanded(child: _buildCategory(context, categories[1].$1, categories[1].$2, const CalparFormMain(viewMode: '',))),
       ],
     );
   }

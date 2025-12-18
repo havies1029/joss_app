@@ -1,6 +1,8 @@
+import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/pages/payment/dnsppacari_list.dart';
+import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
 import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
-import 'package:joss_app/widgets/floatingmenumaster_widget.dart';
+import 'package:joss_app/pages/payment/paymentsuccess_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
@@ -31,37 +33,81 @@ class DnrekapcobCariPageState extends State<DnrekapcobCariPage> {
   Widget build(BuildContext context) {
     dnrekapcobCariBloc = BlocProvider.of<DnrekapcobCariBloc>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("DN Rekap COB"),
-        elevation: 2,        
-      ),
-      floatingActionButton: SpeedDial(
-          icon: Icons.menu,
-          activeIcon: Icons.close,
-          backgroundColor: Colors.blue,
+    return BlocListener<DnRekap2invBloc, DnRekap2invState>(
+      listener: (BuildContext context, DnRekap2invState state) {  
+        if (state.isProcessed){
+          if (state.paymentStatus == "20"){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.')),
+            );
+            onViewPaymentMethods();
+          } 
+          else if (state.paymentStatus == "30"){
+            refreshData();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Silakan lakukan pembayaran.')),
+            );          
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => InvbayarvaFormFormPage(viewMode: "ubah", recordId: state.invoiceId)),
+            );
+          }
+          else if (state.paymentStatus == "40"){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Proses pembayaran Berhasil.')),
+            );           
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PaymentsuccessFormPage()),
+            );           
+          }
+          else if (state.paymentStatus == "91"){
+            refreshData();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Proses pembayaran gagal. Silakan coba lagi.')),
+            );                      
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("DN Rekap COB"),
+          elevation: 2,        
+        ),
+        floatingActionButton: SpeedDial(
+            icon: Icons.menu,
+            activeIcon: Icons.close,
+            backgroundColor: Colors.blue,
+            children: [
+              SpeedDialChild(
+                child: Icon(Icons.add),
+                label: 'View Outstanding Polis',
+                onTap: () => onViewListOutstandingPolis(),
+              ),
+              SpeedDialChild(
+                child: Icon(Icons.payment),
+                label: 'Lanjut Pembayaran',
+                onTap: () {
+                  context.read<DnRekap2invBloc>().add(DnToInvByListCobProcessEvent(
+                    listCob: dnrekapcobCariBloc.state.selectedIds.join(";"),
+                  ));
+                  //onViewPaymentMethods();
+                },
+              ),            
+            ],
+          ),
+              body: Column(
           children: [
-            SpeedDialChild(
-              child: Icon(Icons.add),
-              label: 'View Outstanding Polis',
-              onTap: () => onViewListOutstandingPolis(),
+            ListPageFilterBarUIWidget(
+              searchController: _searchController,
+              searchButton: buildSearchButton(),
             ),
-            SpeedDialChild(
-              child: Icon(Icons.payment),
-              label: 'Edit Data',
-              onTap: () => onViewPaymentMethods(),
-            ),            
+      
+            Expanded(child: buildList()),
           ],
         ),
-				body: Column(
-        children: [
-          ListPageFilterBarUIWidget(
-            searchController: _searchController,
-            searchButton: buildSearchButton(),
-          ),
-
-          Expanded(child: buildList()),
-        ],
       ),
     );
   }

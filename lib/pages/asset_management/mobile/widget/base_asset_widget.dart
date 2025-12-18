@@ -1,15 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/asset_management/mobile/widget/asset_list_widget.dart';
-import '../../../../../../common/constants.dart';
-// import '../../../../models/combobox/combocoblist_model.dart';
-import '../../../../models/gen_aset_dashboard/asetdashboardcari_model.dart';
-// import '../../../../repositories/combobox/combocoblist_repository.dart';
-import '../../../../repositories/gen_aset_dashboard/asetdashboardcari_repository.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+import 'package:joss_app/models/gen_aset_dashboard/asetdashboardcari_model.dart';
 import 'package:joss_app/repositories/combobox/combomcobapp1_repository.dart';
+import 'package:joss_app/repositories/gen_aset_dashboard/asetdashboardcari_repository.dart';
+import 'package:joss_app/pages/asset_management/mobile/widget/asset_list_widget.dart';
 
 import 'base_table/base_table_aset_widget.dart';
 
