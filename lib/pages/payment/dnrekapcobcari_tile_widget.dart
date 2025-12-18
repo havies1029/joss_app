@@ -13,7 +13,7 @@ class DnrekapcobCariTileWidget extends StatelessWidget {
 	final int polisCount;
   final bool isChecked;
   final ValueChanged<bool?> onChecked;
-
+  final double tsi;
 
 	const DnrekapcobCariTileWidget(
 		{super.key,
@@ -25,7 +25,8 @@ class DnrekapcobCariTileWidget extends StatelessWidget {
 		required this.polisAmount, 
 		required this.polisCount,
     required this.isChecked,
-    required this.onChecked});
+    required this.onChecked,
+    required this.tsi});
 
 	@override
 	Widget build(BuildContext context) {
@@ -104,6 +105,15 @@ class DnrekapcobCariTileWidget extends StatelessWidget {
                       Container(height: 5),
                       Text(
                         NumberFormat("#,###").format(polisCount),
+                        style: MyText.bodyLarge(context)!
+                          .copyWith(color: MyColors.grey_80)),
+                      Container(height: 10),
+                      Text("tsi",
+                        style: MyText.bodyLarge(context)!
+                          .copyWith(color: MyColors.grey_40)),
+                      Container(height: 5),
+                      Text(
+                        NumberFormat("#,###").format(tsi),
                         style: MyText.bodyLarge(context)!
                           .copyWith(color: MyColors.grey_80)),
                     ],

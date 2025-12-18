@@ -1,10 +1,10 @@
-import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
+import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'paymentmethodcari_event.dart';
 import 'paymentmethodcari_state.dart';
 
 class PaymentMethodCariBloc extends Bloc<PaymentMethodCariEvent, PaymentMethodCariState> {
-  final PaymentMethodCariRepository repository;
+  final PaymentDnRepository repository;
 
   PaymentMethodCariBloc({required this.repository})
       : super(const PaymentMethodCariState()) {
