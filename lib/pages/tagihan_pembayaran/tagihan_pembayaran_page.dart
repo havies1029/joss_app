@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../common/constants.dart';
 import '../../widgets/apptheme/header_card.dart';
 import '../base/base_background_sidepage.dart';
+import '../literasi/mobile/artikel/artikel_page.dart';
+import '../literasi/mobile/tentang_jps_page.dart';
+import '../literasi/mobile/testimoni_page.dart';
 
 class TagihanPembayaranPage extends StatefulWidget {
   const TagihanPembayaranPage({super.key});
