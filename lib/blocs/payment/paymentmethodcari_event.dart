@@ -15,3 +15,5 @@ class PaymentSelectMethodEvent extends PaymentMethodCariEvent {
   @override
   List<Object?> get props => [methodId];
 }
+
+class PaymentResetSelectedEvent extends PaymentMethodCariEvent {}

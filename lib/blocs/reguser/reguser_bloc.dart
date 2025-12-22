@@ -18,7 +18,6 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<RegUserHapusEvent>(onHapusRegUser);
     on<RegUserLihatEvent>(onLihatRegUser);
     on<ValidasiPinHPEvent>(onValidasiPinHP);
-
 	}
 
   Future<void> onTambahRegUser(

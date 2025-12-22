@@ -32,6 +32,43 @@ class PaymentMethodCariState extends Equatable {
     );
   }
 
+  String? get selectedMethodName {
+    if (selectedMethodId == null) return null;
+    for (final c in categories) {
+      for (final item in c.items) {
+        if (item.methodId == selectedMethodId) {
+          return item.title;
+        }
+      }
+    }
+    return null;
+  }
+
+  String? get selectedCategoryName {
+    if (selectedMethodId == null) return null;
+
+    for (final c in categories) {
+      final found = c.items.any((item) => item.methodId == selectedMethodId);
+      if (found) return c.categoryName;
+    }
+
+    return null;
+  }
+
+  PaymentCategory? get selectedCategory {
+    if (selectedMethodId == null) return null;
+
+    for (final c in categories) {
+      if (c.items.any((item) => item.methodId == selectedMethodId)) {
+        return c;
+      }
+    }
+    return null;
+  }
+
+
+
   @override
   List<Object?> get props => [isLoading, isLoaded, hasError, categories, selectedMethodId];
 }
+

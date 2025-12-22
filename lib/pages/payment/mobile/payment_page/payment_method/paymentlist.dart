@@ -1,12 +1,11 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../blocs/payment/paymentmethodcari_bloc.dart';
-import '../../../../blocs/payment/paymentmethodcari_event.dart';
-import '../../../../common/constants.dart';
+import 'package:joss_app/blocs/payment/paymentmethodcari_bloc.dart';
+import 'package:joss_app/blocs/payment/paymentmethodcari_event.dart';
+import 'package:joss_app/common/constants.dart';
 
 class PaymentCategoryTile extends StatelessWidget {
   final String categoryName;
@@ -126,4 +125,3 @@ class PaymentCategoryTile extends StatelessWidget {
     );
   }
 }
-

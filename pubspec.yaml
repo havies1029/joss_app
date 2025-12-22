@@ -19,7 +19,7 @@ dependencies:
   date_field: ^6.0.0
   dropdown_search: ^6.0.1  
   equatable: ^2.0.3
-  flex_color_scheme: ^8.0.0
+  flex_color_scheme: ^8.3.0
   cached_network_image: ^3.4.1
   file_picker: ^8.0.0+1
   flutter_animate: ^3.0.0
@@ -237,6 +237,7 @@ flutter:
     - assets/icons/unduh_polis1.svg
     - assets/icons/aktifkan1.svg
     - assets/icons/beli_polis1.svg
+    - assets/icons/logo_berhasil.svg
 
   fonts:
     - family: Delm-Regular

@@ -11,7 +11,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
   final String title;
   final VoidCallback? onBack;
 
-  /// 🔥 PARAMETER BARU — opsional
   final List<BlocListener>? blocListeners;
 
   const BaseBackgroundSidePage({
@@ -26,7 +25,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🔥 Buat UI asli TANPA perubahan
     final Widget page = Scaffold(
       backgroundColor: primaryBlackColor,
 
@@ -117,12 +115,10 @@ class BaseBackgroundSidePage extends StatelessWidget {
       ),
     );
 
-    // 🔥 Jika TIDAK ada listeners → langsung return page
     if (blocListeners == null || blocListeners!.isEmpty) {
       return page;
     }
 
-    // 🔥 Jika ADA listeners → bungkus dengan MultiBlocListener
     return MultiBlocListener(
       listeners: blocListeners!,
       child: page,

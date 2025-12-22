@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
+import 'package:joss_app/blocs/payment/paymentmethodcari_bloc.dart';
+import 'package:joss_app/blocs/payment/paymentmethodcari_state.dart';
 import 'package:intl/intl.dart';
 import 'package:date_field/date_field.dart';
 
@@ -35,13 +37,14 @@ class InvbayarvaFormFormPageFormState extends State<InvbayarvaFormFormPage> {
 	@override
 	Widget build(BuildContext context) {
 		invbayarvaFormBloc = BlocProvider.of<InvbayarvaFormBloc>(context);
+    final state = context.watch<PaymentMethodCariBloc>().state;
+    final catName = state.selectedCategoryName ?? "-";
+
 		return BlocConsumer<InvbayarvaFormBloc, InvbayarvaFormState>(
 			builder: (context, state) {
 				return Scaffold(
           appBar: AppBar(
-            title: Text(
-              "Menunggu Bayar VA",
-            ),
+            title: Text("Bayar via $catName"),
           ),
           body: SingleChildScrollView(
               child: Padding(
@@ -126,6 +129,7 @@ class InvbayarvaFormFormPageFormState extends State<InvbayarvaFormFormPage> {
 				},
 			);
 		}
+
 	void loadData() {
 		if (widget.viewMode == "ubah") {
 		invbayarvaFormBloc.add(

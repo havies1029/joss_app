@@ -10,6 +10,10 @@ class PaymentMethodCariBloc extends Bloc<PaymentMethodCariEvent, PaymentMethodCa
       : super(const PaymentMethodCariState()) {
     on<PaymentMethodCariLoadEvent>(_onLoad);
     on<PaymentSelectMethodEvent>(_onSelectMethod);
+    on<PaymentResetSelectedEvent>((event, emit) {
+      emit(state.copyWith(selectedMethodId: null));
+    });
+
   }
 
   Future<void> _onLoad(

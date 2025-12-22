@@ -55,7 +55,6 @@ class AuthenticationBloc
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthenticationState> emit) async {
     debugPrint("_onAppStarted");
 
-    // ⛔ Cegah jika sedang dalam proses OTP
     if (AppData.isInOtpProcess) {
       debugPrint("⛔ Lewati _onAppStarted karena sedang dalam proses OTP");
       return;
@@ -148,20 +147,16 @@ class AuthenticationBloc
   Future<void> _onRequirePinEmailVerification(
       RequirePinEmailVerification event,
       Emitter<AuthenticationState> emit) async {
-    debugPrint("✅ emit AuthenticationRequirePinEmailVerification (no loading)");
     emit(AuthenticationRequirePinEmailVerification(email: event.email));
   }
   Future<void> _onRequirePinHPVerification(
       RequirePinHPVerification event,
       Emitter<AuthenticationState> emit) async {
-    debugPrint("✅ emit AuthenticationRequirePinHPVerification (no loading)");
     emit(AuthenticationRequirePinHPVerification(hpno: event.hpno));
   }
 
   Future<void> _onUserAuthenticated(
       UserAuthenticated event, Emitter<AuthenticationState> emit) async {
-    debugPrint("_onLoggedIn dari Form Login User");
-
     emit(AuthenticationLoading());
 
     //emit(AuthenticationUserAuthenticated(user: event.user));

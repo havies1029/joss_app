@@ -5,6 +5,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import 'package:joss_app/pages/gen_regmv/mobile/regmv_main_page.dart';
 
+import '../../../aset/aset_cari.dart';
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../beli_polis/mobile/beli_polis_page.dart';
 import '../../../calpar/mobile/calpar_form/calpar_form3.dart';
@@ -20,10 +21,12 @@ import '../../../gen_endors/endors2cari_list_widget.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
+import '../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
 import '../../../payment/ringkasan/detail/dnsppacari_list.dart';
 import '../../../payment/dnsppamvcari_list.dart';
-import '../../../payment/mobile/payment_page/paymentFormPage.dart';
+import '../../../payment/mobile/payment_page/payment_method/paymentFormPage.dart';
 import '../../../payment/paymentmethodcari_list.dart' hide PaymentMethodsCariListPage;
 import '../../../register/mobile/client/register_client_page.dart';
 

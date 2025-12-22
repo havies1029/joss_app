@@ -17,7 +17,6 @@ class _PaymentMethodsCariListPageState extends State<PaymentMethodsCariListPage>
   void initState() {
     super.initState();
 
-    // Load data ketika page dibuka
     context.read<PaymentMethodCariBloc>().add(PaymentMethodCariLoadEvent());
   }
 
