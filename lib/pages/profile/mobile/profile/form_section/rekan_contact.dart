@@ -29,152 +29,75 @@ class MRekanContactCrudFormPage extends StatefulWidget {
       MRekanContactCrudFormPageFormState();
 }
 
-class MRekanContactCrudFormPageFormState
-    extends State<MRekanContactCrudFormPage> {
-  late MRekanContactCrudBloc mRekanContactCrudBloc;
+class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage> {
+  late final MRekanContactCrudBloc mRekanContactCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
-  var fieldAlamat1Controller = TextEditingController();
-  var fieldEmailController = TextEditingController();
+
+  final fieldAlamat1Controller = TextEditingController();
+  final fieldEmailController = TextEditingController();
+  final fieldTelpController = TextEditingController();
+
   ComboMKotaModel? fieldComboMKota;
   final comboMKotaKey = GlobalKey<DropdownSearchState<ComboMKotaModel>>();
   ComboMPropinsiModel? fieldComboMPropinsi;
-  final comboMPropinsiKey =
-      GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
+  final comboMPropinsiKey = GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
   ComboRKodeposModel? fieldComboRKodepos;
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
-  var fieldTelpController = TextEditingController();
+
   bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
+    mRekanContactCrudBloc = context.read<MRekanContactCrudBloc>();
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
   }
 
   @override
+  void dispose() {
+    fieldAlamat1Controller.dispose();
+    fieldEmailController.dispose();
+    fieldTelpController.dispose();
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    // init bloc contact
-    mRekanContactCrudBloc = BlocProvider.of<MRekanContactCrudBloc>(context);
-
-    SizeConfig().init(context);
-
     return BaseBackgroundSidePage(
       title: "Kontak & Alamat",
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
             width: double.infinity,
-            height: constraints.maxHeight, // ✅ full tinggi layar
-            color: secondaryBlackColor, // ✅ ganti warna utama
+            height: constraints.maxHeight,
+            color: secondaryBlackColor,
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight, // ✅ tetap isi seluruh layar walau konten sedikit
-                ),
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  child: BlocConsumer<MRekanContactCrudBloc, MRekanContactCrudState>(
+
+                  child: BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
+                    listenWhen: (prev, curr) =>
+                    curr.isLoaded == true || curr.isSaved == true,
                     listener: (context, state) {
-                      // 🟢 Muat data dari API (seperti semula)
-                      if (state.isLoaded && _isFirstLoad) {
-                        if (state.record != null) {
-                          fieldAlamat1Controller.text = state.record!.alamat1;
-
-                          // Email fallback dari profil
-                          if (state.record!.email.isNotEmpty) {
-                            fieldEmailController.text = state.record!.email;
-                          } else {
-                            final profile = context.read<UserProfileCubit>().state;
-                            if (fieldEmailController.text.isEmpty &&
-                                (profile.email?.isNotEmpty ?? false)) {
-                              fieldEmailController.text = profile.email!;
-                            }
-                          }
-
-                          // Telepon fallback dari profil
-                          if (state.record!.telp.isNotEmpty) {
-                            fieldTelpController.text = state.record!.telp;
-                          } else {
-                            final profile = context.read<UserProfileCubit>().state;
-                            if (fieldTelpController.text.isEmpty &&
-                                (profile.telepon?.isNotEmpty ?? false)) {
-                              fieldTelpController.text = profile.telepon!;
-                            }
-                          }
-
-                          fieldComboMKota = state.comboMKota;
-                          fieldComboMPropinsi = state.comboMPropinsi;
-                          fieldComboRKodepos = state.comboRKodepos;
-                        }
+                      if (state.isLoaded && state.record != null) {
+                        _injectPayload(state.record!);
                       }
 
                       if (state.isSaved && !state.hasFailure) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           successSnackBar("Data berhasil disimpan 🎉"),
                         );
-                        _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
                       }
-
                     },
 
-                    builder: (context, state) {
-                      return Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              "Kontak & Alamat",
-                              textAlign: TextAlign.start,
-                              style: headingStyle(context, fontSize: 22)
-                                  .copyWith(color: Colors.white),
-                            ),
-                            Text(
-                              "Gunakan email yang aktif dan alamat yang jelas.",
-                              style: bodyTextStyle(
-                                context,
-                                fontSize: 16,
-                              ).copyWith(color: hintGrey),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // 🧩 Card form utama
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                color: secondaryBlackColor.withOpacity(0.2), // ✅ transparan halus
-                                border: Border.all(color: sGrey.withOpacity(0.4)),
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
-                              ),
-                              child: Column(
-                                children: [
-                                  buildFieldEmail(),
-                                  const SizedBox(height: 16),
-                                  buildFieldTelp(),
-                                  const SizedBox(height: 16),
-                                  buildFieldAlamat1(),
-                                  const SizedBox(height: 16),
-                                  buildFieldMpropinsiId(),
-                                  const SizedBox(height: 16),
-                                  buildFieldMkotaId(),
-                                  const SizedBox(height: 16),
-                                  buildFieldRkodeposId(),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 40),
-                            AppButton.primary(text: "Submit", onPressed: onSaveForm),
-                          ],
-                        ),
-                      );
-                    },
+                    child: _buildFormContent(context),
                   ),
                 ),
               ),
@@ -184,6 +107,73 @@ class MRekanContactCrudFormPageFormState
       ),
     );
   }
+
+  Widget _buildFormContent(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "Kontak & Alamat",
+            textAlign: TextAlign.start,
+            style: headingStyle(context, fontSize: getResponsiveFont(context, 22))
+                .copyWith(color: Colors.white),
+          ),
+
+          Text(
+            "Gunakan email yang aktif dan alamat yang jelas.",
+            style: bodyTextStyle(
+              context,
+              fontSize: getResponsiveFont(context, 16),
+            ).copyWith(color: hintGrey),
+          ),
+
+          const SizedBox(height: vPadding),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            decoration: BoxDecoration(
+              color: pGrey,
+              border: Border.all(color: sGrey),
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+            ),
+            child: Column(
+              children: [
+                buildFieldEmail(),
+                const SizedBox(height: vPadding),
+                buildFieldTelp(),
+                const SizedBox(height: vPadding),
+                buildFieldAlamat1(),
+                const SizedBox(height: vPadding),
+                buildFieldMpropinsiId(),
+                const SizedBox(height: vPadding),
+                buildFieldMkotaId(),
+                const SizedBox(height: vPadding),
+                buildFieldRkodeposId(),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: vPadding),
+          AppButton.primary(text: "Submit", onPressed: onSaveForm),
+        ],
+      ),
+    );
+  }
+
+  void _injectPayload(MRekanContactCrudModel record) {
+    fieldAlamat1Controller.text = record.alamat1;
+    fieldEmailController.text   = record.email;
+    fieldTelpController.text    = record.telp;
+
+    fieldComboMKota     = record.comboMKota;
+    fieldComboMPropinsi = record.comboMPropinsi;
+    fieldComboRKodepos  = record.comboRKodepos;
+
+    setState(() {});
+  }
+
 
   void loadData() {
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
@@ -199,154 +189,100 @@ class MRekanContactCrudFormPageFormState
     }
   }
 
-  Widget buildFieldEmail() {
-    return appTextField(
-      label: "Email",
-      controller: fieldEmailController,
-      keyboardType: TextInputType.emailAddress,
-      maxLines: 1,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kStringNullError;
-        }
-        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-          return kInvalidEmailError;
-        }
-        return null;
-      },
-    );
-  }
+  Widget buildFieldEmail() => appTextField(
+    label: "Email",
+    controller: fieldEmailController,
+    keyboardType: TextInputType.emailAddress,
+    validator: (v) {
+      if (v == null || v.isEmpty) return kEmailNullError;
+      return null;
+    },
+  );
 
-  Widget buildFieldTelp() {
-    return appTextField(
-      label: "No. Telp Perusahaan",
-      controller: fieldTelpController,
-      keyboardType: TextInputType.phone,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kPhoneNumberNullError;
-        }
-        return null;
-      },
-    );
-  }
+  Widget buildFieldTelp() => appTextField(
+    label: "No. Telp Perusahaan",
+    controller: fieldTelpController,
+    keyboardType: TextInputType.phone,
+    validator: (v) {
+      if (v == null || v.isEmpty) return kPhoneNumberNullError;
+      return null;
+    },
+  );
 
-  Widget buildFieldAlamat1() {
-    return appTextField(
-      label: "Alamat",
-      controller: fieldAlamat1Controller,
-      keyboardType: TextInputType.multiline,
-      maxLines: 3,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return kAddressNullError;
-        }
-        return null;
-      },
-    );
-  }
+  Widget buildFieldAlamat1() => appTextField(
+    label: "Alamat Rumah",
+    controller: fieldAlamat1Controller,
+    keyboardType: TextInputType.text,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+    ],
+    validator: (v) {
+      if (v == null || v.isEmpty) return kAddressNullError;
+      return null;
+    },
+  );
 
-  Widget buildFieldMpropinsiId() {
-    return ReusableComboBox<ComboMPropinsiModel>(
-      hintText: "Provinsi",
-      comboKey: comboMPropinsiKey,
-      initItem: fieldComboMPropinsi,
-      dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
-      displayText: (item) => item.propinsiNama,
-      compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
-      onChangedCallback: (value) {
-        if (value != null) {
-          removeError(error: kStringProvinsiError);
-          mRekanContactCrudBloc.add(
-            ComboMPropinsiChangedEvent(comboMPropinsi: value),
-          );
-          // Clear dependent dropdowns
-          comboMKotaKey.currentState?.clear();
-          comboRKodeposKey.currentState?.clear();
-        }
-      },
-      onSaveCallback: (value) {
-        if (value != null) {
-          fieldComboMPropinsi = value;
-        }
-      },
-      validatorCallback: (value) {
-        if (value == null) {
-          return kStringProvinsiError;
-        }
-        return null;
-      },
-    );
-  }
+  Widget buildFieldMpropinsiId() => ReusableComboBox<ComboMPropinsiModel>(
+    hintText: "Provinsi",
+    comboKey: comboMPropinsiKey,
+    initItem: fieldComboMPropinsi,
+    dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
+    displayText: (item) => item.propinsiNama,
+    compareItems: (a, b) => a.mpropinsiId == b.mwilayahId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        mRekanContactCrudBloc.add(
+          ComboMPropinsiChangedEvent(comboMPropinsi: v),
+        );
+        comboMKotaKey.currentState?.clear();
+        comboRKodeposKey.currentState?.clear();
+      }
+      fieldComboMPropinsi = v;
+    },
+    onSaveCallback: (value) => fieldComboMPropinsi = value,
+  );
 
-  Widget buildFieldMkotaId() {
-    return ReusableComboBox<ComboMKotaModel>(
-      hintText: "Kota",
-      comboKey: comboMKotaKey,
-      initItem: fieldComboMKota,
-      dataLoader:
-          () => ComboMKotaRepository().getComboMKota(
-            fieldComboMPropinsi?.mpropinsiId ?? "",
-          ),
-      displayText: (item) => item.kotaDesc,
-      compareItems: (a, b) => a.mkotaId == b.mkotaId,
-      onChangedCallback: (value) {
-        if (value != null) {
-          removeError(error: kStringKotaError);
-          mRekanContactCrudBloc.add(ComboMKotaChangedEvent(comboMKota: value));
-          comboRKodeposKey.currentState?.clear();
-        }
-      },
-      onSaveCallback: (value) {
-        if (value != null) {
-          fieldComboMKota = value;
-        }
-      },
-      validatorCallback: (value) {
-        if (value == null) {
-          return kStringKotaError;
-        }
-        return null;
-      },
-    );
-  }
+  Widget buildFieldMkotaId() => ReusableComboBox<ComboMKotaModel>(
+    hintText: "Kota",
+    comboKey: comboMKotaKey,
+    initItem: fieldComboMKota,
+    dataLoader: () => ComboMKotaRepository().getComboMKota(fieldComboMPropinsi?.mwilayahId ?? ""),
+    displayText: (item) => item.kotaDesc,
+    compareItems: (a, b) => a.mkotaId == b.mkotaId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        mRekanContactCrudBloc.add(ComboMKotaChangedEvent(comboMKota: v));
+        comboRKodeposKey.currentState?.clear();
+      }
+      fieldComboMKota = v;
+    },
+    onSaveCallback: (value) => fieldComboMKota = value,
+  );
 
-  Widget buildFieldRkodeposId() {
-    return ReusableComboBox<ComboRKodeposModel>(
-      hintText: "Kodepos (Opsional)",
-      showClearButton: true,
-      comboKey: comboRKodeposKey,
-      initItem: fieldComboRKodepos,
-      dataLoader: () => ComboRKodeposRepository().getComboRKodepos(
-        fieldComboMKota?.mkotaId ?? "",
-        "",
-      ),
-      displayText: (item) => item.kodeposNo,
-      compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
-      onChangedCallback: (value) {
-        if (value != null) {
-          // ✅ kalau user pilih kodepos baru
-          mRekanContactCrudBloc.add(
-            ComboRKodeposChangedEvent(comboRKodepos: value),
-          );
-          fieldComboRKodepos = value;
-        } else {
-          // ✅ kalau user hapus / clear pilihan
-          fieldComboRKodepos = const ComboRKodeposModel(); // 🔥 reset total, bukan null
-          mRekanContactCrudBloc.add(
-            ComboRKodeposChangedEvent(
-              comboRKodepos: fieldComboRKodepos ?? const ComboRKodeposModel(),
-            ),
-          );
-        }
-        setState(() {}); // refresh tampilan
-      },
+  Widget buildFieldRkodeposId() => ReusableComboBox<ComboRKodeposModel>(
+    hintText: "Kodepos (Opsional)",
+    comboKey: comboRKodeposKey,
+    initItem: fieldComboRKodepos,
+    dataLoader: () => ComboRKodeposRepository().getComboRKodepos(fieldComboMKota?.mkotaId ?? "", ""),
+    displayText: (item) => item.kodeposNo,
+    compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
+    validatorCallback: (v) => v == null ? kStringNullError : null,
+    onChangedCallback: (v) {
+      if (v != null){
+        removeError(error: kStringNullError);
+        mRekanContactCrudBloc.add(
+          ComboRKodeposChangedEvent(comboRKodepos: v),
+        );
+      }
+      // fieldComboMKelurahan = v;
+    },
+    onSaveCallback: (value) => fieldComboRKodepos = value,
+  );
 
-      onSaveCallback: (value) {
-        fieldComboRKodepos = value;
-      },
-    );
-  }
 
   void onSaveForm() {
     if (_formKey.currentState!.validate()) {

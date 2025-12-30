@@ -18,7 +18,7 @@ import '../../../models/regpar/regpar4form_model.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
-import '../../payment/mobile/payment_page/payment_method/paymentFormPage.dart';
+import '../../payment/paymentmethodcari_list.dart';
 
 
 

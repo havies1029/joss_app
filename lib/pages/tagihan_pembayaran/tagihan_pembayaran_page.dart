@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list_widget.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/payment_rincian_tab.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/payment_ringkasan_tab.dart';
 import '../../common/constants.dart';
 import '../../widgets/apptheme/header_card.dart';
 import '../base/base_background_sidepage.dart';
@@ -23,10 +26,10 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
   int selectedTab = 0;
 
   final List<Map<String, dynamic>> tabItems = [
-    {'label': 'Ringkasan', 'page': const TentangJPSPage()},
+    {'label': 'Ringkasan', 'page': const PaymentRingkasanTab()},
     {
       'label': 'Rincian',
-      'page': const ArtikelPage(constraints: BoxConstraints()),
+      'page': const DnsppaCariListWidget(),
     },
     // {'label': 'Testimoni', 'page': const TestimoniPage()},
     {'label': 'Riwayat', 'page': const TestimoniPage()},

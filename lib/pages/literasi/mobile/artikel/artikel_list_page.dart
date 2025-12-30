@@ -39,7 +39,6 @@ class ArtikelListPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // MAIN ARTICLES
           BlocBuilder<Berita1CariBloc, Berita1CariState>(
             builder: (context, state1) {
               return Column(

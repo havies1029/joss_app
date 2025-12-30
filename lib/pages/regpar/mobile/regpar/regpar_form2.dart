@@ -308,7 +308,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
       FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
     ],
     validator: (v) {
-      if (v == null || v.isEmpty) return kStringNullError;
+      if (v == null || v.isEmpty) return kAddressNullError;
       return null;
     },
   );

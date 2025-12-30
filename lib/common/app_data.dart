@@ -15,6 +15,10 @@ class AppData {
   // static String prefixEndPoint = "/eAssistToolsAPI";
   // static String httpAuthority = "10.0.2.2";
 
+  // static bool useSSL = false;
+  // static String apiDomain = "http://10.211.55.5/eAssistToolsAPI/";
+  // static String prefixEndPoint = "/eAssistToolsAPI";
+  // static String httpAuthority = "10.211.55.5";
 
   //
   // static bool useSSL = false;
@@ -25,13 +29,15 @@ class AppData {
   //
 
 
+  static bool useSSL = false;
 
-static bool useSSL = false;
-static String apiDomain = "http://localhost:1234/";
-static String prefixEndPoint = "/eAssistToolsAPI";
-static String httpAuthority = "localhost:1234";
+  static String httpAuthority = "localhost";
+  static String prefixEndPoint = "/eAssistToolsAPI/";
+
+  static String apiDomain = "http://localhost/eAssistToolsAPI/";
 
 //
+// //
 // static bool useSSL = false;
 // static String apiDomain = "http${useSSL ? "s" : ""}://108.181.199.145/eAssistToolsAPI/";
 // static String prefixEndPoint = "/eAssistToolsAPI";

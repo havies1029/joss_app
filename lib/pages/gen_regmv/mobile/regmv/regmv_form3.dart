@@ -139,10 +139,10 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
       listeners: [
         BlocListener<Regmv3FormBloc, Regmv3FormState>(
           listenWhen: (prev, curr) =>
-          curr.isLoaded == true && curr.record != null && !_isPayloadInjected,
+          curr.isLoaded == true && curr.record != null,
           listener: (context, state) {
             _injectPayload(state.record!);
-            _isPayloadInjected = true;
+            // _isPayloadInjected = true;
           },
         ),
       ],

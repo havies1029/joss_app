@@ -69,8 +69,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _nama.text = widget.initNama ?? '';
     _email.text = widget.initEmail ?? '';
     _hp.text = widget.initHp ?? '';
+    _jabatan = widget.initJabatanModel;
     _isDefault = widget.initIsDefault;
-// 🔹 Tambahkan inisialisasi untuk COB list
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cobBloc = context.read<RekanPicCobCariBloc>();
       cobBloc.add(RefreshRekanPicCobCariEvent(
@@ -89,7 +90,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
             });
             debugPrint('✅ [INIT] Loaded ${_pendingCobList.length} COB lama ke pending list');
           }
-          sub.cancel(); // cukup ambil sekali, biar gak double trigger
+          sub.cancel();
         }
       });
     });
@@ -235,7 +236,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 720),
                         child: Card(
-                          color: formGrey,
+                          color: pGrey,
                           shape: RoundedRectangleBorder(
                             borderRadius:
                             BorderRadius.circular(cardBorderRadius),
@@ -256,7 +257,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                     style:
                                     headingStyle(context, fontSize: 20),
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: vPadding),
 
                                   appTextField(
                                     label: 'Nama PIC',
@@ -267,7 +268,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         : null,
                                     textInputAction: TextInputAction.next,
                                   ),
-                                  const SizedBox(height: hPadding),
+                                  const SizedBox(height: vPadding),
+
 
                                   appTextField(
                                     label: 'Email',
@@ -276,7 +278,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                     validator: _emailValidator,
                                     textInputAction: TextInputAction.next,
                                   ),
-                                  const SizedBox(height: hPadding),
+                                  const SizedBox(height: vPadding),
+
                                   appTextField(
                                     label: 'No. Telp',
                                     controller: _hp,
@@ -291,8 +294,6 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         : null,
                                   ),
                                   const SizedBox(height: hPadding),
-
-                                  // Jabatan
 
                                   if (mjnsclientId != '10')
                                     ReusableComboBox<ComboMJabatanModel>(
@@ -345,20 +346,16 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         ),
                                       );
 
-                                      // 🔹 Setelah balik dari halaman pilih COB
                                       if (selectedCobs != null) {
                                         setState(() {
-                                          // reset dulu, lalu isi ulang berdasarkan hasil pilihan baru
                                           final combined = <RekanPicCobCariModel>[];
 
-                                          // tambahkan semua yang dicentang dari halaman pilihan
                                           for (final cob in selectedCobs) {
                                             if (cob.isChecked) {
                                               combined.add(cob);
                                             }
                                           }
 
-                                          // tambahkan juga COB lama yang belum diubah
                                           for (final old in _pendingCobList) {
                                             if (!combined.any((c) => c.mcobId == old.mcobId)) {
                                               combined.add(old);

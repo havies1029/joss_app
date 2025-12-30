@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:joss_app/blocs/gen_profile/mrekancontactcrud_bloc.dart';
 
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
@@ -27,19 +28,22 @@ class MRekanGeneralIdvCrudFormPage extends StatefulWidget {
 
 class MRekanGeneralIdvCrudFormPageFormState
     extends State<MRekanGeneralIdvCrudFormPage> {
-  late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   final _formKey = GlobalKey<FormState>();
+
+  final fieldRekanNamaController = TextEditingController();
+
   final List<String> errors = [];
   ComboMPekerjaanModel? fieldComboMPekerjaan;
+  final comboMPekerjaanKey = GlobalKey<DropdownSearchState<ComboMPekerjaanModel>>();
+
   ComboMJnskelModel? fieldComboMJnskel;
-  final comboMPekerjaanKey =
-      GlobalKey<DropdownSearchState<ComboMPekerjaanModel>>();
   final comboMJnsKelKey = GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
-  var fieldRekanNamaController = TextEditingController();
-  bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
@@ -47,56 +51,35 @@ class MRekanGeneralIdvCrudFormPageFormState
 
   @override
   Widget build(BuildContext context) {
-    // init bloc contact
-    mRekanGeneralIdvCrudBloc = BlocProvider.of<MRekanGeneralIdvCrudBloc>(
-      context,
-    );
-    SizeConfig().init(context);
-
     return BaseBackgroundSidePage(
       title: 'Informasi Klien',
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
             width: double.infinity,
-            height: constraints.maxHeight, // ✅ full tinggi layar
-            color: secondaryBlackColor, // ✅ warna utama background
+            height: constraints.maxHeight,
+            color: secondaryBlackColor,
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight, // ✅ tetap isi penuh meski konten sedikit
+                  minHeight: constraints.maxHeight,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: BlocConsumer<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
-                    listener: (context, state) {
-                      if (state.isLoaded && _isFirstLoad) {
-                        if (state.record != null) {
-                          fieldRekanNamaController.text = state.record!.rekanNama;
-
-                          if (state.record!.rekanNama.isNotEmpty) {
-                            fieldRekanNamaController.text = state.record!.rekanNama;
-                          } else {
-                            final profile = context.read<UserProfileCubit>().state;
-                            if (fieldRekanNamaController.text.isEmpty &&
-                                (profile.nama?.isNotEmpty ?? false)) {
-                              fieldRekanNamaController.text = profile.nama!;
-                            }
-                          }
+                      listener: (context, state) {
+                        if (state.isLoaded && state.record != null) {
+                          _injectPayload(state.record!);
                         }
-                        fieldComboMPekerjaan = state.comboMPekerjaan;
-                        fieldComboMJnskel = state.comboMJnskel;
-                      }
-                      if (state.isSaved && !state.hasFailure) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          successSnackBar("Data berhasil disimpan 🎉"),
-                        );
-                        _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
-                      }
 
-                    },
-                    builder: (context, state) {
+                        if (state.isSaved && !state.hasFailure) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            successSnackBar("Data berhasil disimpan 🎉"),
+                          );
+                        }
+                      },
+                      builder: (context, state) {
                       return Form(
                         key: _formKey,
                         child: Column(
@@ -167,43 +150,41 @@ class MRekanGeneralIdvCrudFormPageFormState
                             // Heading
                             Text(
                               "Informasi Klien",
-                              style: headingStyle(context, fontSize: 22)
+                              style: headingStyle(context, fontSize: getResponsiveFont(context, 22))
                                   .copyWith(color: Colors.white),
                             ),
                             Text(
                               "Lengkapi identitas dasar Anda dengan benar.",
                               style: bodyTextStyle(
                                 context,
-                                fontSize: 16,
+                                fontSize: getResponsiveFont(context, 16),
                               ).copyWith(color: hintGrey),
                             ),
-                            const SizedBox(height: 20),
-
-                            // 🧩 Form container
+                            const SizedBox(height: vPadding),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 15,
                               ),
                               decoration: BoxDecoration(
-                                color: secondaryBlackColor.withOpacity(0.25), // ✅ lembut kontras
-                                border: Border.all(color: sGrey.withOpacity(0.4)),
+                                color: pGrey,
+                                border: Border.all(color: sGrey),
                                 borderRadius: BorderRadius.circular(cardBorderRadius),
                               ),
                               child: Column(
                                 children: [
                                   buildFieldRekanNama(),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: vPadding),
                                   buildFieldJenisKlien(),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: vPadding),
                                   buildFieldPekerjaan(),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: vPadding),
                                   buildFieldJenisKelamin(),
                                 ],
                               ),
                             ),
 
-                            const SizedBox(height: 40),
+                            const SizedBox(height: vPadding),
                             AppButton.primary(text: "Submit", onPressed: onSaveForm),
                           ],
                         ),
@@ -217,8 +198,16 @@ class MRekanGeneralIdvCrudFormPageFormState
         },
       ),
     );
-
   }
+
+  void _injectPayload(MRekanGeneralIdvCrudModel record) {
+    fieldRekanNamaController.text = record.rekanNama ?? "";
+    fieldComboMPekerjaan = record.comboMPekerjaan;
+    fieldComboMJnskel    = record.comboMJnskel;
+
+    setState(() {});
+  }
+
 
   void loadData() {
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());

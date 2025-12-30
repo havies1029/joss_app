@@ -15,9 +15,6 @@ class HeroCardWidget extends StatefulWidget {
   final VoidCallback? onDetailTap;
   final String custType;
 
-
-  static const String _placeholder = 'assets/images/profile_placeholder.jpg';
-
   const HeroCardWidget({
     super.key,
     required this.userName,
@@ -86,12 +83,13 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
 
   Widget _buildUserHeader(BuildContext context) {
     final hasBytes = widget.imageBytes != null && widget.imageBytes!.isNotEmpty;
-    final src =
-        (widget.userImage?.isNotEmpty ?? false)
-            ? widget.userImage!
-            : HeroCardWidget._placeholder;
+    final String? src = widget.userImage;
 
-    Widget buildFromString(String s) {
+    Widget buildFromString(String? s) {
+      if (s == null || s.isEmpty) {
+        return _avatarFallback();
+      }
+
       if (s.startsWith('http')) {
         return Image.network(
           s,
@@ -99,12 +97,10 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           errorBuilder: (_, __, ___) => _avatarFallback(),
         );
       }
-      return Image.asset(
-        s,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _avatarFallback(),
-      );
+
+      return _avatarFallback();
     }
+
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: hPadding + 6),
@@ -114,8 +110,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
             width: 46,
             height: 46,
             child: ClipOval(
-              child:
-              hasBytes
+              child: hasBytes
                   ? Image.memory(
                 widget.imageBytes!,
                 fit: BoxFit.cover,

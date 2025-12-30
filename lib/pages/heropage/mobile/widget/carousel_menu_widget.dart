@@ -13,7 +13,7 @@ class CarouselMenuWidget extends StatefulWidget {
 
 class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   late final PageController _pageController;
-  int _currentIndex = 1; // mulai dari 1 karena pakai dummy looping
+  int _currentIndex = 1;
 
   @override
   void initState() {
@@ -78,7 +78,7 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
         if (state.status == ListStatus.success && state.items.isEmpty) {
           return Center(
             child: Text(
-              "Tidak ada gambar event 😢",
+              "Tidak ada gambar event",
               style: TextStyle(
                 color: primaryLightColor.withOpacity(0.6),
                 fontSize: getResponsiveFont(context, 16),
@@ -112,7 +112,6 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
             itemCount: images.length,
             physics: const BouncingScrollPhysics(),
             onPageChanged: (index) {
-              // Tanpa rebuild global, cukup logic looping saja
               if (index == 0) {
                 Future.microtask(() => _pageController.jumpToPage(images.length - 2));
               } else if (index == images.length - 1) {
@@ -153,21 +152,33 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   Widget _buildCachedImage(String imageUrl) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
+      child: Image.network(
+        imageUrl,
         fit: BoxFit.cover,
         width: double.infinity,
-        placeholder: (context, url) => const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
+
+        // loading sementara
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+            ),
+          );
+        },
+
+        // fallback error
+        errorBuilder: (context, error, stackTrace) => Container(
           color: Colors.grey.shade900,
           alignment: Alignment.center,
-          child: const Icon(Icons.broken_image, color: Colors.grey, size: 40),
+          child: const Icon(
+            Icons.broken_image,
+            color: Colors.grey,
+            size: 40,
+          ),
         ),
       ),
     );
   }
+
 }

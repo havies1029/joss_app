@@ -22,7 +22,7 @@ import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
-import '../../../payment/mobile/payment_page/payment_success/payment_success.dart';
+import '../../../payment/rincian/rinciansoa_page.dart';
 import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
 import '../../../payment/ringkasan/detail/dnsppacari_list.dart';
 import '../../../payment/dnsppamvcari_list.dart';
@@ -349,7 +349,7 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
       //
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage()));
         break;
 
       // case 'Test Page':

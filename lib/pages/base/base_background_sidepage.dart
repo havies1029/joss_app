@@ -26,7 +26,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget page = Scaffold(
-      backgroundColor: primaryBlackColor,
+      backgroundColor: secondaryBlackColor,
 
       bottomNavigationBar: Container(
         height: 46,

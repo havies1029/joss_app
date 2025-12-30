@@ -322,7 +322,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
                             // === CARD FORM ===
                             Card(
-                              color: formGrey,
+                              color: pGrey,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
                                 BorderRadius.circular(cardBorderRadius),
@@ -345,7 +345,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                         style:
                                         headingStyle(context, fontSize: 20),
                                       ),
-                                      const SizedBox(height: hPadding),
+                                      const SizedBox(height: vPadding),
 
                                       // === INPUT FIELD ===
                                       appTextField(
@@ -357,7 +357,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                             : null,
                                         textInputAction: TextInputAction.next,
                                       ),
-                                      const SizedBox(height: hPadding),
+                                      const SizedBox(height: vPadding),
+
                                       appTextField(
                                         label: 'Email',
                                         controller: _email,
@@ -366,7 +367,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                         validator: _emailValidator,
                                         textInputAction: TextInputAction.next,
                                       ),
-                                      const SizedBox(height: hPadding),
+                                      const SizedBox(height: vPadding),
+
                                       appTextField(
                                         label: 'No. Telp',
                                         controller: _hp,
@@ -380,7 +382,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                             ? kPhoneNumberNullError
                                             : null,
                                       ),
-                                      const SizedBox(height: hPadding),
+                                      const SizedBox(height: vPadding),
+
 
                                       if (mjnsclientId != '10')
                                         ReusableComboBox<ComboMJabatanModel>(
@@ -389,24 +392,21 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                           comboKey: _comboKey,
                                           initItem: _jabatan,
                                           maxHeight: 180,
-                                          showClearButton: true, // ✅ tambahkan tombol clear
+                                          showClearButton: true,
                                           dataLoader: _loadJabatan,
                                           displayText: (i) => i.jabatanDesc,
                                           compareItems: (a, b) =>
                                           (a.mjabatanId ?? '').trim() == (b.mjabatanId ?? '').trim(),
                                           onChangedCallback: (value) {
                                             if (value != null) {
-                                              // ✅ jika user pilih jabatan baru
                                               _jabatan = value;
                                             } else {
-                                              // ✅ jika user hapus pilihan (clear)
-                                              _jabatan = null; // atau bisa pakai ComboMJabatanModel(mjabatanId: '0')
+                                              _jabatan = null;
                                             }
                                             setState(() {});
                                           },
                                           onSaveCallback: (val) => _jabatan = val,
                                           validatorCallback: (val) {
-                                            // Kalau lo pengen biarin bisa kosong, return null aja
                                             return null;
                                           },
                                         ),
@@ -428,7 +428,6 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                       ),
                                       const SizedBox(height: hPadding),
 
-                                      // === COB LIST ===
                                       GestureDetector(
                                         onTap: () async {
                                           final selectedCobs =

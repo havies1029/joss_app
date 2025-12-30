@@ -1,25 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
-
 import 'package:joss_app/blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
-import 'package:joss_app/blocs/gen_profile/mrekan1crud_bloc.dart';
 
 import 'package:joss_app/models/combobox/combombank_model.dart';
-import 'package:joss_app/widgets/combobox/combombank_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-import '../../../../../blocs/gen_profile/mrekanbanklist_bloc.dart';
-import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
-import '../../../../../helper/image_uploader.dart';
-import '../../../../../models/gen_profile/mrekanbanklist_model.dart';
 import '../../../../../repositories/combobox/combombank_repository.dart';
-import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanBankCrudFormPage extends StatefulWidget {
@@ -38,68 +28,41 @@ class MRekanBankCrudFormPage extends StatefulWidget {
 }
 
 class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
-  late MRekanBankCrudBloc mRekanBankCrudBloc;
+  late final MRekanBankCrudBloc mRekanBankCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+
+  final fieldMrekan1IdController = TextEditingController();
+  final fieldRekNamaController = TextEditingController();
+  final fieldRekNoController = TextEditingController();
+
   ComboMBankModel? fieldComboMBank;
   final comboMBankKey = GlobalKey<DropdownSearchState<ComboMBankModel>>();
-  var fieldMrekan1IdController = TextEditingController();
-  var fieldRekNamaController = TextEditingController();
-  var fieldRekNoController = TextEditingController();
-  String? existingMrekanBankId; // simpan id kalau ketemu
+
+  String? existingMrekanBankId;
   bool _isFirstLoad = true;
-  // di dalam MRekanBankCrudFormPageFormState
-  List<MRekanBankListModel> _allRekanBankList = [];
-  List<MRekanBankListModel> _filteredRekanBankList = [];
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      context.read<MRekanBankListBloc>().add(
-        RefreshMRekanBankListEvent(searchText: "", hal: 0),
-      );
-    });
-
+    mRekanBankCrudBloc = context.read<MRekanBankCrudBloc>();
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
   }
 
   void loadData() {
-    if (widget.viewMode == "ubah") {
-      mRekanBankCrudBloc.add(
-        MRekanBankCrudLihatEvent(recordId: widget.recordId),
-      );
-    }
 
     final profile = context.read<UserProfileCubit>().state;
     fieldMrekan1IdController.text = profile.mrekan1Id ?? '';
 
-    // 🔥 Filter list berdasarkan mrekan1Id (pasti 1 atau kosong)
-    final currentMrekan1Id = fieldMrekan1IdController.text;
-    _filteredRekanBankList =
-        _allRekanBankList
-            .where((item) => item.mrekan1Id == currentMrekan1Id)
-            .toList();
+    mRekanBankCrudBloc.add(
+      MRekanBankCrudLihatEvent(recordId: profile.mrekan1Id ?? ""),
+    );
 
-    // Debug biar jelas
-    if (_filteredRekanBankList.isNotEmpty) {
-      final item = _filteredRekanBankList.first;
-      debugPrint("🎯 RekanBank ditemukan untuk mrekan1Id=$currentMrekan1Id:");
-      debugPrint(
-        "- ${item.mrekanbankId} | ${item.mrekan1Id} | ${item.rekNama} | ${item.rekNo}",
-      );
-    } else {
-      debugPrint("⚠️ Tidak ada RekanBank untuk mrekan1Id=$currentMrekan1Id");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    mRekanBankCrudBloc = BlocProvider.of<MRekanBankCrudBloc>(context);
-    SizeConfig().init(context);
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: primaryBlackColor,
@@ -108,42 +71,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
           title: 'Rekening Bank',
           child: Column(
             children: [
-              BlocListener<MRekanBankListBloc, MRekanBankListState>(
-                listenWhen: (prev, curr) => prev.items != curr.items,
-                listener: (context, state) async {
-                  _allRekanBankList = state.items;
-
-                  final currentMrekan1Id = fieldMrekan1IdController.text;
-                  final filtered =
-                      _allRekanBankList
-                          .where((item) => item.mrekan1Id == currentMrekan1Id)
-                          .toList();
-
-                  if (filtered.isNotEmpty) {
-                    final item = filtered.first;
-                    existingMrekanBankId = item.mrekanbankId;
-
-                    setState(() {
-                      fieldMrekan1IdController.text = item.mrekan1Id;
-                      fieldRekNamaController.text = item.rekNama;
-                      fieldRekNoController.text = item.rekNo;
-
-                      fieldComboMBank = ComboMBankModel(
-                        mbankId: item.mbankId,
-                        bankNama: item.bankNama,
-                      );
-                    });
-                  } else {
-                    existingMrekanBankId = null;
-                    debugPrint(
-                      "⚠️ Tidak ada RekanBank untuk mrekan1Id=$currentMrekan1Id",
-                    );
-                  }
-
-
-                },
-                child: const SizedBox.shrink(),
-              ),
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -155,93 +82,25 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                       horizontal: 15,
                       vertical: 20,
                     ),
-                    child: BlocConsumer<
-                        MRekanBankCrudBloc,
-                        MRekanBankCrudState
-                    >(
+
+                    child: BlocListener<MRekanBankCrudBloc, MRekanBankCrudState>(
+                      listenWhen: (prev, curr) =>
+                      curr.isLoaded == true || curr.isSaved == true,
+
                       listener: (context, state) {
-                        // 🔸 Load data record (tetap di sini)
-                        if (state.isLoaded && _isFirstLoad) {
-                          if (state.record != null) {
-                            fieldMrekan1IdController.text = state.record!.mrekan1Id;
-                            fieldRekNamaController.text = state.record!.rekNama;
-                            fieldRekNoController.text = state.record!.rekNo;
-                          }
-                          fieldComboMBank = state.comboMBank;
+                        if (state.isLoaded && _isFirstLoad && state.record != null) {
+                          _injectPayload(state.record!);
                         }
 
-                        // ✅ Pindahkan ke luar
                         if (state.isSaved && !state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan 🎉"),
                           );
-                          _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
+                          _isFirstLoad = true;
                         }
-
                       },
 
-                      builder: (context, state) {
-                        return Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                "Rekening Bank",
-                                style: headingStyle(context, fontSize: 22),
-                              ),
-                              Text(
-                                "Lengkapi data rekening untuk pencairan klaim.",
-                                style: bodyTextStyle(
-                                  context,
-                                  fontSize: 16,
-                                ).copyWith(color: hintGrey),
-                              ),
-                              const SizedBox(height: 10),
-
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 15,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: pGrey,
-                                  border: Border.all(color: sGrey),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(cardBorderRadius),
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    // Fields
-                                    buildFieldNamaBank(),
-                                    // const SizedBox(height: 16),
-                                    // BlocListener<UserProfileCubit, UserProfileState>(
-                                    //   listenWhen: (prev, curr) => prev.mrekan1Id != curr.mrekan1Id,
-                                    //   listener: (context, state) {
-                                    //     final next = state.mrekan1Id ?? '';
-                                    //     if (fieldMrekan1IdController.text != next) {
-                                    //       fieldMrekan1IdController.text = next;
-                                    //     }
-                                    //   },
-                                    //   child: buildFieldMrekan1Id(),
-                                    // ),
-                                    const SizedBox(height: 16),
-                                    buildFieldRekNama(),
-                                    const SizedBox(height: 16),
-                                    buildFieldRekNo(),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 30),
-                              AppButton.primary(
-                                text: "Submit",
-                                onPressed: onSaveForm,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      child: _buildFormContent(context),
                     ),
                   ),
                 ),
@@ -252,6 +111,63 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       ),
     );
   }
+
+
+  Widget _buildFormContent(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "Rekening Bank",
+            style: headingStyle(context, fontSize: getResponsiveFont(context, 22)),
+          ),
+          Text(
+            "Lengkapi data rekening untuk pencairan klaim.",
+            style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16))
+                .copyWith(color: hintGrey),
+          ),
+          const SizedBox(height: vPadding),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            decoration: BoxDecoration(
+              color: pGrey,
+              border: Border.all(color: sGrey),
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+            ),
+            child: Column(
+              children: [
+                buildFieldNamaBank(),
+                const SizedBox(height: vPadding),
+                buildFieldRekNama(),
+                const SizedBox(height: vPadding),
+                buildFieldRekNo(),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: vPadding),
+
+          AppButton.primary(
+            text: "Submit",
+            onPressed: onSaveForm,
+          )
+        ],
+      ),
+    );
+  }
+
+  void _injectPayload(MRekanBankCrudModel record) {
+    fieldMrekan1IdController.text = record.mrekan1Id;
+    fieldRekNamaController.text   = record.rekNama;
+    fieldRekNoController.text     = record.rekNo;
+
+    fieldComboMBank = record.comboMBank;
+
+    setState(() {});
+  }
+
 
   Widget buildFieldNamaBank() {
     return ReusableComboBox<ComboMBankModel>(
@@ -281,22 +197,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
-  // Widget buildFieldMrekan1Id() {
-  //   return appTextField(
-  //     label: "MRekan1Id",
-  //     controller: fieldMrekan1IdController,
-  //     enabled: false, // readonly
-  //     suffixIcon: const Icon(Icons.lock_outline, size: 18),
-  //     validator: (value) {
-  //       if (value == null || value.isEmpty) {
-  //         addError(error: kStringNullError);
-  //         return "";
-  //       }
-  //       return null;
-  //     },
-  //   );
-  // }
-
   Widget buildFieldRekNama() {
     return appTextField(
       label: "Nama Rekening",
@@ -315,6 +215,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     return appTextField(
       label: "Nomor Rekening",
       controller: fieldRekNoController,
+      keyboardType: TextInputType.phone,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return kStringNullError;

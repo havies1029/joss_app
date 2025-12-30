@@ -19,11 +19,7 @@ class ListKlaimWidget extends StatefulWidget {
 class _ListKlaimWidgetState extends State<ListKlaimWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
   final _scrollCtr = ScrollController();
-  bool _showAddForm = false;
-  bool _isSavingNew = false;
   final Map<String, bool> _isSavingById = {};
 
   @override
@@ -49,7 +45,7 @@ class _ListKlaimWidgetState extends State<ListKlaimWidget>
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor,
+      backgroundColor: secondaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundSidePage(
           title: 'Klaim',

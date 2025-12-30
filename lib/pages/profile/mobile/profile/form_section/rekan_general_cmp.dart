@@ -60,13 +60,13 @@ class MRekanGeneralCmpCrudFormPageFormState
         builder: (context, constraints) {
           return Container(
             width: double.infinity,
-            height: constraints.maxHeight, // ✅ full tinggi layar
-            color: secondaryBlackColor, // ✅ background utama hitam elegan
+            height: constraints.maxHeight,
+            color: secondaryBlackColor,
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight, // ✅ tetap isi penuh walau konten sedikit
+                  minHeight: constraints.maxHeight,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
@@ -166,46 +166,45 @@ class MRekanGeneralCmpCrudFormPageFormState
                               },
                             ),
 
-                            const SizedBox(height: 24),
+                            const SizedBox(height: vPadding),
 
                             // --- Heading ---
                             Text(
                               "Informasi Perusahaan",
-                              style: headingStyle(context, fontSize: 22)
+                              style: headingStyle(context, fontSize: getResponsiveFont(context, 22))
                                   .copyWith(color: Colors.white),
                             ),
                             Text(
                               "Lengkapi identitas dasar Anda dengan benar.",
-                              style: bodyTextStyle(context, fontSize: 16)
+                              style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16))
                                   .copyWith(color: hintGrey),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: vPadding),
 
-                            // --- Form Section ---
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 15,
                               ),
                               decoration: BoxDecoration(
-                                color: secondaryBlackColor.withOpacity(0.25), // ✅ layer lembut
-                                border: Border.all(color: sGrey.withOpacity(0.4)),
+                                color: pGrey,
+                                border: Border.all(color: sGrey),
                                 borderRadius: BorderRadius.circular(cardBorderRadius),
                               ),
                               child: Column(
                                 children: [
                                   buildFieldJenisKlien(),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: vPadding),
                                   buildFieldNamaPerusahaan(),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: vPadding),
                                   buildFieldBentukPerusahaan(),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: vPadding),
                                   buildFieldBidangUsaha(),
                                 ],
                               ),
                             ),
 
-                            const SizedBox(height: 40),
+                            const SizedBox(height: vPadding),
                             AppButton.primary(text: "Submit", onPressed: onSaveForm),
                           ],
                         ),

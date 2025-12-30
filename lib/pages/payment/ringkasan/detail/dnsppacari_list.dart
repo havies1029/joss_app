@@ -14,6 +14,7 @@ class DnsppaCariPage extends StatefulWidget {
 }
 
 class DnsppaCariPageState extends State<DnsppaCariPage> {
+
 	late DnsppaCariBloc dnsppaCariBloc;
   final TextEditingController _searchController = TextEditingController();
 	@override

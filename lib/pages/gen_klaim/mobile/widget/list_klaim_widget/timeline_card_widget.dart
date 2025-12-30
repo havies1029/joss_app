@@ -117,8 +117,8 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
                   ),
                   child: Column(
                     children: [
-                      _buildDetailRow("ID Klaim", widget.record.klaim1Id ?? "-"),
-                      kDivider(color: sGrey),
+                      // _buildDetailRow("ID Klaim", widget.record.klaim1Id ?? "-"),
+                      // kDivider(color: sGrey),
                       _buildDetailRow("Nama Tertanggung",
                           widget.record.insuredName ?? "-"),
                       kDivider(color: sGrey),

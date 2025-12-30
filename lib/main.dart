@@ -13,6 +13,8 @@ import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
+import 'package:joss_app/blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
+import 'package:joss_app/blocs/share_cubit/share_dnsppa_state_cubit.dart';
 import 'package:joss_app/blocs/simulpar/simulparlist_bloc.dart';
 import 'package:joss_app/blocs/user_profile/user_profile_state.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
@@ -281,6 +283,8 @@ Future<void> main() async {
         BlocProvider(create: (_) => ShareMvStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareHealthStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareHullStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareDnsppaStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareDnrekapcobStateCubit()), // hydrated
 
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
