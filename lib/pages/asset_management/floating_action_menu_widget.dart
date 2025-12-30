@@ -8,7 +8,8 @@ enum ActionType {
   aktifkanKembali,
   unduhPolis,
   lacakPolis,
-  beliPolis
+  beliPolis,
+  bayar
 }
 
 class ActionMenuItem {

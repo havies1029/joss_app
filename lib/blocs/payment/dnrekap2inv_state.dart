@@ -9,6 +9,7 @@ class DnRekap2invState extends Equatable {
 	final bool hasFailure;
   final List<DnHeaderCobModel> rincianSOAList;
   final List<String> selectedIds;
+  final List<RincianFlatItem> rincianFlatItems;
 
 
 	const DnRekap2invState(
@@ -16,10 +17,11 @@ class DnRekap2invState extends Equatable {
     this.paymentStatus = "",
 		this.isProcessing = false,
 		this.isProcessed = false,
-		this.hasFailure = false,		
+		this.hasFailure = false,
     this.rincianSOAList = const [],
-    this.selectedIds = const []
-      });
+    this.selectedIds = const [],
+      this.rincianFlatItems = const [],
+    });
 
 factory DnRekap2invState.initial() {
   return const DnRekap2invState(
@@ -30,6 +32,7 @@ factory DnRekap2invState.initial() {
     hasFailure: false,
     rincianSOAList: [],
     selectedIds: [],
+    rincianFlatItems: [],
   );
 }
 
@@ -43,6 +46,7 @@ factory DnRekap2invState.initial() {
       bool? hasFailure,
       List<DnHeaderCobModel>? rincianSOAList,
       List<String>? selectedIds,
+      List<RincianFlatItem>? rincianFlatItems,
     }) {
 		return DnRekap2invState(			
 			invoiceId: invoiceId ?? this.invoiceId,
@@ -52,9 +56,10 @@ factory DnRekap2invState.initial() {
       hasFailure: hasFailure ?? this.hasFailure,
       rincianSOAList: rincianSOAList ?? this.rincianSOAList,
       selectedIds: selectedIds ?? this.selectedIds,
+      rincianFlatItems: rincianFlatItems ?? this.rincianFlatItems,
     );
 	}
 
 	@override
-	List<Object> get props => [invoiceId, paymentStatus, isProcessing, isProcessed, hasFailure, rincianSOAList, selectedIds];
+	List<Object> get props => [invoiceId, paymentStatus, isProcessing, isProcessed, hasFailure, rincianSOAList, selectedIds, rincianFlatItems];
 }

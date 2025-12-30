@@ -4,15 +4,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../../../helper/fab_action_helper.dart';
 import '../../../../../../widgets/EmptyStateWidget.dart';
-import '../../../../floating_action_menu_widget.dart';
 
 typedef OnRowTapCallback<T> = void Function(T item, int rowIndex);
 
-class ReusableAsetTable<
-  TBloc extends StateStreamableSource<TState>,
-  TState,
-  TModel,
-  TCubit extends Cubit<Map<String, TModel>>
+class ReusablePaymentTable<
+TBloc extends StateStreamableSource<TState>,
+TState,
+TModel,
+TCubit extends Cubit<Map<String, TModel>>
 >
     extends StatefulWidget {
   final TBloc bloc;
@@ -23,12 +22,13 @@ class ReusableAsetTable<
   final Map<int, TableColumnWidth> columnWidths;
   final List<Widget> headerCells;
   final String Function(TModel model) getItemId;
+  final void Function(List<TModel> selectedItems)? onPay;
   final List<Widget> Function(
-    BuildContext context,
-    TModel item,
-    int rowNumber,
-    TCubit cubit,
-  )
+      BuildContext context,
+      TModel item,
+      int rowNumber,
+      TCubit cubit,
+      )
   rowBuilder;
 
   final VoidCallback? onFetchMore;
@@ -37,7 +37,7 @@ class ReusableAsetTable<
   final bool showCheckbox;
   final OnRowTapCallback<TModel>? onRowTap;
 
-  const ReusableAsetTable({
+  const ReusablePaymentTable({
     super.key,
     required this.bloc,
     required this.cubit,
@@ -53,20 +53,21 @@ class ReusableAsetTable<
     this.currentStatusFilter,
     this.showCheckbox = true,
     this.onRowTap,
+    this.onPay,
   });
 
   @override
-  State<ReusableAsetTable<TBloc, TState, TModel, TCubit>> createState() =>
-      _ReusableAsetTableState<TBloc, TState, TModel, TCubit>();
+  State<ReusablePaymentTable<TBloc, TState, TModel, TCubit>> createState() =>
+      _ReusablePaymentTableState<TBloc, TState, TModel, TCubit>();
 }
 
-class _ReusableAsetTableState<
-  TBloc extends StateStreamableSource<TState>,
-  TState,
-  TModel,
-  TCubit extends Cubit<Map<String, TModel>>
+class _ReusablePaymentTableState<
+TBloc extends StateStreamableSource<TState>,
+TState,
+TModel,
+TCubit extends Cubit<Map<String, TModel>>
 >
-    extends State<ReusableAsetTable<TBloc, TState, TModel, TCubit>> {
+    extends State<ReusablePaymentTable<TBloc, TState, TModel, TCubit>> {
   final ScrollController _scrollController = ScrollController();
   final ScrollController _horizontalController = ScrollController();
   bool _showBottomLoader = false;
@@ -134,13 +135,13 @@ class _ReusableAsetTableState<
                     selectedItems.length == totalItems && totalItems > 0;
                 final selectedItemsList = selectedItems.values.toList();
 
-                final availableActions =
-                    widget.showCheckbox
-                        ? FabActionHelper.getAvailableActions(
-                          currentStatusFilter: widget.currentStatusFilter,
-                          selectedItems: selectedItemsList,
-                        )
-                        : <ActionMenuItem>[];
+                // final availableActions =
+                // widget.showCheckbox
+                //     ? FabActionHelper.getAvailableActions(
+                //   currentStatusFilter: widget.currentStatusFilter,
+                //   selectedItems: selectedItemsList,
+                // )
+                //     : <ActionMenuItem>[];
 
                 return Stack(
                   children: [
@@ -187,7 +188,7 @@ class _ReusableAsetTableState<
                                     controller: _scrollController,
                                     scrollDirection: Axis.vertical,
                                     physics:
-                                        const AlwaysScrollableScrollPhysics(),
+                                    const AlwaysScrollableScrollPhysics(),
                                     child: Scrollbar(
                                       controller: _horizontalController,
                                       thumbVisibility: true,
@@ -197,8 +198,8 @@ class _ReusableAsetTableState<
                                       interactive: true,
                                       notificationPredicate:
                                           (notif) =>
-                                              notif.metrics.axis ==
-                                              Axis.horizontal,
+                                      notif.metrics.axis ==
+                                          Axis.horizontal,
                                       child: SingleChildScrollView(
                                         controller: _horizontalController,
                                         scrollDirection: Axis.horizontal,
@@ -215,15 +216,15 @@ class _ReusableAsetTableState<
                                               width: 0.6,
                                             ),
                                             defaultVerticalAlignment:
-                                                TableCellVerticalAlignment
-                                                    .middle,
+                                            TableCellVerticalAlignment
+                                                .middle,
                                             columnWidths: widget.columnWidths,
                                             children: [
                                               _buildHeaderRow(isAllSelected),
                                               for (
-                                                int i = 0;
-                                                i < items.length;
-                                                i++
+                                              int i = 0;
+                                              i < items.length;
+                                              i++
                                               )
                                                 _buildDataRow(
                                                   context,
@@ -253,9 +254,9 @@ class _ReusableAsetTableState<
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 250),
                               opacity:
-                                  (_showBottomLoader && canLoadMore)
-                                      ? 1.0
-                                      : 0.0,
+                              (_showBottomLoader && canLoadMore)
+                                  ? 1.0
+                                  : 0.0,
                               child: IgnorePointer(
                                 ignoring: !(_showBottomLoader && canLoadMore),
                                 child: const SizedBox(
@@ -274,24 +275,72 @@ class _ReusableAsetTableState<
                         ),
                       ],
                     ),
-                    if (widget.showCheckbox && availableActions.isNotEmpty)
-                      FloatingActionMenuWidget(
-                        availableActions: availableActions,
-                        selectedItems: selectedItemsList,
-                        onActionTap: (actionType, selectedItems) {
-                          FabActionHelper.handleAction(
-                            context: context,
-                            actionType: actionType,
-                            selectedItems: selectedItems,
-                            onActionComplete: () {
-                              widget.cubit.emit(Map<String, TModel>.from({}));
-                              if (widget.onFetchMore != null) {
-                                widget.onFetchMore!();
-                              }
-                            },
-                          );
-                        },
+                    if (widget.showCheckbox &&
+                        selectedItemsList.isNotEmpty &&
+                        widget.onPay != null)
+                      Positioned(
+                        right: 16,
+                        bottom: 16,
+                        child: GestureDetector(
+                          onTap: () => widget.onPay!(selectedItemsList),
+                          child: Container(
+                            height: 44,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: BorderRadius.circular(22),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SvgPicture.asset(
+                                  "assets/icons/bayar.svg", // sesuaikan
+                                  width: 18,
+                                  height: 18,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  "Bayar",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
+                    // if (widget.showCheckbox && availableActions.isNotEmpty)
+                    //   FloatingActionMenuWidget(
+                    //     availableActions: availableActions,
+                    //     selectedItems: selectedItemsList,
+                    //     onActionTap: (actionType, selectedItems) {
+                    //       FabActionHelper.handleAction(
+                    //         context: context,
+                    //         actionType: actionType,
+                    //         selectedItems: selectedItems,
+                    //         onActionComplete: () {
+                    //           widget.cubit.emit(Map<String, TModel>.from({}));
+                    //           if (widget.onFetchMore != null) {
+                    //             widget.onFetchMore!();
+                    //           }
+                    //         },
+                    //       );
+                    //     },
+                    //   ),
                   ],
                 );
               },
@@ -324,7 +373,7 @@ class _ReusableAsetTableState<
           padding: const EdgeInsets.all(8),
           child: Tooltip(
             message:
-                isAllSelected ? "Batalkan semua pilihan" : "Pilih semua data",
+            isAllSelected ? "Batalkan semua pilihan" : "Pilih semua data",
             child: InkWell(
               onTap: () => _handleSelectAll(isAllSelected),
               child: AnimatedSwitcher(
@@ -372,12 +421,12 @@ class _ReusableAsetTableState<
   }
 
   TableRow _buildDataRow(
-    BuildContext context,
-    TModel item,
-    int rowNumber,
-    int rowIndex,
-    Map<String, TModel> selectedItems,
-  ) {
+      BuildContext context,
+      TModel item,
+      int rowNumber,
+      int rowIndex,
+      Map<String, TModel> selectedItems,
+      ) {
     final id = widget.getItemId(item);
     final isActive = selectedItems.containsKey(id);
     final List<Widget> rowChildren = [];
@@ -427,19 +476,19 @@ class _ReusableAsetTableState<
     return TableRow(
       decoration: BoxDecoration(
         color:
-            isActive
-                ? primaryColor.withOpacity(0.2)
-                : (rowNumber.isEven ? formGrey : pGrey),
+        isActive
+            ? primaryColor.withOpacity(0.2)
+            : (rowNumber.isEven ? formGrey : pGrey),
       ),
       children: rowChildren,
     );
   }
 
   void _handleCheckboxTap(
-    String id,
-    TModel item,
-    Map<String, TModel> selectedItems,
-  ) {
+      String id,
+      TModel item,
+      Map<String, TModel> selectedItems,
+      ) {
     setState(() {
       if (selectedItems.containsKey(id)) {
         selectedItems.remove(id);
@@ -471,8 +520,8 @@ class ActionButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap:
-          onTap ??
-          () => debugPrint("[ActionButtonWidget] '$label' belum di-handle."),
+      onTap ??
+              () => debugPrint("[ActionButtonWidget] '$label' belum di-handle."),
       child: Container(
         height: 26,
         padding: const EdgeInsets.symmetric(horizontal: 8),

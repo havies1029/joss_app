@@ -178,6 +178,7 @@ import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
 import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
+import 'blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
 import 'blocs/share_cubit/share_health_state_cubit.dart';
 import 'blocs/share_cubit/share_hull_state_cubit.dart';
 import 'blocs/share_cubit/share_mv_state_cubit.dart';
@@ -281,6 +282,8 @@ Future<void> main() async {
         BlocProvider(create: (_) => ShareMvStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareHealthStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareHullStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareDnrekapcobStateCubit()), // hydrated
+        BlocProvider(create: (_) => ShareRincianStateCubit()), // hydrated
 
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
