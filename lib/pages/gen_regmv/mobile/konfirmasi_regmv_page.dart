@@ -219,7 +219,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PaymentMethodsCariListPage(
+                            builder: (context) => PaymentMethods(
                               // recordId: widget.recordId ?? '',
                               // viewMode: 'ubah',
                             ),

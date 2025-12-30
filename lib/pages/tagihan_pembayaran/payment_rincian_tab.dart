@@ -1,3 +1,4 @@
+
 // // pages/tagihan_pembayaran/payment_rincian_tab.dart
 // import 'package:flutter/material.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,3 +27,19 @@
 //     );
 //   }
 // }
+
+// pages/tagihan_pembayaran/payment_rincian_tab.dart
+import 'package:flutter/material.dart';
+import '../payment/mobile/rincian/rincian_page.dart';
+
+class PaymentRincianTab extends StatelessWidget {
+  const PaymentRincianTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: const RincianPage(),
+    );
+  }
+}
+

@@ -11,16 +11,17 @@ import 'package:joss_app/blocs/payment/paymentmethodcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../base/base_background_sidepage.dart';
 
-class PaymentPocess extends StatefulWidget {
+class PaymentProcess extends StatefulWidget {
+  final String viewMode;
   final String recordId;
 
-  const PaymentPocess({super.key, required this.recordId});
+  const PaymentProcess({super.key,required this.viewMode, required this.recordId});
 
   @override
-  State<PaymentPocess> createState() => _PaymentPocessState();
+  State<PaymentProcess> createState() => _PaymentProcessState();
 }
 
-class _PaymentPocessState extends State<PaymentPocess> {
+class _PaymentProcessState extends State<PaymentProcess> {
   late InvbayarvaFormBloc invbayarvaFormBloc;
   final List<String> errors = [];
 
@@ -53,8 +54,10 @@ class _PaymentPocessState extends State<PaymentPocess> {
   }
 
   void loadData() {
+    if (widget.viewMode == "ubah") {
       invbayarvaFormBloc.add(
           InvbayarvaFormLihatEvent(invoiceId: widget.recordId));
+    }
   }
 
   @override

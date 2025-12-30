@@ -7,12 +7,24 @@ import '../../../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../../../../../../blocs/share_cubit/share_par_state_cubit.dart';
 import '../../../../../../helper/action_button_helper.dart';
 import '../../../../../../models/gen_aset_par/asetparcari_model.dart';
+import '../../../../../../widgets/apptheme/dialog_detail_polis.dart';
 import '../tables/reusable_aset_table.dart';
 
 class AsetListPar extends StatelessWidget {
   final String searchText;
   final String? statusLabel;
-  const AsetListPar({super.key, required this.searchText, this.statusLabel,});
+  final bool showCheckbox;
+  final OnRowTapCallback<AsetParCariModel>? onRowTap;
+  final List<AsetParCariModel>? overrideItems;
+
+  const AsetListPar({
+    super.key,
+    required this.searchText,
+    this.statusLabel,
+    this.showCheckbox = true,
+    this.onRowTap,
+    this.overrideItems,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +38,13 @@ class AsetListPar extends StatelessWidget {
       bloc: context.read<AsetParCariBloc>(),
       cubit: cubit,
       hasMore: (state) => !state.hasReachedMax,
-      getItems: (state) => state.items,
+      getItems: (state) => overrideItems ?? state.items,
       getStatus: (state) => state.status,
       getItemId: (item) => item.asetParId,
+      showCheckbox: showCheckbox,
+      onRowTap: onRowTap ??
+              (item, _) => defaultParRowTap(context, item),
+
       columnWidths: const {
         0: IntrinsicColumnWidth(),
         1: IntrinsicColumnWidth(),
@@ -38,7 +54,7 @@ class AsetListPar extends StatelessWidget {
         5: IntrinsicColumnWidth(),
         6: IntrinsicColumnWidth(),
         7: IntrinsicColumnWidth(),
-        8: IntrinsicColumnWidth(),
+        // 8: IntrinsicColumnWidth(),
         // 9: IntrinsicColumnWidth(),
       },
       currentStatusFilter: statusLabel,
@@ -100,6 +116,35 @@ class AsetListPar extends StatelessWidget {
         context.read<AsetParCariBloc>().add(FetchAsetParCariEvent());
       },
       emptyStatusLabel: statusLabel,
+    );
+  }
+
+  static void defaultParRowTap(
+      BuildContext context,
+      AsetParCariModel item,
+      ) {
+    DialogDetailPolis.show(
+      context,
+      title: "Detail",
+      items: [
+        DetailItem(label: "Tertanggung", value: item.tertanggung),
+        DetailItem(label: "Alamat", value: item.alamat),
+        DetailItem(label: "Periode", value: item.periode),
+        DetailItem(
+          label: "Nilai Pertanggungan",
+          value: NumberFormat.currency(locale: 'id', symbol: 'IDR ')
+              .format(item.sumInsured),
+        ),
+        DetailItem(
+          label: "Premi",
+          value: NumberFormat.currency(locale: 'id', symbol: 'IDR ')
+              .format(item.premi),
+        ),
+        DetailItem(label: "Status", value: item.status),
+        DetailItem(label: "No. Polis", value: item.polisNo ?? "-"),
+        DetailItem(label: "Currency", value: item.curr ?? "-"),
+        DetailItem(label: "Klausula Bank", value: item.klausulaBank ?? "-"),
+      ],
     );
   }
 }

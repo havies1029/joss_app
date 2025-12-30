@@ -11,15 +11,15 @@ import '../../../../base/base_background_sidepage.dart';
 import '../../../invbayarvaform_form.dart';
 import '../payment_process/payment_process.dart';
 
-class PaymentMethodsCariListPage extends StatefulWidget {
-  const PaymentMethodsCariListPage({super.key});
+class PaymentMethods extends StatefulWidget {
+  const PaymentMethods({super.key});
 
   @override
-  State<PaymentMethodsCariListPage> createState() =>
-      _PaymentMethodsCariListPageState();
+  State<PaymentMethods> createState() =>
+      _PaymentMethodsState();
 }
-class _PaymentMethodsCariListPageState
-    extends State<PaymentMethodsCariListPage> {
+class _PaymentMethodsState
+    extends State<PaymentMethods> {
 
   int? _expandedIndex;
 

@@ -16,10 +16,10 @@ class DnRekap2invState extends Equatable {
     this.paymentStatus = "",
 		this.isProcessing = false,
 		this.isProcessed = false,
-		this.hasFailure = false,		
+		this.hasFailure = false,
     this.rincianSOAList = const [],
-    this.selectedIds = const []
-      });
+    this.selectedIds = const [],
+    });
 
 factory DnRekap2invState.initial() {
   return const DnRekap2invState(

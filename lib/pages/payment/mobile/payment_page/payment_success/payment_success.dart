@@ -8,8 +8,7 @@ import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
 class PaymentSuccess extends StatefulWidget {
-  final String recordId;
-  const PaymentSuccess({super.key, required this.recordId});
+  const PaymentSuccess({super.key});
 
   @override
   State<PaymentSuccess> createState() => _PaymentSuccessState();
