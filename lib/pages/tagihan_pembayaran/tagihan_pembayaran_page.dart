@@ -56,7 +56,7 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryBlackColor,
+      backgroundColor: secondaryBlackColor,
       body: SafeArea(
         child: Stack(
           children: [

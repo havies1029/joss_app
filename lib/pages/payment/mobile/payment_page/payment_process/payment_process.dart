@@ -33,23 +33,23 @@ class _PaymentProcessState extends State<PaymentProcess> {
   @override
   void initState() {
     super.initState();
-
-    // load awal
+    invbayarvaFormBloc = context.read<InvbayarvaFormBloc>();
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
 
     // cek tiap 3 detik
-    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
-      context.read<DnRekap2invBloc>().add(
-        CheckInvoiceStatusEvent(invoiceId: widget.recordId),
-      );
-    });
+    // _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+    //   context.read<DnRekap2invBloc>().add(
+    //     CheckInvoiceStatusEvent(invoiceId: widget.recordId),
+    //   );
+    // });
+
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    // _timer?.cancel();
     super.dispose();
   }
 
@@ -75,7 +75,7 @@ class _PaymentProcessState extends State<PaymentProcess> {
 
   Widget buildForm() {
     final displayVa = fieldVaNoController.text.trim().isEmpty
-        ? "1234 5678 9012 3456"
+        ? "1234"
         : fieldVaNoController.text;
     return BlocListener<DnRekap2invBloc, DnRekap2invState>(
       listener: (context, payState) {
@@ -86,8 +86,7 @@ class _PaymentProcessState extends State<PaymentProcess> {
       child: BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
         listener: (context, state) {
           if (state.isLoaded && state.record != null) {
-            fieldBatasBayarController.text =
-                state.record!.batasBayar.toIso8601String();
+            fieldBatasBayarController.text = state.record!.batasBayar.toIso8601String();
             fieldVaNoController.text = state.record!.vaNo;
           }
         },

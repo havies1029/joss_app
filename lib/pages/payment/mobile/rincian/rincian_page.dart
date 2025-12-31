@@ -179,7 +179,9 @@ class _RincianPageState extends State<RincianPage> {
   @override
   void initState() {
     super.initState();
-
+    dn2invBloc = context.read<DnRekap2invBloc>();
+    dnrekapcobCariBloc = context.read<DnrekapcobCariBloc>();
+    dn2invBloc.add(InitializeDnRekap2invEvent());
     Future.delayed(const Duration(milliseconds: 500), () {
       refreshData();
     });
@@ -209,9 +211,6 @@ class _RincianPageState extends State<RincianPage> {
 
   @override
   Widget build(BuildContext context) {
-    dn2invBloc = BlocProvider.of<DnRekap2invBloc>(context);
-    dnrekapcobCariBloc = BlocProvider.of<DnrekapcobCariBloc>(context);
-    dn2invBloc.add(InitializeDnRekap2invEvent());
     return BlocListener<DnRekap2invBloc, DnRekap2invState>(
       listener: (BuildContext context, DnRekap2invState state) {
         if (state.isProcessed){

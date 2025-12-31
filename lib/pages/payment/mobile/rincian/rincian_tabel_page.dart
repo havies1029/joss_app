@@ -28,30 +28,25 @@ class _RincianTablePageState extends State<RincianTablePage> {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: widget.headers.length,
+      padding: EdgeInsets.symmetric(
+        horizontal: hPadding * 1.5,
+        vertical: 8,
+      ),
       itemBuilder: (context, index) {
         final header = widget.headers[index];
-
-        return Card(
-          elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeaderTitle(header),
-                const SizedBox(height: 12),
-                _buildDetailTable(header.details),
-                const SizedBox(height: 12),
-                _buildFooterTable(header.footers),
-              ],
-            ),
-          ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeaderTitle(header),
+            const SizedBox(height: hPadding),
+            _buildDetailTable(header.details),
+            _buildFooterTable(header.footers),
+          ],
         );
       },
     );
   }
+
 
   // ============================
   // HEADER TITLE
@@ -71,29 +66,62 @@ class _RincianTablePageState extends State<RincianTablePage> {
       return const Text("Tidak ada detail polis");
     }
 
-    return Table(
-      border: TableBorder.all(color: Colors.grey.shade400),
-      columnWidths: const {
-        0: FlexColumnWidth(1),
-        1: FlexColumnWidth(1),
-        2: FlexColumnWidth(2),
-        3: FlexColumnWidth(3),
-        4: FlexColumnWidth(1.5),
-        5: FlexColumnWidth(2),
-        6: FlexColumnWidth(3),
-      },
-      children: [
-        _tableHeader([
-          "",
-          "No",
-          "No Polis",
-          "Object",
-          "Curr",
-          "Outstanding",
-          "Periode",
-        ]),
-        ...details.map((d) => _detailRowWithCheckbox(d))
-      ],
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(cardBorderRadius),
+        topRight: Radius.circular(cardBorderRadius),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: formGrey,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(cardBorderRadius),
+            topRight: Radius.circular(cardBorderRadius),
+          ),
+          border: const Border(
+            top: BorderSide(color: sGrey, width: 1),
+            left: BorderSide(color: sGrey, width: 1),
+            right: BorderSide(color: sGrey, width: 1),
+            bottom: BorderSide(color: sGrey, width: 0.5),
+          ),
+        ),
+        child: Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: const TableBorder(
+            horizontalInside: BorderSide(
+              color: sGrey,
+              width: 1,
+            ),
+            verticalInside: BorderSide(
+              color: sGrey,
+              width: 1,
+            ),
+          ),
+          columnWidths: const {
+            0: FlexColumnWidth(1),
+            1: FlexColumnWidth(1),
+            2: FlexColumnWidth(2),
+            3: FlexColumnWidth(3),
+            4: FlexColumnWidth(1.5),
+            5: FlexColumnWidth(2),
+            6: FlexColumnWidth(3),
+          },
+          children: [
+            _tableHeader([
+              "",
+              "No",
+              "No Polis",
+              "Object",
+              "Curr",
+              "Outstanding",
+              "Periode",
+            ]),
+            ...details.asMap().entries.map(
+                  (e) => _detailRowWithCheckbox(e.value, e.key),
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -105,115 +133,256 @@ class _RincianTablePageState extends State<RincianTablePage> {
       return const Text("Tidak ada footer summary");
     }
 
-    return Table(
-      border: TableBorder.all(color: Colors.grey.shade400),
-      columnWidths: const {
-        0: FlexColumnWidth(2),
-        1: FlexColumnWidth(2),
-      },
-      children: [
-        _tableHeader([
-          "Currency",
-          "Total OS"
-        ]),
-        ...footers.map((f) => _tableRow([
-          f.currSimbol,
-          formatNum(f.totalOs),
-        ])),
-      ],
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(cardBorderRadius),
+        bottomRight: Radius.circular(cardBorderRadius),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: pGrey,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(cardBorderRadius),
+            bottomRight: Radius.circular(cardBorderRadius),
+          ),
+          border: const Border(
+            top: BorderSide(color: sGrey, width: 0.5),
+            left: BorderSide(color: sGrey, width: 0.5),
+            right: BorderSide(color: sGrey, width: 0.5),
+            bottom: BorderSide(color: sGrey, width: 1),
+          ),
+        ),
+        child: Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: const TableBorder(
+            horizontalInside: BorderSide(
+              color: sGrey,
+              width: 1,
+            ),
+          ),
+          columnWidths: const {
+            0: FlexColumnWidth(2),
+            1: FlexColumnWidth(3),
+          },
+          children: [
+            ...footers.map(
+                  (f) => TableRow(
+                children: [
+                  // LABEL
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Sub Total:",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: primaryLightColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: formGrey,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: sGrey, width: 1),
+                          ),
+                          child: Text(
+                            f.currSimbol,
+                            style: TextStyle(
+                              color: primaryLightColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        Text(
+                          formatNum(f.totalOs),
+                          style: TextStyle(
+                            color: primaryLightColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
-
 
   // ============================
   // TABLE HELPERS
   // ============================
   TableRow _tableHeader(List<String> cells) {
     return TableRow(
-      decoration: BoxDecoration(color: Colors.grey.shade300),
-      children: cells
-          .map(
-            (text) => Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            text,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-      )
-          .toList(),
+      decoration: BoxDecoration(color: formGrey),
+      children: cells.map(
+            (text) {
+          final isNo = text == "No";
+
+          return Padding(
+            padding: const EdgeInsets.all(6),
+            child: isNo
+                ? Center(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: primaryLightColor,
+                ),
+              ),
+            )
+                : Text(
+              text,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: primaryLightColor,
+              ),
+            ),
+          );
+        },
+      ).toList(),
     );
   }
 
   TableRow _tableRow(List<String> cells) {
     return TableRow(
-      children: cells
-          .map(
+      children: cells.map(
             (text) => Padding(
           padding: const EdgeInsets.all(6),
-          child: Text(text),
+          child: Text(
+            text,
+            style: TextStyle(color: primaryLightColor),
+          ),
         ),
-      )
-          .toList(),
+      ).toList(),
     );
   }
 
-  TableRow _detailRowWithCheckbox(DnDetailSppaModel d) {
-    final isSelected = widget.selectedIds.contains(d.dn1Id); // ambil dari BLoC state
+
+  TableRow _detailRowWithCheckbox(DnDetailSppaModel d, int index) {
+    final isSelected = widget.selectedIds.contains(d.dn1Id);
 
     return TableRow(
+      decoration: BoxDecoration(
+        color: isSelected
+            ? primaryColor.withOpacity(0.3)
+            : (index.isEven ? pGrey : formGrey),
+      ),
       children: [
-        // CHECKBOX CELL
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Checkbox(
-            value: isSelected,
-            onChanged: (checked) {
-              if (checked == true) {
-                widget.onSelect(d.dn1Id);   // kirim ke BLoC
-              } else {
-                widget.onUnselect(d.dn1Id); // kirim ke BLoC
-              }
-            },
+        TableCell(
+          child: Center(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: (checked) {
+                if (checked == true) {
+                  widget.onSelect(d.dn1Id);
+                } else {
+                  widget.onUnselect(d.dn1Id);
+                }
+              },
+
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+              ),
+              side: MaterialStateBorderSide.resolveWith(
+                    (states) => BorderSide(
+                  color: sGrey,
+                  width: 1,
+                ),
+              ),
+
+              fillColor: MaterialStateProperty.resolveWith((states) {
+                if (states.contains(MaterialState.selected)) {
+                  return primaryColor;
+                }
+                return Colors.transparent;
+              }),
+
+              checkColor: primaryLightColor,
+
+            ),
           ),
         ),
 
-
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(d.rownumber.toString()),
+        TableCell(
+          child: Center(
+            child: Text(
+              d.rownumber.toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
         ),
 
-        // NO POLIS
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(d.noPolis),
+        TableCell(
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              d.noPolis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
         ),
 
-        // OBJECT DESC
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(d.objectDesc),
+        TableCell(
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              d.objectDesc,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
         ),
 
-        // CURR
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(d.currSimbol),
+        TableCell(
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              d.currSimbol,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
         ),
 
-        // OS
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(formatNum(d.dnOs)),
+        TableCell(
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              formatNum(d.dnOs),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
         ),
 
-        // PERIODE
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            "${d.polisMulai.toString().substring(0, 10)} → "
-                "${d.polisAkhir.toString().substring(0, 10)}",
+        TableCell(
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              "${d.polisMulai.toString().substring(0, 10)} → "
+                  "${d.polisAkhir.toString().substring(0, 10)}",
+              style: TextStyle(color: primaryLightColor),
+            ),
           ),
         ),
       ],
