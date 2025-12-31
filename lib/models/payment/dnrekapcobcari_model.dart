@@ -27,6 +27,15 @@ class DnrekapcobCariModel {
 		);
 
 	}
+	Map<String, dynamic> toExportMap() {
+		return {
+			'COB': cobNama,
+			'Currency': currSimbol,
+			'Jumlah Polis': polisCount,
+			'Total TSI': tsi,
+			'Total Premi': polisAmount,
+		};
+	}
 
 	Map<String, dynamic> toJson() =>
 		{'cobId': cobId,

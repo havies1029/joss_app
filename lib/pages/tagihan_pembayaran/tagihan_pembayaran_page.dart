@@ -27,7 +27,7 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
   int selectedTab = 0;
 
   final List<Map<String, dynamic>> tabItems = [
-    {'label': 'Ringkasan', 'page': const TestimoniPage()},
+    {'label': 'Ringkasan', 'page': const PaymentRingkasanTab()},
     {
       'label': 'Rincian',
       // 'page': const DnsppaCariListWidget(),
