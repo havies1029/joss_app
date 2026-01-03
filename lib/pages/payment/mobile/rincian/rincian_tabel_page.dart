@@ -26,6 +26,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final bool isNarrow = width < 900;
+
     return ListView.builder(
       itemCount: widget.headers.length,
       padding: EdgeInsets.symmetric(
@@ -34,19 +37,24 @@ class _RincianTablePageState extends State<RincianTablePage> {
       ),
       itemBuilder: (context, index) {
         final header = widget.headers[index];
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeaderTitle(header),
             const SizedBox(height: hPadding),
-            _buildDetailTable(header.details),
+
+            // ⬇️ pilih table berdasarkan width
+            isNarrow
+                ? _buildDetailTableCompact(header.details)
+                : _buildDetailTableNormal(header.details),
+
             _buildFooterTable(header.footers),
           ],
         );
       },
     );
   }
-
 
   // ============================
   // HEADER TITLE
@@ -61,10 +69,135 @@ class _RincianTablePageState extends State<RincianTablePage> {
     );
   }
 
-  Widget _buildDetailTable(List<DnDetailSppaModel> details) {
-    if (details.isEmpty) {
-      return const Text("Tidak ada detail polis");
-    }
+  // Widget _buildDetailTable(List<DnDetailSppaModel> details) {
+  //   if (details.isEmpty) {
+  //     return const Text("Tidak ada detail polis");
+  //   }
+  //
+  //   return ClipRRect(
+  //     borderRadius: BorderRadius.only(
+  //       topLeft: Radius.circular(cardBorderRadius),
+  //       topRight: Radius.circular(cardBorderRadius),
+  //     ),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         color: formGrey,
+  //         borderRadius: BorderRadius.only(
+  //           topLeft: Radius.circular(cardBorderRadius),
+  //           topRight: Radius.circular(cardBorderRadius),
+  //         ),
+  //         border: const Border(
+  //           top: BorderSide(color: sGrey, width: 1),
+  //           left: BorderSide(color: sGrey, width: 1),
+  //           right: BorderSide(color: sGrey, width: 1),
+  //           bottom: BorderSide(color: sGrey, width: 0.5),
+  //         ),
+  //       ),
+  //       child: Table(
+  //         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+  //         border: const TableBorder(
+  //           horizontalInside: BorderSide(
+  //             color: sGrey,
+  //             width: 1,
+  //           ),
+  //           verticalInside: BorderSide(
+  //             color: sGrey,
+  //             width: 1,
+  //           ),
+  //         ),
+  //         columnWidths: const {
+  //           0: FlexColumnWidth(1),
+  //           1: FlexColumnWidth(1),
+  //           2: FlexColumnWidth(2),
+  //           3: FlexColumnWidth(3),
+  //           4: FlexColumnWidth(1.5),
+  //           5: FlexColumnWidth(2),
+  //           6: FlexColumnWidth(3),
+  //         },
+  //         children: [
+  //           _tableHeader([
+  //             "",
+  //             "No",
+  //             "No Polis",
+  //             "Object",
+  //             "Curr",
+  //             "Outstanding",
+  //             "Periode",
+  //           ]),
+  //           ...details.asMap().entries.map(
+  //                 (e) => _detailRowWithCheckbox(e.value, e.key),
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildDetailTableCompact(List<DnDetailSppaModel> details) {
+    if (details.isEmpty) return const Text("Tidak ada detail polis");
+
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(cardBorderRadius),
+        topRight: Radius.circular(cardBorderRadius),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: formGrey,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(cardBorderRadius),
+            topRight: Radius.circular(cardBorderRadius),
+          ),
+          border: const Border(
+            top: BorderSide(color: sGrey, width: 1),
+            left: BorderSide(color: sGrey, width: 1),
+            right: BorderSide(color: sGrey, width: 1),
+            bottom: BorderSide(color: sGrey, width: 0.5),
+          ),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Table(
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            border: const TableBorder(
+              horizontalInside: BorderSide(color: sGrey, width: 1),
+              verticalInside: BorderSide(color: sGrey, width: 1),
+            ),
+            columnWidths: const {
+              0: FixedColumnWidth(40),
+              1: FixedColumnWidth(50),
+              2: IntrinsicColumnWidth(),
+              3: IntrinsicColumnWidth(),
+              4: FixedColumnWidth(80),
+              5: FixedColumnWidth(120),
+              6: FixedColumnWidth(130),
+            },
+            children: [
+              _tableHeader([
+                "",
+                "No",
+                "No Polis",
+                "Object",
+                "Curr",
+                "Outstanding",
+                "Periode",
+              ]),
+              ...details.asMap().entries.map(
+                    (e) => _detailRowWithCheckbox(
+                  e.value,
+                  e.key,
+                  compact: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailTableNormal(List<DnDetailSppaModel> details) {
+    if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
       borderRadius: BorderRadius.only(
@@ -88,14 +221,8 @@ class _RincianTablePageState extends State<RincianTablePage> {
         child: Table(
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           border: const TableBorder(
-            horizontalInside: BorderSide(
-              color: sGrey,
-              width: 1,
-            ),
-            verticalInside: BorderSide(
-              color: sGrey,
-              width: 1,
-            ),
+            horizontalInside: BorderSide(color: sGrey, width: 1),
+            verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: const {
             0: FlexColumnWidth(1),
@@ -117,8 +244,12 @@ class _RincianTablePageState extends State<RincianTablePage> {
               "Periode",
             ]),
             ...details.asMap().entries.map(
-                  (e) => _detailRowWithCheckbox(e.value, e.key),
-            )
+                  (e) => _detailRowWithCheckbox(
+                e.value,
+                e.key,
+                compact: false,
+              ),
+            ),
           ],
         ),
       ),
@@ -281,7 +412,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
   }
 
 
-  TableRow _detailRowWithCheckbox(DnDetailSppaModel d, int index) {
+  TableRow _detailRowWithCheckbox(DnDetailSppaModel d, int index, {required bool compact}) {
     final isSelected = widget.selectedIds.contains(d.dn1Id);
 
     return TableRow(
@@ -340,6 +471,8 @@ class _RincianTablePageState extends State<RincianTablePage> {
             padding: const EdgeInsets.all(6),
             child: Text(
               d.noPolis,
+              maxLines: compact ? 2 : null,
+              overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
               style: TextStyle(color: primaryLightColor),
             ),
           ),
@@ -350,6 +483,8 @@ class _RincianTablePageState extends State<RincianTablePage> {
             padding: const EdgeInsets.all(6),
             child: Text(
               d.objectDesc,
+              maxLines: compact ? 2 : null,
+              overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
               style: TextStyle(color: primaryLightColor),
             ),
           ),
@@ -380,7 +515,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
             padding: const EdgeInsets.all(6),
             child: Text(
               "${d.polisMulai.toString().substring(0, 10)} → "
-                  "${d.polisAkhir.toString().substring(0, 10)}",
+              "${d.polisAkhir.toString().substring(0, 10)}",
+              maxLines: compact ? 2 : null,
+              overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
               style: TextStyle(color: primaryLightColor),
             ),
           ),

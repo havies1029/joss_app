@@ -25,3 +25,5 @@ class Pay1CrudModel {
 		'totalOs': totalOs.toString()};
 
 }
+
+

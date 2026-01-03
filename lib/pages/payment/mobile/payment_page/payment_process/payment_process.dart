@@ -1,56 +1,132 @@
-import 'dart:async';
-
-import 'package:date_field/date_field.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
-import '../../../../../blocs/payment/invbayarvaform_bloc.dart';
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/widgets/form_error.dart';
+import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
 import 'package:joss_app/blocs/payment/paymentmethodcari_bloc.dart';
-import '../../../../../common/constants.dart';
+import 'package:joss_app/blocs/payment/paymentmethodcari_state.dart';
+import 'package:intl/intl.dart';
+import 'package:date_field/date_field.dart';
+
 import '../../../../base/base_background_sidepage.dart';
+
 
 class PaymentProcess extends StatefulWidget {
   final String viewMode;
   final String recordId;
 
-  const PaymentProcess({super.key,required this.viewMode, required this.recordId});
+  const PaymentProcess({super.key, required this.viewMode, required this.recordId});
 
   @override
-  State<PaymentProcess> createState() => _PaymentProcessState();
+  PaymentProcessFormState createState() => PaymentProcessFormState();
 }
 
-class _PaymentProcessState extends State<PaymentProcess> {
+class PaymentProcessFormState extends State<PaymentProcess> {
   late InvbayarvaFormBloc invbayarvaFormBloc;
+  final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
-
-  final fieldBatasBayarController = TextEditingController(text: DateTime.now().toIso8601String());
-  final fieldVaNoController = TextEditingController();
-
-  Timer? _timer;
+  var fieldBatasBayarController = TextEditingController(text: DateTime.now().toIso8601String());
+  var fieldVaNoController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    invbayarvaFormBloc = context.read<InvbayarvaFormBloc>();
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
-
-    // cek tiap 3 detik
-    // _timer = Timer.periodic(const Duration(seconds: 3), (_) {
-    //   context.read<DnRekap2invBloc>().add(
-    //     CheckInvoiceStatusEvent(invoiceId: widget.recordId),
-    //   );
-    // });
-
   }
 
   @override
-  void dispose() {
-    // _timer?.cancel();
-    super.dispose();
+  Widget build(BuildContext context) {
+    invbayarvaFormBloc = BlocProvider.of<InvbayarvaFormBloc>(context);
+    final state = context.watch<PaymentMethodCariBloc>().state;
+    final catName = state.selectedCategoryName ?? "-";
+
+    return BlocConsumer<InvbayarvaFormBloc, InvbayarvaFormState>(
+      builder: (context, state) {
+        return BaseBackgroundSidePage(
+          title: "$catName",
+
+          child: Container(
+            color: secondaryBlackColor,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: hPadding),
+                      buildWaitingStatus(),
+                      const SizedBox(height: hPadding),
+                      buildFieldVaNo(),
+                      const SizedBox(height: hPadding),
+                      buildFieldBatasBayar(),
+                      const SizedBox(height: hPadding),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: 60,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: ElevatedButton(
+                            onPressed: _dismissDialog,
+                            child: const Text('Close', style: TextStyle(fontSize: 13)),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: 100,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<DnRekap2invBloc>().add(
+                                CheckInvoiceStatusEvent(invoiceId: widget.recordId),
+                              );
+                            },
+                            child: const Text('Cek Payment Manual', style: TextStyle(fontSize: 13)),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: 100,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<DnRekap2invBloc>().add(
+                                ForcePaymentViaVaEvent(invoiceId: widget.recordId),
+                              );
+                            },
+                            child: const Text('Backend -> Payment Via VA', style: TextStyle(fontSize: 13)),
+                          ),
+                        ),
+                      ),
+                      FormError(
+                        errors: errors,
+                        key: null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      listener: (context, state) {
+        if (state.isLoaded && state.record != null) {
+          fieldBatasBayarController.text = state.record!.batasBayar.toIso8601String();
+          fieldVaNoController.text = state.record!.vaNo;
+        }
+      },
+    );
   }
 
   void loadData() {
@@ -60,84 +136,43 @@ class _PaymentProcessState extends State<PaymentProcess> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<PaymentMethodCariBloc>().state;
-    final catName = state.selectedCategoryName ?? "-";
-    return BaseBackgroundSidePage(
-      title: "$catName",
-      child: Container(
-        color: secondaryBlackColor,
-        child: buildForm(),
-      ),
-    );
-  }
+  Widget buildWaitingStatus() {
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
 
-  Widget buildForm() {
-    final displayVa = fieldVaNoController.text.trim().isEmpty
-        ? "1234"
-        : fieldVaNoController.text;
-    return BlocListener<DnRekap2invBloc, DnRekap2invState>(
-      listener: (context, payState) {
-        if (payState.paymentStatus != "30" && Navigator.canPop(context)) {
-          Navigator.pop(context);
-        }
-      },
-      child: BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
-        listener: (context, state) {
-          if (state.isLoaded && state.record != null) {
-            fieldBatasBayarController.text = state.record!.batasBayar.toIso8601String();
-            fieldVaNoController.text = state.record!.vaNo;
-          }
-        },
-        child: Center(
-          child: Column(
+          decoration: BoxDecoration(
+            color: formGrey,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+            border: const Border(
+              top: BorderSide(color: sGrey, width: 1),
+              left: BorderSide(color: sGrey, width: 1),
+              right: BorderSide(color: sGrey, width: 1),
+              bottom: BorderSide(color: sGrey, width: 0.5),
+            ),
+          ),
+
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // BOX STATUS
-              buildPaymentStatusBox(),
-
-              const SizedBox(height: hPadding),
-
-              Text(
-                "Total Pembayaran",
-                style: TextStyle(
-                  color: hintGrey,
-                  fontSize: getResponsiveFont(context, 16),
-                ),
+              Icon(
+                Icons.hourglass_bottom,
+                color: primaryColor,
+                size: 18,
               ),
 
-              const SizedBox(height: hPadding),
+              const SizedBox(width: 10),
 
               Text(
-                "Nomor Virtual Account:",
+                "Menunggu Pembayaran",
                 style: TextStyle(
-                  color: primaryLightColor,
-                  fontSize: getResponsiveFont(context, 18),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: primaryColor,
                 ),
               ),
-
-              const SizedBox(height: hPadding),
-
-              AppButton.iconRight(
-                text: displayVa,
-                icon: const Icon(Icons.copy, color: Colors.white),
-                backgroundColor: Colors.orange,
-                borderRadius: 20,
-                textStyle: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                  letterSpacing: 1.8,
-                ),
-                width: 20 * 3,
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: displayVa));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Nomor VA disalin!")),
-                  );
-                },
-              )
             ],
           ),
         ),
@@ -145,81 +180,119 @@ class _PaymentProcessState extends State<PaymentProcess> {
     );
   }
 
+  Widget buildFieldBatasBayar() {
+    final date = DateTime.tryParse(fieldBatasBayarController.text);
 
-  Widget buildFieldBatasBayar(){
-    return DateTimeFormField(
-      mode: DateTimeFieldPickerMode.date,
-      dateFormat: DateFormat('dd/MM/yyyy HH:mm:ss'),
-      initialValue: DateTime.tryParse(fieldBatasBayarController.text),
-      decoration: const InputDecoration(
-        labelText: "Batas Bayar",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-      ),
-    );
-  }
+    final formatted = date != null
+        ? DateFormat('dd MMMM yyyy HH:mm').format(date)
+        : "-";
 
-  Widget buildVaBox() {
-    final displayVa = fieldVaNoController.text.trim().isEmpty
-        ? "1234 5678 9012 3456"
-        : fieldVaNoController.text;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.orange,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            displayVa,
-            style: const TextStyle(
-              fontSize: 22,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 1.8,
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(top: 16),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+        decoration: BoxDecoration(
+          color: pGrey,
+          borderRadius: BorderRadius.circular(cardBorderRadius), // <— di sini
+          border: Border.all(
+            color: sGrey,
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              "Pembayaran Berakhir pada:",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: formGrey,
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: displayVa));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Nomor VA disalin!")),
-              );
-            },
-            child: const Icon(Icons.copy, color: Colors.white, size: 24),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildPaymentStatusBox() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: pGrey,
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(color: sGrey),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.hourglass_bottom, color: primaryColor, size: 16),
-          const SizedBox(width: hPadding),
-          Text(
-            "Menunggu Pembayaran",
-            style: TextStyle(
-              fontSize: 13,
-              color: primaryColor,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 6),
+            Text(
+              formatted,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
+
+
+  Widget buildFieldVaNo() {
+    final va = fieldVaNoController.text;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          "Nomor Virtual Account:",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: hPadding),
+
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: primaryColor,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                va,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: va));
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Nomor VA disalin"),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.copy,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  void _dismissDialog() {
+    Navigator.pop(context);
+  }
 
 }
