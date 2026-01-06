@@ -1,18 +1,17 @@
 
 import 'package:joss_app/apis/payment/paymentdn_api.dart';
-import 'package:joss_app/models/payment/dnheadercob_model.dart';
 import 'package:joss_app/models/payment/invoicestatus_model.dart';
+import 'package:joss_app/models/payment/rinciansoa_model.dart';
 import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 part 'dnrekap2inv_event.dart';
 part 'dnrekap2inv_state.dart'; 
 
 class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
-	DnRekap2invBloc() : super(const DnRekap2invState()) {
+	DnRekap2invBloc() : super(DnRekap2invState()) {
    
     on<DnToInvByListCobProcessEvent>(onDnToInvByListCobProcess);
     on<DnToInvByListDnProcessEvent>(onDnToInvByListDnProcess);
@@ -42,6 +41,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessed: true,
         invoiceId: invoiceStatus[0].invoiceId,
         paymentStatus: invoiceStatus[0].status,
+        totalBayar: invoiceStatus[0].totalBayar,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -51,7 +51,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
     }
   }
 
-  Future<void>  onDnToInvByListDnProcess(
+  Future<void> onDnToInvByListDnProcess(
       DnToInvByListDnProcessEvent event, Emitter<DnRekap2invState> emit) async {
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
 
@@ -66,6 +66,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessed: true,
         invoiceId: invoiceStatus[0].invoiceId,
         paymentStatus: invoiceStatus[0].status,
+        totalBayar: invoiceStatus[0].totalBayar,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -89,6 +90,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessing: false,
         isProcessed: true,
         paymentStatus: invoiceStatus[0].status,
+        totalBayar: invoiceStatus[0].totalBayar,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -112,6 +114,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         isProcessing: false,
         isProcessed: true,
         paymentStatus: invoiceStatus[0].status,
+        totalBayar: invoiceStatus[0].totalBayar,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -130,12 +133,12 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
-      List<DnHeaderCobModel> rincianSOA = await repo.fetchRincianSOACustomer(event.searchText);
+      RincianSOAModel rincianSOA = await repo.fetchRincianSOACustomer(event.searchText);
 
       emit(state.copyWith(
         isProcessing: false,
         isProcessed: true,
-        rincianSOAList: rincianSOA,
+        rincianSOA: rincianSOA,
       ));
     } catch (e) {
       emit(state.copyWith(

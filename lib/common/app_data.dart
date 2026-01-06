@@ -35,7 +35,7 @@ class AppData {
 // static String httpAuthority = "localhost:1234";
 
   //
-  static bool useSSL = false;
+  static bool useSSL = true;
   static String apiDomain =
       "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
   static String prefixEndPoint = "";

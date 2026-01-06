@@ -182,11 +182,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     // ================== PROFILE SECTION ==================
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, authState) {
-                        final custType = authState is AuthenticationAuthenticated
-                            ? (authState.user.custType ?? '').toUpperCase()
+                        final userType = authState is AuthenticationAuthenticated
+                            ? (authState.user.userType ?? '').toUpperCase()
                             : '';
 
-                        if (custType == 'C') {
+                        if (userType == 'C') {
                           // 🔹 CLIENT
                           return BlocBuilder<UserProfileCubit, UserProfileState>(
                             buildWhen: (prev, curr) {
@@ -226,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           );
                         }
 
-                        else if (custType == 'U') {
+                        else if (userType == 'U') {
                           // 🔹 USER BIASA
                           return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
                             buildWhen: (prev, curr) => prev.email != curr.email,
@@ -244,14 +244,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           );
                         }
 
-// 🔹 CUSTTYPE KOSONG / TIDAK DIKENAL
+// 🔹 userType KOSONG / TIDAK DIKENAL
                         else {
                           final fallbackEmail = authState is AuthenticationAuthenticated
                               ? (authState.user.email?.trim() ?? 'Guest User')
                               : 'Guest User';
 
                           debugPrint(
-                              "⚙️ [ProfileCard] CustType kosong/tidak dikenal → pakai auth email: $fallbackEmail");
+                              "⚙️ [ProfileCard] userType kosong/tidak dikenal → pakai auth email: $fallbackEmail");
 
                           return _buildProfileCard(
                             context: context,
@@ -275,12 +275,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     // ================== AKUN SECTION ==================
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, authState) {
-                        final custType =
+                        final userType =
                             authState is AuthenticationAuthenticated
-                                ? authState.user.custType
+                                ? authState.user.userType
                                 : '';
 
-                        if (custType == 'C') {
+                        if (userType == 'C') {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

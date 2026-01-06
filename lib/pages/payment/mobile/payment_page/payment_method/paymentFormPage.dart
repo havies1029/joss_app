@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_method//paymentlist.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_bloc.dart';
@@ -12,7 +13,9 @@ import '../../../invbayarvaform_form.dart';
 import '../payment_process/payment_process.dart';
 
 class PaymentMethods extends StatefulWidget {
-  const PaymentMethods({super.key});
+  final String curr;
+  final double totalBayar;
+  const PaymentMethods({super.key, required this.curr, required this.totalBayar});
 
   @override
   State<PaymentMethods> createState() =>
@@ -26,9 +29,7 @@ class _PaymentMethodsState
   @override
   void initState() {
     super.initState();
-    context.read<PaymentMethodCariBloc>().add(
-      PaymentMethodCariLoadEvent(),
-    );
+    context.read<PaymentMethodCariBloc>().add(PaymentMethodCariLoadEvent());
   }
 
   @override
@@ -45,24 +46,40 @@ class _PaymentMethodsState
                   if (state.isLoading) return const Center(child: CircularProgressIndicator());
                   if (state.hasError) return const Center(child: Text("Failed to load data"));
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                    itemCount: state.categories.length,
-                    itemBuilder: (context, index) {
-                      final cat = state.categories[index];
-                      return PaymentCategoryTile(
-                        categoryName: cat.categoryName,
-                        items: cat.items,
-                        isExpanded: _expandedIndex == index,
-                        onTapHeader: () {
-                          context.read<PaymentMethodCariBloc>().add(PaymentResetSelectedEvent());
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "Total Bayar: ${widget.curr} ${NumberFormat("#,###").format(widget.totalBayar)}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: hPadding),
+                            itemCount: state.categories.length,
+                            itemBuilder: (context, index) {
+                              final cat = state.categories[index];
+                              return PaymentCategoryTile(
+                                categoryName: cat.categoryName,
+                                items: cat.items,
+                                isExpanded: _expandedIndex == index,
+                                onTapHeader: () {
+                                  context.read<PaymentMethodCariBloc>().add(PaymentResetSelectedEvent());
 
-                          setState(() {
-                            _expandedIndex = _expandedIndex == index ? null : index;
-                          });
-                        },
-                      );
-                    },
+                                  setState(() {
+                                    _expandedIndex = _expandedIndex == index ? null : index;
+                                  });
+                                },
+                              );
+                            },
+                        )
+                      )
+                    ],
                   );
                 },
               ),

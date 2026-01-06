@@ -32,7 +32,9 @@ class DnsppaCariPageState extends State<DnsppaCariPage> {
           appBar: AppBar(
             title: const Text("List Outstanding Polis"),
           ),
-          body: Column(
+      body: Stack(
+        children: [
+          Column(
             children: [
               ListPageFilterBarUIWidget(
                 searchController: _searchController,
@@ -41,7 +43,11 @@ class DnsppaCariPageState extends State<DnsppaCariPage> {
               Expanded(child: DnsppaCariListWidget()),
             ],
           ),
-        );
+
+        ],
+      ),
+
+    );
 	}
 	void refreshData() {
 		dnsppaCariBloc.add(

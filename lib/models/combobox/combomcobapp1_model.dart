@@ -1,21 +1,61 @@
+// import 'package:equatable/equatable.dart';
+//
+// class ComboMCobApp1Model extends Equatable {
+//   final String mCobApp1Id;
+//   final String cobNama;
+//
+//   const ComboMCobApp1Model({this.mCobApp1Id='', this.cobNama=''});
+//
+//   factory ComboMCobApp1Model.fromJson(Map<String, dynamic> data) =>
+//       ComboMCobApp1Model(
+//         mCobApp1Id: data['mCobApp1Id'],
+//         cobNama: data['cobNama'],
+//       );
+//
+//   Map<String, dynamic> toJson() =>
+//       {'mCobApp1Id': mCobApp1Id,
+//         'cobNama': cobNama,};
+//
+//   @override
+//   List<Object> get props => [mCobApp1Id, cobNama];
+// }
+
 import 'package:equatable/equatable.dart';
 
 class ComboMCobApp1Model extends Equatable {
   final String mCobApp1Id;
   final String cobNama;
+  final String cobIcon;
+  // final String cobNama;
+  final int noUrut;
+  final bool isAktif;
 
-  const ComboMCobApp1Model({this.mCobApp1Id='', this.cobNama=''});
+  const ComboMCobApp1Model({
+    this.cobIcon = '',
+    this.cobNama = '',
+    this.isAktif = false,
+    this.mCobApp1Id = '',
+    this.noUrut = 0,
+  });
 
   factory ComboMCobApp1Model.fromJson(Map<String, dynamic> data) =>
       ComboMCobApp1Model(
-        mCobApp1Id: data['mCobApp1Id'],
+        cobIcon: data['cobIcon'],
         cobNama: data['cobNama'],
+        isAktif: data['isAktif'],
+        mCobApp1Id: data['mCobApp1Id'],
+        noUrut: data['noUrut'],
       );
 
   Map<String, dynamic> toJson() =>
-      {'mCobApp1Id': mCobApp1Id,
-        'cobNama': cobNama,};
+      {  'cobIcon': cobIcon,
+        'cobNama': cobNama,
+        'isAktif': isAktif,
+        'mCobApp1Id': mCobApp1Id,
+        'noUrut': noUrut,
+      };
 
   @override
-  List<Object> get props => [mCobApp1Id, cobNama];
+  List<Object> get props => [cobIcon, cobNama, isAktif, mCobApp1Id, noUrut];
 }
+

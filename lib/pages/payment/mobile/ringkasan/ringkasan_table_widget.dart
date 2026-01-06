@@ -23,7 +23,7 @@ class RingkasanTableWidget extends StatelessWidget {
 
         return RingkasanTablePage(
           items: state.items,
-          selectedIds: state.selectedIds.toSet(),
+          selectedIds: state.selectedIds,
           onSelect: (id) {
             context.read<DnrekapcobCariBloc>()
                 .add(ToggleSelectItemEvent(id));

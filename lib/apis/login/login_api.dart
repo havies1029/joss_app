@@ -61,13 +61,13 @@ class LoginApi {
 
       try {
         User user = User(
-          id: 0,
-          token: token.token,
-          username: username,
-          nama: info[2],
-          email: info[5],
-          userCabang: info[1],
-          custType: "C",);
+            id: 0,
+            token: token.token,
+            username: username,
+            nama: info[2],
+            email: info[5],
+            userCabang: info[1],
+            userType: "C",);
         return user;
       } on Exception {
         //debugPrint("Error : ${e.toString()}");
@@ -85,7 +85,7 @@ class LoginApi {
 
     var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetUserEndPoint);
     final http.Response response =
-    await http.get(uri, headers: <String, String>{
+        await http.get(uri, headers: <String, String>{
       'Content-Type': 'application/json; odata=verbos',
       'Accept': 'application/json; odata=verbos',
       'Authorization': 'Bearer $token'
@@ -96,27 +96,31 @@ class LoginApi {
       List<String> info = result.split(";");
       if (info[0] == "U") {
         User user = User(
-          id: 0,
-          token: token,
-          username: info[1],
-          nama: info[1],
-          email: info[2],
-          custType: info[0],);
+            id: 0,
+            token: token,
+            username: info[1],
+            nama: info[1],
+            email: info[2],
+            userType: info[0],);
         return user;
       } else if (info[0] == "C") {
         User user = User(
-          id: 0,
-          token: token,
-          username: info[1],
-          nama: info[2],
-          email: info[3],
-          custType: info[0],);
+            id: 0,
+            token: token,
+            username: info[1],
+            nama: info[2],
+            email: info[3],
+            userType: info[0],);
         return user;
       } else {
-        throw Exception("User not found or invalid token");
+        debugPrint("User not found or invalid token");
+        return null;
+        //throw Exception("User not found or invalid token");
       }
     } else {
-      throw Exception("Failed to load data getUserByTokenAPI: ${response.statusCode}");
+      debugPrint("Failed to load data getUserByTokenAPI: ${response.statusCode}");
+      return null;
+      //throw Exception("Failed to load data getUserByTokenAPI: ${response.statusCode}");
     }
   }
 }

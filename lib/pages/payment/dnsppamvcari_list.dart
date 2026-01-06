@@ -43,9 +43,16 @@ class DnsppamvCariPageState extends State<DnsppamvCariPage> {
 		);
 	}
 	void refreshData() {
+		print(">>> CALL API WITH sppa1Id = ${widget.sppa1Id}");
+
 		dnsppamvCariBloc.add(
-			RefreshDnsppamvCariEvent(sppa1Id: widget.sppa1Id, searchText: _searchController.text));
+			RefreshDnsppamvCariEvent(
+				sppa1Id: widget.sppa1Id,
+				searchText: _searchController.text,
+			),
+		);
 	}
+
 
 	IconButton buildSearchButton() {
 		return IconButton(

@@ -102,13 +102,13 @@
 //     final authState = context.read<AuthenticationBloc>().state;
 //
 //     if (authState is AuthenticationAuthenticated) {
-//       final custType = authState.user.custType;
-//       if (custType == 'C') {
+//       final userType = authState.user.userType;
+//       if (userType == 'C') {
 //         final profileState = context.read<UserProfileCubit>().state;
 //         return profileState.nama?.trim().isNotEmpty == true
 //             ? profileState.nama!.trim()
 //             : 'Client User';
-//       } else if (custType == 'U') {
+//       } else if (userType == 'U') {
 //         final regState = context.read<RegUserProfileCubit>().state;
 //         return regState.email.isNotEmpty ? regState.email : 'New User';
 //       }
@@ -300,13 +300,13 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
     final authState = context.read<AuthenticationBloc>().state;
 
     if (authState is AuthenticationAuthenticated) {
-      final custType = authState.user.custType;
-      if (custType == 'C') {
+      final userType = authState.user.userType;
+      if (userType == 'C') {
         final profileState = context.read<UserProfileCubit>().state;
         return profileState.nama?.trim().isNotEmpty == true
             ? profileState.nama!.trim()
             : 'Client User';
-      } else if (custType == 'U') {
+      } else if (userType == 'U') {
         final regState = context.read<RegUserProfileCubit>().state;
         return regState.email.isNotEmpty ? regState.email : 'New User';
       }

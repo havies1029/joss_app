@@ -224,7 +224,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
     );
 
     context.read<RegUserBloc>().add(
-        RegUserTambahEvent(record: record)
+        RegUserTambahEvent(record: record, requestFrom: '')
     );
   }
 
@@ -411,7 +411,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                               );
 
                                               context.read<RegUserBloc>().add(
-                                                RegUserTambahEvent(record: record),
+                                                RegUserTambahEvent(record: record, requestFrom: ''),
                                               );
                                             }
                                           },

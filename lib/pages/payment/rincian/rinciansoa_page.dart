@@ -25,6 +25,7 @@ class _RincianSoaPageState extends State<RincianSoaPage> {
     super.initState();
 
     Future.delayed(const Duration(milliseconds: 500), () {
+      dn2invBloc.add(InitializeDnRekap2invEvent());
       refreshData();
     });
   }
@@ -33,15 +34,15 @@ class _RincianSoaPageState extends State<RincianSoaPage> {
   Widget build(BuildContext context) {    
     dn2invBloc = BlocProvider.of<DnRekap2invBloc>(context);
     dnrekapcobCariBloc = BlocProvider.of<DnrekapcobCariBloc>(context);
-    dn2invBloc.add(InitializeDnRekap2invEvent());
+    
     return BlocListener<DnRekap2invBloc, DnRekap2invState>(
       listener: (BuildContext context, DnRekap2invState state) {  
         if (state.isProcessed){
           if (state.paymentStatus == "20"){
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Silakan lanjutkan ke metode pembayaran.')),
+              const SnackBar(content: Text('Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.')),
             );
-            onViewPaymentMethods();
+            onViewPaymentMethods(state.curr, state.totalBayar);
           } 
           else if (state.paymentStatus == "30"){
             ScaffoldMessenger.of(context).showSnackBar(
@@ -102,10 +103,11 @@ class _RincianSoaPageState extends State<RincianSoaPage> {
                       searchController: _searchController,
                       searchButton: buildSearchButton()),
                 Expanded(
-                  child: state.rincianSOAList.isEmpty
+                  child: state.rincianSOA.headers.isEmpty
                       ? const Center(child: Text("Data kosong"))
                       : RincianSoaWidget(
-                    headers: state.rincianSOAList,
+                    headers: state.rincianSOA.headers,
+                    grandTotals: state.rincianSOA.grandtotal,
                     selectedIds: state.selectedIds,
                     onSelect: (dn1Id) {
                       dn2invBloc.add(SelectDetailEvent(dn1Id));
@@ -115,6 +117,7 @@ class _RincianSoaPageState extends State<RincianSoaPage> {
                     },
                   ),
                 ),
+                
               ],
             );
           },
@@ -140,11 +143,13 @@ class _RincianSoaPageState extends State<RincianSoaPage> {
 	}
 
 
-  void onViewPaymentMethods() {
+  void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentMethodsCariListPage()),
+      MaterialPageRoute(builder: (context) => PaymentMethodsCariListPage(curr: curr, totalBayar: totalBayar)),
     ); // Implement your ta    
   }    
+
   
+
 }

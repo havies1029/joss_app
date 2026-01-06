@@ -19,6 +19,7 @@ enum CategoryType {
   hull,
   sdm,
   lain_lain,
+  rincian
 }
 
 class ExportHelper {
@@ -305,6 +306,7 @@ class ExportHelper {
       'marineKargo': 'Marine & Kargo',
       'sdm': 'Sumber Daya Manusia',
       'lain_lain': 'Lain-lain',
+      'rincian': 'Rincian',
     };
     return categoryLabels[name] ?? name;
   }

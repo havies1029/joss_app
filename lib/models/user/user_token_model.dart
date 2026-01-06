@@ -1,19 +1,19 @@
 class UserToken {
   int? id;
   String? token;
-  String? custType;
+  String? userType;
 
-  UserToken({this.id, this.token, this.custType = ""});
+  UserToken({this.id, this.token, this.userType = ""});
 
   factory UserToken.fromDatabaseJson(Map<String, dynamic> data) => UserToken(
     id: data['id'],
     token: data['token'],
-    custType: data['custType'] ?? "",
+    userType: data['userType'] ?? "",
   );
 
   Map<String, dynamic> toDatabaseJson() => {
     "id": id,
     "token": token,
-    "custType": custType,
+    "userType": userType,
   };
 }

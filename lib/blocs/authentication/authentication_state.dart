@@ -10,30 +10,10 @@ class AuthenticationUninitialized extends AuthenticationState {}
 class AuthenticationAuthenticated extends AuthenticationState {
   final User user;
   final String authenticatedFrom;
-  final bool isSwitchingToClient;
-
-  AuthenticationAuthenticated({
-    required this.user,
-    required this.authenticatedFrom,
-    this.isSwitchingToClient = false,
-  });
-
-  AuthenticationAuthenticated copyWith({
-    User? user,
-    String? authenticatedFrom,
-    bool? isSwitchingToClient,
-  }) {
-    return AuthenticationAuthenticated(
-      user: user ?? this.user,
-      authenticatedFrom: authenticatedFrom ?? this.authenticatedFrom,
-      isSwitchingToClient: isSwitchingToClient ?? this.isSwitchingToClient,
-    );
-  }
-
+  AuthenticationAuthenticated({required this.user, required this.authenticatedFrom});
   @override
-  List<Object> get props => [user, authenticatedFrom, isSwitchingToClient];
+  List<Object> get props => [user, authenticatedFrom];
 }
-
 
 class AuthenticationGoogleUserAuthenticated extends AuthenticationState {
   final GoogleSignInAccount user;
@@ -81,6 +61,13 @@ class AuthenticationRequirePinHPVerification extends AuthenticationState {
 
 class AuthenticationForgotPassword extends AuthenticationState {}
 
-class AuthenticationRequireRegisterClient extends AuthenticationState {}
+class AuthenticationRequireRegisterClient extends AuthenticationState {
+  final String requiredFrom;
+  AuthenticationRequireRegisterClient({required this.requiredFrom});
+  @override
+  List<Object> get props => [requiredFrom];
+}
 
 class AuthenticationPhonePinVerified extends AuthenticationState {}
+
+class AuthenticationUserRoleChanged extends AuthenticationState {}
