@@ -329,8 +329,8 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
       //
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        // Navigator.push(context, MaterialPageRoute(builder: (_) => RincianSoaPage()));
+        // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => RincianSoaPage()));
         break;
 
       // case 'Test Page':

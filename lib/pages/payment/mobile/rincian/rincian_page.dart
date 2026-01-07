@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_success/payment_success.dart';
+import 'package:joss_app/pages/payment/mobile/rincian/rincian_grand_total_widget.dart';
 import 'package:joss_app/pages/payment/mobile/rincian/rincian_tabel_page.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../blocs/payment/dnrekapcobcari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
 import '../../paymentmethodcari_list.dart';
-import '../payment_page/payment_method/paymentFormPage.dart';
+import '../bayar_button.dart';
+import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
+import 'konfirmasi_detail_polis.dart';
 
 class RincianPage extends StatefulWidget {
   const RincianPage({super.key});
@@ -64,14 +67,14 @@ class _RincianPageState extends State<RincianPage> {
         if (state.isProcessed){
           if (state.paymentStatus == "20"){
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Silakan lanjutkan ke metode pembayaran.')),
+              successSnackBar('Silakan lanjutkan ke metode pembayaran.'),
             );
             onViewPaymentMethods(state.curr, state.totalBayar);
           }
           else if (state.paymentStatus == "30"){
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Silakan lakukan pembayaran.')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(infoSnackBar('Silakan lakukan pembayaran.'));
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -79,9 +82,9 @@ class _RincianPageState extends State<RincianPage> {
             );
           }
           else if (state.paymentStatus == "40"){
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Proses pembayaran Berhasil.')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(successSnackBar('Proses pembayaran berhasil.'));
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -91,7 +94,7 @@ class _RincianPageState extends State<RincianPage> {
           else if (state.paymentStatus == "91"){
             refreshData();
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Proses pembayaran gagal. Silakan coba lagi.')),
+              errorSnackBar('Proses pembayaran gagal. Silakan coba lagi.'),
             );
           }
         }
@@ -118,46 +121,44 @@ class _RincianPageState extends State<RincianPage> {
                     ),
 
                     Expanded(
-                      child: state.rincianSOA.headers.isEmpty
-                          ? const Center(child: Text("Data kosong"))
-                          : RincianTablePage(
-                        headers: state.rincianSOA.headers,
-                        selectedIds: state.selectedIds,
-                        onSelect: (dn1Id) {
-                          dn2invBloc.add(SelectDetailEvent(dn1Id));
-                        },
-                        onUnselect: (dn1Id) {
-                          dn2invBloc.add(UnselectDetailEvent(dn1Id));
-                        },
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: state.rincianSOA.headers.isEmpty
+                                ? const Center(child: Text("Data kosong"))
+                                : RincianTablePage(
+                              headers: state.rincianSOA.headers,
+                              selectedIds: state.selectedIds,
+                              onSelect: (dn1Id) {
+                                dn2invBloc.add(SelectDetailEvent(dn1Id));
+                              },
+                              onUnselect: (dn1Id) {
+                                dn2invBloc.add(UnselectDetailEvent(dn1Id));
+                              },
+                            ),
+                          ),
+
+                          RincianGrandTotalTableWidget(
+                            grandTotals: state.rincianSOA.grandtotal,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
 
-                // 👉 FAB ala-Scaffold
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SpeedDial(
-                      icon: Icons.menu,
-                      activeIcon: Icons.close,
-                      backgroundColor: Colors.blue,
-                      children: [
-                        SpeedDialChild(
-                          child: const Icon(Icons.payment),
-                          label: 'Lanjut Pembayaran',
-                          onTap: () {
-                            context.read<DnRekap2invBloc>().add(
-                              DnToInvByListDnProcessEvent(
-                                listDn: dn2invBloc.state.selectedIds.join(";"),
-                              ),
-                            );
-                          },
+                BayarButton(
+                  isEnabled: state.selectedIds.isNotEmpty,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RincianKonfirmasiDetailPage(
+                          selectedDnIds: List.from(state.selectedIds),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ],
             );

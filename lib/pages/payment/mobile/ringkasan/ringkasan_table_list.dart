@@ -111,7 +111,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
             final isNo = text == "No";
 
             return Padding(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
               child:
                   isNo
                       ? Center(

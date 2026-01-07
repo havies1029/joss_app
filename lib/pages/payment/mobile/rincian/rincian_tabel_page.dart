@@ -11,6 +11,8 @@ class RincianTablePage extends StatefulWidget {
   final List<String> selectedIds;
   final Function(String dn1Id) onSelect;
   final Function(String dn1Id) onUnselect;
+  final bool readOnly;
+  final bool showFooter;
 
   const RincianTablePage({
     super.key,
@@ -18,6 +20,8 @@ class RincianTablePage extends StatefulWidget {
     required this.selectedIds,
     required this.onSelect,
     required this.onUnselect,
+    this.readOnly = false,
+    this.showFooter = true,
   });
 
   @override
@@ -27,6 +31,16 @@ class RincianTablePage extends StatefulWidget {
 class _RincianTablePageState extends State<RincianTablePage> {
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
+  }
+
+  List<DnDetailSppaModel> _filteredDetails(
+      List<DnDetailSppaModel> details,
+      ) {
+    if (!widget.readOnly) return details;
+
+    return details
+        .where((d) => widget.selectedIds.contains(d.dn1Id))
+        .toList();
   }
 
   @override
@@ -42,18 +56,22 @@ class _RincianTablePageState extends State<RincianTablePage> {
       ),
       itemBuilder: (context, index) {
         final header = widget.headers[index];
-
+        final filteredDetails = _filteredDetails(header.details);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeaderTitle(context, header),
             const SizedBox(height: hPadding),
 
-            isNarrow
-                ? _buildDetailTableCompact(header.details)
-                : _buildDetailTableNormal(header.details),
 
-            _buildFooterTable(header.footers),
+
+        isNarrow
+        ? _buildDetailTableCompact(filteredDetails)
+            : _buildDetailTableNormal(filteredDetails),
+
+            if (widget.showFooter)
+              _buildFooterTable(header.footers),
+
           ],
         );
       },
@@ -71,7 +89,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
-      borderRadius: BorderRadius.only(
+      borderRadius: widget.readOnly
+          ? BorderRadius.circular(cardBorderRadius)
+          : BorderRadius.only(
         topLeft: Radius.circular(cardBorderRadius),
         topRight: Radius.circular(cardBorderRadius),
       ),
@@ -97,20 +117,22 @@ class _RincianTablePageState extends State<RincianTablePage> {
               horizontalInside: BorderSide(color: sGrey, width: 1),
               verticalInside: BorderSide(color: sGrey, width: 1),
             ),
-            columnWidths: const {
-              0: FixedColumnWidth(40),
-              1: FixedColumnWidth(50),
-              2: IntrinsicColumnWidth(),
-              3: IntrinsicColumnWidth(),
-              4: FixedColumnWidth(80),
-              5: FixedColumnWidth(120),
+            columnWidths: {
+              0: widget.readOnly
+                  ? const FixedColumnWidth(0)
+                  : const FixedColumnWidth(40),
+              1: const FixedColumnWidth(50),
+              2: const IntrinsicColumnWidth(),
+              3: const IntrinsicColumnWidth(),
+              4: const FixedColumnWidth(80),
+              5: const FixedColumnWidth(120),
             },
             children: [
               _tableHeader(context, [
                 "",
                 "NO",
                 "NO POLIS",
-                "PERIODE POLIS",
+                "PERIODE\nPOLIS",
                 "CURR",
                 "PREMI",
               ]),
@@ -132,10 +154,13 @@ class _RincianTablePageState extends State<RincianTablePage> {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
-      borderRadius: BorderRadius.only(
+      borderRadius: widget.readOnly
+          ? BorderRadius.circular(cardBorderRadius)
+          : BorderRadius.only(
         topLeft: Radius.circular(cardBorderRadius),
         topRight: Radius.circular(cardBorderRadius),
       ),
+
       child: Container(
         decoration: BoxDecoration(
           color: formGrey,
@@ -156,17 +181,19 @@ class _RincianTablePageState extends State<RincianTablePage> {
             horizontalInside: BorderSide(color: sGrey, width: 1),
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
-          columnWidths: const {
-            0: FlexColumnWidth(1),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(2),
-            3: FlexColumnWidth(3),
-            4: FlexColumnWidth(1.5),
-            5: FlexColumnWidth(2),
+          columnWidths: {
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FlexColumnWidth(1),
+            1: const FlexColumnWidth(1),
+            2: const FlexColumnWidth(2),
+            3: const FlexColumnWidth(3),
+            4: const FlexColumnWidth(1.5),
+            5: const FlexColumnWidth(2),
           },
           children: [
             _tableHeader(context, [
-              "",
+               "",
               "NO",
               "NO POLIS",
               "PERIODE POLIS",
@@ -275,7 +302,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
       children: cells
           .map(
             (text) => Padding(
-          padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
           child: Text(
             text,
             style: bodyTextStyle(context, fontSize: 15),
@@ -295,36 +322,39 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
     return TableRow(
       decoration: BoxDecoration(
-        color: isSelected
+        color: (!widget.readOnly && isSelected)
             ? primaryColor.withOpacity(0.3)
             : (index.isEven ? pGrey : formGrey),
       ),
       children: [
-        Center(
-          child: Checkbox(
-            value: isSelected,
-            onChanged: (checked) {
-              if (checked == true) {
-                widget.onSelect(d.dn1Id);
-              } else {
-                widget.onUnselect(d.dn1Id);
-              }
-            },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+        if (!widget.readOnly)
+          Center(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: (checked) {
+                if (checked == true) {
+                  widget.onSelect(d.dn1Id);
+                } else {
+                  widget.onUnselect(d.dn1Id);
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+              ),
+              side: MaterialStateBorderSide.resolveWith(
+                    (states) => const BorderSide(color: sGrey),
+              ),
+              fillColor: MaterialStateProperty.resolveWith(
+                    (states) =>
+                states.contains(MaterialState.selected)
+                    ? primaryColor
+                    : Colors.transparent,
+              ),
+              checkColor: primaryLightColor,
             ),
-            side: MaterialStateBorderSide.resolveWith(
-                  (states) => BorderSide(color: sGrey),
-            ),
-            fillColor: MaterialStateProperty.resolveWith(
-                  (states) =>
-              states.contains(MaterialState.selected)
-                  ? primaryColor
-                  : Colors.transparent,
-            ),
-            checkColor: primaryLightColor,
-          ),
-        ),
+          )
+        else
+          const SizedBox(),
 
         Center(
           child: Text(

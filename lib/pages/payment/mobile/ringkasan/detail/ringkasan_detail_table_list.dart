@@ -71,7 +71,7 @@ class RingkasanDetailTableList extends StatelessWidget {
 
   Widget _headerCell(BuildContext context, String text) {
     return Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
       child: Text(
         text,
         style: bodyTextStyle(context, fontSize: 15),

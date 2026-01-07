@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
 import 'package:joss_app/blocs/payment/pay1crud_bloc.dart';
@@ -37,47 +38,43 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
 
   @override
   Widget build(BuildContext context) {
-    double fontSize16 = getResponsiveFont(context, 16);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              hPadding * 1.5,
-              16,
-              hPadding * 1.5,
-              8,
-            ),
-            child: Row(
+    return Dialog(
+      backgroundColor: pGrey,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: sGrey),
+      ),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
               children: [
-                Expanded(
-                  child: Text(
-                    "Detail Pembayaran",
-                    style: TextStyle(
-                      fontSize: fontSize16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                const Spacer(),
+                Text(
+                  "Detail",
+                  style: bodyTextStyle(context, fontSize: 16),
                 ),
+                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
-          ),
 
-          const Divider(height: 1),
+            const Divider(height: 1),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: hPadding * 1.5,
-              vertical: 10,
-            ),
-            child: BlocBuilder<Pay1CrudBloc, Pay1CrudState>(
+      Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 10,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            BlocBuilder<Pay1CrudBloc, Pay1CrudState>(
               buildWhen: (p, c) =>
               p.isLoading != c.isLoading ||
                   p.isLoaded != c.isLoaded ||
@@ -89,113 +86,154 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
                   return const LoadingIndicator();
                 }
 
-                return _buildPay1SummaryFromModel(
-                  state.record!,
-                  fontSize: fontSize16,
-                );
+                return _buildPay1SummaryFromModel(state.record!);
               },
             ),
-          ),
 
-          const SizedBox(height: hPadding),
+            const SizedBox(height: hPadding),
+            const Divider(height: 1),
+            const SizedBox(height: hPadding),
 
-          const Divider(height: 1),
-
-          const SizedBox(height: hPadding),
-
-          Flexible(
-            fit: FlexFit.loose,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: hPadding * 1.5,
+            SizedBox(
+              height: 250, // atur sesuai kebutuhan UI
+              child: SingleChildScrollView(
+                child: RiwayatTableWidget(),
               ),
-              child: RiwayatTableWidget(),
             ),
-          ),
 
-          const SizedBox(height: hPadding),
 
-          const Divider(height: 1),
+            const SizedBox(height: hPadding),
+            const Divider(height: 1),
+            const SizedBox(height: hPadding),
 
-          const SizedBox(height: hPadding),
-        ],
-      ),
+            BlocBuilder<Pay1CrudBloc, Pay1CrudState>(
+              buildWhen: (p, c) =>
+              p.isLoading != c.isLoading ||
+                  p.isLoaded != c.isLoaded ||
+                  p.record != c.record,
+              builder: (context, state) {
+                if (state.isLoading ||
+                    state.isLoaded != true ||
+                    state.record == null) {
+                  return const LoadingIndicator();
+                }
+
+                return _buildTotalBayar(state.record!);
+              },
+            ),
+
+            const SizedBox(height: 15),
+
+            /// ❌ Flexible DIHAPUS
+            AppButton.iconLeft(
+              text: 'Unduh Invoice',
+              icon: SvgPicture.asset(
+                'assets/icons/invoice.svg',
+                width: 18,
+                height: 18,
+              ),
+            ),
+          ],
+        ),
+      )
+      ],
+        ),
+      )
     );
   }
 
-  Widget _buildPay1SummaryFromModel(Pay1CrudModel model, {required double fontSize}) {
-    final labelStyle = TextStyle(
-      fontSize: fontSize,
-      color: primaryLightColor.withOpacity(0.75),
-      fontWeight: FontWeight.w500,
-    );
-
-    final valueStyle = TextStyle(
-      fontSize: fontSize,
-      color: primaryLightColor,
-      fontWeight: FontWeight.w600,
-    );
+  Widget _buildPay1SummaryFromModel(Pay1CrudModel model) {
+    final title = bodyTextStyle(context, fontSize: 14);
+    final value =
+    bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey);
 
     return Column(
       children: [
-        _kvRow(labelStyle, valueStyle, "No Pembayaran:", model.ar1Id),
-
-        const SizedBox(height: hPadding),
-
-        _kvRow(labelStyle, valueStyle, "Tanggal Dibayar:", _dateFmt.format(model.arTgl)),
-
-        const SizedBox(height: hPadding),
-
-        _kvRow(labelStyle, valueStyle, "Jumlah Polis Dibayar:", "${model.sppaCount} Polis"),
-
-        const SizedBox(height: hPadding),
-
-        _kvRow(labelStyle, valueStyle, "Total OS:", _fmtNum(model.totalOs)),
-      ],
-    );
-  }
-
-  Widget _kvRow(TextStyle labelStyle, TextStyle valueStyle, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Text(label, style: labelStyle),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("No Pembayaran:", style: title),
+            Text(model.ar1Id, style: value),
+          ],
         ),
-        const SizedBox(width: hPadding),
-        Expanded(
-          child: Text(
-            value,
-            style: valueStyle,
-            textAlign: TextAlign.right,
-          ),
+        const SizedBox(height: hPadding),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Tanggal Dibayar:", style: title),
+            Text(_dateFmt.format(model.arTgl), style: value),
+          ],
+        ),
+        const SizedBox(height: hPadding),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Jumlah Polis Dibayar:", style: title),
+            Text("${model.sppaCount} Polis", style: value),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildPay1SummarySkeleton({required double fontSize}) {
-    Widget line(double w) => Container(
-      height: fontSize,
-      width: w,
-      decoration: BoxDecoration(
-        color: primaryLightColor.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-    );
 
-    return Column(
+  Widget _buildTotalBayar(Pay1CrudModel model) {
+    final title = bodyTextStyle(context, fontSize: 14);
+    final value =
+    bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey);
+
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(children: [Expanded(child: line(140)), line(120)]),
-        const SizedBox(height: hPadding),
-        Row(children: [Expanded(child: line(160)), line(100)]),
-        const SizedBox(height: hPadding),
-        Row(children: [Expanded(child: line(190)), line(90)]),
-        const SizedBox(height: hPadding),
-        Row(children: [Expanded(child: line(90)), line(130)]),
+        Text("Total Pembayaran:", style: title),
+        Text(_fmtNum(model.totalOs), style: value),
       ],
     );
   }
+
+  // Widget _kvRow(TextStyle labelStyle, TextStyle valueStyle, String label, String value) {
+  //   return Row(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Expanded(
+  //         child: Text(label, style: labelStyle),
+  //       ),
+  //       const SizedBox(width: hPadding),
+  //       Expanded(
+  //         child: Text(
+  //           value,
+  //           style: valueStyle,
+  //           textAlign: TextAlign.right,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  // Widget _buildPay1SummarySkeleton({required double fontSize}) {
+  //   Widget line(double w) => Container(
+  //     height: fontSize,
+  //     width: w,
+  //     decoration: BoxDecoration(
+  //       color: primaryLightColor.withOpacity(0.12),
+  //       borderRadius: BorderRadius.circular(6),
+  //     ),
+  //   );
+  //
+  //   return Column(
+  //     children: [
+  //       Row(children: [Expanded(child: line(140)), line(120)]),
+  //       const SizedBox(height: hPadding),
+  //       Row(children: [Expanded(child: line(160)), line(100)]),
+  //       const SizedBox(height: hPadding),
+  //       Row(children: [Expanded(child: line(190)), line(90)]),
+  //       const SizedBox(height: hPadding),
+  //       Row(children: [Expanded(child: line(90)), line(130)]),
+  //     ],
+  //   );
+  // }
 
   void refreshData() {
     pay1CrudBloc.add(Pay1CrudLihatEvent(recordId: widget.ar1Id));

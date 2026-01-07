@@ -56,23 +56,22 @@ class RiwayatPageState extends State<RiwayatPage> {
           }),
         ],
         child: Scaffold(
-          floatingActionButton: FloatingMenuMasterWidget(
-              onTambah: onTambahData),
-          body: Center(
+          // floatingActionButton: FloatingMenuMasterWidget(
+          //     onTambah: onTambahData),
+          body: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: hPadding * 1.5,
+              vertical: 10,
+            ),
+            color: secondaryBlackColor,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(height: vPadding,),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                    vertical: 8,
-                  ),
-                  child: ListPageFilterBarUIWidget(
-                    searchController: _searchController,
-                    searchButton: buildSearchButton(),
-                  ),
+                ListPageFilterBarUIWidget(
+                  searchController: _searchController,
+                  searchButton: buildSearchButton(),
                 ),
+                const SizedBox(height: 10),
                 buildList()
               ],
 

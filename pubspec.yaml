@@ -71,6 +71,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/bank_logo/
     - assets/images/
     - assets/icons/
     - assets/images/month/
