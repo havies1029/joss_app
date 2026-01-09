@@ -1,5 +1,5 @@
-import 'package:joss_app/apis/combobox/combomcobapp1_api.dart';
-import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+import '../../apis/combobox/combomcobapp1_api.dart';
+import '../../models/combobox/combomcobapp1_model.dart';
 
 class ComboMCobApp1Repository {
 

@@ -13,7 +13,7 @@ class HeroCardWidget extends StatefulWidget {
   final String premiumAmount;
   final int polisCount;
   final VoidCallback? onDetailTap;
-  final String custType;
+  final String userType;
 
   const HeroCardWidget({
     super.key,
@@ -23,7 +23,7 @@ class HeroCardWidget extends StatefulWidget {
     required this.premiumAmount,
     required this.polisCount,
     this.onDetailTap,
-    required this.custType,
+    required this.userType,
   });
 
   @override
@@ -50,7 +50,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
   }
   @override
   Widget build(BuildContext context) {
-    final custType = widget.custType;
+    final userType = widget.userType;
     final mjnsclientId = context.watch<UserProfileCubit>().state.mjnsclientId ?? '';
 
     return Container(
@@ -72,7 +72,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
             _buildUserHeader(context),
             const SizedBox(height: 16),
 
-            if (custType == 'C' && mjnsclientId == '10') _buildInfoCardPremi(context),
+            if (userType == 'C' && mjnsclientId == '10') _buildInfoCardPremi(context),
 
             const SizedBox(height: 12),
           ],
@@ -132,7 +132,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           //         style: headingStyle(context, fontSize: 22),
           //       ),
           //       // Text(
-          //       //   widget.custType == 'C'
+          //       //   widget.userType == 'C'
           //       //       ? 'Klien JPS'
           //       //       : 'Nasabah Biasa',
           //       //   style: bodyTextStyle(context),
@@ -145,7 +145,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           //   ),
           // ),
 
-          widget.custType != 'C' ?
+          widget.userType != 'C' ?
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -39,12 +39,12 @@ class HeroPage extends StatelessWidget {
                     children: [
                       BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, authState) {
-                          final custType =
+                          final userType =
                           authState is AuthenticationAuthenticated
-                              ? (authState.user.custType ?? '').toUpperCase()
+                              ? (authState.user.userType ?? '').toUpperCase()
                               : '';
 
-                          if (custType == 'C') {
+                          if (userType == 'C') {
                             // 🔹 Client → ambil dari UserProfileCubit
                             return BlocBuilder<UserProfileCubit, UserProfileState>(
                               buildWhen:
@@ -66,13 +66,13 @@ class HeroPage extends StatelessWidget {
                                 return _buildHeroContent(
                                   context,
                                   displayName: displayName,
-                                  custType: custType,
+                                  userType: userType,
                                   bytes: bytes,
                                   screenHeight: screenHeight,
                                 );
                               },
                             );
-                          } else if (custType == 'U') {
+                          } else if (userType == 'U') {
                             // 🔹 User baru → ambil dari RegUserProfileCubit
                             return BlocBuilder<
                                 RegUserProfileCubit,
@@ -88,14 +88,14 @@ class HeroPage extends StatelessWidget {
                                 return _buildHeroContent(
                                   context,
                                   displayName: displayName,
-                                  custType: custType,
+                                  userType: userType,
                                   bytes: null,
                                   screenHeight: screenHeight,
                                 );
                               },
                             );
                           } else {
-                            // 🔹 CustType kosong / tidak dikenal
+                            // 🔹 userType kosong / tidak dikenal
                             final fallbackEmail =
                             authState is AuthenticationAuthenticated
                                 ? (authState.user.email?.trim() ?? 'Guest User')
@@ -104,7 +104,7 @@ class HeroPage extends StatelessWidget {
                             return _buildHeroContent(
                               context,
                               displayName: fallbackEmail,
-                              custType: custType.isEmpty ? '(Unknown)' : custType,
+                              userType: userType.isEmpty ? '(Unknown)' : userType,
                               bytes: null,
                               screenHeight: screenHeight,
                             );
@@ -126,7 +126,7 @@ class HeroPage extends StatelessWidget {
   Widget _buildHeroContent(
       BuildContext context, {
         required String displayName,
-        required String custType,
+        required String userType,
         Uint8List? bytes,
         required double screenHeight,
       }) {
@@ -137,8 +137,8 @@ class HeroPage extends StatelessWidget {
         HeroCardWidget(
           userName: displayName,
           imageBytes: bytes,
-          premiumAmount: custType == 'C' ? '10.500.000.000' : '0',
-          polisCount: custType == 'C' ? 21 : 0,
+          premiumAmount: userType == 'C' ? '10.500.000.000' : '0',
+          polisCount: userType == 'C' ? 21 : 0,
           onDetailTap: () {
             Navigator.push(
               context,
@@ -147,15 +147,15 @@ class HeroPage extends StatelessWidget {
               ),
             );
           },
-          custType: custType,
+          userType: userType,
         ),
         const SizedBox(height: vPadding - 3),
-        ListMenuWidget(custType: custType),
+        ListMenuWidget(userType: userType),
         const SizedBox(height: vPadding - 3),
         const CarouselMenuWidget(),
         const SizedBox(height: vPadding - 3),
 
-        if (custType == 'C')
+        if (userType == 'C')
           const TransaksiListWidget()
         else
           Column(

@@ -9,10 +9,11 @@ abstract class RegUserEvents extends Equatable {
 
 class RegUserTambahEvent extends RegUserEvents {
 	final RegUserModel record;
-	const RegUserTambahEvent({required this.record});
+  final String requestFrom;
+	const RegUserTambahEvent({required this.record, required this.requestFrom});
 
 	@override
-	List<Object> get props => [record];
+	List<Object> get props => [record, requestFrom];
 }
 
 class RegUserUbahEvent extends RegUserEvents {
@@ -46,4 +47,5 @@ class ValidasiPinHPEvent extends RegUserEvents {
 	@override
 	List<Object> get props => [record];
 }
+
 

@@ -1,40 +1,45 @@
-import 'package:joss_app/models/combobox/combombank_model.dart';
+import 'package:joss_app/models/payment/instruksibayar_model.dart';
 
 class InvbayarvaFormModel {
+  String bankNama;
 	DateTime batasBayar;
-	String invbayarvaId;
-	String trsVaNoref;
+	String iconId;
+	String iconUrl;
 	String vaNo;
-	String? mbankId;
-	ComboMBankModel? comboMBank;
+	double totalBayar;
+  String curr;
+  List<InstruksiBayarModel> instruksi;
 
-	InvbayarvaFormModel({required this.batasBayar, required this.invbayarvaId, 
-		required this.trsVaNoref, required this.vaNo, 
-		this.mbankId, this.comboMBank});
-
+	InvbayarvaFormModel({
+    required this.bankNama, required this.batasBayar, required this.iconId, 
+		required this.iconUrl, required this.vaNo, 
+		required this.totalBayar, required this.curr, required this.instruksi,});
 	factory InvbayarvaFormModel.fromJson(Map<String, dynamic> data) {
-		ComboMBankModel? comboMBank;
-		if (data['comboMBank'] != null) {
-			comboMBank = ComboMBankModel.fromJson(data['comboMBank']);
-		}
-
 		return InvbayarvaFormModel(
+      bankNama: data['bankNama']??'',
 			batasBayar: DateTime.tryParse(data['batasBayar'].toString())??DateTime.now(),
-			invbayarvaId: data['invbayarvaId']??'',
-			trsVaNoref: data['trsVaNoref']??'',
+			iconId: data['iconId']??'',
+			iconUrl: data['iconUrl']??'',
 			vaNo: data['vaNo']??'',
-			mbankId: data['mbankId']??'',
-			comboMBank: comboMBank
+			totalBayar: (data['totalBayar'] ?? 0).toDouble(),
+      curr: data['curr']??'',
+      instruksi: (data['instruksi'] as List<dynamic>?)
+          ?.map((e) => InstruksiBayarModel.fromJson(e))
+          .toList() ?? [],
 		);
 
 	}
 
 	Map<String, dynamic> toJson() =>
-		{'batasBayar': batasBayar.toIso8601String(),
-		'invbayarvaId': invbayarvaId,
-		'trsVaNoref': trsVaNoref,
-		'vaNo': vaNo,
-		'mbankId': mbankId,
-		'comboMBank': comboMBank?.toJson()};
+		{
+      'bankNama': bankNama,
+      'batasBayar': batasBayar.toIso8601String(),
+      'iconId': iconId,
+      'iconUrl': iconUrl,
+      'vaNo': vaNo,
+      'totalBayar': totalBayar,
+      'curr': curr,
+      'instruksi': instruksi.map((e) => e.toJson()).toList(),
+    };
 
 }

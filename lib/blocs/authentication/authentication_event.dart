@@ -63,11 +63,12 @@ class ForgotPasword extends AuthenticationEvent {
 
 class UserAuthenticated extends AuthenticationEvent {
   final User user;
+  final String authenticatedFrom;
 
-  const UserAuthenticated({required this.user});
+  const UserAuthenticated({required this.user, required this.authenticatedFrom});
 
   @override
-  List<Object> get props => [user];
+  List<Object> get props => [user, authenticatedFrom];
 }
 
 class GoogleUserAuthenticated extends AuthenticationEvent {
@@ -79,7 +80,21 @@ class GoogleUserAuthenticated extends AuthenticationEvent {
   List<Object> get props => [user];
 }
 
-class RequireRegisterClient extends AuthenticationEvent {}
+class RequireRegisterClient extends AuthenticationEvent {
+  final String requiredFrom;
+  const RequireRegisterClient({required this.requiredFrom});
+  @override
+  List<Object> get props => [requiredFrom];
+}
 
 class PhonePinVerified extends AuthenticationEvent {}
 
+class UserRoleChanged extends AuthenticationEvent {
+  final User user;
+  final String authenticatedFrom;
+
+  const UserRoleChanged({required this.user, required this.authenticatedFrom});
+  
+  @override
+  List<Object> get props => [user, authenticatedFrom];
+}

@@ -8,7 +8,6 @@ class InvbayarvaFormState extends Equatable {
 	final bool isSaving;
 	final bool isSaved;
 	final bool hasFailure;
-	final ComboMBankModel? comboMBank;
 	const InvbayarvaFormState(
 		{this.record,
 		this.isLoading = false,
@@ -16,7 +15,6 @@ class InvbayarvaFormState extends Equatable {
 		this.isSaving = false,
 		this.isSaved = false,
 		this.hasFailure = false,
-		this.comboMBank,
 });
 
 	InvbayarvaFormState copyWith({
@@ -26,7 +24,6 @@ class InvbayarvaFormState extends Equatable {
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMBankModel? comboMBank,
 	}){
 		return InvbayarvaFormState(
 			record: record ?? this.record,
@@ -35,7 +32,6 @@ class InvbayarvaFormState extends Equatable {
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMBank: comboMBank?? this.comboMBank,
 		);
 	}
 

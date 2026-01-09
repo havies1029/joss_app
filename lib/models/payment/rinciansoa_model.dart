@@ -1,5 +1,5 @@
-import 'package:eassist_tools_app/models/payment/dngrandtotal_model.dart';
-import 'package:eassist_tools_app/models/payment/dnheadercob_model.dart';
+import 'dngrandtotal_model.dart';
+import 'dnheadercob_model.dart';
 
 class RincianSOAModel {
   final List<DnHeaderCobModel> headers;

@@ -4,11 +4,11 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/payment/dnrekapcobcari_model.dart';
 import 'package:path/path.dart';
 
-class RingkasanTablePage extends StatelessWidget {
+class RingkasanTablePage extends StatefulWidget {
   final List<DnrekapcobCariModel> items;
   final Set<String> selectedIds;
-  final ValueChanged<String> onSelect;
-  final ValueChanged<String> onUnselect;
+  final Function(String dn1Id) onSelect;
+  final Function(String dn1Id) onUnselect;
 
   const RingkasanTablePage({
     super.key,
@@ -17,7 +17,11 @@ class RingkasanTablePage extends StatelessWidget {
     required this.onSelect,
     required this.onUnselect,
   });
+  @override
+  State<RingkasanTablePage> createState() => _RingkasanTablePageState();
+}
 
+class _RingkasanTablePageState extends State<RingkasanTablePage> {
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
   }
@@ -25,9 +29,9 @@ class RingkasanTablePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: items.length,
+      itemCount: widget.items.length,
       itemBuilder: (context, index) {
-        final item = items[index];
+        final item = widget.items[index];
         return Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -35,7 +39,7 @@ class RingkasanTablePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailTable(context, item, index),
+              _buildBodyTable(context, item, index),
               const SizedBox(height: hPadding),
               _buildFooterTable(context, item),
             ],
@@ -48,9 +52,9 @@ class RingkasanTablePage extends StatelessWidget {
   // ============================
   // DETAIL TABLE
   // ============================
-  Widget _buildDetailTable(
+  Widget _buildBodyTable(
     BuildContext context,
-    DnrekapcobCariModel item,
+    DnrekapcobCariModel bodyItems,
     int index,
   ) {
     return ClipRRect(
@@ -70,17 +74,25 @@ class RingkasanTablePage extends StatelessWidget {
               verticalInside: BorderSide(color: sGrey),
             ),
             columnWidths: const {
-              0: FixedColumnWidth(50),  // Checkbox  (35 + 15)
-              1: FixedColumnWidth(50),  // No        (35 + 15)
-              2: FixedColumnWidth(70),  // Kategori  (55 + 15)
-              3: FixedColumnWidth(70),  // Jumlah Polis (55 + 15)
-              4: FixedColumnWidth(55),  // Curr      (40 + 15)
+              0: FixedColumnWidth(50), // Checkbox  (35 + 15)
+              1: FixedColumnWidth(50), // No        (35 + 15)
+              2: FixedColumnWidth(70), // Kategori  (55 + 15)
+              3: FixedColumnWidth(70), // Jumlah Polis (55 + 15)
+              4: FixedColumnWidth(55), // Curr      (40 + 15)
               5: FixedColumnWidth(115), // TSI       (100 + 15)
-              6: FixedColumnWidth(95),  // Premi     (80 + 15)
+              6: FixedColumnWidth(95), // Premi     (80 + 15)
             },
             children: [
-              _tableHeader(context),
-              _detailRowWithCheckbox(context, item, index),
+              _tableHeader(context, [
+                "",
+                "NO",
+                "KATEGORI",
+                "JUMLAH\nPOLIS",
+                "CURR",
+                "TOTAL NILAI\nPERTANGGUNGAN",
+                "TOTAL PREMI",
+              ]),
+              _detailRowWithCheckbox(context, bodyItems, index),
             ],
           ),
         ),
@@ -89,72 +101,98 @@ class RingkasanTablePage extends StatelessWidget {
   }
 
   // ============================
-  // TABLE HEADER
+  // TABLE HELPERS
   // ============================
-  TableRow _tableHeader(BuildContext context) {
+  TableRow _tableHeader(BuildContext context, List<String> cells) {
     return TableRow(
       decoration: BoxDecoration(color: formGrey),
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(6),
-          child: SizedBox(), // checkbox header
-        ),
+      children:
+          cells.map((text) {
+            final isNo = text == "No";
 
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            "NO",
-            textAlign: TextAlign.center,
-            style: bodyTextStyle(context, fontSize: 15),
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text("KATEGORI", style: bodyTextStyle(context, fontSize: 15)),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            "JUMLAH\nPOLIS",
-            style: bodyTextStyle(context, fontSize: 15),
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text("CURR", style: bodyTextStyle(context, fontSize: 15)),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            "TOTAL NILAI\nPERTANGGUNGAN",
-            style: bodyTextStyle(context, fontSize: 15),
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            "TOTAL PREMI",
-            style: bodyTextStyle(context, fontSize: 15),
-          ),
-        ),
-      ],
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
+              child:
+                  isNo
+                      ? Center(
+                        child: Text(
+                          text,
+                          style: bodyTextStyle(context, fontSize: 15),
+                        ),
+                      )
+                      : Text(text, style: bodyTextStyle(context, fontSize: 15)),
+            );
+          }).toList(),
     );
   }
+
+  // ============================
+  // TABLE HEADER
+  // ============================
+  // TableRow _tableHeader(BuildContext context) {
+  //   return TableRow(
+  //     decoration: BoxDecoration(color: formGrey),
+  //     children: [
+  //       const Padding(
+  //         padding: EdgeInsets.all(6),
+  //         child: SizedBox(), // checkbox header
+  //       ),
+  //
+  //       Padding(
+  //         padding: const EdgeInsets.all(6),
+  //         child: Text(
+  //           "NO",
+  //           textAlign: TextAlign.center,
+  //           style: bodyTextStyle(context, fontSize: 15),
+  //         ),
+  //       ),
+  //
+  //       Padding(
+  //         padding: const EdgeInsets.all(6),
+  //         child: Text("KATEGORI", style: bodyTextStyle(context, fontSize: 15)),
+  //       ),
+  //
+  //       Padding(
+  //         padding: const EdgeInsets.all(6),
+  //         child: Text(
+  //           "JUMLAH\nPOLIS",
+  //           style: bodyTextStyle(context, fontSize: 15),
+  //         ),
+  //       ),
+  //
+  //       Padding(
+  //         padding: const EdgeInsets.all(6),
+  //         child: Text("CURR", style: bodyTextStyle(context, fontSize: 15)),
+  //       ),
+  //
+  //       Padding(
+  //         padding: const EdgeInsets.all(6),
+  //         child: Text(
+  //           "TOTAL NILAI\nPERTANGGUNGAN",
+  //           style: bodyTextStyle(context, fontSize: 15),
+  //         ),
+  //       ),
+  //
+  //       Padding(
+  //         padding: const EdgeInsets.all(6),
+  //         child: Text(
+  //           "TOTAL PREMI",
+  //           style: bodyTextStyle(context, fontSize: 15),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   // ============================
   // DETAIL ROW WITH CHECKBOX
   // ============================
   TableRow _detailRowWithCheckbox(
     BuildContext context,
-    DnrekapcobCariModel item,
+    DnrekapcobCariModel rows,
     int index,
   ) {
-    final isSelected = selectedIds.contains(item.cobId);
+    final isSelected = widget.selectedIds.contains(rows.cobId);
 
     return TableRow(
       decoration: BoxDecoration(
@@ -171,9 +209,9 @@ class RingkasanTablePage extends StatelessWidget {
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
-                  onSelect(item.cobId);
+                  widget.onSelect(rows.cobId);
                 } else {
-                  onUnselect(item.cobId);
+                  widget.onUnselect(rows.cobId);
                 }
               },
               shape: RoundedRectangleBorder(
@@ -208,7 +246,7 @@ class RingkasanTablePage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
-              item.cobNama,
+              rows.cobNama,
               style: bodyTextStyle(context, fontSize: 15),
             ),
           ),
@@ -219,7 +257,7 @@ class RingkasanTablePage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
-              formatNum(item.polisCount),
+              formatNum(rows.polisCount),
               style: bodyTextStyle(context, fontSize: 15),
             ),
           ),
@@ -230,7 +268,7 @@ class RingkasanTablePage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
-              item.currSimbol,
+              rows.currSimbol,
               style: bodyTextStyle(context, fontSize: 15),
             ),
           ),
@@ -241,7 +279,7 @@ class RingkasanTablePage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
-              formatNum(item.tsi),
+              formatNum(rows.tsi),
               style: bodyTextStyle(context, fontSize: 15),
             ),
           ),
@@ -252,7 +290,7 @@ class RingkasanTablePage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
-              formatNum(item.polisAmount),
+              formatNum(rows.polisAmount),
               style: bodyTextStyle(context, fontSize: 15),
             ),
           ),
@@ -264,7 +302,7 @@ class RingkasanTablePage extends StatelessWidget {
   // ============================
   // FOOTER SUMMARY TABLE
   // ============================
-  Widget _buildFooterTable(BuildContext context, DnrekapcobCariModel item) {
+  Widget _buildFooterTable(BuildContext context, DnrekapcobCariModel footers) {
     return ClipRRect(
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(cardBorderRadius),
@@ -307,7 +345,7 @@ class RingkasanTablePage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(10),
                   child: Text(
-                    item.currSimbol,
+                    footers.currSimbol,
                     style: bodyTextStyle(context, fontSize: 15),
                   ),
                 ),
@@ -318,7 +356,7 @@ class RingkasanTablePage extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      formatNum(item.polisAmount),
+                      formatNum(footers.polisAmount),
                       style: bodyTextStyle(context, fontSize: 15),
                     ),
                   ),

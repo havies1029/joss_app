@@ -6,11 +6,12 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
+import 'package:joss_app/pages/payment/mobile/payment_page/payment_process/payment_process.dart';
 import 'package:joss_app/pages/payment/mobile/ringkasan/ringkasan_table_widget.dart';
 import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list.dart';
 import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
-import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
-import 'package:joss_app/pages/payment/paymentsuccess_form.dart';
+import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
+import 'package:joss_app/pages/payment/mobile/payment_page/payment_success/payment_success.dart';
 
 import '../../../../common/constants.dart';
 import '../../../../helper/expert_helper.dart';
@@ -18,6 +19,8 @@ import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
+import '../bayar_button.dart';
+import 'detail/ringkasan_detail_page.dart';
 
 class RingkasanPage extends StatefulWidget {
   const RingkasanPage({super.key});
@@ -47,34 +50,30 @@ class RingkasanPageState extends State<RingkasanPage> {
         if (state.isProcessed) {
           if (state.paymentStatus == "20") {
             ScaffoldMessenger.of(context).showSnackBar(
-              successSnackBar(
-                'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
-              ),
+              successSnackBar('Silakan lanjutkan ke metode pembayaran.'),
             );
-            onViewPaymentMethods();
+            onViewPaymentMethods(state.curr, state.totalBayar);
           } else if (state.paymentStatus == "30") {
-            ScaffoldMessenger.of(context).showSnackBar(
-              infoSnackBar(
-                'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
-              ),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(infoSnackBar('Silakan lakukan pembayaran.'));
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder:
-                    (context) => InvbayarvaFormFormPage(
+                    (context) => PaymentProcess(
                       viewMode: "ubah",
                       recordId: state.invoiceId,
                     ),
               ),
             );
           } else if (state.paymentStatus == "40") {
-            ScaffoldMessenger.of(context).showSnackBar(
-              successSnackBar('Proses pembayaran berhasil.'),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(successSnackBar('Proses pembayaran berhasil.'));
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PaymentsuccessFormPage()),
+              MaterialPageRoute(builder: (context) => PaymentSuccess()),
             );
           } else if (state.paymentStatus == "91") {
             refreshData();
@@ -85,79 +84,74 @@ class RingkasanPageState extends State<RingkasanPage> {
         }
       },
       child: Scaffold(
-        floatingActionButton: SpeedDial(
-          icon: Icons.menu,
-          activeIcon: Icons.close,
-          backgroundColor: Colors.blue,
+        body: Stack(
           children: [
-            SpeedDialChild(
-              child: const Icon(Icons.add),
-              label: 'View Outstanding Polis',
-              onTap: () => onViewListOutstandingPolis(),
-            ),
-            SpeedDialChild(
-              child: const Icon(Icons.payment),
-              label: 'Lanjut Pembayaran',
-              onTap: () {
-                context.read<DnRekap2invBloc>().add(
-                  DnToInvByListCobProcessEvent(
-                    listCob: dnrekapcobCariBloc.state.selectedIds.join(";"),
+            // ====== MAIN CONTENT ======
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: hPadding * 1.5,
+                vertical: 10,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ListPageFilterBarUIWidget(
+                          searchController: _searchController,
+                          searchButton: buildSearchButton(),
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      PolisButton(
+                        assetPath: "assets/icons/unduh.svg",
+                        bgColor: const Color(0xFFA1A1AA),
+                        borderColor: const Color(0xFFBCBCC7),
+                        onTap: () => _showExportDialog(context),
+                        iconSize: 16,
+                        height: 36,
+                        width: 36,
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      PolisButton(
+                        assetPath: "assets/icons/bagikan.svg",
+                        bgColor: const Color(0xFF295EFF),
+                        borderColor: const Color(0xFF5D86FF),
+                        onTap: () => _onShare(context),
+                        iconSize: 16,
+                        height: 36,
+                        width: 36,
+                      ),
+                    ],
                   ),
+
+                  const SizedBox(height: hPadding),
+                  Expanded(child: buildList()),
+                  const SizedBox(height: hPadding),
+                  buildInfoNote(context),
+                ],
+              ),
+            ),
+
+            // ====== FLOATING BAYAR BUTTON ======
+            BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+              builder: (context, state) {
+                final hasSelection = state.selectedIds.isNotEmpty;
+
+                return BayarButton(
+                  isEnabled: hasSelection,
+                  onTap: hasSelection ? onViewListOutstandingPolis : null,
                 );
               },
             ),
           ],
         ),
-        body: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: hPadding * 1.5,
-            vertical: 10,
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ListPageFilterBarUIWidget(
-                      searchController: _searchController,
-                      searchButton: buildSearchButton(),
-                    ),
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  PolisButton(
-                    assetPath: "assets/icons/unduh.svg",
-                    bgColor: const Color(0xFFA1A1AA),
-                    borderColor: const Color(0xFFBCBCC7),
-                    onTap: () => _showExportDialog(context),
-                    iconSize: 16,
-                    height: 36,
-                    width: 36,
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  PolisButton(
-                    assetPath: "assets/icons/bagikan.svg",
-                    bgColor: const Color(0xFF295EFF),
-                    borderColor: const Color(0xFF5D86FF),
-                    onTap: () => _onShare(context),
-                    iconSize: 16,
-                    height: 36,
-                    width: 36,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: hPadding),
-              Expanded(child: buildList()),
-              const SizedBox(height: hPadding),
-              buildInfoNote(context)
-            ],
-          ),
-        ),
       ),
+
     );
   }
 
@@ -165,20 +159,13 @@ class RingkasanPageState extends State<RingkasanPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          Icons.info_outline,
-          size: 18,
-          color: primaryLightColor,
-        ),
+        Icon(Icons.info_outline, size: 18, color: primaryLightColor),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             "Apabila Anda melakukan pembayaran melalui bagian keuangan internal kami, "
-                "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate.",
-            style: bodyTextStyle(
-              context,
-              fontSize: 15,
-            ),
+            "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate.",
+            style: bodyTextStyle(context, fontSize: 15),
           ),
         ),
       ],
@@ -190,7 +177,7 @@ class RingkasanPageState extends State<RingkasanPage> {
       context,
       MaterialPageRoute(
         builder:
-            (context) => DnsppaCariPage(
+            (context) => RingkasanDetailPage(
               listcobId: dnrekapcobCariBloc.state.selectedIds.join(";"),
               currId: '001',
             ),
@@ -198,16 +185,14 @@ class RingkasanPageState extends State<RingkasanPage> {
     );
   }
 
-  // ============================
-  // EXPORT DIALOG
-  // ============================
+  ///Export dialog
   void _showExportDialog(BuildContext context) {
     final state = dnrekapcobCariBloc.state;
 
     if (state.selectedIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar("Pilih data terlebih dahulu"),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
       return;
     }
 
@@ -265,9 +250,7 @@ class RingkasanPageState extends State<RingkasanPage> {
     );
   }
 
-  // ============================
-  // EXPORT DATA
-  // ============================
+  ///Export data
   Future<void> _exportData(
     BuildContext context,
     ExportFormat format,
@@ -302,29 +285,27 @@ class RingkasanPageState extends State<RingkasanPage> {
       }
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          successSnackBar("Berhasil ekspor ${data.length} item"),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(successSnackBar("Berhasil ekspor ${data.length} item"));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          errorSnackBar("Gagal ekspor: $e"),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(errorSnackBar("Gagal ekspor: $e"));
       }
     }
   }
 
-  // ============================
-  // SHARE DIALOG
-  // ============================
+  ///Share data
   void _onShare(BuildContext context) {
     final state = dnrekapcobCariBloc.state;
 
     if (state.selectedIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar("Pilih data terlebih dahulu"),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
       return;
     }
 
@@ -441,10 +422,10 @@ ${selectedItems.map((e) => '• ${e.cobNama}: ${e.polisCount} polis').join('\n')
     );
   }
 
-  void onViewPaymentMethods() {
+  void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentMethodsCariListPage()),
+      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
     );
   }
 

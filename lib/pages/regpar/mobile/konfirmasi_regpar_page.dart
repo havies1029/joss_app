@@ -189,7 +189,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PaymentMethodsCariListPage(
+                            builder: (context) => PaymentMethodsCariListPage(curr: '', totalBayar: 0,
                               // recordId: widget.recordId ?? '',
                               // viewMode: 'ubah',
                             ),

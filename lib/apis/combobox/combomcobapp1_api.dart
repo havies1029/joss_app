@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
-import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+import '../../models/combobox/combomcobapp1_model.dart';
 
 class ComboMCobApp1API {
 

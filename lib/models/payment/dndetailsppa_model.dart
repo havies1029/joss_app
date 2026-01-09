@@ -11,11 +11,11 @@ class DnDetailSppaModel {
   int rownumber;
 	String sppa1Id;
 
-	DnDetailSppaModel({required this.cobId, required this.currSimbol, 
-		required this.dnOs, required this.dn1Id, 
-		required this.noPolis, required this.objectDesc, 
-		required this.polisAkhir, required this.polisMulai, 
-		required this.rownumber,    
+	DnDetailSppaModel({required this.cobId, required this.currSimbol,
+		required this.dnOs, required this.dn1Id,
+		required this.noPolis, required this.objectDesc,
+		required this.polisAkhir, required this.polisMulai,
+		required this.rownumber,
 		required this.sppa1Id});
 
 	factory DnDetailSppaModel.fromJson(Map<String, dynamic> data) {
@@ -32,6 +32,15 @@ class DnDetailSppaModel {
 			sppa1Id: data['sppa1Id']??''
 		);
 
+	}
+	Map<String, dynamic> toExportMap() {
+		return {
+			'No Polis': noPolis,
+			'Periode Mulai': polisAkhir.toIso8601String(),
+			'Periode Akhir': polisMulai.toIso8601String(),
+			'Currency': currSimbol,
+			'Premi': dnOs.toString(),
+		};
 	}
 
 	Map<String, dynamic> toJson() =>

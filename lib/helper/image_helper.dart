@@ -30,4 +30,21 @@ class ImageHelper {
     final now = DateTime.now();
     return now.microsecondsSinceEpoch.toString();
   }
+
+  static String bankLogoAsset(String bankCode) {
+    switch (bankCode.toUpperCase()) {
+      case 'BCA':
+        return 'assets/bank_logo/bca.png';
+      case 'MANDIRI':
+        return 'assets/bank_logo/mandiri.png';
+      case 'BNI':
+        return 'assets/bank_logo/bni.png';
+      case 'BRI':
+        return 'assets/bank_logo/bri.png';
+      case 'DANAMON':
+        return 'assets/bank_logo/danamon.png';
+      default:
+        return 'assets/bank_logo/bank.png';
+    }
+  }
 }

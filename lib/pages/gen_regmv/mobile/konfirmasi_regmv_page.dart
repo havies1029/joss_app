@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../../blocs/gen_regmv/regmv1crud_bloc.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv3form_bloc.dart';
@@ -14,7 +15,6 @@ import '../../../models/gen_regmv/regmv4form_model.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
-import '../../payment/mobile/payment_page/payment_method/paymentFormPage.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {
   final String viewMode;
@@ -219,7 +219,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PaymentMethods(
+                            builder: (context) => PaymentMethodPage(curr: '', totalBayar:0,
                               // recordId: widget.recordId ?? '',
                               // viewMode: 'ubah',
                             ),

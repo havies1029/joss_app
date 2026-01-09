@@ -37,12 +37,9 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
-          insetPadding: const EdgeInsets.all(16),
-          child: BlocProvider.value(
-            value: context.read<Pay2CariBloc>(),
-            child: RiwayatDetailTablePage(ar1Id: ar1Id),
-          ),
+        return BlocProvider.value(
+          value: context.read<Pay2CariBloc>(),
+          child: RiwayatDetailTablePage(ar1Id: ar1Id),
         );
       },
       useSafeArea: true,
@@ -102,30 +99,9 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
           );
         }
 
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: hPadding * 1.5,
-            vertical: 8,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Riwayat Pembayaran",
-                style: TextStyle(
-                  fontSize: getResponsiveFont(context, 18),
-                  color: primaryLightColor,
-                ),
-              ),
-
-              const SizedBox(height: hPadding),
-
-              isNarrow
-                  ? _buildTableCompact(state.items)
-                  : _buildTableNormal(state.items)
-            ],
-          ),
-        );
+        return SizedBox(child: isNarrow
+            ? _buildTableCompact(state.items)
+            : _buildTableNormal(state.items));
       },
     );
   }
@@ -142,7 +118,6 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minWidth: MediaQuery.of(context).size.width - (hPadding * 3),
-              // -padding kiri kanan (kamu pakai hPadding*1.5 x2)
             ),
             child: Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -227,11 +202,11 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
     return TableRow(
       decoration: const BoxDecoration(color: formGrey),
       children: [
-        _headerCell("No"),
-        _headerCell("No Pembayaran"),
-        _headerCell("Tanggal Dibayar"),
-        _headerCell("Jumlah Polis"),
-        _headerCell("Total Pembayaran"),
+        _headerCell("NO"),
+        _headerCell("NO PEMBAYARAN"),
+        _headerCell("TANGGAL\nDIBAYAR"),
+        _headerCell("JUMLAH\nPOLIS"),
+        _headerCell("TOTAL PEMBAYARAN"),
         // _headerCell("Aksi"),
       ],
     );
@@ -239,11 +214,11 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
 
   Widget _headerCell(String text) {
     return Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
       child: Text(
         text,
         style: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontSize: 15,
           color: primaryLightColor,
         ),
       ),
@@ -312,7 +287,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
       padding: const EdgeInsets.all(6),
       child: Text(
         text,
-        style: TextStyle(color: primaryLightColor),
+        style: TextStyle(color: primaryLightColor, fontSize: 15),
       ),
     );
   }

@@ -6,6 +6,7 @@ import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../payment/dnsppamvcari_list.dart';
 import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
 // import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
 // import '../../../payment/mobile/rincian/rincian_page.dart';
@@ -17,9 +18,9 @@ import 'package:confetti/confetti.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
-  final String custType;
+  final String userType;
 
-  const ListMenuWidget({super.key, required this.custType});
+  const ListMenuWidget({super.key, required this.userType});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class ListMenuWidget extends StatelessWidget {
     final itemWidth = getItemWidth(context);
     return Column(
       children: [
-        if (custType != 'C') _buildDaftarKlienButton(context),
+        if (userType != 'C') _buildDaftarKlienButton(context),
 
         Container(
           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
@@ -49,7 +50,7 @@ class ListMenuWidget extends StatelessWidget {
                     final item = menuItems[index];
                     return SizedBox(
                       width: itemWidth,
-                      child: _buildMenuItem(context, item, custType),
+                      child: _buildMenuItem(context, item, userType),
                     );
                   },
                 ),
@@ -186,8 +187,8 @@ class ListMenuWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, MenuItem item, String custType) {
-    final isClient = custType == 'C';
+  Widget _buildMenuItem(BuildContext context, MenuItem item, String userType) {
+    final isClient = userType == 'C';
     final isAlwaysActive =
         item.title == "Cari Asuransi" || item.title == "Lapor Klaim" || item.title == "Bantuan";
 
@@ -328,8 +329,8 @@ class ListMenuWidget extends StatelessWidget {
       //   break;
       //
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage()));
-        // Navigator.push(context, MaterialPageRoute(builder: (_) => RincianSoaPage()));
+        // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => RincianSoaPage()));
         break;
 
       // case 'Test Page':

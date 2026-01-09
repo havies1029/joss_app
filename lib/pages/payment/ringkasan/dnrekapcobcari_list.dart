@@ -1,5 +1,4 @@
 import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
-import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list.dart';
 import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
 import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
 import 'package:joss_app/pages/payment/paymentsuccess_form.dart';
@@ -7,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
-import 'package:joss_app/pages/payment/ringkasan/dnrekapcobcari_list_widget.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
+import 'detail/dnsppacari_list.dart';
+import 'dnrekapcobcari_list_widget.dart';
 
 class DnrekapcobCariPage extends StatefulWidget {
   const DnrekapcobCariPage({super.key});
@@ -40,7 +41,7 @@ class DnrekapcobCariPageState extends State<DnrekapcobCariPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.')),
             );
-            onViewPaymentMethods();
+            onViewPaymentMethods(state.curr, state.totalBayar);
           } 
           else if (state.paymentStatus == "30"){
             refreshData();
@@ -119,10 +120,10 @@ class DnrekapcobCariPageState extends State<DnrekapcobCariPage> {
     ); // Implement your tambah data logic here
   }
 
-  void onViewPaymentMethods() {
+  void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentMethodsCariListPage()),
+      MaterialPageRoute(builder: (context) => PaymentMethodsCariListPage(curr: curr, totalBayar: totalBayar)),
     ); // Implement your ta    
   }    
 
@@ -150,6 +151,4 @@ class DnrekapcobCariPageState extends State<DnrekapcobCariPage> {
       ],
     );
   }
-
-
 }

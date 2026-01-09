@@ -5,76 +5,55 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/login/emailverification_model.dart';
 
 class EmailVerificationAPI {
-	Future<ReturnDataAPI> emailVerificationTambahAPI(
-			EmailVerificationModel record) async {
+
+	Future<ReturnDataAPI> emailVerificationTambahAPI(EmailVerificationModel record) async {
 		String tambahEndpoint =
-				"${AppData.prefixEndPoint}/api/login/emailverification/create";
+			"${AppData.prefixEndPoint}/api/login/emailverification/create";
 		Map<String, String> queryParams = {"modul_id": "emailVerificationTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		// 🔍 DEBUG LOG
-		print("📤 [emailVerificationTambahAPI]");
-		print("→ URI: $uri");
-		print("→ Request Body: ${jsonEncode(record.toJson())}");
+    //debugPrint("emailVerificationTambahAPI #10");
+    //debugPrint("URI: $uri");
+    //debugPrint("Request Body: ${jsonEncode(record.toJson())}");
 
 		ReturnDataAPI returnData;
-		final http.Response response = await http.post(
-			uri,
+		final http.Response response = await http.post(uri,
 			headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
 			},
-			body: jsonEncode(record.toJson()),
-		);
+			body: jsonEncode(record.toJson()));
 
-		print("📥 Response Status: ${response.statusCode}");
-		print("📥 Raw Response Body: ${response.body}");
+      
 
 		if (response.statusCode == 200) {
-			final decoded = jsonDecode(response.body);
-			print("🧩 ReturnDataAPI JSON: $decoded"); // 🔥 log sebelum parse
-			returnData = ReturnDataAPI.fromDatabaseJson(decoded);
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
-
-		print("✅ Final ReturnData: success=${returnData.success}, data=${returnData.data}, rowcount=${returnData.rowcount}");
 		return returnData;
 	}
 
-	Future<ReturnDataAPI> validasiPinEmailAPI(
-			EmailVerificationModel record) async {
+  Future<ReturnDataAPI> validasiPinEmailAPI(EmailVerificationModel record) async {
 		String tambahEndpoint =
-				"${AppData.prefixEndPoint}/api/login/emailverification/validasipinemail";
+			"${AppData.prefixEndPoint}/api/login/emailverification/validasipinemail";
 		Map<String, String> queryParams = {"modul_id": "validasiPinEmailAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		print("📤 [validasiPinEmailAPI]");
-		print("→ URI: $uri");
-		print("→ Request Body: ${jsonEncode(record.toJson())}");
-
 		ReturnDataAPI returnData;
-		final http.Response response = await http.post(
-			uri,
+		final http.Response response = await http.post(uri,
 			headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
 			},
-			body: jsonEncode(record.toJson()),
-		);
-
-		print("📥 Response Status: ${response.statusCode}");
-		print("📥 Raw Response Body: ${response.body}");
+			body: jsonEncode(record.toJson()));
 
 		if (response.statusCode == 200) {
-			final decoded = jsonDecode(response.body);
-			print("🧩 ReturnDataAPI JSON: $decoded");
-			returnData = ReturnDataAPI.fromDatabaseJson(decoded);
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
-
-		print("✅ Final ReturnData: success=${returnData.success}, data=${returnData.data}, rowcount=${returnData.rowcount}");
 		return returnData;
 	}
+	
 }

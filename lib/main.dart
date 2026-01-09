@@ -496,7 +496,7 @@ Future<void> main() async {
             listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
             listener: (context, state) {
               final s = state as AuthenticationAuthenticated;
-              if (s.user.custType == 'C') {
+              if (s.user.userType == 'C') {
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
                 debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
               }
@@ -648,7 +648,7 @@ class _AppState extends State<_App> {
               }
 
               // 🔹 3. Handle Client ('C')
-              if ((user.custType ?? '').toUpperCase() == 'C') {
+              if ((user.userType ?? '').toUpperCase() == 'C') {
                 context.read<UserProfileCubit>().setProfile(
                   mrekan1Id: user.id?.toString(),
                   nama: user.nama,
@@ -702,7 +702,7 @@ class _AppState extends State<_App> {
               }
 
               // 🔹 4. Handle User Biasa ('U')
-              else if ((user.custType ?? '').toUpperCase() == 'U') {
+              else if ((user.userType ?? '').toUpperCase() == 'U') {
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
                   if (ChatInitService.I.isInitialized) return;
 
@@ -735,7 +735,7 @@ class _AppState extends State<_App> {
                 });
               }
 
-              // 🔹 5. Handle CustType kosong / tidak dikenali
+              // 🔹 5. Handle userType kosong / tidak dikenali
               else {
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
                   if (ChatInitService.I.isInitialized) return;

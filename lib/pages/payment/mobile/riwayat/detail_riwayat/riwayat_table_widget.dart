@@ -75,7 +75,7 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
-        decoration: _boxDecorationTopOnly(), // mirip rincian (bagian atas)
+        decoration: _boxDecoration(), // mirip rincian (bagian atas)
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Table(
@@ -104,7 +104,7 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
-        decoration: _boxDecorationTopOnly(),
+        decoration: _boxDecoration(),
         child: Table(
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           border: _tableBorder(),
@@ -126,7 +126,7 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
   }
 
   // ========= SHARED PARTS =========
-  BoxDecoration _boxDecorationTopOnly() {
+  BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: formGrey,
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -150,10 +150,10 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
     return const TableRow(
       decoration: BoxDecoration(color: formGrey),
       children: [
-        _HeaderCell("No", center: true),
-        _HeaderCell("No Polis/SPPA"),
-        _HeaderCell("Periode"),
-        _HeaderCell("Outstanding"),
+        _headerCell("NO", center: true),
+        _headerCell("NO POLIS"),
+        _headerCell("PERIODE\NPOLIS"),
+        _headerCell("PRREMI"),
       ],
     );
   }
@@ -208,22 +208,22 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
 }
 
 // header cell helper biar const TableRow bisa dipakai
-class _HeaderCell extends StatelessWidget {
+class _headerCell extends StatelessWidget {
   final String text;
   final bool center;
 
-  const _HeaderCell(this.text, {this.center = false});
+  const _headerCell(this.text, {this.center = false});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
       child: center
           ? Center(
         child: Text(
           text,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontSize: 15,
             color: primaryLightColor,
           ),
         ),
@@ -231,7 +231,7 @@ class _HeaderCell extends StatelessWidget {
           : Text(
         text,
         style: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontSize: 15,
           color: primaryLightColor,
         ),
       ),
