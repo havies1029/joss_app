@@ -6,12 +6,13 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
+import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_process/payment_process.dart';
 import 'package:joss_app/pages/payment/mobile/ringkasan/ringkasan_table_widget.dart';
 import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list.dart';
 import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
-import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
-import 'package:joss_app/pages/payment/mobile/payment_page/payment_success/payment_success.dart';
+import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
+import 'package:joss_app/pages/payment/paymentsuccess_form.dart';
 
 import '../../../../common/constants.dart';
 import '../../../../helper/expert_helper.dart';
@@ -20,6 +21,7 @@ import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
 import '../bayar_button.dart';
+import '../payment_page/payment_success/payment_success.dart';
 import 'detail/ringkasan_detail_page.dart';
 
 class RingkasanPage extends StatefulWidget {

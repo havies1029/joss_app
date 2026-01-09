@@ -5,6 +5,7 @@ import 'package:joss_app/models/payment/dnfootercob_model.dart';
 import 'package:joss_app/models/payment/dnheadercob_model.dart';
 
 import '../../../../common/constants.dart';
+import '../../../../widgets/apptheme/dialog_detail_polis.dart';
 
 class RincianTablePage extends StatefulWidget {
   final List<DnHeaderCobModel> headers;
@@ -313,6 +314,35 @@ class _RincianTablePageState extends State<RincianTablePage> {
     );
   }
 
+  void _showDetailPopup(BuildContext context, DnDetailSppaModel d) {
+    DialogDetailPolis.show(
+      context,
+      title: "Detail",
+      items: [
+        DetailItem(
+          label: "NO",
+          value: d.rownumber.toString(),
+        ),
+        DetailItem(
+          label: "NO POLIS",
+          value: d.noPolis,
+        ),
+        DetailItem(
+          label: "Tanggal Mulai",
+          value: d.polisMulai.toString().substring(0, 10),
+        ),
+        DetailItem(
+          label: "Tanggal Berakhir",
+          value: d.polisAkhir.toString().substring(0, 10),
+        ),
+        DetailItem(
+          label: "Total Premi",
+          value: "${d.currSimbol} ${formatNum(d.dnOs)}",
+        ),
+      ],
+    );
+  }
+
   TableRow _detailRowWithCheckbox(
       DnDetailSppaModel d,
       int index, {
@@ -356,49 +386,72 @@ class _RincianTablePageState extends State<RincianTablePage> {
         else
           const SizedBox(),
 
-        Center(
-          child: Text(
-            d.rownumber.toString(),
-            style: TextStyle(color: primaryLightColor),
+        _tapCell(
+          context: context,
+          data: d,
+          child: Center(
+            child: Text(
+              d.rownumber.toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
           ),
         ),
 
-        Center(
+        _tapCell(
+          context: context,
+          data: d,
           child: Text(
             d.noPolis,
             maxLines: compact ? 2 : null,
-            overflow:
-            compact ? TextOverflow.ellipsis : TextOverflow.visible,
+            overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
             style: TextStyle(color: primaryLightColor),
           ),
         ),
 
-        Padding(
-          padding: const EdgeInsets.all(6),
+        _tapCell(
+          context: context,
+          data: d,
           child: Text(
             "${d.polisMulai.toString().substring(0, 10)} → "
                 "${d.polisAkhir.toString().substring(0, 10)}",
             maxLines: compact ? 2 : null,
-            overflow:
-            compact ? TextOverflow.ellipsis : TextOverflow.visible,
+            overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
             style: TextStyle(color: primaryLightColor),
           ),
         ),
 
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Text(d.currSimbol,
-              style: TextStyle(color: primaryLightColor)),
+        _tapCell(
+          context: context,
+          data: d,
+          child: Text(
+            d.currSimbol,
+            style: TextStyle(color: primaryLightColor),
+          ),
         ),
 
-        Padding(
-          padding: const EdgeInsets.all(6),
+        _tapCell(
+          context: context,
+          data: d,
           child: Text(
             formatNum(d.dnOs),
             style: TextStyle(color: primaryLightColor),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _tapCell({
+    required BuildContext context,
+    required DnDetailSppaModel data,
+    required Widget child,
+  }) {
+    return InkWell(
+      onTap: () => _showDetailPopup(context, data),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: child,
+      ),
     );
   }
 }

@@ -28,6 +28,11 @@ class PaymentMethodPage extends StatefulWidget {
 
 class _PaymentMethodPageState extends State<PaymentMethodPage> {
   int? _expandedIndex;
+  final categoryIcons = [
+    'assets/icons/va.svg',
+    'assets/icons/ewallet.svg',
+    'assets/icons/cc.svg',
+  ];
 
   @override
   void initState() {
@@ -36,113 +41,105 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
           PaymentMethodCariLoadEvent(),
         );
   }
+
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Metode Pembayaran",
       child: Container(
         color: secondaryBlackColor,
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         child: Column(
           children: [
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+              child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    if (state.hasError) {
-                      return const Center(
-                        child: Text("Gagal memuat metode pembayaran"),
-                      );
-                    }
-
-                    return Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: pGrey,
-                            borderRadius: BorderRadius.circular(cardBorderRadius),
-                            border: Border.all(color: sGrey),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Total Pembayaran:",
-                                style: inputTextStyle(context),
-                              ),
-                              Text(
-                                "${widget.curr} "
-                                    "${NumberFormat("#,###").format(widget.totalBayar)}",
-                                style: headingStyle(context),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(height: vPadding),
-
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: state.categories.length,
-                            itemBuilder: (context, index) {
-                              final cat = state.categories[index];
-
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: hPadding),
-                                child: PaymentList(
-                                  categoryName: cat.categoryName,
-                                  items: cat.items,
-                                  isExpanded: _expandedIndex == index,
-                                  onTapHeader: () {
-                                    if (_expandedIndex != index) {
-                                      context
-                                          .read<PaymentMethodCariBloc>()
-                                          .add(PaymentResetSelectedEvent());
-                                    }
-
-                                    setState(() {
-                                      _expandedIndex =
-                                      _expandedIndex == index ? null : index;
-                                    });
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                  if (state.hasError) {
+                    return const Center(
+                      child: Text("Gagal memuat metode pembayaran"),
                     );
-                  },
-                ),
+                  }
+
+                  return Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: pGrey,
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                          border: Border.all(color: sGrey),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Total Pembayaran:", style: inputTextStyle(context)),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${widget.curr} ${NumberFormat("#,###").format(widget.totalBayar)}",
+                              style: headingStyle(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: pGrey,
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                          border: Border.all(color: sGrey),
+                        ),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: state.categories.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: sGrey.withOpacity(0.5),
+                          ),
+                          itemBuilder: (context, index) {
+                            final cat = state.categories[index];
+
+                            return PaymentList(
+                              iconPath: categoryIcons[index],
+                              categoryName: cat.categoryName,
+                              items: cat.items,
+                              isExpanded: _expandedIndex == index,
+                              onTapHeader: () {
+                                if (_expandedIndex != index) {
+                                  context
+                                      .read<PaymentMethodCariBloc>()
+                                      .add(PaymentResetSelectedEvent());
+                                }
+
+                                setState(() {
+                                  _expandedIndex =
+                                  _expandedIndex == index ? null : index;
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
-
-            /// ===== BUTTON LANJUTKAN =====
             BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
               builder: (context, state) {
                 if (state.selectedMethodId == null) {
                   return const SizedBox.shrink();
                 }
 
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                    vertical: 16,
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: AppButton.primary(
-                      text: "Lanjutkan",
-                      onPressed: _onLanjutkanPressed,
-                    ),
-                  ),
+                return AppButton.primary(
+                  text: "Lanjutkan",
+                  onPressed: _onLanjutkanPressed,
                 );
               },
             ),

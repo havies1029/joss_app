@@ -18,13 +18,11 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
   late ConfettiController _controllerLeft;
   late ConfettiController _controllerRight;
 
-
   @override
   void initState() {
     super.initState();
-    _controllerLeft  = ConfettiController(duration: const Duration(seconds: 1));
+    _controllerLeft = ConfettiController(duration: const Duration(seconds: 1));
     _controllerRight = ConfettiController(duration: const Duration(seconds: 1));
-
 
     _controllerLeft.play();
     _controllerRight.play();
@@ -40,14 +38,13 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryBlackColor, // 🟢 Hitam solid sebagai base layer
+      backgroundColor: primaryBlackColor,
       body: BaseBackgroundFirstPage(
         child: Scaffold(
-          backgroundColor: Colors
-              .transparent, // 🟢 biar transparan ke layer BaseBackground
+          backgroundColor: Colors.transparent,
           body: Stack(
             children: [
-              /// Confetti kiri–atas
+              // Confetti kiri–atas
               Align(
                 alignment: const Alignment(-1, -1),
                 child: ConfettiWidget(
@@ -59,7 +56,7 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                 ),
               ),
 
-              /// Confetti kanan–atas
+              // Confetti kanan–atas
               Align(
                 alignment: const Alignment(1, -1),
                 child: ConfettiWidget(
@@ -71,42 +68,35 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                 ),
               ),
 
-              /// Konten utama
+              // Konten utama
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset(
                       "assets/icons/logo_berhasil.svg",
-                      width: 56 * 3,
-                      height: 56 * 3,
+                      width: 120,
+                      height: 120,
                     ),
                     const SizedBox(height: vPadding),
                     Text(
                       "Pembayaran Berhasil!",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: getResponsiveFont(context, 30),
-                        color: primaryLightColor,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: headingStyle(context),
                     ),
                     const SizedBox(height: hPadding),
                     Text(
                       "Polis Anda kini aktif.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: hintGrey,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: bodyTextStyle(context, fontSize: 20)
+                          .copyWith(color: hintGrey),
                     ),
                     const SizedBox(height: vPadding),
                     AppButton.primary(
                       text: "Kembali",
                       backgroundColor: formGrey,
-                      borderside: BorderSide(color: sGrey, width: 1),
-                      width: 60 * 3,
+                      borderside: BorderSide(color: sGrey),
+                      width: 245,
                       onPressed: () {
                         context
                             .read<DnRekap2invBloc>()
@@ -123,5 +113,4 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
       ),
     );
   }
-
 }
