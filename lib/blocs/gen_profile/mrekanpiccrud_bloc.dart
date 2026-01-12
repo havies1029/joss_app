@@ -28,15 +28,41 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
   }
 
   Future<void> onTambahMRekanPicCrud(
-      MRekanPicCrudTambahEvent event, Emitter<MRekanPicCrudState> emit) async {
-    ReturnDataAPI returnData;
-    bool hasFailure = true;
-    emit(state.copyWith(isSaving: true, isSaved: false));
-    returnData = await repository.mRekanPicCrudTambah(event.record);
-    hasFailure = !returnData.success;
+      MRekanPicCrudTambahEvent event,
+      Emitter<MRekanPicCrudState> emit,
+      ) async {
     emit(
-        state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+      state.copyWith(
+        isSaving: true,
+        isSaved: false,
+        hasFailure: false,
+        savedId: null,
+      ),
+    );
+
+    try {
+      final returnData = await repository.mRekanPicCrudTambah(event.record);
+
+      emit(
+        state.copyWith(
+          isSaving: false,
+          isSaved: returnData.success,
+          hasFailure: !returnData.success,
+          savedId: returnData.success ? returnData.data?.toString() : null,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isSaving: false,
+          isSaved: false,
+          hasFailure: true,
+          savedId: null,
+        ),
+      );
+    }
   }
+
 
 
   Future<void> onUbahMRekanPicCrud(

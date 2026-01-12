@@ -211,11 +211,22 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
       ],
     );
   }
-
   Widget _headerCell(String text) {
+    final bool isNo = text.trim().toUpperCase() == "NO";
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-      child: Text(
+      child: isNo
+          ? Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 15,
+            color: primaryLightColor,
+          ),
+        ),
+      )
+          : Text(
         text,
         style: TextStyle(
           fontSize: 15,
@@ -237,7 +248,10 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
       children: [
         _rowTapWrapper(
           d,
-          child: _cell((index + 1).toString()),
+          child: _cell(
+            (index + 1).toString(),
+            center: true,
+          ),
         ),
 
         _rowTapWrapper(
@@ -282,12 +296,28 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
     );
   }
 
-  Widget _cell(String text) {
+  Widget _cell(
+      String text, {
+        bool center = false,
+      }) {
     return Padding(
       padding: const EdgeInsets.all(6),
-      child: Text(
+      child: center
+          ? Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            color: primaryLightColor,
+            fontSize: 15,
+          ),
+        ),
+      )
+          : Text(
         text,
-        style: TextStyle(color: primaryLightColor, fontSize: 15),
+        style: TextStyle(
+          color: primaryLightColor,
+          fontSize: 15,
+        ),
       ),
     );
   }

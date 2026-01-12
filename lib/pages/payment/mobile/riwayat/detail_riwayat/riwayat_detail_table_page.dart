@@ -122,11 +122,11 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
               },
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: hPadding),
 
-            /// ❌ Flexible DIHAPUS
             AppButton.iconLeft(
               text: 'Unduh Invoice',
+              backgroundColor: primaryColor,
               icon: SvgPicture.asset(
                 'assets/icons/invoice.svg',
                 width: 18,

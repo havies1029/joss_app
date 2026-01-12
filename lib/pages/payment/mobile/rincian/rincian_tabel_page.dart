@@ -53,7 +53,6 @@ class _RincianTablePageState extends State<RincianTablePage> {
       itemCount: widget.headers.length,
       padding: EdgeInsets.symmetric(
         horizontal: hPadding * 1.5,
-        vertical: 8,
       ),
       itemBuilder: (context, index) {
         final header = widget.headers[index];
@@ -63,8 +62,6 @@ class _RincianTablePageState extends State<RincianTablePage> {
           children: [
             _buildHeaderTitle(context, header),
             const SizedBox(height: hPadding),
-
-
 
         isNarrow
         ? _buildDetailTableCompact(filteredDetails)
@@ -133,7 +130,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
                 "",
                 "NO",
                 "NO POLIS",
-                "PERIODE\nPOLIS",
+                "PERIODE POLIS",
                 "CURR",
                 "PREMI",
               ]),
@@ -299,20 +296,28 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
   TableRow _tableHeader(BuildContext context, List<String> cells) {
     return TableRow(
-      decoration: BoxDecoration(color: formGrey),
-      children: cells
-          .map(
-            (text) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
-          child: Text(
+      decoration: const BoxDecoration(color: formGrey),
+      children: cells.map((text) {
+        final bool isNo = text.trim().toUpperCase() == "NO";
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+          child: isNo
+              ? Center(
+            child: Text(
+              text,
+              style: bodyTextStyle(context, fontSize: 15),
+            ),
+          )
+              : Text(
             text,
             style: bodyTextStyle(context, fontSize: 15),
           ),
-        ),
-      )
-          .toList(),
+        );
+      }).toList(),
     );
   }
+
 
   void _showDetailPopup(BuildContext context, DnDetailSppaModel d) {
     DialogDetailPolis.show(

@@ -25,24 +25,39 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
   }
-
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final bool isNarrow = width < 900;
+
     return ListView.builder(
       itemCount: widget.items.length,
+
+      padding: EdgeInsets.symmetric(
+        horizontal: hPadding * 1.5,
+      ),
+
       itemBuilder: (context, index) {
         final item = widget.items[index];
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildBodyTable(context, item, index),
-              const SizedBox(height: hPadding),
-              _buildFooterTable(context, item),
-            ],
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: hPadding),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                isNarrow
+                    ? _buildBodyTableCompact(context, item, index)
+                    : _buildBodyTableNormal(context, item, index),
+
+                const SizedBox(height: hPadding),
+
+                _buildFooterTable(context, item),
+              ],
+            ),
           ),
         );
       },
@@ -52,11 +67,11 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
   // ============================
   // DETAIL TABLE
   // ============================
-  Widget _buildBodyTable(
-    BuildContext context,
-    DnrekapcobCariModel bodyItems,
-    int index,
-  ) {
+  Widget _buildBodyTableCompact(
+      BuildContext context,
+      DnrekapcobCariModel bodyItems,
+      int index,
+      ) {
     return ClipRRect(
       borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
       child: Container(
@@ -74,13 +89,13 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
               verticalInside: BorderSide(color: sGrey),
             ),
             columnWidths: const {
-              0: FixedColumnWidth(50), // Checkbox  (35 + 15)
-              1: FixedColumnWidth(50), // No        (35 + 15)
-              2: FixedColumnWidth(70), // Kategori  (55 + 15)
-              3: FixedColumnWidth(70), // Jumlah Polis (55 + 15)
-              4: FixedColumnWidth(55), // Curr      (40 + 15)
-              5: FixedColumnWidth(115), // TSI       (100 + 15)
-              6: FixedColumnWidth(95), // Premi     (80 + 15)
+              0: FixedColumnWidth(50),
+              1: FixedColumnWidth(50),
+              2: FixedColumnWidth(110), // dibuat lebih lega
+              3: FixedColumnWidth(90),
+              4: FixedColumnWidth(55),
+              5: FixedColumnWidth(150),
+              6: FixedColumnWidth(120),
             },
             children: [
               _tableHeader(context, [
@@ -92,9 +107,64 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
                 "TOTAL NILAI\nPERTANGGUNGAN",
                 "TOTAL PREMI",
               ]),
-              _detailRowWithCheckbox(context, bodyItems, index),
+              _detailRowWithCheckbox(
+                context,
+                bodyItems,
+                index,
+                compact: true,
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBodyTableNormal(
+      BuildContext context,
+      DnrekapcobCariModel bodyItems,
+      int index,
+      ) {
+    return ClipRRect(
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: formGrey,
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          border: Border.all(color: sGrey),
+        ),
+        child: Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: const TableBorder(
+            horizontalInside: BorderSide(color: sGrey),
+            verticalInside: BorderSide(color: sGrey),
+          ),
+          columnWidths: const {
+            0: FlexColumnWidth(1),
+            1: FlexColumnWidth(1),
+            2: FlexColumnWidth(2.3),
+            3: FlexColumnWidth(1.5),
+            4: FlexColumnWidth(1),
+            5: FlexColumnWidth(2.5),
+            6: FlexColumnWidth(2),
+          },
+          children: [
+            _tableHeader(context, [
+              "",
+              "NO",
+              "KATEGORI",
+              "JUMLAH POLIS",
+              "CURR",
+              "TOTAL NILAI PERTANGGUNGAN",
+              "TOTAL PREMI",
+            ]),
+            _detailRowWithCheckbox(
+              context,
+              bodyItems,
+              index,
+              compact: false,
+            ),
+          ],
         ),
       ),
     );
@@ -105,24 +175,25 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
   // ============================
   TableRow _tableHeader(BuildContext context, List<String> cells) {
     return TableRow(
-      decoration: BoxDecoration(color: formGrey),
-      children:
-          cells.map((text) {
-            final isNo = text == "No";
+      decoration: const BoxDecoration(color: formGrey),
+      children: cells.map((text) {
+        final bool isNo = text.trim().toUpperCase() == "NO";
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
-              child:
-                  isNo
-                      ? Center(
-                        child: Text(
-                          text,
-                          style: bodyTextStyle(context, fontSize: 15),
-                        ),
-                      )
-                      : Text(text, style: bodyTextStyle(context, fontSize: 15)),
-            );
-          }).toList(),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+          child: isNo
+              ? Center(
+            child: Text(
+              text,
+              style: bodyTextStyle(context, fontSize: 15),
+            ),
+          )
+              : Text(
+            text,
+            style: bodyTextStyle(context, fontSize: 15),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -188,18 +259,20 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
   // DETAIL ROW WITH CHECKBOX
   // ============================
   TableRow _detailRowWithCheckbox(
-    BuildContext context,
-    DnrekapcobCariModel rows,
-    int index,
-  ) {
+      BuildContext context,
+      DnrekapcobCariModel rows,
+      int index, {
+        required bool compact,
+      }) {
     final isSelected = widget.selectedIds.contains(rows.cobId);
+
+    TextStyle cellStyle() => bodyTextStyle(context, fontSize: 15);
 
     return TableRow(
       decoration: BoxDecoration(
-        color:
-            isSelected
-                ? primaryColor.withOpacity(0.3)
-                : (index.isEven ? pGrey : formGrey),
+        color: isSelected
+            ? primaryColor.withOpacity(0.3)
+            : (index.isEven ? pGrey : formGrey),
       ),
       children: [
         // Checkbox
@@ -218,7 +291,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
                 borderRadius: BorderRadius.circular(cardBorderRadius / 2),
               ),
               side: MaterialStateBorderSide.resolveWith(
-                (states) => BorderSide(color: sGrey, width: 1),
+                    (states) => const BorderSide(color: sGrey, width: 1),
               ),
               fillColor: MaterialStateProperty.resolveWith((states) {
                 if (states.contains(MaterialState.selected)) {
@@ -236,7 +309,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
           child: Center(
             child: Text(
               (index + 1).toString(),
-              style: bodyTextStyle(context, fontSize: 15),
+              style: cellStyle(),
             ),
           ),
         ),
@@ -247,7 +320,9 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
             padding: const EdgeInsets.all(6),
             child: Text(
               rows.cobNama,
-              style: bodyTextStyle(context, fontSize: 15),
+              maxLines: compact ? 2 : null,
+              overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
+              style: cellStyle(),
             ),
           ),
         ),
@@ -258,7 +333,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
             padding: const EdgeInsets.all(6),
             child: Text(
               formatNum(rows.polisCount),
-              style: bodyTextStyle(context, fontSize: 15),
+              style: cellStyle(),
             ),
           ),
         ),
@@ -269,29 +344,31 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
             padding: const EdgeInsets.all(6),
             child: Text(
               rows.currSimbol,
-              style: bodyTextStyle(context, fontSize: 15),
+              style: cellStyle(),
             ),
           ),
         ),
 
-        // Total Nilai Pertanggungan (TSI)
+        // TSI
         TableCell(
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
               formatNum(rows.tsi),
-              style: bodyTextStyle(context, fontSize: 15),
+              maxLines: compact ? 2 : null,
+              overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
+              style: cellStyle(),
             ),
           ),
         ),
 
-        // Total Premi (Polis Amount)
+        // Premi
         TableCell(
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
               formatNum(rows.polisAmount),
-              style: bodyTextStyle(context, fontSize: 15),
+              style: cellStyle(),
             ),
           ),
         ),

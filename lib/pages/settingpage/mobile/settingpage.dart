@@ -244,7 +244,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           );
                         }
 
-// 🔹 userType KOSONG / TIDAK DIKENAL
                         else {
                           final fallbackEmail = authState is AuthenticationAuthenticated
                               ? (authState.user.email?.trim() ?? 'Guest User')
@@ -374,7 +373,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const MRekanPicListSimple(),
+                                          builder: (_) => const MrekanPicMainPage(),
                                         ),
                                       );
                                     },
@@ -392,7 +391,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     // ================== SYARAT & KETENTUAN ==================
                     _buildSectionTitle(context, 'Syarat dan Ketentuan'),
-                    _buildCardContainer(
+                     _buildCardContainer(
                       children: [
                         _buildMenuItem(
                           svgAsset: 'assets/icons/sk.svg',

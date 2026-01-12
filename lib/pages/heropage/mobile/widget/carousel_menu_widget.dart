@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:joss_app/blocs/gallery/galleryeventcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../../common/loading_indicator.dart';
+
 class CarouselMenuWidget extends StatefulWidget {
   const CarouselMenuWidget({super.key});
 
@@ -65,15 +67,14 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
       buildWhen: (prev, curr) => prev.items != curr.items || prev.status != curr.status,
       builder: (context, state) {
         if (state.status == ListStatus.initial) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-              ),
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(
+              child: LoadingIndicator(),
             ),
           );
         }
+
 
         if (state.status == ListStatus.success && state.items.isEmpty) {
           return Center(

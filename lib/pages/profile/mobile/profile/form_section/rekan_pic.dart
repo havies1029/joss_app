@@ -1,476 +1,482 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
-import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
-import 'package:joss_app/models/combobox/combomjabatan_model.dart';
-import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 
-import '../../../../../../common/constants.dart';
-import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
+import '../../../../../blocs/gen_invite/invite_bloc.dart';
+import '../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
+import '../../../../../blocs/user_profile/user_profile_cubit.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../models/gen_profile/mrekanpiclist_model.dart';
+import '../../../../../models/gen_profile/rekanpiccobcari_model.dart';
+import '../../../../../repositories/gen_invite/invite_repository.dart';
+import '../../../../../widgets/apptheme/invite_success_popup.dart';
+import '../../../../../widgets/showdialoghapus_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
+import 'crud_pic/edit_pic_remake.dart';
+import 'crud_pic/tambah_pic_remake.dart';
 
-/// Bundle controller per baris
-class _PicRowCtrls {
-  final formKey = GlobalKey<FormState>();
-  final nama = TextEditingController();
-  final email = TextEditingController();
-  final hp = TextEditingController();
-  final comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
-  ComboMJabatanModel? jabatan;
-  bool isDefault = false;
-
-  void dispose() {
-    nama.dispose();
-    email.dispose();
-    hp.dispose();
-  }
-}
-
-class MRekanPicInlineEditorList extends StatefulWidget {
-  const MRekanPicInlineEditorList({super.key});
+class MrekanPicMainPage extends StatefulWidget {
+  const MrekanPicMainPage({super.key});
 
   @override
-  State<MRekanPicInlineEditorList> createState() => _MRekanPicInlineEditorListState();
+  State<MrekanPicMainPage> createState() => _MrekanPicMainPageState();
 }
 
-class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
+class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
   late MRekanPicListBloc listBloc;
   late MRekanPicCrudBloc crudBloc;
-
-  // Controllers utk item existing: key = mrekanpicId
-  final Map<String, _PicRowCtrls> _rowCtrls = {};
-  // Controllers utk form tambah
-  final _PicRowCtrls _newCtrls = _PicRowCtrls();
-
-  bool _showAddForm = false;
-  bool _isSavingNew = false;
+  List<String> _mrekanPicIds = [];
 
   @override
-  void dispose() {
-    for (final c in _rowCtrls.values) {
-      c.dispose();
-    }
-    _newCtrls.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    listBloc = context.read<MRekanPicListBloc>();
+    crudBloc = context.read<MRekanPicCrudBloc>();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      loadData();
+    });
+  }
+
+  void loadData() {
+    listBloc.add(
+        FetchMRekanPicListEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    // --- init blocs
-    listBloc = context.read<MRekanPicListBloc>();
-    crudBloc = context.read<MRekanPicCrudBloc>();
     SizeConfig().init(context);
 
-    final content = BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-      listener: (context, state) {
-        if (state.isSaved) {
-          listBloc.add(FetchMRekanPicListEvent());
-          setState(() {
-            _isSavingNew = false;
-            _showAddForm = false;
-          });
-          _clearNewRow();
-        }
-      },
-      child: BlocBuilder<MRekanPicListBloc, MRekanPicListState>(
-        builder: (context, state) {
-          if (state.status == ListStatus.failure) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Gagal memuat data PIC'),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () => listBloc.add(FetchMRekanPicListEvent()),
-                    child: const Text('Coba lagi'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          _ensureRowControllers(state);
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  Text('Total PIC: ${state.items.length}', style: bodyTextStyle(context, fontSize: 16)),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    child: (!_showAddForm)
-                        ? _ctaButton(
-                      context,
-                      label: 'Tambah PIC',
-                      icon: Icons.add,
-                      onTap: _isSavingNew
-                          ? null
-                          : () => setState(() => _showAddForm = true),
-                    )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
-
-
-              const SizedBox(height: hPadding),
-
-              // === LIST ===
-              if (state.items.isNotEmpty)
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: state.items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 15),
-                  itemBuilder: (ctx, idx) {
-                    final item = state.items[idx];
-                    final ctrls = _rowCtrls[item.mrekanpicId]!;
-                    return _buildEditorRowCard(
-                      title: 'PIC ${idx + 1}',
-                      ctrls: ctrls,
-                      isNew: false,
-                      onSave: () => _saveExisting(item.mrekanpicId, ctrls),
-                      onDelete: () => _confirmDelete(item.mrekanpicId),
-                    );
-                  },
-                ),
-
-              const SizedBox(height: 16),
-
-              // === FORM TAMBAH ===
-              AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  transitionBuilder: (child, anim) =>
-                      SizeTransition(sizeFactor: anim, child: child),
-                  child: _showAddForm
-                      ? _buildEditorRowCard(
-                    key: const ValueKey('add-form'),
-                    title: 'Tambah PIC Baru',
-                    ctrls: _newCtrls,
-                    isNew: true,
-                    onSave: _isSavingNew ? null : _saveNew,
-                    onDelete: () {
-                      setState(() {
-                        _showAddForm = false;
-                        _isSavingNew = false;
-                      });
-                      _clearNewRow();
-                    },
-                    isSaving: _isSavingNew,
-                  )
-                      : AppButton.iconLeft(
-                      text: 'Tambah PIC',
-                      icon: const Icon(Icons.add, size: 24),
-                      onPressed: _isSavingNew
-                          ? null
-                          : () => setState(() => _showAddForm = true)
-                  )
-
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: BaseBackgroundSidePage(
           title: 'Informasi PIC',
-          child: Column(
-            children: [
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Container(
+                    width: double.infinity,
                     color: secondaryBlackColor,
-                  ),
-                  child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
                       horizontal: hPadding * 1.5,
                       vertical: 20,
                     ),
-                    child: content,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  void _ensureRowControllers(MRekanPicListState state) {
-    if (state.items.isEmpty) {
-      // kalau kosong, cukup pastikan _rowCtrls kosong juga
-      _rowCtrls.clear();
-      return;
-    }
+                    child: MultiBlocListener(
+                      listeners: [
+                        BlocListener<MRekanPicListBloc, MRekanPicListState>(
+                          listenWhen: (prev, curr) =>
+                          prev.items.length != curr.items.length ||
+                              prev.status != curr.status,
+                          listener: (context, state) {
+                            _mrekanPicIds = state.items
+                                .map((e) => (e.mrekanpicId ?? '').trim())
+                                .where((id) => id.isNotEmpty)
+                                .toList();
+                          },
+                        ),
 
-    // Tambahkan ctrls yang belum ada
-    for (final item in state.items) {
-      if (!_rowCtrls.containsKey(item.mrekanpicId)) {
-        final c = _PicRowCtrls();
-        c.nama.text  = item.picNama ?? '';
-        c.email.text = item.picEmail ?? '';
-        c.hp.text    = item.picHp ?? '';
-        c.isDefault  = item.isDefault ?? false;
+                        BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
+                          listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
+                          listener: (context, state) {
+                            if (state.isSaved) {
+                              context.read<MRekanPicListBloc>().add(FetchMRekanPicListEvent());
+                            }
+                          },
+                        ),
+                      ],
 
-        c.jabatan = ComboMJabatanModel(
-          mjabatanId: item.mjabatanId,
-          jabatanDesc: item.jabatanDesc ?? item.jabatanDesc ?? '', // isi label
-        );
+                      // UI tetap pakai BlocBuilder LIST
+                      child: BlocBuilder<MRekanPicListBloc, MRekanPicListState>(
+                        builder: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 40),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
 
-        _rowCtrls[item.mrekanpicId] = c;
-      }
-    }
+                          if (state.status == ListStatus.failure) {
+                            return Column(
+                              children: [
+                                const SizedBox(height: 12),
+                                Text('Gagal memuat data PIC', style: bodyTextStyle(context)),
+                                const SizedBox(height: 8),
+                                TextButton(
+                                  onPressed: () =>
+                                      context.read<MRekanPicListBloc>().add(FetchMRekanPicListEvent()),
+                                  child: const Text('Coba lagi'),
+                                ),
+                              ],
+                            );
+                          }
 
-    // Bersihkan ctrls yang tidak ada lagi di list
-    final ids = state.items.map((e) => e.mrekanpicId).toSet();
-    final remove = _rowCtrls.keys.where((id) => !ids.contains(id)).toList();
-    for (final id in remove) {
-      _rowCtrls[id]?.dispose();
-      _rowCtrls.remove(id);
-    }
-  }
+                          final total = state.items.length;
 
-  Widget _buildEditorRowCard({
-    Key? key,
-    required String title,
-    required _PicRowCtrls ctrls,
-    required bool isNew,
-    required VoidCallback? onSave,
-    required VoidCallback onDelete,
-    bool isSaving = false,
-  }) {
-    return Card(
-      key: key,
-      color: pGrey,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        side: const BorderSide(
-          color: sGrey,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Form(
-          key: ctrls.formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header + actions
-              Row(
-                children: [
-                  Text(
-                    title,
-                    style: bodyTextStyle(context, fontSize: 20),
-                  ),
-                  const Spacer(),
-                  AppButton.icon(
-                    icon: const Icon(Icons.check, size: 20),
-                    onPressed: onSave,
-                    isLoading: isSaving,
-                    backgroundColor: Colors.transparent,
-                  ),
-                  AppButton.icon(
-                    icon: Icon(
-                      isNew ? Icons.close : Icons.delete,
-                      color: primaryLightColor,
-                      size: 20,
-                    ),
-                    onPressed: onDelete,
-                    isOutlined: true,
-                    backgroundColor: Colors.transparent,
-                  )
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Total PIC: $total',
+                                    style: bodyTextStyle(context, fontSize: 18),
+                                  ),
+                                  const Spacer(),
+                                  _primaryButton(
+                                    onPressed: () async {
+                                      final changed = await Navigator.push<bool>(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const TambahPicWidget()),
+                                      );
 
-                ],
-              ),
+                                      if (changed == true) {
+                                        context.read<MRekanPicListBloc>().add(
+                                          FetchMRekanPicListEvent(),
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(Icons.add, size: 20),
+                                    label: 'Tambah PIC',
+                                  ),
+                                ],
+                              ),
 
-              const SizedBox(height: 8),
+                              const SizedBox(height: hPadding),
 
-              appTextField(
-                label: "Nama PIC",
-                controller: ctrls.nama,
-                textInputAction: TextInputAction.next,
-                validator: (v) => (v == null || v.trim().isEmpty) ? kNameNullError: null,
-              ),
+                              if (state.items.isEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  child: Text(
+                                    'Belum ada PIC.',
+                                    style: bodyTextStyle(context, fontSize: 16)
+                                        .copyWith(color: hintGrey),
+                                  ),
+                                )
+                              else
+                                Column(
+                                  children: List.generate(state.items.length, (i) {
+                                    final it = state.items[i];
+                                    final id = (it.mrekanpicId ?? '').trim();
+                                    if (id.isEmpty) return const SizedBox.shrink();
 
-              const SizedBox(height: 12),
-
-              appTextField(
-                label: "Email",
-                controller: ctrls.email,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                validator: (v) => (v == null || v.trim().isEmpty) ? kEmailNullError : null,
-              ),
-
-              const SizedBox(height: 12),
-
-              appTextField(
-                label: "No. Telp",
-                controller: ctrls.hp,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]')),
-                ],
-                textInputAction: TextInputAction.done,
-                validator: (v) => (v == null || v.trim().isEmpty) ? kPhoneNumberNullError : null,
-              ),
-
-              const SizedBox(height: 12),
-
-              // Jabatan
-              FormField<ComboMJabatanModel>(
-                validator: (value) =>
-                ctrls.jabatan == null ? 'Jabatan harus dipilih' : null,
-                builder: (ffState) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ReusableComboBox<ComboMJabatanModel>(
-                        hintText: "Jabatan",
-                        comboKey: ctrls.comboKey,
-                        initItem: ctrls.jabatan,
-                        maxHeight: 150,
-                        dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
-                        displayText: (item) => item.jabatanDesc,
-                        compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
-                        onChangedCallback: (val) {
-                          setState(() => ctrls.jabatan = val);
-                          ffState.didChange(val);
-                        },
-                        onSaveCallback: (val) {
-                          ctrls.jabatan = val;
-                        },
-                        validatorCallback: (val) {
-                          if (val == null) return kStringNullError;
-                          return null;
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom: i == state.items.length - 1 ? 0 : 14,
+                                      ),
+                                      child: _picCardFromItem(it, i),
+                                    );
+                                  }),
+                                ),
+                            ],
+                          );
                         },
                       ),
-                    ],
-                  );
-                },
-              ),
+                    ),
 
-              const SizedBox(height: 8),
-
-              // Default checkbox
-              CheckboxListTile(
-                value: ctrls.isDefault,
-                onChanged: (v) => setState(() => ctrls.isDefault = v ?? false),
-                title: Text(
-                  'Jadikan sebagai PIC default',
-                  style: bodyTextStyle(context),
+                  ),
                 ),
-                dense: true,
-                activeColor: primaryColor,
-                controlAffinity: ListTileControlAffinity.leading,
-                contentPadding: EdgeInsets.zero,
-              )
-
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  // === ACTIONS ===
-
-  void _saveExisting(String recordId, _PicRowCtrls c) {
-    if (!(c.formKey.currentState?.validate() ?? false)) return;
-    final record = MRekanPicCrudModel(
-      mrekanpicId: recordId,
-      picNama: c.nama.text.trim(),
-      picEmail: c.email.text.trim().toLowerCase(),
-      picHp: c.hp.text.trim(),
-      mjabatanId: c.jabatan?.mjabatanId,
-      isDefault: c.isDefault,
+  Future<void> _goEditById(String id) async {
+    final changed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditPicWidget(mrekanpicId: id),
+      ),
     );
-    crudBloc.add(MRekanPicCrudUbahEvent(record: record));
+
+    if (changed == true) {
+      context.read<MRekanPicListBloc>().add(
+        FetchMRekanPicListEvent(),
+      );
+    }
   }
 
-  void _saveNew() {
-    final c = _newCtrls;
-    if (!(c.formKey.currentState?.validate() ?? false)) return;
-    setState(() => _isSavingNew = true);
 
-    final record = MRekanPicCrudModel(
-      picNama: c.nama.text.trim(),
-      picEmail: c.email.text.trim().toLowerCase(),
-      picHp: c.hp.text.trim(),
-      mjabatanId: c.jabatan?.mjabatanId,
-      isDefault: c.isDefault,
+
+  Widget _primaryButton({
+    required VoidCallback? onPressed,
+    required Widget icon,
+    required String label,
+  }) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: icon,
+      label: Text(label),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+        ),
+      ),
     );
-    crudBloc.add(MRekanPicCrudTambahEvent(record: record));
   }
 
-  void _clearNewRow() {
-    _newCtrls.nama.clear();
-    _newCtrls.email.clear();
-    _newCtrls.hp.clear();
-    _newCtrls.jabatan = null;
-    _newCtrls.isDefault = false;
+  Widget _picCardFromItem(MRekanPicListModel it, int index) {
+    final id = (it.mrekanpicId ?? '').trim();
+
+    final labelStyle =
+    bodyTextStyle(context, fontSize: 16).copyWith(color: cardGrey);
+    final valueStyle =
+    bodyTextStyle(context, fontSize: 16).copyWith(color: primaryLightColor);
+
+    return Card(
+      color: formGrey,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        side: const BorderSide(color: sGrey, width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _ghostIconButton(
+                  icon: const Icon(Icons.edit, size: 20),
+                  onPressed: () => _goEditById(id),
+                  bg: const Color(0xFFFFC107),
+                ),
+                const SizedBox(width: 8),
+                _ghostIconButton(
+                  icon: const Icon(Icons.delete, size: 20),
+                  onPressed: () => _confirmDelete(id),
+                  bg: const Color(0xFFE53935),
+                ),
+                const Spacer(),
+
+                if ((it.statusPic ?? '').toLowerCase() != 'sudah aksep')
+                  _inviteButton(email: (it.picEmail ?? '').trim()),
+              ],
+            ),
+
+            const SizedBox(height: hPadding),
+            Divider(color: sGrey, height: 20),
+
+            _kv('Nama PIC :', it.picNama ?? '-', labelStyle, valueStyle),
+            _kv('Email :', it.picEmail ?? '-', labelStyle, valueStyle),
+            _kv('No. Telp :', it.picHp ?? '-', labelStyle, valueStyle),
+            _kv('Jabatan :', it.jabatanDesc ?? '-', labelStyle, valueStyle),
+
+            Divider(color: sGrey, height: 20),
+            const SizedBox(height: 8),
+
+            Text(
+              'Polis yang bisa diakses:',
+              style: bodyTextStyle(context, fontSize: 16)
+                  .copyWith(color: hintGrey, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+
+            _cobListSection(rekanPicId: id),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _kv(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Text.rich(
+        TextSpan(children: [
+          TextSpan(text: '$label ', style: labelStyle),
+          TextSpan(text: value, style: valueStyle),
+        ]),
+      ),
+    );
+  }
+
+  Widget _cobListSection({required String rekanPicId}) {
+    return BlocProvider(
+      create: (_) => RekanPicCobCariBloc()
+        ..add(
+          RefreshRekanPicCobCariEvent(
+            rekanPicId: rekanPicId,
+            searchText: '',
+          ),
+        ),
+      child: BlocBuilder<RekanPicCobCariBloc, RekanPicCobCariState>(
+        builder: (context, state) {
+          if (state.status == ListStatus.initial) {
+            return const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            );
+          }
+          if (state.status == ListStatus.failure) {
+            return Text(
+              '⚠ Gagal memuat COB',
+              style: bodyTextStyle(context).copyWith(color: Colors.red),
+            );
+          }
+          if (state.items.isEmpty) {
+            return Text(
+              'Tidak ada COB.',
+              style: bodyTextStyle(context).copyWith(color: hintGrey),
+            );
+          }
+
+          final selected = state.items.where((c) => c.isChecked).toList();
+
+          return Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: selected
+                .map(
+                  (c) => Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                ),
+                child: Text(
+                  c.cobNama,
+                  style: bodyTextStyle(context, fontSize: 12)
+                      .copyWith(color: Colors.white),
+                ),
+              ),
+            )
+                .toList(),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _inviteButton({
+    required String email,
+  }) {
+    return BlocProvider(
+      create: (_) => InviteBloc(repo: InviteRepository()),
+      child: BlocConsumer<InviteBloc, InviteState>(
+        listener: (context, state) async {
+          if (state.isSuccess) {
+            await showDialog(
+              context: context,
+              builder: (_) => const InviteSuccessPopup(),
+            );
+          } else if (state.message.isNotEmpty && !state.isLoading) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
+        builder: (context, state) {
+          final isLoading = state.isLoading;
+
+          return _ghostIconButtonWithLabel(
+            label: isLoading ? 'Mengirim...' : 'Kirim Undangan',
+            icon: isLoading
+                ? const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+                : const Icon(Icons.send, size: 18, color: Colors.white),
+            bg: const Color(0xFF2196F3),
+            onPressed: isLoading
+                ? null
+                : () {
+              final userProfile =
+                  context.read<UserProfileCubit>().state;
+              final userId = userProfile.mrekan1Id ?? '0';
+              final emailClean = email.trim().toLowerCase();
+
+              if (emailClean.isEmpty || !emailClean.contains('@')) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Email PIC tidak valid.'),
+                  ),
+                );
+                return;
+              }
+
+              context.read<InviteBloc>().add(
+                SendInviteEvent(
+                  userId: userId,
+                  email: emailClean,
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 
   void _confirmDelete(String recordId) {
+    final id = recordId.trim();
+    if (id.isEmpty) return;
+    listBloc = context.read<MRekanPicListBloc>();
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => ShowDialogHapusWidget(
-        onHapusFunction: (id) => crudBloc.add(MRekanPicCrudHapusEvent(recordId: id)),
-        recordId: recordId,
+        recordId: id,
+        onHapusFunction: (deleteId) {
+          context.read<MRekanPicCrudBloc>().add(
+            MRekanPicCrudHapusEvent(recordId: deleteId),
+          );
+        },
       ),
     ).then((_) {
-      listBloc.add(CloseDialogMRekanPicListEvent());
+      listBloc.add(FetchMRekanPicListEvent());
     });
   }
 
-  Widget _ctaButton(
-      BuildContext context, {
-        required String label,
-        IconData? icon,
-        VoidCallback? onTap,
-      }) {
-    final bool enabled = onTap != null;
 
+
+  Widget _ghostIconButtonWithLabel({
+    required VoidCallback? onPressed,
+    required Widget icon,
+    required Color bg,
+    required String label,
+  }) {
     return Material(
-      color: enabled ? primaryColor : primaryColor.withOpacity(0.5),
+      color: bg,
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: InkWell(
-        onTap: onTap,
         borderRadius: BorderRadius.circular(cardBorderRadius),
-        splashColor: Colors.white24,
-        highlightColor: Colors.white10,
+        onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 18, color: Colors.white),
-                const SizedBox(width: 8),
-              ],
+              icon,
+              const SizedBox(width: 6),
               Text(
                 label,
-                style: bodyTextStyle(context, fontSize: 14)
-                    .copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -479,44 +485,24 @@ class _MRekanPicInlineEditorListState extends State<MRekanPicInlineEditorList> {
     );
   }
 
-  Widget _outlineButton(
-      BuildContext context, {
-        required String label,
-        IconData? icon,
-        VoidCallback? onTap,
-      }) {
-    final bool enabled = onTap != null;
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(
-          color: enabled ? sGrey : sGrey.withOpacity(0.5),
-          width: 1,
-        ),
-      ),
+  Widget _ghostIconButton({
+    required VoidCallback? onPressed,
+    required Widget icon,
+    required Color bg,
+  }) {
+    return Material(
+      color: bg,
+      borderRadius: BorderRadius.circular(cardBorderRadius),
       child: InkWell(
-        onTap: onTap,
         borderRadius: BorderRadius.circular(cardBorderRadius),
+        onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 18, color: primaryLightColor),
-                const SizedBox(width: 8),
-              ],
-              Text(
-                label,
-                style: bodyTextStyle(context, fontSize: 14)
-                    .copyWith(color: primaryLightColor),
-              ),
-            ],
-          ),
+          padding: const EdgeInsets.all(8),
+          child: icon,
         ),
       ),
     );
   }
 
 }
+

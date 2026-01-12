@@ -95,8 +95,7 @@ class _ProfilePageState extends State<ProfilePage>
                         clipBehavior: Clip.none,
                         alignment: Alignment.topCenter,
                         children: [
-                          // 🔹 Container hitam + border oranye full width
-                          // 🔁 REPLACE blok Stack lama mulai dari "Stack(" sampai penutupnya
+
                           Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
@@ -111,11 +110,10 @@ class _ProfilePageState extends State<ProfilePage>
                               elevation: 0,
                               margin: EdgeInsets.zero,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              clipBehavior: Clip.antiAlias, // ⬅️ pastikan isi tetap di dalam card
+                              clipBehavior: Clip.antiAlias,
                               child: Stack(
                                 alignment: Alignment.topCenter,
                                 children: [
-                                  // ⬇️ Konten card (beri ruang di atas untuk avatar)
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(16, 96, 16, 16),
                                     child: BlocBuilder<UserProfileCubit, UserProfileState>(
@@ -128,15 +126,12 @@ class _ProfilePageState extends State<ProfilePage>
                                         return const Column(
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            SizedBox(height: 16), // ruang bawah avatar
-                                            // (Nama/field lain di sini kalau perlu)
+                                            SizedBox(height: 16),
                                           ],
                                         );
                                       },
                                     ),
                                   ),
-
-                                  // 🔹 Avatar di DALAM card, posisi tengah-atas
                                   Positioned(
                                     top: 16,
                                     child: BlocBuilder<UserProfileCubit, UserProfileState>(
@@ -147,8 +142,6 @@ class _ProfilePageState extends State<ProfilePage>
                                       },
                                       builder: (context, state) {
                                         final imageBytes = state.fotoBytes;
-
-                                        // 👇 Tap di area avatar (besar) langsung pick & upload
                                         return InkResponse(
                                           onTap: () => _pickAndUpload(context),
                                           containedInkWell: true,
@@ -157,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage>
                                           child: Stack(
                                             alignment: Alignment.bottomRight,
                                             children: [
-                                              // ring kecil supaya tegas
+
                                               Container(
                                                 padding: const EdgeInsets.all(3),
                                                 decoration: BoxDecoration(
@@ -176,13 +169,11 @@ class _ProfilePageState extends State<ProfilePage>
                                                       : null,
                                                 ),
                                               ),
-
-                                              // 📷 Ikon kamera tetap tampil, tapi non-klik (petunjuk visual)
                                               Positioned(
                                                 bottom: 4,
                                                 right: 4,
                                                 child: IgnorePointer(
-                                                  ignoring: true, // <-- bikin ikon ini purely dekoratif
+                                                  ignoring: true,
                                                   child: CircleAvatar(
                                                     radius: 18,
                                                     backgroundColor: Colors.black87,

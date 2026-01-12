@@ -10,6 +10,7 @@ class MRekanPicCrudState extends Equatable {
 	final bool hasFailure;
 	final bool isFieldIsDefaultChanged;
 	final ComboMJabatanModel? comboMJabatan;
+	final String? savedId;
 	const MRekanPicCrudState(
 			{this.record,
 				this.isLoading = false,
@@ -18,7 +19,8 @@ class MRekanPicCrudState extends Equatable {
 				this.isSaved = false,
 				this.hasFailure = false,
 				this.comboMJabatan,
-				this.isFieldIsDefaultChanged = false
+				this.isFieldIsDefaultChanged = false,
+				this.savedId,
 			});
 
 	MRekanPicCrudState copyWith({
@@ -28,6 +30,7 @@ class MRekanPicCrudState extends Equatable {
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
+		String? savedId,
 		ComboMJabatanModel? comboMJabatan,
 		bool? isFieldIsDefaultChanged
 	}){
@@ -39,10 +42,20 @@ class MRekanPicCrudState extends Equatable {
 				isSaved: isSaved ?? this.isSaved,
 				hasFailure: hasFailure ?? this.hasFailure,
 				comboMJabatan: comboMJabatan?? this.comboMJabatan,
+				savedId: savedId ?? this.savedId,
 				isFieldIsDefaultChanged: isFieldIsDefaultChanged ?? this.isFieldIsDefaultChanged
 		);
 	}
-
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isFieldIsDefaultChanged];
+	List<Object?> get props => [
+		record,
+		comboMJabatan,
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		savedId,
+		isFieldIsDefaultChanged,
+	];
 }

@@ -8,7 +8,7 @@ import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_process/payment_process.dart';
-import 'package:joss_app/pages/payment/mobile/ringkasan/ringkasan_table_widget.dart';
+import 'package:joss_app/pages/payment/mobile/ringkasan/ringkasan_table_list.dart';
 import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list.dart';
 import 'package:joss_app/pages/payment/invbayarvaform_form.dart';
 import 'package:joss_app/pages/payment/paymentmethodcari_list.dart';
@@ -56,23 +56,22 @@ class RingkasanPageState extends State<RingkasanPage> {
             );
             onViewPaymentMethods(state.curr, state.totalBayar);
           } else if (state.paymentStatus == "30") {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(infoSnackBar('Silakan lakukan pembayaran.'));
+            ScaffoldMessenger.of(context).showSnackBar(
+              infoSnackBar('Silakan lakukan pembayaran.'),
+            );
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) => PaymentProcess(
-                      viewMode: "ubah",
-                      recordId: state.invoiceId,
-                    ),
+                builder: (context) => PaymentProcess(
+                  viewMode: "ubah",
+                  recordId: state.invoiceId,
+                ),
               ),
             );
           } else if (state.paymentStatus == "40") {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(successSnackBar('Proses pembayaran berhasil.'));
+            ScaffoldMessenger.of(context).showSnackBar(
+              successSnackBar('Proses pembayaran berhasil.'),
+            );
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => PaymentSuccess()),
@@ -88,15 +87,16 @@ class RingkasanPageState extends State<RingkasanPage> {
       child: Scaffold(
         body: Stack(
           children: [
-            // ====== MAIN CONTENT ======
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: hPadding * 1.5,
-                vertical: 10,
-              ),
-              child: Column(
-                children: [
-                  Row(
+            // ===== MAIN CONTENT =====
+            Column(
+              children: [
+                // ===== HEADER (PAKAI PADDING) =====
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: hPadding * 1.5,
+                    vertical: 10,
+                  ),
+                  child: Row(
                     children: [
                       Expanded(
                         child: ListPageFilterBarUIWidget(
@@ -104,9 +104,7 @@ class RingkasanPageState extends State<RingkasanPage> {
                           searchButton: buildSearchButton(),
                         ),
                       ),
-
                       const SizedBox(width: 8),
-
                       PolisButton(
                         assetPath: "assets/icons/unduh.svg",
                         bgColor: const Color(0xFFA1A1AA),
@@ -116,9 +114,7 @@ class RingkasanPageState extends State<RingkasanPage> {
                         height: 36,
                         width: 36,
                       ),
-
                       const SizedBox(width: 8),
-
                       PolisButton(
                         assetPath: "assets/icons/bagikan.svg",
                         bgColor: const Color(0xFF295EFF),
@@ -130,16 +126,53 @@ class RingkasanPageState extends State<RingkasanPage> {
                       ),
                     ],
                   ),
+                ),
 
-                  const SizedBox(height: hPadding),
-                  Expanded(child: buildList()),
-                  const SizedBox(height: hPadding),
-                  buildInfoNote(context),
-                ],
-              ),
+                const SizedBox(height: hPadding),
+
+                // ===== TABLE (TANPA PADDING) =====
+                Expanded(
+                  child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                    builder: (context, state) {
+                      if (state.status != ListStatus.success) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (state.items.isEmpty) {
+                        return const Center(child: Text("Data kosong"));
+                      }
+
+                      return RingkasanTablePage(
+                        items: state.items,
+                        selectedIds: state.selectedIds,
+                        onSelect: (id) {
+                          context
+                              .read<DnrekapcobCariBloc>()
+                              .add(ToggleSelectItemEvent(id));
+                        },
+                        onUnselect: (id) {
+                          context
+                              .read<DnrekapcobCariBloc>()
+                              .add(ToggleSelectItemEvent(id));
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: hPadding),
+
+                // ===== INFO NOTE (PAKAI PADDING) =====
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  child: buildInfoNote(context),
+                ),
+
+                const SizedBox(height: 10),
+              ],
             ),
 
-            // ====== FLOATING BAYAR BUTTON ======
+            // ===== FLOATING BAYAR BUTTON =====
             BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
               builder: (context, state) {
                 final hasSelection = state.selectedIds.isNotEmpty;
@@ -153,7 +186,6 @@ class RingkasanPageState extends State<RingkasanPage> {
           ],
         ),
       ),
-
     );
   }
 
@@ -166,7 +198,7 @@ class RingkasanPageState extends State<RingkasanPage> {
         Expanded(
           child: Text(
             "Apabila Anda melakukan pembayaran melalui bagian keuangan internal kami, "
-            "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate.",
+                "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate.",
             style: bodyTextStyle(context, fontSize: 15),
           ),
         ),
@@ -440,16 +472,6 @@ ${selectedItems.map((e) => '• ${e.cobNama}: ${e.polisCount} polis').join('\n')
       icon: const Icon(Icons.autorenew_rounded, size: 28),
       onPressed: refreshData,
       tooltip: 'Refresh',
-    );
-  }
-
-  Widget buildList() {
-    return Column(
-      children: [
-        Expanded(
-          child: RingkasanTableWidget(searchText: _searchController.text),
-        ),
-      ],
     );
   }
 }

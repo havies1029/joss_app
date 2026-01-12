@@ -133,6 +133,7 @@ import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_klaim/klaim1crud_bloc.dart';
 import 'blocs/gen_klaim/klaim1list_bloc.dart';
 import 'blocs/gen_klaim/klaim2crud_bloc.dart';
+import 'blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
 import 'blocs/gen_regmv/regmv1crud_bloc.dart';
@@ -275,6 +276,7 @@ Future<void> main() async {
         BlocProvider<MRekanPicCrudBloc>(
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
+        BlocProvider<RekanPicCobCariBloc>(create: (context) => RekanPicCobCariBloc()),
         BlocProvider<ReqComproBloc>(
           create: (_) => ReqComproBloc(repository: ReqComproRepository()),
         ),
