@@ -1,59 +1,99 @@
-import 'package:joss_app/blocs/gen_cob_app/cobcari_bloc.dart';
-import 'package:joss_app/common/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/gen_cob_app/cobcari_bloc.dart';
+import 'package:joss_app/common/constants.dart';
 
 class ButtonGroupCobAsetWidget extends StatefulWidget {
-	const ButtonGroupCobAsetWidget({super.key});
+  const ButtonGroupCobAsetWidget({super.key});
 
-	@override
-	ButtonGroupCobAsetWidgetState createState() => ButtonGroupCobAsetWidgetState();
+  @override
+  State<ButtonGroupCobAsetWidget> createState() => _ButtonGroupCobAsetWidgetState();
 }
 
-class ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
-
+class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
   @override
   void initState() {
     super.initState();
-    // Initializing the bloc to fetch data
     context.read<CobCariBloc>().add(RefreshCobCariEvent());
   }
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = headingStyle(context, fontSize: 14);
+    final Color chipBg = pGrey;
+    final Color chipSelected = primaryColor;
+    final double radius = cardBorderRadius;
+
     return BlocBuilder<CobCariBloc, CobCariState>(
       builder: (context, state) {
         if (state.status == ListStatus.initial) {
-          return Center(child: CircularProgressIndicator());
-        } else if (state.status == ListStatus.success) {
-
-          if (state.selectedCOBId.isEmpty) {
-            // If no COB is selected, select the first one by default
-            context.read<CobCariBloc>().add(SelectButton(state.items.first.mCobApp1Id));
-          }
-
-          return state.items.isNotEmpty ? Wrap(
-            spacing: 10,
-            children: state.items.map((cob) {
-              final isSelected = state.selectedCOBId == cob.mCobApp1Id;
-
-              return ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isSelected ? Colors.blue : Colors.grey,
-                ),
-                onPressed: () {
-                  context.read<CobCariBloc>().add(SelectButton(cob.mCobApp1Id));
-                },
-                child: Text(cob.cobNama),
-              );
-            }).toList(),
-          ) : Center(child: Text("No items found"));
-        } else if (state.status == ListStatus.failure) {
-          return Text("Error: Loading failed",
-              style: TextStyle(color: Colors.red));
+          return const SizedBox(
+            height: 44,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
         }
 
-        return SizedBox.shrink();
+        if (state.status == ListStatus.failure) {
+          return const Text("Error: Loading failed", style: TextStyle(color: Colors.red));
+        }
+
+        if (state.status == ListStatus.success) {
+          final filteredItems =
+          state.items.where((x) => x.mCobApp1Id != "10001").toList();
+
+          if (filteredItems.isEmpty) {
+            return const Center(child: Text("No items found"));
+          }
+
+          if (state.selectedCOBId.isEmpty || state.selectedCOBId == "10001") {
+            context.read<CobCariBloc>().add(SelectButton(filteredItems.first.mCobApp1Id));
+          }
+
+          final chips = filteredItems.map((cob) {
+            final bool selected = state.selectedCOBId == cob.mCobApp1Id;
+
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ChoiceChip(
+                label: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 180),
+                  child: Text(
+                    cob.cobNama,
+                    style: textStyle.copyWith(
+                      color: selected ? Colors.white : primaryLightColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                  ),
+                ),
+                selected: selected,
+                selectedColor: chipSelected,
+                showCheckmark: false,
+                side: BorderSide.none,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(radius),
+                ),
+                labelPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                onSelected: (_) {
+                  context.read<CobCariBloc>().add(SelectButton(cob.mCobApp1Id));
+                },
+              ),
+            );
+          }).toList();
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: chips),
+          );
+        }
+        return const SizedBox.shrink();
       },
     );
   }

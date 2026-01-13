@@ -48,8 +48,7 @@ class AsetListHealth extends StatelessWidget {
         HeaderCell("No", center: true),
         HeaderCell("Nama"),
         HeaderCell("Benefit"),
-        // HeaderCell("Nomor Polis"),
-        // HeaderCell("Posisi", center: true),
+
         HeaderCell("Status", center: true),
         // HeaderCell("Aksi"),
       ],

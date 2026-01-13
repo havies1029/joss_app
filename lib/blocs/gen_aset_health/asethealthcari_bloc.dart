@@ -13,7 +13,9 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 	AsetHealthCariBloc() : super(const AsetHealthCariState()) {
 		on<FetchAsetHealthCariEvent>(onFetchAsetHealthCari);
 		on<RefreshAsetHealthCariEvent>(onRefreshAsetHealthCari);
-		on<DebugFetchAsetHealthCariEvent>(_onDebugFetchAsetHealthCari); // ✅ tambahkan handler baru
+		on<DebugFetchAsetHealthCariEvent>(_onDebugFetchAsetHealthCari);
+		on<SelectHealthDetailEvent>(onSelectDetail);
+		on<UnselectHealthDetailEvent>(onUnselectDetail);
 	}
 
 	// 🔁 Normal Refresh (memperbarui tabel)
@@ -101,5 +103,25 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			debugPrint("💥 [DebugFetch] Error: $e");
 			debugPrint(stack.toString());
 		}
+	}
+
+	Future<void> onSelectDetail(
+			SelectHealthDetailEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..add(event.asethealthId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
+	Future<void> onUnselectDetail(
+			UnselectHealthDetailEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..remove(event.asethealthId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
 	}
 }

@@ -139,8 +139,9 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
       listeners: [
         BlocListener<Regmv3FormBloc, Regmv3FormState>(
           listenWhen: (prev, curr) =>
-          curr.isLoaded == true && curr.record != null,
+          curr.isLoaded == true && curr.record != null && _isPayloadInjected == false,
           listener: (context, state) {
+            _isPayloadInjected = true;
             _injectPayload(state.record!);
             // _isPayloadInjected = true;
           },
@@ -383,14 +384,17 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
     compareItems: (a ,b) => a.mmvmerkId == b.mmvmerkId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
     onChangedCallback: (v) {
-      if (v != null){
+      debugPrint("[MMVMERK] onChanged -> ${v == null ? 'NULL (tidak dipilih)' : '${v.mmvmerkId} | ${v.nmMerk}'}");
+
+      if (v != null) {
         removeError(error: kStringNullError);
-        regmv3Bloc.add(ComboMMvmerkChangedEvent(comboMMvmerk: v)
-        );
+        regmv3Bloc.add(ComboMMvmerkChangedEvent(comboMMvmerk: v));
         comboMMvtipeKey.currentState?.clear();
         comboMMvmodelKey.currentState?.clear();
       }
+
       fieldComboMMvmerk = v;
+      debugPrint("[MMVMERK] fieldComboMMvmerk sekarang -> ${fieldComboMMvmerk?.mmvmerkId ?? 'NULL'}");
     },
     onSaveCallback: (value) => fieldComboMMvmerk = value,
   );

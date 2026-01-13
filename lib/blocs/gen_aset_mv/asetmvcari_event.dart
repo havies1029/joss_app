@@ -35,3 +35,20 @@ class DebugFetchAsetMvCariEvent extends AsetMvCariEvents {
 	@override
 	List<Object> get props => [searchText, statusId];
 }
+
+
+class SelectMvDetailEvent extends AsetMvCariEvents {
+	final String asetMvId;
+	const SelectMvDetailEvent(this.asetMvId);
+
+	@override
+	List<Object> get props => [asetMvId];
+}
+
+class UnselectMvDetailEvent extends AsetMvCariEvents {
+	final String asetMvId;
+	const UnselectMvDetailEvent(this.asetMvId);
+
+	@override
+	List<Object> get props => [asetMvId];
+}

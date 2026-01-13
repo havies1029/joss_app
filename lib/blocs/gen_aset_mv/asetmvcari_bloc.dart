@@ -13,7 +13,9 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 	AsetMvCariBloc() : super(const AsetMvCariState()) {
 		on<FetchAsetMvCariEvent>(onFetchAsetMvCari);
 		on<RefreshAsetMvCariEvent>(onRefreshAsetMvCari);
-		on<DebugFetchAsetMvCariEvent>(_onDebugFetchAsetMvCari); // ✅ handler baru
+		on<DebugFetchAsetMvCariEvent>(_onDebugFetchAsetMvCari);
+		on<SelectMvDetailEvent>(onSelectDetail);
+		on<UnselectMvDetailEvent>(onUnselectDetail);
 	}
 
 	// 🔁 Normal Refresh
@@ -95,5 +97,25 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			debugPrint("💥 [DebugFetch] Error: $e");
 			debugPrint(stack.toString());
 		}
+	}
+
+	Future<void> onSelectDetail(
+			SelectMvDetailEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..add(event.asetMvId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
+	Future<void> onUnselectDetail(
+			UnselectMvDetailEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..remove(event.asetMvId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
 	}
 }

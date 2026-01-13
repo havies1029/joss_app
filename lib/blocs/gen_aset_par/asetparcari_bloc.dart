@@ -13,7 +13,9 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 	AsetParCariBloc() : super(const AsetParCariState()) {
 		on<FetchAsetParCariEvent>(onFetchAsetParCari);
 		on<RefreshAsetParCariEvent>(onRefreshAsetParCari);
-		on<DebugFetchAsetParCariEvent>(_onDebugFetchAsetParCari); // ✅ Tambahan event debug
+		on<DebugFetchAsetParCariEvent>(_onDebugFetchAsetParCari);
+		on<SelectDetailEvent>(onSelectDetail);
+		on<UnselectDetailEvent>(onUnselectDetail);
 	}
 
 	// 🔁 Refresh normal (update tabel)
@@ -111,4 +113,25 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			debugPrint(stack.toString());
 		}
 	}
+
+	Future<void> onSelectDetail(
+			SelectDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..add(event.asetParId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
+	Future<void> onUnselectDetail(
+			UnselectDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..remove(event.asetParId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
 }

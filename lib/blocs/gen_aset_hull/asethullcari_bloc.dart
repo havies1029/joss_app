@@ -14,6 +14,8 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 		on<FetchAsethullCariEvent>(onFetchAsethullCari);
 		on<RefreshAsethullCariEvent>(onRefreshAsethullCari);
 		on<DebugFetchAsethullCariEvent>(_onDebugFetchAsethullCari);
+		on<SelectHullDetailEvent>(onSelectDetail);
+		on<UnselectHullDetailEvent>(onUnselectDetail);
 	}
 
 Future<void> onRefreshAsethullCari(
@@ -88,4 +90,23 @@ Future<void> onFetchAsethullCari(
 		}
 	}
 
+	Future<void> onSelectDetail(
+			SelectHullDetailEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..add(event.asetHullId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
+	Future<void> onUnselectDetail(
+			UnselectHullDetailEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..remove(event.asetHullId);
+
+		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
 }

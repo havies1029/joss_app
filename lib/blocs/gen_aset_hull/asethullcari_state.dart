@@ -8,6 +8,7 @@ class AsethullCariState extends Equatable {
 	final int hal;
   final String searchText;
   final String statusId;
+	final Set<String> selectedIds;
 
 	const AsethullCariState(
 		{this.status = ListStatus.initial,
@@ -16,6 +17,7 @@ class AsethullCariState extends Equatable {
     this.hal = 1,
     this.searchText = "",
     this.statusId = "",
+		this.selectedIds = const <String>{}
 		});
 
 	const AsethullCariState.success(List<AsethullCariModel> items)
@@ -29,7 +31,8 @@ class AsethullCariState extends Equatable {
 		ListStatus? status,
     int? hal,
     String? searchText,
-    String? statusId
+    String? statusId,
+		Set<String>? selectedIds
 		}){
 		return AsethullCariState(
 			items: items ?? this.items,
@@ -37,10 +40,11 @@ class AsethullCariState extends Equatable {
 			status: status ?? this.status,
       hal: hal ?? this.hal,
       searchText: searchText ?? this.searchText,
-      statusId: statusId ?? this.statusId
+      statusId: statusId ?? this.statusId,
+			selectedIds: selectedIds ?? this.selectedIds,
 			);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId];
+	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds];
 }

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
+import '../../../aset/aset_cari.dart';
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../payment/dnsppamvcari_list.dart';
 import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
 // import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
@@ -330,7 +332,7 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => RincianSoaPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
         break;
 
       // case 'Test Page':

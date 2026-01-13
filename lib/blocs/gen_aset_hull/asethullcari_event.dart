@@ -32,3 +32,19 @@ class DebugFetchAsethullCariEvent extends AsethullCariEvents {
 	List<Object> get props => [searchText, statusId];
 }
 
+
+class SelectHullDetailEvent extends AsethullCariEvents {
+	final String asetHullId;
+	const SelectHullDetailEvent(this.asetHullId);
+
+	@override
+	List<Object> get props => [asetHullId];
+}
+
+class UnselectHullDetailEvent extends AsethullCariEvents {
+	final String asetHullId;
+	const UnselectHullDetailEvent(this.asetHullId);
+
+	@override
+	List<Object> get props => [asetHullId];
+}

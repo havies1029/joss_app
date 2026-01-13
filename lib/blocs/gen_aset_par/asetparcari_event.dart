@@ -35,3 +35,20 @@ class DebugFetchAsetParCariEvent extends AsetParCariEvents {
 	@override
 	List<Object> get props => [searchText, statusId];
 }
+
+
+class SelectDetailEvent extends AsetParCariEvents {
+	final String asetParId;
+	const SelectDetailEvent(this.asetParId);
+
+	@override
+	List<Object> get props => [asetParId];
+}
+
+class UnselectDetailEvent extends AsetParCariEvents {
+	final String asetParId;
+	const UnselectDetailEvent(this.asetParId);
+
+	@override
+	List<Object> get props => [asetParId];
+}
