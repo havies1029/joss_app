@@ -48,3 +48,10 @@ class UnselectHullDetailEvent extends AsethullCariEvents {
 	@override
 	List<Object> get props => [asetHullId];
 }
+
+class ClearHullSelectionEvent extends AsethullCariEvents {
+	const ClearHullSelectionEvent();
+
+	@override
+	List<Object> get props => [];
+}

@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_status_aset/statusasetcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../widgets/apptheme/build_status_box.dart';
+
+// pastiin StatusType & StatusChip ke-import
+
 class ButtonGroupStatusAsetWidget extends StatefulWidget {
   const ButtonGroupStatusAsetWidget({super.key});
 
@@ -16,6 +20,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
     super.initState();
     context.read<StatusAsetCariBloc>().add(RefreshStatusAsetCariEvent());
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,60 +37,56 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
         }
 
         if (state.status == ListStatus.failure) {
-          return const Text(
-            "Error: Loading failed",
-            style: TextStyle(color: Colors.red),
-          );
+          return const Text("Error: Loading failed", style: TextStyle(color: Colors.red));
         }
 
         if (state.status == ListStatus.success) {
-          if (state.items.isEmpty) {
-            return const Center(child: Text("No items found"));
-          }
+          if (state.items.isEmpty) return const SizedBox.shrink();
 
+          // default select: pilih yang pertama (sekali, aman)
           if (state.selectedStatusId.isEmpty) {
-            context.read<StatusAsetCariBloc>().add(SelectButton(state.items.first.mstatusasetId));
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              context.read<StatusAsetCariBloc>().add(
+                SelectButton(state.items.first.mstatusasetId),
+              );
+            });
           }
 
-          return Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: state.items.map((status) {
-              final bool selected = state.selectedStatusId == status.mstatusasetId;
+          // urutan sesuai desain (kalau ada di items)
+          final order = ["Semua", "Aktif", "Non Aktif", "Diproses", "Berakhir", "Jatuh Tempo"];
+          final items = [...state.items]..sort((a, b) {
+            final ia = order.indexOf(a.statusNama);
+            final ib = order.indexOf(b.statusNama);
+            return (ia == -1 ? 999 : ia).compareTo(ib == -1 ? 999 : ib);
+          });
 
-              return ChoiceChip(
-                label: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 160),
-                  child: Text(
-                    status.statusNama,
-                    style: headingStyle(context, fontSize: 13).copyWith( // ✅ lebih kecil dari COB (14)
-                      color: selected ? Colors.white : primaryLightColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: items.asMap().entries.map((entry) {
+                final i = entry.key;
+                final status = entry.value;
+
+                final id = status.mstatusasetId;
+                final isSelected = state.selectedStatusId == id;
+
+                final type = StatusType.fromId(id);
+
+                return Padding(
+                  padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
+                  child: StatusChip(
+                    assetPath: type?.asset ?? "assets/icons/no_data.svg", // fallback
+                    label: status.statusNama,
+                    iconColor: type?.color ?? sGrey,
+                    isSelected: isSelected,
+                    onTap: () {
+                      context.read<StatusAsetCariBloc>().add(SelectButton(id));
+                    },
                   ),
-                ),
-                selected: selected,
-                selectedColor: primaryColor,
-                backgroundColor: pGrey,
-                showCheckmark: false,
-
-                side: BorderSide.none,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                ),
-
-                labelPadding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3, 
-                ),
-
-                onSelected: (_) {
-                  context.read<StatusAsetCariBloc>().add(SelectButton(status.mstatusasetId));
-                },
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           );
         }
 

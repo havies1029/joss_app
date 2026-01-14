@@ -12,6 +12,7 @@ import 'package:joss_app/models/combobox/combomkota_model.dart';
 import 'package:joss_app/models/combobox/combompropinsi_model.dart';
 import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
@@ -87,7 +88,35 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                     curr.isLoaded == true || curr.isSaved == true,
                     listener: (context, state) {
                       if (state.isLoaded && state.record != null) {
-                        _injectPayload(state.record!);
+                        final contact = state.record!;
+
+                        _injectPayload(contact);
+
+                        final contactEmail = contact.email.trim();
+                        final contactTelp  = contact.telp.trim();
+
+                        final rekan = context.read<MRekan1CrudBloc>().state.record;
+                        final rekanEmail = (rekan?.email ?? '').trim();
+                        final rekanTelp  = (rekan?.telepon ?? '').trim();
+
+
+                        if (fieldEmailController.text.isEmpty) {
+
+                          if (contactEmail.isNotEmpty) {
+                            fieldEmailController.text = contactEmail;
+                          } else if (rekanEmail.isNotEmpty) {
+                            fieldEmailController.text = rekanEmail;
+                          }
+                        }
+
+                        if (fieldTelpController.text.isEmpty) {
+
+                          if (contactTelp.isNotEmpty) {
+                            fieldTelpController.text = contactTelp;
+                          } else if (rekanTelp.isNotEmpty) {
+                            fieldTelpController.text = rekanTelp;
+                          }
+                        }
                       }
 
                       if (state.isSaved && !state.hasFailure) {
@@ -177,16 +206,20 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
 
   void loadData() {
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
-
-    final profile = context.read<UserProfileCubit>().state;
-
-    if (fieldEmailController.text.isEmpty && (profile.email?.isNotEmpty ?? false)) {
-      fieldEmailController.text = profile.email!;
-    }
-
-    if (fieldTelpController.text.isEmpty && (profile.telepon?.isNotEmpty ?? false)) {
-      fieldTelpController.text = profile.telepon!;
-    }
+    debugPrint("Lihat event trigger");
+    // final email =
+    //     context.read<MRekan1CrudBloc>().state.record?.email;
+    //
+    // final telepon =
+    //     context.read<MRekan1CrudBloc>().state.record?.telepon;
+    //
+    // if (fieldEmailController.text.isEmpty && (email?.isNotEmpty ?? false)) {
+    //   fieldEmailController.text = email!;
+    // }
+    //
+    // if (fieldTelpController.text.isEmpty && (telepon?.isNotEmpty ?? false)) {
+    //   fieldTelpController.text = telepon!;
+    // }
   }
 
   Widget buildFieldEmail() => appTextField(

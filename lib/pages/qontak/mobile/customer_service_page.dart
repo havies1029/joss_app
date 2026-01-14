@@ -169,6 +169,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/reguser/reguser_bloc.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../blocs/reguser_profile/reguser_profile_state.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
@@ -216,12 +218,12 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<UserProfileCubit, UserProfileState>(
-          listener: (context, state) => _scheduleInit(),
-        ),
-        BlocListener<RegUserProfileCubit, RegUserProfileState>(
-          listener: (context, state) => _scheduleInit(),
-        ),
+        // BlocListener<UserProfileCubit, UserProfileState>(
+        //   listener: (context, state) => _scheduleInit(),
+        // ),
+        // BlocListener<RegUserProfileCubit, RegUserProfileState>(
+        //   listener: (context, state) => _scheduleInit(),
+        // ),
         BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) => _scheduleInit(),
         ),
@@ -302,23 +304,31 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
     if (authState is AuthenticationAuthenticated) {
       final userType = authState.user.userType;
       if (userType == 'C') {
-        final profileState = context.read<UserProfileCubit>().state;
-        return profileState.nama?.trim().isNotEmpty == true
-            ? profileState.nama!.trim()
+        final name =
+            context.read<MRekan1CrudBloc>().state.record?.rekanNama;
+
+        return name?.trim().isNotEmpty == true
+            ? name!.trim()
             : 'Client User';
       } else if (userType == 'U') {
-        final regState = context.read<RegUserProfileCubit>().state;
-        return regState.email.isNotEmpty ? regState.email : 'New User';
+        final email = context.select(
+              (RegUserBloc b) => (b.state.record?.email ?? '').trim(),
+        );
+
+        return email.isNotEmpty ? email : 'New User';
       }
+
     }
     return '';
   }
 
   Future<String> _getUserId(BuildContext context) async {
-    final profileState = context.read<UserProfileCubit>().state;
-    if (profileState.mrekan1Id != null &&
-        profileState.mrekan1Id!.trim().isNotEmpty) {
-      return profileState.mrekan1Id!;
+    final mrekan1Id =
+        context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
+
+    if (mrekan1Id != null &&
+        mrekan1Id!.trim().isNotEmpty) {
+      return mrekan1Id!;
     }
 
     final prefs = await SharedPreferences.getInstance();

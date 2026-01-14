@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -11,6 +13,7 @@ import 'package:joss_app/models/combobox/combompekerjaan_model.dart';
 import 'package:joss_app/models/combobox/combomjnskel_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
@@ -39,7 +42,7 @@ class MRekanGeneralIdvCrudFormPageFormState
 
   ComboMJnskelModel? fieldComboMJnskel;
   final comboMJnsKelKey = GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
-
+  bool _isFirstLoad = true;
   @override
   void initState() {
     super.initState();
@@ -69,14 +72,31 @@ class MRekanGeneralIdvCrudFormPageFormState
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: BlocConsumer<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
                       listener: (context, state) {
-                        if (state.isLoaded && state.record != null) {
+                        if (state.isLoaded && state.record != null && _isFirstLoad) {
                           _injectPayload(state.record!);
+
+                          final formName = (state.record?.rekanNama ?? '').trim();
+                          final fallbackName =
+                          (context.read<MRekan1CrudBloc>().state.record?.rekanNama ?? '').trim();
+
+                          if (fieldRekanNamaController.text.trim().isEmpty) {
+                            if (formName.isNotEmpty) {
+                              fieldRekanNamaController.text = formName;
+                            } else if (fallbackName.isNotEmpty) {
+                              fieldRekanNamaController.text = fallbackName;
+                            }
+                          }
+
+                          _isFirstLoad = false;
                         }
 
                         if (state.isSaved && !state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan 🎉"),
                           );
+
+                          // kalau kamu mau reload manual / buka lagi setelah save
+                          _isFirstLoad = true;
                         }
                       },
                       builder: (context, state) {
@@ -86,12 +106,19 @@ class MRekanGeneralIdvCrudFormPageFormState
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // 🧿 Avatar section
-                            BlocBuilder<UserProfileCubit, UserProfileState>(
-                              buildWhen: (prev, curr) =>
-                              (prev.fotoBytes?.lengthInBytes ?? -1) !=
-                                  (curr.fotoBytes?.lengthInBytes ?? -1),
+                            BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                              buildWhen: (prev, curr) {
+                                if (prev is ProfileDownloadFotoLoaded &&
+                                    curr is ProfileDownloadFotoLoaded) {
+                                  return prev.imageBytes.lengthInBytes !=
+                                      curr.imageBytes.lengthInBytes;
+                                }
+                                return prev.runtimeType != curr.runtimeType;
+                              },
                               builder: (context, state) {
-                                final imageBytes = state.fotoBytes;
+                                final Uint8List? imageBytes =
+                                state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
+
                                 return Center(
                                   child: InkResponse(
                                     onTap: () => ImageUploader.pickAndUpload(context),
@@ -212,11 +239,12 @@ class MRekanGeneralIdvCrudFormPageFormState
   void loadData() {
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
 
-    final profile = context.read<UserProfileCubit>().state;
-
-    if (fieldRekanNamaController.text.isEmpty && (profile.nama?.isNotEmpty ?? false)) {
-      fieldRekanNamaController.text = profile.nama!;
-    }
+    // final name =
+    //     context.read<MRekan1CrudBloc>().state.record?.rekanNama;
+    //
+    // if (fieldRekanNamaController.text.isEmpty && (name?.isNotEmpty ?? false)) {
+    //   fieldRekanNamaController.text = name!;
+    // }
   }
 
   Widget buildFieldPekerjaan() {

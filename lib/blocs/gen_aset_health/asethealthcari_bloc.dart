@@ -16,6 +16,7 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 		on<DebugFetchAsetHealthCariEvent>(_onDebugFetchAsetHealthCari);
 		on<SelectHealthDetailEvent>(onSelectDetail);
 		on<UnselectHealthDetailEvent>(onUnselectDetail);
+		on<ClearHealthSelectionEvent>(onClearSelection);
 	}
 
 	// 🔁 Normal Refresh (memperbarui tabel)
@@ -123,5 +124,13 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			..remove(event.asethealthId);
 
 		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
+	Future<void> onClearSelection(
+			ClearHealthSelectionEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		if (state.selectedIds.isEmpty) return;
+		emit(state.copyWith(selectedIds: <String>{}));
 	}
 }

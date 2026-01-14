@@ -14,6 +14,7 @@ import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
 import '../../../../../../apis/gen_profile/rekanpiccobcari_api.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
+import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
@@ -145,8 +146,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
             title: 'Edit PIC reake',
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final mjnsclientId =
-                    context.read<UserProfileCubit>().state.mjnsclientId ?? '';
+                final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
                 return SingleChildScrollView(
                   padding: EdgeInsets.only(
@@ -417,7 +417,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       final st = _comboKey.currentState;
       if (selected == null) selected = st?.getSelectedItem;
     } catch (_) {}
-    final mjnsclientId = context.read<UserProfileCubit>().state.mjnsclientId ?? '';
+    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
     final idJabatan = (mjnsclientId == '10') ? '' : (selected?.mjabatanId ?? '').trim();
     if (idJabatan.isEmpty) {

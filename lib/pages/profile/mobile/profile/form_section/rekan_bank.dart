@@ -7,6 +7,7 @@ import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
 import 'package:joss_app/models/combobox/combombank_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../repositories/combobox/combombank_repository.dart';
@@ -52,11 +53,11 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
   void loadData() {
 
-    final profile = context.read<UserProfileCubit>().state;
-    fieldMrekan1IdController.text = profile.mrekan1Id ?? '';
+    final mrekan1Id = context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
+    fieldMrekan1IdController.text = mrekan1Id ?? '';
 
     mRekanBankCrudBloc.add(
-      MRekanBankCrudLihatEvent(recordId: profile.mrekan1Id ?? ""),
+      MRekanBankCrudLihatEvent(recordId: mrekan1Id ?? ""),
     );
 
   }

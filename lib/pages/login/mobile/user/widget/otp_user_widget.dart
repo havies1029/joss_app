@@ -185,9 +185,9 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
       return;
     }
     //Navigator.of(context).pop();
-      context.read<RegUserProfileCubit>().setProfile(
-        email: widget.email,
-      );
+    //   context.read<RegUserProfileCubit>().setProfile(
+    //     email: widget.email,
+    //   );
 
     context.read<EmailVerificationBloc>().add(
       ValidasiPinEmailEvent(

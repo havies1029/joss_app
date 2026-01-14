@@ -253,4 +253,12 @@ enum StatusType {
   final String asset;
   final Color color;
   const StatusType(this.id, this.asset, this.color);
+
+
+  static StatusType? fromId(String id) {
+    for (final t in StatusType.values) {
+      if (t.id == id) return t;
+    }
+    return null;
+  }
 }

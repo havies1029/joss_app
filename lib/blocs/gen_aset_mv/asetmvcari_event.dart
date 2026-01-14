@@ -22,7 +22,6 @@ class RefreshAsetMvCariEvent extends AsetMvCariEvents {
 	List<Object> get props => [searchText, statusId];
 }
 
-// ✅ Event baru khusus debug (tidak mengubah state UI)
 class DebugFetchAsetMvCariEvent extends AsetMvCariEvents {
 	final String searchText;
 	final String statusId;
@@ -51,4 +50,11 @@ class UnselectMvDetailEvent extends AsetMvCariEvents {
 
 	@override
 	List<Object> get props => [asetMvId];
+}
+
+class ClearMvSelectionEvent extends AsetMvCariEvents {
+	const ClearMvSelectionEvent();
+
+	@override
+	List<Object> get props => [];
 }

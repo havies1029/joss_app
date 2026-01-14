@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +14,7 @@ import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 import 'package:joss_app/widgets/combobox/comborkodepos_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
@@ -202,11 +205,19 @@ class MRekanPajakCrudFormPageFormState extends State<MRekanPajakCrudFormPage> {
                                 // --- Avatar tetap di atas tengah ---
                                 Positioned(
                                   top: 16,
-                                  child: BlocBuilder<UserProfileCubit, UserProfileState>(
-                                    buildWhen: (prev, curr) =>
-                                    (prev.fotoBytes?.lengthInBytes ?? -1) != (curr.fotoBytes?.lengthInBytes ?? -1),
+                                  child: BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                                    buildWhen: (prev, curr) {
+                                      if (prev is ProfileDownloadFotoLoaded &&
+                                          curr is ProfileDownloadFotoLoaded) {
+                                        return prev.imageBytes.lengthInBytes !=
+                                            curr.imageBytes.lengthInBytes;
+                                      }
+                                      return prev.runtimeType != curr.runtimeType;
+                                    },
                                     builder: (context, state) {
-                                      final imageBytes = state.fotoBytes;
+                                      final Uint8List? imageBytes =
+                                      state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
+
                                       return InkResponse(
                                         onTap: () => ImageUploader.pickAndUpload(context),
                                         containedInkWell: true,

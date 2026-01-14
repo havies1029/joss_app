@@ -54,9 +54,9 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
           listener: (context, state) {
             final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
-            if (bytes.isNotEmpty) {
-              context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
-            }
+            // if (bytes.isNotEmpty) {
+            //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+            // }
           },
         ),
         BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
@@ -67,12 +67,12 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
             final mrekan1Id = state.record?.mrekan1Id;
             final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 
-            if (nama != null && nama.isNotEmpty) {
-              context.read<UserProfileCubit>().setProfile(
-                nama: nama,
-                mjnsclientId: mjnsclientId, // 👈 simpan juga
-              );
-            }
+            // if (nama != null && nama.isNotEmpty) {
+            //   context.read<UserProfileCubit>().setProfile(
+            //     nama: nama,
+            //     mjnsclientId: mjnsclientId, // 👈 simpan juga
+            //   );
+            // }
 
             if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
               context.read<MRekanContactCrudBloc>().add(
@@ -87,11 +87,11 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           prev.record != curr.record && curr.record != null && !curr.hasFailure,
           listener: (context, state) {
             final record = state.record!;
-            if (record.email.isNotEmpty) {
-              context.read<RegUserProfileCubit>().setProfile(
-                email: record.email,
-              );
-            }
+            // if (record.email.isNotEmpty) {
+            //   context.read<RegUserProfileCubit>().setProfile(
+            //     email: record.email,
+            //   );
+            // }
           },
         ),
 

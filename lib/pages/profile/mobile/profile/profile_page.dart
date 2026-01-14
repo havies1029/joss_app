@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
+import '../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
 import '../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../common/constants.dart';
@@ -43,8 +44,8 @@ class _ProfilePageState extends State<ProfilePage>
       // trigger upload
       context.read<ProfileUploadFotoBloc>().add(UploadProfilePicture(bytes, fileName));
 
-      // optimistic UI
-      context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+      // // optimistic UI
+      // context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal memilih foto: $e')),
@@ -116,13 +117,18 @@ class _ProfilePageState extends State<ProfilePage>
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(16, 96, 16, 16),
-                                    child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                                    child: BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
                                       buildWhen: (prev, curr) {
-                                        final p = prev.fotoBytes?.lengthInBytes ?? -1;
-                                        final c = curr.fotoBytes?.lengthInBytes ?? -1;
-                                        return p != c;
+                                        if (prev is ProfileDownloadFotoLoaded &&
+                                            curr is ProfileDownloadFotoLoaded) {
+                                          return prev.imageBytes.lengthInBytes !=
+                                              curr.imageBytes.lengthInBytes;
+                                        }
+                                        return prev.runtimeType != curr.runtimeType;
                                       },
                                       builder: (context, state) {
+                                        final Uint8List? imageBytes =
+                                        state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
                                         return const Column(
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
@@ -134,14 +140,18 @@ class _ProfilePageState extends State<ProfilePage>
                                   ),
                                   Positioned(
                                     top: 16,
-                                    child: BlocBuilder<UserProfileCubit, UserProfileState>(
+                                    child: BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
                                       buildWhen: (prev, curr) {
-                                        final p = prev.fotoBytes?.lengthInBytes ?? -1;
-                                        final c = curr.fotoBytes?.lengthInBytes ?? -1;
-                                        return p != c;
+                                        if (prev is ProfileDownloadFotoLoaded &&
+                                            curr is ProfileDownloadFotoLoaded) {
+                                          return prev.imageBytes.lengthInBytes !=
+                                              curr.imageBytes.lengthInBytes;
+                                        }
+                                        return prev.runtimeType != curr.runtimeType;
                                       },
                                       builder: (context, state) {
-                                        final imageBytes = state.fotoBytes;
+                                        final Uint8List? imageBytes =
+                                        state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
                                         return InkResponse(
                                           onTap: () => _pickAndUpload(context),
                                           containedInkWell: true,

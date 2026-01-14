@@ -280,7 +280,7 @@ Future<void> main() async {
         BlocProvider<ReqComproBloc>(
           create: (_) => ReqComproBloc(repository: ReqComproRepository()),
         ),
-        BlocProvider(create: (_) => UserProfileCubit()), // hydrated
+        // BlocProvider(create: (_) => UserProfileCubit()), // hydrated
         BlocProvider(create: (_) => ShareRingkasanStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareParStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareMvStateCubit()), // hydrated
@@ -308,7 +308,7 @@ Future<void> main() async {
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
-        BlocProvider(create: (_) => RegUserProfileCubit()),
+        // BlocProvider(create: (_) => RegUserProfileCubit()),
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(
           create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1)),
@@ -428,13 +428,13 @@ Future<void> main() async {
               final mrekan1Id = state.record?.mrekan1Id;
               final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 
-              if (nama != null && nama.isNotEmpty) {
-                context.read<UserProfileCubit>().setProfile(
-                  mrekan1Id : mrekan1Id,
-                  nama: nama,
-                  mjnsclientId: mjnsclientId, // 👈 simpan juga
-                );
-              }
+              // if (nama != null && nama.isNotEmpty) {
+              //   context.read<UserProfileCubit>().setProfile(
+              //     mrekan1Id : mrekan1Id,
+              //     nama: nama,
+              //     mjnsclientId: mjnsclientId, // 👈 simpan juga
+              //   );
+              // }
 
               if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
                 context.read<MRekanContactCrudBloc>().add(
@@ -449,12 +449,12 @@ Future<void> main() async {
             prev.record != curr.record && curr.record != null && !curr.hasFailure,
             listener: (context, state) {
               final record = state.record!;
-              if (record.email.isNotEmpty) {
-                context.read<RegUserProfileCubit>().setProfile(
-                  email: record.email,
-                  reguserId: record.requestId,
-                );
-              }
+              // if (record.email.isNotEmpty) {
+              //   context.read<RegUserProfileCubit>().setProfile(
+              //     email: record.email,
+              //     reguserId: record.requestId,
+              //   );
+              // }
             },
           ),
 
@@ -466,12 +466,12 @@ Future<void> main() async {
               final email = state.record?.email?.trim() ?? '';
               final telepon = state.record?.telp?.trim() ?? '';
 
-              if (email.isNotEmpty || telepon.isNotEmpty) {
-                context.read<UserProfileCubit>().setProfile(
-                  email: email,
-                  telepon: telepon,
-                );
-              }
+              // if (email.isNotEmpty || telepon.isNotEmpty) {
+              //   context.read<UserProfileCubit>().setProfile(
+              //     email: email,
+              //     telepon: telepon,
+              //   );
+              // }
             },
           ),
 
@@ -518,12 +518,12 @@ Future<void> main() async {
             listenWhen: (_, c) => c is ProfileDownloadFotoLoaded,
             listener: (context, state) {
               final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
-              if (bytes.isNotEmpty) {
-                context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
-                debugPrint('[Foto] bytes=${bytes.length} -> set ke UserProfileCubit');
-              } else {
-                debugPrint('[Foto] bytes kosong, skip setProfile()');
-              }
+              // if (bytes.isNotEmpty) {
+              //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+              //   debugPrint('[Foto] bytes=${bytes.length} -> set ke UserProfileCubit');
+              // } else {
+              //   debugPrint('[Foto] bytes kosong, skip setProfile()');
+              // }
             },
           ),
         ],
@@ -651,26 +651,29 @@ class _AppState extends State<_App> {
 
               // 🔹 3. Handle Client ('C')
               if ((user.userType ?? '').toUpperCase() == 'C') {
-                context.read<UserProfileCubit>().setProfile(
-                  mrekan1Id: user.id?.toString(),
-                  nama: user.nama,
-                  email: user.email,
-                  telepon: user.hp,
-                );
+                // context.read<UserProfileCubit>().setProfile(
+                //   mrekan1Id: user.id?.toString(),
+                //   nama: user.nama,
+                //   email: user.email,
+                //   telepon: user.hp,
+                // );
 
-                return BlocListener<UserProfileCubit, UserProfileState>(
+                return BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
                   listenWhen: (prev, curr) =>
-                  prev.mrekan1Id != curr.mrekan1Id &&
-                      curr.mrekan1Id != null &&
-                      curr.mrekan1Id!.trim().isNotEmpty,
-                  listener: (context, profile) async {
+                  prev.record?.mrekan1Id != curr.record?.mrekan1Id &&
+                      curr.record?.mrekan1Id != null &&
+                      curr.record!.mrekan1Id!.trim().isNotEmpty,
+                  listener: (context, state) async {
                     if (ChatInitService.I.isInitialized) return;
 
                     try {
-                      final userId = profile.mrekan1Id!.trim();
-                      final displayName = (profile.nama?.trim().isNotEmpty ?? false)
-                          ? profile.nama!.trim()
-                          : profile.email ?? "Guest";
+                      final userId = state.record!.mrekan1Id!.trim();
+
+                      // ambil nama paling relevan
+                      final displayName =
+                      (state.record?.rekanNama?.trim().isNotEmpty ?? false)
+                          ? state.record!.rekanNama!.trim()
+                          : "Guest";
 
                       final result = await ChatInitService.I.ensureInit(
                         userId: userId,
@@ -776,8 +779,7 @@ class _AppState extends State<_App> {
             }
 
             if (state is AuthenticationUnauthenticated) {
-              context.read<UserProfileCubit>().clearProfile();
-              context.read<RegUserProfileCubit>().clearProfile();
+              // context.read<UserProfileCubit>().clearProfile();
               context.read<LoginBloc>().add(LoginReset());
 
               ChatInitService.I.dispose();
@@ -814,7 +816,6 @@ class _AppState extends State<_App> {
               while (_navigatorKey.currentState?.canPop() ?? false) {
                 _navigatorKey.currentState?.pop();
               }
-              // 🚀 OTP sukses → langsung logout biar state balik ke Unauthenticated
               context.read<AuthenticationBloc>().add(LoggedOut());
               return const LoadingIndicator();
             }

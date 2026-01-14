@@ -31,6 +31,7 @@ class ActionMenuItem {
 }
 
 class FloatingActionMenuWidget extends StatefulWidget {
+  final bool isFabEnabled;
   final List<ActionMenuItem> availableActions;
   final Function(ActionType type, List<dynamic> selectedItems) onActionTap;
   final List<dynamic> selectedItems;
@@ -39,6 +40,7 @@ class FloatingActionMenuWidget extends StatefulWidget {
     super.key,
     required this.availableActions,
     required this.onActionTap,
+    this.isFabEnabled = true,
     required this.selectedItems,
   });
 

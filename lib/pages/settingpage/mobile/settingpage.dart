@@ -3,10 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/pages/qontak/mobile/customer_service_page.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../blocs/reguser_profile/reguser_profile_state.dart';
@@ -156,8 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final mjnsclientId =
-        context.read<UserProfileCubit>().state.mjnsclientId;
+    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
     return Scaffold(
       body: BaseBackgroundFirstPage(
         child: SafeArea(
@@ -188,61 +190,62 @@ class _SettingsPageState extends State<SettingsPage> {
 
                         if (userType == 'C') {
                           // 🔹 CLIENT
-                          return BlocBuilder<UserProfileCubit, UserProfileState>(
+                          return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
                             buildWhen: (prev, curr) {
-                              final nameChanged = prev.nama != curr.nama;
-                              final emailChanged = prev.email != curr.email;
-                              final telpChanged = prev.telepon != curr.telepon;
-                              final bytesChanged =
-                                  (prev.fotoBytes == null && curr.fotoBytes != null) ||
-                                      (prev.fotoBytes != null && curr.fotoBytes == null) ||
-                                      (prev.fotoBytes != null &&
-                                          curr.fotoBytes != null &&
-                                          prev.fotoBytes!.lengthInBytes != curr.fotoBytes!.lengthInBytes);
-                              return nameChanged || emailChanged || telpChanged || bytesChanged;
-                            },
-                            builder: (context, state) {
-                              final nama = (state.nama?.trim().isNotEmpty ?? false)
-                                  ? state.nama!.trim()
-                                  : 'Pengguna';
-                              final email =
-                              (state.email?.trim().isNotEmpty ?? false) ? state.email!.trim() : null;
-                              final telepon = (state.telepon?.trim().isNotEmpty ?? false)
-                                  ? state.telepon!.trim()
-                                  : null;
-                              final foto = (state.fotoBytes != null && state.fotoBytes!.isNotEmpty)
-                                  ? state.fotoBytes
-                                  : null;
+                              final prevRec = prev.record;
+                              final currRec = curr.record;
 
-                              return _buildProfileCard(
-                                context: context,
-                                nama: nama,
-                                email: email,
-                                telepon: telepon,
-                                foto: foto,
-                                subtitle: "Klien JPS",
+                              return prevRec?.rekanNama != currRec?.rekanNama ||
+                                  prevRec?.email != currRec?.email ||   // sesuaikan nama field
+                                  prevRec?.telepon != currRec?.telepon;       // sesuaikan nama field
+                            },
+                            builder: (context, rekanState) {
+                              final namaRaw = rekanState.record?.rekanNama?.trim();
+                              final emailRaw = rekanState.record?.email?.trim(); // <-- ganti sesuai modelmu
+                              final telpRaw  = rekanState.record?.telepon?.trim();  // <-- ganti sesuai modelmu
+
+                              final nama = (namaRaw != null && namaRaw.isNotEmpty) ? namaRaw : 'Pengguna';
+                              final email = (emailRaw != null && emailRaw.isNotEmpty) ? emailRaw : null;
+                              final telepon = (telpRaw != null && telpRaw.isNotEmpty) ? telpRaw : null;
+
+                              return BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                                buildWhen: (prev, curr) =>
+                                curr is ProfileDownloadFotoLoaded ||
+                                    (prev is ProfileDownloadFotoLoaded && curr is! ProfileDownloadFotoLoaded),
+                                builder: (context, fotoState) {
+                                  final foto = (fotoState is ProfileDownloadFotoLoaded &&
+                                      fotoState.imageBytes.isNotEmpty)
+                                      ? fotoState.imageBytes
+                                      : null;
+
+                                  return _buildProfileCard(
+                                    context: context,
+                                    nama: nama,
+                                    email: email,
+                                    telepon: telepon,
+                                    foto: foto,
+                                    subtitle: "Klien JPS",
+                                  );
+                                },
                               );
                             },
                           );
                         }
 
                         else if (userType == 'U') {
-                          // 🔹 USER BIASA
-                          return BlocBuilder<RegUserProfileCubit, RegUserProfileState>(
-                            buildWhen: (prev, curr) => prev.email != curr.email,
-                            builder: (context, state) {
-                              final nama = (state.email.trim().isNotEmpty)
-                                  ? state.email.trim()
-                                  : 'Pengguna Baru';
+                          final displayName = authState is AuthenticationAuthenticated
+                              ? (authState.user.email?.trim().isNotEmpty ?? false)
+                              ? authState.user.email!.trim()
+                              : 'Pengguna Baru'
+                              : 'Pengguna Baru';
 
-                              return _buildProfileCard(
-                                context: context,
-                                nama: nama,
-                                foto: null,
-                              );
-                            },
+                          return _buildProfileCard(
+                            context: context,
+                            nama: displayName,
+                            foto: null,
                           );
                         }
+
 
                         else {
                           final fallbackEmail = authState is AuthenticationAuthenticated
@@ -309,26 +312,28 @@ class _SettingsPageState extends State<SettingsPage> {
                                     svgAsset:
                                         'assets/icons/informasi_klien.svg',
                                     title: 'Informasi Klien',
-                                    onTap: () {
+                                    onTap: () async {
                                       if (mjnsclientId == '10') {
-                                        Navigator.push(
+                                        await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder:
-                                                (_) =>
-                                                    const MRekanGeneralIdvCrudFormPage(),
+                                            builder: (_) => const MRekanGeneralIdvCrudFormPage(),
                                           ),
                                         );
                                       } else {
-                                        Navigator.push(
+                                        await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder:
-                                                (_) =>
-                                                    const MRekanGeneralCmpCrudFormPage(),
+                                            builder: (_) => const MRekanGeneralCmpCrudFormPage(),
                                           ),
                                         );
                                       }
+
+                                      context.read<MRekan1CrudBloc>().add(
+                                        MRekan1CrudLihatEvent(),
+                                      );
+
+                                      context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
                                     },
                                   ),
                                   sDivider,

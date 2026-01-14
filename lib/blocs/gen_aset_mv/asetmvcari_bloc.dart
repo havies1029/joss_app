@@ -16,6 +16,7 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		on<DebugFetchAsetMvCariEvent>(_onDebugFetchAsetMvCari);
 		on<SelectMvDetailEvent>(onSelectDetail);
 		on<UnselectMvDetailEvent>(onUnselectDetail);
+		on<ClearMvSelectionEvent>(onClearSelection);
 	}
 
 	// 🔁 Normal Refresh
@@ -117,5 +118,13 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			..remove(event.asetMvId);
 
 		emit(state.copyWith(selectedIds: updatedSelectedIds));
+	}
+
+	Future<void> onClearSelection(
+			ClearMvSelectionEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		if (state.selectedIds.isEmpty) return;
+		emit(state.copyWith(selectedIds: <String>{}));
 	}
 }

@@ -11,6 +11,7 @@ import 'package:joss_app/pages/profile/mobile/profile/form_section/crud_pic/edit
 import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 
 import '../../../../../../blocs/gen_invite/invite_bloc.dart';
+import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../repositories/gen_invite/invite_repository.dart';
 import '../../../../../../widgets/apptheme/invite_success_popup.dart';
@@ -371,19 +372,21 @@ class _PicReadOnlyCardState extends State<_PicReadOnlyCard> {
                             onPressed: isLoading
                                 ? null
                                 : () {
-                              final userProfile =
-                                  context.read<UserProfileCubit>().state;
-                              final userId = userProfile.mrekan1Id ?? '0';
-                              final email = widget.email.trim().toLowerCase();
+                              final mrekan1Id =
+                                  context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
 
-                              if (email.isEmpty || !email.contains('@')) {
+                              if (mrekan1Id == null || mrekan1Id.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Email PIC tidak valid.'),
+                                    content: Text('Data klien belum siap. Silakan coba lagi.'),
                                   ),
                                 );
                                 return;
                               }
+
+                              final userId = mrekan1Id;
+                              final email = widget.email.trim().toLowerCase();
+
 
                               context.read<InviteBloc>().add(
                                 SendInviteEvent(userId: userId, email: email),

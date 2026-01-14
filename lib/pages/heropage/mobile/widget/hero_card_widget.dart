@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
 import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../blocs/user_profile/user_profile_cubit.dart';
 
 class HeroCardWidget extends StatefulWidget {
@@ -48,10 +49,11 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
     _cardPageController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final userType = widget.userType;
-    final mjnsclientId = context.watch<UserProfileCubit>().state.mjnsclientId ?? '';
+    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),

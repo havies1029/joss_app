@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +10,8 @@ import 'package:joss_app/models/gen_profile/mrekangeneralcmpcrud_model.dart';
 import 'package:joss_app/models/combobox/combombentukcst_model.dart';
 import 'package:joss_app/models/combobox/combombidang_model.dart';
 
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
@@ -73,30 +77,31 @@ class MRekanGeneralCmpCrudFormPageFormState
                   child: BlocConsumer<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
                     listener: (context, state) {
                       if (state.isLoaded && _isFirstLoad) {
-                        if (state.record != null) {
-                          fieldRekanNamaController.text = state.record?.rekanNama ?? "";
+                        final formName = (state.record?.rekanNama ?? '').trim();
+                        final fallbackName =
+                        (context.read<MRekan1CrudBloc>().state.record?.rekanNama ?? '').trim();
 
-                          if (state.record!.rekanNama!.isNotEmpty) {
-                            fieldRekanNamaController.text = state.record!.rekanNama!;
-                          } else {
-                            final profile = context.read<UserProfileCubit>().state;
-                            if (fieldRekanNamaController.text.isEmpty &&
-                                (profile.nama?.isNotEmpty ?? false)) {
-                              fieldRekanNamaController.text = profile.nama!;
-                            }
+                        if (fieldRekanNamaController.text.trim().isEmpty) {
+                          if (formName.isNotEmpty) {
+                            fieldRekanNamaController.text = formName;
+                          } else if (fallbackName.isNotEmpty) {
+                            fieldRekanNamaController.text = fallbackName;
                           }
                         }
+
                         fieldComboMBentukCst = state.comboMBentukCst;
                         fieldComboMBidang = state.comboMBidang;
+
+                        _isFirstLoad = false;
                       }
 
                       if (state.isSaved && !state.hasFailure) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           successSnackBar("Data berhasil disimpan 🎉"),
                         );
-                        _isFirstLoad = true; // biar kalau mau reload manual, bisa nanti
-                      }
 
+                        _isFirstLoad = true;
+                      }
                     },
                     builder: (context, state) {
                       return Form(
@@ -105,12 +110,18 @@ class MRekanGeneralCmpCrudFormPageFormState
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // --- Avatar ---
-                            BlocBuilder<UserProfileCubit, UserProfileState>(
-                              buildWhen: (prev, curr) =>
-                              (prev.fotoBytes?.lengthInBytes ?? -1) !=
-                                  (curr.fotoBytes?.lengthInBytes ?? -1),
+                            BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                              buildWhen: (prev, curr) {
+                                if (prev is ProfileDownloadFotoLoaded &&
+                                    curr is ProfileDownloadFotoLoaded) {
+                                  return prev.imageBytes.lengthInBytes !=
+                                      curr.imageBytes.lengthInBytes;
+                                }
+                                return prev.runtimeType != curr.runtimeType;
+                              },
                               builder: (context, state) {
-                                final imageBytes = state.fotoBytes;
+                                final Uint8List? imageBytes =
+                                state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
                                 return Center(
                                   child: InkResponse(
                                     onTap: () => ImageUploader.pickAndUpload(context),
@@ -223,11 +234,13 @@ class MRekanGeneralCmpCrudFormPageFormState
   void loadData() {
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
 
-    final profile = context.read<UserProfileCubit>().state;
-
-    if (fieldRekanNamaController.text.isEmpty && (profile.nama?.isNotEmpty ?? false)) {
-      fieldRekanNamaController.text = profile.nama!;
-    }
+    // final name =
+    //     context.read<MRekan1CrudBloc>().state.record?.rekanNama;
+    //
+    //
+    // if (fieldRekanNamaController.text.isEmpty && (name?.isNotEmpty ?? false)) {
+    //   fieldRekanNamaController.text = name!;
+    // }
 
   }
 

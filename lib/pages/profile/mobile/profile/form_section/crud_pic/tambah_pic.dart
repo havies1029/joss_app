@@ -12,7 +12,9 @@ import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
 import '../../../../../../blocs/gen_invite/invite_bloc.dart';
+import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
+import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
@@ -140,7 +142,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
       return;
     }
 
-    final mjnsclientId = context.read<UserProfileCubit>().state.mjnsclientId ?? '';
+    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+
     final idJabatan = (mjnsclientId == '10')
         ? ''
         : (_jabatan?.mjabatanId?.trim().isEmpty ?? true)
@@ -289,8 +292,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
             title: 'Tambah PIC',
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final mjnsclientId =
-                    context.read<UserProfileCubit>().state.mjnsclientId ?? '';
+                final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+
                 return SingleChildScrollView(
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom + 20,
@@ -641,12 +644,9 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                       : inviteState.isLoading
                                                       ? null
                                                       : () {
-                                                    final userId = context
-                                                        .read<
-                                                        UserProfileCubit>()
-                                                        .state
-                                                        .mrekan1Id ??
-                                                        '0';
+                                                    final mrekan1Id =
+                                                        context.read<MRekan1CrudBloc>().state.record?.mrekan1Id ?? "";
+
                                                     final email = _email
                                                         .text
                                                         .trim()
@@ -657,7 +657,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                         InviteBloc>()
                                                         .add(SendInviteEvent(
                                                         userId:
-                                                        userId,
+                                                        mrekan1Id,
                                                         email:
                                                         email));
                                                   },

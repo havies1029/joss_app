@@ -52,3 +52,10 @@ class UnselectDetailEvent extends AsetParCariEvents {
 	@override
 	List<Object> get props => [asetParId];
 }
+
+class ClearParSelectionEvent extends AsetParCariEvents {
+	const ClearParSelectionEvent();
+
+	@override
+	List<Object> get props => [];
+}

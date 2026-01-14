@@ -30,7 +30,7 @@ class ImageUploader {
       );
 
       // optimistic UI: langsung ganti avatar
-      context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+      // context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

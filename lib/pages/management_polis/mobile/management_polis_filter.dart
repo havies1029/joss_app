@@ -18,6 +18,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
 import '../../../helper/expert_helper.dart';
 import '../../../helper/mobile_expert_helper.dart';
+import '../../../widgets/EmptyStateWidget.dart';
 import '../../../widgets/apptheme/polis_button.dart';
 import '../../../widgets/apptheme/popup_widget.dart';
 import 'cob_polis/health_cob_table.dart';
@@ -44,6 +45,17 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
   late AsethullCariBloc asetHullCariBloc;
   late AsetHealthCariBloc asetHealthCariBloc;
   String _cobId() => context.read<CobCariBloc>().state.selectedCOBId;
+
+  String _selectedStatusLabel(BuildContext context) {
+    final st = context.read<StatusAsetCariBloc>().state;
+
+    if (st.selectedStatusId.isEmpty) return "Semua";
+
+    final found = st.items.where((e) => e.mstatusasetId == st.selectedStatusId).toList();
+    if (found.isEmpty) return "Semua";
+
+    return found.first.statusNama;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +150,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                       if (parState.status == ListStatus.failure) {
                         return const Center(child: Text('Failed to fetch data'));
                       }
+
                       if (parState.items.isEmpty) {
-                        return const Center(child: Text('No items found'));
+                        final label = _selectedStatusLabel(context);
+                        return EmptyStateWidget(statusLabel: label);
                       }
 
                       return PropertyCobTable(
@@ -165,7 +179,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (mvState.items.isEmpty) {
-                        return const Center(child: Text('No items found'));
+                        final label = _selectedStatusLabel(context);
+                        return EmptyStateWidget(statusLabel: label);
                       }
 
                       return KendaraanCobTable(
@@ -192,7 +207,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                             'Failed to fetch data'));
                       }
                       if (HullState.items.isEmpty) {
-                        return const Center(child: Text('No items found'));
+                        final label = _selectedStatusLabel(context);
+                        return EmptyStateWidget(statusLabel: label);
                       }
 
                       return HullCobTable(
@@ -222,7 +238,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (healthState.items.isEmpty) {
-                        return const Center(child: Text('No items found'));
+                        final label = _selectedStatusLabel(context);
+                        return EmptyStateWidget(statusLabel: label);
                       }
 
                       return HealthCobTable(
@@ -389,7 +406,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     final cobId = _cobId();
     if (cobId == "10002") return CategoryType.properti;
     if (cobId == "10003") return CategoryType.kendaraan;
-    if (cobId == "10003") return CategoryType.hull;
+    if (cobId == "10004") return CategoryType.hull;
     if (cobId == "10005") return CategoryType.kesehatan;
     return CategoryType.ringkasan;
   }
@@ -580,35 +597,4 @@ $previewRows$more
   }
 
 
-}
-
-class FloatingMenuWrapper extends StatelessWidget {
-  const FloatingMenuWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final cobId = context.select((CobCariBloc b) => b.state.selectedCOBId);
-
-    // Ambil selectedIds sesuai COB aktif (reactive)
-    final Set<String> selectedIds = switch (cobId) {
-      "10002" => context.select((AsetParCariBloc b) => b.state.selectedIds),
-      "10003" => context.select((AsetMvCariBloc b) => b.state.selectedIds),
-      "10004" => context.select((AsethullCariBloc b) => b.state.selectedIds),
-      "10005" => context.select((AsetHealthCariBloc b) => b.state.selectedIds),
-      _ => const <String>{},
-    };
-
-    final hasSelected = selectedIds.isNotEmpty;
-
-    return FloatingActionMenuWidget(
-      selectedItems: selectedIds.toList(),
-      onActionTap: (type, selected) {
-        // selected = list of IDs (String)
-        // lakukan sesuai action:
-        // contoh:
-        // if (type == ActionType.unduhPolis) _showExportDialog(context, selected);
-      }, availableActions: [],
-      // isMainEnabled: hasSelected,
-    );
-  }
 }

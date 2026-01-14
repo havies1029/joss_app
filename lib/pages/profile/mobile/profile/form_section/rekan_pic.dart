@@ -6,6 +6,7 @@ import 'package:joss_app/blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 
 import '../../../../../blocs/gen_invite/invite_bloc.dart';
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../common/constants.dart';
@@ -401,9 +402,10 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
             onPressed: isLoading
                 ? null
                 : () {
-              final userProfile =
-                  context.read<UserProfileCubit>().state;
-              final userId = userProfile.mrekan1Id ?? '0';
+              final mrekan1Id =
+                  context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
+
+              final userId = mrekan1Id ?? '0';
               final emailClean = email.trim().toLowerCase();
 
               if (emailClean.isEmpty || !emailClean.contains('@')) {

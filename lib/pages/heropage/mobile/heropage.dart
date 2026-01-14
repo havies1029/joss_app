@@ -5,6 +5,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/pages/heropage/mobile/widget/detail_premi.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../../blocs/reguser/reguser_bloc.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../blocs/user_profile/user_profile_state.dart';
 import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
@@ -45,45 +48,50 @@ class HeroPage extends StatelessWidget {
                               : '';
 
                           if (userType == 'C') {
-                            // 🔹 Client → ambil dari UserProfileCubit
-                            return BlocBuilder<UserProfileCubit, UserProfileState>(
-                              buildWhen:
-                                  (prev, curr) =>
-                              prev.nama != curr.nama ||
-                                  prev.fotoBytes != curr.fotoBytes,
-                              builder: (context, profileState) {
+                            return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
+                              buildWhen: (prev, curr) =>
+                              prev.record?.rekanNama != curr.record?.rekanNama,
+                              builder: (context, rekanState) {
+                                final nama = rekanState.record?.rekanNama?.trim();
                                 final displayName =
-                                (profileState.nama?.trim().isNotEmpty ?? false)
-                                    ? profileState.nama!.trim()
-                                    : 'Client User';
+                                (nama != null && nama.isNotEmpty) ? nama : 'Client User';
 
-                                final bytes =
-                                (profileState.fotoBytes != null &&
-                                    profileState.fotoBytes!.isNotEmpty)
-                                    ? profileState.fotoBytes
-                                    : null;
+                                return BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                                  buildWhen: (prev, curr) =>
+                                  curr is ProfileDownloadFotoLoaded ||
+                                      (prev is ProfileDownloadFotoLoaded &&
+                                          curr is! ProfileDownloadFotoLoaded),
+                                  builder: (context, fotoState) {
+                                    final bytes = (fotoState is ProfileDownloadFotoLoaded &&
+                                        fotoState.imageBytes.isNotEmpty)
+                                        ? fotoState.imageBytes
+                                        : null;
 
-                                return _buildHeroContent(
-                                  context,
-                                  displayName: displayName,
-                                  userType: userType,
-                                  bytes: bytes,
-                                  screenHeight: screenHeight,
+                                    return _buildHeroContent(
+                                      context,
+                                      displayName: displayName,
+                                      userType: userType,
+                                      bytes: bytes,
+                                      screenHeight: screenHeight,
+                                    );
+                                  },
                                 );
                               },
                             );
                           } else if (userType == 'U') {
-                            // 🔹 User baru → ambil dari RegUserProfileCubit
-                            return BlocBuilder<
-                                RegUserProfileCubit,
-                                RegUserProfileState
-                            >(
-                              buildWhen: (prev, curr) => prev.email != curr.email,
+                            return BlocBuilder<RegUserBloc, RegUserState>(
+                              buildWhen: (prev, curr) =>
+                              prev.record?.email != curr.record?.email ||
+                                  prev.record?.personalNama != curr.record?.personalNama ||
+                                  prev.record?.userNama != curr.record?.userNama,
                               builder: (context, regState) {
-                                final displayName =
-                                regState.email.isNotEmpty
-                                    ? regState.email
-                                    : 'New User';
+                                final email = (regState.record?.email ?? '').trim();
+                                final personalNama = (regState.record?.personalNama ?? '').trim();
+                                final userNama = (regState.record?.userNama ?? '').trim();
+
+                                final displayName = email.isNotEmpty
+                                    ? email
+                                    : (personalNama.isNotEmpty ? personalNama : (userNama.isNotEmpty ? userNama : 'New User'));
 
                                 return _buildHeroContent(
                                   context,
