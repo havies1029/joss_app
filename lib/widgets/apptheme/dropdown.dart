@@ -76,6 +76,21 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(color: primaryColor),
           ),
+
+          // ERROR
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.red),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.red),
+          ),
+
+          errorStyle: bodyTextStyle(context).copyWith(
+            color: Colors.red,
+            fontSize: 12,
+          ),
         ),
       ),
       // DATA LOADER

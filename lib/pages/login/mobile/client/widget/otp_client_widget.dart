@@ -244,7 +244,40 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
                       position: _slideAnimation,
                       child: Column(
                         children: [
-                          SizedBox(height: topSpacing),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                            child:
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    for (var controller in _otpControllers) {
+                                      controller.clear();
+                                    }
+                                    _timer?.cancel();
+                                    Navigator.of(context, rootNavigator: false).pop();
+                                    context.read<AuthenticationBloc>().add(LoggedOut());
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  icon: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: primaryLightColor,
+                                    size: getResponsiveFont(context, 18),
+                                  ),
+                                  label: Text(
+                                      "Kembali",
+                                      style: bodyTextStyle(context).copyWith(color: primaryLightColor)
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
 
                           Container(
                             width: double.infinity,

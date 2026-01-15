@@ -19,7 +19,6 @@ import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../../repositories/combobox/comborkodepos_repository.dart';
-import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanContactCrudFormPage extends StatefulWidget {
@@ -121,7 +120,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
 
                       if (state.isSaved && !state.hasFailure) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          successSnackBar("Data berhasil disimpan 🎉"),
+                          successSnackBar("Data berhasil disimpan!"),
                         );
                       }
                     },
@@ -245,10 +244,10 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
   Widget buildFieldAlamat1() => appTextField(
     label: "Alamat Rumah",
     controller: fieldAlamat1Controller,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-    ],
+    keyboardType: TextInputType.streetAddress,
+    // inputFormatters: [
+    //   FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+    // ],
     validator: (v) {
       if (v == null || v.isEmpty) return kAddressNullError;
       return null;
@@ -262,10 +261,9 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
     displayText: (item) => item.propinsiNama,
     compareItems: (a, b) => a.mpropinsiId == b.mwilayahId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
+    validatorCallback: (v) => v == null ? kStringProvinsiError : null,
     onChangedCallback: (v) {
       if (v != null){
-        removeError(error: kStringNullError);
         mRekanContactCrudBloc.add(
           ComboMPropinsiChangedEvent(comboMPropinsi: v),
         );
@@ -284,10 +282,9 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     dataLoader: () => ComboMKotaRepository().getComboMKota(fieldComboMPropinsi?.mwilayahId ?? ""),
     displayText: (item) => item.kotaDesc,
     compareItems: (a, b) => a.mkotaId == b.mkotaId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
+    validatorCallback: (v) => v == null ? kStringKotaError : null,
     onChangedCallback: (v) {
       if (v != null){
-        removeError(error: kStringNullError);
         mRekanContactCrudBloc.add(ComboMKotaChangedEvent(comboMKota: v));
         comboRKodeposKey.currentState?.clear();
       }
@@ -303,10 +300,9 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     dataLoader: () => ComboRKodeposRepository().getComboRKodepos(fieldComboMKota?.mkotaId ?? "", ""),
     displayText: (item) => item.kodeposNo,
     compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
+    validatorCallback: (v) => v == null ? kStringKodeposError : null,
     onChangedCallback: (v) {
       if (v != null){
-        removeError(error: kStringNullError);
         mRekanContactCrudBloc.add(
           ComboRKodeposChangedEvent(comboRKodepos: v),
         );
@@ -335,14 +331,6 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
           mRekanContactCrudBloc.state.record!.mrekancontact1Id;
 
       mRekanContactCrudBloc.add(MRekanContactCrudUbahEvent(record: record));
-    }
-  }
-
-  void removeError({required String error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
     }
   }
 }

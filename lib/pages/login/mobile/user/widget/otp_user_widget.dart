@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
+import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../../../common/constants.dart';
@@ -226,8 +227,8 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     final screenHeight = MediaQuery.of(context).size.height;
 
     // adaptif: kalau layar kecil, jaraknya lebih kecil
-    final double topSpacing =
-    screenHeight < 700 ? screenHeight * 0.06 : screenHeight * 0.095;
+    // final double topSpacing =
+    // screenHeight < 700 ? screenHeight * 0.06 : screenHeight * 0.095;
 
     return Scaffold(
       backgroundColor: secondaryBlackColor,
@@ -243,7 +244,40 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                       position: _slideAnimation,
                       child: Column(
                         children: [
-                          SizedBox(height: topSpacing),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                            child:
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    for (var controller in _otpControllers) {
+                                      controller.clear();
+                                    }
+                                    _timer?.cancel();
+                                    Navigator.of(context, rootNavigator: false).pop();
+                                    context.read<AuthenticationBloc>().add(LoggedOut());
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  icon: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: primaryLightColor,
+                                    size: getResponsiveFont(context, 18),
+                                  ),
+                                  label: Text(
+                                      "Kembali",
+                                      style: bodyTextStyle(context).copyWith(color: primaryLightColor)
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                           Container(
                             decoration: BoxDecoration(
                               gradient: cardBorderGradient,

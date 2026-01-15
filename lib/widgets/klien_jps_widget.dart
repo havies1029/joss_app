@@ -216,8 +216,6 @@ Widget SocmedIcon(String assetPath, bool isMobile) => Container(
         height: isMobile ? 20 : 30,
         colorFilter:
         const ColorFilter.mode(primaryLightColor, BlendMode.srcIn),
-        allowDrawingOutsideViewBox: true,
-        fit: BoxFit.scaleDown,
       ),
     ),
   ),

@@ -83,293 +83,264 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: MultiBlocListener(
-          listeners: [
-            // =========================
-            // 1) LISTENER CRUD PIC
-            // =========================
-            BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-              listenWhen: (prev, curr) =>
-              prev.isSaved != curr.isSaved ||
-                  prev.hasFailure != curr.hasFailure ||
-                  prev.isLoaded != curr.isLoaded ||
-                  prev.record != curr.record,
-              listener: (context, state) {
-                if (state.isSaved == true) {
-                  Navigator.pop(context, true);
-                  return;
-                }
+    return MultiBlocListener(
+      listeners: [
+        // =========================
+        // 1) LISTENER CRUD PIC
+        // =========================
+        BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
+          listenWhen: (prev, curr) =>
+          prev.isSaved != curr.isSaved ||
+              prev.hasFailure != curr.hasFailure ||
+              prev.isLoaded != curr.isLoaded ||
+              prev.record != curr.record,
+          listener: (context, state) {
+            if (state.isSaved == true) {
+              Navigator.pop(context, true);
+              return;
+            }
 
-                if (state.isLoaded == true && state.record != null) {
-                  _injectPayload(state.record!);
-                }
+            if (state.isLoaded == true && state.record != null) {
+              _injectPayload(state.record!);
+            }
 
-                if (state.hasFailure == true) {
-                  setState(() => _saving = false);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Gagal menyimpan perubahan. Coba lagi.')),
-                  );
-                }
-              },
-            ),
+            if (state.hasFailure == true) {
+              setState(() => _saving = false);
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar('Gagal menyimpan perubahan. Coba lagi.'),
+              );
+            }
+          },
+        ),
 
-            // =========================
-            // 2) LISTENER COB (inject cob awal ke pending list)
-            // =========================
-            BlocListener<RekanPicCobCariBloc, RekanPicCobCariState>(
-              listenWhen: (prev, curr) =>
-              prev.status != curr.status || prev.items != curr.items,
-              listener: (context, state) {
-                // sesuaikan kalau enum kamu bukan "success"
-                if (state.status != ListStatus.success) return;
+        // =========================
+        // 2) LISTENER COB (inject cob awal ke pending list)
+        // =========================
+        BlocListener<RekanPicCobCariBloc, RekanPicCobCariState>(
+          listenWhen: (prev, curr) =>
+          prev.status != curr.status || prev.items != curr.items,
+          listener: (context, state) {
+            // sesuaikan kalau enum kamu bukan "success"
+            if (state.status != ListStatus.success) return;
 
-                final selected = state.items.where((e) => e.isChecked == true).toList();
+            final selected = state.items.where((e) => e.isChecked == true).toList();
 
-                // isi pending hanya dari hasil fetch awal
-                setState(() {
-                  _pendingCobList = List<RekanPicCobCariModel>.from(selected);
-                });
+            // isi pending hanya dari hasil fetch awal
+            setState(() {
+              _pendingCobList = List<RekanPicCobCariModel>.from(selected);
+            });
 
-                debugPrint('✅ [COB INIT] pendingCobList=${_pendingCobList.length}');
-              },
-            ),
-          ],
+            debugPrint('✅ [COB INIT] pendingCobList=${_pendingCobList.length}');
+          },
+        ),
+      ],
 
-          // =========================
-          // CHILD UI KAMU TETAP
-          // =========================
-          child: BaseBackgroundSidePage(
-            title: 'Edit PIC reake',
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+      // =========================
+      // CHILD UI KAMU TETAP
+      // =========================
+      child: BaseBackgroundSidePage(
+        title: 'Edit PIC',
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
-                return SingleChildScrollView(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: Container(
+                color: secondaryBlackColor,
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                  vertical: 10,
+                ),
+                child: Card(
+                  color: pGrey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    side: const BorderSide(color: sGrey),
                   ),
-                  child: Container(
-                    width: double.infinity,
-                    color: secondaryBlackColor,
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5,
-                      vertical: 20,
-                    ),
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 720),
-                        child: Card(
-                          color: pGrey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(cardBorderRadius),
-                            side: const BorderSide(color: sGrey),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Text('Form Edit PIC',
+                          //     style: headingStyle(context, fontSize: 20)),
+                          // const SizedBox(height: vPadding),
+
+                          buildFieldEmail(),
+                          const SizedBox(height: hPadding),
+
+                          buildFieldRekanNama(),
+                          const SizedBox(height: hPadding),
+
+                          buildFiledTelp(),
+                          const SizedBox(height: hPadding),
+
+                          if (mjnsclientId != '10') buildFieldJabatan(),
+                          const SizedBox(height: hPadding),
+
+                          CheckboxWidget(
+                            leftLabel: '',
+                            rightLabel: 'PIC Default',
+                            initialValue: _isDefault,
+                            callback: (val) {
+                              setState(() => _isDefault = val);
+                            },
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Form(
-                              key: _formKey,
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('Form Edit PIC',
-                                      style: headingStyle(context, fontSize: 20)),
-                                  const SizedBox(height: vPadding),
 
-                                  buildFieldRekanNama(),
-                                  const SizedBox(height: vPadding),
+                          const SizedBox(height: hPadding),
 
-                                  buildFieldEmail(),
-                                  const SizedBox(height: vPadding),
-
-                                  buildFiledTelp(),
-                                  const SizedBox(height: vPadding),
-
-                                  if (mjnsclientId != '10') buildFieldJabatan(),
-                                  const SizedBox(height: vPadding),
-
-                                  CheckboxListTile(
-                                    value: _isDefault,
-                                    onChanged: (v) =>
-                                        setState(() => _isDefault = v ?? false),
-                                    title: Text(
-                                      'Jadikan sebagai PIC default',
-                                      style: bodyTextStyle(context),
-                                    ),
-                                    dense: true,
-                                    activeColor: primaryColor,
-                                    controlAffinity: ListTileControlAffinity.leading,
-                                    contentPadding: EdgeInsets.zero,
+                          GestureDetector(
+                            onTap: () async {
+                              final selectedCobs = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => RekanPicCobCariPage(
+                                    rekanPicId: widget.mrekanpicId,
+                                    viewMode: 'ubah',
                                   ),
-                                  const SizedBox(height: hPadding),
+                                ),
+                              );
 
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final selectedCobs = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => RekanPicCobCariPage(
-                                            rekanPicId: widget.mrekanpicId,
-                                            viewMode: 'ubah',
-                                          ),
-                                        ),
-                                      );
+                              if (selectedCobs != null) {
+                                setState(() {
+                                  final combined = <RekanPicCobCariModel>[];
 
-                                      if (selectedCobs != null) {
-                                        setState(() {
-                                          final combined = <RekanPicCobCariModel>[];
+                                  for (final cob in selectedCobs) {
+                                    if (cob.isChecked) {
+                                      combined.add(cob);
+                                    }
+                                  }
 
-                                          for (final cob in selectedCobs) {
-                                            if (cob.isChecked) {
-                                              combined.add(cob);
-                                            }
-                                          }
+                                  for (final old in _pendingCobList) {
+                                    if (!combined.any((c) => c.mcobId == old.mcobId)) {
+                                      combined.add(old);
+                                    }
+                                  }
 
-                                          for (final old in _pendingCobList) {
-                                            if (!combined.any((c) => c.mcobId == old.mcobId)) {
-                                              combined.add(old);
-                                            }
-                                          }
+                                  _pendingCobList = combined;
+                                });
+                              }
 
-                                          _pendingCobList = combined;
-                                        });
-                                      }
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Akses',
+                                  style: bodyTextStyle(context, fontSize: 16),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: pGrey,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: sGrey),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        'assets/icons/list_cob_icon.svg',
+                                        width: 10,
+                                        height: 10,
+                                      ),
+                                    ),
 
-                                    },
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
+                                    const SizedBox(width: 10),
+
+                                    Expanded(
+                                      child: _pendingCobList.isEmpty
+                                          ? Text(
+                                        'Pilih Daftar COB',
+                                        style: bodyTextStyle(context, fontSize: 16),
+                                      )
+                                          : Wrap(
+                                        spacing: 6,
+                                        runSpacing: 6,
+                                        children: _pendingCobList.map((e) => Container(
+                                          height: 30,
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                           decoration: BoxDecoration(
-                                            color: Colors.grey.shade800,
-                                            borderRadius: BorderRadius.circular(10),
+                                            color: primaryColor,
+                                            borderRadius: BorderRadius.circular(4),
                                           ),
-                                          child: SvgPicture.asset(
-                                            'assets/icons/list_cob_icon.svg',
-                                            width: 20,
-                                            height: 20,
-                                            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                          child: Text(
+                                            e.cobNama,
+                                            style: bodyTextStyle(context, fontSize: 16),
                                           ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Akses',
-                                                style: bodyTextStyle(context)
-                                                    .copyWith(color: Colors.white70, fontSize: 13),
-                                              ),
-                                              const SizedBox(height: 4),
-
-                                              if (_pendingCobList!.isEmpty)
-                                                const Text(
-                                                  'Pilih Daftar COB',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 15,
-                                                  ),
-                                                )
-                                              else
-                                                Wrap(
-                                                  spacing: 6,
-                                                  runSpacing: 6,
-                                                  children: _pendingCobList
-                                                  !.map(
-                                                        (e) => Container(
-                                                      padding: const EdgeInsets.symmetric(
-                                                          horizontal: 10, vertical: 6),
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(0xFFFF9D00),
-                                                        borderRadius: BorderRadius.circular(8),
-                                                      ),
-                                                      child: Text(
-                                                        e.cobNama,
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 13,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                      .toList(),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                        )).toList(),
+                                      ),
                                     ),
-                                  ),
+                                  ],
+                                ),
 
-                                  const SizedBox(height: 20),
-
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed:
-                                          _saving ? null : () => Navigator.pop(context, false),
-                                          style: TextButton.styleFrom(
-                                            padding:
-                                            const EdgeInsets.symmetric(vertical: 12),
-                                            backgroundColor: sGrey.withOpacity(0.25),
-                                            foregroundColor: primaryLightColor,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(cardBorderRadius),
-                                            ),
-                                          ),
-                                          child: const Text('Batal'),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: _saving ? null : _save,
-                                          style: TextButton.styleFrom(
-                                            padding:
-                                            const EdgeInsets.symmetric(vertical: 12),
-                                            backgroundColor: primaryColor,
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(cardBorderRadius),
-                                            ),
-                                          ),
-                                          child: _saving
-                                              ? const SizedBox(
-                                            width: 18,
-                                            height: 18,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          )
-                                              : const Text('Simpan'),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
                           ),
-                        ),
+
+                          const SizedBox(height: 20),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed:
+                                  _saving ? null : () => Navigator.pop(context, false),
+                                  style: TextButton.styleFrom(
+                                    padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                    backgroundColor: sGrey.withOpacity(0.25),
+                                    foregroundColor: primaryLightColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(cardBorderRadius),
+                                    ),
+                                  ),
+                                  child: const Text('Batal'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: _saving ? null : _save,
+                                  style: TextButton.styleFrom(
+                                    padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                    backgroundColor: primaryColor,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(cardBorderRadius),
+                                    ),
+                                  ),
+                                  child: _saving
+                                      ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                      : const Text('Simpan'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -405,7 +376,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     if (_pendingCobList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.')),
+        infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'),
       );
       return;
     }
@@ -422,7 +393,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     final idJabatan = (mjnsclientId == '10') ? '' : (selected?.mjabatanId ?? '').trim();
     if (idJabatan.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Jabatan harus dipilih')),
+        infoSnackBar('Jabatan harus dipilih'),
       );
       return;
     }
@@ -451,11 +422,11 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     final cobResult = await cobRepo.rekanPicCobUpdateList(widget.mrekanpicId, listCheckbox);
     if (cobResult.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('PIC & ${listCheckbox.length} COB berhasil diperbarui!')),
+        successSnackBar('PIC & ${listCheckbox.length} COB berhasil diperbarui!'),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('PIC tersimpan, tapi gagal update COB.')),
+        errorSnackBar('PIC tersimpan, tapi gagal update COB.'),
       );
     }
 

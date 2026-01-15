@@ -95,7 +95,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
                         if (state.isSaved && !state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan 🎉"),
+                            successSnackBar("Data berhasil disimpan!"),
                           );
                           _isFirstLoad = true;
                         }

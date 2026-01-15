@@ -122,6 +122,20 @@ class appTextField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: primaryColor),
         ),
+
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+        errorStyle: bodyTextStyle(context).copyWith(
+          color: Colors.red,
+          fontSize: 12,
+        ),
+
         prefix: prefix,
         suffix: suffix,
         suffixIcon: suffixIcon,
@@ -174,6 +188,14 @@ class _AppDateFieldState extends State<AppDateField> {
   void initState() {
     super.initState();
     selectedDate = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(AppDateField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      selectedDate = widget.initialValue;
+    }
   }
 
   Future<void> _pickDate(BuildContext context) async {
@@ -235,6 +257,21 @@ class _AppDateFieldState extends State<AppDateField> {
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: primaryColor),
         ),
+
+        // ERROR
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+        errorStyle: bodyTextStyle(context).copyWith(
+          color: Colors.red,
+          fontSize: 12,
+        ),
+
         suffixIcon: const Icon(Icons.event, color: primaryLightColor),
       ),
       validator: (v) {
