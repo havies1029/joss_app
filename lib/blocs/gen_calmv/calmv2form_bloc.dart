@@ -16,6 +16,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		on<Calmv2FormHapusEvent>(onHapusCalmv2Form);
 		on<Calmv2FormLihatEvent>(onLihatCalmv2Form);
 	}
+
 	Future<void> onTambahCalmv2Form(
 			Calmv2FormTambahEvent event,
 			Emitter<Calmv2FormState> emit,
@@ -23,35 +24,22 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(isSaving: true, isSaved: false));
 
 		final ReturnDataAPI returnData = await repository.calmv2FormTambah(event.record);
-
 		final hasFailure = !returnData.success;
 
-		// ✔ ID yang dikembalikan API
-		final newId = returnData.data?.toString() ?? "";
+		var newRecord = event.record;
 
-		// ✔ Build record final dengan ID baru
-		final savedRecord = Calmv2FormModel(
-			calmv2Id: newId,
-			calmv1Id: event.record.calmv1Id,
-			aw: event.record.aw,
-			isEq: event.record.isEq,
-			isFlood: event.record.isFlood,
-			isSrcc: event.record.isSrcc,
-			isTbod: event.record.isTbod,
-			isTerrorism: event.record.isTerrorism,
-			pad: event.record.pad,
-			pap: event.record.pap,
-			passangerCount: event.record.passangerCount,
-			pll: event.record.pll,
-			tpl: event.record.tpl,
-		);
+		if (returnData.success && returnData.data != null) {
+			final newId = returnData.data.toString();
+			if (newId.isNotEmpty) {
+				newRecord = event.record.copyWith(calmv2Id: newId);
+			}
+		}
 
-		// ✔ Emit ke UI
 		emit(state.copyWith(
 			isSaving: false,
-			isSaved: true,
+			isSaved: returnData.success,
 			hasFailure: hasFailure,
-			record: savedRecord,
+			record: newRecord,
 			returnData: returnData,
 		));
 	}

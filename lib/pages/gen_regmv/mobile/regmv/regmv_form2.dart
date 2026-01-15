@@ -71,6 +71,11 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
 
   String selectedPassengerCount = "";
 
+  String cleanNum(num value) {
+    final f = NumberFormat("#,###", "en_US");
+    return f.format(value);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -252,17 +257,18 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     fieldIsTbodController.text = record.isTbod.toString();
     fieldIsTerrorismController.text = record.isTerrorism.toString();
 
-    fieldPadController.text = record.pad.toString();
-    fieldPapController.text = record.pap.toString();
-    fieldPassangerCountController.text = record.passangerCount.toString();
-    fieldPllController.text = record.pll.toString();
+    fieldPadController.text = cleanNum(record.pad);
+    fieldPapController.text = cleanNum(record.pap);
+    fieldPllController.text = cleanNum(record.pll);
+    fieldTplController.text = cleanNum(record.tpl);
+
     fieldPolisMulaiController.text = record.polisMulai.toIso8601String();
     fieldPolisAkhirController.text = record.polisAkhir.toIso8601String();
 
     kejadianMulaiTgl = record.polisMulai;
     kejadianBerakhirTgl = record.polisAkhir;
     selectedPassengerCount = record.passangerCount.toString();
-    fieldTplController.text = record.tpl.toString();
+    fieldPassangerCountController.text = record.passangerCount.toString();
 
     // Dropdown Values
     fieldComboRMatauang = record.comboRMatauang;

@@ -12,7 +12,7 @@ class ReturnDataAPI {
   factory ReturnDataAPI.fromDatabaseJson(Map<String, dynamic> json) {
     return ReturnDataAPI(
       success: json['success'] ?? false,
-      data: json['data']?.toString() ?? '', // 🔥 tangani null jadi string kosong
+      data: json['data']?.toString() ?? '',
       rowcount: json['rowcount'] ?? 0,
     );
   }

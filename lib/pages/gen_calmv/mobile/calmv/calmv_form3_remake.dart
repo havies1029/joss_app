@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 
-import '../../../../common/thousand_separator_input_formatter.dart';
+import '../../../../models/gen_calmv/calmv3form_model.dart';
 
 class CalmvForm3Section extends StatefulWidget {
   final bool isExpanded;
-
-  final Map<String, dynamic>? initialPayload;
+  final ValueChanged<bool> onToggle;
 
   const CalmvForm3Section({
     super.key,
     required this.isExpanded,
-    this.initialPayload,
+    required this.onToggle,
   });
 
   @override
@@ -25,25 +22,11 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
   final netCtrl = TextEditingController();
   final subtotalCtrl = TextEditingController();
 
-  final _rupiah0 = NumberFormat.decimalPattern('id_ID'); // 1.234.567
-
-  String formatIntRupiah(dynamic v) {
-    if (v == null) return "0";
-    final n = (v is num) ? v : num.tryParse(v.toString());
-    if (n == null) return "0";
-    return _rupiah0.format(n.round()); // atau floor()
-  }
-
   Map<String, dynamic>? _lastPayload;
 
   @override
   void initState() {
     super.initState();
-
-    // Jika parent pertama kali ngirim payload → inject
-    if (widget.initialPayload != null) {
-      injectPayload(widget.initialPayload!);
-    }
   }
 
   @override
@@ -54,15 +37,17 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
     super.dispose();
   }
 
-  void injectPayload(Map<String, dynamic> payload) {
-    _lastPayload = payload;
+  // DIPANGGIL OLEH PARENT
+  void injectPayload(Calmv3FormModel? form3Record) {
+    if (form3Record == null) return;
 
     setState(() {
-      diskonPremiCtrl.text = formatIntRupiah(payload["diskonPremi"]);
-      netCtrl.text        = formatIntRupiah(payload["netPremi"]);
-      subtotalCtrl.text   = formatIntRupiah(payload["subtotalPremi"]);
+      diskonPremiCtrl.text = form3Record!.premiDiskon.toString();
+      netCtrl.text = form3Record!.premiNet.toString();
+      subtotalCtrl.text = form3Record!.premiSubtotal.toString();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +71,7 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
               ),
             ),
             onTap: () {
-              // toggle kalau nanti mau
+              widget.onToggle(!widget.isExpanded);
             },
           ),
 

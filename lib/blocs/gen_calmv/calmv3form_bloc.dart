@@ -5,6 +5,9 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/gen_calmv/calmv3form_model.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv3form_repository.dart';
 
+import '../../models/gen_calmv/calmv1crud_model.dart';
+import '../../models/gen_calmv/calmv2form_model.dart';
+
 part 'calmv3form_event.dart';
 part 'calmv3form_state.dart';
 
@@ -80,19 +83,20 @@ class Calmv3FormBloc extends Bloc<Calmv3FormEvents, Calmv3FormState> {
 
 	Future<void> onHitungPremiCalmv3Form(
 			Calmv3FormHitungPremiEvent event,
-			Emitter<Calmv3FormState> emit) async {
-		debugPrint("🚀 [Bloc] HitungPremi dipanggil dengan calmv1Id=${event.calmv1Id}");
+			Emitter<Calmv3FormState> emit,
+			) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 
 		try {
-			Calmv3FormModel record = await repository.calmv3FormHitungPremi(event.calmv1Id);
-			debugPrint("✅ [Bloc] Data premi diterima: ${record.toJson()}");
+			final result = await repository.calmv3FormHitungPremi(event.calmv1Id);
 
-			emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
+			emit(state.copyWith(
+				isLoading: false,
+				isLoaded: true,
+				record: result,
+			));
 		} catch (e) {
-			debugPrint("❌ [Bloc] Gagal ambil data premi: $e");
 			emit(state.copyWith(isLoading: false, isLoaded: false));
 		}
 	}
-
 }

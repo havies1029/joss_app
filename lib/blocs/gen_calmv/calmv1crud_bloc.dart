@@ -29,23 +29,16 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 	Future<void> onTambahCalmv1Crud(
 			Calmv1CrudTambahEvent event, Emitter<Calmv1CrudState> emit) async {
 
-		debugPrint("🟢 [BLOC] onTambahCalmv1Crud triggered");
 		emit(state.copyWith(isSaving: true, isSaved: false));
 
 		final returnData = await repository.calmv1CrudTambah(event.record);
 
-		debugPrint("📩 Response dari repository:");
-		debugPrint("➡️ success=${returnData.success}");
-		debugPrint("➡️ data=${returnData.data}");
-		debugPrint("➡️ rowcount=${returnData.rowcount}");
 
 		bool hasFailure = !returnData.success;
 
-		// ⬇️ FIX: kalau backend ngirim data sebagai string, simpan manual ke record
 		Calmv1CrudModel newRecord = event.record;
 		if (returnData.success && returnData.data is String) {
 			newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
-			debugPrint("✅ Set calmv1Id dari response string: ${newRecord.calmv1Id}");
 		}
 
 		emit(state.copyWith(
