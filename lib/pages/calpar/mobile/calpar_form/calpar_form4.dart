@@ -37,7 +37,14 @@ class Calpar4FormPageFormState extends State<Calpar4FormPage> {
   final netCtrl = TextEditingController();
   final subtotalCtrl = TextEditingController();
   late final Calpar4FormBloc calpar4Bloc;
+  final _rupiah0 = NumberFormat.decimalPattern('id_ID');
 
+  String formatIntRupiah(dynamic v) {
+    if (v == null) return "0";
+    final n = (v is num) ? v : num.tryParse(v.toString());
+    if (n == null) return "0";
+    return _rupiah0.format(n.round()); // atau floor()
+  }
 
   @override
   void initState() {
@@ -58,9 +65,9 @@ class Calpar4FormPageFormState extends State<Calpar4FormPage> {
     // netCtrl.text = payload["premiNet"]?.toString() ?? "0";
     // subtotalCtrl.text = payload["premiOther"]?.toString() ?? "0";
     //
-    diskonPremiCtrl.text = record.discPersen.toString();
-    netCtrl.text = record.premiNet.toString();
-    subtotalCtrl.text = record.premiOther.toString();
+    diskonPremiCtrl.text = formatIntRupiah(record.discPersen);
+    netCtrl.text = formatIntRupiah(record.premiNet);
+    subtotalCtrl.text = formatIntRupiah(record.premiOther);
 
     setState(() {
 

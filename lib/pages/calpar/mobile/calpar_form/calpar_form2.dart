@@ -107,8 +107,6 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
   }
 
   void _injectPayload(Calpar2FormModel record) {
-    debugPrint("🔥 [Form2] Injecting payload...");
-
     fieldBiIndexRateController.text       = cleanNum(record.biIndexRate);
     fieldBiTotalController.text      = cleanNum(record.biTotal);
     fieldSiBiController.text      = cleanNum(record.siBi);

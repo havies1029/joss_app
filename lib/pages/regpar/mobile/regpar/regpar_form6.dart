@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../blocs/regpar/regpar5form_bloc.dart';
@@ -33,6 +34,14 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
   final premiNetCtrl = TextEditingController();
   final premiCtrl = TextEditingController();
   late final Regpar5FormBloc regpar5Bloc;
+  final _rupiah0 = NumberFormat.decimalPattern('id_ID');
+
+  String formatIntRupiah(dynamic v) {
+    if (v == null) return "0";
+    final n = (v is num) ? v : num.tryParse(v.toString());
+    if (n == null) return "0";
+    return _rupiah0.format(n.round()); // atau floor()
+  }
 
   @override
   void initState() {
@@ -64,9 +73,9 @@ class RegparForm6SectionState extends State<RegparForm6Section> {
   void _injectPayload(Regpar5FormModel record) {
     debugPrint("🔥 Injecting payload into Form6...");
 
-    diskonNilaiCtrl.text = record.diskonNilai.toString();
-    premiNetCtrl.text = record.premiNet.toString();
-    premiCtrl.text = record.premiTotal.toString();
+    diskonNilaiCtrl.text = formatIntRupiah(record.diskonNilai);
+    premiNetCtrl.text = formatIntRupiah(record.premiNet);
+    premiCtrl.text = formatIntRupiah(record.premiTotal);
 
     setState(() {});
   }

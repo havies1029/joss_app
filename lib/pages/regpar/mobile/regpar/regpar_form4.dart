@@ -54,6 +54,10 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
 
   late final Regpar4FormBloc regpar4Bloc;
 
+  String cleanNum(num value) {
+    final f = NumberFormat("#,###", "en_US");
+    return f.format(value);
+  }
 
   @override
   void initState() {
@@ -179,14 +183,11 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
   }
 
   void _injectPayload(Regpar4FormModel record) {
-    debugPrint("🔥 Injecting payload into Form1...");
-
-    // Text Controllers
-    fieldSiBuildingController.text = record.siBuilding.toString();
-    fieldSiContentController.text = record.siContent.toString();
-    fieldSiMachineryController.text = record.siMachinery.toString();
-    fieldSiOtherController.text = record.siOther.toString();
-    fieldSiStockController.text = record.siStock.toString();
+    fieldSiBuildingController.text = cleanNum(record.siBuilding);
+    fieldSiContentController.text = cleanNum(record.siContent);
+    fieldSiMachineryController.text = cleanNum(record.siMachinery);
+    fieldSiOtherController.text = cleanNum(record.siOther);
+    fieldSiStockController.text = cleanNum(record.siStock);
     fieldComboRMatauang = record.comboRMatauang;
 
     setState(() {});
