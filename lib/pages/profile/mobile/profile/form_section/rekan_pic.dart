@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
@@ -50,144 +51,139 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: BaseBackgroundSidePage(
-          title: 'Informasi PIC',
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Container(
-                    width: double.infinity,
-                    color: secondaryBlackColor,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5,
-                      vertical: 20,
+    return BaseBackgroundSidePage(
+      title: 'Informasi PIC',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Container(
+                width: double.infinity,
+                color: secondaryBlackColor,
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                  vertical: 10,
+                ),
+
+                child: MultiBlocListener(
+                  listeners: [
+                    BlocListener<MRekanPicListBloc, MRekanPicListState>(
+                      listenWhen: (prev, curr) =>
+                      prev.items.length != curr.items.length ||
+                          prev.status != curr.status,
+                      listener: (context, state) {
+                        _mrekanPicIds = state.items
+                            .map((e) => (e.mrekanpicId ?? '').trim())
+                            .where((id) => id.isNotEmpty)
+                            .toList();
+                      },
                     ),
 
-                    child: MultiBlocListener(
-                      listeners: [
-                        BlocListener<MRekanPicListBloc, MRekanPicListState>(
-                          listenWhen: (prev, curr) =>
-                          prev.items.length != curr.items.length ||
-                              prev.status != curr.status,
-                          listener: (context, state) {
-                            _mrekanPicIds = state.items
-                                .map((e) => (e.mrekanpicId ?? '').trim())
-                                .where((id) => id.isNotEmpty)
-                                .toList();
-                          },
-                        ),
+                    BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
+                      listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
+                      listener: (context, state) {
+                        if (state.isSaved) {
+                          context.read<MRekanPicListBloc>().add(FetchMRekanPicListEvent());
+                        }
+                      },
+                    ),
+                  ],
 
-                        BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-                          listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
-                          listener: (context, state) {
-                            if (state.isSaved) {
-                              context.read<MRekanPicListBloc>().add(FetchMRekanPicListEvent());
-                            }
-                          },
-                        ),
-                      ],
+                  // UI tetap pakai BlocBuilder LIST
+                  child: BlocBuilder<MRekanPicListBloc, MRekanPicListState>(
+                    builder: (context, state) {
+                      if (state.status == ListStatus.initial) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 40),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
 
-                      // UI tetap pakai BlocBuilder LIST
-                      child: BlocBuilder<MRekanPicListBloc, MRekanPicListState>(
-                        builder: (context, state) {
-                          if (state.status == ListStatus.initial) {
-                            return const Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 40),
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          }
+                      if (state.status == ListStatus.failure) {
+                        return Column(
+                          children: [
+                            const SizedBox(height: 12),
+                            Text('Gagal memuat data PIC', style: bodyTextStyle(context)),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () =>
+                                  context.read<MRekanPicListBloc>().add(FetchMRekanPicListEvent()),
+                              child: const Text('Coba lagi'),
+                            ),
+                          ],
+                        );
+                      }
 
-                          if (state.status == ListStatus.failure) {
-                            return Column(
-                              children: [
-                                const SizedBox(height: 12),
-                                Text('Gagal memuat data PIC', style: bodyTextStyle(context)),
-                                const SizedBox(height: 8),
-                                TextButton(
-                                  onPressed: () =>
-                                      context.read<MRekanPicListBloc>().add(FetchMRekanPicListEvent()),
-                                  child: const Text('Coba lagi'),
-                                ),
-                              ],
-                            );
-                          }
+                      final total = state.items.length;
 
-                          final total = state.items.length;
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'Total PIC: $total',
-                                    style: bodyTextStyle(context, fontSize: 18),
-                                  ),
-                                  const Spacer(),
-                                  _primaryButton(
-                                    onPressed: () async {
-                                      final changed = await Navigator.push<bool>(
-                                        context,
-                                        MaterialPageRoute(builder: (_) => const TambahPicWidget()),
-                                      );
-
-                                      if (changed == true) {
-                                        context.read<MRekanPicListBloc>().add(
-                                          FetchMRekanPicListEvent(),
-                                        );
-                                      }
-                                    },
-                                    icon: const Icon(Icons.add, size: 20),
-                                    label: 'Tambah PIC',
-                                  ),
-                                ],
+                              Text(
+                                'Total PIC: $total',
+                                style: bodyTextStyle(context, fontSize: 16),
                               ),
+                              const Spacer(),
+                              SizedBox(width: 120, height:30,child: AppButton.iconLeft(
+                                text: 'Tambah PIC',
+                                textStyle: bodyTextStyle(context, fontSize: 16),
+                                icon: const Icon(Icons.add, size: 16),
+                                onPressed: () async {
+                                  final changed = await Navigator.push<bool>(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const TambahPicWidget()),
+                                  );
 
-                              const SizedBox(height: hPadding),
-
-                              if (state.items.isEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  child: Text(
-                                    'Belum ada PIC.',
-                                    style: bodyTextStyle(context, fontSize: 16)
-                                        .copyWith(color: hintGrey),
-                                  ),
-                                )
-                              else
-                                Column(
-                                  children: List.generate(state.items.length, (i) {
-                                    final it = state.items[i];
-                                    final id = (it.mrekanpicId ?? '').trim();
-                                    if (id.isEmpty) return const SizedBox.shrink();
-
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: i == state.items.length - 1 ? 0 : 14,
-                                      ),
-                                      child: _picCardFromItem(it, i),
+                                  if (changed == true) {
+                                    context.read<MRekanPicListBloc>().add(
+                                      FetchMRekanPicListEvent(),
                                     );
-                                  }),
-                                ),
+                                  }
+                                },
+                              ))
                             ],
-                          );
-                        },
-                      ),
-                    ),
+                          ),
 
+                          const SizedBox(height: 12),
+
+                          if (state.items.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                'Belum ada PIC.',
+                                style: bodyTextStyle(context, fontSize: 16),
+                              ),
+                            )
+                          else
+                            Column(
+                              children: List.generate(state.items.length, (i) {
+                                final it = state.items[i];
+                                final id = (it.mrekanpicId ?? '').trim();
+                                if (id.isEmpty) return const SizedBox.shrink();
+
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: i == state.items.length - 1 ? 0 : 14,
+                                  ),
+                                  child: _picCardFromItem(it, i),
+                                );
+                              }),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -207,28 +203,6 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
     }
   }
 
-
-
-  Widget _primaryButton({
-    required VoidCallback? onPressed,
-    required Widget icon,
-    required String label,
-  }) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: icon,
-      label: Text(label),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-        ),
-      ),
-    );
-  }
-
   Widget _picCardFromItem(MRekanPicListModel it, int index) {
     final id = (it.mrekanpicId ?? '').trim();
 
@@ -241,26 +215,43 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
       color: formGrey,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(cardBorderRadius),
-        side: const BorderSide(color: sGrey, width: 1),
+        side: const BorderSide(color: sGrey),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                _ghostIconButton(
-                  icon: const Icon(Icons.edit, size: 20),
+                AppButton.icon(
+                  icon: SvgPicture.asset(
+                    'assets/icons/edit_icon_polis.svg',
+                    width: 15,
+                    height: 15,
+                  ),
                   onPressed: () => _goEditById(id),
-                  bg: const Color(0xFFFFC107),
+                  backgroundColor: const Color(0xFFFFC20A),
+                  squareSize: 30,
+                  borderRadius: 8,
                 ),
-                const SizedBox(width: 8),
-                _ghostIconButton(
-                  icon: const Icon(Icons.delete, size: 20),
+                const SizedBox(width: 6),
+                AppButton.icon(
+                  icon: SvgPicture.asset(
+                    'assets/icons/hapus.svg',
+                    width: 15,
+                    height: 15,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   onPressed: () => _confirmDelete(id),
-                  bg: const Color(0xFFE53935),
+                  backgroundColor: const Color(0xFFF63434),
+                  squareSize: 30,
+                  borderRadius: 8,
                 ),
+
                 const Spacer(),
 
                 if ((it.statusPic ?? '').toLowerCase() != 'sudah aksep')
@@ -268,23 +259,26 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
               ],
             ),
 
-            const SizedBox(height: hPadding),
-            Divider(color: sGrey, height: 20),
+            const SizedBox(height: 8),
+            Divider(color: sGrey),
+            const SizedBox(height: 8),
 
-            _kv('Nama PIC :', it.picNama ?? '-', labelStyle, valueStyle),
-            _kv('Email :', it.picEmail ?? '-', labelStyle, valueStyle),
-            _kv('No. Telp :', it.picHp ?? '-', labelStyle, valueStyle),
-            _kv('Jabatan :', it.jabatanDesc ?? '-', labelStyle, valueStyle),
+            _cardRow('Email:', it.picEmail ?? '-', labelStyle, valueStyle),
+            _cardRow('Nama:', it.picNama ?? '-', labelStyle, valueStyle),
+            _cardRow('No Telp:', it.picHp ?? '-', labelStyle, valueStyle),
+            // _cardRow('Jabatan:', it.jabatanDesc ?? '-', labelStyle, valueStyle),
+            // _cardRow('Peran:', it.peranan ?? '-', labelStyle, valueStyle),
+            // _cardRow('Status:', it.statusPic ?? '-', labelStyle, valueStyle),
 
-            Divider(color: sGrey, height: 20),
+            const SizedBox(height: 8),
+            Divider(color: sGrey),
             const SizedBox(height: 8),
 
             Text(
               'Polis yang bisa diakses:',
-              style: bodyTextStyle(context, fontSize: 16)
-                  .copyWith(color: hintGrey, fontWeight: FontWeight.w600),
+              style: bodyTextStyle(context, fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             _cobListSection(rekanPicId: id),
           ],
@@ -293,9 +287,9 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
     );
   }
 
-  Widget _kv(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
+  Widget _cardRow(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Text.rich(
         TextSpan(children: [
           TextSpan(text: '$label ', style: labelStyle),
@@ -324,7 +318,7 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
           }
           if (state.status == ListStatus.failure) {
             return Text(
-              '⚠ Gagal memuat COB',
+              'Gagal memuat COB',
               style: bodyTextStyle(context).copyWith(color: Colors.red),
             );
           }
@@ -338,23 +332,22 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
           final selected = state.items.where((c) => c.isChecked).toList();
 
           return Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 6,
+            runSpacing: 6,
             children: selected
                 .map(
                   (c) => Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 9,
+                  vertical: 2,
                 ),
                 decoration: BoxDecoration(
                   color: primaryColor,
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   c.cobNama,
-                  style: bodyTextStyle(context, fontSize: 12)
-                      .copyWith(color: Colors.white),
+                  style: bodyTextStyle(context, fontSize: 12),
                 ),
               ),
             )

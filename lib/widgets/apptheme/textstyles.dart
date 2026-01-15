@@ -9,30 +9,31 @@ double getResponsiveFont(BuildContext context, double base) {
 
 /// Textstyles
 TextStyle headingStyle(BuildContext ctx, {double fontSize = 30}) => TextStyle(
-  fontSize: getResponsiveFont(ctx, fontSize),
-  color: primaryLightColor,
-  fontWeight: FontWeight.w500,
-  height: 1
-);
+    fontSize: getResponsiveFont(ctx, fontSize),
+    color: primaryLightColor,
+    fontWeight: FontWeight.w500,
+    height: 1,
+    letterSpacing: 0);
 
 TextStyle inputTextStyle(BuildContext ctx, {Color? color}) => TextStyle(
-  fontSize: getResponsiveFont(ctx, 18),
-  color: color ?? primaryColor,
-  fontWeight: FontWeight.w400,
-  height: 1
-);
+    fontSize: getResponsiveFont(ctx, 18),
+    color: color ?? primaryColor,
+    fontWeight: FontWeight.w400,
+    height: 1,
+    letterSpacing: 0);
 
 TextStyle bodyTextStyle(
   BuildContext ctx, {
   double fontSize = 18,
   TextDecoration decoration = TextDecoration.none,
-}) => TextStyle(
-  fontSize: getResponsiveFont(ctx, fontSize),
-  color: primaryLightColor,
-  fontWeight: FontWeight.w400,
-  decoration: decoration,
-  height: 1
-);
+}) =>
+    TextStyle(
+        fontSize: getResponsiveFont(ctx, fontSize),
+        color: primaryLightColor,
+        fontWeight: FontWeight.w400,
+        decoration: decoration,
+        height: 1,
+        letterSpacing: 0);
 
 class HoverableText extends StatefulWidget {
   final String text;

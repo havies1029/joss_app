@@ -95,7 +95,7 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
             const SizedBox(height: hPadding),
 
             SizedBox(
-              height: 250, // atur sesuai kebutuhan UI
+              height: 250,
               child: SingleChildScrollView(
                 child: RiwayatTableWidget(),
               ),

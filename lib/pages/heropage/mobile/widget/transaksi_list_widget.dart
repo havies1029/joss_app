@@ -290,7 +290,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
     switch (status.toLowerCase()) {
       case "berhasil":
       case "disetujui":
-        return pGreen;
+        return successGreen;
       case "ditolak":
         return pRed;
       case "diproses":

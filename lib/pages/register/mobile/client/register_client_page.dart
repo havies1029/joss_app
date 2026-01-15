@@ -49,7 +49,7 @@ class _RegisterClientState extends State<RegisterClient>
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: primaryBlackColor, // ⬅️ kasih warna dasar hitam
+      backgroundColor: primaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundFirstPage(
           child: Column(

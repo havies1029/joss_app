@@ -16,6 +16,7 @@ import '../../../blocs/reguser_profile/reguser_profile_state.dart';
 import '../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../gen_cob_app/cobcari_main.dart';
 import '../../gen_dn1/dn1cari_list.dart';
+import '../../login/change_pswd_main.dart';
 import '../../profile/mobile/profile/form_section/crud_pic/list_pic.dart';
 import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
@@ -297,7 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder:
-                                              (_) => const Dn1CariPage( sppa1Id: ""),
+                                              (_) => const UbahPasswordPage(),
                                         ),
                                       );
                                     },

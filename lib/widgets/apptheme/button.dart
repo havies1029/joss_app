@@ -371,7 +371,7 @@ class _AppButtonState extends State<AppButton>
 
   TextStyle _getTextStyle() {
     return widget.textStyle ??
-        headingStyle(context, fontSize: 18);
+        bodyTextStyle(context);
   }
 
   ButtonStyle _getButtonStyle() {

@@ -319,7 +319,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     return AppDateField(
       label: 'Tanggal Mulai',
       initialValue: kejadianMulaiTgl ?? _today,
-      firstDate: DateTime(2000),
+      firstDate: _today,
       lastDate: DateTime(2100),
       validator: (dt) => (dt == null) ? kStringNullError : null,
       onChanged: (dt) {

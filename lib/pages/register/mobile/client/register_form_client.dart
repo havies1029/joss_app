@@ -330,8 +330,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                       label: Text(
                                         "Kembali",
                                         style: bodyTextStyle(context).copyWith(
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.w600,
+                                          color: primaryColor
                                         ),
                                       ),
                                     ),

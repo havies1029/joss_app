@@ -92,7 +92,7 @@ class MRekanGeneralIdvCrudFormPageFormState
 
                         if (state.isSaved && !state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan 🎉"),
+                            successSnackBar("Data berhasil disimpan!"),
                           );
 
                           // kalau kamu mau reload manual / buka lagi setelah save

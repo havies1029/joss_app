@@ -28,19 +28,19 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
           padding: const EdgeInsets.all(15),
           child: Column(
             children: [
-              // 🔹 Tentang JPS
+              //  Tentang JPS
               TentangCardWidget(),
               const SizedBox(height: 40),
 
-              // 🔹 Company Profile
+              // Company Profile
               CompanyProfileCard(),
               const SizedBox(height: 40),
 
-              // 🔹 Testimoni
+              // Testimoni
               TestimonialSection(),
               const SizedBox(height: 40),
 
-              // 🔹 Klien
+              // Klien
               ClientSection(),
             ],
           ),
