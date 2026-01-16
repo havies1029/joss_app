@@ -240,6 +240,7 @@ flutter:
     - assets/icons/aktifkan1.svg
     - assets/icons/beli_polis1.svg
     - assets/icons/logo_berhasil.svg
+    - assets/icons/unduh_invoice.svg
 
   fonts:
     - family: Delm-Regular

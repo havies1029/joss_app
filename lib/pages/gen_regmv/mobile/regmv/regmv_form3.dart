@@ -74,6 +74,11 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
   late final Regmv3FormBloc regmv3Bloc;
   bool _isPayloadInjected = false;
 
+  String cleanNum(num value) {
+    final f = NumberFormat("#,###", "en_US");
+    return f.format(value);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -206,7 +211,7 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
 
     // Text Controllers
     fieldAksesorisController.text = record.aksesoris.toString();
-    fieldHargaController.text = record.harga.toString();
+    fieldHargaController.text = cleanNum(record.harga);
     fieldMesinNoController.text = record.mesinNo.toString();
 
     fieldPlatNoController.text = record.platNo.toString();

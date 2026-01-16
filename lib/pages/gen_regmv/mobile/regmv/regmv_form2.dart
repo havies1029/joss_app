@@ -67,7 +67,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
   final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
   DateTime? kejadianBerakhirTgl;
-  final _years = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final _years = DateTime(DateTime.now().year+1, DateTime.now().month, DateTime.now().day);
 
   String selectedPassengerCount = "";
 
@@ -80,6 +80,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
   void initState() {
     super.initState();
     regmv2Bloc = context.read<Regmv2FormBloc>();
+    kejadianBerakhirTgl = _years;
     // Future.microtask(_loadData);
   }
 
@@ -266,7 +267,9 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     fieldPolisAkhirController.text = record.polisAkhir.toIso8601String();
 
     kejadianMulaiTgl = record.polisMulai;
-    kejadianBerakhirTgl = record.polisAkhir;
+    if (_isPayloadInjected) {
+      kejadianBerakhirTgl = record.polisAkhir;
+    }
     selectedPassengerCount = record.passangerCount.toString();
     fieldPassangerCountController.text = record.passangerCount.toString();
 

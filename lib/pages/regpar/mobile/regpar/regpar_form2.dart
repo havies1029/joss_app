@@ -71,6 +71,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
 
   DateTime? kejadianMulaiTgl;
   DateTime? kejadianBerakhirTgl;
+  final _years = DateTime(DateTime.now().year+1, DateTime.now().month, DateTime.now().day);
 
   final DateTime _today = DateTime.now().copyWith(
     hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0,
@@ -82,6 +83,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
   void initState() {
     super.initState();
     regpar2Bloc = context.read<Regpar2FormBloc>();
+    kejadianBerakhirTgl = _years;
     // Future.microtask(_loadData);
   }
 
@@ -195,8 +197,10 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
 
     // Text Controllers
     // fieldCoverLamaController.text = record.coverLama.toString();
-    kejadianMulaiTgl = record.polisAkhir;
-    kejadianBerakhirTgl  = record.polisMulai;
+    kejadianMulaiTgl = record.polisMulai;
+    if (_isPayloadInjected){
+      kejadianBerakhirTgl  = record.polisAkhir;
+    }
     fieldObjectAlamatController.text = record.objectAlamat.toString();
     // Dropdown Values
     fieldComboRKonstruksiojk = record.comboRKonstruksiojk;
@@ -217,8 +221,8 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
   Future<void> saveForm2() async {
     final record = Regpar2FormModel(
       // coverLama: int.parse(fieldCoverLamaController.text),
-      polisAkhir: kejadianMulaiTgl ?? _today,
-      polisMulai: kejadianBerakhirTgl ?? addOneYearSafe(_today),
+      polisAkhir: kejadianBerakhirTgl ?? addOneYearSafe(_today),
+      polisMulai: kejadianMulaiTgl ?? _today,
       regpar2Id: widget.regpar1Id! ?? widget.recordId!,
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,
       rokupasiId: fieldComboROkupasi?.rokupasiId, regpar1Id: widget.regpar1Id!, objectAlamat: fieldObjectAlamatController.text ?? '',
@@ -243,7 +247,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
       label: 'Tanggal Mulai',
       initialValue: kejadianMulaiTgl ?? _today,
       firstDate: _today,
-      lastDate: DateTime(2100, 1, 1),
+      lastDate: DateTime(2100),
       validator: (dt) => dt == null ? kStringNullError : null,
       onChanged: (dt) {
         if (dt == null) return;

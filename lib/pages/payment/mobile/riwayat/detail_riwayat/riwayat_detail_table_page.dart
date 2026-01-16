@@ -49,27 +49,35 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                const Spacer(),
-                Text(
-                  "Detail",
-                  style: bodyTextStyle(context, fontSize: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: SizedBox(
+                height: 48,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      "Detail",
+                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16)),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
+              ),
             ),
 
             const Divider(height: 1),
 
       Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 10,
+          horizontal: hPadding * 1.5,
+          vertical: hPadding,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,13 +102,9 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
             const Divider(height: 1),
             const SizedBox(height: hPadding),
 
-            SizedBox(
-              height: 250,
-              child: SingleChildScrollView(
-                child: RiwayatTableWidget(),
-              ),
+            SingleChildScrollView(
+              child: RiwayatTableWidget(),
             ),
-
 
             const SizedBox(height: hPadding),
             const Divider(height: 1),
@@ -124,14 +128,54 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
 
             const SizedBox(height: hPadding),
 
-            AppButton.iconLeft(
-              text: 'Unduh Invoice',
-              backgroundColor: primaryColor,
-              icon: SvgPicture.asset(
-                'assets/icons/invoice.svg',
-                width: 18,
-                height: 18,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: AppButton.iconLeft(
+                      text: 'Unduh Polis',
+                      backgroundColor: primaryColor,
+                      icon: SvgPicture.asset(
+                        'assets/icons/invoice.svg',
+                        width: 18,
+                        height: 18,
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Fitur unduh invoice belum tersedia'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10,),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: AppButton.iconLeft(
+                      text: 'Unduh Invoice',
+                      backgroundColor: GreenforPayment,
+                      icon: SvgPicture.asset(
+                        'assets/icons/unduh_invoice',
+                        width: 18,
+                        height: 18,
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Fitur unduh invoice belum tersedia'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

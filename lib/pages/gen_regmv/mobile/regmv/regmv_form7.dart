@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -36,6 +37,14 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
 
   bool _isPayloadInjected = false;
   late final Regmv6FormBloc regmv6Bloc;
+  final _rupiah0 = NumberFormat.decimalPattern('id_ID');
+
+  String formatIntRupiah(dynamic v) {
+    if (v == null) return "0";
+    final n = (v is num) ? v : num.tryParse(v.toString());
+    if (n == null) return "0";
+    return _rupiah0.format(n.round()); // atau floor()
+  }
 
   @override
   void initState() {
@@ -60,9 +69,9 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
   void _injectPayload(Regmv6FormModel record) {
     debugPrint("🔥 Injecting payload into Form6...");
 
-    diskonPremiCtrl.text = record.premiDiskon.toString();
-    netCtrl.text = record.premiNet.toString();
-    subtotalCtrl.text = record.premiSubtotal.toString();
+    diskonPremiCtrl.text = formatIntRupiah(record.premiDiskon);
+    netCtrl.text = formatIntRupiah(record.premiNet);
+    subtotalCtrl.text = formatIntRupiah(record.premiSubtotal);
 
     setState(() {});
 
@@ -101,10 +110,9 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
       listeners: [
         BlocListener<Regmv6FormBloc, Regmv6FormState>(
           listenWhen: (prev, curr) =>
-          curr.record != null && !_isPayloadInjected,
+          curr.record != null ,
           listener: (context, state) {
             _injectPayload(state.record!);
-            _isPayloadInjected = true;
           },
         ),
       ],
