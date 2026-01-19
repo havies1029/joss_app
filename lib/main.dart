@@ -14,17 +14,11 @@ import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
-import 'package:joss_app/blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
-import 'package:joss_app/blocs/share_cubit/share_dnsppa_state_cubit.dart';
 import 'package:joss_app/blocs/simulpar/simulparlist_bloc.dart';
-import 'package:joss_app/blocs/user_profile/user_profile_state.dart';
-import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/login/mobile/client/widget/otp_client_widget.dart';
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/otp_user_widget.dart';
-import 'package:joss_app/pages/profile/mobile/profile/form_section/rekan_pajak.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
-import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:joss_app/pages/startpage/mobile/startpage.dart';
 import 'package:joss_app/repositories/calpar/calpar1crud_repository.dart';
 import 'package:joss_app/repositories/calpar/calpar2form_repository.dart';
@@ -34,7 +28,6 @@ import 'package:joss_app/repositories/gen_calmv/calmv1crud_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv2form_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv3form_repository.dart';
 import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
-import 'package:joss_app/repositories/gen_dn1/dn1cari_repository.dart';
 import 'package:joss_app/repositories/gen_endors/endors1crud_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
 import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
@@ -62,7 +55,6 @@ import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
 import 'package:joss_app/repositories/payment/invbayarvaform_repository.dart';
 import 'package:joss_app/repositories/payment/pay1crud_repository.dart';
 import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
-import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
@@ -73,9 +65,7 @@ import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
 import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
-import 'package:joss_app/repositories/simulpar/simulparlist_repository.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_screen.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:joss_app/common/constants.dart';
@@ -94,7 +84,6 @@ import 'package:joss_app/blocs/gen_profile/mrekan1crud_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekan1list_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekancontactcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekancontactlist_bloc.dart';
-import 'package:joss_app/blocs/user_profile/user_profile_cubit.dart';
 
 import 'package:joss_app/repositories/user/user_repository.dart';
 import 'package:joss_app/repositories/login/emailverification_repository.dart';
@@ -105,7 +94,6 @@ import 'package:joss_app/repositories/gen_profile/mrekancontactcrud_repository.d
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'apis/payment/paymentdn_api.dart';
-import 'apis/payment/paymentmethodcari_api.dart';
 import 'blocs/asetothers/asetotherscari_bloc.dart';
 import 'blocs/calpar/calpar1crud_bloc.dart';
 import 'blocs/calpar/calpar1list_bloc.dart';
@@ -181,20 +169,12 @@ import 'blocs/regpar/regpar5form_bloc.dart';
 import 'blocs/regpar/regpar6cari_bloc.dart';
 import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
 import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
-import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
-import 'blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
-import 'blocs/share_cubit/share_health_state_cubit.dart';
-import 'blocs/share_cubit/share_hull_state_cubit.dart';
-import 'blocs/share_cubit/share_mv_state_cubit.dart';
-import 'blocs/share_cubit/share_par_state_cubit.dart';
 import 'blocs/simulmv/simulmvcrud_bloc.dart';
 import 'blocs/simulpar/simulparcrud_bloc.dart';
 import 'blocs/hasil_simul_par_cubit/hasil_simul_par_cubit.dart';
-import 'blocs/share_cubit/share_ringkasan_state_cubit.dart';
 import 'package:joss_app/blocs/hasil_simul_mv_cubit/hasil_simul_mv_cubit.dart';
 import 'helper/app_prefs.dart';
-import 'models/reguser/reguser_model.dart';
 import 'blocs/regother/regother1crud_bloc.dart';
 import 'blocs/regother/regother1list_bloc.dart';
 import 'blocs/regother/regother2form_bloc.dart';
@@ -209,15 +189,14 @@ import 'package:joss_app/blocs/payment/dnsppamvcari_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory:
-    kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory(
-      (await getApplicationDocumentsDirectory()).path,
-    ),
-  );
+  // HydratedBloc.storage = await HydratedStorage.build(
+  //   storageDirectory:
+  //   kIsWeb
+  //       ? HydratedStorageDirectory.web
+  //       : HydratedStorageDirectory(
+  //     (await getApplicationDocumentsDirectory()).path,
+  //   ),
+  // );
 
   final userRepository = UserRepository();
   final prefs = await SharedPreferences.getInstance();
@@ -227,21 +206,10 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => AuthenticationBloc(userRepository: userRepository)..add(AppStarted()),
-        ),
-        BlocProvider<SimulasiParLocalCubit>(
-          create: (_) => SimulasiParLocalCubit(appPrefs),
-        ),
-        BlocProvider<SimulasiMvLocalCubit>(
-          create: (_) => SimulasiMvLocalCubit(appPrefs),
-        ),
-        BlocProvider(
-          create: (ctx) => LoginBloc(
-            authenticationBloc: ctx.read<AuthenticationBloc>(),
-            userRepository: userRepository,
-          ),
-        ),
+        BlocProvider(create: (_) => AuthenticationBloc(userRepository: userRepository)..add(AppStarted()),),
+        BlocProvider<SimulasiParLocalCubit>(create: (_) => SimulasiParLocalCubit(appPrefs),),
+        BlocProvider<SimulasiMvLocalCubit>(create: (_) => SimulasiMvLocalCubit(appPrefs),),
+        BlocProvider(create: (context) => LoginBloc(authenticationBloc: context.read<AuthenticationBloc>(),userRepository: userRepository,),),
         // BlocProvider(
         //   create: (ctx) => EmailVerificationBloc(
         //     repository: EmailVerificationRepository(),
@@ -253,14 +221,8 @@ Future<void> main() async {
         BlocProvider(create: (_) => ProfileUploadFotoBloc()),
         BlocProvider(create: (_) => ProfileDownloadFotoBloc(repository: UserFotoRepository())),
         BlocProvider(create: (_) => MRekan1CrudBloc(repository: MRekan1CrudRepository())),
-        BlocProvider<EmailVerificationBloc>(
-            create: (context) =>
-                EmailVerificationBloc(
-                    repository: EmailVerificationRepository(),
-                    authenticationBloc: BlocProvider.of<AuthenticationBloc>(context))),
-        BlocProvider<RegUserBloc>(
-            create: (context) =>
-                RegUserBloc(repository: RegUserRepository(), authenticationBloc: BlocProvider.of<AuthenticationBloc>(context))),
+        BlocProvider<EmailVerificationBloc>(create: (context) =>EmailVerificationBloc(repository: EmailVerificationRepository(),authenticationBloc: BlocProvider.of<AuthenticationBloc>(context))),
+        BlocProvider<RegUserBloc>(create: (context) => RegUserBloc(repository: RegUserRepository(), authenticationBloc: BlocProvider.of<AuthenticationBloc>(context))),
         BlocProvider(create: (_) => MRekan1ListBloc()),
         BlocProvider(create: (_) => Calmv1ListBloc()),
         BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
@@ -272,22 +234,10 @@ Future<void> main() async {
         BlocProvider(create: (_) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralIdvCrudBloc(repository: MRekanGeneralIdvCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralCmpCrudBloc(repository: MRekanGeneralCmpCrudRepository())),
-        BlocProvider<MRekanPicListBloc>(
-          create: (context) => MRekanPicListBloc(repository: MRekanPicListRepository())..add(FetchMRekanPicListEvent()),
-        ),
-        BlocProvider<MRekanPicCrudBloc>(
-          create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
-        ),
+        BlocProvider<MRekanPicListBloc>(create: (context) => MRekanPicListBloc(repository: MRekanPicListRepository())..add(FetchMRekanPicListEvent()),),
+        BlocProvider<MRekanPicCrudBloc>(create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),),
         BlocProvider<RekanPicCobCariBloc>(create: (context) => RekanPicCobCariBloc()),
-        BlocProvider<ReqComproBloc>(
-          create: (_) => ReqComproBloc(repository: ReqComproRepository()),
-        ),
-        // BlocProvider(create: (_) => UserProfileCubit()), // hydrated
-        BlocProvider(create: (_) => ShareRingkasanStateCubit()), // hydrated
-        BlocProvider(create: (_) => ShareParStateCubit()), // hydrated
-        BlocProvider(create: (_) => ShareMvStateCubit()), // hydrated
-        BlocProvider(create: (_) => ShareHealthStateCubit()), // hydrated
-        BlocProvider(create: (_) => ShareHullStateCubit()), // hydrated
+        BlocProvider<ReqComproBloc>(create: (_) => ReqComproBloc(repository: ReqComproRepository()),),
 
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
@@ -297,8 +247,6 @@ Future<void> main() async {
         BlocProvider(create: (_) => Regother1ListBloc()),
 
         BlocProvider(create: (context) => DnrekapcobCariBloc()),
-        BlocProvider(create:  (context) => DnsppaCariBloc()),
-        BlocProvider(create:  (context) => DnsppamvCariBloc()),
         BlocProvider(create: (context) => DnsppaCariBloc()),
         BlocProvider(create: (context) => DnsppamvCariBloc()),
         BlocProvider(create: (context) => PaymentMethodCariBloc(repository: PaymentDnRepository(api: PaymentDnAPI()))),
@@ -310,68 +258,36 @@ Future<void> main() async {
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
-        // BlocProvider(create: (_) => RegUserProfileCubit()),
-        BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
-        BlocProvider(
-          create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1)),
-        ),
-        BlocProvider(
-          create: (_) => BeritaKecilCariBloc()..add(RefreshBeritaKecilCariEvent(2)),
-        ),
-        BlocProvider(
-          create: (_) => BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3)),
-        ),
+        BlocProvider(create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1)),),
+        BlocProvider(create: (_) => BeritaKecilCariBloc()..add(RefreshBeritaKecilCariEvent(2)),),
+        BlocProvider(create: (_) => BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3)),),
         BlocProvider(create: (_) => Berita2CariBloc()),
         BlocProvider(create: (_) => Berita3CariBloc()),
-        BlocProvider<ArticleSelectionCubit>(
-          create: (_) => ArticleSelectionCubit(appPrefs),
-        ),
+        BlocProvider<ArticleSelectionCubit>(create: (_) => ArticleSelectionCubit(appPrefs),),
         BlocProvider(create: (_) => TrslogCariBloc()),
-        BlocProvider<Klaim1ListBloc>(
-            create: (context) =>
-                Klaim1ListBloc()),
-        BlocProvider<Klaim2ListBloc>(
-            create: (context) =>
-                Klaim2ListBloc()),
-        BlocProvider<MRekanBankListBloc>(
-            create: (context) =>
-                MRekanBankListBloc()),
-        BlocProvider<MRekanBankCrudBloc>(
-          create: (context) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository()),
-        ),
-        BlocProvider<Klaim1CrudBloc>(
-          create: (context) => Klaim1CrudBloc(repository: Klaim1CrudRepository()),
-        ),
-        BlocProvider<Klaim2CrudBloc>(
-          create: (context) => Klaim2CrudBloc(repository: Klaim2CrudRepository()),
-        ),
+        BlocProvider<Klaim1ListBloc>(create: (context) => Klaim1ListBloc()),
+        BlocProvider<Klaim2ListBloc>(create: (context) => Klaim2ListBloc()),
+        BlocProvider<MRekanBankListBloc>(create: (context) => MRekanBankListBloc()),
+        BlocProvider<MRekanBankCrudBloc>(create: (context) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository()),),
+        BlocProvider<Klaim1CrudBloc>(create: (context) => Klaim1CrudBloc(repository: Klaim1CrudRepository()),),
+        BlocProvider<Klaim2CrudBloc>(create: (context) => Klaim2CrudBloc(repository: Klaim2CrudRepository()),),
         BlocProvider(create: (context) => StatusAsetCariBloc()),
         BlocProvider<AsethullCariBloc>(create: (context) => AsethullCariBloc()),
         BlocProvider<AsetRingkasanCariBloc>(create: (context) => AsetRingkasanCariBloc()),
-        BlocProvider<AsetParCariBloc>(
-            create: (context) => AsetParCariBloc()),
-        BlocProvider<AsetMvCariBloc>(
-            create: (context) => AsetMvCariBloc()),
-        BlocProvider<AsetHealthCariBloc>(
-            create: (context) => AsetHealthCariBloc()),
-        BlocProvider<AsetothersCariBloc>(
-            create: (context) => AsetothersCariBloc()),
+        BlocProvider<AsetParCariBloc>(create: (context) => AsetParCariBloc()),
+        BlocProvider<AsetMvCariBloc>(create: (context) => AsetMvCariBloc()),
+        BlocProvider<AsetHealthCariBloc>(create: (context) => AsetHealthCariBloc()),
+        BlocProvider<AsetothersCariBloc>(create: (context) => AsetothersCariBloc()),
         BlocProvider<AsetDashboardCariBloc>(create: (context) => AsetDashboardCariBloc()),
         BlocProvider(create: (context) => Promo1CariBloc()),
         BlocProvider(create: (context) => Promo2CariBloc()),
         BlocProvider(create:(context) => SppamvListBloc()),
-        BlocProvider(create: (context) => SppamvCrudBloc(repository: SppamvCrudRepository())),
         BlocProvider(create: (context) => SppaparListBloc()),
         BlocProvider(create: (context) => SppaparCrudBloc(repository: SppaparCrudRepository())),
         BlocProvider(create: (context) => SimulparListBloc()),
-        BlocProvider<SimulmvCrudBloc>(
-            create: (context) =>
-                SimulmvCrudBloc(repository: SimulmvCrudRepository())),
-        BlocProvider<SimulparCrudBloc>(
-            create: (context) =>
-                SimulparCrudBloc(repository: SimulparCrudRepository())),
-        BlocProvider<CobCariBloc>(
-            create: (context) => CobCariBloc()),
+        BlocProvider<SimulmvCrudBloc>(create: (context) => SimulmvCrudBloc(repository: SimulmvCrudRepository())),
+        BlocProvider<SimulparCrudBloc>(create: (context) => SimulparCrudBloc(repository: SimulparCrudRepository())),
+        BlocProvider<CobCariBloc>(create: (context) => CobCariBloc()),
         BlocProvider<Dn1CariBloc>(create: (context) => Dn1CariBloc()),
         BlocProvider(create: (context) => InviteBloc(repo: InviteRepository())),
         BlocProvider(create: (context) => Endors1CrudBloc(repository: Endors1CrudRepository())),
@@ -384,13 +300,6 @@ Future<void> main() async {
         BlocProvider(create:(context) => Regmv4FormBloc(repository: Regmv4FormRepository())),
         BlocProvider(create:(context) => Regmv5FormBloc(repository: Regmv5FormRepository())),
         BlocProvider(create:(context) => Regmv6FormBloc(repository: Regmv6FormRepository())),
-
-        BlocProvider(create:(context) => Regpar1ListBloc()),
-        BlocProvider(create:(context) => Regpar1CrudBloc(repository: Regpar1CrudRepository())),
-        BlocProvider(create:(context) => Regpar2FormBloc(repository: Regpar2FormRepository())),
-        BlocProvider(create:(context) => Regpar3FormBloc(repository: Regpar3FormRepository())),
-        BlocProvider(create:(context) => Regpar4FormBloc(repository: Regpar4FormRepository())),
-        BlocProvider(create:(context) => Regpar5FormBloc(repository: Regpar5FormRepository())),
 
         BlocProvider(create: (context) => SppamvCrudBloc(repository: SppamvCrudRepository())),
         BlocProvider(create: (_) => Calpar3FormBloc(repository: Calpar3FormRepository())),
@@ -424,63 +333,6 @@ Future<void> main() async {
      ],
       child: MultiBlocListener(
         listeners: [
-          // Debug listener untuk Rekan
-          BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
-            listenWhen: (prev, curr) =>
-            curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
-            listener: (context, state) {
-              final nama = state.record?.rekanNama?.trim();
-              final mrekan1Id = state.record?.mrekan1Id;
-              final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
-
-              // if (nama != null && nama.isNotEmpty) {
-              //   context.read<UserProfileCubit>().setProfile(
-              //     mrekan1Id : mrekan1Id,
-              //     nama: nama,
-              //     mjnsclientId: mjnsclientId, // 👈 simpan juga
-              //   );
-              // }
-
-              if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
-                context.read<MRekanContactCrudBloc>().add(
-                  MRekanContactCrudLihatEvent(),
-                );
-              }
-            },
-          ),
-
-          BlocListener<EmailVerificationBloc, EmailVerificationState>(
-            listenWhen: (prev, curr) =>
-            prev.record != curr.record && curr.record != null && !curr.hasFailure,
-            listener: (context, state) {
-              final record = state.record!;
-              // if (record.email.isNotEmpty) {
-              //   context.read<RegUserProfileCubit>().setProfile(
-              //     email: record.email,
-              //     reguserId: record.requestId,
-              //   );
-              // }
-            },
-          ),
-
-
-          BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
-            listenWhen: (prev, curr) =>
-            curr.isLoaded && prev.record != curr.record,
-            listener: (context, state) {
-              final email = state.record?.email?.trim() ?? '';
-              final telepon = state.record?.telp?.trim() ?? '';
-
-              // if (email.isNotEmpty || telepon.isNotEmpty) {
-              //   context.read<UserProfileCubit>().setProfile(
-              //     email: email,
-              //     telepon: telepon,
-              //   );
-              // }
-            },
-          ),
-
-          // 🌐 Network status listener
           BlocListener<NetworkBloc, NetworkState>(
             listener: (context, state) {
               final messenger = ScaffoldMessenger.of(context);
@@ -498,37 +350,20 @@ Future<void> main() async {
             },
           ),
 
-          // 🔑 Authentication listener
           BlocListener<AuthenticationBloc, AuthenticationState>(
             listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
             listener: (context, state) {
               final s = state as AuthenticationAuthenticated;
               if (s.user.userType == 'C') {
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
-                debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
               }
 
-              // trigger foto profil sekali
               final fotoState = context.read<ProfileDownloadFotoBloc>().state;
               if (fotoState is! ProfileDownloadFotoLoading &&
                   fotoState is! ProfileDownloadFotoLoaded) {
                 context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
-                debugPrint('[Foto] LoadSecureImage() dipanggil');
+                // debugPrint('[Foto] LoadSecureImage() dipanggil');
               }
-            },
-          ),
-
-          // 🖼 Foto profil listener
-          BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-            listenWhen: (_, c) => c is ProfileDownloadFotoLoaded,
-            listener: (context, state) {
-              final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
-              // if (bytes.isNotEmpty) {
-              //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
-              //   debugPrint('[Foto] bytes=${bytes.length} -> set ke UserProfileCubit');
-              // } else {
-              //   debugPrint('[Foto] bytes kosong, skip setProfile()');
-              // }
             },
           ),
         ],
@@ -557,7 +392,9 @@ class _App extends StatefulWidget {
 class _AppState extends State<_App> {
   late bool _showOnboarding;
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-
+  bool _pendingGoToLoginUser = false;
+  int _unauthSeenCount = 0;
+  int _pushLoginCount = 0;
   @override
   void initState() {
     super.initState();
@@ -568,7 +405,22 @@ class _AppState extends State<_App> {
     setState(() {
       _showOnboarding = false;
     });
+
+    if (_pendingGoToLoginUser) {
+      _pendingGoToLoginUser = false;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final nav = _navigatorKey.currentState;
+        if (nav == null) return;
+
+        nav.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginUser()),
+              (route) => false,
+        );
+      });
+    }
   }
+
 
   // 🔹 Helper untuk buka popup biar gak nulis ulang
   Future<void> _showPopup(Widget page) async {
@@ -606,9 +458,79 @@ class _AppState extends State<_App> {
             }
           },
         ),
+
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) => curr is AuthenticationRequireLoginClient,
+          listener: (_, state) {
+            if (state is AuthenticationRequireLoginClient) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final nav = _navigatorKey.currentState;
+                if (nav == null) return;
+
+                nav.pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (_) => const LoginClient(),
+                  ),
+                      (route) => false,
+                );
+              });
+            }
+          },
+        ),
+
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) => curr is AuthenticationUnauthenticated,
+          listener: (_, state) {
+            if (state is AuthenticationUnauthenticated) {
+              // Kalau onboarding belum selesai: tahan dulu
+              if (_showOnboarding) {
+                _pendingGoToLoginUser = true;
+                return;
+              }
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final nav = _navigatorKey.currentState;
+                if (nav == null) return;
+
+                nav.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginUser()),
+                      (route) => false,
+                );
+              });
+            }
+          },
+        ),
+
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
+          listener: (_, state) {
+            if (state is AuthenticationAuthenticated) {
+              // Kalau onboarding masih aktif, jangan pop apa-apa dulu
+              if (_showOnboarding) return;
+              debugPrint(state.authenticatedFrom);
+              if (state.authenticatedFrom == 'login_user' ||
+                  state.authenticatedFrom == 'login_client' ||
+                  state.authenticatedFrom == 'email_verification') {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final nav = _navigatorKey.currentState;
+                  if (nav == null) return;
+
+                  nav.pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => HomeTabWidget(userRepository: widget.userRepository),
+                    ),
+                        (route) => false,
+                  );
+                });
+              }
+            }
+          },
+        ),
+
+
       ],
       child: MaterialApp(
-        navigatorKey: _navigatorKey, // 🔥 Fix error Navigator
+        navigatorKey: _navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'JPS Insurance',
         theme: FlexThemeData.light(
@@ -629,18 +551,29 @@ class _AppState extends State<_App> {
           switch (settings.name) {
             case 'chat':
               return MaterialPageRoute(
-                builder: (_) => const MobileChatScreen(), // dari SDK Mekari
+                builder: (_) => const MobileChatScreen(),
               );
             default:
               return null;
           }
         },
+
         home: _showOnboarding
+            ? StartScreen(onCompleted: _onOnboardingCompleted)
+            : HomeTabWidget(
+          userRepository: widget.userRepository,),
+      ),
+    );
+  }
+}
+
+
+/*
+home: _showOnboarding
             ? StartScreen(onCompleted: _onOnboardingCompleted)
             : BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
-              // 🔹 1. Bersihkan semua route sebelumnya
               while (_navigatorKey.currentState?.canPop() ?? false) {
                 _navigatorKey.currentState?.pop();
               }
@@ -648,20 +581,11 @@ class _AppState extends State<_App> {
               final user = state.user;
               final homeWidget = HomeTabWidget(userRepository: widget.userRepository);
 
-              // 🔹 2. Cegah double inisialisasi chat
               if (ChatInitService.I.isInitialized) {
-                debugPrint("⚠️ [ChatInitService] Sudah diinisialisasi, skip ulang init.");
                 return homeWidget;
               }
 
-              // 🔹 3. Handle Client ('C')
               if ((user.userType ?? '').toUpperCase() == 'C') {
-                // context.read<UserProfileCubit>().setProfile(
-                //   mrekan1Id: user.id?.toString(),
-                //   nama: user.nama,
-                //   email: user.email,
-                //   telepon: user.hp,
-                // );
 
                 return BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
                   listenWhen: (prev, curr) =>
@@ -684,34 +608,14 @@ class _AppState extends State<_App> {
                         userId: userId,
                         displayName: displayName,
                       );
-
-                      // if (context.mounted) {
-                      //   ScaffoldMessenger.of(context).showSnackBar(
-                      //     SnackBar(
-                      //       content: Text(result.success
-                      //           ? "✅ Chat siap: ${result.displayName}"
-                      //           : "❌ Gagal inisialisasi chat: ${result.error}"),
-                      //       backgroundColor: result.success ? Colors.green : Colors.red,
-                      //     ),
-                      //   );
-                      // }
                     } catch (e, s) {
                       debugPrint("🔥 [ChatInit Error C] $e\n$s");
-                      if (context.mounted) {
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   SnackBar(
-                        //     content: Text("❌ Error inisialisasi chat: $e"),
-                        //     backgroundColor: Colors.red,
-                        //   ),
-                        // );
-                      }
                     }
                   },
                   child: homeWidget,
                 );
               }
 
-              // 🔹 4. Handle User Biasa ('U')
               else if ((user.userType ?? '').toUpperCase() == 'U') {
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
                   if (ChatInitService.I.isInitialized) return;
@@ -725,27 +629,12 @@ class _AppState extends State<_App> {
                       displayName: email,
                     );
 
-                    if (context.mounted) {
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   SnackBar(
-                      //     content: Text(result.success
-                      //         ? "✅ Chat siap: ${result.displayName}"
-                      //         : "❌ Gagal inisialisasi chat: ${result.error}"),
-                      //     backgroundColor: result.success ? Colors.green : Colors.red,
-                      //   ),
-                      // );
-                    }
-
-                    debugPrint(result.success
-                        ? "✅ [ChatInitService] Initialized untuk $email"
-                        : "⚠️ [ChatInitService] Gagal init: ${result.error}");
                   } catch (e, s) {
                     debugPrint("🔥 [ChatInit Error U] $e\n$s");
                   }
                 });
               }
 
-              // 🔹 5. Handle userType kosong / tidak dikenali
               else {
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
                   if (ChatInitService.I.isInitialized) return;
@@ -758,21 +647,6 @@ class _AppState extends State<_App> {
                       userId: email,
                       displayName: email,
                     );
-
-                    if (context.mounted) {
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   SnackBar(
-                      //     content: Text(result.success
-                      //         ? "✅ Chat siap (default): ${result.displayName}"
-                      //         : "❌ Gagal inisialisasi chat: ${result.error}"),
-                      //     backgroundColor: result.success ? Colors.green : Colors.red,
-                      //   ),
-                      // );
-                    }
-
-                    debugPrint(result.success
-                        ? "✅ [ChatInitService] Initialized default untuk $email"
-                        : "⚠️ [ChatInitService] Gagal init default: ${result.error}");
                   } catch (e, s) {
                     debugPrint("🔥 [ChatInit Error UNKNOWN] $e\n$s");
                   }
@@ -852,8 +726,5 @@ class _AppState extends State<_App> {
             // default → loading
             return const LoadingIndicator();
           },
-        ),
-      ),
-    );
-  }
-}
+
+*/

@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 
+import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../common/constants.dart';
 
@@ -135,9 +136,10 @@ class _LoginFormUserState extends State<LoginFormUser>
         ),
         GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => LoginClient()),
+            final authBloc = context.read<AuthenticationBloc>();
+
+            authBloc.add(
+              RequireLoginClient(requiredFrom: "login_user", errorMsg: ""),
             );
           },
           child: Text(

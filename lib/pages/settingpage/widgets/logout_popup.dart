@@ -74,61 +74,36 @@ class _LogoutConfirmationPopupState extends State<LogoutConfirmationPopup>
   Future<void> _confirmLogout() async {
     if (_isLoggingOut || !mounted) return;
 
-    setState(() {
-      _isLoggingOut = true;
-    });
+    setState(() => _isLoggingOut = true);
 
+    // 1) Tutup popup dulu (animasi)
     try {
-      AuthenticationBloc? authBloc;
-      if (mounted) {
-        try {
-          authBloc = context.read<AuthenticationBloc>();
-        } catch (e) {}
-      }
+      await _animController.reverse();
+      await _overlayController.reverse();
+    } catch (_) {}
 
-      // Google Sign Out
-      try {
-        await googleSignIn.signOut();
-      } catch (e) {}
+    if (!mounted) return;
 
-      // Trigger logout BEFORE closing popup
-      if (authBloc != null) {
-        // context.read<UserProfileCubit>().clearProfile();
-        // context.read<RegUserProfileCubit>().clearProfile();
-        // context.read<LoginBloc>().add(LoginReset());
-        // ChatInitService.I.dispose();
-        authBloc.add(LoggedOut());
-        await Future.delayed(const Duration(milliseconds: 100));
-      } else {
-        return; // Don't continue if we can't logout
-      }
+    // 2) Pop dialog (keluar dari popup route)
+    Navigator.of(context).pop();
 
-      // Close popup with animation only after logout is triggered
-      try {
-        if (mounted) {
-          await _animController.reverse();
-          await _overlayController.reverse();
-        }
-      } catch (e) {}
+    // 3) Baru sign out + dispatch logout
+    try {
+      await googleSignIn.signOut();
+    } catch (_) {}
 
-      // Pop dialog
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      // Emergency fallback - try to logout anyway
-      if (mounted) {
-        try {
-          context.read<AuthenticationBloc>().add(LoggedOut());
-          Navigator.of(context).pop();
-        } catch (fallbackError) {
-          if (mounted) {
-            Navigator.of(context).pop();
-          }
-        }
-      }
-    }
+    // Optional cleanup sebelum logout event (kalau kamu mau aktifkan)
+    // context.read<UserProfileCubit>().clearProfile();
+    // context.read<RegUserProfileCubit>().clearProfile();
+    // context.read<LoginBloc>().add(LoginReset());
+    // ChatInitService.I.dispose();
+
+    // 4) Trigger logout (listener di root yang handle navigation ke LoginUser)
+    try {
+      context.read<AuthenticationBloc>().add(LoggedOut());
+    } catch (_) {}
   }
+
 
   @override
   Widget build(BuildContext context) {

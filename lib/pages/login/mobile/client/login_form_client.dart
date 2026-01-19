@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
+import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../common/constants.dart';
 
 class LoginFormClient extends StatefulWidget {
@@ -333,12 +334,7 @@ class _LoginFormClientState extends State<LoginFormClient>
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(builder: (_) => const LoginUser()),
-                                            ).then((_) {
-                                              Navigator.pop(context); // auto kembali ke halaman sebelumnya
-                                            });
+                                            context.read<AuthenticationBloc>().add(RequireLoginUser());
                                           },
                                           child: Text(
                                             "Masuk Sebagai Pengguna",
