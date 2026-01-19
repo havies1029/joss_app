@@ -106,24 +106,24 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
               0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
               1: const FixedColumnWidth(50),  // No
               2: const FixedColumnWidth(170), // Tertanggung
-              3: const FixedColumnWidth(140), // Periode
-              4: const FixedColumnWidth(160), // Merk Kendaraan
-              5: const FixedColumnWidth(120), // Nomor Polisi
-              6: const FixedColumnWidth(170), // Nilai Tertanggung
-              7: const FixedColumnWidth(130), // Premi
-              8: const FixedColumnWidth(110), // Status
+              3: const FixedColumnWidth(145), // Periode Mulai (disamain)
+              4: const FixedColumnWidth(145), // Periode Akhir (disamain)
+              5: const FixedColumnWidth(130), // Merk Kendaraan (+10)
+              6: const FixedColumnWidth(170), // Nomor Polisi
+              7: const FixedColumnWidth(130), // Nilai Tertanggung
+              8: const FixedColumnWidth(110), // Premi
             },
             children: [
               _tableHeader(context, [
                 "",
                 "No",
                 "Tertanggung",
-                "Periode",
+                "Periode Mulai",
+                "Periode Akhir",
                 "Merk Kendaraan",
                 "Nomor Polisi",
                 "Nilai Tertanggung",
                 "Premi",
-                "Status",
               ]),
               ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
                 context,
@@ -161,27 +161,29 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8), // checkbox
-            1: const FlexColumnWidth(1),   // No
-            2: const FlexColumnWidth(2.4), // Tertanggung
-            3: const FlexColumnWidth(1.8), // Periode
-            4: const FlexColumnWidth(2.0), // Merk Kendaraan
-            5: const FlexColumnWidth(1.8), // Nomor Polisi
-            6: const FlexColumnWidth(2.2), // Nilai Tertanggung
-            7: const FlexColumnWidth(1.6), // Premi
-            8: const FlexColumnWidth(1.4), // Status
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FlexColumnWidth(0.8), // checkbox
+            1: const FlexColumnWidth(1.0),   // No
+            2: const FlexColumnWidth(2.4),   // Tertanggung
+            3: const FlexColumnWidth(1.7),   // Periode Mulai (disamain & dikecilin)
+            4: const FlexColumnWidth(1.7),   // Periode Akhir (disamain)
+            5: const FlexColumnWidth(2.0),   // Merk Kendaraan (+0.2)
+            6: const FlexColumnWidth(2.4),   // Nomor Polisi (+0.2)
+            7: const FlexColumnWidth(1.7),   // Nilai Tertanggung (+0.1)
+            8: const FlexColumnWidth(1.4),   // Premi
           },
           children: [
             _tableHeader(context, [
               "",
               "No",
               "Tertanggung",
-              "Periode",
+              "Periode Mulai",
+              "Periode Akhir",
               "Merk Kendaraan",
               "Nomor Polisi",
               "Nilai Tertanggung",
               "Premi",
-              "Status",
             ]),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
@@ -274,10 +276,20 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           ),
         ),
 
-        // Periode
+        // Periode Mulai
         _cell(
           child: Text(
-            d.periode,
+            "${d.periodeMulai}",
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        // Periode Akhir
+        _cell(
+          child: Text(
+            "${d.periodeAkhir}",
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: primaryLightColor),
@@ -325,16 +337,16 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         ),
 
         // Status
-        _cell(
-          child: Center(
-            child: Text(
-              d.status,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
+        // _cell(
+        //   child: Center(
+        //     child: Text(
+        //       d.status,
+        //       maxLines: 1,
+        //       overflow: TextOverflow.ellipsis,
+        //       style: TextStyle(color: primaryLightColor),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

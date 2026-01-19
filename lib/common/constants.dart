@@ -81,6 +81,11 @@ const Color sGrey = Color(0xFF4E4E4E);
 const Color hintGrey = Color(0xFFBCBCBC);
 const Color unselectedColor = Color(0xFF666666);
 
+const Color bGrey = Color(0xFFA1A1AA);
+const Color bdGrey = Color(0xFFBCBCC7);
+const Color bBlue = Color(0xFF295EFF);
+const Color bdBlue = Color(0xFF5D86FF);
+
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
 const Color sBlue = Color(0xFF0088FF);

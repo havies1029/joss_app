@@ -28,14 +28,14 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
 
     CobCariRepository repo = CobCariRepository();
     if (state.status == ListStatus.initial) {
-      List<CobCariModel> items = await repo.getCobCari();
+      List<CobCariModel> items = await repo.getCobManPolCari();
       return emit(state.copyWith(
         items: items,
         hasReachedMax: false,
         status: ListStatus.success,
       ));
     }
-    List<CobCariModel> items = await repo.getCobCari();
+    List<CobCariModel> items = await repo.getCobManPolCari();
     if (items.isEmpty) {
       return emit(state.copyWith(hasReachedMax: true));
     } else {
@@ -43,8 +43,8 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
 
       final result = cobCari
           .whereWithIndex((e, index) =>
-              cobCari.indexWhere((e2) => e2.mCobApp1Id == e.mCobApp1Id) ==
-              index)
+      cobCari.indexWhere((e2) => e2.mCobApp1Id == e.mCobApp1Id) ==
+          index)
           .toList();
 
       return emit(state.copyWith(
@@ -56,9 +56,9 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
   }
 
   Future<void> onSelectButton(
-    SelectButton event, Emitter<CobManPolState> emit) async {
-      emit(state.copyWith(
-        selectedCOBId: event.id,
-      ));
-    }
+      SelectButton event, Emitter<CobManPolState> emit) async {
+    emit(state.copyWith(
+      selectedCOBId: event.id,
+    ));
+  }
 }

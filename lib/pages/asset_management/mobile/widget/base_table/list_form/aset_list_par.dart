@@ -53,7 +53,7 @@ class AsetListPar extends StatelessWidget {
         4: IntrinsicColumnWidth(),
         5: IntrinsicColumnWidth(),
         6: IntrinsicColumnWidth(),
-        7: IntrinsicColumnWidth(),
+        // 7: IntrinsicColumnWidth(),
         // 8: IntrinsicColumnWidth(),
         // 9: IntrinsicColumnWidth(),
       },
@@ -62,7 +62,7 @@ class AsetListPar extends StatelessWidget {
         HeaderCell("No", center: true),
         HeaderCell("Tertanggung"),
         HeaderCell("Alamat"),
-        HeaderCell("Periode"),
+        // HeaderCell("Periode"),
         // HeaderCell("Currency"),
         // HeaderCell("Klausula Bank"),
         // HeaderCell("Polis No"),
@@ -75,7 +75,7 @@ class AsetListPar extends StatelessWidget {
         CellText("$rowNumber", center: true),
         CellText(item.tertanggung),
         CellText(item.alamat),
-        CellText(item.periode),
+        // CellText(item.periode),
         // CellText(item.curr),
         // CellText(item.klausulaBank),
         // CellText(item.polisNo),
@@ -129,7 +129,7 @@ class AsetListPar extends StatelessWidget {
       items: [
         DetailItem(label: "Tertanggung", value: item.tertanggung),
         DetailItem(label: "Alamat", value: item.alamat),
-        DetailItem(label: "Periode", value: item.periode),
+        // DetailItem(label: "Periode", value: item.periode),
         DetailItem(
           label: "Nilai Pertanggungan",
           value: NumberFormat.currency(locale: 'id', symbol: 'IDR ')
@@ -143,7 +143,7 @@ class AsetListPar extends StatelessWidget {
         DetailItem(label: "Status", value: item.status),
         DetailItem(label: "No. Polis", value: item.polisNo ?? "-"),
         DetailItem(label: "Currency", value: item.curr ?? "-"),
-        DetailItem(label: "Klausula Bank", value: item.klausulaBank ?? "-"),
+        // DetailItem(label: "Klausula Bank", value: item.klausulaBank ?? "-"),
       ],
     );
   }

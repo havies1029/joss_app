@@ -75,7 +75,6 @@ class ShareMvStateCubit extends Cubit<Map<String, AsetMvCariModel>> {
         'No. Polis': e.polisNo,
         'Jenis': e.jenisMv,
         'Merk': e.merk,
-        'Tipe': e.tipe,
         'Tahun': e.tahun,
         'Currency': e.curr,
         'Sum Insured': e.sumInsured,

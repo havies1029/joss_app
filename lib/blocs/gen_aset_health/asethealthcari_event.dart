@@ -22,7 +22,6 @@ class RefreshAsetHealthCariEvent extends AsetHealthCariEvents {
 	List<Object> get props => [searchText, statusId];
 }
 
-// ✅ Event baru khusus debug (tidak trigger rebuild tabel)
 class DebugFetchAsetHealthCariEvent extends AsetHealthCariEvents {
 	final String searchText;
 	final String statusId;

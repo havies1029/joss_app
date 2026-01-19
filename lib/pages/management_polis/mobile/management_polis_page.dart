@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../../../../common/constants.dart';
+import '../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
 import '../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
 import '../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
 import '../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-import '../../../blocs/gen_cob_app/cobcari_bloc.dart';
 import '../../../blocs/gen_status_aset/statusasetcari_bloc.dart';
 import '../../../helper/fab_action_helper.dart';
 import '../../../widgets/apptheme/header_card.dart';
@@ -85,10 +86,11 @@ class FloatingMenuWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cobId = context.select((CobCariBloc b) => b.state.selectedCOBId);
+    final cobId = context.select((CobManPolBloc b) => b.state.selectedCOBId);
 
     // 1) subscribe selectedIds sesuai COB
     final Set<String> selectedIds = switch (cobId) {
+      // "10002" => context.select((AsetParCariBloc b) => b.state.selectedIds),
       "10002" => context.select((AsetParCariBloc b) => b.state.selectedIds),
       "10003" => context.select((AsetMvCariBloc b) => b.state.selectedIds),
       "10004" => context.select((AsethullCariBloc b) => b.state.selectedIds),
@@ -149,6 +151,10 @@ class FloatingMenuWrapper extends StatelessWidget {
       final st = context.read<AsetHealthCariBloc>().state;
       return st.items.where((x) => selectedIds.contains(x.asethealthId)).toList();
     }
+    if (cobId == "10006") {
+      final st = context.read<AsetothersCariBloc>().state;
+      return st.items.where((x) => selectedIds.contains(x.asetOthersId)).toList();
+    }
     return [];
   }
 
@@ -157,6 +163,8 @@ class FloatingMenuWrapper extends StatelessWidget {
     if (cobId == "10003") context.read<AsetMvCariBloc>().add(ClearMvSelectionEvent());
     if (cobId == "10004") context.read<AsethullCariBloc>().add(ClearHullSelectionEvent());
     if (cobId == "10005") context.read<AsetHealthCariBloc>().add(ClearHealthSelectionEvent());
+    if (cobId == "10006") context.read<AsetothersCariBloc>().add(ClearOthersSelectionEvent());
+
   }
 
   void _refreshByCob(BuildContext context, String cobId) {
@@ -172,6 +180,8 @@ class FloatingMenuWrapper extends StatelessWidget {
       context.read<AsethullCariBloc>().add(RefreshAsethullCariEvent(statusId: statusId, searchText: searchText));
     } else if (cobId == "10005") {
       context.read<AsetHealthCariBloc>().add(RefreshAsetHealthCariEvent(statusId: statusId, searchText: searchText));
+    } else if (cobId == "10006") {
+      context.read<AsetothersCariBloc>().add(RefreshAsetothersCariEvent(statusId: statusId, searchText: searchText, cobId: cobId));
     }
   }
 }

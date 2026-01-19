@@ -7,7 +7,8 @@ import '../../../../common/constants.dart';
 import '../../../base/base_background_firstpage.dart';
 
 class RegisterClient extends StatefulWidget {
-  const RegisterClient({super.key});
+  final String requestFrom;
+  const RegisterClient({super.key, required this.requestFrom});
 
   @override
   _RegisterClientState createState() => _RegisterClientState();
@@ -38,11 +39,12 @@ class _RegisterClientState extends State<RegisterClient>
 
   // Widget yang mengandung RegisterFormClient
   Widget _buildDesignRegisterFormClient() {
-    return const RegisterFormClient();
+    return RegisterFormClient(requestFrom: widget.requestFrom,);
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[RegisterClient] build requestFrom=${widget.requestFrom}');
     final screenHeight = MediaQuery.of(context).size.height;
     final verticalPadding = screenHeight * 0.03;
     final headerSpacing = screenHeight * 0.025;

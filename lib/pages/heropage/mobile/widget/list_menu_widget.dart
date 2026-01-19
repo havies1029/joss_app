@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../aset/aset_cari.dart';
 import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../management_polis/mobile/management_polis_filter.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../payment/dnsppamvcari_list.dart';
 import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
@@ -29,166 +33,187 @@ class ListMenuWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final menuItems = _getMenuItems();
     final itemWidth = getItemWidth(context);
-    return Column(
-      children: [
-        if (userType != 'C') _buildDaftarKlienButton(context),
 
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          decoration: BoxDecoration(
-            color: secondaryBlackColor,
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(cardBorderRadius),
-              bottomRight: Radius.circular(cardBorderRadius),
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        if (state is AuthenticationRequireRegisterClient) {
+          _openRegisterClientDialog(context, requestFrom: state.requiredFrom);
+        }
+      },
+      child: Column(
+        children: [
+          if (userType != 'C') _buildDaftarKlienButton(context),
+
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            decoration: BoxDecoration(
+              color: secondaryBlackColor,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(cardBorderRadius),
+                bottomRight: Radius.circular(cardBorderRadius),
+              ),
             ),
-          ),
-          child: SizedBox(
-            height: 120,
-            child: Stack(
-              children: [
-                ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: menuItems.length,
-                  itemBuilder: (context, index) {
-                    final item = menuItems[index];
-                    return SizedBox(
-                      width: itemWidth,
-                      child: _buildMenuItem(context, item, userType),
-                    );
-                  },
-                ),
-                // Gradient kiri (gelap → transparan)
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: 40,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: blackFadeGradientHorizontal,
+            child: SizedBox(
+              height: 120,
+              child: Stack(
+                children: [
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: menuItems.length,
+                    itemBuilder: (context, index) {
+                      final item = menuItems[index];
+                      return SizedBox(
+                        width: itemWidth,
+                        child: _buildMenuItem(context, item, userType),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 40,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: blackFadeGradientHorizontal,
+                      ),
                     ),
                   ),
-                ),
-                // Gradient kanan (transparan → gelap)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: 48,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: blackFadeGradientHorizontalReversed,
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 48,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: blackFadeGradientHorizontalReversed,
+                      ),
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openRegisterClientDialog(BuildContext context, {required String requestFrom}) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (_, __, ___) {
+        return SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: primaryBlackColor,
+              child: RegisterClient(requestFrom: requestFrom),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return SlideTransition(
+          position: Tween(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(anim),
+          child: child,
+        );
+      },
+    );
+  }
+
+  Widget _buildDaftarKlienButton(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        onTap: () {
+          // optional: haptic biar terasa "klik"
+          // HapticFeedback.lightImpact();
+
+          context.read<AuthenticationBloc>().add(
+            RequireRegisterClient(
+              requiredFrom: 'daftarclient_page',
+            ),
+          );
+        },
+        child: Ink(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: registerButtonGradient,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: hPadding,
+              horizontal: vPadding,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/diamond.svg',
+                        width: 20,
+                        height: 20,
+                      ),
+                      const SizedBox(width: 5),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Daftar Klien Sekarang!',
+                            style: bodyTextStyle(context, fontSize: 16),
+                          ),
+                          Text(
+                            'Langkah pertama untuk mengelola Polis',
+                            style: bodyTextStyle(context, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20),
+
+                // CTA "Mulai"
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Mulai',
+                    style: bodyTextStyle(context, fontSize: 16),
                   ),
                 ),
               ],
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildDaftarKlienButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showGeneralDialog(
-          context: context,
-          barrierDismissible: true,
-          barrierLabel: '',
-          transitionDuration: const Duration(milliseconds: 300),
-          pageBuilder: (_, __, ___) {
-            return SafeArea(
-              child: Scaffold(
-                backgroundColor: Colors.transparent,
-                body: Center(
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: primaryBlackColor,
-                    child: const RegisterClient(),
-                  ),
-                ),
-              ),
-            );
-          },
-          transitionBuilder: (_, anim, __, child) {
-            return SlideTransition(
-              position: Tween(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(anim),
-              child: child,
-            );
-          },
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: registerButtonGradient,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: hPadding,
-            horizontal: vPadding,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Content area
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/diamond.svg',
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Daftar Klien Sekarang!',
-                          style: bodyTextStyle(context, fontSize: 16),
-                        ),
-                        Text(
-                          'Langkah pertama untuk mengelola Polis',
-                          style: bodyTextStyle(context, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: primaryColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Mulai',
-                  style: bodyTextStyle(context, fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
+
 
   Widget _buildMenuItem(BuildContext context, MenuItem item, String userType) {
     final isClient = userType == 'C';
@@ -333,7 +358,7 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
         break;
 
       // case 'Test Page':

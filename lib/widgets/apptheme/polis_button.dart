@@ -40,17 +40,22 @@ class PolisButton extends StatelessWidget {
     );
 
     final button = (text == null || text!.isEmpty)
-        ? IconButton( // 🔥 mode icon-only
-      onPressed: onTap,
-      icon: iconWidget,
-      style: IconButton.styleFrom(
-        backgroundColor: bgColor ?? Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-          side: BorderSide(
-            color: borderColor ?? Colors.transparent,
-            width: 0.8,
-          ),
+        ? Material(
+      color: bgColor ?? Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+        side: BorderSide(
+          color: borderColor ?? Colors.transparent,
+          width: 0.8,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onTap,
+        child: SizedBox(
+          height: height,
+          width: width ?? height,
+          child: Center(child: iconWidget),
         ),
       ),
     )
@@ -74,6 +79,7 @@ class PolisButton extends StatelessWidget {
             fontSize: 12,
           ),
     );
+
 
     if (width != null) {
       return SizedBox(width: width, height: height, child: button);

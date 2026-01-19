@@ -105,9 +105,9 @@ class _HealthCobTableState extends State<HealthCobTable> {
             columnWidths: {
               0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
               1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(200), // Nama
-              3: const FixedColumnWidth(230), // Benefit
-              4: const FixedColumnWidth(110), // Status
+              2: const FixedColumnWidth(250), // Nama
+              3: const FixedColumnWidth(290), // Benefit
+              // 4: const FixedColumnWidth(110), // Status
             },
             children: [
               _tableHeader(context, [
@@ -115,7 +115,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
                 "No",
                 "Nama",
                 "Benefit",
-                "Status",
+                // "Status",
               ]),
               ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
                 context,
@@ -154,9 +154,9 @@ class _HealthCobTableState extends State<HealthCobTable> {
           ),
           columnWidths: {
             0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8), // checkbox
-            1: const FlexColumnWidth(1),   // No
-            2: const FlexColumnWidth(3.2), // Nama
-            3: const FlexColumnWidth(3.0), // Benefit
+            1: const FlexColumnWidth(1.0),   // No
+            2: const FlexColumnWidth(3.9),   // Nama
+            3: const FlexColumnWidth(3.7),   // Benefit
             4: const FlexColumnWidth(1.4), // Status
           },
           children: [
@@ -165,7 +165,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
               "No",
               "Nama",
               "Benefit",
-              "Status",
+              // "Status",
             ]),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
@@ -271,16 +271,16 @@ class _HealthCobTableState extends State<HealthCobTable> {
         ),
 
         // Status
-        _cell(
-          child: Center(
-            child: Text(
-              d.status,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
+        // _cell(
+        //   child: Center(
+        //     child: Text(
+        //       d.status,
+        //       maxLines: 1,
+        //       overflow: TextOverflow.ellipsis,
+        //       style: TextStyle(color: primaryLightColor),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

@@ -13,7 +13,8 @@ import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
 
 class RegisterFormClient extends StatefulWidget {
-  const RegisterFormClient({super.key});
+  final String requestFrom;
+  const RegisterFormClient({super.key, required this.requestFrom});
 
   @override
   State<RegisterFormClient> createState() => _RegisterFormClientState();
@@ -224,7 +225,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
     );
 
     context.read<RegUserBloc>().add(
-        RegUserTambahEvent(record: record, requestFrom: '')
+        RegUserTambahEvent(record: record, requestFrom: widget.requestFrom)
     );
   }
 
@@ -316,7 +317,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 4), // sesuaikan biar sejajar
                                     child: TextButton.icon(
-                                      onPressed: () => Navigator.pop(context),
+                                      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                                       style: TextButton.styleFrom(
                                         padding: EdgeInsets.zero,
                                         minimumSize: const Size(0, 0),
@@ -410,7 +411,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                               );
 
                                               context.read<RegUserBloc>().add(
-                                                RegUserTambahEvent(record: record, requestFrom: ''),
+                                                RegUserTambahEvent(record: record, requestFrom: widget.requestFrom),
                                               );
                                             }
                                           },

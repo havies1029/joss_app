@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../common/constants.dart';
-import '../../../../models/gen_aset_hull/asethullcari_model.dart';
+import '../../../../models/asetothers/asetotherscari_model.dart';
 
-
-class HullCobTable extends StatefulWidget {
-  final List<AsethullCariModel> items;
+class KargoCobTable extends StatefulWidget {
+  final List<AsetothersCariModel> items;
   final List<String> selectedIds;
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
   final bool readOnly;
-  final bool showFooter; // tetap ada biar kompatibel, tapi tidak dipakai
-  final String? title;   // optional kalau mau judul
+  final bool showFooter;
+  final String? title;
 
-  const HullCobTable({
+  const KargoCobTable({
     super.key,
     required this.items,
     required this.selectedIds,
@@ -26,15 +25,17 @@ class HullCobTable extends StatefulWidget {
   });
 
   @override
-  State<HullCobTable> createState() => _HullCobTableState();
+  State<KargoCobTable> createState() => _KargoCobTableState();
 }
 
-class _HullCobTableState extends State<HullCobTable> {
+class _KargoCobTableState extends State<KargoCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
 
-  List<AsethullCariModel> get _filteredItems {
+  List<AsetothersCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
-    return widget.items.where((d) => widget.selectedIds.contains(d.asetHullId)).toList();
+    return widget.items
+        .where((d) => widget.selectedIds.contains(d.asetOthersId))
+        .toList();
   }
 
   @override
@@ -69,18 +70,11 @@ class _HullCobTableState extends State<HullCobTable> {
         ],
       ),
     );
-
   }
 
-  Widget _buildHeaderTitle(BuildContext context, String cobNama) {
-    return Text(
-      "Polis $cobNama",
-      style: headingStyle(context, fontSize: 14),
-    );
-  }
-
-  Widget _buildDetailTableCompact(BuildContext context, List<AsethullCariModel> details) {
-    if (details.isEmpty) return const Text("Tidak ada detail polis");
+  Widget _buildDetailTableCompact(
+      BuildContext context, List<AsetothersCariModel> details) {
+    if (details.isEmpty) return const Text("Tidak ada detail");
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -106,19 +100,21 @@ class _HullCobTableState extends State<HullCobTable> {
             columnWidths: {
               0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
               1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(190), // Tertanggung
-              3: const FixedColumnWidth(290), // Detail Rangka Kapal
-              4: const FixedColumnWidth(210), // Nilai Tertanggung
-              5: const FixedColumnWidth(130), // Premi
-              // 6: const FixedColumnWidth(110), // Status
+              2: const FixedColumnWidth(310), // Object Desc
+              3: const FixedColumnWidth(180), // Polis No
+              4: const FixedColumnWidth(80),  // Curr
+              5: const FixedColumnWidth(200), // Sum Insured
+              6: const FixedColumnWidth(140), // Premi
+              // 7: const FixedColumnWidth(110), // Status
             },
             children: [
               _tableHeader(context, [
                 "",
                 "No",
-                "Tertanggung",
-                "Detail Rangka Kapal",
-                "Nilai Tertanggung",
+                "Object",
+                "Polis No",
+                "Curr",
+                "Sum Insured",
                 "Premi",
                 // "Status",
               ]),
@@ -135,8 +131,9 @@ class _HullCobTableState extends State<HullCobTable> {
     );
   }
 
-  Widget _buildDetailTableNormal(BuildContext context, List<AsethullCariModel> details) {
-    if (details.isEmpty) return const Text("Tidak ada detail polis");
+  Widget _buildDetailTableNormal(
+      BuildContext context, List<AsetothersCariModel> details) {
+    if (details.isEmpty) return const Text("Tidak ada detail");
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -160,19 +157,21 @@ class _HullCobTableState extends State<HullCobTable> {
           columnWidths: {
             0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8), // checkbox
             1: const FlexColumnWidth(1.0),   // No
-            2: const FlexColumnWidth(2.6),   // Tertanggung
-            3: const FlexColumnWidth(3.7),   // Detail Rangka Kapal
-            4: const FlexColumnWidth(2.7),   // Nilai Tertanggung
-            5: const FlexColumnWidth(1.6),   // Premi
-            // 6: const FlexColumnWidth(1.4), // Status
+            2: const FlexColumnWidth(3.6),   // Object Desc
+            3: const FlexColumnWidth(2.3),   // Polis No
+            4: const FlexColumnWidth(1.0),   // Curr
+            5: const FlexColumnWidth(2.7),   // Sum Insured
+            6: const FlexColumnWidth(1.6),   // Premi
+            // 7: const FlexColumnWidth(1.4), // Status
           },
           children: [
             _tableHeader(context, [
               "",
               "No",
-              "Tertanggung",
-              "Detail Rangka Kapal",
-              "Nilai Tertanggung",
+              "Object",
+              "Polis No",
+              "Curr",
+              "Sum Insured",
               "Premi",
               // "Status",
             ]),
@@ -193,7 +192,12 @@ class _HullCobTableState extends State<HullCobTable> {
       decoration: const BoxDecoration(color: formGrey),
       children: cells.map((text) {
         final upper = text.trim().toUpperCase();
-        final bool center = (upper == "NO" || upper == "STATUS" || text.trim().isEmpty);
+        final bool center = (upper == "NO" ||
+            upper == "STATUS" ||
+            upper == "CURR" ||
+            upper == "PREMI" ||
+            upper == "SUM INSURED" ||
+            text.trim().isEmpty);
 
         final child = Text(text, style: bodyTextStyle(context, fontSize: 15));
 
@@ -207,11 +211,11 @@ class _HullCobTableState extends State<HullCobTable> {
 
   TableRow _detailRowWithCheckbox(
       BuildContext context,
-      AsethullCariModel d,
+      AsetothersCariModel d,
       int index, {
         required bool compact,
       }) {
-    final isSelected = widget.selectedIds.contains(d.asetHullId);
+    final isSelected = widget.selectedIds.contains(d.asetOthersId);
 
     return TableRow(
       decoration: BoxDecoration(
@@ -220,16 +224,15 @@ class _HullCobTableState extends State<HullCobTable> {
             : (index.isEven ? pGrey : formGrey),
       ),
       children: [
-        // checkbox (tetap sama seperti tabel kamu sebelumnya)
-        if (!widget.readOnly) ...[
+        if (!widget.readOnly)
           Center(
             child: Checkbox(
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
-                  widget.onSelect(d.asetHullId);
+                  widget.onSelect(d.asetOthersId);
                 } else {
-                  widget.onUnselect(d.asetHullId);
+                  widget.onUnselect(d.asetOthersId);
                 }
               },
               shape: RoundedRectangleBorder(
@@ -245,52 +248,57 @@ class _HullCobTableState extends State<HullCobTable> {
               ),
               checkColor: primaryLightColor,
             ),
-          ),
-        ] else ...[
+          )
+        else
           const SizedBox(),
-        ],
 
-        // No
         _cell(
           child: Center(
             child: Text(
-              (index + 1).toString(),
+              d.nomor.toString(),
               style: TextStyle(color: primaryLightColor),
             ),
           ),
         ),
 
-        // Tertanggung
         _cell(
           child: Text(
-            d.tertanggung,
+            d.objectDesc,
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: primaryLightColor),
           ),
         ),
 
-        // Detail Rangka Kapal (pakai namaKapal)
         _cell(
           child: Text(
-            d.namaKapal,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        // Nilai Tertanggung (TSI)
-        _cell(
-          child: Text(
-            formatNum(d.tsi),
+            d.polisNo,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: primaryLightColor),
           ),
         ),
 
-        // Premi
+        _cell(
+          child: Center(
+            child: Text(
+              d.curr,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            formatNum(d.sumInsured),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
         _cell(
           child: Text(
             formatNum(d.premi),
@@ -300,7 +308,6 @@ class _HullCobTableState extends State<HullCobTable> {
           ),
         ),
 
-        // Status
         // _cell(
         //   child: Center(
         //     child: Text(

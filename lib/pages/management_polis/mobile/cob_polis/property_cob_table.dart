@@ -10,8 +10,8 @@ class PropertyCobTable extends StatefulWidget {
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
   final bool readOnly;
-  final bool showFooter; // tetap ada biar kompatibel, tapi tidak dipakai
-  final String? title;   // optional kalau mau judul
+  final bool showFooter;
+  final String? title;
 
   const PropertyCobTable({
     super.key,
@@ -106,11 +106,11 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
               0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
               1: const FixedColumnWidth(50),  // No
               2: const FixedColumnWidth(170), // Tertanggung
-              3: const FixedColumnWidth(220), // Alamat
-              4: const FixedColumnWidth(160), // Periode
-              5: const FixedColumnWidth(170), // Nilai Pertanggungan
-              6: const FixedColumnWidth(130), // Premi
-              7: const FixedColumnWidth(110), // Status
+              3: const FixedColumnWidth(240), // Alamat (+20)
+              4: const FixedColumnWidth(145), // Periode Mulai (disamain)
+              5: const FixedColumnWidth(145), // Periode Akhir (disamain)
+              6: const FixedColumnWidth(150), // Nilai Pertanggungan (+20)
+              7: const FixedColumnWidth(110), // Premi
             },
             children: [
               _tableHeader(context, [
@@ -118,10 +118,11 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                 "No",
                 "Tertanggung",
                 "Alamat",
-                "Periode",
+                "Periode Mulai",
+                "Periode Akhir",
                 "Nilai Pertanggungan",
                 "Premi",
-                "Status",
+                // "Status",
               ]),
               ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
                 context,
@@ -159,14 +160,16 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8), // checkbox
-            1: const FlexColumnWidth(1),   // No
-            2: const FlexColumnWidth(2.2), // Tertanggung
-            3: const FlexColumnWidth(3),   // Alamat
-            4: const FlexColumnWidth(1.8), // Periode
-            5: const FlexColumnWidth(2.2), // Nilai Pertanggungan
-            6: const FlexColumnWidth(1.6), // Premi
-            7: const FlexColumnWidth(1.4), // Status
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FlexColumnWidth(0.8), // checkbox
+            1: const FlexColumnWidth(1.0),   // No
+            2: const FlexColumnWidth(2.2),   // Tertanggung
+            3: const FlexColumnWidth(3.3),   // Alamat (+0.3)
+            4: const FlexColumnWidth(1.7),   // Periode Mulai (disamain & dikecilin)
+            5: const FlexColumnWidth(1.7),   // Periode Akhir (disamain)
+            6: const FlexColumnWidth(1.8),   // Nilai Pertanggungan (+0.2)
+            7: const FlexColumnWidth(1.4),   // Premi
           },
           children: [
             _tableHeader(context, [
@@ -174,10 +177,11 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
               "No",
               "Tertanggung",
               "Alamat",
-              "Periode",
+              "Periode Mulai",
+              "Periode Akhir",
               "Nilai Pertanggungan",
               "Premi",
-              "Status",
+              // "Status",
             ]),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
@@ -277,14 +281,26 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           ),
         ),
 
+        // Periode Mulai
         _cell(
           child: Text(
-            d.periode.isNotEmpty ? d.periode : "${d.periodeMulai} → ${d.periodeAkhir}",
+            "${d.periodeMulai}",
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: primaryLightColor),
           ),
         ),
+
+        // Periode Akhir
+        _cell(
+          child: Text(
+            "${d.periodeAkhir}",
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
 
         _cell(
           child: Text(
@@ -304,16 +320,16 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           ),
         ),
 
-        _cell(
-          child: Center(
-            child: Text(
-              d.status,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
+        // _cell(
+        //   child: Center(
+        //     child: Text(
+        //       d.status,
+        //       maxLines: 1,
+        //       overflow: TextOverflow.ellipsis,
+        //       style: TextStyle(color: primaryLightColor),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

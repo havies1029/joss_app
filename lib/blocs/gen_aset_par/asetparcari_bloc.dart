@@ -99,7 +99,6 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 				──────────────────────────────
 				• Alamat       : ${i.alamat}
 				• Currency     : ${i.curr}
-				• Klausula     : ${i.klausulaBank}
 				• Polis No     : ${i.polisNo}
 				• Sum Insured  : ${i.sumInsured}
 				• Premi        : ${i.premi}

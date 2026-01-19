@@ -72,8 +72,6 @@ class ShareParStateCubit extends Cubit<Map<String, AsetParCariModel>> {
         'ID': e.asetParId,
         'No. Polis': e.polisNo,
         'Alamat': e.alamat,
-        'Klausula Bank': e.klausulaBank,
-        'Mitra Rekanan ID': e.mrekanId,
         'Currency': e.curr,
         'Premi': e.premi,
         'Sum Insured': e.sumInsured,

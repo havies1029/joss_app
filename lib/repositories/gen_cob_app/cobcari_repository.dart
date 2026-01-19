@@ -7,4 +7,9 @@ class CobCariRepository {
 		CobCariAPI api = CobCariAPI();
 		return await api.getCobCariAPI();
 	}
+
+	Future<List<CobCariModel>> getCobManPolCari() async {
+		CobCariAPI api = CobCariAPI();
+		return await api.getCobManPolCariAPI();
+	}
 }

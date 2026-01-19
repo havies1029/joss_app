@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1crud_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1list_bloc.dart';
 import '../../../blocs/gen_calmv/calmv2form_bloc.dart';
 import '../../../blocs/gen_calmv/calmv3form_bloc.dart';
+import '../../../blocs/reguser/reguser_bloc.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
@@ -398,6 +400,22 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
   }
 
   Future<void> onLanjutkanPressed() async {
+    final authState = context.read<AuthenticationBloc>().state;
+    debugPrint('[Lanjutkan] authState=${authState.runtimeType}');
+    if (authState is AuthenticationAuthenticated) {
+      debugPrint('[Lanjutkan] userType=${authState.user.userType}');
+      if (authState.user.userType != "C") {
+        debugPrint('[Lanjutkan] dispatch RequireRegisterClient from=calmv_page');
+        context.read<AuthenticationBloc>().add(
+          RequireRegisterClient(
+            requiredFrom: 'calmv_page',
+          ),
+        );
+        return;
+      }
+    }
+
+    debugPrint('[Lanjutkan] dispatch CalMv2RegMvEvent calmv1Id=$calmv1Id');
     context.read<Calmv1ListBloc>().add(
       CalMv2RegMvEvent(calmv1Id: calmv1Id!),
     );

@@ -5,6 +5,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/gen_calmv/calmv1crud_bloc.dart';
 import 'package:joss_app/blocs/gen_calmv/calmv1list_bloc.dart';
 import 'package:joss_app/blocs/gen_calmv/calmv2form_bloc.dart';
+import 'package:joss_app/blocs/gen_cob_app/cobmanpol_bloc.dart';
 import 'package:joss_app/blocs/gen_dn1/dn1cari_bloc.dart';
 import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
@@ -105,6 +106,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'apis/payment/paymentdn_api.dart';
 import 'apis/payment/paymentmethodcari_api.dart';
+import 'blocs/asetothers/asetotherscari_bloc.dart';
 import 'blocs/calpar/calpar1crud_bloc.dart';
 import 'blocs/calpar/calpar1list_bloc.dart';
 import 'blocs/calpar/calpar2form_bloc.dart';
@@ -352,6 +354,8 @@ Future<void> main() async {
             create: (context) => AsetMvCariBloc()),
         BlocProvider<AsetHealthCariBloc>(
             create: (context) => AsetHealthCariBloc()),
+        BlocProvider<AsetothersCariBloc>(
+            create: (context) => AsetothersCariBloc()),
         BlocProvider<AsetDashboardCariBloc>(create: (context) => AsetDashboardCariBloc()),
         BlocProvider(create: (context) => Promo1CariBloc()),
         BlocProvider(create: (context) => Promo2CariBloc()),
@@ -416,6 +420,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => RegparUploadFotoObjectBloc(repository: RegparUploadFotoObjectRepository())),
         BlocProvider(create: (context) => RegparDownloadFotoObjectBloc(repository: RegparDownloadFotoObjectRepository())),
         BlocProvider(create: (context) => Regpar6CariBloc()),
+        BlocProvider(create: (context) => CobManPolBloc()),
      ],
       child: MultiBlocListener(
         listeners: [
@@ -789,10 +794,11 @@ class _AppState extends State<_App> {
             if (state is AuthenticationRequireLoginClient) {
               return const LoginClient();
             }
-
-            if (state is AuthenticationRequireRegisterClient) {
-              return const RegisterClient();
-            }
+            //
+            // if (state is AuthenticationRequireRegisterClient) {
+            //   debugPrint('[MAIN] show RegisterClient from=${state.requiredFrom}');
+            //   return RegisterClient(requestFrom: state.requiredFrom,);
+            // }
 
             if (state is AuthenticationForgotPassword) {
               // return const ForgotPasswordPage();
@@ -813,10 +819,20 @@ class _AppState extends State<_App> {
 
             if (state is AuthenticationPhonePinVerified) {
 
-              while (_navigatorKey.currentState?.canPop() ?? false) {
-                _navigatorKey.currentState?.pop();
+              String requestFrom = context.read<RegUserBloc>().state.requestFrom;
+              if (requestFrom == "calmv_page " || requestFrom == "calpar_page") {
+                debugPrint("Log out user");
+                // force login user
+                BlocProvider.of<AuthenticationBloc>(context).add(
+                  LoggedOut(),
+                );
+              }else{
+                while (_navigatorKey.currentState?.canPop() ?? false) {
+                  _navigatorKey.currentState?.pop();
+                }
+                context.read<AuthenticationBloc>().add(LoggedOut());
               }
-              context.read<AuthenticationBloc>().add(LoggedOut());
+
               return const LoadingIndicator();
             }
 
