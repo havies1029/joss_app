@@ -11,6 +11,7 @@ class AsethullCariModel {
 	String status;
 	double tsi;
 	int nomor;
+	String filePolisId;
 
 	AsethullCariModel({required this.asetHullId,
 		required this.tertanggung,
@@ -19,21 +20,22 @@ class AsethullCariModel {
 		required this.curr,
 		required this.namaKapal, required this.polisNo,
 		required this.premi, required this.status,
-		required this.tsi, required this.nomor});
+		required this.tsi, required this.nomor, required this.filePolisId});
 
 	factory AsethullCariModel.fromJson(Map<String, dynamic> data) {
 		return AsethullCariModel(
-				asetHullId: data['asetHullId']??'',
-				tertanggung: data['tertanggung']??'',
-				periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
-				periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
-				curr: data['curr']??'',
-				namaKapal: data['namaKapal']??'',
-				polisNo: data['polisNo']??'',
-				premi: double.tryParse(data['premi'].toString())??0,
-				status: data['status']??'',
-				tsi: double.tryParse(data['tsi'].toString())??0,
-				nomor: int.tryParse(data['nomor'].toString())??0
+			asetHullId: data['asetHullId']??'',
+			tertanggung: data['tertanggung']??'',
+			periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
+			periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
+			curr: data['curr']??'',
+			namaKapal: data['namaKapal']??'',
+			polisNo: data['polisNo']??'',
+			premi: double.tryParse(data['premi'].toString())??0,
+			status: data['status']??'',
+			tsi: double.tryParse(data['tsi'].toString())??0,
+			nomor: int.tryParse(data['nomor'].toString())??0,
+			filePolisId: data['filePolisId']??'',
 		);
 
 	}
@@ -49,7 +51,8 @@ class AsethullCariModel {
 				'premi': premi,
 				'tsi': tsi,
 				'status': status,
-				'nomor': nomor
+				'nomor': nomor,
+				'filePolisId': filePolisId,
 			};
 
 }

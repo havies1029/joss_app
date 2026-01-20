@@ -55,7 +55,6 @@ class AsetListHealth extends StatelessWidget {
       rowBuilder: (context, item, rowNumber, cubit) => [
         CellText("$rowNumber", center: true),
         CellText(item.nama),
-        CellText(item.benefit),
         // CellText(item.polisNo),
         // CellText(item.posisi, center: true),
         CellText(item.status, center: true),

@@ -84,6 +84,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
     super.initState();
     regpar2Bloc = context.read<Regpar2FormBloc>();
     kejadianBerakhirTgl = _years;
+    debugPrint("kejadianBerakhirTgl : ${kejadianBerakhirTgl.toString()}");
     // Future.microtask(_loadData);
   }
 
@@ -197,9 +198,9 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
 
     // Text Controllers
     // fieldCoverLamaController.text = record.coverLama.toString();
-    kejadianMulaiTgl = record.polisMulai;
     if (_isPayloadInjected){
       kejadianBerakhirTgl  = record.polisAkhir;
+      kejadianMulaiTgl = record.polisMulai;
     }
     fieldObjectAlamatController.text = record.objectAlamat.toString();
     // Dropdown Values
@@ -221,7 +222,7 @@ class RegparForm2SectionState extends State<RegparForm2Section> {
   Future<void> saveForm2() async {
     final record = Regpar2FormModel(
       // coverLama: int.parse(fieldCoverLamaController.text),
-      polisAkhir: kejadianBerakhirTgl ?? addOneYearSafe(_today),
+      polisAkhir: kejadianBerakhirTgl ?? _years,
       polisMulai: kejadianMulaiTgl ?? _today,
       regpar2Id: widget.regpar1Id! ?? widget.recordId!,
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,

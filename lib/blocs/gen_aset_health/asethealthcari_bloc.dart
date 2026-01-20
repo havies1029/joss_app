@@ -14,9 +14,14 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 		on<FetchAsetHealthCariEvent>(onFetchAsetHealthCari);
 		on<RefreshAsetHealthCariEvent>(onRefreshAsetHealthCari);
 		on<DebugFetchAsetHealthCariEvent>(_onDebugFetchAsetHealthCari);
+
 		on<SelectHealthDetailEvent>(onSelectDetail);
 		on<UnselectHealthDetailEvent>(onUnselectDetail);
 		on<ClearHealthSelectionEvent>(onClearSelection);
+
+		on<SelectPolisHealthDetailEvent>(onSelectPolisHealthDetail);
+		on<UnselectPolisHealthDetailEvent>(onUnselectPolisHealthDetail);
+		on<ClearPolisHealthSelectionEvent>(onClearPolisHealthSelection);
 	}
 
 	// 🔁 Normal Refresh (memperbarui tabel)
@@ -132,5 +137,34 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			) async {
 		if (state.selectedIds.isEmpty) return;
 		emit(state.copyWith(selectedIds: <String>{}));
+	}
+
+
+	Future<void> onSelectPolisHealthDetail(
+			SelectPolisHealthDetailEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: event.filePolisId,
+		));
+	}
+
+	Future<void> onUnselectPolisHealthDetail(
+			UnselectPolisHealthDetailEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
+	}
+
+	Future<void> onClearPolisHealthSelection(
+			ClearPolisHealthSelectionEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		if (state.selectedFilePolisId.isEmpty) return;
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
 	}
 }

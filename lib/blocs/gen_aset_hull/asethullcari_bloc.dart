@@ -14,9 +14,14 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 		on<FetchAsethullCariEvent>(onFetchAsethullCari);
 		on<RefreshAsethullCariEvent>(onRefreshAsethullCari);
 		on<DebugFetchAsethullCariEvent>(_onDebugFetchAsethullCari);
+
 		on<SelectHullDetailEvent>(onSelectDetail);
 		on<UnselectHullDetailEvent>(onUnselectDetail);
 		on<ClearHullSelectionEvent>(onClearSelection);
+
+		on<SelectPolisHullDetailEvent>(onSelectPolisHullrDetail);
+		on<UnselectPolisHullDetailEvent>(onUnselectPolisHullDetail);
+		on<ClearPolisHullSelectionEvent>(onClearPolisHullSelection);
 	}
 
 Future<void> onRefreshAsethullCari(
@@ -117,5 +122,33 @@ Future<void> onFetchAsethullCari(
 			) async {
 		if (state.selectedIds.isEmpty) return;
 		emit(state.copyWith(selectedIds: <String>{}));
+	}
+
+	Future<void> onSelectPolisHullrDetail(
+			SelectPolisHullDetailEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: event.filePolisId,
+		));
+	}
+
+	Future<void> onUnselectPolisHullDetail(
+			UnselectPolisHullDetailEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
+	}
+
+	Future<void> onClearPolisHullSelection(
+			ClearPolisHullSelectionEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		if (state.selectedFilePolisId.isEmpty) return;
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
 	}
 }

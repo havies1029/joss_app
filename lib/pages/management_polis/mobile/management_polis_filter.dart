@@ -455,7 +455,6 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
           .map((d) => {
         "No": d.nomor,
         "Nama": d.nama,
-        "Benefit": d.benefit,
         "Status": d.status,
       })
           .toList();

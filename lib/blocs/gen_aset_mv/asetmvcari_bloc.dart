@@ -14,9 +14,14 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		on<FetchAsetMvCariEvent>(onFetchAsetMvCari);
 		on<RefreshAsetMvCariEvent>(onRefreshAsetMvCari);
 		on<DebugFetchAsetMvCariEvent>(_onDebugFetchAsetMvCari);
+
 		on<SelectMvDetailEvent>(onSelectDetail);
 		on<UnselectMvDetailEvent>(onUnselectDetail);
 		on<ClearMvSelectionEvent>(onClearSelection);
+
+		on<SelectPolisMvDetailEvent>(onSelectPolisMvrDetail);
+		on<UnselectPolisMvDetailEvent>(onUnselectPolisMvDetail);
+		on<ClearPolisMvSelectionEvent>(onClearPolisMvSelection);
 	}
 
 	// 🔁 Normal Refresh
@@ -126,5 +131,33 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			) async {
 		if (state.selectedIds.isEmpty) return;
 		emit(state.copyWith(selectedIds: <String>{}));
+	}
+
+	Future<void> onSelectPolisMvrDetail(
+			SelectPolisMvDetailEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: event.filePolisId,
+		));
+	}
+
+	Future<void> onUnselectPolisMvDetail(
+			UnselectPolisMvDetailEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
+	}
+
+	Future<void> onClearPolisMvSelection(
+			ClearPolisMvSelectionEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		if (state.selectedFilePolisId.isEmpty) return;
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
 	}
 }

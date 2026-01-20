@@ -260,16 +260,6 @@ class _HealthCobTableState extends State<HealthCobTable> {
           ),
         ),
 
-        // Benefit
-        _cell(
-          child: Text(
-            d.benefit,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
         // Status
         // _cell(
         //   child: Center(

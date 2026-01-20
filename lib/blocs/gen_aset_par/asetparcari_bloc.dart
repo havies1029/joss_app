@@ -14,9 +14,18 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		on<FetchAsetParCariEvent>(onFetchAsetParCari);
 		on<RefreshAsetParCariEvent>(onRefreshAsetParCari);
 		on<DebugFetchAsetParCariEvent>(_onDebugFetchAsetParCari);
+
 		on<SelectDetailEvent>(onSelectDetail);
 		on<UnselectDetailEvent>(onUnselectDetail);
 		on<ClearParSelectionEvent>(onClearSelection);
+
+		on<SelectPolisParDetailEvent>(onSelectPolisParDetail);
+		on<UnselectPolisParDetailEvent>(onUnselectPolisParDetail);
+		on<ClearPolisParSelectionEvent>(onClearPolisParSelection);
+
+		on<SelectPolisEqDetailEvent>(onSelectPolisEqDetail);
+		on<UnselectPolisEqDetailEvent>(onUnselectPolisEqDetail);
+		on<ClearPolisEqSelectionEvent>(onClearPolisEqSelection);
 	}
 
 	Future<void> onRefreshAsetParCari(
@@ -141,4 +150,74 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		emit(state.copyWith(selectedIds: <String>{}));
 	}
 
+
+
+
+
+
+
+
+
+
+
+	Future<void> onSelectPolisParDetail(
+			SelectPolisParDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisParId: event.filePolisParId,
+		));
+	}
+
+
+
+	Future<void> onUnselectPolisParDetail(
+			UnselectPolisParDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisParId: "",
+		));
+	}
+
+	Future<void> onClearPolisParSelection(
+			ClearPolisParSelectionEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		if (state.selectedFilePolisParId.isEmpty) return;
+		emit(state.copyWith(
+			selectedFilePolisParId: "",
+		));
+	}
+
+
+
+
+	Future<void> onSelectPolisEqDetail(
+			SelectPolisEqDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisEqId: event.filePolisEqId,
+		));
+	}
+
+	Future<void> onUnselectPolisEqDetail(
+			UnselectPolisEqDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisEqId: "",
+		));
+	}
+
+	Future<void> onClearPolisEqSelection(
+			ClearPolisEqSelectionEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		if (state.selectedFilePolisEqId.isEmpty) return;
+		emit(state.copyWith(
+			selectedFilePolisEqId: "",
+		));
+	}
 }

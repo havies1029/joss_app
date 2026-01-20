@@ -59,3 +59,58 @@ class ClearParSelectionEvent extends AsetParCariEvents {
 	@override
 	List<Object> get props => [];
 }
+
+
+
+class SelectPolisParDetailEvent extends AsetParCariEvents {
+	final String filePolisParId;
+	const SelectPolisParDetailEvent(this.filePolisParId);
+
+	@override
+	List<Object> get props => [filePolisParId];
+}
+
+class UnselectPolisParDetailEvent extends AsetParCariEvents {
+	final String filePolisParId;
+	const UnselectPolisParDetailEvent(this.filePolisParId);
+
+	@override
+	List<Object> get props => [filePolisParId];
+}
+
+class ClearPolisParSelectionEvent extends AsetParCariEvents {
+	const ClearPolisParSelectionEvent();
+
+	@override
+	List<Object> get props => [];
+}
+
+
+
+
+
+
+class SelectPolisEqDetailEvent extends AsetParCariEvents {
+	final String filePolisEqId;
+	const SelectPolisEqDetailEvent(this.filePolisEqId);
+
+	@override
+	List<Object> get props => [filePolisEqId];
+}
+
+class UnselectPolisEqDetailEvent extends AsetParCariEvents {
+	final String filePolisEqId;
+	const UnselectPolisEqDetailEvent(this.filePolisEqId);
+
+	@override
+	List<Object> get props => [filePolisEqId];
+}
+
+class ClearPolisEqSelectionEvent extends AsetParCariEvents {
+	const ClearPolisEqSelectionEvent();
+
+	@override
+	List<Object> get props => [];
+}
+
+

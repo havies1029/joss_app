@@ -50,6 +50,7 @@ import 'package:joss_app/repositories/gen_regmv/regmv_download_stnk_repository.d
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_acc_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_foto_mobil_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_stnk_repository.dart';
+import 'package:joss_app/repositories/gen_sppamv/download_polis_repository.dart';
 import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
 import 'package:joss_app/repositories/payment/invbayarvaform_repository.dart';
@@ -142,6 +143,7 @@ import 'blocs/gen_regmv/regmv_download_foto_stnk_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
+import 'blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import 'blocs/gen_sppamv/sppamvcrud_bloc.dart';
 import 'blocs/gen_sppamv/sppamvlist_bloc.dart';
 import 'blocs/gen_sppapar/sppaparcrud_bloc.dart';
@@ -330,6 +332,8 @@ Future<void> main() async {
         BlocProvider(create: (context) => RegparDownloadFotoObjectBloc(repository: RegparDownloadFotoObjectRepository())),
         BlocProvider(create: (context) => Regpar6CariBloc()),
         BlocProvider(create: (context) => CobManPolBloc()),
+
+        BlocProvider(create:  (context) => SppaDownloadPolisBloc(repository: DownloadPolisRepository())),
      ],
       child: MultiBlocListener(
         listeners: [
