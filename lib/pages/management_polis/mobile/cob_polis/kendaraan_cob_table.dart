@@ -9,9 +9,13 @@ class KendaraanCobTable extends StatefulWidget {
   final List<String> selectedIds;
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
+
+  final Function(String id) onSelectFilePolisMvId;
+  final Function(String id) onUnselectFilePolisMvId;
+
   final bool readOnly;
-  final bool showFooter; // tetap ada biar kompatibel, tapi tidak dipakai
-  final String? title;   // optional kalau mau judul
+  final bool showFooter;
+  final String? title;
 
   const KendaraanCobTable({
     super.key,
@@ -19,6 +23,8 @@ class KendaraanCobTable extends StatefulWidget {
     required this.selectedIds,
     required this.onSelect,
     required this.onUnselect,
+    required this.onSelectFilePolisMvId,
+    required this.onUnselectFilePolisMvId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -236,8 +242,14 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
               onChanged: (checked) {
                 if (checked == true) {
                   widget.onSelect(d.asetMvId);
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisMvId(d.filePolisId);
+                  }
                 } else {
                   widget.onUnselect(d.asetMvId);
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisMvId(d.filePolisId);
+                  }
                 }
               },
               shape: RoundedRectangleBorder(

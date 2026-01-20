@@ -10,6 +10,10 @@ enum ActionType {
   lacakPolis,
   beliPolis,
   bayar,
+
+  lihatPolis,
+  lihatPolisPar,
+  lihatPolisEq,
 }
 
 class ActionMenuItem {

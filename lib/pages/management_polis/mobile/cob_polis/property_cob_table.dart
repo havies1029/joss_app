@@ -9,6 +9,13 @@ class PropertyCobTable extends StatefulWidget {
   final List<String> selectedIds;
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
+
+  final Function(String id) onSelectFilePolisParId;
+  final Function(String id) onUnselectFilePolisParId;
+
+  final Function(String id) onSelectFilePolisEqId;
+  final Function(String id) onUnselectFilePolisEqId;
+
   final bool readOnly;
   final bool showFooter;
   final String? title;
@@ -19,6 +26,10 @@ class PropertyCobTable extends StatefulWidget {
     required this.selectedIds,
     required this.onSelect,
     required this.onUnselect,
+    required this.onSelectFilePolisParId,
+    required this.onUnselectFilePolisParId,
+    required this.onSelectFilePolisEqId,
+    required this.onUnselectFilePolisEqId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -234,8 +245,20 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
               onChanged: (checked) {
                 if (checked == true) {
                   widget.onSelect(d.asetParId);
+                  if (d.filePolisParId.isNotEmpty) {
+                    widget.onSelectFilePolisParId(d.filePolisParId);
+                  }
+                  if (d.filePolisEqId.isNotEmpty) {
+                    widget.onSelectFilePolisEqId(d.filePolisEqId);
+                  }
                 } else {
                   widget.onUnselect(d.asetParId);
+                  if (d.filePolisParId.isNotEmpty) {
+                    widget.onUnselectFilePolisParId(d.filePolisParId);
+                  }
+                  if (d.filePolisEqId.isNotEmpty) {
+                    widget.onUnselectFilePolisEqId(d.filePolisEqId);
+                  }
                 }
               },
               shape: RoundedRectangleBorder(

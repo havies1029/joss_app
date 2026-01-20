@@ -42,3 +42,26 @@ class ClearOthersSelectionEvent extends AsetothersCariEvents {
 	@override
 	List<Object> get props => [];
 }
+
+class SelectPolisOthersDetailEvent extends AsetothersCariEvents {
+	final String filePolisId;
+	const SelectPolisOthersDetailEvent(this.filePolisId);
+
+	@override
+	List<Object> get props => [filePolisId];
+}
+
+class UnselectPolisOthersDetailEvent extends AsetothersCariEvents {
+	final String filePolisId;
+	const UnselectPolisOthersDetailEvent(this.filePolisId);
+
+	@override
+	List<Object> get props => [filePolisId];
+}
+
+class ClearPolisOthersSelectionEvent extends AsetothersCariEvents {
+	const ClearPolisOthersSelectionEvent();
+
+	@override
+	List<Object> get props => [];
+}

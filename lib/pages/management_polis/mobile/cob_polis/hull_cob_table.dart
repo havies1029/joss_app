@@ -10,9 +10,13 @@ class HullCobTable extends StatefulWidget {
   final List<String> selectedIds;
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
+
+  final Function(String id) onSelectFilePolisHullId;
+  final Function(String id) onUnselectFilePolisHullId;
+
   final bool readOnly;
-  final bool showFooter; // tetap ada biar kompatibel, tapi tidak dipakai
-  final String? title;   // optional kalau mau judul
+  final bool showFooter;
+  final String? title;
 
   const HullCobTable({
     super.key,
@@ -20,6 +24,8 @@ class HullCobTable extends StatefulWidget {
     required this.selectedIds,
     required this.onSelect,
     required this.onUnselect,
+    required this.onSelectFilePolisHullId,
+    required this.onUnselectFilePolisHullId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -228,8 +234,14 @@ class _HullCobTableState extends State<HullCobTable> {
               onChanged: (checked) {
                 if (checked == true) {
                   widget.onSelect(d.asetHullId);
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisHullId(d.filePolisId);
+                  }
                 } else {
                   widget.onUnselect(d.asetHullId);
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisHullId(d.filePolisId);
+                  }
                 }
               },
               shape: RoundedRectangleBorder(

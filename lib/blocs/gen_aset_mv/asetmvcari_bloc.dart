@@ -19,7 +19,7 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		on<UnselectMvDetailEvent>(onUnselectDetail);
 		on<ClearMvSelectionEvent>(onClearSelection);
 
-		on<SelectPolisMvDetailEvent>(onSelectPolisMvrDetail);
+		on<SelectPolisMvDetailEvent>(onSelectPolisMvDetail);
 		on<UnselectPolisMvDetailEvent>(onUnselectPolisMvDetail);
 		on<ClearPolisMvSelectionEvent>(onClearPolisMvSelection);
 	}
@@ -133,7 +133,7 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		emit(state.copyWith(selectedIds: <String>{}));
 	}
 
-	Future<void> onSelectPolisMvrDetail(
+	Future<void> onSelectPolisMvDetail(
 			SelectPolisMvDetailEvent event,
 			Emitter<AsetMvCariState> emit,
 			) async {
