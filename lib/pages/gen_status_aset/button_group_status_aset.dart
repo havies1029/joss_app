@@ -53,13 +53,26 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
             });
           }
 
-          // urutan sesuai desain (kalau ada di items)
-          final order = ["Semua", "Aktif", "Non Aktif", "Diproses", "Berakhir", "Jatuh Tempo"];
-          final items = [...state.items]..sort((a, b) {
-            final ia = order.indexOf(a.statusNama);
-            final ib = order.indexOf(b.statusNama);
-            return (ia == -1 ? 999 : ia).compareTo(ib == -1 ? 999 : ib);
-          });
+          final allowedIds = {"10001", "10002", "10003", "10004"};
+
+          final items = state.items
+              .where((e) => allowedIds.contains(e.mstatusasetId))
+              .toList();
+
+          String _statusNama(String id) {
+            switch (id) {
+              case "10001":
+                return "Aktif";
+              case "10003":
+                return "Non Aktif";
+              case "10002":
+                return "Diproses";
+              case "10004":
+                return "Jatuh Tempo";
+              default:
+                return "";
+            }
+          }
 
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -77,7 +90,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
                   padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
                   child: StatusChip(
                     assetPath: type?.asset ?? "assets/icons/no_data.svg", // fallback
-                    label: status.statusNama,
+                    label: _statusNama(id),
                     iconColor: type?.color ?? sGrey,
                     isSelected: isSelected,
                     onTap: () {

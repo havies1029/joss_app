@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import '../pages/asset_management/mobile/widget/detail_management_page/detail_management_widget.dart';
-import '../pages/asset_management/floating_action_menu_widget.dart';
+import 'package:joss_app/pages/management_polis/detail_management_page/detail_management_widget.dart';
+// import '../pages/asset_management/mobile/widget/detail_management_page/detail_management_widget.dart';
+// import '../pages/asset_management/floating_action_menu_widget.dart';
 import '../pages/beli_polis/mobile/beli_polis_page.dart';
 import '../pages/gen_endors/endors1crud_form.dart';
+import '../pages/management_polis/floating_action_menu_widget.dart';
 
 class FabActionHelper {
   static final List<ActionMenuItem> masterActions = [

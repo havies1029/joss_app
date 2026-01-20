@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../../../helper/fab_action_helper.dart';
 import '../../../../../../widgets/EmptyStateWidget.dart';
-import '../asset_management/floating_action_menu_widget.dart';
+import '../management_polis/floating_action_menu_widget.dart';
 
 typedef OnRowTapCallback<T> = void Function(T item, int rowIndex);
 

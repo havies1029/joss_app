@@ -39,12 +39,12 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
     if (items.isEmpty) {
       return emit(state.copyWith(hasReachedMax: true));
     } else {
-      List<CobCariModel> cobCari = List.of(state.items)..addAll(items);
+      List<CobCariModel> cobManPol = List.of(state.items)..addAll(items);
 
-      final result = cobCari
+      final result = cobManPol
           .whereWithIndex((e, index) =>
-      cobCari.indexWhere((e2) => e2.mCobApp1Id == e.mCobApp1Id) ==
-          index)
+              cobManPol.indexWhere((e2) => e2.mCobApp1Id == e.mCobApp1Id) ==
+              index)
           .toList();
 
       return emit(state.copyWith(
@@ -56,9 +56,9 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
   }
 
   Future<void> onSelectButton(
-      SelectButton event, Emitter<CobManPolState> emit) async {
-    emit(state.copyWith(
-      selectedCOBId: event.id,
-    ));
-  }
+    SelectButton event, Emitter<CobManPolState> emit) async {
+      emit(state.copyWith(
+        selectedCOBId: event.id,
+      ));
+    }
 }

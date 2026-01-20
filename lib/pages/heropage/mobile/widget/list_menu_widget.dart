@@ -6,7 +6,6 @@ import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../aset/aset_cari.dart';
-import '../../../asset_management/mobile/asset_management_page.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
@@ -343,7 +342,7 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Polis':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => AssetManagementPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
         break;
 
       // case 'Bantuan':

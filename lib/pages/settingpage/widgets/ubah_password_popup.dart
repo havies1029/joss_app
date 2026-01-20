@@ -358,7 +358,7 @@ class _PasswordRequirementRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          checked ? Icons.check_circle : Icons.radio_button_unchecked,
+          checked ? Icons.radio_button_checked : Icons.radio_button_unchecked,
           size: 15,
           color: checked ? primaryColor : hintGrey,
         ),

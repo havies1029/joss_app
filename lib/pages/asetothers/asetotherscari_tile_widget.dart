@@ -3,22 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:joss_app/widgets/my_colors.dart';
 import 'package:joss_app/widgets/my_text.dart';
 
-class AsetParCariTileWidget extends StatelessWidget {
-	final String alamat;
-	final String asetParId;
+class AsetothersCariTileWidget extends StatelessWidget {
+	final String asetOthersId;
 	final String curr;
 	final int nomor;
+	final String objectDesc;
 	final String polisNo;
 	final double premi;
 	final String status;
 	final double sumInsured;
 
-	const AsetParCariTileWidget(
+	const AsetothersCariTileWidget(
 		{super.key,
-		required this.alamat, 
-		required this.asetParId, 
-		required this.curr,
+		required this.asetOthersId, 
+		required this.curr, 
 		required this.nomor, 
+		required this.objectDesc, 
 		required this.polisNo, 
 		required this.premi, 
 		required this.status, 
@@ -40,21 +40,12 @@ class AsetParCariTileWidget extends StatelessWidget {
 				child: Column(
 					crossAxisAlignment: CrossAxisAlignment.start,
 					children: [
-						Text("alamat",
+						Text("asetOthersId",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							alamat,
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("asetParId",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							asetParId,
+							asetOthersId,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
@@ -73,6 +64,15 @@ class AsetParCariTileWidget extends StatelessWidget {
 						Container(height: 5),
 						Text(
 							NumberFormat("#,###").format(nomor),
+							style: MyText.bodyLarge(context)!
+								.copyWith(color: MyColors.grey_80)),
+						Container(height: 10),
+						Text("objectDesc",
+							style: MyText.bodyLarge(context)!
+								.copyWith(color: MyColors.grey_40)),
+						Container(height: 5),
+						Text(
+							objectDesc,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),

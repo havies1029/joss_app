@@ -43,7 +43,7 @@ class _StatusChipState extends State<StatusChip> {
         iconPath = "assets/icons/aktif_hover.svg";
       } else if (widget.label.toLowerCase().contains("non")) {
         iconPath = "assets/icons/nonaktif_hover.svg";
-      } else if (widget.label.toLowerCase().contains("proses")) {
+      } else if (widget.label.toLowerCase().contains("diproses")) {
         iconPath = "assets/icons/diproses_hover.svg";
       } else if (widget.label.toLowerCase().contains("jatuh tempo")) {
         iconPath = "assets/icons/jatuhtempo_hover.svg";
@@ -75,7 +75,7 @@ class _StatusChipState extends State<StatusChip> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SvgPicture.asset(
-                    iconPath, // ✅ otomatis berubah sesuai isSelected
+                    iconPath,
                     width: widget.iconSize,
                     height: widget.iconSize,
                   ),
@@ -102,7 +102,7 @@ class _StatusChipState extends State<StatusChip> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: primaryColor,
+                    color: widget.isSelected ? pGrey : primaryColor,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(6),
                       topRight: Radius.circular(6),

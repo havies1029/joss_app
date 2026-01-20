@@ -19,7 +19,7 @@ class ArtikelDetailPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        title: Material(
+        leading: Material(
           color: pGrey,
           borderRadius: BorderRadius.circular(6.67),
           child: InkWell(
