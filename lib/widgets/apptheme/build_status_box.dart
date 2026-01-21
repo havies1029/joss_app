@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 
 class StatusChip extends StatefulWidget {
-  final String assetPath;
+  final String statusId;
   final String label;
   final String? count;
-  final Color iconColor;
   final bool isSelected;
   final VoidCallback onTap;
   final double height;
@@ -14,10 +13,9 @@ class StatusChip extends StatefulWidget {
 
   const StatusChip({
     super.key,
-    required this.assetPath,
+    required this.statusId,
     required this.label,
     this.count,
-    required this.iconColor,
     this.isSelected = false,
     required this.onTap,
     this.height = 34,
@@ -31,24 +29,49 @@ class StatusChip extends StatefulWidget {
 class _StatusChipState extends State<StatusChip> {
   bool _isPressed = false;
 
+  String _normalIconByStatusId(String id) {
+    switch (id) {
+      case "10001":
+        return "assets/icons/aktif.svg";
+      case "10002":
+        return "assets/icons/diproses.svg";
+      case "10003":
+        return "assets/icons/nonaktif.svg";
+      case "10004":
+          return "assets/icons/jatuhtempo.svg";
+      default:
+        return "assets/icons/no_data.svg";
+    }
+  }
+
+  String _activeIconByStatusId(String id) {
+    switch (id) {
+      case "10001":
+        return "assets/icons/aktif_hover.svg";
+      case "10002":
+        return "assets/icons/diproses_hover.svg";
+      case "10003":
+        return "assets/icons/nonaktif_hover.svg";
+      case "10004":
+        return "assets/icons/jatuhtempo_hover.svg";
+      default:
+        return "assets/icons/no_data.svg";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bool isJatuhTempo =
-    widget.label.toLowerCase().contains("jatuh tempo");
+    final bool isJatuhTempo = widget.statusId == "10004";
 
-    // 🔹 Tentukan path icon aktif vs non-aktif
-    String iconPath = widget.assetPath;
-    if (widget.isSelected) {
-      if (widget.label.toLowerCase().contains("aktif")) {
-        iconPath = "assets/icons/aktif_hover.svg";
-      } else if (widget.label.toLowerCase().contains("non")) {
-        iconPath = "assets/icons/nonaktif_hover.svg";
-      } else if (widget.label.toLowerCase().contains("diproses")) {
-        iconPath = "assets/icons/diproses_hover.svg";
-      } else if (widget.label.toLowerCase().contains("jatuh tempo")) {
-        iconPath = "assets/icons/jatuhtempo_hover.svg";
-      }
-    }
+    // 🔥 INI INTI: icon normal/active sama-sama ditentukan dari statusId
+    final String iconPath = widget.isSelected
+        ? _activeIconByStatusId(widget.statusId)
+        : _normalIconByStatusId(widget.statusId);
+
+    final String textLabel =
+    (widget.count != null && widget.count!.isNotEmpty)
+        ? "${widget.label} (${widget.count})"
+        : widget.label;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -56,18 +79,19 @@ class _StatusChipState extends State<StatusChip> {
       onTapCancel: () => setState(() => _isPressed = false),
       onTap: widget.onTap,
       child: AnimatedScale(
-        scale: 1,
-        duration: const Duration(milliseconds: 150),
+        scale: _isPressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // 🔹 Container utama
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               height: widget.height,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
+                // kalau kamu mau warna ikut selected, keep ini.
+                // kalau mau warna tetap, ganti jadi: color: pGrey,
                 color: widget.isSelected ? primaryColor : pGrey,
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -81,26 +105,20 @@ class _StatusChipState extends State<StatusChip> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    widget.count != null && widget.count!.isNotEmpty
-                        ? "${widget.label} (${widget.count})"
-                        : widget.label,
+                    textLabel,
                     style: bodyTextStyle(context, fontSize: 13.2),
                   ),
                 ],
               ),
             ),
 
-            // 🔹 Badge khusus Jatuh Tempo
             if (isJatuhTempo)
               Positioned(
                 top: -8,
                 right: -2,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 2,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
                     color: widget.isSelected ? pGrey : primaryColor,
                     borderRadius: const BorderRadius.only(

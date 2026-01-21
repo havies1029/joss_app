@@ -37,6 +37,19 @@ class HullCobTable extends StatefulWidget {
 
 class _HullCobTableState extends State<HullCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  late final ScrollController hController;
+
+  @override
+  void initState() {
+    super.initState();
+    hController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
 
   List<AsethullCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
@@ -85,7 +98,10 @@ class _HullCobTableState extends State<HullCobTable> {
     );
   }
 
-  Widget _buildDetailTableCompact(BuildContext context, List<AsethullCariModel> details) {
+  Widget _buildDetailTableCompact(
+      BuildContext context,
+      List<AsethullCariModel> details,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
@@ -101,40 +117,57 @@ class _HullCobTableState extends State<HullCobTable> {
             bottom: BorderSide(color: sGrey, width: 1),
           ),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey, width: 1),
-              verticalInside: BorderSide(color: sGrey, width: 1),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            columnWidths: {
-              0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
-              1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(190), // Tertanggung
-              3: const FixedColumnWidth(290), // Detail Rangka Kapal
-              4: const FixedColumnWidth(210), // Nilai Tertanggung
-              5: const FixedColumnWidth(130), // Premi
-              // 6: const FixedColumnWidth(110), // Status
-            },
-            children: [
-              _tableHeader(context, [
-                "",
-                "No",
-                "Tertanggung",
-                "Detail Rangka Kapal",
-                "Nilai Tertanggung",
-                "Premi",
-                // "Status",
-              ]),
-              ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-                context,
-                e.value,
-                e.key,
-                compact: true,
-              )),
-            ],
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey, width: 1),
+                  verticalInside: BorderSide(color: sGrey, width: 1),
+                ),
+                columnWidths: {
+                  0: widget.readOnly
+                      ? const FixedColumnWidth(0)
+                      : const FixedColumnWidth(40), // checkbox
+                  1: const FixedColumnWidth(50),  // No
+                  2: const FixedColumnWidth(190), // Tertanggung
+                  3: const FixedColumnWidth(290), // Detail Rangka Kapal
+                  4: const FixedColumnWidth(210), // Nilai Tertanggung
+                  5: const FixedColumnWidth(130), // Premi
+                },
+                children: [
+                  _tableHeader(context, [
+                    "",
+                    "No",
+                    "Tertanggung",
+                    "Detail Rangka Kapal",
+                    "Nilai Tertanggung",
+                    "Premi",
+                  ]),
+                  ...details.asMap().entries.map(
+                        (e) => _detailRowWithCheckbox(
+                      context,
+                      e.value,
+                      e.key,
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

@@ -227,6 +227,10 @@ flutter:
     - assets/icons/jatuhtempo_hover.svg
     - assets/icons/nonaktif_hover.svg
     - assets/icons/aktifkan_kembali.svg
+    - assets/icons/aktif.svg
+    - assets/icons/diproses.svg
+    - assets/icons/nonaktif.svg
+    - assets/icons/jatuhtempo.svg
     - assets/icons/lacak_polis.svg
     - assets/icons/unduh_polis.svg
     - assets/icons/perpanjangan.svg

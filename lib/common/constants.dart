@@ -80,6 +80,7 @@ const Color pGrey = Color(0xFF292929);
 const Color sGrey = Color(0xFF4E4E4E);
 const Color hintGrey = Color(0xFFBCBCBC);
 const Color unselectedColor = Color(0xFF666666);
+const Color scrollBar = Color(0xFFD9D9D9);
 
 const Color bGrey = Color(0xFFA1A1AA);
 const Color bdGrey = Color(0xFFBCBCC7);

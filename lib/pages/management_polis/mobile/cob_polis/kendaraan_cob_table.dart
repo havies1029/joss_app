@@ -36,7 +36,19 @@ class KendaraanCobTable extends StatefulWidget {
 
 class _KendaraanCobTableState extends State<KendaraanCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  late final ScrollController hController;
 
+  @override
+  void initState() {
+    super.initState();
+    hController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
   List<AsetMvCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items.where((d) => widget.selectedIds.contains(d.asetMvId)).toList();
@@ -84,7 +96,10 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     );
   }
 
-  Widget _buildDetailTableCompact(BuildContext context, List<AsetMvCariModel> details) {
+  Widget _buildDetailTableCompact(
+      BuildContext context,
+      List<AsetMvCariModel> details,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
@@ -100,44 +115,63 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
             bottom: BorderSide(color: sGrey, width: 1),
           ),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey, width: 1),
-              verticalInside: BorderSide(color: sGrey, width: 1),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            columnWidths: {
-              0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
-              1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(170), // Tertanggung
-              3: const FixedColumnWidth(145), // Periode Mulai (disamain)
-              4: const FixedColumnWidth(145), // Periode Akhir (disamain)
-              5: const FixedColumnWidth(130), // Merk Kendaraan (+10)
-              6: const FixedColumnWidth(170), // Nomor Polisi
-              7: const FixedColumnWidth(130), // Nilai Tertanggung
-              8: const FixedColumnWidth(110), // Premi
-            },
-            children: [
-              _tableHeader(context, [
-                "",
-                "No",
-                "Tertanggung",
-                "Periode Mulai",
-                "Periode Akhir",
-                "Merk Kendaraan",
-                "Nomor Polisi",
-                "Nilai Tertanggung",
-                "Premi",
-              ]),
-              ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-                context,
-                e.value,
-                e.key,
-                compact: true,
-              )),
-            ],
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey, width: 1),
+                  verticalInside: BorderSide(color: sGrey, width: 1),
+                ),
+                columnWidths: {
+                  0: widget.readOnly
+                      ? const FixedColumnWidth(0)
+                      : const FixedColumnWidth(40), // checkbox
+                  1: const FixedColumnWidth(50),  // No
+                  2: const FixedColumnWidth(170), // Tertanggung
+                  3: const FixedColumnWidth(145), // Periode Mulai
+                  4: const FixedColumnWidth(145), // Periode Akhir
+                  5: const FixedColumnWidth(130), // Merk Kendaraan
+                  6: const FixedColumnWidth(170), // Nomor Polisi
+                  7: const FixedColumnWidth(130), // Nilai Tertanggung
+                  8: const FixedColumnWidth(110), // Premi
+                },
+                children: [
+                  _tableHeader(context, [
+                    "",
+                    "No",
+                    "Tertanggung",
+                    "Periode Mulai",
+                    "Periode Akhir",
+                    "Merk Kendaraan",
+                    "Nomor Polisi",
+                    "Nilai Tertanggung",
+                    "Premi",
+                  ]),
+                  ...details.asMap().entries.map(
+                        (e) => _detailRowWithCheckbox(
+                      context,
+                      e.value,
+                      e.key,
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

@@ -157,6 +157,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   height: 400,
                   child: BlocBuilder<AsetRingkasanCariBloc, AsetRingkasanCariState>(
                     builder: (context, ringkasanState) {
+                      var stateStatus = statusAsetBloc.state;
+
                       if (ringkasanState.status == ListStatus.initial) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -165,7 +167,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                       }
 
                       if (ringkasanState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return EmptyStateWidget(statusId: stateStatus.selectedStatusId);
                       }
 
                       return RingkasanCobTable(
@@ -180,6 +182,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   height: 400,
                   child: BlocBuilder<AsetParCariBloc, AsetParCariState>(
                     builder: (context, parState) {
+                      var stateStatus = statusAsetBloc.state;
+
                       if (parState.status == ListStatus.initial) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -188,7 +192,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                       }
 
                       if (parState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return EmptyStateWidget(statusId: stateStatus.selectedStatusId);
                       }
 
                       return PropertyCobTable(
@@ -211,6 +215,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   height: 400,
                   child: BlocBuilder<AsetMvCariBloc, AsetMvCariState>(
                     builder: (context, mvState) {
+                      var stateStatus = statusAsetBloc.state;
+
                       if (mvState.status == ListStatus.initial) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -218,7 +224,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (mvState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return EmptyStateWidget(statusId: stateStatus.selectedStatusId);
                       }
 
                       return KendaraanCobTable(
@@ -239,6 +245,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   height: 400,
                   child: BlocBuilder<AsethullCariBloc, AsethullCariState>(
                     builder: (context, HullState) {
+                      var stateStatus = statusAsetBloc.state;
+
                       if (HullState.status == ListStatus.initial) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -247,7 +255,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                             'Failed to fetch data'));
                       }
                       if (HullState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return EmptyStateWidget(statusId: stateStatus.selectedStatusId);
                       }
 
                       return HullCobTable(
@@ -268,6 +276,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   height: 400,
                   child: BlocBuilder<AsetHealthCariBloc, AsetHealthCariState>(
                     builder: (context, healthState) {
+                      var stateStatus = statusAsetBloc.state;
+
                       if (healthState.status == ListStatus.initial) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -275,7 +285,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (healthState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return EmptyStateWidget(statusId: stateStatus.selectedStatusId);
                       }
 
                       return HealthCobTable(
@@ -296,6 +306,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   height: 400,
                   child: BlocBuilder<AsetothersCariBloc, AsetothersCariState>(
                     builder: (context, othersState) {
+                      var stateStatus = statusAsetBloc.state;
+
                       if (othersState.status == ListStatus.initial) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -303,7 +315,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (othersState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return EmptyStateWidget(statusId: stateStatus.selectedStatusId);
                       }
 
                       return KargoCobTable(

@@ -36,6 +36,19 @@ class HealthCobTable extends StatefulWidget {
 
 class _HealthCobTableState extends State<HealthCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  late final ScrollController hController;
+
+  @override
+  void initState() {
+    super.initState();
+    hController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
 
   List<AsetHealthCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
@@ -84,7 +97,10 @@ class _HealthCobTableState extends State<HealthCobTable> {
     );
   }
 
-  Widget _buildDetailTableCompact(BuildContext context, List<AsetHealthCariModel> details) {
+  Widget _buildDetailTableCompact(
+      BuildContext context,
+      List<AsetHealthCariModel> details,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
@@ -100,41 +116,59 @@ class _HealthCobTableState extends State<HealthCobTable> {
             bottom: BorderSide(color: sGrey, width: 1),
           ),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey, width: 1),
-              verticalInside: BorderSide(color: sGrey, width: 1),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            columnWidths: {
-              0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
-              1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(250), // Nama
-              3: const FixedColumnWidth(290), // Benefit
-              // 4: const FixedColumnWidth(110), // Status
-            },
-            children: [
-              _tableHeader(context, [
-                "",
-                "No",
-                "Nama",
-                "Benefit",
-                // "Status",
-              ]),
-              ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-                context,
-                e.value,
-                e.key,
-                compact: true,
-              )),
-            ],
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey, width: 1),
+                  verticalInside: BorderSide(color: sGrey, width: 1),
+                ),
+                columnWidths: {
+                  0: widget.readOnly
+                      ? const FixedColumnWidth(0)
+                      : const FixedColumnWidth(40), // checkbox
+                  1: const FixedColumnWidth(50),  // No
+                  2: const FixedColumnWidth(250), // Nama
+                  3: const FixedColumnWidth(290), // Benefit
+                },
+                children: [
+                  _tableHeader(context, [
+                    "",
+                    "No",
+                    "Nama",
+                    "Benefit",
+                  ]),
+                  ...details.asMap().entries.map(
+                        (e) => _detailRowWithCheckbox(
+                      context,
+                      e.value,
+                      e.key,
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildDetailTableNormal(BuildContext context, List<AsetHealthCariModel> details) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");

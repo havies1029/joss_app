@@ -36,6 +36,19 @@ class KargoCobTable extends StatefulWidget {
 
 class _KargoCobTableState extends State<KargoCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  late final ScrollController hController;
+
+  @override
+  void initState() {
+    super.initState();
+    hController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
 
   List<AsetothersCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
@@ -79,7 +92,9 @@ class _KargoCobTableState extends State<KargoCobTable> {
   }
 
   Widget _buildDetailTableCompact(
-      BuildContext context, List<AsetothersCariModel> details) {
+      BuildContext context,
+      List<AsetothersCariModel> details,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail");
 
     return ClipRRect(
@@ -95,47 +110,65 @@ class _KargoCobTableState extends State<KargoCobTable> {
             bottom: BorderSide(color: sGrey, width: 1),
           ),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey, width: 1),
-              verticalInside: BorderSide(color: sGrey, width: 1),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            columnWidths: {
-              0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
-              1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(310), // Object Desc
-              3: const FixedColumnWidth(180), // Polis No
-              4: const FixedColumnWidth(80),  // Curr
-              5: const FixedColumnWidth(200), // Sum Insured
-              6: const FixedColumnWidth(140), // Premi
-              // 7: const FixedColumnWidth(110), // Status
-            },
-            children: [
-              _tableHeader(context, [
-                "",
-                "No",
-                "Object",
-                "Polis No",
-                "Curr",
-                "Sum Insured",
-                "Premi",
-                // "Status",
-              ]),
-              ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-                context,
-                e.value,
-                e.key,
-                compact: true,
-              )),
-            ],
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey, width: 1),
+                  verticalInside: BorderSide(color: sGrey, width: 1),
+                ),
+                columnWidths: {
+                  0: widget.readOnly
+                      ? const FixedColumnWidth(0)
+                      : const FixedColumnWidth(40), // checkbox
+                  1: const FixedColumnWidth(50),  // No
+                  2: const FixedColumnWidth(310), // Object Desc
+                  3: const FixedColumnWidth(180), // Polis No
+                  4: const FixedColumnWidth(80),  // Curr
+                  5: const FixedColumnWidth(200), // Sum Insured
+                  6: const FixedColumnWidth(140), // Premi
+                },
+                children: [
+                  _tableHeader(context, [
+                    "",
+                    "No",
+                    "Object",
+                    "Polis No",
+                    "Curr",
+                    "Sum Insured",
+                    "Premi",
+                  ]),
+                  ...details.asMap().entries.map(
+                        (e) => _detailRowWithCheckbox(
+                      context,
+                      e.value,
+                      e.key,
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildDetailTableNormal(
       BuildContext context, List<AsetothersCariModel> details) {

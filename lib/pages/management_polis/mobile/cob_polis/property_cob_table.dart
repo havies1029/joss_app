@@ -41,6 +41,19 @@ class PropertyCobTable extends StatefulWidget {
 
 class _PropertyCobTableState extends State<PropertyCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  late final ScrollController hController;
+
+  @override
+  void initState() {
+    super.initState();
+    hController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
 
   List<AsetParCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
@@ -89,7 +102,10 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
-  Widget _buildDetailTableCompact(BuildContext context, List<AsetParCariModel> details) {
+  Widget _buildDetailTableCompact(
+      BuildContext context,
+      List<AsetParCariModel> details,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
@@ -105,48 +121,67 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             bottom: BorderSide(color: sGrey, width: 1),
           ),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey, width: 1),
-              verticalInside: BorderSide(color: sGrey, width: 1),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            columnWidths: {
-              0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40), // checkbox
-              1: const FixedColumnWidth(50),  // No
-              2: const FixedColumnWidth(170), // Tertanggung
-              3: const FixedColumnWidth(240), // Alamat (+20)
-              4: const FixedColumnWidth(145), // Periode Mulai (disamain)
-              5: const FixedColumnWidth(145), // Periode Akhir (disamain)
-              6: const FixedColumnWidth(150), // Nilai Pertanggungan (+20)
-              7: const FixedColumnWidth(110), // Premi
-            },
-            children: [
-              _tableHeader(context, [
-                "",
-                "No",
-                "Tertanggung",
-                "Alamat",
-                "Periode Mulai",
-                "Periode Akhir",
-                "Nilai Pertanggungan",
-                "Premi",
-                // "Status",
-              ]),
-              ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-                context,
-                e.value,
-                e.key,
-                compact: true,
-              )),
-            ],
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey, width: 1),
+                  verticalInside: BorderSide(color: sGrey, width: 1),
+                ),
+                columnWidths: {
+                  0: widget.readOnly
+                      ? const FixedColumnWidth(0)
+                      : const FixedColumnWidth(40), // checkbox
+                  1: const FixedColumnWidth(50),  // No
+                  2: const FixedColumnWidth(170), // Tertanggung
+                  3: const FixedColumnWidth(240), // Alamat
+                  4: const FixedColumnWidth(145), // Periode Mulai
+                  5: const FixedColumnWidth(145), // Periode Akhir
+                  6: const FixedColumnWidth(150), // Nilai Pertanggungan
+                  7: const FixedColumnWidth(110), // Premi
+                },
+                children: [
+                  _tableHeader(context, [
+                    "",
+                    "No",
+                    "Tertanggung",
+                    "Alamat",
+                    "Periode Mulai",
+                    "Periode Akhir",
+                    "Nilai Pertanggungan",
+                    "Premi",
+                  ]),
+                  ...details.asMap().entries.map(
+                        (e) => _detailRowWithCheckbox(
+                      context,
+                      e.value,
+                      e.key,
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildDetailTableNormal(BuildContext context, List<AsetParCariModel> details) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");

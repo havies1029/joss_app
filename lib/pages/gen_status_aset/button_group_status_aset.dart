@@ -89,9 +89,8 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
                 return Padding(
                   padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
                   child: StatusChip(
-                    assetPath: type?.asset ?? "assets/icons/no_data.svg", // fallback
+                    statusId: id,
                     label: _statusNama(id),
-                    iconColor: type?.color ?? sGrey,
                     isSelected: isSelected,
                     onTap: () {
                       context.read<StatusAsetCariBloc>().add(SelectButton(id));

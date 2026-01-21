@@ -23,6 +23,19 @@ class RingkasanCobTable extends StatefulWidget {
 
 class _RingkasanCobTableState extends State<RingkasanCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  late final ScrollController hController;
+
+  @override
+  void initState() {
+    super.initState();
+    hController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +81,7 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
     );
   }
 
+
   Widget _buildDetailTableCompact(
       BuildContext context,
       List<AsetRingkasanCariModel> details,
@@ -87,49 +101,66 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
             bottom: BorderSide(color: sGrey, width: 1),
           ),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey, width: 1),
-              verticalInside: BorderSide(color: sGrey, width: 1),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1), // <-- 30% opacity
             ),
-            columnWidths: const {
-              0: FixedColumnWidth(60),  // No
-              1: FixedColumnWidth(220), // Jenis Polis (asetNama)
-              2: FixedColumnWidth(110), // Currency
-              3: FixedColumnWidth(110), // Jumlah
-              4: FixedColumnWidth(170), // Nilai
-              5: FixedColumnWidth(150), // Premi
-              6: FixedColumnWidth(130), // Nomor Urut
-              7: FixedColumnWidth(110), // Satuan
-            },
-            children: [
-              _tableHeader(context, const [
-                "No",
-                "Jenis Polis",
-                "Currency",
-                "Jumlah",
-                "Nilai",
-                "Premi",
-                "Nomor Urut",
-                "Satuan",
-              ]),
-              ...details.asMap().entries.map(
-                    (e) => _detailRow(
-                  context,
-                  e.value,
-                  e.key,
-                  compact: true,
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey, width: 1),
+                  verticalInside: BorderSide(color: sGrey, width: 1),
                 ),
+                columnWidths: const {
+                  0: FixedColumnWidth(60),
+                  1: FixedColumnWidth(220),
+                  2: FixedColumnWidth(110),
+                  3: FixedColumnWidth(110),
+                  4: FixedColumnWidth(170),
+                  5: FixedColumnWidth(150),
+                  6: FixedColumnWidth(130),
+                  7: FixedColumnWidth(110),
+                },
+                children: [
+                  _tableHeader(context, const [
+                    "No",
+                    "Jenis Polis",
+                    "Currency",
+                    "Jumlah",
+                    "Nilai",
+                    "Premi",
+                    "Nomor Urut",
+                    "Satuan",
+                  ]),
+                  ...details.asMap().entries.map(
+                        (e) => _detailRow(
+                      context,
+                      e.value,
+                      e.key,
+                      compact: true,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+
+
 
   Widget _buildDetailTableNormal(
       BuildContext context,
