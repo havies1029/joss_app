@@ -37,7 +37,7 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
         }
 
         if (state.status == ListStatus.failure) {
-          return const Text("Error: Loading failed", style: TextStyle(color: Colors.red));
+          return const Text("Gagal memuat data", style: TextStyle(color: Colors.red));
         }
 
         // if (state.status == ListStatus.success) {
@@ -98,7 +98,7 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
           final filteredItems = state.items.toList();
 
           if (filteredItems.isEmpty) {
-            return const Center(child: Text("No items found"));
+            return const Center(child: Text("Data tidak ditemukan"));
           }
 
           if (state.selectedCOBId.isEmpty) {

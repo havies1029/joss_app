@@ -84,7 +84,7 @@ class _RegparFormMainState extends State<RegparFormMain> {
 
           listener: (context, state) {
             if(isHitungPremiClicked == true){
-              isHitungPremiClicked = false;
+              // isHitungPremiClicked = false;
               simulateToggleForm6();
             }
 

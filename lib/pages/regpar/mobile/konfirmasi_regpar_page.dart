@@ -18,6 +18,7 @@ import '../../../models/regpar/regpar4form_model.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../payment/paymentmethodcari_list.dart';
 
 
@@ -189,7 +190,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PaymentMethodsCariListPage(curr: '', totalBayar: 0,
+                            builder: (context) => PaymentMethodPage(curr: '', totalBayar:0,
                               // recordId: widget.recordId ?? '',
                               // viewMode: 'ubah',
                             ),

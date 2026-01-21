@@ -37,7 +37,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
         }
 
         if (state.status == ListStatus.failure) {
-          return const Text("Error: Loading failed", style: TextStyle(color: Colors.red));
+          return const Text("Gagal memuat data", style: TextStyle(color: Colors.red));
         }
 
         if (state.status == ListStatus.success) {
