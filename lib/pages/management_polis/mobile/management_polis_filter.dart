@@ -59,83 +59,84 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     if (found.isEmpty) return "Semua";
 
     return found.first.statusNama;
-  }
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    cobAsetBloc = context.read<CobManPolBloc>();
-    statusAsetBloc = context.read<StatusAsetCariBloc>();
-    asetRingkasanCariBloc = context.read<AsetRingkasanCariBloc>();
-    asetParCariBloc = context.read<AsetParCariBloc>();
-    asetMvCariBloc = context.read<AsetMvCariBloc>();
-    asetHullCariBloc = context.read<AsethullCariBloc>();
-    asetHealthCariBloc = context.read<AsetHealthCariBloc>();
-    asetOthersCariBloc = context.read<AsetothersCariBloc>();
+    @override
+    Widget build(BuildContext context) {
+      cobAsetBloc = context.read<CobManPolBloc>();
+      statusAsetBloc = context.read<StatusAsetCariBloc>();
+      asetRingkasanCariBloc = context.read<AsetRingkasanCariBloc>();
+      asetParCariBloc = context.read<AsetParCariBloc>();
+      asetMvCariBloc = context.read<AsetMvCariBloc>();
+      asetHullCariBloc = context.read<AsethullCariBloc>();
+      asetHealthCariBloc = context.read<AsetHealthCariBloc>();
+      asetOthersCariBloc = context.read<AsetothersCariBloc>();
 
-    return BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
-      listener: (context, state) => refreshData(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            color: secondaryBlackColor,
-            padding: EdgeInsets.symmetric(
-              horizontal: hPadding * 1.5,
-              vertical: hPadding,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const ButtonGroupCobAsetWidget(),
+      return BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
+        listener: (context, state) => refreshData(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: secondaryBlackColor,
+              padding: EdgeInsets.symmetric(
+                horizontal: hPadding * 1.5,
+                vertical: hPadding,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const ButtonGroupCobAsetWidget(),
 
-                const SizedBox(height: hPadding),
+                  const SizedBox(height: hPadding),
 
-                BlocSelector<CobManPolBloc, CobManPolState, String>(
-                  selector: (state) => state.selectedCOBId,
-                  builder: (context, selectedCobId) {
-                    final hideSearch = selectedCobId == "10001";
+                  BlocSelector<CobManPolBloc, CobManPolState, String>(
+                    selector: (state) => state.selectedCOBId,
+                    builder: (context, selectedCobId) {
+                      final hideSearch = selectedCobId == "10001";
 
-                    return Row(
-                      children: [
-                        if (!hideSearch) ...[
-                          Expanded(
-                            child: ListPageFilterBarUIWidget(
-                              searchController: _searchController,
-                              searchButton: buildSearchButton(),
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (!hideSearch) ...[
+                            Expanded(
+                              child: ListPageFilterBarUIWidget(
+                                searchController: _searchController,
+                                searchButton: buildSearchButton(),
+                              ),
                             ),
+                            const SizedBox(width: 8),
+                          ],
+
+                          PolisButton(
+                            assetPath: "assets/icons/unduh.svg",
+                            bgColor: bGrey,
+                            borderColor: bdGrey,
+                            onTap: () => _showExportDialog(context),
+                            iconSize: 16,
+                            height: 36,
+                            width: 36,
                           ),
                           const SizedBox(width: 8),
+                          PolisButton(
+                            assetPath: "assets/icons/bagikan.svg",
+                            bgColor: bBlue,
+                            borderColor: bdBlue,
+                            onTap: () => _onShare(context),
+                            iconSize: 16,
+                            height: 36,
+                            width: 36,
+                          ),
                         ],
+                      );
+                    },
+                  ),
 
-                        PolisButton(
-                          assetPath: "assets/icons/unduh.svg",
-                          bgColor: bGrey,
-                          borderColor: bdGrey,
-                          onTap: () => _showExportDialog(context),
-                          iconSize: 16,
-                          height: 36,
-                          width: 36,
-                        ),
-                        const SizedBox(width: 8),
-                        PolisButton(
-                          assetPath: "assets/icons/bagikan.svg",
-                          bgColor: bBlue,
-                          borderColor: bdBlue,
-                          onTap: () => _onShare(context),
-                          iconSize: 16,
-                          height: 36,
-                          width: 36,
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                  const SizedBox(height: hPadding),
 
-                const SizedBox(height: hPadding),
-
-                const ButtonGroupStatusAsetWidget(),
-              ],
-            ),
+                  const ButtonGroupStatusAsetWidget(),
+                ],
+              ),
           ),
           // const SizedBox(height: 12),
           BlocConsumer<CobManPolBloc, CobManPolState>(
@@ -267,13 +268,13 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                   child: BlocBuilder<AsetHealthCariBloc, AsetHealthCariState>(
                     builder: (context, healthState) {
                       if (healthState.status == ListStatus.initial) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: LinearProgressIndicator());
                       }
                       if (healthState.status == ListStatus.failure) {
                         return const Center(child: Text('Gagal memuat data'));
                       }
                       if (healthState.items.isEmpty) {
-                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
+                        return Padding(padding: EdgeInsets.all(100),child: EmptyStateWidget(statusLabel: state.selectedCOBId));
                       }
 
                       return HealthCobTable(

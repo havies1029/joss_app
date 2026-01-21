@@ -10,7 +10,6 @@ enum ActionType {
   lacakPolis,
   beliPolis,
   bayar,
-
   lihatPolis,
   lihatPolisPar,
   lihatPolisEq,
@@ -95,39 +94,37 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Positioned(
-          right: 20,
-          bottom: 55,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 250),
-            opacity: _isExpanded ? 1.0 : 0.0,
-            child: IgnorePointer(
-              ignoring: !_isExpanded,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children:
-                    widget.availableActions.reversed.map((action) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 7),
-                        child: ScaleTransition(
-                          scale: _scaleAnimation,
-                          child: _buildActionButton(action),
-                        ),
-                      );
-                    }).toList(),
-              ),
-            ),
-          ),
-        ),
+        // Expanded Action Buttons
+        Padding(padding: EdgeInsets.only(right: 6),child: AnimatedSize(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          child: _isExpanded
+              ? Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: widget.availableActions.reversed.map((action) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 7),
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: _buildActionButton(action),
+                ),
+              );
+            }).toList(),
+          )
+              : const SizedBox.shrink(),
+        ),),
+
+        if (_isExpanded) const SizedBox(height: 7),
 
         // Main FAB Button
-        Positioned(
-          right: 8,
-          bottom: 0,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: RotationTransition(
             turns: _rotateAnimation,
             child: Container(
@@ -180,21 +177,20 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient:
-                isDisabled
-                    ? LinearGradient(
-                      colors: [
-                        const Color(0xFF404040),
-                        const Color(0xFF404040),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                    : LinearGradient(
-                      colors: action.gradientColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+            gradient: isDisabled
+                ? LinearGradient(
+              colors: [
+                const Color(0xFF404040),
+                const Color(0xFF404040),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            )
+                : LinearGradient(
+              colors: action.gradientColors,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             border: Border.all(
               color: isDisabled ? const Color(0xFF5D5D5D) : action.borderColor,
             ),
@@ -203,13 +199,12 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
             color: Colors.transparent,
             shape: const CircleBorder(),
             child: InkWell(
-              onTap:
-                  isDisabled
-                      ? null
-                      : () {
-                        _toggleMenu();
-                        widget.onActionTap(action.type, widget.selectedItems);
-                      },
+              onTap: isDisabled
+                  ? null
+                  : () {
+                _toggleMenu();
+                widget.onActionTap(action.type, widget.selectedItems);
+              },
               customBorder: const CircleBorder(),
               child: Container(
                 width: 45,
@@ -217,10 +212,9 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color:
-                        isDisabled
-                            ? const Color(0xFF5D5D5D)
-                            : action.borderColor,
+                    color: isDisabled
+                        ? const Color(0xFF5D5D5D)
+                        : action.borderColor,
                   ),
                 ),
                 alignment: Alignment.center,

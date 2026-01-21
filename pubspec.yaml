@@ -62,6 +62,7 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   carousel_slider: 4.2.0
   shimmer: ^3.0.0
+  syncfusion_flutter_pdfviewer: ^31.1.19
 
 dev_dependencies:
   flutter_test:
