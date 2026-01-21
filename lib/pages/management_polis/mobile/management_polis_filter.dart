@@ -610,7 +610,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
   }
 
   void _onShare(BuildContext context) {
-    final rows = _exportRows(); // hasil map export (udah sesuai COB aktif)
+    final rows = _exportRows();
 
     if (rows.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -627,14 +627,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       return v.toString();
     }
 
-    // preview max 15 baris biar tidak kepanjangan
-    final previewRows = rows.take(15).map((m) {
-      // contoh format: • No: 1 | Tertanggung: A | Alamat: ... | ...
+    final detailText = rows.map((m) {
       final parts = m.entries.map((e) => "${e.key}: ${fmt(e.value)}").join(" | ");
       return "• $parts";
     }).join("\n");
-
-    final more = rows.length > 15 ? "\n…dan ${rows.length - 15} data lainnya" : "";
 
     final message = '''
 📄 Rincian Terpilih ($cobLabel)
@@ -642,80 +638,66 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 Jumlah Data: ${rows.length}
 
 Detail:
-$previewRows$more
+$detailText
 ''';
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // penting
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.share, color: primaryColor, size: 24),
-                const SizedBox(width: 12),
-                Text(
-                  "Bagikan Rincian ($cobLabel)",
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[300]!),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.share, color: primaryColor),
+                  const SizedBox(width: 10),
+                  Text(
+                    "Bagikan Rincian ($cobLabel)",
+                    style: bodyTextStyle(context),
+                  ),
+                ],
               ),
-              child: Text(message, style: const TextStyle(fontSize: 14, height: 1.5)),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 12),
+              Text(
+                "Total data terpilih: ${rows.length}",
+                style: bodyTextStyle(context, fontSize: 14),
+              ),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
+              const SizedBox(height: 20),
+
+              AppButton.iconLeft(
+                text: "Salin Rincian",
                 icon: const Icon(Icons.copy),
-                label: const Text("Salin Rincian"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: message));
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    successSnackBar("Rincian berhasil disalin", icon: Icons.copy),
+                    successSnackBar("Rincian berhasil disalin"),
                   );
                 },
               ),
-            ),
 
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                child: const Text("Batal"),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Batal"),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-
-
 }

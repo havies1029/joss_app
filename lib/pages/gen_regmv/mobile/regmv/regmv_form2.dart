@@ -434,10 +434,10 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
       ThousandsSeparatorInputFormatter(),
     ],
     validator: (v) {
-      if (v == null || v.isEmpty) return kStringNullError;
+      if (v == null || v.isEmpty) return null;
       final clean = v.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka <= 0) return kString0;
+      if (angka == null || angka < 0) return "Tidak boleh minus";
       return null;
     },
   );
