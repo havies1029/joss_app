@@ -139,6 +139,7 @@ class Calpar2FormPageFormState extends State<Calpar2FormPage> {
     return Padding(
         padding: const EdgeInsets.all(15),
         child: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
             key: _calparform2key,
             child: Column(
                 children: [

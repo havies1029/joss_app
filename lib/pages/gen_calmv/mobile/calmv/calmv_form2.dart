@@ -145,6 +145,7 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Form(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         key: _calmvform2key,
         child: Column(
           children: [

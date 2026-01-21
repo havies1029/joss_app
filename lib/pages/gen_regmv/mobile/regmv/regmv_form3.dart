@@ -155,6 +155,7 @@ class RegmvForm3SectionState extends State<RegmvForm3Section> {
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
         child: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _regmvform3key,
           child: Column(
             children: [
