@@ -27,8 +27,6 @@ import 'cob_polis/hull_cob_table.dart';
 import 'cob_polis/kargo_cob_table.dart';
 import 'cob_polis/kendaraan_cob_table.dart';
 import 'cob_polis/property_cob_table.dart';
-import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
-
 import 'cob_polis/ringkasan_cob_table.dart';
 
 
@@ -146,10 +144,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (state.status == ListStatus.failure) {
-                return const Center(child: Text('Failed to fetch data'));
+                return const Center(child: Text('Gagal memuat data'));
               }
               if (state.items.isEmpty) {
-                return const Center(child: Text('No items found'));
+                return const Center(child: Text('Data tidak ditemukan'));
               }
 
               if (state.selectedCOBId == "10001"){
@@ -161,7 +159,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (ringkasanState.status == ListStatus.failure) {
-                        return const Center(child: Text('Failed to fetch data'));
+                        return const Center(child: Text('Gagal memuat data'));
                       }
 
                       if (ringkasanState.items.isEmpty) {
@@ -184,7 +182,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (parState.status == ListStatus.failure) {
-                        return const Center(child: Text('Failed to fetch data'));
+                        return const Center(child: Text('Gagal memuat data'));
                       }
 
                       if (parState.items.isEmpty) {
@@ -215,7 +213,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (mvState.status == ListStatus.failure) {
-                        return const Center(child: Text('Failed to fetch data'));
+                        return const Center(child: Text('Gagal memuat data'));
                       }
                       if (mvState.items.isEmpty) {
                         return EmptyStateWidget(statusLabel: state.selectedCOBId);
@@ -244,7 +242,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                       }
                       if (HullState.status == ListStatus.failure) {
                         return const Center(child: Text(
-                            'Failed to fetch data'));
+                            'Gagal memuat data'));
                       }
                       if (HullState.items.isEmpty) {
                         return EmptyStateWidget(statusLabel: state.selectedCOBId);
@@ -272,7 +270,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (healthState.status == ListStatus.failure) {
-                        return const Center(child: Text('Failed to fetch data'));
+                        return const Center(child: Text('Gagal memuat data'));
                       }
                       if (healthState.items.isEmpty) {
                         return EmptyStateWidget(statusLabel: state.selectedCOBId);
@@ -300,7 +298,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (othersState.status == ListStatus.failure) {
-                        return const Center(child: Text('Failed to fetch data'));
+                        return const Center(child: Text('Gagal memuat data'));
                       }
                       if (othersState.items.isEmpty) {
                         return EmptyStateWidget(statusLabel: state.selectedCOBId);
@@ -547,30 +545,31 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return Material(
-          color: Colors.transparent,
-          child: Center(
-            child: PopupWidget(
-              title: "Pilih format file untuk diunduh",
-              subtitle: "Tersedia Excel dan PDF",
-              button1Text: "Excel",
-              button2Text: "PDF",
-              onExportSelected: (format) async {
-                Navigator.pop(context);
-                await _exportData(context, format, rows);
-              },
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => Navigator.pop(context),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: GestureDetector(
+                onTap: () {},
+                child: PopupWidget(
+                  title: "Pilih format file untuk diunduh",
+                  subtitle: "Tersedia Excel dan PDF",
+                  button1Text: "Excel",
+                  button2Text: "PDF",
+                  onExportSelected: (format) async {
+                    Navigator.pop(context);
+                    await _exportData(context, format, rows);
+                  },
+                ),
+              ),
             ),
           ),
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-          child: child,
-        ),
-      ),
     );
+
   }
 
   Future<void> _exportData(

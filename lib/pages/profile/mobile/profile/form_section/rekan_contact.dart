@@ -87,8 +87,10 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                     curr.isLoaded == true || curr.isSaved == true,
                     listener: (context, state) {
                       if (state.isLoaded && state.record != null) {
+                      // if (state.isLoaded && state.record != null && _isFirstLoad) {
                         final contact = state.record!;
 
+                        // _isFirstLoad = false;
                         _injectPayload(contact);
 
                         final contactEmail = contact.email.trim();
@@ -260,17 +262,21 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     initItem: fieldComboMPropinsi,
     dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
     displayText: (item) => item.propinsiNama,
-    compareItems: (a, b) => a.mpropinsiId == b.mwilayahId,
+    compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
     validatorCallback: (v) => v == null ? kStringProvinsiError : null,
     onChangedCallback: (v) {
-      if (v != null){
-        mRekanContactCrudBloc.add(
-          ComboMPropinsiChangedEvent(comboMPropinsi: v),
-        );
-        comboMKotaKey.currentState?.clear();
-        comboRKodeposKey.currentState?.clear();
-      }
+      // if (v != null){
+      //   mRekanContactCrudBloc.add(
+      //     ComboMPropinsiChangedEvent(comboMPropinsi: v),
+      //   );
+      //   }
       fieldComboMPropinsi = v;
+
+      fieldComboMKota = null;
+      fieldComboRKodepos = null;
+
+      comboMKotaKey.currentState?.clear();
+      comboRKodeposKey.currentState?.clear();
     },
     onSaveCallback: (value) => fieldComboMPropinsi = value,
   );
@@ -279,15 +285,20 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     hintText: "Kota",
     comboKey: comboMKotaKey,
     initItem: fieldComboMKota,
-    dataLoader: () => ComboMKotaRepository().getComboMKota(fieldComboMPropinsi?.mwilayahId ?? ""),
+    dataLoader: () {
+      return ComboMKotaRepository()
+          .getComboMKota(fieldComboMPropinsi?.mpropinsiId ?? "");
+    },
     displayText: (item) => item.kotaDesc,
     compareItems: (a, b) => a.mkotaId == b.mkotaId,
     validatorCallback: (v) => v == null ? kStringKotaError : null,
     onChangedCallback: (v) {
       if (v != null){
-        mRekanContactCrudBloc.add(ComboMKotaChangedEvent(comboMKota: v));
+        // mRekanContactCrudBloc.add(ComboMKotaChangedEvent(comboMKota: v));
         comboRKodeposKey.currentState?.clear();
+        fieldComboRKodepos = null;
       }
+
       fieldComboMKota = v;
     },
     onSaveCallback: (value) => fieldComboMKota = value,
@@ -297,7 +308,11 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     hintText: "Kodepos (Opsional)",
     comboKey: comboRKodeposKey,
     initItem: fieldComboRKodepos,
-    dataLoader: () => ComboRKodeposRepository().getComboRKodepos(fieldComboMKota?.mkotaId ?? "", ""),
+    dataLoader: () {
+      return ComboRKodeposRepository()
+          .getComboRKodepos(fieldComboMKota?.mkotaId ?? "", "");
+    },
+
     displayText: (item) => item.kodeposNo,
     compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
     validatorCallback: (v) => v == null ? kStringKodeposError : null,

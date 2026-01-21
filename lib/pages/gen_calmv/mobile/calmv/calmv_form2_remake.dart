@@ -247,17 +247,12 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
     autovalidateMode: AutovalidateMode.onUserInteraction,
     inputFormatters: [
       FilteringTextInputFormatter.digitsOnly,
-      NumericToOneDecimalFormatter(),
     ],
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;
-      final plain = v.replaceAll(".", "");
-      if (plain.length > 3) {
-        return "Maks 3 digit (100%)";
-      }
-
       final x = double.tryParse(v);
       if (x == null) return "Format tidak valid";
+      if (x < 0) return "Tidak boleh minus";
       if (x > 100) return "Max 100%";
 
       return null;
@@ -382,7 +377,7 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
   );
 
   Widget _buildFieldIsTbod() => CheckboxWidget(
-    rightLabel: "Kerusakan Barang Pihak ketiga",
+    rightLabel: "Pencurian Barang oleh Supir",
     initialValue: toBoolean(fieldIsTbodController.text),
     callback: (v) => fieldIsTbodController.text = v.toString(),
     leftLabel: "",
