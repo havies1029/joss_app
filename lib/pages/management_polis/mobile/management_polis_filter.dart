@@ -79,7 +79,6 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          /// 🔥 FILTER SECTION (dibungkus background)
           Container(
             color: secondaryBlackColor,
             padding: EdgeInsets.symmetric(
@@ -166,8 +165,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                       }
 
                       if (ringkasanState.items.isEmpty) {
-                        final label = _selectedStatusLabel(context);
-                        return EmptyStateWidget(statusLabel: label);
+                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
                       }
 
                       return RingkasanCobTable(
@@ -190,8 +188,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                       }
 
                       if (parState.items.isEmpty) {
-                        final label = _selectedStatusLabel(context);
-                        return EmptyStateWidget(statusLabel: label);
+                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
                       }
 
                       return PropertyCobTable(
@@ -200,6 +197,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         selectedIds: parState.selectedIds.toList(),
                         onSelect: (id) => context.read<AsetParCariBloc>().add(SelectDetailEvent(id)),
                         onUnselect: (id) => context.read<AsetParCariBloc>().add(UnselectDetailEvent(id)),
+                        onSelectFilePolisParId: (id) => context.read<AsetParCariBloc>().add(SelectPolisParDetailEvent(id)),
+                        onUnselectFilePolisParId: (id) => context.read<AsetParCariBloc>().add(UnselectPolisParDetailEvent(id)),
+                        onSelectFilePolisEqId: (id) =>  context.read<AsetParCariBloc>().add(SelectPolisEqDetailEvent(id)),
+                        onUnselectFilePolisEqId: (id) =>  context.read<AsetParCariBloc>().add(UnselectPolisEqDetailEvent(id)),
                         readOnly: false,
                       );
                     },
@@ -217,8 +218,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (mvState.items.isEmpty) {
-                        final label = _selectedStatusLabel(context);
-                        return EmptyStateWidget(statusLabel: label);
+                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
                       }
 
                       return KendaraanCobTable(
@@ -227,6 +227,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         selectedIds: mvState.selectedIds.toList(),
                         onSelect: (id) => context.read<AsetMvCariBloc>().add(SelectMvDetailEvent(id)),
                         onUnselect: (id) => context.read<AsetMvCariBloc>().add(UnselectMvDetailEvent(id)),
+                        onSelectFilePolisMvId: (id) => context.read<AsetMvCariBloc>().add(SelectPolisMvDetailEvent(id)),
+                        onUnselectFilePolisMvId: (id) => context.read<AsetMvCariBloc>().add(UnselectPolisMvDetailEvent(id)),
                         readOnly: false,
                       );
                     },
@@ -245,20 +247,17 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                             'Failed to fetch data'));
                       }
                       if (HullState.items.isEmpty) {
-                        final label = _selectedStatusLabel(context);
-                        return EmptyStateWidget(statusLabel: label);
+                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
                       }
 
                       return HullCobTable(
                         // title: "Polis Property",
                         items: HullState.items,
                         selectedIds: HullState.selectedIds.toList(),
-                        onSelect: (id) =>
-                            context.read<AsethullCariBloc>().add(
-                                SelectHullDetailEvent(id)),
-                        onUnselect: (id) =>
-                            context.read<AsethullCariBloc>().add(
-                                UnselectHullDetailEvent(id)),
+                        onSelect: (id) => context.read<AsethullCariBloc>().add(SelectHullDetailEvent(id)),
+                        onUnselect: (id) =>context.read<AsethullCariBloc>().add(UnselectHullDetailEvent(id)),
+                        onSelectFilePolisHullId: (id) => context.read<AsethullCariBloc>().add(SelectPolisHullDetailEvent(id)),
+                        onUnselectFilePolisHullId: (id) => context.read<AsethullCariBloc>().add(UnselectPolisHullDetailEvent(id)),
                         readOnly: false,
                       );
                     },
@@ -276,8 +275,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (healthState.items.isEmpty) {
-                        final label = _selectedStatusLabel(context);
-                        return EmptyStateWidget(statusLabel: label);
+                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
                       }
 
                       return HealthCobTable(
@@ -286,6 +284,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         selectedIds: healthState.selectedIds.toList(),
                         onSelect: (id) => context.read<AsetHealthCariBloc>().add(SelectHealthDetailEvent(id)),
                         onUnselect: (id) => context.read<AsetHealthCariBloc>().add(UnselectHealthDetailEvent(id)),
+                        onSelectFilePolisHealthId: (id) => context.read<AsetHealthCariBloc>().add(SelectPolisHealthDetailEvent(id)),
+                        onUnselectFilePolisHealthId: (id) => context.read<AsetHealthCariBloc>().add(UnselectPolisHealthDetailEvent(id)),
                         readOnly: false,
                       );
                     },
@@ -303,8 +303,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         return const Center(child: Text('Failed to fetch data'));
                       }
                       if (othersState.items.isEmpty) {
-                        final label = _selectedStatusLabel(context);
-                        return EmptyStateWidget(statusLabel: label);
+                        return EmptyStateWidget(statusLabel: state.selectedCOBId);
                       }
 
                       return KargoCobTable(
@@ -313,6 +312,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         selectedIds: othersState.selectedIds.toList(),
                         onSelect: (id) => context.read<AsetothersCariBloc>().add(SelectOthersDetailEvent(id)),
                         onUnselect: (id) => context.read<AsetothersCariBloc>().add(UnselectOthersDetailEvent(id)),
+                        onSelectFilePolisHealthId: (id) => context.read<AsetothersCariBloc>().add(SelectPolisOthersDetailEvent(id)),
+                        onUnselectFilePolisHealthId: (id) => context.read<AsetothersCariBloc>().add(UnselectPolisOthersDetailEvent(id)),
                         readOnly: false,
                       );
                     },
@@ -332,6 +333,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       ),
     );
   }
+
+
+
+
 
   IconButton buildSearchButton() {
     return IconButton(
@@ -377,7 +382,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     }
   }
 
-  bool hasSelected(BuildContext context) {
+  bool hasSelectedhasSelected(BuildContext context) {
     final cobId = _cobId();
 
     // if (cobId == "10001") return context.select((AsetRingkasanCariBloc b) => b.state.selectedIds.isNotEmpty);

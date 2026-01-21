@@ -170,7 +170,6 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 	}
 
 
-
 	Future<void> onUnselectPolisParDetail(
 			UnselectPolisParDetailEvent event,
 			Emitter<AsetParCariState> emit,

@@ -27,19 +27,26 @@ class AsetParCariModel {
 
 	factory AsetParCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetParCariModel(
-			asetParId: data['asetParId']??'',
-			tertanggung: data['tertanggung']??'',
-			periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
-			periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
-			alamat: data['alamat']??'',
-			curr: data['curr']??'',
-			nomor: int.tryParse(data['nomor'].toString())??0,
-			polisNo: data['polisNo']??'',
-			premi: double.tryParse(data['premi'].toString())??0,
-			status: data['status']??'',
-			sumInsured: double.tryParse(data['sumInsured'].toString())??0,
-			filePolisParId: data['filePolisParId']??'',
-			filePolisEqId: data['filePolisEqId']??'',
+			asetParId: data['asetParId']?.toString() ?? '',
+			tertanggung: data['tertanggung']?.toString() ?? '',
+			periodeMulai: DateTime.tryParse(
+				data['periodeMulai']?.toString() ?? '',
+			) ??
+					DateTime(1970),
+			periodeAkhir: DateTime.tryParse(
+				data['periodeAkhir']?.toString() ?? '',
+			) ??
+					DateTime(1970),
+			alamat: data['alamat']?.toString() ?? '',
+			curr: data['curr']?.toString() ?? '',
+			nomor: int.tryParse(data['nomor']?.toString() ?? '') ?? 0,
+			polisNo: data['polisNo']?.toString() ?? '',
+			premi: double.tryParse(data['premi']?.toString() ?? '') ?? 0,
+			status: data['status']?.toString() ?? '',
+			sumInsured: double.tryParse(data['sumInsured']?.toString() ?? '') ?? 0,
+			filePolisParId: data['filePolisParId']?.toString() ?? '',
+			filePolisEqId: data['filePolisEqId']?.toString() ?? '',
+
 		);
 
 	}

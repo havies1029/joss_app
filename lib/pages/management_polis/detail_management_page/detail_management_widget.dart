@@ -2,46 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import '../../../../../blocs/share_cubit/share_health_state_cubit.dart';
-import '../../../../../blocs/share_cubit/share_hull_state_cubit.dart';
-import '../../../../../blocs/share_cubit/share_mv_state_cubit.dart';
-import '../../../../../blocs/share_cubit/share_par_state_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../widgets/apptheme/help_contact_card_widget.dart';
 import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
 import 'package:joss_app/models/gen_endors/endors2cari_model.dart';
 
 class DetailManagementPolisPage extends StatelessWidget {
-  final dynamic data; // Bisa model apa pun: MV, Health, PAR
+  final dynamic data;
+  final String cobId;
 
   const DetailManagementPolisPage({
     super.key,
     required this.data,
+    required this.cobId,
   });
 
-  /// 🧩 Ambil ID dari dataMap berdasarkan Cubit aktif
-  String extractAssetIdFromCubit(BuildContext context, Map<String, dynamic> dataMap) {
-    // 1️⃣ Cek jenis Cubit yang tersedia di context
-    if (context.read<ShareHullStateCubit?>() != null) {
-      return dataMap["asetHullId"]?.toString() ?? "";
-    }
-    if (context.read<ShareMvStateCubit?>() != null) {
-      return dataMap["asetMvId"]?.toString() ?? "";
-    }
-    if (context.read<ShareParStateCubit?>() != null) {
-      return dataMap["asetParId"]?.toString() ?? "";
-    }
-    if (context.read<ShareHealthStateCubit?>() != null) {
-      return dataMap["asethealthId"]?.toString() ?? "";
-    }
-
-    // 2️⃣ fallback aman — cari key yang mengandung "id"
-    final idEntry = dataMap.entries.firstWhere(
-          (e) => e.key.toLowerCase().contains("id"),
-      orElse: () => const MapEntry("id", ""),
-    );
-
-    return idEntry.value.toString();
+  String extractAssetIdByCob(
+      Map<String, dynamic> dataMap,
+      String cobId,
+      ) {
+    return switch (cobId) {
+      "10002" => dataMap["asetParId"]?.toString() ?? "",
+      "10003" => dataMap["asetMvId"]?.toString() ?? "",
+      "10004" => dataMap["asetHullId"]?.toString() ?? "",
+      "10005" => dataMap["asethealthId"]?.toString() ?? "",
+      "10006" => dataMap["asetOthersId"]?.toString() ?? "",
+      _ => "",
+    };
   }
 
 
@@ -49,7 +36,7 @@ class DetailManagementPolisPage extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     final Map<String, dynamic> dataMap = _toMap(data);
-    final sppa1Id = extractAssetIdFromCubit(context, dataMap);
+    final sppa1Id = extractAssetIdByCob(dataMap, cobId);
 
     return Scaffold(
       backgroundColor: Colors.transparent,

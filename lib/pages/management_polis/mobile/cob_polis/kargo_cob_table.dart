@@ -9,6 +9,10 @@ class KargoCobTable extends StatefulWidget {
   final List<String> selectedIds;
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
+
+  final Function(String id) onSelectFilePolisHealthId;
+  final Function(String id) onUnselectFilePolisHealthId;
+
   final bool readOnly;
   final bool showFooter;
   final String? title;
@@ -19,6 +23,8 @@ class KargoCobTable extends StatefulWidget {
     required this.selectedIds,
     required this.onSelect,
     required this.onUnselect,
+    required this.onSelectFilePolisHealthId,
+    required this.onUnselectFilePolisHealthId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -231,8 +237,14 @@ class _KargoCobTableState extends State<KargoCobTable> {
               onChanged: (checked) {
                 if (checked == true) {
                   widget.onSelect(d.asetOthersId);
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisHealthId(d.filePolisId);
+                  }
                 } else {
                   widget.onUnselect(d.asetOthersId);
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisHealthId(d.filePolisId);
+                  }
                 }
               },
               shape: RoundedRectangleBorder(

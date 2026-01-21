@@ -15,6 +15,10 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 		on<SelectOthersDetailEvent>(onSelectDetail);
 		on<UnselectOthersDetailEvent>(onUnselectDetail);
 		on<ClearOthersSelectionEvent>(onClearSelection);
+
+		on<SelectPolisOthersDetailEvent>(onSelectPolisOthersDetail);
+		on<UnselectPolisOthersDetailEvent>(onUnselectPolisOthersDetail);
+		on<ClearPolisOthersSelectionEvent>(onClearPolisOthersSelection);
 	}
 
 Future<void> onRefreshAsetothersCari(
@@ -83,5 +87,34 @@ Future<void> onFetchAsetothersCari(
 			) async {
 		if (state.selectedIds.isEmpty) return;
 		emit(state.copyWith(selectedIds: <String>{}));
+	}
+
+
+	Future<void> onSelectPolisOthersDetail(
+			SelectPolisOthersDetailEvent event,
+			Emitter<AsetothersCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: event.filePolisId,
+		));
+	}
+
+	Future<void> onUnselectPolisOthersDetail(
+			UnselectPolisOthersDetailEvent event,
+			Emitter<AsetothersCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
+	}
+
+	Future<void> onClearPolisOthersSelection(
+			ClearPolisOthersSelectionEvent event,
+			Emitter<AsetothersCariState> emit,
+			) async {
+		if (state.selectedFilePolisId.isEmpty) return;
+		emit(state.copyWith(
+			selectedFilePolisId: "",
+		));
 	}
 }

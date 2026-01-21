@@ -3,29 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
-import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
 import '../../blocs/login/emailverification_bloc.dart';
 import '../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../blocs/reguser/reguser_bloc.dart';
 import '../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../blocs/user_profile/user_profile_cubit.dart';
 import '../../common/constants.dart';
-import '../../common/loading_indicator.dart';
 import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
 import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
 import '../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../gen_klaim/mobile/klaim_main_page.dart';
 import '../heropage/mobile/heropage.dart';
-import '../login/mobile/client/login_client_page.dart';
-import '../login/mobile/client/widget/otp_client_widget.dart';
-import '../login/mobile/user/login_user_page.dart';
-import '../login/mobile/user/widget/otp_user_widget.dart';
 import '../qontak/mobile/chat_init_service.dart';
 import '../qontak/mobile/customer_service_page.dart';
-import '../register/mobile/client/register_client_page.dart';
 import '../settingpage/mobile/settingpage.dart';
 import 'draggable_chat_button.dart';
 
@@ -57,86 +49,51 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<AuthenticationBloc, AuthenticationState>(
-          listenWhen: (_, __) => true, // sementara untuk test
+        // Listener Foto Profil
+        BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+          listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
           listener: (context, state) {
-
-            // if (state is AuthenticationUnauthenticated) {
-            //   WidgetsBinding.instance.addPostFrameCallback((_) {
-            //     final nav = Navigator.of(context, rootNavigator: true);
-            //     nav.pushAndRemoveUntil(
-            //       MaterialPageRoute(builder: (_) => const LoginUser()),
-            //           (route) => false,
-            //     );
-            //   });
+            final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
+            // if (bytes.isNotEmpty) {
+            //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
             // }
-            //
-            // if (state is AuthenticationRequireLoginClient) {
-            //   WidgetsBinding.instance.addPostFrameCallback((_) {
-            //     final nav = Navigator.of(context, rootNavigator: true);
-            //     nav.pushAndRemoveUntil(
-            //       MaterialPageRoute(builder: (_) => const LoginClient()),
-            //           (route) => false,
-            //     );
-            //   });
-            // }
+          },
+        ),
+        BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
+          listener: (context, state) {
+            final nama = state.record?.rekanNama?.trim();
+            final mrekan1Id = state.record?.mrekan1Id;
+            final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 
-            // if (state is AuthenticationRequireRegisterClient) {
-            //   Navigator.of(context).pushAndRemoveUntil(
-            //     MaterialPageRoute(builder: (_) => RegisterClient(requestFrom: state.requiredFrom,)),
-            //         (route) => false,
+            // if (nama != null && nama.isNotEmpty) {
+            //   context.read<UserProfileCubit>().setProfile(
+            //     nama: nama,
+            //     mjnsclientId: mjnsclientId, // 👈 simpan juga
             //   );
             // }
 
-            // if (state is AuthenticationRequirePinHPVerification) {
-            //   Navigator.of(context).pushAndRemoveUntil(
-            //     MaterialPageRoute(builder: (_) => PopupClientWidget(phoneNumber: state.hpno),),
-            //         (route) => false,
+            if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
+              context.read<MRekanContactCrudBloc>().add(
+                MRekanContactCrudLihatEvent(),
+              );
+            }
+          },
+        ),
+
+        BlocListener<EmailVerificationBloc, EmailVerificationState>(
+          listenWhen: (prev, curr) =>
+          prev.record != curr.record && curr.record != null && !curr.hasFailure,
+          listener: (context, state) {
+            final record = state.record!;
+            // if (record.email.isNotEmpty) {
+            //   context.read<RegUserProfileCubit>().setProfile(
+            //     email: record.email,
             //   );
             // }
-            //
-            // if (state is AuthenticationRequirePinEmailVerification) {
-            //   Navigator.of(context).pushAndRemoveUntil(
-            //     MaterialPageRoute(builder: (_) => PopupUserWidget(email: state.email),),
-            //         (route) => false,
-            //   );
-            // }
-
-            if (state is AuthenticationForgotPassword) {
-              // Navigator.of(context).pushAndRemoveUntil(
-              //   MaterialPageRoute(builder: (_) => ForgotPasswordPage),
-              //       (route) => false,
-              // );
-            }
-            //
-            // if (state is AuthenticationPhonePinVerified) {
-            //   Navigator.of(context).pop();
-            //
-            //   String requestFrom = context.read<RegUserBloc>().state.requestFrom;
-            //   if (requestFrom == "hero_page") {
-            //     BlocProvider.of<AuthenticationBloc>(context).add(
-            //       LoggedOut(),
-            //     );
-            //   }
-            // }
-
-            if (state is AuthenticationGoogleUserAuthenticated) {
-              Navigator.of(context).pop();
-            }
-
-            if (state is AuthenticationLoading) {
-
-            }
-
-            if (state is AuthenticationPreCheckHasToken) {
-
-            }
-
-            if (state is AuthenticationPostCheckHasToken) {
-
-            }
-
-        }),
+          },
+        ),
 
       ],
       child: Scaffold(
@@ -175,34 +132,6 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
       ),
     );
   }
-
-  bool _loginClientDialogOpen = false;
-
-  void _showLoginClientFullscreen() {
-    if (_loginClientDialogOpen) return;
-    _loginClientDialogOpen = true;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) {
-        _loginClientDialogOpen = false;
-        return;
-      }
-
-      await showGeneralDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierLabel: 'Login',
-        pageBuilder: (_, __, ___) => const LoginClient(),
-        transitionDuration: const Duration(milliseconds: 180),
-        transitionBuilder: (_, anim, __, child) {
-          return FadeTransition(opacity: anim, child: child);
-        },
-      );
-
-      _loginClientDialogOpen = false;
-    });
-  }
-
 }
 
 class NavBarItem {
