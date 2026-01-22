@@ -114,6 +114,7 @@ class RegparForm1SectionState extends State<RegparForm1Section> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Form(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         key: _regparform1key,
         child: Column(
           children: [

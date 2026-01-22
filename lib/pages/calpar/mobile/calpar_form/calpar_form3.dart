@@ -138,6 +138,7 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Form(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         key: _calparform3key,
         child: Column(
           children: [
@@ -264,6 +265,7 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
   Widget buildFieldMwilayahId() => ReusableComboBox<ComboMWilayahModel>(
     hintText: "Wilayah Objek",
     initItem: fieldComboMWilayah,
+    maxHeight: 150,
     dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
     displayText: (i) => i.wilayahNama,
     compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
@@ -274,6 +276,7 @@ class Calpar3FormPageFormState extends State<Calpar3FormPage> {
 
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
     hintText: "Wilayah Objek",
+    maxHeight: 200,
     initItem: fieldComboMJnscoverPar,
     dataLoader: () => ComboMJnscoverParRepository().getComboMJnscoverPar(),
     displayText: (i) => i.jenisNama,

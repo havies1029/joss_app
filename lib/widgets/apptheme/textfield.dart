@@ -122,7 +122,6 @@ class appTextField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: primaryColor),
         ),
-
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           borderSide: BorderSide(color: Colors.red),
@@ -135,7 +134,6 @@ class appTextField extends StatelessWidget {
           color: Colors.red,
           fontSize: 12,
         ),
-
         prefix: prefix,
         suffix: suffix,
         suffixIcon: suffixIcon,
@@ -227,6 +225,13 @@ class _AppDateFieldState extends State<AppDateField> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnabled = widget.enabled;
+
+    final Color bgColor = isEnabled ? formGrey : formGrey;
+    final Color borderColor = isEnabled ? sGrey : sGrey;
+    final Color textColor = isEnabled ? primaryLightColor : sGrey;
+    final Color iconColor = isEnabled ? primaryLightColor : sGrey;
+
     Widget field = TextFormField(
       enabled: widget.enabled,
       readOnly: true,
@@ -239,19 +244,22 @@ class _AppDateFieldState extends State<AppDateField> {
       style: bodyTextStyle(context),
       decoration: InputDecoration(
         labelText: widget.label,
-        labelStyle: inputTextStyle(context),
+        labelStyle: inputTextStyle(context).copyWith(
+          color: isEnabled ? primaryColor : sGrey,
+        ),
         hintText: 'Pilih ${widget.label}',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
-        fillColor: formGrey,
+        fillColor: bgColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
-          borderSide: const BorderSide(color: sGrey),
+          borderSide: BorderSide(color: borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
-          borderSide: const BorderSide(color: sGrey),
+          borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -260,19 +268,22 @@ class _AppDateFieldState extends State<AppDateField> {
 
         // ERROR
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          borderSide: const BorderSide(color: Colors.red),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          borderSide: BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          borderSide: const BorderSide(color: Colors.red),
         ),
         errorStyle: bodyTextStyle(context).copyWith(
           color: Colors.red,
           fontSize: 12,
         ),
 
-        suffixIcon: const Icon(Icons.event, color: primaryLightColor),
+        suffixIcon: Icon(
+          Icons.event,
+          color: iconColor,
+        ),
       ),
       validator: (v) {
         if (widget.validator != null) {

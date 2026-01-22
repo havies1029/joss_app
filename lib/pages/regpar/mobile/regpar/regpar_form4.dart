@@ -134,6 +134,7 @@ class RegparForm4SectionState extends State<RegparForm4Section> {
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
         child: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _regparform4key,
           child: Column(
             children: [

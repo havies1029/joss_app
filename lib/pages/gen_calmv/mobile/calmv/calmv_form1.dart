@@ -119,6 +119,7 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
         return Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             key: _calmvform1key,
             child: Column(
               children: [

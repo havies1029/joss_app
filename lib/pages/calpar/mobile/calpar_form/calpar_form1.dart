@@ -120,6 +120,7 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
         return Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             key: _calparform1key,
             child: Column(
               children: [
@@ -194,6 +195,7 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
     hintText: "Jenis Cover",
     initItem: fieldComboMJnscoverPar,
+    maxHeight: 150,
     dataLoader: () => ComboMJnscoverParRepository().getComboMJnscoverPar(),
     displayText: (i) => i.jenisNama,
     compareItems: (a, b) => a.mjnscoverparId == b.mjnscoverparId,
@@ -205,6 +207,7 @@ class Calpar1CrudFormPageFormState extends State<Calpar1CrudFormPage> {
   Widget buildFieldRkonstruksiojkId() => ReusableComboBox<ComboRKonstruksiojkModel>(
     hintText: "Konstruksi",
     comboKey: konstruksiKey,
+    maxHeight: 200,
     initItem: fieldComboRKonstruksiojk,
     dataLoader: () => ComboRKonstruksiojkRepository().getComboRKonstruksiojk(),
     displayText: (i) => i.kelasNama,
