@@ -10,6 +10,7 @@ class AsetMvCariState extends Equatable {
   final String statusId;
 	final Set<String> selectedIds;
 	final String selectedFilePolisId;
+	final String activeAsetMvId;
 
 	const AsetMvCariState(
 		{this.status = ListStatus.initial,
@@ -19,7 +20,8 @@ class AsetMvCariState extends Equatable {
 		this.searchText = '',
 		this.statusId = '',
 		this.selectedIds = const <String>{},
-		this.selectedFilePolisId = "",});
+		this.selectedFilePolisId = "",
+		this.activeAsetMvId = "",});
 
 	const AsetMvCariState.success(List<AsetMvCariModel> items)
 			: this(status: ListStatus.success, items: items);
@@ -34,7 +36,8 @@ class AsetMvCariState extends Equatable {
 		String? searchText,
 		String? statusId,
 		Set<String>? selectedIds,
-		String? selectedFilePolisId}) {
+		String? selectedFilePolisId,
+		String? activeAsetMvId,}) {
 		return AsetMvCariState(
 			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
@@ -44,9 +47,10 @@ class AsetMvCariState extends Equatable {
 			statusId: statusId ?? this.statusId,
 			selectedIds: selectedIds ?? this.selectedIds,
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
+			activeAsetMvId: activeAsetMvId ?? this.activeAsetMvId,
 		);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId];
+	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetMvId];
 }

@@ -55,6 +55,40 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     super.dispose();
   }
 
+  bool _isAllSelected(List<AsetParCariModel> details) {
+    if (details.isEmpty) return false;
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => selected.contains(d.asetParId));
+  }
+
+  bool _isNoneSelected(List<AsetParCariModel> details) {
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => !selected.contains(d.asetParId));
+  }
+
+  void _toggleSelectAll(bool checked, List<AsetParCariModel> details) {
+    for (final d in details) {
+      final id = d.asetParId;
+      if (id.isEmpty) continue;
+
+      if (checked) {
+        // select hanya yang belum kepilih (biar gak spam event)
+        if (!widget.selectedIds.contains(id)) {
+          widget.onSelect(id);
+          if (d.filePolisParId.isNotEmpty) widget.onSelectFilePolisParId(d.filePolisParId);
+          if (d.filePolisEqId.isNotEmpty) widget.onSelectFilePolisEqId(d.filePolisEqId);
+        }
+      } else {
+        // unselect hanya yang memang kepilih
+        if (widget.selectedIds.contains(id)) {
+          widget.onUnselect(id);
+          if (d.filePolisParId.isNotEmpty) widget.onUnselectFilePolisParId(d.filePolisParId);
+          if (d.filePolisEqId.isNotEmpty) widget.onUnselectFilePolisEqId(d.filePolisEqId);
+        }
+      }
+    }
+  }
+
   List<AsetParCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items.where((d) => widget.selectedIds.contains(d.asetParId)).toList();
@@ -155,16 +189,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   7: const FixedColumnWidth(110), // Premi
                 },
                 children: [
-                  _tableHeader(context, [
-                    "",
-                    "No",
-                    "Tertanggung",
-                    "Alamat",
-                    "Periode Mulai",
-                    "Periode Akhir",
-                    "Nilai Pertanggungan",
-                    "Premi",
-                  ]),
+                  _tableHeaderWithSelectAll(context, details, compact: true),
+
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
@@ -218,17 +244,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             7: const FlexColumnWidth(1.4),   // Premi
           },
           children: [
-            _tableHeader(context, [
-              "",
-              "No",
-              "Tertanggung",
-              "Alamat",
-              "Periode Mulai",
-              "Periode Akhir",
-              "Nilai Pertanggungan",
-              "Premi",
-              // "Status",
-            ]),
+            _tableHeaderWithSelectAll(context, details, compact: false),
+
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
@@ -240,6 +257,77 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       ),
     );
   }
+
+  TableRow _tableHeaderWithSelectAll(
+      BuildContext context,
+      List<AsetParCariModel> details, {
+        required bool compact,
+      }) {
+    if (widget.readOnly) {
+      return _tableHeader(context, [
+        "",
+        "No",
+        "Tertanggung",
+        "Alamat",
+        "Periode Mulai",
+        "Periode Akhir",
+        "Nilai Pertanggungan",
+        "Premi",
+      ]);
+    }
+
+    final allSelected = _isAllSelected(details);
+    final noneSelected = _isNoneSelected(details);
+
+    return TableRow(
+      decoration: const BoxDecoration(color: formGrey),
+      children: [
+        Center(
+          child: Checkbox(
+            value: allSelected ? true : (noneSelected ? false : null),
+            tristate: true,
+            // onChanged: (val) {
+            //   // kalau posisi "minus" (null) diklik -> treat jadi select all
+            //   final checked = val ?? false;
+            //   _toggleSelectAll(checked, details);
+            // },
+            onChanged: (_) {
+              final checked = !_isAllSelected(details);
+              _toggleSelectAll(checked, details);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+            ),
+            side: MaterialStateBorderSide.resolveWith(
+                  (states) => const BorderSide(color: sGrey),
+            ),
+            fillColor: MaterialStateProperty.resolveWith(
+                  (states) => states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
+            ),
+            checkColor: primaryLightColor,
+          ),
+        ),
+        ...[
+          "No",
+          "Tertanggung",
+          "Alamat",
+          "Periode Mulai",
+          "Periode Akhir",
+          "Nilai Pertanggungan",
+          "Premi",
+        ].map((t) {
+          final upper = t.toUpperCase();
+          final center = upper == "NO";
+          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+            child: center ? Center(child: child) : child,
+          );
+        }).toList(),
+      ],
+    );
+  }
+
 
   TableRow _tableHeader(BuildContext context, List<String> cells) {
     return TableRow(

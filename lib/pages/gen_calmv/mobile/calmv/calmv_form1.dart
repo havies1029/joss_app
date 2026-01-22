@@ -171,7 +171,7 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     fieldComboMWilayah = record.comboMWilayah;
 
     // Currency combo (jaga-jaga)
-    // fieldComboUang = record.currId.toString();
+    // fieldComboUang = record.combo;
     // Kalau backend punya field lain untuk currency,
     // ganti ke record.comboMmataUang / record.comboCurrId
     // sesuai design API
@@ -245,7 +245,7 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
     hintText: "Mata Uang",
     initItem: fieldComboUang,
     dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-    displayText: (item) => item.rmatauangNama,
+    displayText: (item) => item.rmatauangSimbol,
     compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
     validatorCallback: (v) => v == null ? kStringNullError : null,
     onChangedCallback: (v) => fieldComboUang = v,
@@ -304,6 +304,9 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
         FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
         ThousandsSeparatorInputFormatter(),
       ],
+    onChanged: (_) {
+      _calmvform1key.currentState?.validate();
+    },
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;
       final clean = v.replaceAll(",", "");

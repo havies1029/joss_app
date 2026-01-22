@@ -363,7 +363,7 @@ class CalmvForm2SectionState extends State<CalmvForm2Section> {
       if (v == null || v.isEmpty) return kStringNullError;
       final clean = v.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) return kString0;
+      if (angka == null || angka < 0) return "Tidak Boleh Minus";
       return null;
     },
   );

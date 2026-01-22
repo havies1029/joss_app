@@ -51,6 +51,41 @@ class _HullCobTableState extends State<HullCobTable> {
     super.dispose();
   }
 
+  bool _isAllSelected(List<AsethullCariModel> details) {
+    if (details.isEmpty) return false;
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => selected.contains(d.asetHullId));
+  }
+
+  bool _isNoneSelected(List<AsethullCariModel> details) {
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => !selected.contains(d.asetHullId));
+  }
+
+  void _toggleSelectAll(bool checked, List<AsethullCariModel> details) {
+    for (final d in details) {
+      final id = d.asetHullId;
+      if (id.isEmpty) continue;
+
+      if (checked) {
+        if (!widget.selectedIds.contains(id)) {
+          widget.onSelect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onSelectFilePolisHullId(d.filePolisId);
+          }
+        }
+      } else {
+        if (widget.selectedIds.contains(id)) {
+          widget.onUnselect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onUnselectFilePolisHullId(d.filePolisId);
+          }
+        }
+      }
+    }
+  }
+
+
   List<AsethullCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items.where((d) => widget.selectedIds.contains(d.asetHullId)).toList();
@@ -149,14 +184,7 @@ class _HullCobTableState extends State<HullCobTable> {
                   5: const FixedColumnWidth(130), // Premi
                 },
                 children: [
-                  _tableHeader(context, [
-                    "",
-                    "No",
-                    "Tertanggung",
-                    "Detail Rangka Kapal",
-                    "Nilai Tertanggung",
-                    "Premi",
-                  ]),
+                  _tableHeaderWithSelectAll(context, details),
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
@@ -206,15 +234,7 @@ class _HullCobTableState extends State<HullCobTable> {
             // 6: const FlexColumnWidth(1.4), // Status
           },
           children: [
-            _tableHeader(context, [
-              "",
-              "No",
-              "Tertanggung",
-              "Detail Rangka Kapal",
-              "Nilai Tertanggung",
-              "Premi",
-              // "Status",
-            ]),
+            _tableHeaderWithSelectAll(context, details),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
@@ -224,6 +244,69 @@ class _HullCobTableState extends State<HullCobTable> {
           ],
         ),
       ),
+    );
+  }
+
+  TableRow _tableHeaderWithSelectAll(
+      BuildContext context,
+      List<AsethullCariModel> details,
+      ) {
+    if (widget.readOnly) {
+      return _tableHeader(context, [
+        "",
+        "No",
+        "Tertanggung",
+        "Detail Rangka Kapal",
+        "Nilai Tertanggung",
+        "Premi",
+      ]);
+    }
+
+    final allSelected = _isAllSelected(details);
+    final noneSelected = _isNoneSelected(details);
+
+    return TableRow(
+      decoration: const BoxDecoration(color: formGrey),
+      children: [
+        Center(
+          child: Checkbox(
+            value: allSelected ? true : (noneSelected ? false : null),
+            tristate: true,
+            onChanged: (_) {
+              // sama persis kayak MV: minus/false -> select all, true -> unselect all
+              final checked = !_isAllSelected(details);
+              _toggleSelectAll(checked, details);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+            ),
+            side: MaterialStateBorderSide.resolveWith(
+                  (states) => const BorderSide(color: sGrey),
+            ),
+            fillColor: MaterialStateProperty.resolveWith(
+                  (states) => states.contains(MaterialState.selected)
+                  ? primaryColor
+                  : Colors.transparent,
+            ),
+            checkColor: primaryLightColor,
+          ),
+        ),
+        ...[
+          "No",
+          "Tertanggung",
+          "Detail Rangka Kapal",
+          "Nilai Tertanggung",
+          "Premi",
+        ].map((t) {
+          final upper = t.toUpperCase();
+          final center = upper == "NO";
+          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+            child: center ? Center(child: child) : child,
+          );
+        }).toList(),
+      ],
     );
   }
 

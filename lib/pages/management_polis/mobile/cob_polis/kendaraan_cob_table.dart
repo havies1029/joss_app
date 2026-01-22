@@ -49,6 +49,41 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     hController.dispose();
     super.dispose();
   }
+
+  bool _isAllSelected(List<AsetMvCariModel> details) {
+    if (details.isEmpty) return false;
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => selected.contains(d.asetMvId));
+  }
+
+  bool _isNoneSelected(List<AsetMvCariModel> details) {
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => !selected.contains(d.asetMvId));
+  }
+
+  void _toggleSelectAll(bool checked, List<AsetMvCariModel> details) {
+    for (final d in details) {
+      final id = d.asetMvId;
+      if (id.isEmpty) continue;
+
+      if (checked) {
+        if (!widget.selectedIds.contains(id)) {
+          widget.onSelect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onSelectFilePolisMvId(d.filePolisId);
+          }
+        }
+      } else {
+        if (widget.selectedIds.contains(id)) {
+          widget.onUnselect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onUnselectFilePolisMvId(d.filePolisId);
+          }
+        }
+      }
+    }
+  }
+
   List<AsetMvCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items.where((d) => widget.selectedIds.contains(d.asetMvId)).toList();
@@ -150,17 +185,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
                   8: const FixedColumnWidth(110), // Premi
                 },
                 children: [
-                  _tableHeader(context, [
-                    "",
-                    "No",
-                    "Tertanggung",
-                    "Periode Mulai",
-                    "Periode Akhir",
-                    "Merk Kendaraan",
-                    "Nomor Polisi",
-                    "Nilai Tertanggung",
-                    "Premi",
-                  ]),
+                  _tableHeaderWithSelectAll(context, details),
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
@@ -214,17 +239,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
             8: const FlexColumnWidth(1.4),   // Premi
           },
           children: [
-            _tableHeader(context, [
-              "",
-              "No",
-              "Tertanggung",
-              "Periode Mulai",
-              "Periode Akhir",
-              "Merk Kendaraan",
-              "Nomor Polisi",
-              "Nilai Tertanggung",
-              "Premi",
-            ]),
+            _tableHeaderWithSelectAll(context, details),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
@@ -236,6 +251,76 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       ),
     );
   }
+
+  TableRow _tableHeaderWithSelectAll(
+      BuildContext context,
+      List<AsetMvCariModel> details,
+      ) {
+    if (widget.readOnly) {
+      return _tableHeader(context, [
+        "",
+        "No",
+        "Tertanggung",
+        "Periode Mulai",
+        "Periode Akhir",
+        "Merk Kendaraan",
+        "Nomor Polisi",
+        "Nilai Tertanggung",
+        "Premi",
+      ]);
+    }
+
+    final allSelected = _isAllSelected(details);
+    final noneSelected = _isNoneSelected(details);
+
+    return TableRow(
+      decoration: const BoxDecoration(color: formGrey),
+      children: [
+        Center(
+          child: Checkbox(
+            value: allSelected ? true : (noneSelected ? false : null),
+            tristate: true,
+            onChanged: (_) {
+              // toggle by CURRENT state (state null pun tetap jadi select all)
+              final checked = !_isAllSelected(details);
+              _toggleSelectAll(checked, details);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+            ),
+            side: MaterialStateBorderSide.resolveWith(
+                  (states) => const BorderSide(color: sGrey),
+            ),
+            fillColor: MaterialStateProperty.resolveWith(
+                  (states) => states.contains(MaterialState.selected)
+                  ? primaryColor
+                  : Colors.transparent,
+            ),
+            checkColor: primaryLightColor,
+          ),
+        ),
+        ...[
+          "No",
+          "Tertanggung",
+          "Periode Mulai",
+          "Periode Akhir",
+          "Merk Kendaraan",
+          "Nomor Polisi",
+          "Nilai Tertanggung",
+          "Premi",
+        ].map((t) {
+          final upper = t.toUpperCase();
+          final center = upper == "NO";
+          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+            child: center ? Center(child: child) : child,
+          );
+        }).toList(),
+      ],
+    );
+  }
+
 
   TableRow _tableHeader(BuildContext context, List<String> cells) {
     return TableRow(

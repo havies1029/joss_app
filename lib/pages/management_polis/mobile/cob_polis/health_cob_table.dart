@@ -50,6 +50,40 @@ class _HealthCobTableState extends State<HealthCobTable> {
     super.dispose();
   }
 
+  bool _isAllSelected(List<AsetHealthCariModel> details) {
+    if (details.isEmpty) return false;
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => selected.contains(d.asethealthId));
+  }
+
+  bool _isNoneSelected(List<AsetHealthCariModel> details) {
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => !selected.contains(d.asethealthId));
+  }
+
+  void _toggleSelectAll(bool checked, List<AsetHealthCariModel> details) {
+    for (final d in details) {
+      final id = d.asethealthId;
+      if (id.isEmpty) continue;
+
+      if (checked) {
+        if (!widget.selectedIds.contains(id)) {
+          widget.onSelect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onSelectFilePolisHealthId(d.filePolisId);
+          }
+        }
+      } else {
+        if (widget.selectedIds.contains(id)) {
+          widget.onUnselect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onUnselectFilePolisHealthId(d.filePolisId);
+          }
+        }
+      }
+    }
+  }
+
   List<AsetHealthCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items.where((d) => widget.selectedIds.contains(d.asethealthId)).toList();
@@ -146,12 +180,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
                   3: const FixedColumnWidth(290), // Benefit
                 },
                 children: [
-                  _tableHeader(context, [
-                    "",
-                    "No",
-                    "Nama",
-                    "Benefit",
-                  ]),
+                  _tableHeaderWithSelectAll(context, details),
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
@@ -200,13 +229,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
             4: const FlexColumnWidth(1.4), // Status
           },
           children: [
-            _tableHeader(context, [
-              "",
-              "No",
-              "Nama",
-              "Benefit",
-              // "Status",
-            ]),
+            _tableHeaderWithSelectAll(context, details),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
@@ -216,6 +239,65 @@ class _HealthCobTableState extends State<HealthCobTable> {
           ],
         ),
       ),
+    );
+  }
+
+  TableRow _tableHeaderWithSelectAll(
+      BuildContext context,
+      List<AsetHealthCariModel> details,
+      ) {
+    if (widget.readOnly) {
+      return _tableHeader(context, [
+        "",
+        "No",
+        "Nama",
+        "Benefit",
+      ]);
+    }
+
+    final allSelected = _isAllSelected(details);
+    final noneSelected = _isNoneSelected(details);
+
+    return TableRow(
+      decoration: const BoxDecoration(color: formGrey),
+      children: [
+        Center(
+          child: Checkbox(
+            value: allSelected ? true : (noneSelected ? false : null),
+            tristate: true,
+            onChanged: (_) {
+              // sama persis kayak MV: minus/false => select all, true => unselect all
+              final checked = !_isAllSelected(details);
+              _toggleSelectAll(checked, details);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+            ),
+            side: MaterialStateBorderSide.resolveWith(
+                  (states) => const BorderSide(color: sGrey),
+            ),
+            fillColor: MaterialStateProperty.resolveWith(
+                  (states) => states.contains(MaterialState.selected)
+                  ? primaryColor
+                  : Colors.transparent,
+            ),
+            checkColor: primaryLightColor,
+          ),
+        ),
+        ...[
+          "No",
+          "Nama",
+          "Benefit",
+        ].map((t) {
+          final upper = t.toUpperCase();
+          final center = upper == "NO";
+          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+            child: center ? Center(child: child) : child,
+          );
+        }).toList(),
+      ],
     );
   }
 

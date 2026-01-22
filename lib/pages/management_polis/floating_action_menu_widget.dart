@@ -131,6 +131,7 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
+                  width: 0.8,
                   color: _isExpanded ? sGrey : const Color(0xD4FF9144),
                 ),
               ),
@@ -192,6 +193,7 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
               end: Alignment.bottomRight,
             ),
             border: Border.all(
+              width: 0.8,
               color: isDisabled ? const Color(0xFF5D5D5D) : action.borderColor,
             ),
           ),
@@ -212,6 +214,7 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
+                    width: 0.8,
                     color: isDisabled
                         ? const Color(0xFF5D5D5D)
                         : action.borderColor,

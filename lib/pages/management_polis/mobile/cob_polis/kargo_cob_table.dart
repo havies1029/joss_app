@@ -50,6 +50,41 @@ class _KargoCobTableState extends State<KargoCobTable> {
     super.dispose();
   }
 
+  bool _isAllSelected(List<AsetothersCariModel> details) {
+    if (details.isEmpty) return false;
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => selected.contains(d.asetOthersId));
+  }
+
+  bool _isNoneSelected(List<AsetothersCariModel> details) {
+    final selected = widget.selectedIds.toSet();
+    return details.every((d) => !selected.contains(d.asetOthersId));
+  }
+
+  void _toggleSelectAll(bool checked, List<AsetothersCariModel> details) {
+    for (final d in details) {
+      final id = d.asetOthersId;
+      if (id.isEmpty) continue;
+
+      if (checked) {
+        if (!widget.selectedIds.contains(id)) {
+          widget.onSelect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onSelectFilePolisHealthId(d.filePolisId);
+          }
+        }
+      } else {
+        if (widget.selectedIds.contains(id)) {
+          widget.onUnselect(id);
+          if (d.filePolisId.isNotEmpty) {
+            widget.onUnselectFilePolisHealthId(d.filePolisId);
+          }
+        }
+      }
+    }
+  }
+
+
   List<AsetothersCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items
@@ -143,15 +178,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
                   6: const FixedColumnWidth(140), // Premi
                 },
                 children: [
-                  _tableHeader(context, [
-                    "",
-                    "No",
-                    "Object",
-                    "Polis No",
-                    "Curr",
-                    "Sum Insured",
-                    "Premi",
-                  ]),
+                  _tableHeaderWithSelectAll(context, details),
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
@@ -204,16 +231,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
             // 7: const FlexColumnWidth(1.4), // Status
           },
           children: [
-            _tableHeader(context, [
-              "",
-              "No",
-              "Object",
-              "Polis No",
-              "Curr",
-              "Sum Insured",
-              "Premi",
-              // "Status",
-            ]),
+            _tableHeaderWithSelectAll(context, details),
             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
@@ -223,6 +241,74 @@ class _KargoCobTableState extends State<KargoCobTable> {
           ],
         ),
       ),
+    );
+  }
+
+  TableRow _tableHeaderWithSelectAll(
+      BuildContext context,
+      List<AsetothersCariModel> details,
+      ) {
+    if (widget.readOnly) {
+      return _tableHeader(context, [
+        "",
+        "No",
+        "Object",
+        "Polis No",
+        "Curr",
+        "Sum Insured",
+        "Premi",
+      ]);
+    }
+
+    final allSelected = _isAllSelected(details);
+    final noneSelected = _isNoneSelected(details);
+
+    return TableRow(
+      decoration: const BoxDecoration(color: formGrey),
+      children: [
+        Center(
+          child: Checkbox(
+            value: allSelected ? true : (noneSelected ? false : null),
+            tristate: true,
+            onChanged: (_) {
+              // sama persis: false/null => select all, true => unselect all
+              final checked = !_isAllSelected(details);
+              _toggleSelectAll(checked, details);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+            ),
+            side: MaterialStateBorderSide.resolveWith(
+                  (states) => const BorderSide(color: sGrey),
+            ),
+            fillColor: MaterialStateProperty.resolveWith(
+                  (states) => states.contains(MaterialState.selected)
+                  ? primaryColor
+                  : Colors.transparent,
+            ),
+            checkColor: primaryLightColor,
+          ),
+        ),
+        ...[
+          "No",
+          "Object",
+          "Polis No",
+          "Curr",
+          "Sum Insured",
+          "Premi",
+        ].map((t) {
+          final upper = t.trim().toUpperCase();
+          final center = (upper == "NO" ||
+              upper == "CURR" ||
+              upper == "PREMI" ||
+              upper == "SUM INSURED");
+          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
+            child: center ? Center(child: child) : child,
+          );
+        }).toList(),
+      ],
     );
   }
 
