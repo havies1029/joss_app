@@ -21,6 +21,7 @@ class appTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final TextInputAction? textInputAction;
   final AutovalidateMode? autovalidateMode;
+  final String? errorText;
 
   const appTextField({
     super.key,
@@ -44,6 +45,7 @@ class appTextField extends StatelessWidget {
     this.height,
     this.textInputAction,
     this.autovalidateMode,
+    this.errorText,
   });
 
   List<TextInputFormatter>? _getDefaultFormatters() {
@@ -137,6 +139,7 @@ class appTextField extends StatelessWidget {
         prefix: prefix,
         suffix: suffix,
         suffixIcon: suffixIcon,
+        errorText: errorText,
       ),
       validator: validator,
     );

@@ -33,6 +33,19 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 		on<FieldMesinNoChangedEvent>(onFieldMesinNoChanged);
 		on<FieldPlatNoChangedEvent>(onFieldPlatNoChanged);
 		on<FieldRangkaNoChangedEvent>(onFieldRangkaNoChanged);
+		on<Regmv3DraftEvent>(onDraftRegmv3Crud);
+	}
+
+	Future<void> onDraftRegmv3Crud(
+			Regmv3DraftEvent event,
+			Emitter<Regmv3FormState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional kalau mau reset flag:
+			// isSaved: false,
+			// hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahRegmv3Form(

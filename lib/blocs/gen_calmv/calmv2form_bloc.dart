@@ -15,16 +15,29 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		on<Calmv2FormTambahEvent>(onTambahCalmv2Form);
 		on<Calmv2FormHapusEvent>(onHapusCalmv2Form);
 		on<Calmv2FormLihatEvent>(onLihatCalmv2Form);
+		on<Calmv2FormDraftEvent>(onDraftCalmv2Form);
+	}
+
+	Future<void> onDraftCalmv2Form(
+			Calmv2FormDraftEvent event,
+			Emitter<Calmv2FormState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional: reset flags kalau kamu pakai flag utk submit
+			// isSaved: false,
+			// hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahCalmv2Form(
 			Calmv2FormTambahEvent event,
 			Emitter<Calmv2FormState> emit,
 			) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
+		emit(state.copyWith(isSaving: true, isSaved: false, hasFailure: false));
 
-		final ReturnDataAPI returnData = await repository.calmv2FormTambah(event.record);
-		final hasFailure = !returnData.success;
+		final ReturnDataAPI returnData =
+		await repository.calmv2FormTambah(event.record);
 
 		var newRecord = event.record;
 
@@ -35,14 +48,17 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 			}
 		}
 
+		debugPrint("✅ saved calmv2Id: ${newRecord.calmv2Id}");
+
 		emit(state.copyWith(
 			isSaving: false,
 			isSaved: returnData.success,
-			hasFailure: hasFailure,
+			hasFailure: !returnData.success,
 			record: newRecord,
 			returnData: returnData,
 		));
 	}
+
 
 	Future<void> onUbahCalmv2Form(
 		Calmv2FormUbahEvent event, Emitter<Calmv2FormState> emit) async {

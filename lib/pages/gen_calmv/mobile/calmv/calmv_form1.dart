@@ -305,9 +305,6 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
         FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
         ThousandsSeparatorInputFormatter(),
       ],
-    onChanged: (_) {
-      _calmvform1key.currentState?.validate();
-    },
     validator: (v) {
       if (v == null || v.isEmpty) return kStringNullError;
       final clean = v.replaceAll(",", "");

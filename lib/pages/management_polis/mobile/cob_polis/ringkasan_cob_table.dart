@@ -123,25 +123,19 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
                   verticalInside: BorderSide(color: sGrey, width: 1),
                 ),
                 columnWidths: const {
-                  0: FixedColumnWidth(60),
-                  1: FixedColumnWidth(220),
-                  2: FixedColumnWidth(110),
-                  3: FixedColumnWidth(110),
-                  4: FixedColumnWidth(170),
-                  5: FixedColumnWidth(150),
-                  6: FixedColumnWidth(130),
-                  7: FixedColumnWidth(110),
+                  0: FixedColumnWidth(60),   // No
+                  1: FixedColumnWidth(160),  // Jenis Polis
+                  2: FixedColumnWidth(120),  // Jumlah Polis
+                  3: FixedColumnWidth(200),  // Nilai Pertanggungan
+                  4: FixedColumnWidth(200),  // Total Premi
                 },
                 children: [
                   _tableHeader(context, const [
                     "No",
                     "Jenis Polis",
-                    "Currency",
-                    "Jumlah",
-                    "Nilai",
-                    "Premi",
-                    "Nomor Urut",
-                    "Satuan",
+                    "Jumlah Polis",
+                    "Nilai Pertanggungan",
+                    "Total Premi",
                   ]),
                   ...details.asMap().entries.map(
                         (e) => _detailRow(
@@ -188,25 +182,19 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: const {
-            0: FlexColumnWidth(0.9), // No
-            1: FlexColumnWidth(2.6), // Jenis Polis
-            2: FlexColumnWidth(1.2), // Currency
-            3: FlexColumnWidth(1.2), // Jumlah
-            4: FlexColumnWidth(1.8), // Nilai
-            5: FlexColumnWidth(1.6), // Premi
-            6: FlexColumnWidth(1.4), // Nomor Urut
-            7: FlexColumnWidth(1.2), // Satuan
+            0: FlexColumnWidth(0.9),  // No
+            1: FlexColumnWidth(2.3),  // Jenis Polis
+            2: FlexColumnWidth(1.4),  // Jumlah Polis
+            3: FlexColumnWidth(2.5),  // Nilai Pertanggungan
+            4: FlexColumnWidth(2.0),  // Total Premi
           },
           children: [
             _tableHeader(context, const [
               "No",
               "Jenis Polis",
-              "Currency",
-              "Jumlah",
-              "Nilai",
-              "Premi",
-              "Nomor Urut",
-              "Satuan",
+              "Jumlah Polis",
+              "Nilai Pertanggungan",
+              "Total Premi",
             ]),
             ...details.asMap().entries.map(
                   (e) => _detailRow(
@@ -226,19 +214,15 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
     return TableRow(
       decoration: const BoxDecoration(color: formGrey),
       children: cells.map((text) {
-        final upper = text.trim().toUpperCase();
-        final bool center =
-        (upper == "NO" ||
-            upper == "CURRENCY" ||
-            upper == "JUMLAH" ||
-            upper == "NOMOR URUT" ||
-            upper == "SATUAN");
-
-        final child = Text(text, style: bodyTextStyle(context, fontSize: 15));
+        final isNo = text.toUpperCase() == "NO";
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-          child: center ? Center(child: child) : child,
+          child: isNo
+              ? Center(
+            child: Text(text, style: bodyTextStyle(context, fontSize: 15)),
+          )
+              : Text(text, style: bodyTextStyle(context, fontSize: 15)),
         );
       }).toList(),
     );
@@ -250,104 +234,79 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
       int index, {
         required bool compact,
       }) {
-    // ID tersedia kalau nanti kamu butuh (mis. onTap row):
-    final String id = d.asetRingkasanId;
+    final textStyle = TextStyle(color: primaryLightColor);
+
+    // helpers: gabung dengan spasi rapi (kalau kosong, nggak bikin spasi aneh)
+    String join2(String a, String b) {
+      final aa = a.trim();
+      final bb = b.trim();
+      if (aa.isEmpty) return bb;
+      if (bb.isEmpty) return aa;
+      return "$aa $bb";
+    }
+
+    final jumlahDenganSatuan = join2(d.jmlAset.toString(), d.satuan);
+    final nilaiDenganCurr = join2(d.curr, formatNum(d.nilaiAset));
+    final premiDenganCurr = join2(d.curr, formatNum(d.nilaiPremi));
 
     return TableRow(
       decoration: BoxDecoration(
         color: index.isEven ? pGrey : formGrey,
       ),
       children: [
-        // No (nomor baris)
+        // No (CENTER)
         _cell(
           child: Center(
             child: Text(
               (index + 1).toString(),
-              style: TextStyle(color: primaryLightColor),
+              style: textStyle,
             ),
           ),
         ),
 
-        // Jenis Polis = asetNama
+        // Jenis Polis (LEFT)
         _cell(
           child: Text(
             d.asetNama,
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: textStyle,
           ),
         ),
 
-        // Currency
-        _cell(
-          child: Center(
-            child: Text(
-              d.curr,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        // Jumlah
-        _cell(
-          child: Center(
-            child: Text(
-              d.jmlAset.toString(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        // Nilai
+        // Jumlah Polis + Satuan (LEFT)
         _cell(
           child: Text(
-            formatNum(d.nilaiAset),
+            jumlahDenganSatuan,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: textStyle,
           ),
         ),
 
-        // Premi
+        // Currency + Nilai Pertanggungan (LEFT)
         _cell(
           child: Text(
-            formatNum(d.nilaiPremi),
+            nilaiDenganCurr,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: textStyle,
           ),
         ),
 
-        // Nomor Urut (from model)
+        // Currency + Total Premi (LEFT)
         _cell(
-          child: Center(
-            child: Text(
-              d.noUrut.toString(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        // Satuan
-        _cell(
-          child: Center(
-            child: Text(
-              d.satuan,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
+          child: Text(
+            premiDenganCurr,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textStyle,
           ),
         ),
       ],
     );
   }
+
 
   Widget _cell({required Widget child}) {
     return Padding(

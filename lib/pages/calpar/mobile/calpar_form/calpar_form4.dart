@@ -122,7 +122,7 @@ class Calpar4FormPageFormState extends State<Calpar4FormPage> {
             children: [
               appTextField(
                 label: 'Premi',
-                controller: subtotalCtrl,
+                controller: netCtrl,
                 enabled: false,
               ),
 

@@ -69,3 +69,10 @@ class ComboRMatauangChangedEvent extends Calmv1CrudEvents{
 
 	@override	List<Object> get props => [comboRMatauang];}
 
+class Calmv1DraftEvent extends Calmv1CrudEvents {
+	final Calmv1CrudModel record;
+	const Calmv1DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

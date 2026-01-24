@@ -163,18 +163,18 @@ class RegmvForm1SectionState extends State<RegmvForm1Section> {
 
   }
 
-  // Widget buildFieldCalmv1Id() => appTextField(
-  //   label: "No SPPA",
-  //   controller: fieldCalmv1IdController,
-  //   keyboardType: TextInputType.text,
-  //   inputFormatters: [
-  //     FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-  //   ],
-  //   validator: (v) {
-  //     if (v == null || v.isEmpty) return kStringNullError;
-  //     return null;
-  //   },
-  // );
+  Widget buildFieldCalmv1Id() => appTextField(
+    label: "No SPPA",
+    controller: fieldCalmv1IdController,
+    keyboardType: TextInputType.text,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+    ],
+    validator: (v) {
+      if (v == null || v.isEmpty) return kStringNullError;
+      return null;
+    },
+  );
 
   Widget buildFieldTtgAlamat() => appTextField(
     label: "Nama Tertanggung",

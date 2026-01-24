@@ -7,6 +7,7 @@ import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../aset/aset_cari.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
+import '../../../gen_endors/endors1crud_form.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
@@ -357,7 +358,7 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake(  )));
         break;
 
       // case 'Test Page':

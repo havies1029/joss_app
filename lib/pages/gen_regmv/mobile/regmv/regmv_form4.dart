@@ -344,10 +344,18 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
 
   Widget _buildActionButtons(int previewCount) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: AppButton.primary(
-            text: 'Ambil dari Galeri',
+          child: AppButton.iconLeft(
+            text: 'Pilih File',
+            icon: SvgPicture.asset(
+              'assets/icons/gallery_img.svg',
+              width: 18,
+              height: 18,
+              color: Colors.white,
+            ),
+            backgroundColor: sGrey,
             onPressed: previewCount >= 10
                 ? () => _maxReached()
                 : () => _pickFromGallery(context),
@@ -355,8 +363,14 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: AppButton.primary(
+          child: AppButton.iconLeft(
             text: 'Ambil Foto',
+            icon: SvgPicture.asset(
+              'assets/icons/photo_img.svg',
+              width: 18,
+              height: 18,
+              color: Colors.white,
+            ),
             onPressed: previewCount >= 10
                 ? () => _maxReached()
                 : () => _pickFromCamera(context),

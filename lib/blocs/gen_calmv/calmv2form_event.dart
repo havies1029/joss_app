@@ -39,3 +39,10 @@ class Calmv2FormLihatEvent extends Calmv2FormEvents {
 	List<Object> get props => [recordId];
 }
 
+class Calmv2FormDraftEvent extends Calmv2FormEvents {
+	final Calmv2FormModel record;
+	const Calmv2FormDraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

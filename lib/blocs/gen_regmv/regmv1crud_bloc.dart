@@ -15,6 +15,19 @@ class Regmv1CrudBloc extends Bloc<Regmv1CrudEvents, Regmv1CrudState> {
 		on<Regmv1CrudTambahEvent>(onTambahRegmv1Crud);
 		on<Regmv1CrudHapusEvent>(onHapusRegmv1Crud);
 		on<Regmv1CrudLihatEvent>(onLihatRegmv1Crud);
+		on<Regmv1DraftEvent>(onDraftRegmv1Crud);
+	}
+
+	Future<void> onDraftRegmv1Crud(
+			Regmv1DraftEvent event,
+			Emitter<Regmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional kalau mau reset flag:
+			// isSaved: false,
+			// hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahRegmv1Crud(

@@ -65,3 +65,11 @@ class Calmv3FormHitungPremiEvent extends Calmv3FormEvents {
 	@override
 	List<Object> get props => [calmv1Id];
 }
+
+class Calmv3FormDraftEvent extends Calmv3FormEvents {
+	final Calmv3FormModel record;
+	const Calmv3FormDraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

@@ -209,24 +209,26 @@ class _RegmvFormMainState extends State<RegmvFormMain> {
 
             const SizedBox(height: hPadding),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: AppButton.iconRight(
-                text: "Lanjutkan",
-                icon: Icon(Icons.arrow_forward),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => KonfirmasiRegMvPage(
-                        recordId: widget.recordId ?? '',
-                        viewMode: 'ubah',
+            if (regmv3Id?.isNotEmpty == true) ...[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                child: AppButton.iconRight(
+                  text: "Lanjutkan",
+                  icon: Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => KonfirmasiRegMvPage(
+                          recordId: widget.recordId ?? '',
+                          viewMode: 'ubah',
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
+            ]
           ],
         ),
       ),

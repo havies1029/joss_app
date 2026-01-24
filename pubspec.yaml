@@ -246,6 +246,8 @@ flutter:
     - assets/icons/beli_polis1.svg
     - assets/icons/logo_berhasil.svg
     - assets/icons/unduh_invoice.svg
+    - assets/icons/photo_img.svg
+    - assets/icons/gallery_img.svg
 
   fonts:
     - family: Delm-Regular

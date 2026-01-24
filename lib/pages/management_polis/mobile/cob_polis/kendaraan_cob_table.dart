@@ -177,12 +177,11 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
                       : const FixedColumnWidth(40), // checkbox
                   1: const FixedColumnWidth(50),  // No
                   2: const FixedColumnWidth(170), // Tertanggung
-                  3: const FixedColumnWidth(145), // Periode Mulai
-                  4: const FixedColumnWidth(145), // Periode Akhir
-                  5: const FixedColumnWidth(130), // Merk Kendaraan
-                  6: const FixedColumnWidth(170), // Nomor Polisi
-                  7: const FixedColumnWidth(130), // Nilai Tertanggung
-                  8: const FixedColumnWidth(110), // Premi
+                  3: const FixedColumnWidth(170), // Periode (gabungan)
+                  4: const FixedColumnWidth(130), // Merk Kendaraan
+                  5: const FixedColumnWidth(170), // Nomor Polisi
+                  6: const FixedColumnWidth(170), // Nilai Pertanggungan (curr + nilai)
+                  7: const FixedColumnWidth(140), // Premi (curr + premi)
                 },
                 children: [
                   _tableHeaderWithSelectAll(context, details),
@@ -231,12 +230,11 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
                 : const FlexColumnWidth(0.8), // checkbox
             1: const FlexColumnWidth(1.0),   // No
             2: const FlexColumnWidth(2.4),   // Tertanggung
-            3: const FlexColumnWidth(1.7),   // Periode Mulai (disamain & dikecilin)
-            4: const FlexColumnWidth(1.7),   // Periode Akhir (disamain)
-            5: const FlexColumnWidth(2.0),   // Merk Kendaraan (+0.2)
-            6: const FlexColumnWidth(2.4),   // Nomor Polisi (+0.2)
-            7: const FlexColumnWidth(1.7),   // Nilai Tertanggung (+0.1)
-            8: const FlexColumnWidth(1.4),   // Premi
+            3: const FlexColumnWidth(2.0),   // Periode (gabungan)
+            4: const FlexColumnWidth(2.0),   // Merk Kendaraan
+            5: const FlexColumnWidth(2.4),   // Nomor Polisi
+            6: const FlexColumnWidth(1.9),   // Nilai Pertanggungan
+            7: const FlexColumnWidth(1.6),   // Premi
           },
           children: [
             _tableHeaderWithSelectAll(context, details),
@@ -261,11 +259,10 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         "",
         "No",
         "Tertanggung",
-        "Periode Mulai",
-        "Periode Akhir",
+        "Periode",
         "Merk Kendaraan",
         "Nomor Polisi",
-        "Nilai Tertanggung",
+        "Nilai Pertanggungan",
         "Premi",
       ]);
     }
@@ -302,11 +299,10 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         ...[
           "No",
           "Tertanggung",
-          "Periode Mulai",
-          "Periode Akhir",
+          "Periode",
           "Merk Kendaraan",
           "Nomor Polisi",
-          "Nilai Tertanggung",
+          "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
           final upper = t.toUpperCase();
@@ -407,25 +403,15 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           ),
         ),
 
-        // Periode Mulai
         _cell(
           child: Text(
-            "${d.periodeMulai}",
-            maxLines: compact ? 2 : 1,
+            "${d.periodeMulai} -\n${d.periodeAkhir}",
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
 
-        // Periode Akhir
-        _cell(
-          child: Text(
-            "${d.periodeAkhir}",
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
 
         // Merk Kendaraan
         _cell(
@@ -447,25 +433,23 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           ),
         ),
 
-        // Nilai Tertanggung (sum insured)
         _cell(
           child: Text(
-            formatNum(d.sumInsured),
+            "${d.curr} ${formatNum(d.sumInsured)}",
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
+          ),
+        ),
+        _cell(
+          child: Text(
+            "${d.curr} ${formatNum(d.premi)}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
 
-        // Premi
-        _cell(
-          child: Text(
-            formatNum(d.premi),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
 
         // Status
         // _cell(

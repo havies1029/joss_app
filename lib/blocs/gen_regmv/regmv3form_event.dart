@@ -123,3 +123,11 @@ class FieldRangkaNoChangedEvent extends Regmv3FormEvents {
 	@override
 	List<Object> get props => [rangkaNo];
 }
+
+class Regmv3DraftEvent extends Regmv3FormEvents {
+	final Regmv3FormModel record;
+	const Regmv3DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

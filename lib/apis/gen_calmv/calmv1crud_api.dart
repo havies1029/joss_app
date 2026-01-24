@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -13,10 +12,6 @@ class Calmv1CrudAPI {
 		Map<String, String> queryParams = {"modul_id": "calmv1CrudTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		debugPrint("🟠 [API] Calmv1CrudTambahAPI called");
-		debugPrint("➡️ Endpoint: $tambahEndpoint");
-		debugPrint("➡️ Payload: ${jsonEncode(record.toJson())}");
-
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
 				headers: <String, String>{
@@ -26,40 +21,27 @@ class Calmv1CrudAPI {
 				},
 				body: jsonEncode(record.toJson()));
 
-		debugPrint("⬅️ StatusCode: ${response.statusCode}");
-		debugPrint("⬅️ Response body: ${response.body}");
-
 		if (response.statusCode == 200) {
-			try {
-				final decoded = jsonDecode(response.body);
-				debugPrint("⬅️ Decoded JSON: $decoded");
-				returnData = ReturnDataAPI.fromDatabaseJson(decoded);
-				debugPrint("✅ ReturnData success=${returnData.success}, data=${returnData.data}");
-			} catch (e) {
-				debugPrint("❌ JSON decode error: $e");
-				returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-			}
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
-			debugPrint("❌ HTTP Error ${response.statusCode}");
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
 		return returnData;
 	}
-
 	Future<bool> calmv1CrudUbahAPI(Calmv1CrudModel record) async {
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/calmv/calmv1crud/update";
+				"${AppData.prefixEndPoint}/api/calmv/calmv1crud/update";
 		Map<String, String> queryParams = {"modul_id": "calmv1CrudUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
@@ -69,7 +51,6 @@ class Calmv1CrudAPI {
 		}
 		return returnData.success;
 	}
-
 	Future<bool> calmv1CrudHapusAPI(String calmv1Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/delete";
 		Map<String, String> queryParams = {
@@ -77,7 +58,7 @@ class Calmv1CrudAPI {
 			'modul_id': 'calmv1CrudHapusAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -96,7 +77,7 @@ class Calmv1CrudAPI {
 		Map<String, String> queryParams = {'calmv1Id': calmv1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -110,10 +91,8 @@ class Calmv1CrudAPI {
 		}
 	}
 
+
 	Future<ReturnDataAPI> calmMvToRegMvAPI(String calmv1Id) async {
-		debugPrint("==============================================");
-		debugPrint("🚀 [API] calmMvToRegMvAPI DIPANGGIL");
-		debugPrint("📌 calmv1Id = $calmv1Id");
 
 		String endpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/calmvtoregmv";
 
@@ -143,6 +122,4 @@ class Calmv1CrudAPI {
 
 		return returnData; // ⬅️ bedanya hanya ini!
 	}
-
-
 }

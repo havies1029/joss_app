@@ -19,6 +19,19 @@ class Regmv2FormBloc extends Bloc<Regmv2FormEvents, Regmv2FormState> {
 		on<Regmv2FormLihatEvent>(onLihatRegmv2Form);
 		on<ComboMMvjnscoverChangedEvent>(onComboMMvjnscoverChanged);
 		on<ComboRMatauangChangedEvent>(onComboRMatauangChanged);
+		on<Regmv2DraftEvent>(onDraftRegmv2Crud);
+	}
+
+	Future<void> onDraftRegmv2Crud(
+			Regmv2DraftEvent event,
+			Emitter<Regmv2FormState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional kalau mau reset flag:
+			// isSaved: false,
+			// hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahRegmv2Form(

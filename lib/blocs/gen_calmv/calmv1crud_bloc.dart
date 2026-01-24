@@ -24,6 +24,19 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		on<ComboMMvjnscoverChangedEvent>(onComboMMvjnscoverChanged);
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
 		on<ComboMMvgrupOjkChangedEvent>(onComboMMvgrupOjkChanged);
+		on<Calmv1DraftEvent>(onDraftCalmv1Crud);
+	}
+
+	Future<void> onDraftCalmv1Crud(
+			Calmv1DraftEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional kalau mau reset flag:
+			// isSaved: false,
+			// hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahCalmv1Crud(
@@ -37,8 +50,10 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		bool hasFailure = !returnData.success;
 
 		Calmv1CrudModel newRecord = event.record;
-		if (returnData.success && returnData.data is String) {
+		if (returnData.success && returnData.data != null) {
 			newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
+
+			debugPrint("✅ saved calmv1Id: ${newRecord.calmv1Id}");
 		}
 
 		emit(state.copyWith(

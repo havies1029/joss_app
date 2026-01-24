@@ -51,3 +51,10 @@ class ComboRMatauangChangedEvent extends Regmv2FormEvents{
 
 	@override	List<Object> get props => [comboRMatauang];}
 
+class Regmv2DraftEvent extends Regmv2FormEvents {
+	final Regmv2FormModel record;
+	const Regmv2DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

@@ -128,6 +128,7 @@ import 'blocs/gen_berita/berita3cari_bloc.dart';
 import 'blocs/gen_berita/beritakecilcari_bloc.dart';
 import 'blocs/gen_berita/beritalaincari_bloc.dart';
 import 'blocs/gen_calmv/calmv3form_bloc.dart';
+import 'blocs/gen_calmv/calmv_flow_bloc.dart';
 import 'blocs/gen_cob_app/cobcari_bloc.dart';
 import 'blocs/gen_compro/reqcompro_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
@@ -424,7 +425,13 @@ Future<void> main() async {
         BlocProvider(create: (context) => Regpar6CariBloc()),
         BlocProvider(create: (context) => CobManPolBloc()),
         BlocProvider(create:  (context) => SppaDownloadPolisBloc(repository: DownloadPolisRepository())),
-
+        BlocProvider<CalmvFlowBloc>(
+          create: (context) => CalmvFlowBloc(
+            calmv1CrudBloc: context.read<Calmv1CrudBloc>(),
+            calmv2FormBloc: context.read<Calmv2FormBloc>(),
+            calmv3FormBloc: context.read<Calmv3FormBloc>(),
+          ),
+        ),
       ],
       child: MultiBlocListener(
         listeners: [

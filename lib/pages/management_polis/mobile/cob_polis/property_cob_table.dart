@@ -183,10 +183,9 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   1: const FixedColumnWidth(50),  // No
                   2: const FixedColumnWidth(170), // Tertanggung
                   3: const FixedColumnWidth(240), // Alamat
-                  4: const FixedColumnWidth(145), // Periode Mulai
-                  5: const FixedColumnWidth(145), // Periode Akhir
-                  6: const FixedColumnWidth(150), // Nilai Pertanggungan
-                  7: const FixedColumnWidth(110), // Premi
+                  4: const FixedColumnWidth(180), // Periode (gabungan)
+                  5: const FixedColumnWidth(170), // Nilai Pertanggungan (curr + nilai)
+                  6: const FixedColumnWidth(140), // Premi (curr + premi)
                 },
                 children: [
                   _tableHeaderWithSelectAll(context, details, compact: true),
@@ -237,11 +236,10 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                 : const FlexColumnWidth(0.8), // checkbox
             1: const FlexColumnWidth(1.0),   // No
             2: const FlexColumnWidth(2.2),   // Tertanggung
-            3: const FlexColumnWidth(3.3),   // Alamat (+0.3)
-            4: const FlexColumnWidth(1.7),   // Periode Mulai (disamain & dikecilin)
-            5: const FlexColumnWidth(1.7),   // Periode Akhir (disamain)
-            6: const FlexColumnWidth(1.8),   // Nilai Pertanggungan (+0.2)
-            7: const FlexColumnWidth(1.4),   // Premi
+            3: const FlexColumnWidth(3.3),   // Alamat
+            4: const FlexColumnWidth(2.0),   // Periode (gabungan)
+            5: const FlexColumnWidth(2.0),   // Nilai Pertanggungan
+            6: const FlexColumnWidth(1.6),   // Premi
           },
           children: [
             _tableHeaderWithSelectAll(context, details, compact: false),
@@ -268,9 +266,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         "",
         "No",
         "Tertanggung",
-        "Alamat",
-        "Periode Mulai",
-        "Periode Akhir",
+        "Lokasi",
+        "Periode",
         "Nilai Pertanggungan",
         "Premi",
       ]);
@@ -310,9 +307,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         ...[
           "No",
           "Tertanggung",
-          "Alamat",
-          "Periode Mulai",
-          "Periode Akhir",
+          "Lokasi",
+          "Periode",
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
@@ -430,41 +426,30 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         // Periode Mulai
         _cell(
           child: Text(
-            "${d.periodeMulai}",
-            maxLines: compact ? 2 : 1,
+            "${d.periodeMulai} -\n${d.periodeAkhir}",
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
-
-        // Periode Akhir
+        
         _cell(
           child: Text(
-            "${d.periodeAkhir}",
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-
-        _cell(
-          child: Text(
-            formatNum(d.sumInsured),
+            "${d.curr} ${formatNum(d.sumInsured)}",
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
+          ),
+        ),
+        _cell(
+          child: Text(
+            "${d.curr} ${formatNum(d.premi)}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
 
-        _cell(
-          child: Text(
-            formatNum(d.premi),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
 
         // _cell(
         //   child: Center(

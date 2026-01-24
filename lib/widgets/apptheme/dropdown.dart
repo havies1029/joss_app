@@ -18,7 +18,7 @@ class ReusableComboBox<T> extends StatefulWidget {
   final bool isEnabled;
   final double maxHeight;
   final IconData? prefixIcon;
-
+  final String? errorText;
 
   ReusableComboBox({
     Key? key,
@@ -37,6 +37,7 @@ class ReusableComboBox<T> extends StatefulWidget {
     this.isEnabled = true,
     this.maxHeight = 300,
     this.prefixIcon,
+    this.errorText,
   }) : super(key: key);
 
   @override
@@ -91,6 +92,10 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
             color: Colors.red,
             fontSize: 12,
           ),
+
+          errorText: (widget.errorText != null && widget.errorText!.trim().isNotEmpty)
+              ? widget.errorText
+              : null,
         ),
       ),
       // DATA LOADER
@@ -174,6 +179,9 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
       onChanged: widget.onChangedCallback,
       onSaved: widget.onSaveCallback,
       validator: (value) {
+        if (widget.errorText != null && widget.errorText!.trim().isNotEmpty) {
+          return null;
+        }
         if (widget.validatorCallback != null) {
           final result = widget.validatorCallback!(value);
           if (result != null && result.isNotEmpty) return result;

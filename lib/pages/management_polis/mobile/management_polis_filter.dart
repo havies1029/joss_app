@@ -133,6 +133,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
               final hideSearch = selectedCobId == "10001";
 
               return Row(
+                mainAxisAlignment: hideSearch ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (!hideSearch) ...[
                     Expanded(

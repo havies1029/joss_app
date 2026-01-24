@@ -20,6 +20,19 @@ class Calmv3FormBloc extends Bloc<Calmv3FormEvents, Calmv3FormState> {
 		on<Calmv3FormLihatEvent>(onLihatCalmv3Form);
 		on<Calmv3FormLoadDataEvent>(onLoadDataCalmv3Form);
 		on<Calmv3FormHitungPremiEvent>(onHitungPremiCalmv3Form);
+		on<Calmv3FormDraftEvent>(onDraftCalmv3Form);
+	}
+
+	Future<void> onDraftCalmv3Form(
+			Calmv3FormDraftEvent event,
+			Emitter<Calmv3FormState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional: kalau kamu mau draft ini gak dianggap save
+			// isSaved: false,
+			// hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahCalmv3Form(
