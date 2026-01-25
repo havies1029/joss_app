@@ -52,9 +52,7 @@ class Regmv2FormBloc extends Bloc<Regmv2FormEvents, Regmv2FormState> {
 		if (!hasFailure) {
 			// 🔥 ambil regmv2Id baru dari server
 			final newId = returnData.data?.toString() ?? "";
-			debugPrint("🔥 [BLOC][REGMV2] new regmv2Id from API = $newId");
 
-			// 🔥 update record di event (kalau model mutable, langsung set; kalau immutable pakai copyWith)
 			final updatedRecord = event.record;
 			updatedRecord.regmv2Id = newId;
 

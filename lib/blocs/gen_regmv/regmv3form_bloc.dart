@@ -64,11 +64,8 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 		final bool hasFailure = !returnData.success;
 
 		if (!hasFailure) {
-			// 🔥 ambil regmv3Id baru dari server
 			final newId = returnData.data?.toString() ?? "";
-			debugPrint("🔥 [BLOC][REGMV3] new regmv3Id from API = $newId");
 
-			// 🔥 update record di event (kalau mutable)
 			final updatedRecord = event.record;
 			updatedRecord.regmv3Id = newId;
 
@@ -76,7 +73,7 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 				isSaving: false,
 				isSaved: true,
 				hasFailure: false,
-				record: updatedRecord, // << penting buat UI
+				record: updatedRecord,
 			));
 		} else {
 			emit(state.copyWith(

@@ -140,6 +140,7 @@ import 'blocs/gen_klaim/klaim2crud_bloc.dart';
 import 'blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
+import 'blocs/gen_regmv/polis_tanggal_bloc.dart';
 import 'blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'blocs/gen_regmv/regmv1list_bloc.dart';
 import 'blocs/gen_regmv/regmv2form_bloc.dart';
@@ -153,6 +154,7 @@ import 'blocs/gen_regmv/regmv7cari_bloc.dart';
 import 'blocs/gen_regmv/regmv_download_foto_acc_bloc.dart';
 import 'blocs/gen_regmv/regmv_download_foto_mobil_bloc.dart';
 import 'blocs/gen_regmv/regmv_download_foto_stnk_bloc.dart';
+import 'blocs/gen_regmv/regmv_flow_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
 import 'blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
@@ -432,6 +434,16 @@ Future<void> main() async {
             calmv3FormBloc: context.read<Calmv3FormBloc>(),
           ),
         ),
+        BlocProvider<RegmvFlowBloc>(
+          create: (context) => RegmvFlowBloc(
+            regmv1CrudBloc: context.read<Regmv1CrudBloc>(),
+            regmv2FormBloc: context.read<Regmv2FormBloc>(),
+            regmv3FormBloc: context.read<Regmv3FormBloc>(),
+            regmv6FormBloc: context.read<Regmv6FormBloc>(),
+          ),
+        ),
+        BlocProvider(
+        create: (_) => PolisTanggalBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

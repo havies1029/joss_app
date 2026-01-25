@@ -1,21 +1,20 @@
 part of 'regmv1crud_bloc.dart';
-
 class Regmv1CrudState extends Equatable {
-
 	final Regmv1CrudModel? record;
 	final bool isLoading;
 	final bool isLoaded;
 	final bool isSaving;
 	final bool isSaved;
 	final bool hasFailure;
-	const Regmv1CrudState(
-		{this.record,
+
+	const Regmv1CrudState({
+		this.record,
 		this.isLoading = false,
 		this.isLoaded = false,
 		this.isSaving = false,
 		this.isSaved = false,
 		this.hasFailure = false,
-});
+	});
 
 	Regmv1CrudState copyWith({
 		Regmv1CrudModel? record,
@@ -24,7 +23,7 @@ class Regmv1CrudState extends Equatable {
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-	}){
+	}) {
 		return Regmv1CrudState(
 			record: record ?? this.record,
 			isLoading: isLoading ?? this.isLoading,
@@ -36,5 +35,5 @@ class Regmv1CrudState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [record, isLoading, isLoaded, isSaving, isSaved, hasFailure];
 }

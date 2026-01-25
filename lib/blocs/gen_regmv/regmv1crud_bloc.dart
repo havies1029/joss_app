@@ -22,13 +22,16 @@ class Regmv1CrudBloc extends Bloc<Regmv1CrudEvents, Regmv1CrudState> {
 			Regmv1DraftEvent event,
 			Emitter<Regmv1CrudState> emit,
 			) async {
+		debugPrint("📥 [BLOC][REGMV1] DraftEvent received");
+		debugPrint("📦 ttgNama='${event.record.ttgNama}', ttgAlamat='${event.record.ttgAlamat}', calmv1Id='${event.record.calmv1Id}', regmv1Id='${event.record.regmv1Id}'");
+
 		emit(state.copyWith(
 			record: event.record,
-			// opsional kalau mau reset flag:
-			// isSaved: false,
-			// hasFailure: false,
+			isSaved: false,
+			hasFailure: false,
 		));
 	}
+
 
 	Future<void> onTambahRegmv1Crud(
 			Regmv1CrudTambahEvent event,
@@ -68,12 +71,31 @@ class Regmv1CrudBloc extends Bloc<Regmv1CrudEvents, Regmv1CrudState> {
 			));
 		}
 	}
-
 	Future<void> onUbahRegmv1Crud(
-		Regmv1CrudUbahEvent event, Emitter<Regmv1CrudState> emit) async {
+			Regmv1CrudUbahEvent event,
+			Emitter<Regmv1CrudState> emit,
+			) async {
+		debugPrint("🟣 [BLOC][REGMV1] UbahEvent RECEIVED");
+
+		debugPrint("📦 [BLOC][REGMV1] event.record.regmv1Id = ${event.record.regmv1Id}");
+		debugPrint("📦 [BLOC][REGMV1] event.record.calmv1Id = ${event.record.calmv1Id}");
+		debugPrint("📦 [BLOC][REGMV1] event.record.ttgNama = ${event.record.ttgNama}");
+		debugPrint("📦 [BLOC][REGMV1] event.record.ttgAlamat = ${event.record.ttgAlamat}");
+
 		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.regmv1CrudUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+
+		final result = await repository.regmv1CrudUbah(event.record);
+		final hasFailure = !result;
+
+		debugPrint("📡 [BLOC][REGMV1] API result = $result");
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: hasFailure,
+		));
+
+		debugPrint("✅ [BLOC][REGMV1] state updated after Ubah");
 	}
 
 	Future<void> onHapusRegmv1Crud(

@@ -6,10 +6,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import 'package:string_validator/string_validator.dart';
+import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
+import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
+import '../../../blocs/gen_regmv/polis_tanggal_state.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv3form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv6form_bloc.dart';
+import '../../../blocs/gen_regmv/regmv_flow_bloc.dart';
 import '../../../common/constants.dart';
 import '../../../common/plat_nomor_formatter.dart';
 import '../../../common/rangka_no_formatter.dart';
@@ -25,6 +30,7 @@ import '../../../models/combobox/combormatauang_model.dart';
 import '../../../models/gen_regmv/regmv1crud_model.dart';
 import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
+import '../../../models/gen_regmv/regmv4cari_model.dart';
 import '../../../models/gen_regmv/regmv4form_model.dart';
 import '../../../models/gen_regmv/regmv5form_model.dart';
 import '../../../models/gen_regmv/regmv6form_model.dart';
@@ -44,9 +50,11 @@ import 'konfirmasi_regmv_page.dart';
 
 class RegmvFormMainRemake extends StatefulWidget {
   final String? regmv1Id;
+  final String? calmv1Id;
 
   const RegmvFormMainRemake({
     required this.regmv1Id,
+    required this.calmv1Id,
     super.key,
   });
 
@@ -142,6 +150,13 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   String selectedYearform3 = "";
   //form3
 
+  //form4
+  List<Uint8List> _imagesRegmv4 = [];
+  List<String> _fileNamesRegmv4 = [];
+  List<Regmv4CariModel> _serverPhotosRegmv4 = [];
+  final Set<String> _deletingServerIdsRegmv4 = {};
+  //form4
+
 
   //form7
   final fieldDiskonPersenController = TextEditingController();
@@ -157,6 +172,13 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     super.initState();
     final regmv1 = context.read<Regmv1CrudBloc>().state.record?.regmv1Id ?? "";
     regmv1Id = widget.regmv1Id ?? regmv1;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
+    });
   }
 
   @override
@@ -192,9 +214,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldRangkaNoController.dispose();
     fieldThnBuatController.dispose();
     //form3
-
-
-
 
     //form7
     fieldDiskonPersenController.dispose();
@@ -252,7 +271,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void _payloadform2(Regmv2FormModel record) {
     if (fieldAwController.text.trim().isEmpty) {
-      fieldAwController.text = cleanNum(record.aw);
+      fieldAwController.text = record.aw.toString();
     }
 
     if (fieldIsEqController.text.trim().isEmpty) {
@@ -296,13 +315,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
 
     setState(() {
-      if (kejadianMulaiTgl == null && record.polisMulai != null) {
-        kejadianMulaiTgl = record.polisMulai;
-      }
-      if (kejadianBerakhirTgl == null && record.polisAkhir != null) {
-        kejadianBerakhirTgl = record.polisAkhir;
-      }
+      final mulai = record.polisMulai;
+      final akhir = record.polisAkhir;
 
+      bool sameDay(DateTime a, DateTime b) =>
+          a.year == b.year && a.month == b.month && a.day == b.day;
+
+      if (mulai != null) {
+        if (akhir != null && sameDay(mulai, akhir)) {
+          debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
+        }
+
+        context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
+          DateTime(mulai.year, mulai.month, mulai.day), // normalize
+        ));
+      }
       if (selectedPassengerCount.trim().isEmpty && record.passangerCount != null) {
         final v = record.passangerCount!.toString();
         if (v.isNotEmpty) selectedPassengerCount = v;
@@ -378,27 +405,27 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void _payloadform7(Regmv6FormModel record) {
     if (fieldDiskonPersenController.text.trim().isEmpty) {
-      fieldDiskonPersenController.text = record.diskonPersen.toString();
+      fieldDiskonPersenController.text = cleanNum(record.diskonPersen);
     }
 
     if (fieldPremiAddController.text.trim().isEmpty) {
-      fieldPremiAddController.text = record.premiAdd.toString();
+      fieldPremiAddController.text = cleanNum(record.premiAdd);
     }
 
     if (fieldPremiCascoController.text.trim().isEmpty) {
-      fieldPremiCascoController.text = record.premiCasco.toString();
+      fieldPremiCascoController.text = cleanNum(record.premiCasco);
     }
 
     if (fieldPremiDiskonController.text.trim().isEmpty) {
-      fieldPremiDiskonController.text = record.premiDiskon.toString();
+      fieldPremiDiskonController.text = cleanNum(record.premiDiskon);
     }
 
     if (fieldPremiNetController.text.trim().isEmpty) {
-      fieldPremiNetController.text = record.premiNet.toString();
+      fieldPremiNetController.text = cleanNum(record.premiNet);
     }
 
     if (fieldPremiSubtotalController.text.trim().isEmpty) {
-      fieldPremiSubtotalController.text = record.premiSubtotal.toString();
+      fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
     }
   }
 
@@ -442,6 +469,39 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             }
             if (state.isLoaded && !state.hasFailure && state.record != null) {
               _payloadform3(state.record!);
+            }
+          },
+        ),
+
+        BlocListener<Regmv6FormBloc, Regmv6FormState>(
+          listener: (context, state) {
+            if (state.record != null) {
+              _payloadform7(state.record!);
+
+              openForm7();
+              //
+              // if (state.isLoaded) {
+              //   setState(() {
+              //     regmv6Id = state.record!.regmv6Id;
+              //   });
+              //
+              //   _payloadform7(state.record!);
+              //
+              //   // if (state.record!.regmv6Id.isNotEmpty) {
+              //   //   openForm7();
+              //   // }
+              //   openForm7();
+              // }
+
+              if (state.isSaved) {
+                setState(() {
+                  regmv6Id = state.record!.regmv6Id;
+                });
+
+                if (state.record!.regmv6Id.isNotEmpty) {
+                  openForm7();
+                }
+              }
             }
           },
         ),
@@ -501,9 +561,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                       children: [
                         buildFieldCalmv1Id(),
                         const SizedBox(height: hPadding),
-                        buildFieldTtgAlamat(),
-                        const SizedBox(height: hPadding),
                         buildFieldTtgNama(),
+                        const SizedBox(height: hPadding),
+                        buildFieldTtgAlamat(),
                         const SizedBox(height: 15),
                       ],
                     ),
@@ -661,6 +721,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   const SizedBox(height: hPadding),
 
+                  RegmvForm4Section(
+                    regmv1Id: regmv1Id,
+                    viewMode: 'tamabh',
+                    isExpanded: expanded[3],
+                    onToggle: (v) => setState(() => expanded[3] = v),
+
+                  ),
+
+                  const SizedBox(height: hPadding),
+
                   buildButtonHitungPremi(),
 
                   const SizedBox(height: hPadding),
@@ -670,8 +740,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     title: "Premi",
                     isExpanded: expanded[6],
                     onToggle: (v) => setState(() => expanded[6] = v),
-                    child: (regmv6Id?.isNotEmpty == true)
-                        ? Column(
+                    child: Column(
                       children: [
                         buildFieldPremiNet(),
                         const SizedBox(height: hPadding),
@@ -679,36 +748,31 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         const SizedBox(height: hPadding),
                         buildFieldPremiSubtotal(),
                       ],
-                    )
-                        : const SizedBox(
-                      height: 40,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Klik Hitung Premi untuk melihat hasil."),
-                      ),
                     ),
                   ),
 
                   const SizedBox(height: hPadding),
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                    child: AppButton.iconRight(
-                      text: "Lanjutkan",
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KonfirmasiRegMvPage(
-                              recordId: regmv1Id ?? '',
-                              viewMode: 'ubah',
+                  if (regmv6Id?.isNotEmpty == true) ...[
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                      child: AppButton.iconRight(
+                        text: "Lanjutkan",
+                        icon: Icon(Icons.arrow_forward),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KonfirmasiRegMvPage(
+                                recordId: regmv1Id ?? '',
+                                viewMode: 'ubah',
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
+                  ],
 
                   const SizedBox(height: 25),
                 ],
@@ -866,16 +930,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void draftForm1ToBloc(BuildContext context) {
     final record = Regmv1CrudModel(
-      calmv1Id: fieldCalmv1IdController.text ?? "",
-      regmv1Id: regmv1Id!,
-      ttgAlamat: fieldTtgAlamatController.text ?? "",
+      calmv1Id: widget.calmv1Id ?? "",
+      regmv1Id: regmv1Id ?? "",
       ttgNama: fieldTtgNamaController.text ?? "",
+      ttgAlamat: fieldTtgAlamatController.text ?? "",
     );
 
-    context.read<Regmv1CrudBloc>().add(Regmv1DraftEvent(record: record));
+    context.read<Regmv1CrudBloc>().add(
+      Regmv1DraftEvent(record: record),
+    );
   }
 
+
   void draftForm2ToBloc(BuildContext context){
+    final polis = context.read<PolisTanggalBloc>().state;
+
     final record = Regmv2FormModel(
       aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
       currId: fieldComboRMatauang?.rmatauangKode,
@@ -889,11 +958,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       pap: double.tryParse(fieldPapController.text.replaceAll(',', ''))  ?? 0,
       passangerCount: int.tryParse(selectedPassengerCount ?? '') ?? 0,
       pll: double.tryParse(fieldPllController.text.replaceAll(',', ''))  ?? 0,
-      polisMulai: kejadianMulaiTgl ?? DateTime.now(),
-      polisAkhir: kejadianBerakhirTgl ?? DateTime.now().add(Duration(days: 365)),
-      regmv2Id: widget.regmv1Id ?? "",
+      polisMulai: polis.mulai,
+      polisAkhir: polis.berakhir,
+      regmv2Id: regmv1Id ?? "",
       tpl: double.tryParse(fieldTplController.text.replaceAll(',', '')) ?? 0,
-      regmv1Id: widget.regmv1Id ?? "",
+      regmv1Id: regmv1Id ?? "",
     );
 
     context.read<Regmv2FormBloc>().add(Regmv2DraftEvent(record: record));
@@ -901,7 +970,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void draftForm3ToBloc(BuildContext context){
     final record = Regmv3FormModel(
-      regmv1Id: widget.regmv1Id ?? "",
+      regmv1Id: regmv1Id ?? "",
       aksesoris: fieldAksesorisController.text,
       harga: double.parse(fieldHargaController.text.replaceAll(',', '')),
       mesinNo: fieldMesinNoController.text,
@@ -913,7 +982,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       platNo: fieldPlatNoController.text,
       rangkaNo: fieldRangkaNoController.text,
-      regmv3Id: regmv3Id ?? "",
+      regmv3Id: regmv1Id ?? "",
       thnBuat: int.parse(selectedYearform3),
     );
     context.read<Regmv3FormBloc>().add(Regmv3DraftEvent(record: record));
@@ -946,12 +1015,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       return;
     }
 
-
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
     draftForm3ToBloc(context);
 
-    // context.read<CalmvFlowBloc>().add(CalmvFlowStartEvent());
+    context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
   }
 
   void openForm1() {
@@ -1377,34 +1445,44 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   //form2
   Widget buildFieldPolisMulai() {
-    return AppDateField(
-      label: 'Tanggal Mulai',
-      initialValue: kejadianMulaiTgl ?? _today,
-      firstDate: _today,
-      lastDate: DateTime(2100),
-      validator: (_) => null,
-      onChanged: (dt) {
-        setState(() {
-          kejadianMulaiTgl = dt;
-          kejadianBerakhirTgl = dt != null
-              ? DateTime(dt.year + 1, dt.month, dt.day)
-              : null;
-        });
+    return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
+      buildWhen: (prev, curr) => prev.mulai != curr.mulai,
+      builder: (context, state) {
+        final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        return AppDateField(
+          label: 'Tanggal Mulai',
+          initialValue: state.mulai,
+          firstDate: today,
+          lastDate: DateTime(2100),
+          validator: (_) => null,
+          onChanged: (dt) {
+            if (dt == null) return;
+            context.read<PolisTanggalBloc>().add(PolisMulaiChanged(dt)); // <- trigger event aja
+          },
+        );
       },
     );
   }
 
+
   Widget buildFieldPolisBerakhir() {
-    return AppDateField(
-      label: 'Tanggal Berakhir',
-      enabled: false,
-      initialValue: kejadianBerakhirTgl ?? _today.add(const Duration(days: 365)),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      validator: (_) => null,
-      onChanged: (_) {},
+    return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
+      buildWhen: (prev, curr) => prev.berakhir != curr.berakhir,
+      builder: (context, state) {
+        return AppDateField(
+          key: ValueKey(state.berakhir.toIso8601String()),
+          label: 'Tanggal Berakhir',
+          enabled: false,
+          initialValue: state.berakhir,
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+          validator: (_) => null,
+          onChanged: (_) {},
+        );
+      },
     );
   }
+
 
   Widget _buildComboCurddId() => ReusableComboBox<ComboRMatauangModel>(
     hintText: "Mata Uang",

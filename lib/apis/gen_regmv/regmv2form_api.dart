@@ -36,22 +36,53 @@ class Regmv2FormAPI {
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
-		final http.Response response = await http.post(uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
-				body: jsonEncode(record.toJson()));
+		DateTime mulai = record.polisMulai;
+		DateTime akhir = record.polisAkhir;
+
+		bool sameDay(DateTime a, DateTime b) =>
+				a.year == b.year && a.month == b.month && a.day == b.day;
+
+		// 🔒 Safety: kalau mulai == akhir → hitung ulang akhir = mulai + 1 tahun
+		if (sameDay(mulai, akhir)) {
+			debugPrint("⚠️ polisMulai == polisAkhir, auto set akhir = mulai + 1 tahun");
+
+			akhir = DateTime(mulai.year + 1, mulai.month, mulai.day);
+
+			record = record.copyWith(polisAkhir: akhir);
+		}
+
+		// 🐞 DEBUG PRINT REQUEST
+		debugPrint("🟦 [REGMV2 UBAH API]");
+		debugPrint("URI : $uri");
+		debugPrint("polisMulai  : ${record.polisMulai.toIso8601String()}");
+		debugPrint("polisAkhir  : ${record.polisAkhir.toIso8601String()}");
+		debugPrint("BODY JSON   : ${jsonEncode(record.toJson())}");
+
+		final http.Response response = await http.post(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}',
+			},
+			body: jsonEncode(record.toJson()),
+		);
 
 		ReturnDataAPI returnData;
+
 		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			debugPrint("🟩 [RESPONSE 200] ${response.body}");
+			returnData =
+					ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
+			debugPrint("🟥 [RESPONSE ERROR] status=${response.statusCode}");
+			debugPrint("BODY: ${response.body}");
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
+
 		return returnData.success;
 	}
+
 	Future<bool> regmv2FormHapusAPI(String regmv1Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/regmv/regmv2form/delete";
 		Map<String, String> queryParams = {

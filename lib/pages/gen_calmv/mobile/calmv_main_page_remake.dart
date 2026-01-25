@@ -29,6 +29,7 @@ import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../gen_regmv/mobile/reg_main_page_remake.dart';
+import '../../gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import '../../gen_regmv/mobile/regmv_main_page.dart';
 import 'calmv/calmv_form1_remake.dart';
 import 'calmv/calmv_form2_remake.dart';
@@ -276,13 +277,14 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                 (curr.processMessage).isNotEmpty;
           },
           listener: (context, state) {
+            final calmv1Id = context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
+
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RegmvFormMainRemake(regmv1Id: state.processMessage),
+                builder: (context) => RegmvFormMainRemake(regmv1Id: state.processMessage, calmv1Id: calmv1Id,),
               ),
             );
-            final calmv1Id = context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
             if (calmv1Id.isNotEmpty) {
               context.read<Calmv1CrudBloc>().add(Calmv1CrudLihatEvent(recordId: calmv1Id));
             }
