@@ -73,7 +73,7 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
             }
 
             if (state is UploadStnkSuccess) {
-              _refreshServerPhotos();
+              refreshForm7();
             }
 
             if (state is UploadStnkFailure) {
@@ -93,7 +93,7 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
             // kalau ada aksi hapus berhasil → clear pending + refresh
             if (state.isSaved) {
               _deletingServerIdsRegmv4.clear();
-              _refreshServerPhotos();
+              refreshForm7();
             }
 
             // kalau gagal → clear pending + refresh (rollback by refresh)
@@ -105,7 +105,7 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
                   backgroundColor: Colors.red,
                 ),
               );
-              _refreshServerPhotos();
+              refreshForm7();
             }
           },
         ),
@@ -122,7 +122,7 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
     );
   }
 
-  void _refreshServerPhotos() {
+  void refreshForm7() {
     final id = widget.regmv1Id;
     if (id == null || id.isEmpty) return;
     regmv4CariBloc.add(RefreshRegmv4CariEvent(regmv1Id: id));

@@ -43,7 +43,6 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
   }
 
   void _wireListeners() {
-    // 1) Form1 saved -> trigger ensure Form2 (step2)
     _subRegmv1 = regmv1CrudBloc.stream.listen((s) {
       final id = s.record?.regmv1Id ?? "";
       final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
@@ -54,7 +53,6 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
       }
     });
 
-    // 2) Form2 saved -> trigger ensure Form3 (step3)
     _subRegmv2 = regmv2FormBloc.stream.listen((s) {
       final id = s.record?.regmv2Id ?? "";
       final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
@@ -65,7 +63,6 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
       }
     });
 
-    // 3) Form3 saved -> trigger hitung premi (step4)
     _subRegmv3 = regmv3FormBloc.stream.listen((s) {
       final id = s.record?.regmv3Id ?? "";
       final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
@@ -84,8 +81,6 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
     _subRegmv3.cancel();
     return super.close();
   }
-
-  // ===== handlers =====
 
   void _onFlowStart(
       RegmvFlowStartEvent event,
@@ -123,20 +118,12 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
     _triggerHitungPremi();
   }
 
-  // ===== ensure steps =====
-
   void _ensureRegmv1() {
     final form1 = regmv1CrudBloc.state.record!;
     if (form1.regmv1Id.isEmpty) {
       regmv1CrudBloc.add(Regmv1CrudTambahEvent(record: form1));
       return;
     }
-
-    debugPrint("🟣 [FLOW] About to dispatch Regmv1CrudUbahEvent");
-    debugPrint("🟣 [FLOW] form1.regmv1Id = ${form1.regmv1Id}");
-    debugPrint("🟣 [FLOW] form1.calmv1Id = ${form1.calmv1Id}");
-    debugPrint("🟣 [FLOW] form1.ttgNama = ${form1.ttgNama}");
-    debugPrint("🟣 [FLOW] form1.ttgAlamat = ${form1.ttgAlamat}");
 
     regmv1CrudBloc.add(Regmv1CrudUbahEvent(record: form1));
   }
@@ -145,7 +132,6 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
     final form1 = regmv1CrudBloc.state.record!;
     if (form1.regmv1Id.isEmpty) return;
 
-    // sync parent id ke child form2 & form3 (draft)
     _syncRegmv1IdToForm2And3(form1.regmv1Id);
 
     final form2 = regmv2FormBloc.state.record!;
@@ -174,7 +160,6 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
     regmv3FormBloc.add(Regmv3FormUbahEvent(record: form3WithParent));
   }
 
-  // ===== final step =====
 
   void _triggerHitungPremi() {
 

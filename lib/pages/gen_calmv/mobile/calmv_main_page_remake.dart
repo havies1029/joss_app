@@ -235,34 +235,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   void _payloadform3(Calmv3FormModel record) {
-    if (fieldCalmv1IdController.text.trim().isEmpty &&
-        record.calmv1Id.isNotEmpty) {
-      fieldCalmv1IdController.text = record.calmv1Id;
-    }
-
-    if (fieldDiskonPersenController.text.trim().isEmpty) {
-      fieldDiskonPersenController.text = cleanNum(record.diskonPersen);
-    }
-
-    if (fieldPremiAddController.text.trim().isEmpty) {
-      fieldPremiAddController.text = cleanNum(record.premiAdd);
-    }
-
-    if (fieldPremiCascoController.text.trim().isEmpty) {
-      fieldPremiCascoController.text = cleanNum(record.premiCasco);
-    }
-
-    if (fieldPremiDiskonController.text.trim().isEmpty) {
-      fieldPremiDiskonController.text = cleanNum(record.premiDiskon);
-    }
-
-    if (fieldPremiNetController.text.trim().isEmpty) {
-      fieldPremiNetController.text = cleanNum(record.premiNet);
-    }
-
-    if (fieldPremiSubtotalController.text.trim().isEmpty) {
-      fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
-    }
+    fieldCalmv1IdController.text = record.calmv1Id;
+    fieldDiskonPersenController.text = cleanNum(record.diskonPersen);
+    fieldPremiAddController.text = cleanNum(record.premiAdd);
+    fieldPremiCascoController.text = cleanNum(record.premiCasco);
+    fieldPremiDiskonController.text = cleanNum(record.premiDiskon);
+    fieldPremiNetController.text = cleanNum(record.premiNet);
+    fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
   }
 
 
@@ -320,8 +299,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
         BlocListener<Calmv3FormBloc, Calmv3FormState>(
           listener: (context, state) {
-            if (!state.hasFailure && state.record != null) {
-              // Hitung premi masuk sini lewat isLoaded
+            if (state.record != null) {
               if (state.isLoaded) {
                 setState(() {
                   calmv3Id = state.record!.calmv3Id;
@@ -894,11 +872,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     });
   }
 
-    void openForm3() {
-      setState(() {
-        expanded = [false, false, true];
-      });
-    }
+  void openForm3() {
+     setState(() {
+       expanded = [false, false, true];
+     });
+  }
 
   //form1 field
   Widget _buildComboMMvgrupOjk() => ReusableComboBox<ComboMMvgrupOjkModel>(

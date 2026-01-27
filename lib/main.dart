@@ -51,6 +51,7 @@ import 'package:joss_app/repositories/gen_regmv/regmv3form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv4form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv5form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv6form_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv7form_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_download_fotoacc_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_download_fotomobil_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_download_stnk_repository.dart';
@@ -151,6 +152,7 @@ import 'blocs/gen_regmv/regmv5cari_bloc.dart';
 import 'blocs/gen_regmv/regmv5form_bloc.dart';
 import 'blocs/gen_regmv/regmv6form_bloc.dart';
 import 'blocs/gen_regmv/regmv7cari_bloc.dart';
+import 'blocs/gen_regmv/regmv7form_bloc.dart';
 import 'blocs/gen_regmv/regmv_download_foto_acc_bloc.dart';
 import 'blocs/gen_regmv/regmv_download_foto_mobil_bloc.dart';
 import 'blocs/gen_regmv/regmv_download_foto_stnk_bloc.dart';
@@ -389,6 +391,7 @@ Future<void> main() async {
         BlocProvider(create:(context) => Regmv4FormBloc(repository: Regmv4FormRepository())),
         BlocProvider(create:(context) => Regmv5FormBloc(repository: Regmv5FormRepository())),
         BlocProvider(create:(context) => Regmv6FormBloc(repository: Regmv6FormRepository())),
+        BlocProvider(create:(context) => Regmv7FormBloc(repository: Regmv7FormRepository())),
 
         BlocProvider(create:(context) => Regpar1ListBloc()),
         BlocProvider(create:(context) => Regpar1CrudBloc(repository: Regpar1CrudRepository())),

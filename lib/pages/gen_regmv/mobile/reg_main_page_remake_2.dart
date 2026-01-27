@@ -1,3 +1,4 @@
+/*
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -100,11 +101,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   bool _form5HasError = false;
   String? _form5ErrorText;
 
-  Regmv6FormBloc? regmv6formbloc;
-
   Regmv7FormBloc? regmv7formBloc;
   bool _form7HasError = false;
   String? _form7ErrorText;
+
+  Regmv6FormBloc? regmv6formbloc;
 
   Regmv1CrudModel? form1Record;
   Regmv2FormModel? form2Record;
@@ -193,19 +194,19 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   //form5
 
   //form6
+  List<Uint8List> _imagesRegmv7 = [];
+  List<String> _fileNamesRegmv7 = [];
+  List<Regmv7CariModel> _serverPhotosRegmv7 = [];
+  final Set<String> _deletingServerIdsRegmv7 = {};
+  //form6
+
+  //form7
   final fieldDiskonPersenController = TextEditingController();
   final fieldPremiAddController = TextEditingController();
   final fieldPremiCascoController = TextEditingController();
   final fieldPremiDiskonController = TextEditingController();
   final fieldPremiNetController = TextEditingController();
   final fieldPremiSubtotalController = TextEditingController();
-  //form6
-
-  //form7
-  List<Uint8List> _imagesRegmv7 = [];
-  List<String> _fileNamesRegmv7 = [];
-  List<Regmv7CariModel> _serverPhotosRegmv7 = [];
-  final Set<String> _deletingServerIdsRegmv7 = {};
   //form7
 
   @override
@@ -256,14 +257,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldThnBuatController.dispose();
     //form3
 
-    //form6
+    //form7
     fieldDiskonPersenController.dispose();
     fieldPremiAddController.dispose();
     fieldPremiCascoController.dispose();
     fieldPremiDiskonController.dispose();
     fieldPremiNetController.dispose();
     fieldPremiSubtotalController.dispose();
-    //form6
+    //form7
 
     super.dispose();
   }
@@ -290,23 +291,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   void refreshForm4({required String? recordId}) {
-    debugPrint("🔄 refreshForm4 CALLED");
-    debugPrint("👉 recordId = $recordId");
-
-    if (recordId == null || recordId.isEmpty) {
-      debugPrint("❌ recordId null atau empty, RETURN");
-      return;
-    }
-
-    debugPrint("➡️ Dispatch RefreshRegmv4CariEvent");
-
+    if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv4CariBloc>().add(
       RefreshRegmv4CariEvent(regmv1Id: recordId),
     );
-
-    debugPrint("✅ RefreshRegmv4CariEvent SENT");
   }
-
 
   void refreshForm5({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
@@ -317,15 +306,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   void refreshForm6({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
-    context.read<Regmv6FormBloc>().add(
-      Regmv6FormLihatEvent(recordId: recordId),
+    context.read<Regmv7CariBloc>().add(
+      RefreshRegmv7CariEvent(regmv1Id: recordId),
     );
   }
 
   void refreshForm7({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
-    context.read<Regmv7CariBloc>().add(
-      RefreshRegmv7CariEvent(regmv1Id: recordId),
+    context.read<Regmv6FormBloc>().add(
+      Regmv6FormLihatEvent(recordId: recordId),
     );
   }
 
@@ -477,13 +466,30 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     });
   }
 
-  void _payloadform6(Regmv6FormModel record) {
-    fieldDiskonPersenController.text = cleanNum(record.diskonPersen);
-    fieldPremiAddController.text = cleanNum(record.premiAdd);
-    fieldPremiCascoController.text = cleanNum(record.premiCasco);
-    fieldPremiDiskonController.text = cleanNum(record.premiDiskon);
-    fieldPremiNetController.text = cleanNum(record.premiNet);
-    fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
+  void _payloadform7(Regmv6FormModel record) {
+    if (fieldDiskonPersenController.text.trim().isEmpty) {
+      fieldDiskonPersenController.text = cleanNum(record.diskonPersen);
+    }
+
+    if (fieldPremiAddController.text.trim().isEmpty) {
+      fieldPremiAddController.text = cleanNum(record.premiAdd);
+    }
+
+    if (fieldPremiCascoController.text.trim().isEmpty) {
+      fieldPremiCascoController.text = cleanNum(record.premiCasco);
+    }
+
+    if (fieldPremiDiskonController.text.trim().isEmpty) {
+      fieldPremiDiskonController.text = cleanNum(record.premiDiskon);
+    }
+
+    if (fieldPremiNetController.text.trim().isEmpty) {
+      fieldPremiNetController.text = cleanNum(record.premiNet);
+    }
+
+    if (fieldPremiSubtotalController.text.trim().isEmpty) {
+      fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
+    }
   }
 
   @override
@@ -533,51 +539,30 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         // server list update
         BlocListener<Regmv4CariBloc, Regmv4CariState>(
           listener: (context, state) {
-            debugPrint("👂 Regmv4CariBloc listener CALLED");
-            debugPrint("state.status: ${state.status}");
-            debugPrint("state.items length: ${state.items.length}");
-
             if (state.status == ListStatus.success) {
-              debugPrint("✅ Regmv4CariBloc SUCCESS");
               setState(() => _serverPhotosRegmv4 = List.from(state.items));
             }
           },
         ),
 
-// upload flow
+        // upload flow
         BlocListener<RegmvUploadStnkBloc, RegmvUploadStnkState>(
           listener: (context, state) {
-            debugPrint("👂 RegmvUploadStnkBloc listener CALLED");
-            debugPrint("state runtimeType: ${state.runtimeType}");
-
             if (state is UploadStnkListPreview) {
-              debugPrint("📸 UploadStnkListPreview");
-              debugPrint("images length: ${state.images.length}");
-              debugPrint("fileNames length: ${state.fileNames.length}");
-
+              // cache untuk submit/delete preview
               setState(() {
                 _imagesRegmv4 = List.from(state.images);
                 _fileNamesRegmv4 = List.from(state.fileNames);
               });
             }
 
-            if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-              debugPrint("🔄 refreshForm4 CALLED (general)");
-              refreshForm4(recordId: regmv1Id);
-            }
-
             if (state is UploadStnkSuccess) {
-              debugPrint("✅ UploadStnkSuccess");
-
               if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (success)");
                 refreshForm4(recordId: regmv1Id);
               }
             }
 
             if (state is UploadStnkFailure) {
-              debugPrint("❌ UploadStnkFailure: ${state.error}");
-
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.error),
@@ -588,28 +573,19 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           },
         ),
 
-// delete server (state hanya flag)
+        // delete server (state hanya flag)
         BlocListener<Regmv4FormBloc, Regmv4FormState>(
           listener: (context, state) {
-            debugPrint("👂 Regmv4FormBloc listener CALLED");
-            debugPrint("isSaved: ${state.isSaved}");
-            debugPrint("hasFailure: ${state.hasFailure}");
-
             // kalau ada aksi hapus berhasil → clear pending + refresh
             if (state.isSaved) {
-              debugPrint("✅ Delete SUCCESS");
               _deletingServerIdsRegmv4.clear();
-
               if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (delete success)");
                 refreshForm4(recordId: regmv1Id);
               }
             }
 
             // kalau gagal → clear pending + refresh (rollback by refresh)
             if (state.hasFailure) {
-              debugPrint("❌ Delete FAILURE");
-
               _deletingServerIdsRegmv4.clear();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -617,15 +593,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                   backgroundColor: Colors.red,
                 ),
               );
-
               if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (delete failure)");
                 refreshForm4(recordId: regmv1Id);
               }
             }
           },
         ),
-
 
         // server list update
         BlocListener<Regmv5CariBloc, Regmv5CariState>(
@@ -692,39 +665,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         ),
 
 
-        BlocListener<Regmv6FormBloc, Regmv6FormState>(
-          listener: (context, state) {
-            if (state.record != null) {
-              _payloadform6(state.record!);
-
-              openForm7(recordId: regmv1Id);
-              //
-              // if (state.isLoaded) {
-              //   setState(() {
-              //     regmv6Id = state.record!.regmv6Id;
-              //   });
-              //
-              //   _payloadform6(state.record!);
-              //
-              //   // if (state.record!.regmv6Id.isNotEmpty) {
-              //   //   openForm7();
-              //   // }
-              //   openForm7();
-              // }
-
-              if (state.isSaved) {
-                setState(() {
-                  regmv6Id = state.record!.regmv6Id;
-                });
-
-                if (state.record!.regmv6Id.isNotEmpty) {
-                  openForm7(recordId: regmv1Id);
-                }
-              }
-            }
-          },
-        ),
-
         // server list update
         BlocListener<Regmv7CariBloc, Regmv7CariState>(
           listener: (context, state) {
@@ -747,7 +687,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
             if (state is UploadFotoAccSuccess) {
               if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm7(recordId: regmv1Id);
+                refreshForm6(recordId: regmv1Id);
               }
             }
 
@@ -769,7 +709,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             if (state.isSaved) {
               _deletingServerIdsRegmv7.clear();
               if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm7(recordId: regmv1Id);
+                refreshForm6(recordId: regmv1Id);
               }
             }
 
@@ -783,7 +723,41 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                 ),
               );
               if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm7(recordId: regmv1Id);
+                refreshForm6(recordId: regmv1Id);
+              }
+            }
+          },
+        ),
+
+
+        BlocListener<Regmv6FormBloc, Regmv6FormState>(
+          listener: (context, state) {
+            if (state.record != null) {
+              _payloadform7(state.record!);
+
+              openForm7();
+              //
+              // if (state.isLoaded) {
+              //   setState(() {
+              //     regmv6Id = state.record!.regmv6Id;
+              //   });
+              //
+              //   _payloadform7(state.record!);
+              //
+              //   // if (state.record!.regmv6Id.isNotEmpty) {
+              //   //   openForm7();
+              //   // }
+              //   openForm7();
+              // }
+
+              if (state.isSaved) {
+                setState(() {
+                  regmv6Id = state.record!.regmv6Id;
+                });
+
+                if (state.record!.regmv6Id.isNotEmpty) {
+                  openForm7();
+                }
               }
             }
           },
@@ -795,8 +769,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   Widget _buildForm() {
-    final bool hasForm6Record =
-        context.read<Regmv6FormBloc>().state.record != null;
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: SingleChildScrollView(
@@ -1011,11 +983,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     title: "Upload Foto STNK",
                     isExpanded: expanded[3],
                     onToggle: (v) => setState(() => expanded[3] = v),
-                    onRefresh: () {
-                      if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                        refreshForm4(recordId: regmv1Id);
-                      }
-                    },
                     child: Column(
                       children: [
                         _buildBodyForm4(),
@@ -1031,11 +998,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     title: "Upload Foto Mobil",
                     isExpanded: expanded[4],
                     onToggle: (v) => setState(() => expanded[4] = v),
-                    onRefresh: () {
-                      if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                        refreshForm5(recordId: regmv1Id);
-                      }
-                    },
                     child: Column(
                       children: [
                         _buildBodyForm5(),
@@ -1046,16 +1008,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   const SizedBox(height: hPadding),
 
-                  Form7Page(
+                  Form6Page(
                     context: context,
                     title: "Upload Foto Aksesoris",
                     isExpanded: expanded[5],
                     onToggle: (v) => setState(() => expanded[5] = v),
-                    onRefresh: () {
-                      if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                        refreshForm7(recordId: regmv1Id);
-                      }
-                    },
                     child: Column(
                       children: [
                         _buildBodyForm7(),
@@ -1070,13 +1027,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   const SizedBox(height: hPadding),
 
-                  Form6Page(
+                  Form7Page(
                     context: context,
                     title: "Premi",
                     isExpanded: expanded[6],
                     onToggle: (v) => setState(() => expanded[6] = v),
-                    child: (hasForm6Record)
-                        ? Column(
+                    child: Column(
                       children: [
                         buildFieldPremiNet(),
                         const SizedBox(height: hPadding),
@@ -1084,33 +1040,29 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         const SizedBox(height: hPadding),
                         buildFieldPremiSubtotal(),
                       ],
-                    )
-                        : const SizedBox(
-                      height: 40,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Klik Hitung Premi untuk melihat hasil."),
-                      ),
                     ),
                   ),
 
                   const SizedBox(height: hPadding),
 
-                  if (hasForm6Record) ...[
-                    AppButton.iconRight(
-                      text: "Lanjutkan",
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KonfirmasiRegMvPage(
-                              recordId: regmv1Id ?? '',
-                              viewMode: 'ubah',
+                  if (regmv6Id?.isNotEmpty == true) ...[
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                      child: AppButton.iconRight(
+                        text: "Lanjutkan",
+                        icon: Icon(Icons.arrow_forward),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KonfirmasiRegMvPage(
+                                recordId: regmv1Id ?? '',
+                                viewMode: 'ubah',
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ],
 
@@ -1237,7 +1189,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     required bool isExpanded,
     required ValueChanged<bool> onToggle,
     required Widget child,
-    VoidCallback? onRefresh,
     String title = "Form 4",
   }) {
     return Card(
@@ -1254,7 +1205,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             ),
             onTap: () {
               onToggle(!isExpanded);
-              onRefresh?.call();
             },
           ),
           if (isExpanded)
@@ -1272,7 +1222,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     required bool isExpanded,
     required ValueChanged<bool> onToggle,
     required Widget child,
-    VoidCallback? onRefresh,
     String title = "Form 5",
   }) {
     return Card(
@@ -1289,7 +1238,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             ),
             onTap: () {
               onToggle(!isExpanded);
-              onRefresh?.call();
             },
           ),
           if (isExpanded)
@@ -1307,7 +1255,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     required bool isExpanded,
     required ValueChanged<bool> onToggle,
     required Widget child,
-    VoidCallback? onRefresh,
     String title = "Form 6",
   }) {
     return Card(
@@ -1324,19 +1271,18 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             ),
             onTap: () {
               onToggle(!isExpanded);
-              onRefresh?.call();
             },
-
           ),
           if (isExpanded)
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+              padding: const EdgeInsets.only(bottom: 15),
               child: child,
             ),
         ],
       ),
     );
   }
+
 
   Widget Form7Page({
     required BuildContext context,
@@ -1362,10 +1308,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               onToggle(!isExpanded);
               onRefresh?.call();
             },
+
           ),
           if (isExpanded)
             Padding(
-              padding: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               child: child,
             ),
         ],
@@ -1444,77 +1391,82 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Future<void>  onHitungPremi() async {
     final okForm1 = validateForm1();
     if (!okForm1) {
-      openForm1(recordId: regmv1Id);
+      openForm1();
       return;
     }
 
     final ok2 = validateForm2();
     if (!ok2) {
-      openForm2(recordId: regmv1Id);
+      openForm2();
       return;
     }
 
     final ok3 = validateForm3();
     if (!ok3) {
-      openForm3(recordId: regmv1Id);
+      openForm3();
       return;
     }
 
-    final isUploading4 = context.read<RegmvUploadStnkBloc>().state is UploadStnkLoading;
-    final isUploading5 = context.read<RegmvUploadFotoMobilBloc>().state is UploadFotoMobilLoading;
-    final isUploading7 = context.read<RegmvUploadFotoAccBloc>().state is UploadFotoAccLoading;
-    debugPrint("isUploading4: $isUploading4");
-    debugPrint("_imagesRegmv4 isNotEmpty: ${_imagesRegmv4.isNotEmpty}");
-    debugPrint("_serverPhotosRegmv4 isNotEmpty: ${_serverPhotosRegmv4.isNotEmpty}");
+    final uploadStateForm4 = context.read<RegmvUploadStnkBloc>().state;
+    final bool isUploadingForm4 = uploadStateForm4 is UploadStnkLoading;
+    final canUploadForm4 = !isUploadingForm4 &&
+        _imagesRegmv4.isNotEmpty;
+    if (canUploadForm4) {
+      setState(() {
+        _form4HasError = false;
+        _form4ErrorText = null;
+      });
 
-    final ok4 = !isUploading4 &&
-        (_imagesRegmv4.isNotEmpty || _serverPhotosRegmv4.isNotEmpty);
-
-    debugPrint("ok4 = $ok4");
-
-
-    debugPrint("isUploading5: $isUploading5");
-    debugPrint("_imagesRegmv5 isNotEmpty: ${_imagesRegmv5.isNotEmpty}");
-    debugPrint("_serverPhotosRegmv5 isNotEmpty: ${_serverPhotosRegmv5.isNotEmpty}");
-
-    final ok5 = !isUploading5 &&
-        (_imagesRegmv5.isNotEmpty || _serverPhotosRegmv5.isNotEmpty);
-
-    debugPrint("ok5 = $ok5");
-
-
-    debugPrint("isUploading7: $isUploading7");
-    debugPrint("_imagesRegmv7 isNotEmpty: ${_imagesRegmv7.isNotEmpty}");
-    debugPrint("_serverPhotosRegmv7 isNotEmpty: ${_serverPhotosRegmv7.isNotEmpty}");
-
-    final ok7 = !isUploading7 &&
-        (_imagesRegmv7.isNotEmpty || _serverPhotosRegmv7.isNotEmpty);
-
-    debugPrint("ok7 = $ok7");
-
-
-
-    setState(() {
-      _form4HasError = !ok4;
-      _form4ErrorText = !ok4 ? 'Bagian ini wajib diisi' : null;
-
-      _form5HasError = !ok5;
-      _form5ErrorText = !ok5 ? 'Bagian ini wajib diisi' : null;
-
-      _form7HasError = !ok7;
-      _form7ErrorText = !ok7 ? 'Bagian ini wajib diisi' : null;
-    });
-
-    if (!ok4 || !ok5 || !ok7) {
-      if (!ok4) openForm4(recordId: regmv1Id);
-      else if (!ok5) openForm5(recordId: regmv1Id);
-      else openForm6(recordId: regmv1Id);
+      _onUploadPressedForm4();
+    } else {
+      setState(() {
+        _form4HasError = _imagesRegmv4.isEmpty;
+        _form4ErrorText = _imagesRegmv4.isEmpty ? 'Bagian ini wajib diisi' : null;
+      });
+      openForm4();
       return;
     }
 
-    _onUploadPressedForm4();
-    _onUploadPressedForm5();
-    _onUploadPressedForm7();
+
+    final uploadStateForm5 = context.read<RegmvUploadFotoMobilBloc>().state;
+    final bool isUploadingForm5 = uploadStateForm5 is UploadFotoMobilLoading;
+    final canUploadForm5 = !isUploadingForm5 &&
+        _imagesRegmv5.isNotEmpty;
+    if (canUploadForm5) {
+      setState(() {
+        _form5HasError = false;
+        _form5ErrorText = null;
+      });
+
+      _onUploadPressedForm5();
+    } else {
+      setState(() {
+        _form5HasError = _imagesRegmv5.isEmpty;
+        _form5ErrorText = _imagesRegmv5.isEmpty ? 'Bagian ini wajib diisi' : null;
+      });
+      openForm5();
+      return;
+    }
+
+    final uploadStateForm7 = context.read<RegmvUploadFotoAccBloc>().state;
+    final bool isUploadingForm7 = uploadStateForm7 is UploadFotoAccLoading;
+    final canUploadForm7 = !isUploadingForm7 &&
+        _imagesRegmv7.isNotEmpty;
+    if (canUploadForm7) {
+      setState(() {
+        _form7HasError = false;
+        _form7ErrorText = null;
+      });
+
+      _onUploadPressedForm7();
+    } else {
+      setState(() {
+        _form7HasError = _imagesRegmv7.isEmpty;
+        _form7ErrorText = _imagesRegmv7.isEmpty ? 'Bagian ini wajib diisi' : null;
+      });
+      openForm6();
+      return;
+    }
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -1523,53 +1475,46 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
   }
 
-  void openForm1({required String? recordId}) {
+  void openForm1() {
     setState(() {
       expanded = [true, false, false, false, false, false, false];
     });
-    refreshForm1(recordId: recordId);
   }
 
-  void openForm2({required String? recordId}) {
+  void openForm2() {
     setState(() {
       expanded = [false, true, false, false, false, false, false];
     });
-    refreshForm2(recordId: recordId);
   }
 
-  void openForm3({required String? recordId}) {
+  void openForm3() {
     setState(() {
       expanded = [false, false, true, false, false, false, false];
     });
-    refreshForm3(recordId: recordId);
   }
 
-  void openForm4({required String? recordId}) {
+  void openForm4() {
     setState(() {
       expanded = [false, false, false, true, false, false, false];
     });
-    refreshForm4(recordId: recordId);
   }
 
-  void openForm5({required String? recordId}) {
+  void openForm5() {
     setState(() {
       expanded = [false, false, false, false, true, false, false];
     });
-    refreshForm5(recordId: recordId);
   }
 
-  void openForm6({required String? recordId}) {
+  void openForm6() {
     setState(() {
       expanded = [false, false, false, false, false, true, false];
     });
-    refreshForm6(recordId: recordId);
   }
 
-  void openForm7({required String? recordId}) {
+  void openForm7() {
     setState(() {
       expanded = [false, false, false, false, false, false, true];
     });
-    refreshForm7(recordId: recordId);
   }
 
     bool validateForm1() {
@@ -2735,18 +2680,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   void _onUploadPressedForm4() {
-    debugPrint("🔥 _onUploadPressedForm4 CALLED");
-
     final id = widget.regmv1Id;
-    debugPrint("regmv1Id: $id");
-
-    if (id == null || id.isEmpty) {
-      debugPrint("❌ regmv1Id null atau empty, return");
-      return;
-    }
-
-    debugPrint("_imagesRegmv4 length: ${_imagesRegmv4.length}");
-    debugPrint("_fileNamesRegmv4 length: ${_fileNamesRegmv4.length}");
+    if (id == null || id.isEmpty) return;
 
     context.read<RegmvUploadStnkBloc>().add(
       UploadStnkBatchSubmit(
@@ -2755,10 +2690,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         names: List.from(_fileNamesRegmv4),
       ),
     );
-
-    debugPrint("✅ UploadStnkBatchSubmit event SENT");
   }
-
   //form4
 
   //form5
@@ -2843,7 +2775,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         ),
         const SizedBox(height: 8),
         Text(
-          "Pastikan foto FotoMobil jelas, terang, dan tidak buram.",
+          "Pastikan foto Mobil jelas, terang, dan tidak buram.",
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 14, color: cardGrey),
         ),
@@ -3102,115 +3034,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
   //form5
 
+
   //form6
-  Widget buildFieldDiskonPersen() => appTextField(
-    label: "diskonPersen",
-    controller: fieldDiskonPersenController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form7.diskonPersen'),
-    validator: (_) => err('form7.diskonPersen'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.diskonPersen');
-    },
-  );
-
-  Widget buildFieldPremiAdd() => appTextField(
-    label: "premiAdd",
-    controller: fieldPremiAddController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form7.premiAdd'),
-    validator: (_) => err('form7.premiAdd'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiAdd');
-    },
-  );
-
-  Widget buildFieldPremiCasco() => appTextField(
-    label: "premiCasco",
-    controller: fieldPremiCascoController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form7.premiCasco'),
-    validator: (_) => err('form7.premiCasco'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiCasco');
-    },
-  );
-
-  Widget buildFieldPremiDiskon() => appTextField(
-    label: "premiDiskon",
-    controller: fieldPremiDiskonController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    enabled: false,
-    errorText: err('form7.premiDiskon'),
-    validator: (_) => err('form7.premiDiskon'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiDiskon');
-    },
-  );
-
-  Widget buildFieldPremiNet() => appTextField(
-    label: "premiNet",
-    controller: fieldPremiNetController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    enabled: false,
-    errorText: err('form7.premiNet'),
-    validator: (_) => err('form7.premiNet'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiNet');
-    },
-  );
-
-  Widget buildFieldPremiSubtotal() => appTextField(
-    label: "premiSubtotal",
-    controller: fieldPremiSubtotalController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    enabled: false,
-    errorText: err('form7.premiSubtotal'),
-    validator: (_) => err('form7.premiSubtotal'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiSubtotal');
-    },
-  );
-  //form6
-
-
-  //form7
   Widget _buildBodyForm7() {
     final uploadState = context.watch<RegmvUploadFotoAccBloc>().state;
 
@@ -3283,7 +3108,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         Icon(Icons.upload, size: 40, color: primaryLightColor),
         const SizedBox(height: 14),
         Text(
-          "Unggah Foto FotoAcc",
+          "Unggah Foto Aksesoris",
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -3292,7 +3117,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         ),
         const SizedBox(height: 8),
         Text(
-          "Pastikan foto FotoAcc jelas, terang, dan tidak buram.",
+          "Pastikan foto Mobil jelas, terang, dan tidak buram.",
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 14, color: cardGrey),
         ),
@@ -3331,7 +3156,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         itemBuilder: (context, index) {
           final item = _serverPhotosRegmv7[index];
           final url =
-              "${AppData.apiDomain}api/regmv/regmv7cari/FotoAcc/getfoto/${item.regmv7Id}";
+              "${AppData.apiDomain}api/regmv/regmv7cari/fotoacc/getfoto/${item.regmv7Id}";
 
           final isDeleting = _deletingServerIdsRegmv7.contains(item.regmv7Id);
 
@@ -3549,8 +3374,114 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ),
     );
   }
-//form7
+  //form6
 
+  //form7
+  Widget buildFieldDiskonPersen() => appTextField(
+    label: "diskonPersen",
+    controller: fieldDiskonPersenController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    errorText: err('form7.diskonPersen'),
+    validator: (_) => err('form7.diskonPersen'),
+    onChanged: (value) {
+      final clean = value.replaceAll(",", "").trim();
+      final x = double.tryParse(clean);
+      if (x != null) clearErr('form7.diskonPersen');
+    },
+  );
+
+  Widget buildFieldPremiAdd() => appTextField(
+    label: "premiAdd",
+    controller: fieldPremiAddController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    errorText: err('form7.premiAdd'),
+    validator: (_) => err('form7.premiAdd'),
+    onChanged: (value) {
+      final clean = value.replaceAll(",", "").trim();
+      final x = double.tryParse(clean);
+      if (x != null) clearErr('form7.premiAdd');
+    },
+  );
+
+  Widget buildFieldPremiCasco() => appTextField(
+    label: "premiCasco",
+    controller: fieldPremiCascoController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    errorText: err('form7.premiCasco'),
+    validator: (_) => err('form7.premiCasco'),
+    onChanged: (value) {
+      final clean = value.replaceAll(",", "").trim();
+      final x = double.tryParse(clean);
+      if (x != null) clearErr('form7.premiCasco');
+    },
+  );
+
+  Widget buildFieldPremiDiskon() => appTextField(
+    label: "premiDiskon",
+    controller: fieldPremiDiskonController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    enabled: false,
+    errorText: err('form7.premiDiskon'),
+    validator: (_) => err('form7.premiDiskon'),
+    onChanged: (value) {
+      final clean = value.replaceAll(",", "").trim();
+      final x = double.tryParse(clean);
+      if (x != null) clearErr('form7.premiDiskon');
+    },
+  );
+
+  Widget buildFieldPremiNet() => appTextField(
+    label: "premiNet",
+    controller: fieldPremiNetController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    enabled: false,
+    errorText: err('form7.premiNet'),
+    validator: (_) => err('form7.premiNet'),
+    onChanged: (value) {
+      final clean = value.replaceAll(",", "").trim();
+      final x = double.tryParse(clean);
+      if (x != null) clearErr('form7.premiNet');
+    },
+  );
+
+  Widget buildFieldPremiSubtotal() => appTextField(
+    label: "premiSubtotal",
+    controller: fieldPremiSubtotalController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+      ThousandsSeparatorInputFormatter(),
+    ],
+    enabled: false,
+    errorText: err('form7.premiSubtotal'),
+    validator: (_) => err('form7.premiSubtotal'),
+    onChanged: (value) {
+      final clean = value.replaceAll(",", "").trim();
+      final x = double.tryParse(clean);
+      if (x != null) clearErr('form7.premiSubtotal');
+    },
+  );
+  //form7
 
 
   final Map<String, String?> fieldErrors = {};
@@ -3569,3 +3500,4 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     });
   }
 }
+*/
