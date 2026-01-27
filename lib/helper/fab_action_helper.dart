@@ -12,6 +12,9 @@ import '../pages/beli_polis/mobile/beli_polis_page.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../pages/regreaktif/mobile/form_reaktif.dart';
+import '../pages/regrenewal/mobile/form_renewal.dart';
+
 class FabActionHelper {
   static final List<ActionMenuItem> masterActions = [
     ActionMenuItem(
@@ -341,7 +344,7 @@ class FabActionHelper {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EndorseFormPage(
+        builder: (_) => ReaktifFormPage(
           viewMode: "tambah",
           recordId: "",
           polisId: sppaId,

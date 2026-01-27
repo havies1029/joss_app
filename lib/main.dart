@@ -15,6 +15,8 @@ import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
 import 'package:joss_app/blocs/regendors/regendorscari_bloc.dart';
+import 'package:joss_app/blocs/regreaktif/regreaktif1_bloc.dart';
+import 'package:joss_app/blocs/regrenewal/regrenewcari_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
 import 'package:joss_app/blocs/share_cubit/share_dnsppa_state_cubit.dart';
@@ -75,6 +77,8 @@ import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_download_fotoobject_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository.dart';
+import 'package:joss_app/repositories/regreaktif/regreaktif1_repository.dart';
+import 'package:joss_app/repositories/regrenewal/regrenew1form_repository.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
 import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
@@ -191,6 +195,7 @@ import 'blocs/regpar/regpar5form_bloc.dart';
 import 'blocs/regpar/regpar6cari_bloc.dart';
 import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
 import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
+import 'blocs/regrenewal/regrenew1form_bloc.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
 import 'blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
@@ -461,6 +466,8 @@ Future<void> main() async {
         ),
         BlocProvider(
         create: (_) => PolisTanggalBloc()),
+        BlocProvider(create: (_) => Regrenew1FormBloc(repository: Regrenew1FormRepository())),
+        BlocProvider(create: (_) => Regreaktif1Bloc(repository: Regreaktif1Repository())),
       ],
       child: MultiBlocListener(
         listeners: [

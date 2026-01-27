@@ -99,6 +99,7 @@ class appTextField extends StatelessWidget {
       cursorColor: primaryLightColor,
       style: bodyTextStyle(context),
       decoration: InputDecoration(
+        alignLabelWithHint: true,
         labelText: label,
         labelStyle: (enabled ?? true)
             ? inputTextStyle(context)

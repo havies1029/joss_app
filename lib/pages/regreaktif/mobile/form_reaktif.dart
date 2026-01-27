@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/models/regendors/regendors1form_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
 
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/regreaktif/regreaktif1_bloc.dart';
+import '../../../models/regreaktif/regreaktif1_model.dart';
 
-class EndorseFormPage extends StatefulWidget {
+
+class ReaktifFormPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
   final String polisId;
   final String cobId;
   final String? pageTitle;
 
-  const EndorseFormPage({
+  const ReaktifFormPage({
     super.key,
     required this.viewMode,
     required this.recordId,
@@ -29,11 +31,12 @@ class EndorseFormPage extends StatefulWidget {
 
 
   @override
-  EndorseFormPageFormState createState() => EndorseFormPageFormState();
+  ReaktifFormPageFormState createState() => ReaktifFormPageFormState();
 }
 
-class EndorseFormPageFormState extends State<EndorseFormPage> {
-  late Regendors1FormBloc regendors1FormBloc;
+class ReaktifFormPageFormState extends State<ReaktifFormPage> {
+  late Regreaktif1Bloc regreaktif1Bloc;
+  late MRekan1CrudBloc mrekan1crudbloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
   var fieldEndorsTglController = TextEditingController(text: DateTime.now().toIso8601String());
@@ -51,24 +54,16 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      loadData();
-
-
-      fieldSppa1IdController.text = widget.polisId;
-
-      debugPrint("✅ [Endorse] Polis ID dari BLoC: ${widget.polisId}");
-    });
+    mrekan1crudbloc = context.read<MRekan1CrudBloc>();
+    regreaktif1Bloc = context.read<Regreaktif1Bloc>();
   }
 
   @override
   Widget build(BuildContext context) {
-    regendors1FormBloc = BlocProvider.of<Regendors1FormBloc>(context);
-
-    return BlocConsumer<Regendors1FormBloc, Regendors1FormState>(
+    return BlocConsumer<Regreaktif1Bloc, Regreaktif1State>(
       builder: (context, state) {
         return BaseBackgroundSidePage(
-          title: 'Endorse Perubahan',
+          title: 'Perpanjangan Polis',
           child: Scaffold(
             backgroundColor: secondaryBlackColor,
             bottomNavigationBar: Padding(
@@ -125,22 +120,13 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
         );
       },
       listener: (context, state) async {
-        if (state.isSaved && !state.hasFailure) {
-          if (context.mounted) {
-            Navigator.pop(context, true);
-          }
-        }
+        // if (state.isSaved && !state.hasFailure) {
+        //   if (context.mounted) {
+        //     Navigator.pop(context, true);
+        //   }
+        // }
       },
     );
-  }
-
-
-  void loadData() {
-    if (widget.viewMode == "ubah") {
-      regendors1FormBloc.add(
-          Regendors1FormLihatEvent(recordId: widget.recordId));
-    } else {
-    }
   }
 
   Widget buildFieldEndorsTgl(){
@@ -347,14 +333,13 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
 
   void onSaveForm() {
 
-    final record = Regendors1FormModel(
-      notePerubahan: fieldNotePerubahanController.text,
+    final record = Regreaktif1Model(
+      isUbah: false,
       sppa1Id: widget.polisId,
-      regendors1Id: "",
+      notePerubahan: fieldNotePerubahanController.text,
     );
 
-    regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));
-    debugPrint("berhasil");
+    regreaktif1Bloc.add(Regreaktif1TambahEvent(record: record));
     _dismissDialog();
   }
 
