@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/pages/gen_endors/mobile/form_endorse.dart';
 import 'package:joss_app/pages/management_polis/detail_management_page/detail_management_widget.dart';
 import '../blocs/asetothers/asetotherscari_bloc.dart';
 import '../blocs/gen_aset_health/asethealthcari_bloc.dart';
@@ -8,7 +9,6 @@ import '../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import '../pages/beli_polis/mobile/beli_polis_page.dart';
-import '../pages/gen_endors/endors1crud_form.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -86,7 +86,6 @@ class FabActionHelper {
       borderColor: const Color(0xFF43FB49),
       isEnabled: false,
     ),
-
   ];
 
   static List<ActionMenuItem> visibleActionsByCob({
@@ -96,24 +95,24 @@ class FabActionHelper {
     // whitelist per cob
     final allowedTypes = switch (cobId) {
       "10002" => <ActionType>{
-        ActionType.beliPolis,
-        // ActionType.unduhPolis,
-        ActionType.lacakPolis,
-        ActionType.endorse,
-        ActionType.perpanjangan,
-        ActionType.aktifkanKembali,
-        ActionType.lihatPolisPar,
-        ActionType.lihatPolisEq,
-      },
+          ActionType.beliPolis,
+          // ActionType.unduhPolis,
+          ActionType.lacakPolis,
+          ActionType.endorse,
+          ActionType.perpanjangan,
+          ActionType.aktifkanKembali,
+          ActionType.lihatPolisPar,
+          ActionType.lihatPolisEq,
+        },
       "10003" || "10004" || "10005" || "10006" => <ActionType>{
-        ActionType.beliPolis,
-        // ActionType.unduhPolis,
-        ActionType.lacakPolis,
-        ActionType.endorse,
-        ActionType.perpanjangan,
-        ActionType.aktifkanKembali,
-        ActionType.lihatPolis,
-      },
+          ActionType.beliPolis,
+          // ActionType.unduhPolis,
+          ActionType.lacakPolis,
+          ActionType.endorse,
+          ActionType.perpanjangan,
+          ActionType.aktifkanKembali,
+          ActionType.lihatPolis,
+        },
       _ => <ActionType>{ActionType.beliPolis},
     };
 
@@ -125,7 +124,7 @@ class FabActionHelper {
 
   // Permission berdasarkan status
   static final Map<String, List<ActionType>> statusEnabledMatrix = {
-    'aktif': [ActionType.endorse, ActionType.unduhPolis],
+    'aktif': [ActionType.endorse, ActionType.unduhPolis, ActionType.endorse],
     'diproses': [ActionType.lacakPolis],
     'tunggu pembayaran': [ActionType.lacakPolis],
     'jatuh tempo': [ActionType.perpanjangan],
@@ -133,51 +132,52 @@ class FabActionHelper {
     'non aktif': [ActionType.aktifkanKembali],
   };
 
+  static String _mapStatusIdToKey(String? statusId) {
+    switch (statusId) {
+      case "10001":
+        return "aktif";
+      case "10002":
+        return "diproses";
+      case "10003":
+        return "tunggu pembayaran";
+      case "10004":
+        return "jatuh tempo";
+      case "10005":
+        return "berakhir";
+      case "10006":
+        return "non aktif";
+      default:
+        return "";
+    }
+  }
+
   // Method utama untuk mendapatkan available actions
   static List<ActionMenuItem> getAvailableActions({
     required String? currentStatusFilter,
     required List<dynamic> selectedItems,
   }) {
-    // Tidak ada item terpilih → hanya always enabled yang ON
+    // ❌ gak ada selection → hanya always enabled
     if (selectedItems.isEmpty) {
-      return masterActions.map((action) {
-        return action.copyWith(
-          isEnabled: alwaysEnabledActions.contains(action.type),
+      return masterActions.map((a) {
+        return a.copyWith(
+          isEnabled: alwaysEnabledActions.contains(a.type),
         );
       }).toList();
     }
 
-    // Ada item terpilih → check status
-    final status = _getStatusFromItem(selectedItems.first);
-    final allowedActions = statusEnabledMatrix[status.toLowerCase().trim()] ?? [];
+    // ✅ STATUS DARI FILTER, BUKAN ITEM
+    final statusKey = _mapStatusIdToKey(currentStatusFilter);
+    final allowedActions = statusEnabledMatrix[statusKey] ?? [];
 
     return masterActions.map((action) {
-      // Always enabled actions selalu ON
       if (alwaysEnabledActions.contains(action.type)) {
         return action.copyWith(isEnabled: true);
       }
 
-      // Lainnya ON jika ada di allowed actions
       return action.copyWith(
         isEnabled: allowedActions.contains(action.type),
       );
     }).toList();
-  }
-
-  // Extract status dari item
-  static String _getStatusFromItem(dynamic item) {
-    try {
-      if (item is Map<String, dynamic>) {
-        return item['status']?.toString() ?? '';
-      }
-      if (item.toJson != null) {
-        final json = item.toJson();
-        return json['status']?.toString() ?? '';
-      }
-      return item.status?.toString() ?? '';
-    } catch (_) {
-      return '';
-    }
   }
 
   // Handle action tap
@@ -211,13 +211,15 @@ class FabActionHelper {
         _navigateToDetail(context, item, onActionComplete);
         break;
       case ActionType.endorse:
-        _navigateToEndorse(context, item, "Endorse", onActionComplete);
+        _handleEndorse(context, "Endorse", onActionComplete);
         break;
+
       case ActionType.perpanjangan:
-        _navigateToEndorse(context, item, "Perpanjangan", onActionComplete);
+        _handleEndorse(context, "Perpanjangan", onActionComplete);
         break;
+
       case ActionType.aktifkanKembali:
-        _navigateToEndorse(context, item, "Aktifkan kembali", onActionComplete);
+        _handleEndorse(context, "Aktifkan kembali", onActionComplete);
         break;
       case ActionType.lihatPolisPar:
         _handleLihatPolisPar(context, onActionComplete);
@@ -236,11 +238,125 @@ class FabActionHelper {
     }
   }
 
+  static String _getSelectedPolisIdByCob(BuildContext context, String cobId) {
+    return switch (cobId) {
+      "10002" => context.read<AsetParCariBloc>().state.selectedId,
+      "10003" => context.read<AsetMvCariBloc>().state.selectedFilePolisId,
+      "10004" => context.read<AsethullCariBloc>().state.selectedFilePolisId,
+      "10005" => context.read<AsetHealthCariBloc>().state.selectedFilePolisId,
+      "10006" => context.read<AsetothersCariBloc>().state.selectedFilePolisId,
+      _ => "",
+    };
+  }
+
+  // Helper untuk ambil polisId dari item yang dipilih
+  static String _getPolisIdFromSelectedItem(
+      BuildContext context, String cobId) {
+    try {
+      return switch (cobId) {
+        "10002" => () {
+            final state = context.read<AsetParCariBloc>().state;
+            if (state.selectedIds.isEmpty) return "";
+
+            // Ambil item pertama yang dipilih
+            final selectedItem = state.items.firstWhere(
+              (x) => state.selectedIds.contains(x.asetParId),
+            );
+            return selectedItem.asetParId ?? selectedItem.polisNo ?? "";
+          }(),
+        "10003" => () {
+            final state = context.read<AsetMvCariBloc>().state;
+            if (state.selectedIds.isEmpty) return "";
+
+            final selectedItem = state.items.firstWhere(
+              (x) => state.selectedIds.contains(x.asetMvId),
+            );
+            return selectedItem.asetMvId ?? selectedItem.polisNo ?? "";
+          }(),
+        "10004" => () {
+            final state = context.read<AsethullCariBloc>().state;
+            if (state.selectedIds.isEmpty) return "";
+
+            final selectedItem = state.items.firstWhere(
+              (x) => state.selectedIds.contains(x.asetHullId),
+            );
+
+            return selectedItem.asetHullId ?? selectedItem.polisNo ?? "";
+          }(),
+        "10005" => () {
+            final state = context.read<AsetHealthCariBloc>().state;
+            if (state.selectedIds.isEmpty) return "";
+
+            final selectedItem = state.items.firstWhere(
+              (x) => state.selectedIds.contains(x.asethealthId),
+            );
+
+            return selectedItem.asethealthId ?? selectedItem.polisNo ?? "";
+          }(),
+        "10006" => () {
+            final state = context.read<AsetothersCariBloc>().state;
+            if (state.selectedIds.isEmpty) return "";
+
+            final selectedItem = state.items.firstWhere(
+              (x) => state.selectedIds.contains(x.asetOthersId),
+            );
+
+            return selectedItem.asetOthersId ?? selectedItem.polisNo ?? "";
+          }(),
+        _ => "",
+      };
+    } catch (e) {
+      debugPrint("Error getting polisId from item: $e");
+      return "";
+    }
+  }
+
+  static void _handleEndorse(
+    BuildContext context,
+    String pageTitle,
+    VoidCallback? onComplete,
+  ) {
+    final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
+
+    String sppaId = _getSelectedPolisIdByCob(context, cobId);
+
+    debugPrint("🔍 cobId: $cobId");
+    debugPrint("🔍 sppaId from state: $sppaId");
+
+    if (sppaId.isEmpty) {
+      sppaId = _getPolisIdFromSelectedItem(context, cobId);
+      debugPrint("🔍 sppaId from item: $sppaId");
+    }
+
+    if (sppaId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("⚠ Pilih polis terlebih dahulu"),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EndorseFormPage(
+          viewMode: "tambah",
+          recordId: "",
+          polisId: sppaId,
+          cobId: cobId,
+          pageTitle: pageTitle,
+        ),
+      ),
+    ).then((_) => onComplete?.call());
+  }
+
   static void _handleAlwaysEnabled(
-      BuildContext context,
-      ActionType type,
-      VoidCallback? onComplete,
-      ) {
+    BuildContext context,
+    ActionType type,
+    VoidCallback? onComplete,
+  ) {
     switch (type) {
       case ActionType.beliPolis:
         Navigator.push(
@@ -264,10 +380,10 @@ class FabActionHelper {
   }
 
   static void _navigateToDetail(
-      BuildContext context,
-      dynamic item,
-      VoidCallback? onComplete,
-      ) {
+    BuildContext context,
+    dynamic item,
+    VoidCallback? onComplete,
+  ) {
     final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
     if (cobId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -289,30 +405,31 @@ class FabActionHelper {
     ).then((_) => onComplete?.call());
   }
 
-  static void _navigateToEndorse(
-      BuildContext context,
-      dynamic item,
-      String pageTitle,
-      VoidCallback? onComplete,
-      ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Endors1CrudFormPage(
-          viewMode: "tambah",
-          recordId: "",
-          data: item,
-          pageTitle: pageTitle,
-        ),
-      ),
-    ).then((_) => onComplete?.call());
-  }
+  // static void _navigateToEndorse(
+  //     BuildContext context,
+  //     dynamic item,
+  //     String pageTitle,
+  //     VoidCallback? onComplete,
+  //     ) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (_) => EndorseFormPage(
+  //         viewMode: "tambah",
+  //         recordId: "",
+  //         data: item,
+  //         pageTitle: pageTitle,
+  //       ),
+  //     ),
+  //   ).then((_) => onComplete?.call());
+  // }
 
   static void _handleLihatPolisPar(
-      BuildContext context,
-      VoidCallback? onComplete,
-      ) {
-    final polisId = context.read<AsetParCariBloc>().state.selectedFilePolisParId;
+    BuildContext context,
+    VoidCallback? onComplete,
+  ) {
+    final polisId =
+        context.read<AsetParCariBloc>().state.selectedFilePolisParId;
 
     if (polisId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -324,15 +441,17 @@ class FabActionHelper {
       return;
     }
 
-    context.read<SppaDownloadPolisBloc>().add(DownloadFileEvent(ePolisId: polisId, cob: 'PAR'));
+    context
+        .read<SppaDownloadPolisBloc>()
+        .add(DownloadFileEvent(ePolisId: polisId, cob: 'PAR'));
 
     onComplete?.call();
   }
 
   static void _handleLihatPolisEq(
-      BuildContext context,
-      VoidCallback? onComplete,
-      ) {
+    BuildContext context,
+    VoidCallback? onComplete,
+  ) {
     final polisId = context.read<AsetParCariBloc>().state.selectedFilePolisEqId;
 
     if (polisId.isEmpty) {
@@ -345,14 +464,16 @@ class FabActionHelper {
       return;
     }
 
-    context.read<SppaDownloadPolisBloc>().add(DownloadFileEvent(ePolisId: polisId, cob: 'PAR'));
+    context
+        .read<SppaDownloadPolisBloc>()
+        .add(DownloadFileEvent(ePolisId: polisId, cob: 'PAR'));
     onComplete?.call();
   }
 
   static void _handleLihatPolisGeneric(
-      BuildContext context,
-      VoidCallback? onComplete,
-      ) {
+    BuildContext context,
+    VoidCallback? onComplete,
+  ) {
     final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
 
     // 1️⃣ Ambil polisId berdasarkan COB
@@ -404,14 +525,14 @@ class FabActionHelper {
         );
         break;
 
-    // case "10006": // OTHERS
-    //   downloadBloc.add(
-    //     DownloadFileEvent(
-    //       ePolisId: polisId,
-    //       cob: 'OTHERS',
-    //     ),
-    //   );
-    //   break;
+      // case "10006": // OTHERS
+      //   downloadBloc.add(
+      //     DownloadFileEvent(
+      //       ePolisId: polisId,
+      //       cob: 'OTHERS',
+      //     ),
+      //   );
+      //   break;
 
       default:
         ScaffoldMessenger.of(context).showSnackBar(
@@ -426,8 +547,6 @@ class FabActionHelper {
     // debugPrint("⬇️ Download Polis: id=$polisId, cob=$cobId");
     onComplete?.call();
   }
-
-
 }
 
 extension ActionMenuItemCopy on ActionMenuItem {

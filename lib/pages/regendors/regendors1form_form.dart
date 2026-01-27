@@ -2,44 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/form_error.dart';
-import 'package:joss_app/blocs/gen_endors/endors1crud_bloc.dart';
-import 'package:joss_app/models/gen_endors/endors1crud_model.dart';
+import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
+import 'package:joss_app/models/regendors/regendors1form_model.dart';
 
-class Endors1CrudFormPage extends StatefulWidget {
+
+class Regendors1FormFormPage extends StatefulWidget {
 	final String sppa1Id;
 
-	const Endors1CrudFormPage({super.key, required this.sppa1Id});
+	const Regendors1FormFormPage({super.key, required this.sppa1Id});
 
 	@override
-	Endors1CrudFormPageFormState createState() => Endors1CrudFormPageFormState();
+	Regendors1FormFormPageFormState createState() => Regendors1FormFormPageFormState();
 }
 
-class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
-	late Endors1CrudBloc endors1CrudBloc;
+class Regendors1FormFormPageFormState extends State<Regendors1FormFormPage> {
+	late Regendors1FormBloc regendors1FormBloc;
 	final _formKey = GlobalKey<FormState>();
 	final List<String> errors = [];
 	var fieldNotePerubahanController = TextEditingController();
 
 	@override
 	Widget build(BuildContext context) {
-		endors1CrudBloc = BlocProvider.of<Endors1CrudBloc>(context);
+		regendors1FormBloc = BlocProvider.of<Regendors1FormBloc>(context);
 		return Form(
       key: _formKey,
       child: Column(
         children: [
           const SizedBox(height: 10),
-          Text(
-            "SPPA : ${widget.sppa1Id}",
-            style: const TextStyle(
-              fontSize: 20.0,
-              color: Color(0xffff6101),
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Hind',
-              fontStyle: FontStyle.italic,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-          const SizedBox(height: 25),
+          buildFieldSppa1Id(),
           buildFieldNotePerubahan(),
           const SizedBox(height: 25),
           FormError(
@@ -86,16 +76,15 @@ class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
         ],
       ));
 		}
-	
 
 	Widget buildFieldNotePerubahan(){
 		return TextFormField(
 			keyboardType: TextInputType.multiline,
-			minLines: 10,
-			maxLines: 25,
+			minLines: 5,
+			maxLines: 10,
 			controller: fieldNotePerubahanController,
 			decoration: const InputDecoration(
-				labelText: "Perubahan",
+				labelText: "notePerubahan",
 				floatingLabelBehavior: FloatingLabelBehavior.always,
 			),
 			onChanged: (value) {
@@ -113,6 +102,28 @@ class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
 		);
 	}
 
+	Widget buildFieldSppa1Id(){
+		return TextFormField(
+      readOnly: true,
+			controller: TextEditingController(text: widget.sppa1Id),
+			decoration: const InputDecoration(
+				labelText: "sppa1Id",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
+			onChanged: (value) {
+				if (value.isNotEmpty) {
+				removeError(error: kStringNullError);
+				}
+			},
+			validator: (value) {
+				if (value == null || value.isEmpty) {
+					addError(error: kStringNullError);
+					return "";
+				}
+				return null;
+			},
+		);
+	}
 
 	void _dismissDialog() {
 		Navigator.pop(context);
@@ -121,12 +132,11 @@ class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
 	void onSaveForm() {
 		if (_formKey.currentState!.validate()) {
 			_formKey.currentState!.save();
-			Endors1CrudModel record = Endors1CrudModel(
-				
+			Regendors1FormModel record = Regendors1FormModel(
 				notePerubahan: fieldNotePerubahanController.text,
 				sppa1Id: widget.sppa1Id,
 			);
-				endors1CrudBloc.add(Endors1CrudTambahEvent(record: record));
+			regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));
 			_dismissDialog();
 		}
 	}

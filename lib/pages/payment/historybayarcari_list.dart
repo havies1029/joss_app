@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
-import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
-import 'package:joss_app/pages/gen_endors/endors2cari_list_widget.dart';
+import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
+import 'package:joss_app/pages/payment/historybayarcari_list_widget.dart';
 
-class Endors2CariPage extends StatefulWidget {  
-	final String sppa1Id;
-	const Endors2CariPage({super.key, required this.sppa1Id});
+class HistorybayarCariPage extends StatefulWidget {
+	const HistorybayarCariPage({super.key});
 
 	@override
-	Endors2CariPageState createState() => Endors2CariPageState();
+	HistorybayarCariPageState createState() => HistorybayarCariPageState();
 }
 
-class Endors2CariPageState extends State<Endors2CariPage> {
-	late Endors2CariBloc endors2CariBloc;
+class HistorybayarCariPageState extends State<HistorybayarCariPage> {
+	late HistorybayarCariBloc historybayarCariBloc;
 	final TextEditingController _searchController = TextEditingController();
 	@override
 	void initState() {
@@ -25,7 +24,7 @@ class Endors2CariPageState extends State<Endors2CariPage> {
 
 	@override
 	Widget build(BuildContext context) {
-		endors2CariBloc = BlocProvider.of<Endors2CariBloc>(context);
+		historybayarCariBloc = BlocProvider.of<HistorybayarCariBloc>(context);
 		return Center(
 			child: Column(
 				mainAxisAlignment: MainAxisAlignment.start,
@@ -40,8 +39,8 @@ class Endors2CariPageState extends State<Endors2CariPage> {
 		);
 	}
 	void refreshData() {
-		endors2CariBloc.add(
-			RefreshEndors2CariEvent(sppa1Id: widget.sppa1Id));
+		historybayarCariBloc.add(
+			RefreshHistorybayarCariEvent(searchText: _searchController.text));
 	}
 
 	IconButton buildSearchButton() {
@@ -51,8 +50,8 @@ class Endors2CariPageState extends State<Endors2CariPage> {
 				size: 35.0,
 			),
 			onPressed: () {
-			endors2CariBloc.add(RefreshEndors2CariEvent(sppa1Id: widget.sppa1Id
-				));
+			historybayarCariBloc.add(RefreshHistorybayarCariEvent(statusId: '',
+				searchText: _searchController.text));
 			});
 	}
 
@@ -60,7 +59,7 @@ class Endors2CariPageState extends State<Endors2CariPage> {
 		return Expanded(
 			child: Column(
 				mainAxisAlignment: MainAxisAlignment.start,
-				children: <Widget>[Endors2CariListWidget(searchText: _searchController.text)],
+				children: <Widget>[HistorybayarCariListWidget(searchText: _searchController.text)],
 		));
 	}
 

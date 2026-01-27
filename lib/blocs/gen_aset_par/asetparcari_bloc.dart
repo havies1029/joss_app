@@ -249,6 +249,9 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		on<SelectPolisEqDetailEvent>(onSelectPolisEqDetail);
 		on<UnselectPolisEqDetailEvent>(onUnselectPolisEqDetail);
 		on<ClearPolisEqSelectionEvent>(onClearPolisEqSelection);
+
+		on<SelectSingleDetailEvent>(onSelectDetailId);
+		on<UnselectSingleDetailEvent>(onUnselectDetailId);
 	}
 
 	Future<void> onRefreshAsetParCari(
@@ -310,8 +313,11 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			hal: state.hal + 1,
 		));
 
-		// jaga konsistensi active/file
-		_recomputeActiveAndFiles(emit);
+		if (state.selectedId.isNotEmpty) {
+			_recomputeSingleActiveAndFiles(emit);
+		} else {
+			_recomputeActiveAndFiles(emit);
+		}
 	}
 
 	Future<void> _onDebugFetchAsetParCari(
@@ -361,6 +367,19 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		_recomputeActiveAndFiles(emit, preferId: event.asetParId);
 	}
 
+	Future<void> onSelectDetailId(
+			SelectSingleDetailEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedId: event.asetParId,
+		));
+		_recomputeSingleActiveAndFiles(
+			emit,
+			preferId: event.asetParId,
+		);
+	}
+
 	Future<void> onUnselectDetail(
 			UnselectDetailEvent event,
 			Emitter<AsetParCariState> emit,
@@ -377,6 +396,17 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		_recomputeActiveAndFiles(emit, preferId: preferFallback);
 	}
 
+	Future<void> onUnselectDetailId(
+			UnselectSingleDetailEvent  event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		if (state.selectedId != event.asetParId) return;
+
+		emit(state.copyWith(
+			selectedId: "",
+		));
+	}
+
 	Future<void> onClearSelection(
 			ClearParSelectionEvent event,
 			Emitter<AsetParCariState> emit,
@@ -385,6 +415,7 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 
 		emit(state.copyWith(
 			selectedIds: <String>{},
+			selectedId: "",
 			activeAsetParId: "",
 			selectedFilePolisParId: "",
 			selectedFilePolisEqId: "",
@@ -500,4 +531,41 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			selectedFilePolisEqId: row?.filePolisEqId ?? "",
 		));
 	}
+
+	void _recomputeSingleActiveAndFiles(
+			Emitter<AsetParCariState> emit, {
+				String? preferId,
+			}) {
+		final id = preferId ?? state.selectedId;
+
+		if (id.isEmpty) {
+			emit(state.copyWith(
+				selectedId: "",
+				activeAsetParId: "",
+				selectedFilePolisParId: "",
+				selectedFilePolisEqId: "",
+			));
+			return;
+		}
+
+		final row = _findByAsetParId(id);
+
+		if (row == null) {
+			emit(state.copyWith(
+				selectedId: "",
+				activeAsetParId: "",
+				selectedFilePolisParId: "",
+				selectedFilePolisEqId: "",
+			));
+			return;
+		}
+
+		emit(state.copyWith(
+			selectedId: id,
+			activeAsetParId: id,
+			selectedFilePolisParId: row.filePolisParId,
+			selectedFilePolisEqId: row.filePolisEqId,
+		));
+	}
+
 }

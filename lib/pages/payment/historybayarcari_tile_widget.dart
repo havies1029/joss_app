@@ -1,29 +1,24 @@
-import 'package:joss_app/pages/gen_endors/endors1crud_main.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/widgets/my_colors.dart';
 import 'package:joss_app/widgets/my_text.dart';
 
-class AsetParCariTileWidget extends StatelessWidget {
-	final String alamat;
-	final String asetParId;
-	final String curr;
+class HistorybayarCariTileWidget extends StatelessWidget {
+	final DateTime invTgl;
+	final String inv1Id;
+	final int jmlPolis;
 	final int nomor;
-	final String polisNo;
-	final double premi;
 	final String status;
-	final double sumInsured;
+	final double totalBayar;
 
-	const AsetParCariTileWidget(
+	const HistorybayarCariTileWidget(
 		{super.key,
-		required this.alamat, 
-		required this.asetParId, 
-		required this.curr, 
+		required this.invTgl, 
+		required this.inv1Id, 
+		required this.jmlPolis, 
 		required this.nomor, 
-		required this.polisNo, 
-		required this.premi, 
 		required this.status, 
-		required this.sumInsured});
+		required this.totalBayar});
 
 	@override
 	Widget build(BuildContext context) {
@@ -41,58 +36,39 @@ class AsetParCariTileWidget extends StatelessWidget {
 				child: Column(
 					crossAxisAlignment: CrossAxisAlignment.start,
 					children: [
-						Text("alamat",
+						Text("invTgl",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							alamat,
+							DateFormat("dd/MM/yyyy").format(invTgl),
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("asetParId",
+						Text("inv1Id",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							asetParId,
+							inv1Id,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("curr",
+						Text("jmlPolis",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							curr,
+							NumberFormat("#,###").format(jmlPolis),
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						
 						Text("nomor",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
 							NumberFormat("#,###").format(nomor),
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("polisNo",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							polisNo,
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("premi",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							NumberFormat("#,###").format(premi),
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
@@ -105,27 +81,15 @@ class AsetParCariTileWidget extends StatelessWidget {
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("sumInsured",
+						Text("totalBayar",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							NumberFormat("#,###").format(sumInsured),
+							NumberFormat("#,###").format(totalBayar),
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Endors1CrudMainPage(sppa1Id: asetParId)),
-                );
-              },
-              child: Text("Tambah Endorsement",
-                style: MyText.bodyLarge(context)!
-                  .copyWith(color: MyColors.primary))),
 				]),
 			)
 		);

@@ -13,6 +13,8 @@ import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
+import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
+import 'package:joss_app/blocs/regendors/regendorscari_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
 import 'package:joss_app/blocs/share_cubit/share_dnsppa_state_cubit.dart';
@@ -65,6 +67,7 @@ import 'package:joss_app/repositories/payment/invbayarvaform_repository.dart';
 import 'package:joss_app/repositories/payment/pay1crud_repository.dart';
 import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
 import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
+import 'package:joss_app/repositories/regendors/regendors1form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
@@ -217,14 +220,20 @@ import 'package:joss_app/blocs/payment/dnsppamvcari_bloc.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory:
-    kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory(
-      (await getApplicationDocumentsDirectory()).path,
-    ),
-  );
+  try {
+    HydratedBloc.storage = await HydratedStorage.build(
+      storageDirectory:
+      kIsWeb
+          ? HydratedStorageDirectory.web
+          : HydratedStorageDirectory(
+        (await getApplicationDocumentsDirectory()).path,
+      ),
+    );
+  } catch (e) {
+    // If storage fails, disable persistence (use in-memory)
+    HydratedBloc.storage = null;
+    debugPrint('HydratedBloc storage failed, using in-memory: $e');
+  }
 
   final userRepository = UserRepository();
   final prefs = await SharedPreferences.getInstance();
@@ -317,6 +326,11 @@ Future<void> main() async {
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
+
+        BlocProvider(create:  (context) => Endors1ListBloc()),
+        BlocProvider(create: (context) => Endors1CrudBloc(repository: Endors1CrudRepository())),
+        BlocProvider(create: (context) => RegendorsCariBloc()),
+        BlocProvider(create: (context) => Regendors1FormBloc(repository: Regendors1FormRepository())),
         // BlocProvider(create: (_) => RegUserProfileCubit()),
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(
