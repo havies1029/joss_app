@@ -503,24 +503,12 @@ class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
       try {
         // ✅ tetap bikin record, biar kamu tau mapping data-nya
         Endors1CrudModel record = Endors1CrudModel(
-          endorsTgl: DateTime.parse(fieldEndorsTglController.text),
-          endors1Id: '',
-          insuredNama: fieldInsuredNamaController.text,
-          mstsendorsId: fieldMstsendorsIdController.text,
-          noteKonfirmasi: fieldNoteKonfirmasiController.text,
           notePerubahan: fieldNotePerubahanController.text,
-          periodeAkhir: DateTime.parse(fieldPeriodeAkhirController.text),
-          periodeMulai: DateTime.parse(fieldPeriodeMulaiController.text),
-          premi: _safeDouble(fieldPremiController.text),
           sppa1Id: fieldSppa1IdController.text,
-          statusEndors: fieldStatusEndorsController.text,
-          tsi: _safeDouble(fieldTsiController.text),
         );
 
         debugPrint("✅ [Endors1Crud] Record created:");
         debugPrint("   - sppa1Id: ${record.sppa1Id}");
-        debugPrint("   - premi: ${record.premi}");
-        debugPrint("   - tsi: ${record.tsi}");
 
         // ✅ PREVIEW: jangan dispatch bloc
         if (isPreview) {
@@ -536,9 +524,9 @@ class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
           debugPrint("🟢 [Endors1Crud] Dispatching Tambah event");
           endors1CrudBloc.add(Endors1CrudTambahEvent(record: record));
         } else if (widget.viewMode == "ubah") {
-          record.endors1Id = endors1CrudBloc.state.record!.endors1Id;
+          record.sppa1Id = endors1CrudBloc.state.record!.sppa1Id;
           debugPrint(
-              "🟢 [Endors1Crud] Dispatching Ubah event - ID: ${record.endors1Id}");
+              "🟢 [Endors1Crud] Dispatching Ubah event - ID: ${record.sppa1Id}");
           endors1CrudBloc.add(Endors1CrudUbahEvent(record: record));
         }
 

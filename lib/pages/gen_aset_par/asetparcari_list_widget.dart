@@ -43,37 +43,37 @@ class AsetParCariListWidgetState extends State<AsetParCariListWidget> {
 			}
 
 		return state.items.isNotEmpty
-			? Flexible(
-				child: ListView.builder(
-					padding: EdgeInsets.zero,
-					controller: _scrollController,
-					itemCount: state.items.length,
-					itemBuilder: (_, index) => Container(
-						margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-						padding: const EdgeInsets.all(0.2),
-						decoration: BoxDecoration(
-							borderRadius: BorderRadius.circular(15.0)),
-						child: Column(
-							children: <Widget>[
-								AsetParCariTileWidget(
-									alamat: state.items[index].alamat,
-									asetParId: state.items[index].asetParId,
-									curr: state.items[index].curr,
-									nomor: state.items[index].nomor,
-									polisNo: state.items[index].polisNo,
-									premi: state.items[index].premi,
-									status: state.items[index].status,
-									sumInsured: state.items[index].sumInsured,
-								)
-							],
-						),
-					)),
-				)
+			? Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            controller: _scrollController,
+            itemCount: state.items.length,
+            itemBuilder: (_, index) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+              padding: const EdgeInsets.all(0.2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15.0)),
+              child: Column(
+                children: <Widget>[
+                  AsetParCariTileWidget(
+                    alamat: state.items[index].alamat,
+                    asetParId: state.items[index].asetParId,
+                    curr: state.items[index].curr,
+                    nomor: state.items[index].nomor,
+                    polisNo: state.items[index].polisNo,
+                    premi: state.items[index].premi,
+                    status: state.items[index].status,
+                    sumInsured: state.items[index].sumInsured,
+                  )
+                ],
+              ),
+            )),
+        )
 			: const Center(
 				child: Padding(
 					padding: EdgeInsets.only(top: 80.0),
 					child: Text(
-						'No Data Available!!',
+						'No Data Properti Available!!',
 						style: TextStyle(
 							color: Colors.red,
 							fontSize: 12.0,
@@ -84,7 +84,7 @@ class AsetParCariListWidgetState extends State<AsetParCariListWidget> {
 		} else {
 			return const Center(
 					child: Text(
-						'No Data Available!!',
+						'No Data Properti Available!!',
 						style: TextStyle(
 							color: Colors.red,
 							fontSize: 12.0,

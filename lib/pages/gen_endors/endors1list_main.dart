@@ -7,6 +7,9 @@ class Endors1ListMainPage extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		return Scaffold(
+      appBar: AppBar(
+        title: const Text('List Endorsement'),
+      ),
 			backgroundColor: Colors.grey[100],
 			body: const Endors1ListPage(),
 		);

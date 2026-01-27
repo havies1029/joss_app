@@ -18,15 +18,10 @@ class Endors1ListPageState extends State<Endors1ListPage> {
 	late Endors1ListBloc endors1ListBloc;
 	late Endors1CrudBloc endors1CrudBloc;
 	final TextEditingController _searchController = TextEditingController();
-
 	@override
 	void initState() {
 		super.initState();
-		debugPrint("🚀 [Init] Endors1ListPage dimulai...");
-
 		Future.delayed(const Duration(milliseconds: 500), () {
-			if (!mounted) return;
-			debugPrint("⏱️ [Init] Delay selesai, refresh data pertama kali...");
 			refreshData();
 		});
 	}
@@ -38,115 +33,84 @@ class Endors1ListPageState extends State<Endors1ListPage> {
 
 		return MultiBlocListener(
 			listeners: [
-				// 🔹 Listener untuk perubahan ViewMode (tambah/ubah)
 				BlocListener<Endors1ListBloc, Endors1ListState>(
-					listenWhen: (previous, current) =>
-					previous.viewMode != current.viewMode,
 					listener: (context, state) {
-						debugPrint("👂 [BlocListener] ViewMode berubah ke: ${state.viewMode}");
 						if (state.viewMode == "tambah") {
-							debugPrint("➕ [ViewMode] Buka form tambah data...");
 							showDialogViewData(context, state.viewMode, "");
 						} else if (state.viewMode == "ubah") {
-							debugPrint("✏️ [ViewMode] Buka form ubah untuk ID: ${state.recordId}");
 							showDialogViewData(context, state.viewMode, state.recordId);
 						}
-					},
-				),
-
-				// 🔹 Listener untuk event simpan sukses di CRUD
+				}, listenWhen: (previous, current) {
+					return previous.viewMode != current.viewMode;
+				}),
 				BlocListener<Endors1CrudBloc, Endors1CrudState>(
-					listenWhen: (previous, current) =>
-					previous.isSaved != current.isSaved,
 					listener: (context, state) {
 						if (state.isSaved) {
-							debugPrint("💾 [CRUD] Data berhasil disimpan, refresh list...");
 							refreshData();
 						}
-					},
-				),
+				}, listenWhen: (previous, current) {
+					return previous.isSaved != current.isSaved;
+				}),
 			],
 			child: Scaffold(
 				floatingActionButton: FloatingMenuMasterWidget(
-					onTambah: onTambahData,
-				),
+					onTambah: onTambahData),
 				body: Center(
 					child: Column(
 						mainAxisAlignment: MainAxisAlignment.start,
 						children: [
 							ListPageFilterBarUIWidget(
 								searchController: _searchController,
-								searchButton: buildSearchButton(),
-							),
-							buildList(),
+								searchButton: buildSearchButton()),
+							buildList()
 						],
+
 					),
 				),
-			),
-		);
+			));
 	}
 
-	// 🔹 Fungsi untuk refresh data list
 	void refreshData() {
-		debugPrint(
-				"🔄 [RefreshData] Kirim event RefreshEndors1ListEvent(searchText='${_searchController.text}', hal=0)");
 		endors1ListBloc.add(
-			RefreshEndors1ListEvent(searchText: _searchController.text, hal: 0),
-		);
+			RefreshEndors1ListEvent(searchText: _searchController.text, hal: 0));
 	}
 
-	// 🔹 Fungsi ketika tombol tambah ditekan
 	void onTambahData() {
-		debugPrint("➕ [onTambahData] Tombol tambah ditekan");
 		endors1ListBloc.add(TambahEndors1ListEvent());
 	}
 
-	// 🔹 Tombol Search
 	IconButton buildSearchButton() {
 		return IconButton(
-			icon: const Icon(Icons.autorenew_rounded, size: 35.0),
-			onPressed: () {
-				debugPrint(
-						"🔍 [SearchButton] Ditekan, cari dengan keyword='${_searchController.text}'");
-				endors1ListBloc.add(
-					RefreshEndors1ListEvent(
-						searchText: _searchController.text,
-						hal: 0,
-					),
-				);
-			},
-		);
-	}
-
-	// 🔹 Widget List utama
-	Widget buildList() {
-		debugPrint("🧱 [BuildList] Bangun widget list dengan filter='${_searchController.text}'");
-		return Expanded(
-			child: Endors1ListListWidget(
-				searchText: _searchController.text,
+			icon: const Icon(
+				Icons.autorenew_rounded,
+				size: 35.0,
 			),
-		);
+			onPressed: () {
+			endors1ListBloc.add(RefreshEndors1ListEvent(
+				searchText: _searchController.text, hal: 0));
+			});
 	}
 
-	// 🔹 Dialog Tambah/Ubah data
-	void showDialogViewData(
-			BuildContext context, String viewMode, String recordId) {
-		FocusScope.of(context).requestFocus(FocusNode());
-		debugPrint("🪟 [Dialog] Buka dialog ($viewMode) untuk recordId='$recordId'");
+	Widget buildList() {
+		return Expanded(
+			child: Column(
+				mainAxisAlignment: MainAxisAlignment.start,
+				children: <Widget>[Endors1ListListWidget(searchText: _searchController.text)],
+		));
+	}
 
+	void showDialogViewData(BuildContext context, String viewMode, String sppa1Id) {
+		FocusScope.of(context).requestFocus(FocusNode());
 		showDialog(
 			context: context,
 			barrierDismissible: false,
 			builder: (BuildContext context) {
-				return Endors1CrudFormPage(
-					viewMode: viewMode,
-					recordId: recordId,
-				);
+				return Endors1CrudFormPage(sppa1Id: sppa1Id);
 			},
-			useSafeArea: true,
-		).then((value) {
-			debugPrint("🔙 [Dialog] Dialog ditutup, kirim event CloseDialogEndors1ListEvent()");
+			useSafeArea: true)
+		.then((value) {
 			endors1ListBloc.add(CloseDialogEndors1ListEvent());
 		});
 	}
+
 }

@@ -411,6 +411,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     );
   }
 
+  void debugSelectedRows(String cobId, List<Map<String, dynamic>> rows) {
+    debugPrint("========== SELECTED ROWS ==========");
+    debugPrint("COB ID : $cobId");
+    debugPrint("TOTAL  : ${rows.length}");
+
+    for (var i = 0; i < rows.length; i++) {
+      debugPrint("Row ${i + 1}: ${rows[i]}");
+    }
+
+    debugPrint("===================================");
+  }
+
   void refreshData() {
     var stateCob = cobAsetBloc.state;
     var stateStatus = statusAsetBloc.state;
@@ -481,6 +493,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         "Status": d.status,
       })
           .toList();
+
     }
 
     if (cobId == "10003") {
@@ -571,6 +584,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       })
           .toList();
     }
+
     return [];
   }
 

@@ -3,21 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/showdialoghapus_widget.dart';
-import 'package:joss_app/blocs/gen_endors/endors1list_bloc.dart';
-import 'package:joss_app/blocs/gen_endors/endors1crud_bloc.dart';
-import 'package:joss_app/pages/gen_endors/endors1list_tile_widget.dart';
+import 'package:joss_app/blocs/gen_sppamv/sppamvlist_bloc.dart';
+import 'package:joss_app/blocs/gen_sppamv/sppamvcrud_bloc.dart';
+import 'package:joss_app/pages/gen_sppamv/sppamvlist_tile_widget.dart';
 
-class Endors1ListListWidget extends StatefulWidget {
+class SppamvListListWidget extends StatefulWidget {
 	final String searchText;
-	const Endors1ListListWidget({super.key, required this.searchText});
+	const SppamvListListWidget({super.key, required this.searchText});
 
 	@override
-	Endors1ListListWidgetState createState() => Endors1ListListWidgetState();
+	SppamvListListWidgetState createState() => SppamvListListWidgetState();
 }
 
-class Endors1ListListWidgetState extends State<Endors1ListListWidget> {
-	late Endors1ListBloc endors1ListBloc;
-	late Endors1CrudBloc endors1CrudBloc;
+class SppamvListListWidgetState extends State<SppamvListListWidget> {
+	late SppamvListBloc sppamvListBloc;
+	late SppamvCrudBloc sppamvCrudBloc;
 	final ScrollController _scrollController = ScrollController();
 
 	@override
@@ -36,9 +36,9 @@ class Endors1ListListWidgetState extends State<Endors1ListListWidget> {
 
 	@override
 	Widget build(BuildContext context) {
-		endors1ListBloc = BlocProvider.of<Endors1ListBloc>(context);
-		endors1CrudBloc = BlocProvider.of<Endors1CrudBloc>(context);
-		return BlocConsumer<Endors1ListBloc, Endors1ListState>(
+		sppamvListBloc = BlocProvider.of<SppamvListBloc>(context);
+		sppamvCrudBloc = BlocProvider.of<SppamvCrudBloc>(context);
+		return BlocConsumer<SppamvListBloc, SppamvListState>(
 			builder: (context, state) {
 			if (state.status == ListStatus.success) {
 			return state.items.isNotEmpty
@@ -60,11 +60,11 @@ class Endors1ListListWidgetState extends State<Endors1ListListWidget> {
 												children: [
 													SlidableAction(
 														onPressed: (context) {
-															endors1ListBloc.add(
-																UbahEndors1ListEvent(
+															sppamvListBloc.add(
+																UbahSppamvListEvent(
 																	recordId: state
 																		.items[index]
-																		.endors1Id));
+																		.sppa1Id));
 														},
 														backgroundColor: Colors.green,
 														icon: Icons.edit,
@@ -73,26 +73,33 @@ class Endors1ListListWidgetState extends State<Endors1ListListWidget> {
 													SlidableAction(
 														onPressed: (context) {
 															showDialogHapus(
-																state.items[index].endors1Id);
+																state.items[index].sppa1Id);
 														},
 														backgroundColor: Colors.red,
 														icon: Icons.delete,
 														label: "Delete",
 													),
 												]),
-											child: Endors1ListTileWidget(
-												endorsTgl: state.items[index].endorsTgl,
-												endors1Id: state.items[index].endors1Id,
+											child: SppamvListTileWidget(
+												coverName: state.items[index].coverName,
+												grupNama: state.items[index].grupNama,
+												harga: state.items[index].harga,
 												insuredNama: state.items[index].insuredNama,
-												mstsendorsId: state.items[index].mstsendorsId,
-												noteKonfirmasi: state.items[index].noteKonfirmasi,
-												notePerubahan: state.items[index].notePerubahan,
+												mesinNo: state.items[index].mesinNo,
+												nmMerk: state.items[index].nmMerk,
+												nmTipe: state.items[index].nmTipe,
 												periodeAkhir: state.items[index].periodeAkhir,
 												periodeMulai: state.items[index].periodeMulai,
-												premi: state.items[index].premi,
+												polisiNo: state.items[index].polisiNo,
+												premiTotal: state.items[index].premiTotal,
+												rangkaNo: state.items[index].rangkaNo,
+												curr: state.items[index].curr,
+												sppaTgl: state.items[index].sppaTgl,
 												sppa1Id: state.items[index].sppa1Id,
-												statusEndors: state.items[index].statusEndors,
-												tsi: state.items[index].tsi,
+												thnBuat: state.items[index].thnBuat,
+												warnaDesc: state.items[index].warnaDesc,
+												wilayahNama: state.items[index].wilayahNama,
+                        ePolisId: state.items[index].ePolisId
 											)),
 							],
 						),
@@ -130,12 +137,12 @@ class Endors1ListListWidgetState extends State<Endors1ListListWidget> {
 		if (!_scrollController.hasClients) return;
 		if (_scrollController.position.pixels ==
 				_scrollController.position.maxScrollExtent) {
-			endors1ListBloc.add(FetchEndors1ListEvent());
+			sppamvListBloc.add(FetchSppamvListEvent());
 		}
 	}
 
 	onHapusFunction(String recordId) {
-		endors1CrudBloc.add(Endors1CrudHapusEvent(recordId: recordId));
+		sppamvCrudBloc.add(SppamvCrudHapusEvent(recordId: recordId));
 	}
 
 	void showDialogHapus(String recordId) {
@@ -146,7 +153,7 @@ class Endors1ListListWidgetState extends State<Endors1ListListWidget> {
 				return ShowDialogHapusWidget(onHapusFunction: onHapusFunction, recordId: recordId);
 			}
 		).then((value) {
-			endors1ListBloc.add(CloseDialogEndors1ListEvent());
+			sppamvListBloc.add(CloseDialogSppamvListEvent());
 		});
 	}
 

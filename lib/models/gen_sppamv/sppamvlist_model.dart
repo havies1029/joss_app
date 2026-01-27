@@ -18,37 +18,40 @@ class SppamvListModel {
 	String nmTipe;
 	String warnaDesc;
 	String wilayahNama;
+	String ePolisId;
 
-	SppamvListModel({	required this.harga, required this.insuredNama, 
-		required this.mesinNo, required this.periodeAkhir, 
-		required this.periodeMulai, required this.polisiNo, 
-		required this.premiTotal, required this.rangkaNo, 
-		required this.curr, required this.sppaTgl, 
-		required this.sppa1Id, required this.thnBuat, 
-		required this.coverName, required this.grupNama, 
-		required this.nmMerk, required this.nmTipe, 
-		required this.warnaDesc, required this.wilayahNama});
+	SppamvListModel({	required this.harga, required this.insuredNama,
+		required this.mesinNo, required this.periodeAkhir,
+		required this.periodeMulai, required this.polisiNo,
+		required this.premiTotal, required this.rangkaNo,
+		required this.curr, required this.sppaTgl,
+		required this.sppa1Id, required this.thnBuat,
+		required this.coverName, required this.grupNama,
+		required this.nmMerk, required this.nmTipe,
+		required this.warnaDesc, required this.wilayahNama,
+		this.ePolisId = ''});
 
 	factory SppamvListModel.fromJson(Map<String, dynamic> data) {
 		return SppamvListModel(
-			harga: double.tryParse(data['harga'].toString())??0,
-			insuredNama: data['insuredNama']??'',
-			mesinNo: data['mesinNo']??'',
-			periodeAkhir: DateTime.tryParse(data['periodeAkhir'].toString())??DateTime.now(),
-			periodeMulai: DateTime.tryParse(data['periodeMulai'].toString())??DateTime.now(),
-			polisiNo: data['polisiNo']??'',
-			premiTotal: double.tryParse(data['premiTotal'].toString())??0,
-			rangkaNo: data['rangkaNo']??'',
-			sppaTgl: DateTime.tryParse(data['sppaTgl'].toString())??DateTime.now(),
-			sppa1Id: data['sppa1Id']??'',
-			thnBuat: int.tryParse(data['thnBuat'].toString())??0,
-			coverName: data['coverName']??'',
-			grupNama: data['grupNama']??'',
-			nmMerk: data['nmMerk']??'',
-			nmTipe: data['nmTipe']??'',
-			curr: data['curr']??'',
-			warnaDesc: data['warnaDesc']??'',
-			wilayahNama: data['wilayahNama']??''
+				harga: double.tryParse(data['harga'].toString())??0,
+				insuredNama: data['insuredNama']??'',
+				mesinNo: data['mesinNo']??'',
+				periodeAkhir: DateTime.tryParse(data['periodeAkhir'].toString())??DateTime.now(),
+				periodeMulai: DateTime.tryParse(data['periodeMulai'].toString())??DateTime.now(),
+				polisiNo: data['polisiNo']??'',
+				premiTotal: double.tryParse(data['premiTotal'].toString())??0,
+				rangkaNo: data['rangkaNo']??'',
+				sppaTgl: DateTime.tryParse(data['sppaTgl'].toString())??DateTime.now(),
+				sppa1Id: data['sppa1Id']??'',
+				thnBuat: int.tryParse(data['thnBuat'].toString())??0,
+				coverName: data['coverName']??'',
+				grupNama: data['grupNama']??'',
+				nmMerk: data['nmMerk']??'',
+				nmTipe: data['nmTipe']??'',
+				curr: data['curr']??'',
+				warnaDesc: data['warnaDesc']??'',
+				wilayahNama: data['wilayahNama']??'',
+				ePolisId: data['ePolisId']??''
 		);
 
 	}
@@ -71,6 +74,7 @@ class SppamvListModel {
 		'nmTipe': nmTipe,
 		'rMATAUANGNAMA': curr,
 		'warnaDesc': warnaDesc,
-		'wilayahNama': wilayahNama};
-
+		'wilayahNama': wilayahNama,
+		'ePolisId': ePolisId
+	};
 }
