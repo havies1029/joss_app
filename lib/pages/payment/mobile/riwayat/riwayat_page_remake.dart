@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/payment/mobile/riwayat/riwayat_table_page.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
-import 'package:joss_app/widgets/floatingmenumaster_widget.dart';
 import 'package:joss_app/blocs/payment/pay1list_bloc.dart';
 import 'package:joss_app/blocs/payment/pay1crud_bloc.dart';
-import 'package:joss_app/pages/payment/paymentcrud_page/pay1crud_form.dart';
-import 'package:joss_app/pages/payment/paymentcrud_page/pay1list_list_widget.dart';
 
 import '../../../../common/constants.dart';
 
@@ -36,16 +33,6 @@ class RiwayatPageState extends State<RiwayatPage> {
 
     return MultiBlocListener(
         listeners: [
-          BlocListener<Pay1ListBloc, Pay1ListState>(
-              listener: (context, state) {
-                if (state.viewMode == "tambah") {
-                  showDialogViewData(context, state.viewMode, "");
-                } else if (state.viewMode == "ubah") {
-                  showDialogViewData(context, state.viewMode, state.recordId);
-                }
-              }, listenWhen: (previous, current) {
-            return previous.viewMode != current.viewMode;
-          }),
           BlocListener<Pay1CrudBloc, Pay1CrudState>(
               listener: (context, state) {
                 if (state.isSaved) {
@@ -102,19 +89,4 @@ class RiwayatPageState extends State<RiwayatPage> {
           children: <Widget>[RiwayatTablePage(searchText: _searchController.text)],
         ));
   }
-
-  void showDialogViewData(BuildContext context, String viewMode, String recordId) {
-    FocusScope.of(context).requestFocus(FocusNode());
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Pay1CrudFormPage(viewMode: viewMode, recordId: recordId);
-        },
-        useSafeArea: true)
-        .then((value) {
-      pay1ListBloc.add(CloseDialogPay1ListEvent());
-    });
-  }
-
 }
