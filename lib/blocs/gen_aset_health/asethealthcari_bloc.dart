@@ -183,6 +183,9 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 		on<SelectPolisHealthDetailEvent>(onSelectPolisHealthDetail);
 		on<UnselectPolisHealthDetailEvent>(onUnselectPolisHealthDetail);
 		on<ClearPolisHealthSelectionEvent>(onClearPolisHealthSelection);
+
+		on<SelectSingleHealthDetailEvent>(onSelectDetailHealthId);
+		on<UnselectSingleHealthDetailEvent>(onUnselectDetailHealthId);
 	}
 
 	// -----------------------
@@ -355,6 +358,7 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			selectedIds: <String>{},
 			activeAsetHealthId: "",
 			selectedFilePolisId: "",
+				selectedId: ""
 		));
 	}
 
@@ -388,5 +392,25 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			return;
 		}
 		_recomputeActiveAndFile(emit);
+	}
+
+	Future<void> onSelectDetailHealthId(
+			SelectSingleHealthDetailEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedId: event.asetHealthId,
+		));
+	}
+
+	Future<void> onUnselectDetailHealthId(
+			UnselectSingleHealthDetailEvent  event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		if (state.selectedId != event.asetHealthId) return;
+
+		emit(state.copyWith(
+			selectedId: "",
+		));
 	}
 }

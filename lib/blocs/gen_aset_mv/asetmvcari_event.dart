@@ -81,3 +81,20 @@ class ClearPolisMvSelectionEvent extends AsetMvCariEvents {
 	@override
 	List<Object> get props => [];
 }
+
+
+class SelectSingleMvDetailEvent extends AsetMvCariEvents {
+	final String asetMvId;
+	const SelectSingleMvDetailEvent(this.asetMvId);
+
+	@override
+	List<Object> get props => [asetMvId];
+}
+
+class UnselectSingleMvDetailEvent extends AsetMvCariEvents {
+	final String asetMvId;
+	const UnselectSingleMvDetailEvent(this.asetMvId);
+
+	@override
+	List<Object> get props => [asetMvId];
+}

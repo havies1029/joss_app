@@ -250,8 +250,8 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		on<UnselectPolisEqDetailEvent>(onUnselectPolisEqDetail);
 		on<ClearPolisEqSelectionEvent>(onClearPolisEqSelection);
 
-		on<SelectSingleDetailEvent>(onSelectDetailId);
-		on<UnselectSingleDetailEvent>(onUnselectDetailId);
+		on<SelectSingleParDetailEvent>(onSelectDetailId);
+		on<UnselectSingleParDetailEvent>(onUnselectDetailParId);
 	}
 
 	Future<void> onRefreshAsetParCari(
@@ -368,7 +368,7 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 	}
 
 	Future<void> onSelectDetailId(
-			SelectSingleDetailEvent event,
+			SelectSingleParDetailEvent event,
 			Emitter<AsetParCariState> emit,
 			) async {
 		emit(state.copyWith(
@@ -396,8 +396,8 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		_recomputeActiveAndFiles(emit, preferId: preferFallback);
 	}
 
-	Future<void> onUnselectDetailId(
-			UnselectSingleDetailEvent  event,
+	Future<void> onUnselectDetailParId(
+			UnselectSingleParDetailEvent  event,
 			Emitter<AsetParCariState> emit,
 			) async {
 		if (state.selectedId != event.asetParId) return;

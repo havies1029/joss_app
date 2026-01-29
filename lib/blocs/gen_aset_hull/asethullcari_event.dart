@@ -80,3 +80,20 @@ class ClearPolisHullSelectionEvent extends AsethullCariEvents {
 	@override
 	List<Object> get props => [];
 }
+
+
+class SelectSingleHullDetailEvent extends AsethullCariEvents {
+	final String asetHullId;
+	const SelectSingleHullDetailEvent(this.asetHullId);
+
+	@override
+	List<Object> get props => [asetHullId];
+}
+
+class UnselectSingleHullDetailEvent extends AsethullCariEvents {
+	final String asetHullId;
+	const UnselectSingleHullDetailEvent(this.asetHullId);
+
+	@override
+	List<Object> get props => [asetHullId];
+}
