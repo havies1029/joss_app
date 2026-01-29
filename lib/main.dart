@@ -121,6 +121,7 @@ import 'blocs/calpar/calpar1list_bloc.dart';
 import 'blocs/calpar/calpar2form_bloc.dart';
 import 'blocs/calpar/calpar3form_bloc.dart';
 import 'blocs/calpar/calpar4form_bloc.dart';
+import 'blocs/calpar/calpar_flow_bloc.dart';
 import 'blocs/gallery/galleryeventcari_bloc.dart';
 
 import 'blocs/gallery/gallerymembercari_bloc.dart';
@@ -454,6 +455,14 @@ Future<void> main() async {
             calmv1CrudBloc: context.read<Calmv1CrudBloc>(),
             calmv2FormBloc: context.read<Calmv2FormBloc>(),
             calmv3FormBloc: context.read<Calmv3FormBloc>(),
+          ),
+        ),
+        BlocProvider<CalparFlowBloc>(
+          create: (context) => CalparFlowBloc(
+            calpar1CrudBloc: context.read<Calpar1CrudBloc>(),
+            calpar2FormBloc: context.read<Calpar2FormBloc>(),
+            calpar3FormBloc: context.read<Calpar3FormBloc>(),
+            calpar4FormBloc: context.read<Calpar4FormBloc>(),
           ),
         ),
         BlocProvider<RegmvFlowBloc>(

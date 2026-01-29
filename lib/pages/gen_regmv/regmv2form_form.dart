@@ -153,8 +153,8 @@ class Regmv2FormFormPageFormState extends State<Regmv2FormFormPage> {
 							fieldPapController.text = NumberFormat("#,###").format(state.record!.pap);
 							fieldPassangerCountController.text = state.record!.passangerCount.toString();
 							fieldPllController.text = NumberFormat("#,###").format(state.record!.pll);
-							fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
-							fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
+							fieldPolisAkhirController.text = state.record!.polisAkhir!.toIso8601String();
+							fieldPolisMulaiController.text = state.record!.polisMulai!.toIso8601String();
 							fieldTplController.text = NumberFormat("#,###").format(state.record!.tpl);
 						}
 						fieldComboRMatauang = state.comboRMatauang;

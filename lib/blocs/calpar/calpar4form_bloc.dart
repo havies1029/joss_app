@@ -57,36 +57,24 @@ class Calpar4FormBloc extends Bloc<Calpar4FormEvents, Calpar4FormState> {
 			Calpar4FormHitungPremiEvent event,
 			Emitter<Calpar4FormState> emit) async {
 
-		debugPrint("🔵 [BLoC] HITUNG PREMI TRIGGERED");
-		debugPrint("🔵 [BLoC] calpar1Id => ${event.calpar1Id}");
-
-		// Step 1: Mulai proses
-		debugPrint("🟡 [BLoC] Emit: isCalculating = true, isCalculated = false");
 		emit(state.copyWith(isCalculating: true, isCalculated: false));
 
 		try {
-			// Step 2: Call API
-			debugPrint("🟡 [BLoC] Requesting API Calpar4FormHitungPremi...");
 			Calpar4FormModel record =
 			await repository.calpar4FormHitungPremi(event.calpar1Id);
-
-			debugPrint("🟢 [BLoC] API SUCCESS — Record received:");
-			debugPrint("🟢 [BLoC] premiNet: ${record.premiNet}");
-			debugPrint("🟢 [BLoC] premiPar: ${record.premiPar}");
-			debugPrint("🟢 [BLoC] premiEqvet: ${record.premiEqvet}");
-
-			// Step 3: Emit data
-			debugPrint("🟢 [BLoC] Emit: isCalculating = false, isCalculated = true, record updated");
 			emit(state.copyWith(
 				isCalculating: false,
 				isCalculated: true,
+				isLoading: false,
+				isLoaded: true,
 				record: record,
 			));
 		} catch (e) {
-			debugPrint("🔴 [BLoC] ERROR: $e");
 			emit(state.copyWith(
 				isCalculating: false,
 				isCalculated: false,
+				isLoading: false,
+				isLoaded: false,
 				hasFailure: true,
 			));
 		}

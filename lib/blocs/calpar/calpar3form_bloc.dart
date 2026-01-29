@@ -21,6 +21,21 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 		on<ComboMJnscoverParChangedEvent>(onComboMJnscoverParChanged);
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
 		on<ComboMKabZonaGempaChangedEvent>(onComboMKabZonaGempaChanged);
+		on<Calpar3DraftEvent>(onDraftCalpar3Crud);
+	}
+
+	Future<void> onDraftCalpar3Crud(
+			Calpar3DraftEvent event,
+			Emitter<Calpar3FormState> emit,
+			) async {
+		debugPrint('[onDraftCalpar3Crud] event masuk');
+		debugPrint('[onDraftCalpar3Crud] event.record = ${event.record}');
+
+		emit(state.copyWith(
+			record: event.record,
+		));
+
+		debugPrint('[onDraftCalpar3Crud] emit selesai, state.record sekarang = ${state.copyWith(record: event.record).record}');
 	}
 
 	Future<void> onTambahCalpar3Form(
@@ -86,11 +101,26 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 
 
 	Future<void> onUbahCalpar3Form(
-			Calpar3FormUbahEvent event, Emitter<Calpar3FormState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.calpar3FormUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Calpar3FormUbahEvent event,
+			Emitter<Calpar3FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ok = await repository.calpar3FormUbah(event.record);
+		final hasFailure = !ok;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,   // ✅ jangan true kalau gagal
+			hasFailure: hasFailure,
+			record: event.record,   // ✅ simpan data terbaru
+		));
 	}
+
 
 	Future<void> onHapusCalpar3Form(
 			Calpar3FormHapusEvent event, Emitter<Calpar3FormState> emit) async {

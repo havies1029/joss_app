@@ -61,10 +61,25 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 
 
 	Future<void> onUbahCalmv2Form(
-		Calmv2FormUbahEvent event, Emitter<Calmv2FormState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.calmv2FormUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Calmv2FormUbahEvent event,
+			Emitter<Calmv2FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ok = await repository.calmv2FormUbah(event.record);
+		final hasFailure = !ok;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,   // ✅ jangan true kalau gagal
+			hasFailure: hasFailure,
+			record: event.record,   // ✅ update record di state
+		));
+
 	}
 
 	Future<void> onHapusCalmv2Form(

@@ -49,5 +49,15 @@ class Calpar2FormState extends Equatable {
 	}
 
 	@override
-	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, returnData];
+	List<Object?> get props => [
+		record,
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		returnData,
+		comboRMatauang,
+		comboMBiindemnityOjk,
+	];
 }

@@ -18,11 +18,11 @@ class Calpar2FormModel {
 	String? rmatauangKode;
 	ComboRMatauangModel? comboRMatauang;
 
-	Calpar2FormModel({required this.biIndexRate, required this.biTotal, 
+	Calpar2FormModel({required this.biIndexRate, required this.biTotal,
 		required this.calpar2Id, required this.calpar1Id, required this.siBi,
-		required this.siBuilding, required this.siContent, 
-		required this.siMachinery, required this.siOther, 
-		required this.siStock, required this.stockAdjustable, 
+		required this.siBuilding, required this.siContent,
+		required this.siMachinery, required this.siOther,
+		required this.siStock, required this.stockAdjustable,
 		this.mbiindemnityojkId, this.comboMBiindemnityOjk, this.rmatauangKode, this.comboRMatauang});
 
 	factory Calpar2FormModel.fromJson(Map<String, dynamic> data) {
@@ -72,5 +72,42 @@ class Calpar2FormModel {
 		'comboMBiindemnityOjk': comboMBiindemnityOjk?.toJson(),
 		'rmatauangKode': rmatauangKode,
 		'comboRMatauang': comboRMatauang?.toJson()};
+
+	Calpar2FormModel copyWith({
+		double? biIndexRate,
+		double? biTotal,
+		String? calpar2Id,
+		String? calpar1Id,
+		double? siBi,
+		double? siBuilding,
+		double? siContent,
+		double? siMachinery,
+		double? siOther,
+		double? siStock,
+		double? stockAdjustable,
+		String? mbiindemnityojkId,
+		ComboMBiindemnityOjkModel? comboMBiindemnityOjk,
+		String? rmatauangKode,
+		ComboRMatauangModel? comboRMatauang,
+	}) {
+		return Calpar2FormModel(
+			biIndexRate: biIndexRate ?? this.biIndexRate,
+			biTotal: biTotal ?? this.biTotal,
+			calpar2Id: calpar2Id ?? this.calpar2Id,
+			calpar1Id: calpar1Id ?? this.calpar1Id,
+			siBi: siBi ?? this.siBi,
+			siBuilding: siBuilding ?? this.siBuilding,
+			siContent: siContent ?? this.siContent,
+			siMachinery: siMachinery ?? this.siMachinery,
+			siOther: siOther ?? this.siOther,
+			siStock: siStock ?? this.siStock,
+			stockAdjustable: stockAdjustable ?? this.stockAdjustable,
+			mbiindemnityojkId: mbiindemnityojkId ?? this.mbiindemnityojkId,
+			comboMBiindemnityOjk:
+			comboMBiindemnityOjk ?? this.comboMBiindemnityOjk,
+			rmatauangKode: rmatauangKode ?? this.rmatauangKode,
+			comboRMatauang: comboRMatauang ?? this.comboRMatauang,
+		);
+	}
 
 }

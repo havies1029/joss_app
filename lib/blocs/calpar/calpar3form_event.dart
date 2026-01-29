@@ -56,3 +56,11 @@ class ComboMKabZonaGempaChangedEvent extends Calpar3FormEvents{
 	const ComboMKabZonaGempaChangedEvent({required this.comboMKabZonaGempa});
 
 	@override	List<Object> get props => [comboMKabZonaGempa];}
+
+class Calpar3DraftEvent extends Calpar3FormEvents {
+	final Calpar3FormModel record;
+	const Calpar3DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

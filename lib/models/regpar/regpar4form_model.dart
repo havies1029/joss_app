@@ -44,4 +44,26 @@ class Regpar4FormModel {
 		'currId': currId,
 		'comboRMatauang': comboRMatauang?.toJson()};
 
+	Regpar4FormModel copyWith({
+		String? regpar1Id,
+		double? siBuilding,
+		double? siContent,
+		double? siMachinery,
+		double? siOther,
+		double? siStock,
+		String? currId,
+		ComboRMatauangModel? comboRMatauang,
+	}) {
+		return Regpar4FormModel(
+			regpar1Id: regpar1Id ?? this.regpar1Id,
+			siBuilding: siBuilding ?? this.siBuilding,
+			siContent: siContent ?? this.siContent,
+			siMachinery: siMachinery ?? this.siMachinery,
+			siOther: siOther ?? this.siOther,
+			siStock: siStock ?? this.siStock,
+			currId: currId ?? this.currId,
+			comboRMatauang: comboRMatauang ?? this.comboRMatauang,
+		);
+	}
+
 }

@@ -21,41 +21,30 @@ class 	Calpar1CrudBloc extends Bloc<Calpar1CrudEvents, Calpar1CrudState> {
 		on<ComboROkupasiChangedEvent>(onComboROkupasiChanged);
 		on<ComboRKonstruksiojkChangedEvent>(onComboRKonstruksiojkChanged);
 		on<ComboMJnscoverParChangedEvent>(onComboMJnscoverParChanged);
+		on<Calpar1DraftEvent>(onDraftCalpar1Crud);
 	}
 
-	// Future<void> onTambahCalpar1Crud(
-	// 	Calpar1CrudTambahEvent event, Emitter<Calpar1CrudState> emit) async {
-	//
-	// 	ReturnDataAPI returnData;
-	// 	bool hasFailure = true;
-	// 	emit(state.copyWith(isSaving: true, isSaved: false));
-	// 	returnData = await repository.calpar1CrudTambah(event.record);
-	// 	hasFailure = !returnData.success;
-	// 	emit(state.copyWith(
-	// 		isSaving: false,
-	// 		isSaved: true,
-	// 		hasFailure: hasFailure));
-	// }
+	Future<void> onDraftCalpar1Crud(
+			Calpar1DraftEvent event,
+			Emitter<Calpar1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional kalau mau reset flag:
+			// isSaved: false,
+			// hasFailure: false,
+		));
+	}
 
 	Future<void> onTambahCalpar1Crud(
 			Calpar1CrudTambahEvent event, Emitter<Calpar1CrudState> emit) async {
 
-		debugPrint("🟢 [BLOC] onTambahCalpar1Crud triggered");
 		emit(state.copyWith(isSaving: true, isSaved: false));
-
 		final returnData = await repository.calpar1CrudTambah(event.record);
-
-		debugPrint("📩 Response dari repository:");
-		debugPrint("➡️ success=${returnData.success}");
-		debugPrint("➡️ data=${returnData.data}");
-		debugPrint("➡️ rowcount=${returnData.rowcount}");
-
 		bool hasFailure = !returnData.success;
-
 		Calpar1CrudModel newRecord = event.record;
 		if (returnData.success && returnData.data is String) {
 			newRecord = event.record.copyWith(calpar1Id: returnData.data.toString());
-			debugPrint("✅ Set calmv1Id dari response string: ${newRecord.calpar1Id}");
 		}
 
 		emit(state.copyWith(
@@ -67,10 +56,24 @@ class 	Calpar1CrudBloc extends Bloc<Calpar1CrudEvents, Calpar1CrudState> {
 	}
 
 	Future<void> onUbahCalpar1Crud(
-		Calpar1CrudUbahEvent event, Emitter<Calpar1CrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.calpar1CrudUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Calpar1CrudUbahEvent event,
+			Emitter<Calpar1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ok = await repository.calpar1CrudUbah(event.record);
+		final hasFailure = !ok;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,
+			hasFailure: hasFailure,
+			record: event.record,
+		));
 	}
 
 	Future<void> onHapusCalpar1Crud(

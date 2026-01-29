@@ -73,8 +73,7 @@ class Calpar1CrudAPI {
 		return returnData.success;
 	}
 	Future<Calpar1CrudModel> calpar1CrudLihatAPI(String calpar1Id) async {
-		// String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar1crud/read";
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar4crud/read";
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar1crud/read";
 		Map<String, String> queryParams = {'calpar1Id': calpar1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =

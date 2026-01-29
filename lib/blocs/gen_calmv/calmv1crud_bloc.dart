@@ -53,7 +53,6 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		if (returnData.success && returnData.data != null) {
 			newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
 
-			debugPrint("✅ saved calmv1Id: ${newRecord.calmv1Id}");
 		}
 
 		emit(state.copyWith(
@@ -65,11 +64,27 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 	}
 
 	Future<void> onUbahCalmv1Crud(
-		Calmv1CrudUbahEvent event, Emitter<Calmv1CrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.calmv1CrudUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Calmv1CrudUbahEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ok = await repository.calmv1CrudUbah(event.record);
+		final hasFailure = !ok;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,     // ✅ jangan true kalau gagal
+			hasFailure: hasFailure,
+			record: event.record,     // ✅ pegang data terbaru di state
+		));
+
 	}
+
 
 	Future<void> onHapusCalmv1Crud(
 		Calmv1CrudHapusEvent event, Emitter<Calmv1CrudState> emit) async {

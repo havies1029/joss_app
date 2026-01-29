@@ -18,21 +18,20 @@ class Calpar2FormBloc extends Bloc<Calpar2FormEvents, Calpar2FormState> {
 		on<Calpar2FormLihatEvent>(onLihatCalpar2Form);
 		on<ComboRMatauangChangedEvent>(onComboRMatauangChanged);
 		on<ComboMBiindemnityOjkChangedEvent>(onComboMBiindemnityOjkChanged);
+		on<Calpar2DraftEvent>(onDraftCalpar2Crud);
 	}
 
-	// Future<void> onTambahCalpar2Form(
-	// 	Calpar2FormTambahEvent event, Emitter<Calpar2FormState> emit) async {
-	//
-	// 	ReturnDataAPI returnData;
-	// 	bool hasFailure = true;
-	// 	emit(state.copyWith(isSaving: true, isSaved: false));
-	// 	returnData = await repository.calpar2FormTambah(event.record);
-	// 	hasFailure = !returnData.success;
-	// 	emit(state.copyWith(
-	// 		isSaving: false,
-	// 		isSaved: true,
-	// 		hasFailure: hasFailure));
-	// }
+	Future<void> onDraftCalpar2Crud(
+			Calpar2DraftEvent event,
+			Emitter<Calpar2FormState> emit,
+			) async {
+		emit(state.copyWith(
+			record: event.record,
+			// opsional kalau mau reset flag:
+			// isSaved: false,
+			// hasFailure: false,
+		));
+	}
 
 	Future<void> onTambahCalpar2Form(
 			Calpar2FormTambahEvent event,
@@ -73,13 +72,27 @@ class Calpar2FormBloc extends Bloc<Calpar2FormEvents, Calpar2FormState> {
 			returnData: returnData,
 		));
 	}
-
 	Future<void> onUbahCalpar2Form(
-		Calpar2FormUbahEvent event, Emitter<Calpar2FormState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.calpar2FormUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Calpar2FormUbahEvent event,
+			Emitter<Calpar2FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ok = await repository.calpar2FormUbah(event.record);
+		final hasFailure = !ok;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,
+			hasFailure: hasFailure,
+			record: event.record,
+		));
 	}
+
 
 	Future<void> onHapusCalpar2Form(
 		Calpar2FormHapusEvent event, Emitter<Calpar2FormState> emit) async {

@@ -75,4 +75,35 @@ class Regpar3FormModel {
 				'mwilayahId': mwilayahId,
 				'comboMWilayah': comboMWilayah?.toJson()};
 
+	Regpar3FormModel copyWith({
+		String? regpar1Id,
+		bool? isEq,
+		bool? isFlexas,
+		bool? isOther,
+		bool? isRsmdcc,
+		bool? isTsfwd,
+		String? regpar3Id,
+		String? kab2zonagempaId,
+		ComboMKabZonaGempaModel? comboMKabZonaGempa,
+		String? mjnscoverparId,
+		ComboMJnscoverParModel? comboMJnscoverPar,
+		String? mwilayahId,
+		ComboMWilayahModel? comboMWilayah,
+	}) {
+		return Regpar3FormModel(
+			regpar1Id: regpar1Id ?? this.regpar1Id,
+			isEq: isEq ?? this.isEq,
+			isFlexas: isFlexas ?? this.isFlexas,
+			isOther: isOther ?? this.isOther,
+			isRsmdcc: isRsmdcc ?? this.isRsmdcc,
+			isTsfwd: isTsfwd ?? this.isTsfwd,
+			regpar3Id: regpar3Id ?? this.regpar3Id,
+			kab2zonagempaId: kab2zonagempaId ?? this.kab2zonagempaId,
+			comboMKabZonaGempa: comboMKabZonaGempa ?? this.comboMKabZonaGempa,
+			mjnscoverparId: mjnscoverparId ?? this.mjnscoverparId,
+			comboMJnscoverPar: comboMJnscoverPar ?? this.comboMJnscoverPar,
+			mwilayahId: mwilayahId ?? this.mwilayahId,
+			comboMWilayah: comboMWilayah ?? this.comboMWilayah,
+		);
+	}
 }

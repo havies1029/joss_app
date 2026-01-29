@@ -91,17 +91,14 @@ class Regmv6FormAPI {
 			return throw Exception("Failed to load data");
 		}
 	}
-
 	Future<Regmv6FormModel> regmv6FormHitungPremiAPI(String regmv1Id) async {
-		debugPrint('[API] regmv6FormHitungPremiAPI CALLED');
-		debugPrint('[API] regmv1Id: $regmv1Id');
-
-		final String hitungPremiEndpoint =
+		final hitungPremiEndpoint =
 				"${AppData.prefixEndPoint}/api/regmv/regmv6form/hitungpremi";
 
-		final Map<String, String> queryParams = {
+		final queryParams = {
 			'regmv1Id': regmv1Id,
 			'modul_id': 'regmv6FormHitungPremi',
+			'_ts': DateTime.now().millisecondsSinceEpoch.toString(), // cache buster
 		};
 
 		final uri = AppData.uriHtpp(
@@ -110,40 +107,20 @@ class Regmv6FormAPI {
 			queryParams,
 		);
 
-		debugPrint('[API] URI: $uri');
-		debugPrint('[API] TOKEN EXIST: ${AppData.userToken.isNotEmpty}');
+		final response = await http.get(
+			uri,
+			headers: <String, String>{
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}',
+				// ❌ jangan tambah Expires/Pragma/Cache-Control di web kalau server gak allow
+			},
+		);
 
-		try {
-			final http.Response response = await http.get(
-				uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}',
-				},
-			);
-
-			debugPrint('[API] STATUS CODE: ${response.statusCode}');
-			debugPrint('[API] RESPONSE BODY: ${response.body}');
-
-			if (response.statusCode == 200) {
-				final decoded = jsonDecode(response.body);
-				debugPrint('[API] JSON DECODE SUCCESS');
-
-				return Regmv6FormModel.fromJson(decoded);
-			} else {
-				debugPrint('[API] HITUNG PREMI FAILED');
-				throw Exception(
-					'Failed hitung premi | '
-							'status: ${response.statusCode} | '
-							'body: ${response.body}',
-				);
-			}
-		} catch (e, st) {
-			debugPrint('[API] EXCEPTION: $e');
-			debugPrintStack(stackTrace: st);
-			rethrow;
+		if (response.statusCode == 200) {
+			return Regmv6FormModel.fromJson(jsonDecode(response.body));
 		}
+		throw Exception('Failed hitung premi: ${response.statusCode} ${response.body}');
 	}
+
 
 }

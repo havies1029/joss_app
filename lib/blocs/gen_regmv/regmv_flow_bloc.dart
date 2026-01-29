@@ -42,37 +42,45 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
     _wireListeners();
   }
 
+  bool _lastRegmv1Saved = false;
+  bool _lastRegmv2Saved = false;
+  bool _lastRegmv3Saved = false;
+
   void _wireListeners() {
     _subRegmv1 = regmv1CrudBloc.stream.listen((s) {
+      final rising = !_lastRegmv1Saved && s.isSaved;
+      _lastRegmv1Saved = s.isSaved;
+
       final id = s.record?.regmv1Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
+      final ok = rising && !s.hasFailure && id.isNotEmpty;
       if (!ok) return;
 
-      if (!state.step2Triggered) {
-        add(const RegmvFlowEnsureRegmv2Event());
-      }
+      if (!state.step2Triggered) add(const RegmvFlowEnsureRegmv2Event());
     });
 
     _subRegmv2 = regmv2FormBloc.stream.listen((s) {
+      final rising = !_lastRegmv2Saved && s.isSaved;
+      _lastRegmv2Saved = s.isSaved;
+
       final id = s.record?.regmv2Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
+      final ok = rising && !s.hasFailure && id.isNotEmpty;
       if (!ok) return;
 
-      if (!state.step3Triggered) {
-        add(const RegmvFlowEnsureRegmv3Event());
-      }
+      if (!state.step3Triggered) add(const RegmvFlowEnsureRegmv3Event());
     });
 
     _subRegmv3 = regmv3FormBloc.stream.listen((s) {
+      final rising = !_lastRegmv3Saved && s.isSaved;
+      _lastRegmv3Saved = s.isSaved;
+
       final id = s.record?.regmv3Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
+      final ok = rising && !s.hasFailure && id.isNotEmpty;
       if (!ok) return;
 
-      if (!state.step4Triggered) {
-        add(const RegmvFlowHitungPremiIfReadyEvent());
-      }
+      if (!state.step4Triggered) add(const RegmvFlowHitungPremiIfReadyEvent());
     });
   }
+
 
   @override
   Future<void> close() {
@@ -161,23 +169,45 @@ class RegmvFlowBloc extends Bloc<RegmvFlowEvent, RegmvFlowState> {
   }
 
 
+  int _hitungPremiCallCount = 0;
+
   void _triggerHitungPremi() {
+    _hitungPremiCallCount++;
+    final now = DateTime.now().toIso8601String();
 
-    // guard: harus sudah ready id1,id2,id3
-    final form1 = regmv1CrudBloc.state.record;
-    final form2 = regmv2FormBloc.state.record;
-    final form3 = regmv3FormBloc.state.record;
+    final s1 = regmv1CrudBloc.state;
+    final s2 = regmv2FormBloc.state;
+    final s3 = regmv3FormBloc.state;
 
-    if (form1!.regmv1Id.isEmpty) return;
-    if (form2!.regmv2Id.isEmpty) return;
-    if (form3!.regmv3Id.isEmpty) return;
+    final f1 = s1.record;
+    final f2 = s2.record;
+    final f3 = s3.record;
 
-    regmv6FormBloc.add(
-      Regmv6FormHitungPremiEvent(
-        regmv1Id: form1.regmv1Id,
-      ),
+    debugPrint(
+        "🧮 [_triggerHitungPremi] CALLED #$_hitungPremiCallCount @ $now\n"
+            "  form1: isSaving=${s1.isSaving} isSaved=${s1.isSaved} hasFailure=${s1.hasFailure} id=${f1?.regmv1Id}\n"
+            "  form2: isSaving=${s2.isSaving} isSaved=${s2.isSaved} hasFailure=${s2.hasFailure} id=${f2?.regmv2Id} parent=${f2?.regmv1Id}\n"
+            "  form3: isSaving=${s3.isSaving} isSaved=${s3.isSaved} hasFailure=${s3.hasFailure} id=${f3?.regmv3Id} parent=${f3?.regmv1Id}\n"
     );
+
+    // wajib record ada
+    if (f1 == null || f2 == null || f3 == null) return;
+
+    // wajib "saved beneran"
+    final ok1 = s1.isSaved && !s1.hasFailure && !(s1.isSaving ?? false) && f1.regmv1Id.isNotEmpty;
+    final ok2 = s2.isSaved && !s2.hasFailure && !(s2.isSaving ?? false) && f2.regmv2Id.isNotEmpty;
+    final ok3 = s3.isSaved && !s3.hasFailure && !(s3.isSaving ?? false) && f3.regmv3Id.isNotEmpty;
+
+    if (!ok1 || !ok2 || !ok3) {
+      debugPrint("🧮 [_triggerHitungPremi] SKIP: belum semua form benar-benar SAVED");
+      return;
+    }
+
+    debugPrint("🧮 [_triggerHitungPremi] DISPATCH hitungpremi regmv1Id=${f1.regmv1Id}");
+    regmv6FormBloc.add(Regmv6FormHitungPremiEvent(regmv1Id: f1.regmv1Id));
   }
+
+
 
   void _syncRegmv1IdToForm2And3(String regmv1Id) {
     final form2 = regmv2FormBloc.state.record!;

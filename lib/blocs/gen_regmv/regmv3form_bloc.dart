@@ -85,11 +85,26 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 	}
 
 	Future<void> onUbahRegmv3Form(
-		Regmv3FormUbahEvent event, Emitter<Regmv3FormState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.regmv3FormUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Regmv3FormUbahEvent event,
+			Emitter<Regmv3FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ok = await repository.regmv3FormUbah(event.record);
+		final hasFailure = !ok;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,
+			hasFailure: hasFailure,
+			record: event.record,
+		));
 	}
+
 
 	Future<void> onHapusRegmv3Form(
 		Regmv3FormHapusEvent event, Emitter<Regmv3FormState> emit) async {

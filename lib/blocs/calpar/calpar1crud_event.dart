@@ -57,3 +57,11 @@ class ComboMJnscoverParChangedEvent extends Calpar1CrudEvents{
 
 	@override	List<Object> get props => [comboMJnscoverPar];}
 
+
+class Calpar1DraftEvent extends Calpar1CrudEvents {
+	final Calpar1CrudModel record;
+	const Calpar1DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}

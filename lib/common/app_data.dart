@@ -16,14 +16,14 @@ class AppData {
   // static String httpAuthority = "10.0.2.2";
 
 
-  //
-  // static bool useSSL = false;
-  // static String apiDomain =
-  //     "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
-  // static String prefixEndPoint = "";
-  // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
-  //
 
+  static bool useSSL = false;
+  static String apiDomain =
+      "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
+  static String prefixEndPoint = "";
+  static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
+
+  //
   // static bool useSSL = false;
   // static String httpAuthority = "localhost";
   // static String prefixEndPoint = "/eAssistToolsAPI/";
@@ -42,12 +42,12 @@ class AppData {
   // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
 
 
-
-  static bool useSSL = false;
-  static String httpAuthority = "localhost";
-  static String prefixEndPoint = "/eAssistToolsAPI/";
-  static String apiDomain = "http://localhost/eAssistToolsAPI/";
-
+  //
+  // static bool useSSL = false;
+  // static String httpAuthority = "localhost";
+  // static String prefixEndPoint = "/eAssistToolsAPI/";
+  // static String apiDomain = "http://localhost/eAssistToolsAPI/";
+  //
 
 //
 // static bool useSSL = false;

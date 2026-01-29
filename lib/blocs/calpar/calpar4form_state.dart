@@ -42,7 +42,15 @@ class Calpar4FormState extends Equatable {
 			isCalculated: isCalculated ?? this.isCalculated,
 		);
 	}
-
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isCalculating, isCalculated];
+	List<Object?> get props => [
+		record,
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		isCalculating,
+		isCalculated,
+	];
 }

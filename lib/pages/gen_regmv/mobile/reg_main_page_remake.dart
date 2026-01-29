@@ -547,12 +547,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 // upload flow
         BlocListener<RegmvUploadStnkBloc, RegmvUploadStnkState>(
           listener: (context, state) {
-            debugPrint("👂 RegmvUploadStnkBloc listener CALLED");
-            debugPrint("state runtimeType: ${state.runtimeType}");
 
             if (state is UploadStnkListPreview) {
-              debugPrint("📸 UploadStnkListPreview");
-              debugPrint("images length: ${state.images.length}");
               debugPrint("fileNames length: ${state.fileNames.length}");
 
               setState(() {
@@ -1386,9 +1382,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     );
   }
 
-
-  void draftForm2ToBloc(BuildContext context){
+  void draftForm2ToBloc(BuildContext context) {
     final polis = context.read<PolisTanggalBloc>().state;
+
+    // DEBUG nilai dari bloc tanggal
+    debugPrint("=== DEBUG POLIS TANGGAL ===");
+    debugPrint("polis.mulai    : ${polis.mulai}");
+    debugPrint("polis.berakhir : ${polis.berakhir}");
+    debugPrint("==========================");
 
     final record = Regmv2FormModel(
       aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
@@ -1399,10 +1400,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       isTbod: toBoolean(fieldIsTbodController.text),
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
-      pad: double.tryParse(fieldPadController.text.replaceAll(',', ''))  ?? 0,
-      pap: double.tryParse(fieldPapController.text.replaceAll(',', ''))  ?? 0,
+      pad: double.tryParse(fieldPadController.text.replaceAll(',', '')) ?? 0,
+      pap: double.tryParse(fieldPapController.text.replaceAll(',', '')) ?? 0,
       passangerCount: int.tryParse(selectedPassengerCount ?? '') ?? 0,
-      pll: double.tryParse(fieldPllController.text.replaceAll(',', ''))  ?? 0,
+      pll: double.tryParse(fieldPllController.text.replaceAll(',', '')) ?? 0,
       polisMulai: polis.mulai,
       polisAkhir: polis.berakhir,
       regmv2Id: regmv1Id ?? "",
@@ -1410,8 +1411,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       regmv1Id: regmv1Id ?? "",
     );
 
+    // DEBUG isi record
+    debugPrint("=== DEBUG RECORD FORM2 ===");
+    debugPrint("record.polisMulai : ${record.polisMulai}");
+    debugPrint("record.polisAkhir : ${record.polisAkhir}");
+    debugPrint("=========================");
+
     context.read<Regmv2FormBloc>().add(Regmv2DraftEvent(record: record));
   }
+
 
   void draftForm3ToBloc(BuildContext context){
     final record = Regmv3FormModel(
@@ -1463,36 +1471,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final isUploading4 = context.read<RegmvUploadStnkBloc>().state is UploadStnkLoading;
     final isUploading5 = context.read<RegmvUploadFotoMobilBloc>().state is UploadFotoMobilLoading;
     final isUploading7 = context.read<RegmvUploadFotoAccBloc>().state is UploadFotoAccLoading;
-    debugPrint("isUploading4: $isUploading4");
-    debugPrint("_imagesRegmv4 isNotEmpty: ${_imagesRegmv4.isNotEmpty}");
-    debugPrint("_serverPhotosRegmv4 isNotEmpty: ${_serverPhotosRegmv4.isNotEmpty}");
-
     final ok4 = !isUploading4 &&
         (_imagesRegmv4.isNotEmpty || _serverPhotosRegmv4.isNotEmpty);
-
-    debugPrint("ok4 = $ok4");
-
-
-    debugPrint("isUploading5: $isUploading5");
-    debugPrint("_imagesRegmv5 isNotEmpty: ${_imagesRegmv5.isNotEmpty}");
-    debugPrint("_serverPhotosRegmv5 isNotEmpty: ${_serverPhotosRegmv5.isNotEmpty}");
 
     final ok5 = !isUploading5 &&
         (_imagesRegmv5.isNotEmpty || _serverPhotosRegmv5.isNotEmpty);
 
-    debugPrint("ok5 = $ok5");
-
-
-    debugPrint("isUploading7: $isUploading7");
-    debugPrint("_imagesRegmv7 isNotEmpty: ${_imagesRegmv7.isNotEmpty}");
-    debugPrint("_serverPhotosRegmv7 isNotEmpty: ${_serverPhotosRegmv7.isNotEmpty}");
-
     final ok7 = !isUploading7 &&
         (_imagesRegmv7.isNotEmpty || _serverPhotosRegmv7.isNotEmpty);
-
-    debugPrint("ok7 = $ok7");
-
-
 
     setState(() {
       _form4HasError = !ok4;

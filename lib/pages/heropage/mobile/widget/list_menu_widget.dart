@@ -6,6 +6,7 @@ import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../aset/aset_cari.dart';
+import '../../../calpar/mobile/calpar_main_page_remake.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../../gen_endors/endors1crud_form.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';
@@ -358,7 +359,7 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake(  )));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalparMainPageRemake(  )));
         break;
 
       // case 'Test Page':
