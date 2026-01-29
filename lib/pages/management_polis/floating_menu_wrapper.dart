@@ -22,24 +22,22 @@ class FloatingMenuWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final cobId = context.select((CobManPolBloc b) => b.state.selectedCOBId);
 
-    final Set<String> selectedIds = switch (cobId) {
-      "10002" => context.select((AsetParCariBloc b) => b.state.selectedIds),
-      "10003" => context.select((AsetMvCariBloc b) => b.state.selectedIds),
-      "10004" => context.select((AsethullCariBloc b) => b.state.selectedIds),
-      "10005" => context.select((AsetHealthCariBloc b) => b.state.selectedIds),
-      "10006" => context.select((AsetothersCariBloc b) => b.state.selectedIds),
-      _ => const <String>{},
+    final String selectedId = switch (cobId) {
+      "10002" => context.select((AsetParCariBloc b) => b.state.selectedId),
+      "10003" => context.select((AsetMvCariBloc b) => b.state.selectedId),
+      "10004" => context.select((AsethullCariBloc b) => b.state.selectedId),
+      "10005" => context.select((AsetHealthCariBloc b) => b.state.selectedId),
+      "10006" => context.select((AsetothersCariBloc b) => b.state.selectedId),
+      _ => "",
     };
 
-    final selectedItemsList = _selectedModelsByCob(context, cobId, selectedIds);
+    final selectedItemsList = _selectedModelsByCob(context, cobId, selectedId);
 
     final currentStatusFilter =
     context.select((StatusAsetCariBloc b) => b.state.selectedStatusId);
 
-    // ✅ aturan: kalau select > 1, tombol lihatPolis harus disable
-    final bool disableViewPolisBecauseMultiSelect = selectedIds.length > 1;
+    final bool disableViewPolisBecauseMultiSelect = false;
 
-    // === KHUSUS PAR (10002) ===
     final parPolisParId = cobId == "10002"
         ? context.select((AsetParCariBloc b) => b.state.selectedFilePolisParId)
         : "";
@@ -48,8 +46,6 @@ class FloatingMenuWrapper extends StatelessWidget {
         ? context.select((AsetParCariBloc b) => b.state.selectedFilePolisEqId)
         : "";
 
-    // === COB lain (single polis id) ===
-    // NOTE: pastikan field ini memang ada di state masing-masing.
     final selectedFilePolisIdByCob = switch (cobId) {
       "10003" => context.select((AsetMvCariBloc b) => b.state.selectedFilePolisId),
       "10004" => context.select((AsethullCariBloc b) => b.state.selectedFilePolisId),
@@ -77,7 +73,7 @@ class FloatingMenuWrapper extends StatelessWidget {
     // 3) gabungkan base + polis (hindari duplikat)
     final merged = _mergeActionsByType(baseActions, polisActions);
 
-    // ✅ 4) FILTER: tampilkan hanya action yang relevan untuk COB aktif
+    // 4) FILTER: tampilkan hanya action yang relevan untuk COB aktif
     final availableActions = _filterActionsByCob(cobId, merged);
 
     return FloatingActionMenuWidget(
@@ -111,7 +107,7 @@ class FloatingMenuWrapper extends StatelessWidget {
   }) {
     ActionMenuItem? pick(ActionType t, {required bool enabled}) {
       final idx = base.indexWhere((x) => x.type == t);
-      if (idx == -1) return null; // ✅ anti "Bad state: No element"
+      if (idx == -1) return null; // anti "Bad state: No element"
       return base[idx].copyWith(isEnabled: enabled);
     }
 
@@ -207,35 +203,31 @@ class FloatingMenuWrapper extends StatelessWidget {
   }
 
   // =========================
-  // selections & refresh (punyamu)
+  // selections & refresh (sekarang pakai selectedId)
   // =========================
 
-  List<dynamic> _selectedModelsByCob(
-      BuildContext context,
-      String cobId,
-      Set<String> selectedIds,
-      ) {
-    if (cobId == "10002") {
-      final st = context.read<AsetParCariBloc>().state;
-      return st.items.where((x) => selectedIds.contains(x.asetParId)).toList();
+  List<dynamic> _selectedModelsByCob(BuildContext c, String cobId, String id) {
+    if (id.isEmpty) return [];
+
+    try {
+      return [
+        switch (cobId) {
+          "10002" => c.read<AsetParCariBloc>().state.items
+              .firstWhere((x) => x.asetParId == id),
+          "10003" => c.read<AsetMvCariBloc>().state.items
+              .firstWhere((x) => x.asetMvId == id),
+          "10004" => c.read<AsethullCariBloc>().state.items
+              .firstWhere((x) => x.asetHullId == id),
+          "10005" => c.read<AsetHealthCariBloc>().state.items
+              .firstWhere((x) => x.asethealthId == id),
+          "10006" => c.read<AsetothersCariBloc>().state.items
+              .firstWhere((x) => x.asetOthersId == id),
+          _ => null,
+        }
+      ]..removeWhere((e) => e == null);
+    } catch (_) {
+      return [];
     }
-    if (cobId == "10003") {
-      final st = context.read<AsetMvCariBloc>().state;
-      return st.items.where((x) => selectedIds.contains(x.asetMvId)).toList();
-    }
-    if (cobId == "10004") {
-      final st = context.read<AsethullCariBloc>().state;
-      return st.items.where((x) => selectedIds.contains(x.asetHullId)).toList();
-    }
-    if (cobId == "10005") {
-      final st = context.read<AsetHealthCariBloc>().state;
-      return st.items.where((x) => selectedIds.contains(x.asethealthId)).toList();
-    }
-    if (cobId == "10006") {
-      final st = context.read<AsetothersCariBloc>().state;
-      return st.items.where((x) => selectedIds.contains(x.asetOthersId)).toList();
-    }
-    return [];
   }
 
   void _clearSelectionByCob(BuildContext context, String cobId) {

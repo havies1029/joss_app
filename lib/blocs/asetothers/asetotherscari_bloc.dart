@@ -131,6 +131,9 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 		on<SelectPolisOthersDetailEvent>(onSelectPolisOthersDetail);
 		on<UnselectPolisOthersDetailEvent>(onUnselectPolisOthersDetail);
 		on<ClearPolisOthersSelectionEvent>(onClearPolisOthersSelection);
+
+		on<SelectSingleOthersDetailEvent>(onSelectDetailOthersId);
+		on<UnselectSingleOthersDetailEvent>(onUnselectDetailOthersId);
 	}
 
 	// -----------------------
@@ -276,6 +279,7 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			selectedIds: <String>{},
 			activeAsetOthersId: "",
 			selectedFilePolisId: "",
+				selectedId: ""
 		));
 	}
 
@@ -310,5 +314,25 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			return;
 		}
 		_recomputeActiveAndFile(emit);
+	}
+
+	Future<void> onSelectDetailOthersId(
+			SelectSingleOthersDetailEvent event,
+			Emitter<AsetothersCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedId: event.asetOthersId,
+		));
+	}
+
+	Future<void> onUnselectDetailOthersId(
+			UnselectSingleOthersDetailEvent  event,
+			Emitter<AsetothersCariState> emit,
+			) async {
+		if (state.selectedId != event.asetOthersId) return;
+
+		emit(state.copyWith(
+			selectedId: "",
+		));
 	}
 }

@@ -188,6 +188,9 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		on<SelectPolisMvDetailEvent>(onSelectPolisMvDetail);
 		on<UnselectPolisMvDetailEvent>(onUnselectPolisMvDetail);
 		on<ClearPolisMvSelectionEvent>(onClearPolisMvSelection);
+
+		on<SelectSingleMvDetailEvent>(onSelectDetailMvId);
+		on<UnselectSingleMvDetailEvent>(onUnselectDetailMvId);
 	}
 
 	// -----------------------
@@ -342,6 +345,7 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			selectedIds: <String>{},
 			activeAsetMvId: "",
 			selectedFilePolisId: "",
+			selectedId: ""
 		));
 	}
 
@@ -380,6 +384,25 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		_recomputeActiveAndFile(emit);
 	}
 
+	Future<void> onSelectDetailMvId(
+			SelectSingleMvDetailEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedId: event.asetMvId,
+		));
+	}
+	
+	Future<void> onUnselectDetailMvId(
+			UnselectSingleMvDetailEvent  event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		if (state.selectedId != event.asetMvId) return;
+
+		emit(state.copyWith(
+			selectedId: "",
+		));
+	}
 	// -----------------------
 	// Debug fetch tetap sama
 	// -----------------------

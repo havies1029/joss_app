@@ -259,8 +259,16 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return PropertyCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
-          onSelect: (id) => context.read<AsetParCariBloc>().add(SelectDetailEvent(id)),
-          onUnselect: (id) => context.read<AsetParCariBloc>().add(UnselectDetailEvent(id)),
+          onSelect: (id) {
+            final bloc = context.read<AsetParCariBloc>();
+            bloc.add(SelectDetailEvent(id));
+            bloc.add(SelectSingleParDetailEvent(id));
+          },
+          onUnselect: (id) {
+            final bloc = context.read<AsetParCariBloc>();
+            bloc.add(UnselectDetailEvent(id));
+            bloc.add(UnselectSingleParDetailEvent(id));
+          },
           onSelectFilePolisParId: (id) =>
               context.read<AsetParCariBloc>().add(SelectPolisParDetailEvent(id)),
           onUnselectFilePolisParId: (id) =>
@@ -295,8 +303,16 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return KendaraanCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
-          onSelect: (id) => context.read<AsetMvCariBloc>().add(SelectMvDetailEvent(id)),
-          onUnselect: (id) => context.read<AsetMvCariBloc>().add(UnselectMvDetailEvent(id)),
+          onUnselect: (id) {
+            final bloc = context.read<AsetMvCariBloc>();
+            bloc.add(UnselectMvDetailEvent(id));
+            bloc.add(UnselectSingleMvDetailEvent(id));
+          },
+          onSelect: (id) {
+              final bloc = context.read<AsetMvCariBloc>();
+              bloc.add(SelectMvDetailEvent(id));
+              bloc.add(SelectSingleMvDetailEvent(id));
+              },
           onSelectFilePolisMvId: (id) =>
               context.read<AsetMvCariBloc>().add(SelectPolisMvDetailEvent(id)),
           onUnselectFilePolisMvId: (id) =>
@@ -327,8 +343,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return HullCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
-          onSelect: (id) => context.read<AsethullCariBloc>().add(SelectHullDetailEvent(id)),
-          onUnselect: (id) => context.read<AsethullCariBloc>().add(UnselectHullDetailEvent(id)),
+          onSelect: (id) {
+            final bloc = context.read<AsethullCariBloc>();
+            bloc.add(SelectHullDetailEvent(id));
+            bloc.add(SelectSingleHullDetailEvent(id));
+          },
+          onUnselect: (id) {
+            final bloc = context.read<AsethullCariBloc>();
+            bloc.add(UnselectHullDetailEvent(id));
+            bloc.add(UnselectSingleHullDetailEvent(id));
+          },
+          // onSelect: (id) => context.read<AsethullCariBloc>().add(SelectHullDetailEvent(id)),
+          // onUnselect: (id) => context.read<AsethullCariBloc>().add(UnselectHullDetailEvent(id)),
           onSelectFilePolisHullId: (id) =>
               context.read<AsethullCariBloc>().add(SelectPolisHullDetailEvent(id)),
           onUnselectFilePolisHullId: (id) =>
@@ -359,8 +385,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return HealthCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
-          onSelect: (id) => context.read<AsetHealthCariBloc>().add(SelectHealthDetailEvent(id)),
-          onUnselect: (id) => context.read<AsetHealthCariBloc>().add(UnselectHealthDetailEvent(id)),
+          onSelect: (id) {
+            final bloc = context.read<AsetHealthCariBloc>();
+            bloc.add(SelectHealthDetailEvent(id));
+            bloc.add(SelectSingleHealthDetailEvent(id));
+          },
+          onUnselect: (id) {
+            final bloc = context.read<AsetHealthCariBloc>();
+            bloc.add(UnselectHealthDetailEvent(id));
+            bloc.add(UnselectSingleHealthDetailEvent(id));
+          },
+          // onSelect: (id) => context.read<AsetHealthCariBloc>().add(SelectHealthDetailEvent(id)),
+          // onUnselect: (id) => context.read<AsetHealthCariBloc>().add(UnselectHealthDetailEvent(id)),
           onSelectFilePolisHealthId: (id) =>
               context.read<AsetHealthCariBloc>().add(SelectPolisHealthDetailEvent(id)),
           onUnselectFilePolisHealthId: (id) =>
@@ -391,8 +427,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return KargoCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
-          onSelect: (id) => context.read<AsetothersCariBloc>().add(SelectOthersDetailEvent(id)),
-          onUnselect: (id) => context.read<AsetothersCariBloc>().add(UnselectOthersDetailEvent(id)),
+          onSelect: (id) {
+            final bloc = context.read<AsetothersCariBloc>();
+            bloc.add(SelectOthersDetailEvent(id));
+            bloc.add(SelectSingleOthersDetailEvent(id));
+          },
+          onUnselect: (id) {
+            final bloc = context.read<AsetothersCariBloc>();
+            bloc.add(UnselectOthersDetailEvent(id));
+            bloc.add(UnselectSingleOthersDetailEvent(id));
+          },
+          // onSelect: (id) => context.read<AsetothersCariBloc>().add(SelectOthersDetailEvent(id)),
+          // onUnselect: (id) => context.read<AsetothersCariBloc>().add(UnselectOthersDetailEvent(id)),
           onSelectFilePolisHealthId: (id) =>
               context.read<AsetothersCariBloc>().add(SelectPolisOthersDetailEvent(id)),
           onUnselectFilePolisHealthId: (id) =>

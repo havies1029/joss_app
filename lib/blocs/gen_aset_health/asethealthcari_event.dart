@@ -84,3 +84,20 @@ class ClearPolisHealthSelectionEvent extends AsetHealthCariEvents {
 	@override
 	List<Object> get props => [];
 }
+
+
+class SelectSingleHealthDetailEvent extends AsetHealthCariEvents {
+	final String asetHealthId;
+	const SelectSingleHealthDetailEvent(this.asetHealthId);
+
+	@override
+	List<Object> get props => [asetHealthId];
+}
+
+class UnselectSingleHealthDetailEvent extends AsetHealthCariEvents {
+	final String asetHealthId;
+	const UnselectSingleHealthDetailEvent(this.asetHealthId);
+
+	@override
+	List<Object> get props => [asetHealthId];
+}

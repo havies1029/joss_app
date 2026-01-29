@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../aset/aset_cari.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../../gen_endors/endors1crud_form.dart';
 import '../../../gen_klaim/mobile/klaim_main_page.dart';

@@ -340,6 +340,7 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			selectedIds: <String>{},
 			activeAsetHullId: "",
 			selectedFilePolisId: "",
+				selectedId: ""
 		));
 	}
 
@@ -375,5 +376,25 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			return;
 		}
 		_recomputeActiveAndFile(emit);
+	}
+
+	Future<void> onSelectDetailHullId(
+			SelectSingleHullDetailEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedId: event.asetHullId,
+		));
+	}
+
+	Future<void> onUnselectDetailHullId(
+			UnselectSingleHullDetailEvent  event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		if (state.selectedId != event.asetHullId) return;
+
+		emit(state.copyWith(
+			selectedId: "",
+		));
 	}
 }
