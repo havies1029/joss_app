@@ -8,24 +8,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'dnrekap2inv_event.dart';
-part 'dnrekap2inv_state.dart'; 
+part 'dnrekap2inv_state.dart';
 
 class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
-	DnRekap2invBloc() : super(DnRekap2invState()) {
-   
+  DnRekap2invBloc() : super(DnRekap2invState()) {
+
     on<DnToInvByListCobProcessEvent>(onDnToInvByListCobProcess);
     on<DnToInvByListDnProcessEvent>(onDnToInvByListDnProcess);
     on<CheckInvoiceStatusEvent>(onCheckInvoiceStatus);
     on<Invoice2PaymentViaVAEvent>(onInvoice2PaymentViaVA);
     on<GetRincianSOACustomerEvent>(onGetRincianSOACustomer);
     on<SelectDetailEvent>(onSelectDetail);
-    on<UnselectDetailEvent>(onUnselectDetail); 
+    on<UnselectDetailEvent>(onUnselectDetail);
     on<InitializeDnRekap2invEvent>((event, emit) {
       emit(DnRekap2invState.initial());
     });
     on<ForcePaymentViaVaEvent>(onForcePaymentViaVa);
+    on<RegMv2InvoiceEvent>(onRegMv2Inv);
+    on<RegPar2InvoiceEvent>(onRegPar2Inv);
   }
-		
+
   Future<void> onDnToInvByListCobProcess(
       DnToInvByListCobProcessEvent event, Emitter<DnRekap2invState> emit) async {
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
@@ -99,7 +101,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       ));
     }
   }
-	
+
   Future<void> onInvoice2PaymentViaVA(
       Invoice2PaymentViaVAEvent event, Emitter<DnRekap2invState> emit) async {
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
@@ -172,6 +174,56 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       emit(state.copyWith(
         isProcessing: false,
         isProcessed: true,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isProcessing: false,
+        hasFailure: true,
+      ));
+    }
+  }
+
+  Future<void> onRegMv2Inv(
+      RegMv2InvoiceEvent event, Emitter<DnRekap2invState> emit) async {
+    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+
+    try {
+
+      PaymentDnAPI api = PaymentDnAPI();
+      PaymentDnRepository repo = PaymentDnRepository(api: api);
+      List<InvoiceStatusModel> invoiceStatus = await repo.regMv2Inv(event.regmv1Id);
+
+      emit(state.copyWith(
+        isProcessing: false,
+        isProcessed: true,
+        invoiceId: invoiceStatus[0].invoiceId,
+        paymentStatus: invoiceStatus[0].status,
+        totalBayar: invoiceStatus[0].totalBayar,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isProcessing: false,
+        hasFailure: true,
+      ));
+    }
+  }
+
+  Future<void> onRegPar2Inv(
+      RegPar2InvoiceEvent event, Emitter<DnRekap2invState> emit) async {
+    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+
+    try {
+
+      PaymentDnAPI api = PaymentDnAPI();
+      PaymentDnRepository repo = PaymentDnRepository(api: api);
+      List<InvoiceStatusModel> invoiceStatus = await repo.regPar2Inv(event.regpar1Id);
+
+      emit(state.copyWith(
+        isProcessing: false,
+        isProcessed: true,
+        invoiceId: invoiceStatus[0].invoiceId,
+        paymentStatus: invoiceStatus[0].status,
+        totalBayar: invoiceStatus[0].totalBayar,
       ));
     } catch (e) {
       emit(state.copyWith(

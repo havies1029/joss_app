@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../../blocs/gen_regmv/regmv1crud_bloc.dart';
+import '../../../blocs/gen_regmv/regmv1list_bloc.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv3form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv4form_bloc.dart';
+import '../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../models/gen_regmv/regmv1crud_model.dart';
 import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
@@ -15,6 +17,8 @@ import '../../../models/gen_regmv/regmv4form_model.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
+import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {
   final String viewMode;
@@ -34,6 +38,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   Regmv1CrudModel? regmv1Record;
   Regmv2FormModel? regmv2Record;
   Regmv3FormModel? regmv3Record;
+  late Regmv1ListBloc regmv1ListBloc;
+  final TextEditingController _searchController = TextEditingController();
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -49,7 +55,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   @override
   void initState() {
     super.initState();
-
+    regmv1ListBloc = context.read<Regmv1ListBloc>();
     // 🔥 Trigger load Form 1 saat halaman dibuka
     if (widget.viewMode == "ubah" && widget.recordId != null) {
       context.read<Regmv1CrudBloc>()
@@ -57,16 +63,83 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     }
   }
 
+  void refreshData() {
+    regmv1ListBloc.add(
+        RefreshRegmv1ListEvent(searchText: _searchController.text, hal: 0));
+  }
+
+  void onViewPaymentMethods(String curr, double totalBayar) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
+    ); // Implement your ta
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Konfirmasi",
       blocListeners: [
+        BlocListener<DnRekap2invBloc, DnRekap2invState>(
+          listenWhen: (previous, current) {
+            return previous.isProcessed != current.isProcessed ||
+                previous.hasFailure != current.hasFailure;
+          },
+          listener: (context, state) {
+            if (state.isProcessed) {
+              if (state.paymentStatus == "20") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
+                    ),
+                  ),
+                );
+                onViewPaymentMethods(state.curr, state.totalBayar);
+              } else if (state.paymentStatus == "30") {
+                refreshData();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Silakan lakukan pembayaran.')),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentProcess(
+                      viewMode: "ubah",
+                      recordId: state.invoiceId,
+                    ),
+                  ),
+                );
+              } else if (state.paymentStatus == "40") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Proses pembayaran Berhasil.')),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaymentSuccess()),
+                );
+              } else if (state.paymentStatus == "91") {
+                refreshData();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Proses pembayaran gagal. Silakan coba lagi.'),
+                  ),
+                );
+              }
+            }
+
+            // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
+            // if (state.hasFailure) {
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
+            //   );
+            // }
+          },
+        ),
+
         _buildGenericListener<Regmv1CrudBloc, Regmv1CrudState, Regmv1CrudModel>(
           onPayload: (record) {
             setState(() => regmv1Record = record);
-
-            // Form1 → Form2
             context.read<Regmv2FormBloc>().add(
               Regmv2FormLihatEvent(recordId: record.regmv1Id),
             );
@@ -216,15 +289,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     child: AppButton.primary(
                       text: "Lanjutkan",
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PaymentMethodPage(curr: '', totalBayar:0,
-                              // recordId: widget.recordId ?? '',
-                              // viewMode: 'ubah',
-                            ),
-                          ),
-                        );
+                        context.read<DnRekap2invBloc>().add(
+                            RegMv2InvoiceEvent(regmv1Id: widget.recordId ?? ""));
                       },
                     ),
                   ),

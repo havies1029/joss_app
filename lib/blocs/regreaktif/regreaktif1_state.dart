@@ -36,5 +36,12 @@ class Regreaktif1State extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [
+		record,
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+	];
 }

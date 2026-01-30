@@ -317,7 +317,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -359,7 +359,7 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalparMainPageRemake(  )));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake(  )));
         break;
 
       // case 'Test Page':

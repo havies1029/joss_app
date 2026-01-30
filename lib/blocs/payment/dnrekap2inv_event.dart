@@ -1,10 +1,10 @@
 part of 'dnrekap2inv_bloc.dart';
 
 abstract class DnRekap2invEvent extends Equatable {
-	const DnRekap2invEvent();
+  const DnRekap2invEvent();
 
-	@override
-	List<Object> get props => [];
+  @override
+  List<Object> get props => [];
 }
 
 
@@ -51,7 +51,7 @@ class GetRincianSOACustomerEvent extends DnRekap2invEvent {
 
   @override
   List<Object> get props => [searchText];
-} 
+}
 
 class SelectDetailEvent extends DnRekap2invEvent {
   final String dn1Id;
@@ -71,4 +71,22 @@ class ForcePaymentViaVaEvent extends DnRekap2invEvent {
   const ForcePaymentViaVaEvent({required this.invoiceId});
   @override
   List<Object> get props => [invoiceId];
+}
+
+class RegMv2InvoiceEvent extends DnRekap2invEvent {
+  final String regmv1Id;
+
+  const RegMv2InvoiceEvent({required this.regmv1Id});
+
+  @override
+  List<Object> get props => [regmv1Id];
+}
+
+class RegPar2InvoiceEvent extends DnRekap2invEvent {
+  final String regpar1Id;
+
+  const RegPar2InvoiceEvent({required this.regpar1Id});
+
+  @override
+  List<Object> get props => [regpar1Id];
 }

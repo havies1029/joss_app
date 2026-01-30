@@ -17,7 +17,7 @@ class RegendorsCariBloc extends Bloc<RegendorsCariEvents, RegendorsCariState> {
 Future<void> onRefreshRegendorsCari(
 		RefreshRegendorsCariEvent event, Emitter<RegendorsCariState> emit) async {
 	emit(const RegendorsCariState());
-
+  emit(state.copyWith(searchText: event.searchText));
 	add(FetchRegendorsCariEvent());
 }
 

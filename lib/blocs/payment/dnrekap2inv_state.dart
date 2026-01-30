@@ -53,14 +53,14 @@ class DnRekap2invState extends Equatable {
 
   @override
   List<Object> get props => [
-        invoiceId,
-        paymentStatus,
-        isProcessing,
-        isProcessed,
-        hasFailure,
-        rincianSOA,
-        selectedIds,
-        totalBayar,
-        curr,
-      ];
+    invoiceId,
+    paymentStatus,
+    isProcessing,
+    isProcessed,
+    hasFailure,
+    rincianSOA,
+    selectedIds,
+    totalBayar,
+    curr,
+  ];
 }

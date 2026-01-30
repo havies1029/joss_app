@@ -17,18 +17,39 @@ class Regrenew1FormBloc extends Bloc<Regrenew1FormEvents, Regrenew1FormState> {
 	}
 
 	Future<void> onTambahRegrenew1Form(
-		Regrenew1FormTambahEvent event, Emitter<Regrenew1FormState> emit) async {
+			Regrenew1FormTambahEvent event,
+			Emitter<Regrenew1FormState> emit,
+			) async {
+		emit(state.copyWith(isSaving: true, isSaved: false, hasFailure: false));
 
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.regrenew1FormTambah(event.record);
-		hasFailure = !returnData.success;
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+		try {
+			final returnData = await repository.regrenew1FormTambah(event.record);
+
+			final hasFailure = !returnData.success;
+
+			Regrenew1FormModel newRecord = event.record;
+
+			if (returnData.success && returnData.data != null) {
+				newRecord = event.record.copyWith(
+					sppa1Id: returnData.data.toString(), // <-- simpan ID dari backend
+				);
+			}
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: returnData.success,
+				hasFailure: hasFailure,
+				record: newRecord,
+			));
+		} catch (e) {
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: true,
+			));
+		}
 	}
+
 
 	Future<void> onUbahRegrenew1Form(
 		Regrenew1FormUbahEvent event, Emitter<Regrenew1FormState> emit) async {

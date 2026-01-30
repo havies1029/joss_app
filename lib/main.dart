@@ -187,6 +187,7 @@ import 'blocs/payment/pay1crud_bloc.dart';
 import 'blocs/payment/pay1list_bloc.dart';
 import 'blocs/payment/pay2cari_bloc.dart';
 import 'blocs/payment/paymentmethodcari_bloc.dart';
+import 'blocs/regendors/regendors2cari_bloc.dart';
 import 'blocs/regpar/regpar1crud_bloc.dart';
 import 'blocs/regpar/regpar1list_bloc.dart';
 import 'blocs/regpar/regpar2form_bloc.dart';
@@ -477,6 +478,7 @@ Future<void> main() async {
         create: (_) => PolisTanggalBloc()),
         BlocProvider(create: (_) => Regrenew1FormBloc(repository: Regrenew1FormRepository())),
         BlocProvider(create: (_) => Regreaktif1Bloc(repository: Regreaktif1Repository())),
+        BlocProvider(create: (context) => Regendors2CariBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

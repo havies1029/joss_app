@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/models/regendors/regendors1form_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
 
-import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../blocs/regrenewal/regrenew1form_bloc.dart';
-import '../../../models/regrenewal/regrenew1form_model.dart';
+import '../../detail_management_page/detail_management_widget.dart';
 
 
-class RenewalFormPage extends StatefulWidget {
+class EndorseFormPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
   final String polisId;
   final String cobId;
   final String? pageTitle;
 
-  const RenewalFormPage({
+  const EndorseFormPage({
     super.key,
     required this.viewMode,
     required this.recordId,
@@ -31,12 +31,11 @@ class RenewalFormPage extends StatefulWidget {
 
 
   @override
-  RenewalFormPageFormState createState() => RenewalFormPageFormState();
+  EndorseFormPageFormState createState() => EndorseFormPageFormState();
 }
 
-class RenewalFormPageFormState extends State<RenewalFormPage> {
-  late Regrenew1FormBloc regrenewal1FormBloc;
-  late MRekan1CrudBloc mrekan1crudbloc;
+class EndorseFormPageFormState extends State<EndorseFormPage> {
+  late Regendors1FormBloc regendors1FormBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
   var fieldEndorsTglController = TextEditingController(text: DateTime.now().toIso8601String());
@@ -54,18 +53,24 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   @override
   void initState() {
     super.initState();
-    mrekan1crudbloc = context.read<MRekan1CrudBloc>();
-    regrenewal1FormBloc = context.read<Regrenew1FormBloc>();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      loadData();
+
+
+      fieldSppa1IdController.text = widget.polisId;
+
+      debugPrint("✅ [Endorse] Polis ID dari BLoC: ${widget.polisId}");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    regrenewal1FormBloc = BlocProvider.of<Regrenew1FormBloc>(context);
+    regendors1FormBloc = BlocProvider.of<Regendors1FormBloc>(context);
 
-    return BlocConsumer<Regrenew1FormBloc, Regrenew1FormState>(
+    return BlocConsumer<Regendors1FormBloc, Regendors1FormState>(
       builder: (context, state) {
         return BaseBackgroundSidePage(
-          title: 'Perpanjangan Polis',
+          title: 'Endorse Perubahan',
           child: Scaffold(
             backgroundColor: secondaryBlackColor,
             bottomNavigationBar: Padding(
@@ -122,13 +127,29 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
         );
       },
       listener: (context, state) async {
-        // if (state.isSaved && !state.hasFailure) {
-        //   if (context.mounted) {
-        //     Navigator.pop(context, true);
-        //   }
-        // }
+        if (state.isSaved && !state.hasFailure) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DetailManagementPolisPage(
+                data: "",
+                cobId: "",
+                statusId: "",
+              ),
+            ),
+          );
+        }
       },
     );
+  }
+
+
+  void loadData() {
+    if (widget.viewMode == "ubah") {
+      regendors1FormBloc.add(
+          Regendors1FormLihatEvent(recordId: widget.recordId));
+    } else {
+    }
   }
 
   Widget buildFieldEndorsTgl(){
@@ -335,14 +356,15 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
 
   void onSaveForm() {
 
-    final record = Regrenew1FormModel(
-      isUbah: false,
-      sppa1Id: widget.polisId,
+    final record = Regendors1FormModel(
       notePerubahan: fieldNotePerubahanController.text,
+      sppa1Id: widget.polisId,
+      regendors1Id: "",
     );
 
-    regrenewal1FormBloc.add(Regrenew1FormTambahEvent(record: record));
-    _dismissDialog();
+    regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));
+
+    // _dismissDialog();
   }
 
   void addError({required String error}) {

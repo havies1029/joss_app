@@ -17,18 +17,39 @@ class Regreaktif1Bloc extends Bloc<Regreaktif1Events, Regreaktif1State> {
 	}
 
 	Future<void> onTambahRegreaktif1(
-		Regreaktif1TambahEvent event, Emitter<Regreaktif1State> emit) async {
+			Regreaktif1TambahEvent event,
+			Emitter<Regreaktif1State> emit,
+			) async {
+		emit(state.copyWith(isSaving: true, isSaved: false, hasFailure: false));
 
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.regreaktif1Tambah(event.record);
-		hasFailure = !returnData.success;
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+		try {
+			final returnData = await repository.regreaktif1Tambah(event.record);
+
+			bool hasFailure = !returnData.success;
+
+			Regreaktif1Model newRecord = event.record;
+
+			if (returnData.success && returnData.data != null) {
+				newRecord = event.record.copyWith(
+					sppa1Id: returnData.data.toString(),
+				);
+			}
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: returnData.success,
+				hasFailure: hasFailure,
+				record: newRecord,
+			));
+		} catch (e) {
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: true,
+			));
+		}
 	}
+
 
 	Future<void> onUbahRegreaktif1(
 		Regreaktif1UbahEvent event, Emitter<Regreaktif1State> emit) async {

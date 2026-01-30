@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
 import 'package:joss_app/pages/gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import 'package:string_validator/string_validator.dart';

@@ -8,19 +8,19 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
 
-import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../blocs/regreaktif/regreaktif1_bloc.dart';
-import '../../../models/regreaktif/regreaktif1_model.dart';
+import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../blocs/regrenewal/regrenew1form_bloc.dart';
+import '../../../../models/regrenewal/regrenew1form_model.dart';
 
 
-class ReaktifFormPage extends StatefulWidget {
+class RenewalFormPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
   final String polisId;
   final String cobId;
   final String? pageTitle;
 
-  const ReaktifFormPage({
+  const RenewalFormPage({
     super.key,
     required this.viewMode,
     required this.recordId,
@@ -31,11 +31,11 @@ class ReaktifFormPage extends StatefulWidget {
 
 
   @override
-  ReaktifFormPageFormState createState() => ReaktifFormPageFormState();
+  RenewalFormPageFormState createState() => RenewalFormPageFormState();
 }
 
-class ReaktifFormPageFormState extends State<ReaktifFormPage> {
-  late Regreaktif1Bloc regreaktif1Bloc;
+class RenewalFormPageFormState extends State<RenewalFormPage> {
+  late Regrenew1FormBloc regrenewal1FormBloc;
   late MRekan1CrudBloc mrekan1crudbloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
@@ -55,12 +55,14 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
   void initState() {
     super.initState();
     mrekan1crudbloc = context.read<MRekan1CrudBloc>();
-    regreaktif1Bloc = context.read<Regreaktif1Bloc>();
+    regrenewal1FormBloc = context.read<Regrenew1FormBloc>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<Regreaktif1Bloc, Regreaktif1State>(
+    regrenewal1FormBloc = BlocProvider.of<Regrenew1FormBloc>(context);
+
+    return BlocConsumer<Regrenew1FormBloc, Regrenew1FormState>(
       builder: (context, state) {
         return BaseBackgroundSidePage(
           title: 'Perpanjangan Polis',
@@ -333,13 +335,13 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
 
   void onSaveForm() {
 
-    final record = Regreaktif1Model(
+    final record = Regrenew1FormModel(
       isUbah: false,
       sppa1Id: widget.polisId,
       notePerubahan: fieldNotePerubahanController.text,
     );
 
-    regreaktif1Bloc.add(Regreaktif1TambahEvent(record: record));
+    regrenewal1FormBloc.add(Regrenew1FormTambahEvent(record: record));
     _dismissDialog();
   }
 

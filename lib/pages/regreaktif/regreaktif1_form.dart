@@ -6,6 +6,7 @@ import 'package:joss_app/blocs/regreaktif/regreaktif1_bloc.dart';
 import 'package:joss_app/models/regreaktif/regreaktif1_model.dart';
 import 'package:string_validator/string_validator.dart';
 
+
 class Regreaktif1FormPage extends StatefulWidget {
 	final String sppa1Id;
 
