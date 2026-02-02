@@ -98,3 +98,8 @@ class UnselectSingleMvDetailEvent extends AsetMvCariEvents {
 	@override
 	List<Object> get props => [asetMvId];
 }
+
+class SelectMvCariEvent extends AsetMvCariEvents {
+	final AsetMvCariModel selectedItem;
+	const SelectMvCariEvent({required this.selectedItem});
+}

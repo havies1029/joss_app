@@ -16,6 +16,9 @@ class AsetMvCariModel {
 	int nomor;
 	String status;
 	String filePolisId;
+	String prosesId;
+	String prosesRemarks;
+	String prosesSource;
 
 	AsetMvCariModel({required this.asetMvId, required this.tertanggung,
 		required this.periodeMulai, required this.periodeAkhir,
@@ -24,7 +27,8 @@ class AsetMvCariModel {
 		required this.noPolisi, required this.nomor,
 		required this.polisNo, required this.premi,
 		required this.sumInsured, required this.tahun,
-		required this.modelMv, required this.status, required this.filePolisId});
+		required this.modelMv, required this.status, required this.filePolisId,
+		required this.prosesId, required this.prosesRemarks, required this.prosesSource});
 
 	factory AsetMvCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetMvCariModel(
@@ -44,6 +48,9 @@ class AsetMvCariModel {
 			modelMv: data['modelMv']??'',
 			status: data['status']??'',
 			filePolisId: data['filePolisId']??'',
+			prosesId: data['prosesId']??'',
+			prosesRemarks: data['prosesRemarks']??'',
+			prosesSource: data['prosesSource']??'',
 		);
 
 	}
@@ -65,6 +72,9 @@ class AsetMvCariModel {
 				'modelMv': modelMv,
 				'status': status,
 				'filePolisId': filePolisId,
+				'prosesId': prosesId,
+				'prosesRemarks': prosesRemarks,
+				'prosesSource': prosesSource,
 			};
 
 }

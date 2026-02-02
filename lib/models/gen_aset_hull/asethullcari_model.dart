@@ -12,6 +12,9 @@ class AsethullCariModel {
 	double tsi;
 	int nomor;
 	String filePolisId;
+	String prosesId;
+	String prosesRemarks;
+	String prosesSource;
 
 	AsethullCariModel({required this.asetHullId,
 		required this.tertanggung,
@@ -20,7 +23,8 @@ class AsethullCariModel {
 		required this.curr,
 		required this.namaKapal, required this.polisNo,
 		required this.premi, required this.status,
-		required this.tsi, required this.nomor, required this.filePolisId});
+		required this.tsi, required this.nomor, required this.filePolisId,
+		required this.prosesId, required this.prosesRemarks, required this.prosesSource});
 
 	factory AsethullCariModel.fromJson(Map<String, dynamic> data) {
 		return AsethullCariModel(
@@ -36,6 +40,9 @@ class AsethullCariModel {
 			tsi: double.tryParse(data['tsi'].toString())??0,
 			nomor: int.tryParse(data['nomor'].toString())??0,
 			filePolisId: data['filePolisId']??'',
+			prosesId: data['prosesId']??'',
+			prosesRemarks: data['prosesRemarks']??'',
+			prosesSource: data['prosesSource']??'',
 		);
 
 	}
@@ -53,6 +60,9 @@ class AsethullCariModel {
 				'status': status,
 				'nomor': nomor,
 				'filePolisId': filePolisId,
+				'prosesId': prosesId,
+				'prosesRemarks': prosesRemarks,
+				'prosesSource': prosesSource,
 			};
 
 }

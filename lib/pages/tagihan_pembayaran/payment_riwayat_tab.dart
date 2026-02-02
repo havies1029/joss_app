@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../payment/mobile/riwayat/riwayat_page.dart';
+import '../payment/mobile/riwayat/riwayat_page_remake.dart';
 
 class PaymentRiwayatTab extends StatelessWidget {
   const PaymentRiwayatTab({super.key});
@@ -7,7 +8,7 @@ class PaymentRiwayatTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const RiwayatPage(),
+      body: const RiwayatPageRemake(),
     );
   }
 }

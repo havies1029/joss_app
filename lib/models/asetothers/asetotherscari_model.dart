@@ -9,11 +9,15 @@ class AsetothersCariModel {
 	String status;
 	double sumInsured;
 	String filePolisId;
+	String prosesId;
+	String prosesRemarks;
+	String prosesSource;
 
 	AsetothersCariModel({required this.asetOthersId, required this.curr,
 		required this.nomor, required this.objectDesc,
 		required this.polisNo, required this.premi,
-		required this.status, required this.sumInsured, required this.filePolisId});
+		required this.status, required this.sumInsured, required this.filePolisId,
+		required this.prosesId, required this.prosesRemarks, required this.prosesSource});
 
 	factory AsetothersCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetothersCariModel(
@@ -26,8 +30,10 @@ class AsetothersCariModel {
 			status: data['status']??'',
 			sumInsured: double.tryParse(data['sumInsured'].toString())??0,
 			filePolisId: data['filePolisId']??'',
+			prosesId: data['prosesId']??'',
+			prosesRemarks: data['prosesRemarks']??'',
+			prosesSource: data['prosesSource']??'',
 		);
-
 	}
 
 	Map<String, dynamic> toJson() =>
@@ -40,6 +46,9 @@ class AsetothersCariModel {
 				'status': status,
 				'sumInsured': sumInsured.toString(),
 				'filePolisId': filePolisId,
+				'prosesId': prosesId,
+				'prosesRemarks': prosesRemarks,
+				'prosesSource': prosesSource,
 			};
 
 }

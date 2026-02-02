@@ -89,6 +89,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       List<InvoiceStatusModel> invoiceStatus = await repo.fetchInvoiceStatus(event.invoiceId);
 
       emit(state.copyWith(
+        invoiceId: event.invoiceId,
         isProcessing: false,
         isProcessed: true,
         paymentStatus: invoiceStatus[0].status,

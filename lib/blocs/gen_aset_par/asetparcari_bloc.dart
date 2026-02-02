@@ -252,13 +252,15 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 
 		on<SelectSingleParDetailEvent>(onSelectDetailId);
 		on<UnselectSingleParDetailEvent>(onUnselectDetailParId);
+		on<SelectParCariEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: event.selectedItem));
+		});
 	}
 
 	Future<void> onRefreshAsetParCari(
 			RefreshAsetParCariEvent event,
 			Emitter<AsetParCariState> emit,
 			) async {
-		// ✅ Fix C: jangan clear items supaya UI nggak kedip kosong
 		emit(state.copyWith(
 			status: ListStatus.initial,
 			hal: 0,

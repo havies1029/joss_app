@@ -17,3 +17,9 @@ class RefreshHistorybayarCariEvent extends HistorybayarCariEvents {
   List<Object> get props => [statusId, searchText];
 }
 
+class SelectHistorybayarCariEvent extends HistorybayarCariEvents {
+  final HistorybayarCariModel selected;
+  const SelectHistorybayarCariEvent({required this.selected});
+}
+
+

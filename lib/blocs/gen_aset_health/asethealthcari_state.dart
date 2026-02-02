@@ -12,6 +12,8 @@ class AsetHealthCariState extends Equatable {
 	final String selectedFilePolisId;
 	final String activeAsetHealthId;
 	final String selectedId;
+	final AsetHealthCariModel? selectedItem;
+
 
 	const AsetHealthCariState(
 		{this.status = ListStatus.initial,
@@ -22,7 +24,9 @@ class AsetHealthCariState extends Equatable {
 		this.statusId = '',
 		this.selectedIds = const <String>{},
 		this.selectedFilePolisId = "",
-		this.activeAsetHealthId = "", this.selectedId = ""});
+		this.activeAsetHealthId = "",
+		this.selectedId = "",
+		this.selectedItem,});
 
 	const AsetHealthCariState.success(List<AsetHealthCariModel> items)
 			: this(status: ListStatus.success, items: items);
@@ -38,7 +42,9 @@ class AsetHealthCariState extends Equatable {
 		String? statusId,
 		Set<String>? selectedIds,
 		String? selectedFilePolisId,
-		String? activeAsetHealthId,  String? selectedId
+		String? activeAsetHealthId,
+		String? selectedId,
+		AsetHealthCariModel? selectedItem,
 		}) {
 		return AsetHealthCariState(
 			items: items ?? this.items,
@@ -50,10 +56,11 @@ class AsetHealthCariState extends Equatable {
 			selectedIds: selectedIds ?? this.selectedIds,
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
 			activeAsetHealthId: activeAsetHealthId ?? this.activeAsetHealthId,
-				selectedId: selectedId ?? this.selectedId
+			selectedId: selectedId ?? this.selectedId,
+			selectedItem: selectedItem ?? this.selectedItem,
 		);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetHealthId, selectedId];
+	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetHealthId, selectedId, selectedItem ?? ""];
 }

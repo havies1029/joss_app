@@ -421,6 +421,8 @@ import '../../../../models/gen_aset_health/asethealthcari_model.dart';
 class HealthCobTable extends StatefulWidget {
   final List<AsetHealthCariModel> items;
   final List<String> selectedIds;
+  final void Function(AsetHealthCariModel item)? onSelectItem;
+
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
 
@@ -435,6 +437,7 @@ class HealthCobTable extends StatefulWidget {
     super.key,
     required this.items,
     required this.selectedIds,
+    required this.onSelectItem,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisHealthId,
@@ -679,8 +682,10 @@ class _HealthCobTableState extends State<HealthCobTable> {
                   }
                 }
 
-                // Kemudian select item yang baru diklik
                 widget.onSelect(d.asethealthId);
+
+                widget.onSelectItem?.call(d); //ini coy
+
                 if (d.filePolisId.isNotEmpty) {
                   widget.onSelectFilePolisHealthId(d.filePolisId);
                 }

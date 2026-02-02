@@ -462,6 +462,8 @@ import '../../../../models/gen_aset_hull/asethullcari_model.dart';
 class HullCobTable extends StatefulWidget {
   final List<AsethullCariModel> items;
   final List<String> selectedIds;
+  final void Function(AsethullCariModel item)? onSelectItem;
+
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
 
@@ -476,6 +478,7 @@ class HullCobTable extends StatefulWidget {
     super.key,
     required this.items,
     required this.selectedIds,
+    required this.onSelectItem,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisHullId,
@@ -727,6 +730,9 @@ class _HullCobTableState extends State<HullCobTable> {
 
                 // Kemudian select item yang baru diklik
                 widget.onSelect(d.asetHullId);
+
+                widget.onSelectItem?.call(d); //ini coy
+
                 if (d.filePolisId.isNotEmpty) {
                   widget.onSelectFilePolisHullId(d.filePolisId);
                 }

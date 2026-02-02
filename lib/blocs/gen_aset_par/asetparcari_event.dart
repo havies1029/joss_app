@@ -129,5 +129,10 @@ class UnselectSingleParDetailEvent extends AsetParCariEvents {
 	List<Object> get props => [asetParId];
 }
 
+class SelectParCariEvent extends AsetParCariEvents {
+	final AsetParCariModel selectedItem;
+	const SelectParCariEvent({required this.selectedItem});
+}
+
 
 

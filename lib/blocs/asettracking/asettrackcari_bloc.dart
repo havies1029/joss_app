@@ -13,6 +13,7 @@ class AsettrackCariBloc extends Bloc<AsettrackCariEvents, AsettrackCariState> {
 	AsettrackCariBloc() : super(const AsettrackCariState()) {
 		on<FetchAsettrackCariEvent>(onFetchAsettrackCari);
 		on<RefreshAsettrackCariEvent>(onRefreshAsettrackCari);
+		on<SelectAsettrackCariEvent>(onSelectAsettrackCari);
 	}
 
 Future<void> onRefreshAsettrackCari(
@@ -53,6 +54,10 @@ Future<void> onFetchAsettrackCari(
 			status: ListStatus.success,
 			hal: state.hal + 1));
 		}
+	}
 
+	Future<void> onSelectAsettrackCari(
+			SelectAsettrackCariEvent event, Emitter<AsettrackCariState> emit) async {
+		emit(state.copyWith(selectedAsettrackCari: event.selectedAsettrackCari));
 	}
 }

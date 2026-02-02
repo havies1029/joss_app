@@ -484,6 +484,8 @@ import '../../../../models/gen_aset_mv/asetmvcari_model.dart';
 class KendaraanCobTable extends StatefulWidget {
   final List<AsetMvCariModel> items;
   final List<String> selectedIds;
+  final void Function(AsetMvCariModel item)? onSelectItem;
+
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
 
@@ -498,6 +500,7 @@ class KendaraanCobTable extends StatefulWidget {
     super.key,
     required this.items,
     required this.selectedIds,
+    required this.onSelectItem,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisMvId,
@@ -757,6 +760,9 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
 
                 // Kemudian select item yang baru diklik
                 widget.onSelect(d.asetMvId);
+
+                widget.onSelectItem?.call(d);
+
                 if (d.filePolisId.isNotEmpty) {
                   widget.onSelectFilePolisMvId(d.filePolisId);
                 }

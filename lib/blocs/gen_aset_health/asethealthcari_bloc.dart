@@ -186,6 +186,9 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 
 		on<SelectSingleHealthDetailEvent>(onSelectDetailHealthId);
 		on<UnselectSingleHealthDetailEvent>(onUnselectDetailHealthId);
+		on<SelectHealthCariEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: event.selectedItem));
+		});
 	}
 
 	// -----------------------

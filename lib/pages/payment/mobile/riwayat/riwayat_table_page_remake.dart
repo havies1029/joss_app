@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/payment/pay1list_bloc.dart';
 
-import '../../../../blocs/payment/pay2cari_bloc.dart';
-import '../../../../models/payment/pay1list_model.dart';
+
+import '../../../../blocs/payment/historybayar2cari_bloc.dart';
+import '../../../../models/payment/historybayarcari_model.dart';
 import 'detail_riwayat/riwayat_detail_table_page.dart';
+import 'detail_riwayat/riwayat_detail_table_page_remake.dart';
 
-class RiwayatTablePage extends StatefulWidget {
+class RiwayatTablePageRemake extends StatefulWidget {
   final String searchText;
-  const RiwayatTablePage({super.key, required this.searchText});
+  const RiwayatTablePageRemake({super.key, required this.searchText});
 
   @override
-  RiwayatTablePageState createState() => RiwayatTablePageState();
+  RiwayatTablePageRemakeState createState() => RiwayatTablePageRemakeState();
 }
 
-class RiwayatTablePageState extends State<RiwayatTablePage> {
-  late Pay1ListBloc pay1ListBloc;
+class RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
+  late HistorybayarCariBloc historybayarCariBloc;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -27,7 +29,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
   String formatDate(DateTime date) =>
       DateFormat('yyyy-MM-dd').format(date);
 
-  void _openDetail(String ar1Id) {
+  void _openDetail(String inv1Id) {
     FocusScope.of(context).requestFocus(FocusNode());
 
     showDialog(
@@ -35,17 +37,21 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return BlocProvider.value(
-          value: context.read<Pay2CariBloc>(),
-          child: RiwayatDetailTablePage(ar1Id: ar1Id),
+          value: context.read<Historybayar2CariBloc>(),
+          child: RiwayatDetailTablePageRemake(inv1Id: inv1Id),
         );
       },
       useSafeArea: true,
     );
   }
 
-  Widget _rowTapWrapper(Pay1ListModel d, {required Widget child}) {
+  Widget _rowTapWrapper(HistorybayarCariModel d, {required Widget child}) {
     return InkWell(
-      onTap: () => _openDetail(d.ar1Id),
+      onTap: () => {
+        context.read<HistorybayarCariBloc>()
+            .add(SelectHistorybayarCariEvent(selected: d)),
+        _openDetail(d.inv1Id)
+      },
       child: Padding(
         padding: const EdgeInsets.all(0),
         child: child,
@@ -56,6 +62,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
   @override
   void initState() {
     super.initState();
+    historybayarCariBloc = context.read<HistorybayarCariBloc>();
     _scrollController.addListener(_onScroll);
   }
 
@@ -69,12 +76,10 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
 
   @override
   Widget build(BuildContext context) {
-    pay1ListBloc = BlocProvider.of<Pay1ListBloc>(context);
-
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
-    return BlocConsumer<Pay1ListBloc, Pay1ListState>(
+    return BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
       buildWhen: (p, c) => c.status == ListStatus.success,
       listener: (_, __) {},
       builder: (context, state) {
@@ -104,7 +109,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
 
   // ========= TABLE COMPACT (NARROW) =========
 
-  Widget _buildTableCompact(List<Pay1ListModel> items) {
+  Widget _buildTableCompact(List<HistorybayarCariModel> items) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
@@ -124,6 +129,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
                 2: IntrinsicColumnWidth(),
                 3: IntrinsicColumnWidth(),
                 4: IntrinsicColumnWidth(),
+                5: IntrinsicColumnWidth(),
               },
               children: [
                 _headerRow(),
@@ -140,7 +146,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
 
   // ========= TABLE NORMAL =========
 
-  Widget _buildTableNormal(List<Pay1ListModel> items) {
+  Widget _buildTableNormal(List<HistorybayarCariModel> items) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
@@ -153,8 +159,8 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
             1: FlexColumnWidth(3),
             2: FlexColumnWidth(2),
             3: FlexColumnWidth(2),
-            4: FlexColumnWidth(3),
-            // 4: FlexColumnWidth(2),
+            4: FlexColumnWidth(2),
+            5: FlexColumnWidth(3),
           },
           children: [
             _headerRow(),
@@ -202,6 +208,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
         _headerCell("NO PEMBAYARAN"),
         _headerCell("TANGGAL\nDIBAYAR"),
         _headerCell("JUMLAH\nPOLIS"),
+        _headerCell("STATUS"),
         _headerCell("TOTAL PEMBAYARAN"),
         // _headerCell("Aksi"),
       ],
@@ -233,7 +240,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
   }
 
   TableRow _row(
-      Pay1ListModel d,
+      HistorybayarCariModel d,
       int index, {
         required bool compact,
       }) {
@@ -252,22 +259,27 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
 
         _rowTapWrapper(
           d,
-          child: _cell(d.ar1Id),
+          child: _cell(d.inv1Id),
         ),
 
         _rowTapWrapper(
           d,
-          child: _cell(formatDate(d.arTgl)),
+          child: _cell(formatDate(d.invTgl)),
         ),
 
         _rowTapWrapper(
           d,
-          child: _cell(d.sppaCount.toString()),
+          child: _cell(d.jmlPolis.toString()),
         ),
 
         _rowTapWrapper(
           d,
-          child: _cell(formatNum(d.totalOs)),
+          child: _cell(d.status.toString()),
+        ),
+
+        _rowTapWrapper(
+          d,
+          child: _cell(formatNum(d.totalBayar)),
         ),
       ],
     );
@@ -306,7 +318,7 @@ class RiwayatTablePageState extends State<RiwayatTablePage> {
 
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      pay1ListBloc.add(FetchPay1ListEvent());
+      historybayarCariBloc.add(FetchHistorybayarCariEvent());
     }
   }
 }

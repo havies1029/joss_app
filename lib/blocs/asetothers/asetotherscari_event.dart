@@ -82,3 +82,8 @@ class UnselectSingleOthersDetailEvent extends AsetothersCariEvents {
 	@override
 	List<Object> get props => [asetOthersId];
 }
+
+class SelectOthersCariEvent extends AsetothersCariEvents {
+	final AsetothersCariModel selectedItem;
+	const SelectOthersCariEvent({required this.selectedItem});
+}

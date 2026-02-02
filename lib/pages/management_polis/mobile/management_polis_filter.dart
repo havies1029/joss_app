@@ -259,6 +259,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return PropertyCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          onSelectItem: (item) {
+            context.read<AsetParCariBloc>().add(
+              SelectParCariEvent(selectedItem: item),
+            );
+          },
           onSelect: (id) {
             final bloc = context.read<AsetParCariBloc>();
             bloc.add(SelectDetailEvent(id));
@@ -303,6 +308,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return KendaraanCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          onSelectItem: (item) {
+            context.read<AsetMvCariBloc>().add(
+              SelectMvCariEvent(selectedItem: item),
+            );
+          },
           onUnselect: (id) {
             final bloc = context.read<AsetMvCariBloc>();
             bloc.add(UnselectMvDetailEvent(id));
@@ -343,6 +353,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return HullCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          onSelectItem: (item) {
+            context.read<AsethullCariBloc>().add(
+              SelectHullCariEvent(selectedItem: item),
+            );
+          },
           onSelect: (id) {
             final bloc = context.read<AsethullCariBloc>();
             bloc.add(SelectHullDetailEvent(id));
@@ -385,6 +400,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return HealthCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          onSelectItem: (item) {
+            context.read<AsetHealthCariBloc>().add(
+              SelectHealthCariEvent(selectedItem: item),
+            );
+          },
           onSelect: (id) {
             final bloc = context.read<AsetHealthCariBloc>();
             bloc.add(SelectHealthDetailEvent(id));
@@ -427,6 +447,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return KargoCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          onSelectItem: (item) {
+            context.read<AsetothersCariBloc>().add(
+              SelectOthersCariEvent(selectedItem: item),
+            );
+          },
           onSelect: (id) {
             final bloc = context.read<AsetothersCariBloc>();
             bloc.add(SelectOthersDetailEvent(id));

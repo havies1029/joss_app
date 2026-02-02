@@ -18,3 +18,11 @@ class RefreshAsettrackCariEvent extends AsettrackCariEvents {
 	List<Object> get props => [searchText];
 }
 
+class SelectAsettrackCariEvent extends AsettrackCariEvents {
+	final AsettrackCariModel selectedAsettrackCari;
+
+	const SelectAsettrackCariEvent({required this.selectedAsettrackCari});
+
+	@override
+	List<Object> get props => [selectedAsettrackCari];
+}

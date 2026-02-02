@@ -163,10 +163,12 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 		on<UnselectHullDetailEvent>(onUnselectDetail);
 		on<ClearHullSelectionEvent>(onClearSelection);
 
-		// UI masih ngirim? aman, tapi kita jaga supaya gak bikin kosong saat masih ada selection
 		on<SelectPolisHullDetailEvent>(onSelectPolisHullDetail);
 		on<UnselectPolisHullDetailEvent>(onUnselectPolisHullDetail);
 		on<ClearPolisHullSelectionEvent>(onClearPolisHullSelection);
+		on<SelectHullCariEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: event.selectedItem));
+		});
 	}
 
 	// -----------------------

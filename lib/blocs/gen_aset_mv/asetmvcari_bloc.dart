@@ -191,6 +191,9 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 
 		on<SelectSingleMvDetailEvent>(onSelectDetailMvId);
 		on<UnselectSingleMvDetailEvent>(onUnselectDetailMvId);
+		on<SelectMvCariEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: event.selectedItem));
+		});
 	}
 
 	// -----------------------

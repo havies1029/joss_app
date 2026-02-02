@@ -483,6 +483,8 @@ import '../../../../models/gen_aset_par/asetparcari_model.dart';
 class PropertyCobTable extends StatefulWidget {
   final List<AsetParCariModel> items;
   final List<String> selectedIds;
+  final void Function(AsetParCariModel item)? onSelectItem;
+
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
 
@@ -500,6 +502,7 @@ class PropertyCobTable extends StatefulWidget {
     super.key,
     required this.items,
     required this.selectedIds,
+    required this.onSelectItem,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisParId,
@@ -763,8 +766,10 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   }
                 }
 
-                // Kemudian select item yang baru diklik
                 widget.onSelect(d.asetParId);
+
+                widget.onSelectItem?.call(d); //ini coy
+
                 if (d.filePolisParId.isNotEmpty) {
                   widget.onSelectFilePolisParId(d.filePolisParId);
                 }

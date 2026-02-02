@@ -134,6 +134,9 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 
 		on<SelectSingleOthersDetailEvent>(onSelectDetailOthersId);
 		on<UnselectSingleOthersDetailEvent>(onUnselectDetailOthersId);
+		on<SelectOthersCariEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: event.selectedItem));
+		});
 	}
 
 	// -----------------------

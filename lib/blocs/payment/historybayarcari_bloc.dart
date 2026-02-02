@@ -12,14 +12,28 @@ class HistorybayarCariBloc extends Bloc<HistorybayarCariEvents, HistorybayarCari
 	HistorybayarCariBloc() : super(const HistorybayarCariState()) {
 		on<FetchHistorybayarCariEvent>(onFetchHistorybayarCari);
 		on<RefreshHistorybayarCariEvent>(onRefreshHistorybayarCari);
+		on<SelectHistorybayarCariEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: event.selected));
+		});
 	}
 
-Future<void> onRefreshHistorybayarCari(
-		RefreshHistorybayarCariEvent event, Emitter<HistorybayarCariState> emit) async {
-	emit(const HistorybayarCariState());
+	Future<void> onRefreshHistorybayarCari(
+			RefreshHistorybayarCariEvent event,
+			Emitter<HistorybayarCariState> emit,
+			) async {
+		emit(state.copyWith(
+			status: ListStatus.initial,
+			items: const <HistorybayarCariModel>[],
+			hasReachedMax: false,
+			hal: 0,
+			statusId: event.statusId,
+			searchText: event.searchText,
+			// kalau mau reset selection saat refresh:
+			// selectedItem: null,
+		));
 
-	add(FetchHistorybayarCariEvent());
-}
+		add(FetchHistorybayarCariEvent());
+	}
 
 Future<void> onFetchHistorybayarCari(
 		FetchHistorybayarCariEvent event, Emitter<HistorybayarCariState> emit) async {

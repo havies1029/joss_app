@@ -8,6 +8,7 @@ class HistorybayarCariState extends Equatable {
 	final int hal;
   final String statusId;
   final String searchText;
+	final HistorybayarCariModel? selectedItem;
 
 	const HistorybayarCariState(
 		{this.status = ListStatus.initial,
@@ -15,7 +16,8 @@ class HistorybayarCariState extends Equatable {
 		this.hasReachedMax = false,
 		this.hal = 0,
     this.statusId = '',
-    this.searchText = ''});
+    this.searchText = '',
+		this.selectedItem});
 
 	const HistorybayarCariState.success(List<HistorybayarCariModel> items)
 			: this(status: ListStatus.success, items: items);
@@ -29,6 +31,7 @@ class HistorybayarCariState extends Equatable {
 		int? hal,
     String? statusId,
     String? searchText,
+			HistorybayarCariModel? selectedItem,
     }) {
 
 		return HistorybayarCariState(
@@ -37,9 +40,10 @@ class HistorybayarCariState extends Equatable {
 			status: status ?? this.status,
 			hal: hal ?? this.hal,
       statusId: statusId ?? this.statusId,
-      searchText: searchText ?? this.searchText);
+      searchText: searchText ?? this.searchText,
+			selectedItem: selectedItem ?? this.selectedItem);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, statusId, searchText];
+	List<Object> get props => [status, items, hasReachedMax, hal, statusId, searchText, selectedItem ?? ""];
 }

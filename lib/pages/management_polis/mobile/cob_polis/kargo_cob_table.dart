@@ -471,6 +471,8 @@ import '../../../../models/asetothers/asetotherscari_model.dart';
 class KargoCobTable extends StatefulWidget {
   final List<AsetothersCariModel> items;
   final List<String> selectedIds;
+  final void Function(AsetothersCariModel item)? onSelectItem;
+
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
 
@@ -485,6 +487,7 @@ class KargoCobTable extends StatefulWidget {
     super.key,
     required this.items,
     required this.selectedIds,
+    required this.onSelectItem,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisHealthId,
@@ -738,6 +741,9 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
                 // Kemudian select item yang baru diklik
                 widget.onSelect(d.asetOthersId);
+
+                widget.onSelectItem?.call(d);
+
                 if (d.filePolisId.isNotEmpty) {
                   widget.onSelectFilePolisHealthId(d.filePolisId);
                 }

@@ -10,6 +10,12 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
 
+import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
+import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
+import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
+import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
+import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
+import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../detail_management_page/detail_management_widget.dart';
 
 
@@ -49,6 +55,17 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
   var fieldSppa1IdController = TextEditingController();
   var fieldStatusEndorsController = TextEditingController();
   var fieldTsiController = TextEditingController();
+
+  dynamic _selectedItemByCob(BuildContext context, String cobId) {
+    return switch (cobId) {
+      "10002" => context.read<AsetParCariBloc>().state.selectedItem,
+      "10003" => context.read<AsetMvCariBloc>().state.selectedItem,
+      "10004" => context.read<AsethullCariBloc>().state.selectedItem,
+      "10005" => context.read<AsetHealthCariBloc>().state.selectedItem,
+      "10006" => context.read<AsetothersCariBloc>().state.selectedItem,
+      _ => null,
+    };
+  }
 
   @override
   void initState() {
@@ -127,18 +144,29 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
         );
       },
       listener: (context, state) async {
-        if (state.isSaved && !state.hasFailure) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DetailManagementPolisPage(
-                data: "",
-                cobId: "",
-                statusId: "",
-              ),
-            ),
-          );
+        if (!state.isSaved || state.hasFailure) return;
+
+        final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
+        final selectedItem = _selectedItemByCob(context, cobId);
+
+        if (selectedItem == null) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(infoSnackBar("Data belum dipilih / tidak ditemukan"));
+          return;
         }
+
+        if (!context.mounted) return;
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetailManagementPolisPage(
+              data: selectedItem,
+              cobId: cobId,
+              statusId: "", // tidak dipakai lagi untuk routing proses
+            ),
+          ),
+        );
       },
     );
   }

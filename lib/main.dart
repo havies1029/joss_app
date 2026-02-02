@@ -116,6 +116,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'apis/payment/paymentdn_api.dart';
 import 'apis/payment/paymentmethodcari_api.dart';
 import 'blocs/asetothers/asetotherscari_bloc.dart';
+import 'blocs/asettracking/asettrackcari_bloc.dart';
 import 'blocs/calpar/calpar1crud_bloc.dart';
 import 'blocs/calpar/calpar1list_bloc.dart';
 import 'blocs/calpar/calpar2form_bloc.dart';
@@ -182,6 +183,8 @@ import 'blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
 import 'blocs/payment/dnrekap2inv_bloc.dart';
+import 'blocs/payment/historybayar2cari_bloc.dart';
+import 'blocs/payment/historybayarcari_bloc.dart';
 import 'blocs/payment/invbayarvaform_bloc.dart';
 import 'blocs/payment/pay1crud_bloc.dart';
 import 'blocs/payment/pay1list_bloc.dart';
@@ -197,7 +200,10 @@ import 'blocs/regpar/regpar5form_bloc.dart';
 import 'blocs/regpar/regpar6cari_bloc.dart';
 import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
 import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
+import 'blocs/regreaktif/regreaktif2cari_bloc.dart';
+import 'blocs/regreaktif/regreaktifcari_bloc.dart';
 import 'blocs/regrenewal/regrenew1form_bloc.dart';
+import 'blocs/regrenewal/regrenewal2cari_bloc.dart';
 import 'blocs/reguser_profile/reguser_profile_cubit.dart';
 import 'blocs/gen_review/reviewcari_bloc.dart';
 import 'blocs/share_cubit/share_dnrekapcob_state_cubit.dart';
@@ -476,9 +482,18 @@ Future<void> main() async {
         ),
         BlocProvider(
         create: (_) => PolisTanggalBloc()),
-        BlocProvider(create: (_) => Regrenew1FormBloc(repository: Regrenew1FormRepository())),
-        BlocProvider(create: (_) => Regreaktif1Bloc(repository: Regreaktif1Repository())),
-        BlocProvider(create: (context) => Regendors2CariBloc()),
+        BlocProvider(create: (context) => RegendorsCariBloc()),
+        BlocProvider(create: (context) => Regendors1FormBloc(repository: Regendors1FormRepository())),
+        BlocProvider(create: (context) => RegrenewCariBloc()),
+        BlocProvider(create: (context) => Regrenew1FormBloc(repository: Regrenew1FormRepository())),
+        BlocProvider(create:  (context) => RegreaktifCariBloc()),
+        BlocProvider(create: (context) => Regreaktif1Bloc(repository: Regreaktif1Repository())),
+        BlocProvider(create: (context) => AsettrackCariBloc()),
+        BlocProvider(create: (context) =>Regendors2CariBloc()),
+        BlocProvider(create:  (context) => Regrenewal2CariBloc()),
+        BlocProvider(create:  (context) => Regreaktif2CariBloc()),
+        BlocProvider(create: (context) => HistorybayarCariBloc()),
+        BlocProvider(create:  (context) => Historybayar2CariBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

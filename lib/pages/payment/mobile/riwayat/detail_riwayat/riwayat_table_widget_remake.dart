@@ -1,106 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/blocs/payment/historybayar2cari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
-import 'package:joss_app/models/payment/pay2cari_model.dart';
 
-class RiwayatTableWidget extends StatefulWidget {
-  const RiwayatTableWidget({super.key});
+import '../../../../../models/payment/historybayar2cari_model.dart';
+
+class RiwayatTableWidgetRemake extends StatefulWidget {
+  const RiwayatTableWidgetRemake({super.key});
 
   @override
-  State<RiwayatTableWidget> createState() => _RiwayatTableWidgetState();
+  State<RiwayatTableWidgetRemake> createState() => _RiwayatTableWidgetRemakeState();
 }
-
-class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
-  late Pay2CariBloc pay2CariBloc;
+class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
+  late Historybayar2CariBloc historybayar2cariBloc;
 
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
 
-  String _fmtDate(dynamic v) {
-    if (v == null) return "-";
-    // kalau DateTime
-    if (v is DateTime) return DateFormat('yyyy-MM-dd').format(v);
-    // kalau String "2025-01-01T00:00:00"
-    final s = v.toString();
-    if (s.length >= 10) return s.substring(0, 10);
-    return s;
-  }
-
   @override
   Widget build(BuildContext context) {
-    pay2CariBloc = context.read<Pay2CariBloc>();
+    historybayar2cariBloc = context.read<Historybayar2CariBloc>();
 
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
-    return BlocBuilder<Pay2CariBloc, Pay2CariState>(
+    return BlocBuilder<Historybayar2CariBloc, Historybayar2CariState>(
       buildWhen: (p, c) => p.status != c.status || p.items != c.items,
       builder: (context, state) {
         if (state.status != ListStatus.success) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final items =
-        state.items.isNotEmpty ? state.items : _dummyItems();
+        final items = state.items.isNotEmpty ? state.items : _dummyItems();
 
-        return isNarrow
-            ? _buildTableCompact(items)
-            : _buildTableNormal(items);
+        return isNarrow ? _buildTableCompact(items) : _buildTableNormal(items);
       },
     );
   }
 
   // ========= TABLE COMPACT (NARROW) =========
-  Widget _buildTableCompact(List<Pay2CariModel> items) {
+  Widget _buildTableCompact(List<Historybayar2CariModel> items) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
-        decoration: _boxDecoration(), // mirip rincian (bagian atas)
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: _tableBorder(),
-            columnWidths: const {
-              0: FixedColumnWidth(55), // No
-              1: IntrinsicColumnWidth(), // No Polis / SPPA
-              2: FixedColumnWidth(140), // Periode
-              3: FixedColumnWidth(140), // Outstanding
-            },
-            children: [
-              _headerRow(),
-              ...items.asMap().entries.map(
-                    (e) => _row(e.value, e.key, compact: true),
+        decoration: _boxDecoration(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                // ini kunci: table minimal selebar container
+                width: constraints.maxWidth,
+                child: Table(
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: _tableBorder(),
+                  columnWidths: const {
+                    0: FlexColumnWidth(1), // NO
+                    1: FlexColumnWidth(3), // NO POLIS
+                    2: FlexColumnWidth(3), // PREMI
+                  },
+                  children: [
+                    _headerRow(),
+                    ...items.asMap().entries.map(
+                          (e) => _row(e.value, e.key, compact: true),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
   // ========= TABLE NORMAL =========
-  Widget _buildTableNormal(List<Pay2CariModel> items) {
+  Widget _buildTableNormal(List<Historybayar2CariModel> items) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         decoration: _boxDecoration(),
-        child: Table(
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          border: _tableBorder(),
-          columnWidths: const {
-            0: FlexColumnWidth(1), // No
-            1: FlexColumnWidth(3), // No Polis/SPPA
-            2: FlexColumnWidth(3), // Periode
-            3: FlexColumnWidth(2), // Outstanding
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              width: constraints.maxWidth,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: _tableBorder(),
+                columnWidths: const {
+                  0: FlexColumnWidth(1),
+                  1: FlexColumnWidth(3),
+                  2: FlexColumnWidth(3),
+                },
+                children: [
+                  _headerRow(),
+                  ...items.asMap().entries.map(
+                        (e) => _row(e.value, e.key, compact: false),
+                  ),
+                ],
+              ),
+            );
           },
-          children: [
-            _headerRow(),
-            ...items.asMap().entries.map(
-                  (e) => _row(e.value, e.key, compact: false),
-            ),
-          ],
         ),
       ),
     );
@@ -132,15 +132,14 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
       children: [
         _headerCell("NO", center: true),
         _headerCell("NO POLIS"),
-        _headerCell("PERIODE\NPOLIS"),
-        _headerCell("PRREMI"),
+        _headerCell("PREMI"),
       ],
     );
   }
 
-  TableRow _row(Pay2CariModel d, int index, {required bool compact}) {
-    final periode =
-        "${_fmtDate(d.periodeMulai)} → ${_fmtDate(d.periodeAkhir)}";
+  TableRow _row(Historybayar2CariModel d, int index, {required bool compact}) {
+    final polisNo = d.polisNo.isNotEmpty ? d.polisNo : "-";
+    final premi = "${d.curr} ${formatNum(d.nilaiBayar)}";
 
     return TableRow(
       decoration: BoxDecoration(
@@ -148,9 +147,8 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
       ),
       children: [
         _cellCenter((index + 1).toString()),
-        _cellText(d.sppaNoref.toString(), compact: compact),
-        _cellText(periode, compact: compact),
-        _cellText(formatNum(d.dnOs), compact: compact),
+        _cellText(polisNo, compact: compact),
+        _cellText(premi, compact: compact),
       ],
     );
   }
@@ -202,34 +200,25 @@ class _headerCell extends StatelessWidget {
           ? Center(
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: 15,
-            color: primaryLightColor,
-          ),
+          style: TextStyle(fontSize: 15, color: primaryLightColor),
         ),
       )
           : Text(
         text,
-        style: TextStyle(
-          fontSize: 15,
-          color: primaryLightColor,
-        ),
+        style: TextStyle(fontSize: 15, color: primaryLightColor),
       ),
     );
   }
 }
 
-List<Pay2CariModel> _dummyItems() {
+List<Historybayar2CariModel> _dummyItems() {
   return List.generate(5, (i) {
-    return Pay2CariModel(
-      ar1Id: "AR1-DUMMY-001",
-      ar2Id: "AR2-DUMMY-$i",
+    return Historybayar2CariModel(
+      curr: "IDR",
+      dn1Id: "DN1-DUMMY-$i",
+      nilaiBayar: 1250000.0 * (i + 1),
+      polisNo: "POLIS-00$i",
       sppa1Id: "SPPA-$i",
-      sppaNoref: "POLIS-00$i",
-      dnOs: 1250000.0 * (i + 1),
-      nourut: i + 1,
-      periodeMulai: DateTime(2025, 1, 1),
-      periodeAkhir: DateTime(2025, 12, 31),
     );
   });
 }

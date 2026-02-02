@@ -97,3 +97,8 @@ class UnselectSingleHullDetailEvent extends AsethullCariEvents {
 	@override
 	List<Object> get props => [asetHullId];
 }
+
+class SelectHullCariEvent extends AsethullCariEvents {
+	final AsethullCariModel selectedItem;
+	const SelectHullCariEvent({required this.selectedItem});
+}

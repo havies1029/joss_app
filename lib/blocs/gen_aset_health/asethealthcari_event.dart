@@ -101,3 +101,8 @@ class UnselectSingleHealthDetailEvent extends AsetHealthCariEvents {
 	@override
 	List<Object> get props => [asetHealthId];
 }
+
+class SelectHealthCariEvent extends AsetHealthCariEvents {
+	final AsetHealthCariModel selectedItem;
+	const SelectHealthCariEvent({required this.selectedItem});
+}

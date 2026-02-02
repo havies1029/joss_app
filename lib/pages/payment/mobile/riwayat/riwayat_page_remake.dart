@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/pages/payment/mobile/riwayat/riwayat_table_page.dart';
+import 'package:http/http.dart';
+import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
+import 'package:joss_app/pages/payment/mobile/riwayat/riwayat_table_page_remake.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
-import 'package:joss_app/blocs/payment/pay1list_bloc.dart';
-import 'package:joss_app/blocs/payment/pay1crud_bloc.dart';
 
+import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../common/constants.dart';
+import '../payment_page/payment_method/payment_method_page.dart';
+import '../payment_page/payment_process/payment_process.dart';
+import '../payment_page/payment_success/payment_success.dart';
 
-class RiwayatPage extends StatefulWidget {
-  const RiwayatPage({super.key});
+class RiwayatPageRemake extends StatefulWidget {
+  const RiwayatPageRemake({super.key});
 
   @override
-  RiwayatPageState createState() => RiwayatPageState();
+  RiwayatPageRemakeState createState() => RiwayatPageRemakeState();
 }
 
-class RiwayatPageState extends State<RiwayatPage> {
-  late Pay1ListBloc pay1ListBloc;
-  late Pay1CrudBloc pay1CrudBloc;
+class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
+  late HistorybayarCariBloc historybayarCariBloc;
   final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
+    historybayarCariBloc = context.read<HistorybayarCariBloc>();
     Future.delayed(const Duration(milliseconds: 500), () {
       refreshData();
     });
@@ -28,46 +32,70 @@ class RiwayatPageState extends State<RiwayatPage> {
 
   @override
   Widget build(BuildContext context) {
-    pay1ListBloc = BlocProvider.of<Pay1ListBloc>(context);
-    pay1CrudBloc = BlocProvider.of<Pay1CrudBloc>(context);
-
-    return MultiBlocListener(
-        listeners: [
-          BlocListener<Pay1CrudBloc, Pay1CrudState>(
-              listener: (context, state) {
-                if (state.isSaved) {
-                  refreshData();
-                }
-              }, listenWhen: (previous, current) {
-            return previous.isSaved != current.isSaved;
-          }),
-        ],
-        child: Scaffold(
-          body: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: hPadding * 1.5,
-              vertical: 10,
+    return BlocListener<DnRekap2invBloc, DnRekap2invState>(
+        listener: (BuildContext context, DnRekap2invState state) {
+      if (state.isProcessed){
+        if (state.paymentStatus == "20"){
+          ScaffoldMessenger.of(context).showSnackBar(
+            successSnackBar('Silakan lanjutkan ke metode pembayaran.'),
+          );
+          onViewPaymentMethods(state.curr, state.totalBayar);
+        }
+        else if (state.paymentStatus == "30"){
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(infoSnackBar('Silakan lakukan pembayaran.'));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaymentProcess(viewMode: "ubah", recordId: state.invoiceId)),
+          );
+        }
+        else if (state.paymentStatus == "40"){
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(successSnackBar('Proses pembayaran berhasil.'));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaymentSuccess()),
+          );
+        }
+        else if (state.paymentStatus == "91"){
+          refreshData();
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar('Proses pembayaran gagal. Silakan coba lagi.'),
+          );
+        }
+      }
+    },
+    child: Scaffold(
+      body: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: hPadding * 1.5,
+          vertical: 10,
+        ),
+        color: secondaryBlackColor,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ListPageFilterBarUIWidget(
+              searchController: _searchController,
+              searchButton: buildSearchButton(),
             ),
-            color: secondaryBlackColor,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ListPageFilterBarUIWidget(
-                  searchController: _searchController,
-                  searchButton: buildSearchButton(),
-                ),
-                const SizedBox(height: 10),
-                buildList()
-              ],
-
-            ),
+            const SizedBox(height: 10),
+            buildList(),
+          ],
           ),
-        ));
+        ),
+      )
+    );
   }
 
+
   void refreshData() {
-    pay1ListBloc.add(
-        RefreshPay1ListEvent(searchText: _searchController.text, hal: 0));
+    historybayarCariBloc.add(
+        RefreshHistorybayarCariEvent(searchText: _searchController.text, statusId: '10001'));
   }
 
   IconButton buildSearchButton() {
@@ -77,8 +105,8 @@ class RiwayatPageState extends State<RiwayatPage> {
           size: 35.0,
         ),
         onPressed: () {
-          pay1ListBloc.add(RefreshPay1ListEvent(
-              searchText: _searchController.text, hal: 0));
+          historybayarCariBloc.add(RefreshHistorybayarCariEvent(
+              searchText: _searchController.text, statusId: '10001'));
         });
   }
 
@@ -86,7 +114,16 @@ class RiwayatPageState extends State<RiwayatPage> {
     return Expanded(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[RiwayatTablePage(searchText: _searchController.text)],
+          children: <Widget>[RiwayatTablePageRemake(searchText: _searchController.text)],
         ));
   }
+
+
+  void onViewPaymentMethods(String curr, double totalBayar) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
+    ); // Implement your ta
+  }
+
 }
