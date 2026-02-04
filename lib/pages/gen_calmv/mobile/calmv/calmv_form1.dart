@@ -141,13 +141,9 @@ class CalmvForm1SectionState extends State<CalmvForm1Section> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(child: _buildFieldMmvpakaiId()),
-                    const SizedBox(width: 8),
-                    Flexible(child: _buildComboMWilayah()),
-                  ],
-                ),
+                _buildComboMWilayah(),
+                const SizedBox(height: 12),
+                _buildFieldMmvpakaiId(),
                 const SizedBox(height: 15),
               ],
             ),
