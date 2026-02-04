@@ -233,20 +233,14 @@ import 'package:joss_app/blocs/payment/dnsppamvcari_bloc.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    HydratedBloc.storage = await HydratedStorage.build(
-      storageDirectory:
-      kIsWeb
-          ? HydratedStorageDirectory.web
-          : HydratedStorageDirectory(
-        (await getApplicationDocumentsDirectory()).path,
-      ),
-    );
-  } catch (e) {
-    // If storage fails, disable persistence (use in-memory)
-    HydratedBloc.storage = null;
-    debugPrint('HydratedBloc storage failed, using in-memory: $e');
-  }
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory:
+    kIsWeb
+        ? HydratedStorageDirectory.web
+        : HydratedStorageDirectory(
+      (await getApplicationDocumentsDirectory()).path,
+    ),
+  );
 
   final userRepository = UserRepository();
   final prefs = await SharedPreferences.getInstance();

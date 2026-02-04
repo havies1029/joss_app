@@ -7,7 +7,7 @@ class AppData {
   static bool kIsWeb = false;
   static User user = User();
   static var uriHtpp = useSSL ? Uri.https : Uri.http;
-  static String version = "1.0.2";
+  static String version = "1.   0.2";
   static bool isInOtpProcess = false;
 
   // static bool useSSL = false;
@@ -16,7 +16,7 @@ class AppData {
   // static String httpAuthority = "10.0.2.2";
 
 
-
+  //
   // static bool useSSL = false;
   // static String apiDomain =
   //     "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";

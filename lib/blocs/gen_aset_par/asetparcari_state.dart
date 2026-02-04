@@ -45,7 +45,7 @@ class AsetParCariState extends Equatable {
 		String? selectedFilePolisParId,
 		String? selectedFilePolisEqId,
 		String? activeAsetParId, String? selectedId,
-		AsetParCariModel? selectedItem,
+			_NullableWrapper<AsetParCariModel?>? selectedItem,
 		}) {
 		return AsetParCariState(
 			items: items ?? this.items,
@@ -59,10 +59,15 @@ class AsetParCariState extends Equatable {
 			selectedFilePolisEqId: selectedFilePolisEqId ?? this.selectedFilePolisEqId,
 			activeAsetParId: activeAsetParId ?? this.activeAsetParId,
 			selectedId: selectedId ?? this.selectedId,
-			selectedItem: selectedItem ?? this.selectedItem,
+			selectedItem: selectedItem != null ? selectedItem.value : this.selectedItem,
 		);
 	}
 
 	@override
 	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisParId, selectedFilePolisEqId, activeAsetParId, selectedId, selectedItem ?? ""];
+}
+
+class _NullableWrapper<T> {
+	final T value;
+	const _NullableWrapper(this.value);
 }

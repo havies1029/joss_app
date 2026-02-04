@@ -44,7 +44,8 @@ class AsetMvCariState extends Equatable {
 		String? selectedFilePolisId,
 		String? activeAsetMvId,
 		String? selectedId,
-		AsetMvCariModel? selectedItem,
+		// AsetMvCariModel? selectedItem,
+			_NullableWrapper<AsetMvCariModel?>? selectedItem,
 	}) {
 		return AsetMvCariState(
 			items: items ?? this.items,
@@ -57,10 +58,16 @@ class AsetMvCariState extends Equatable {
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
 			activeAsetMvId: activeAsetMvId ?? this.activeAsetMvId,
 			selectedId: selectedId ?? this.selectedId,
-			selectedItem: selectedItem ?? this.selectedItem,
+			// selectedItem: selectedItem ?? this.selectedItem,
+			selectedItem: selectedItem != null ? selectedItem.value : this.selectedItem,
 		);
 	}
 
 	@override
 	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetMvId, selectedId, selectedItem ?? ""];
+}
+
+class _NullableWrapper<T> {
+	final T value;
+	const _NullableWrapper(this.value);
 }

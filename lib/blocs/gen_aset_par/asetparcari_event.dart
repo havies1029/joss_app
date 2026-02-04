@@ -134,5 +134,7 @@ class SelectParCariEvent extends AsetParCariEvents {
 	const SelectParCariEvent({required this.selectedItem});
 }
 
-
-
+class UnselectParCariEvent extends AsetParCariEvents {
+	final AsetParCariModel selectedItem;
+	const UnselectParCariEvent({required this.selectedItem});
+}

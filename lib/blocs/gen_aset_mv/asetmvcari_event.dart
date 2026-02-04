@@ -103,3 +103,8 @@ class SelectMvCariEvent extends AsetMvCariEvents {
 	final AsetMvCariModel selectedItem;
 	const SelectMvCariEvent({required this.selectedItem});
 }
+
+class UnselectMvCariEvent extends AsetMvCariEvents {
+	final AsetMvCariModel selectedItem;
+	const UnselectMvCariEvent({required this.selectedItem});
+}

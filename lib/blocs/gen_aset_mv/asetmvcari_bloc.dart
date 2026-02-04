@@ -191,9 +191,8 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 
 		on<SelectSingleMvDetailEvent>(onSelectDetailMvId);
 		on<UnselectSingleMvDetailEvent>(onUnselectDetailMvId);
-		on<SelectMvCariEvent>((event, emit) {
-			emit(state.copyWith(selectedItem: event.selectedItem));
-		});
+		on<SelectMvCariEvent>(onSelectMvCari);
+		on<UnselectMvCariEvent>(onUnselectMvCari);
 	}
 
 	// -----------------------
@@ -387,6 +386,24 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 		_recomputeActiveAndFile(emit);
 	}
 
+	Future<void> onSelectMvCari(
+			SelectMvCariEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedItem: _NullableWrapper(event.selectedItem),
+		));
+	}
+
+	Future<void> onUnselectMvCari(
+			UnselectMvCariEvent event,
+			Emitter<AsetMvCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedItem: const _NullableWrapper(null),
+		));
+	}
+	
 	Future<void> onSelectDetailMvId(
 			SelectSingleMvDetailEvent event,
 			Emitter<AsetMvCariState> emit,

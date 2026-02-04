@@ -252,9 +252,8 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 
 		on<SelectSingleParDetailEvent>(onSelectDetailId);
 		on<UnselectSingleParDetailEvent>(onUnselectDetailParId);
-		on<SelectParCariEvent>((event, emit) {
-			emit(state.copyWith(selectedItem: event.selectedItem));
-		});
+		on<SelectParCariEvent>(onSelectParCari);
+		on<UnselectParCariEvent>(onUnselectParCari);
 	}
 
 	Future<void> onRefreshAsetParCari(
@@ -498,6 +497,24 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		} catch (_) {
 			return null;
 		}
+	}
+
+	Future<void> onSelectParCari(
+			SelectParCariEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedItem: _NullableWrapper(event.selectedItem),
+		));
+	}
+
+	Future<void> onUnselectParCari(
+			UnselectParCariEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedItem: const _NullableWrapper(null),
+		));
 	}
 
 	void _recomputeActiveAndFiles(Emitter<AsetParCariState> emit, {String? preferId}) {

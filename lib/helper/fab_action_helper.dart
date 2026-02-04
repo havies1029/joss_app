@@ -110,19 +110,35 @@ class FabActionHelper {
     "E": <ActionType>[
       ActionType.lacakPolis,
       ActionType.endorse,
-      ActionType.unduhPolis,
     ],
     "R": <ActionType>[
       ActionType.lacakPolis,
       ActionType.perpanjangan,
-      ActionType.unduhPolis,
     ],
     "A": <ActionType>[
       ActionType.lacakPolis,
       ActionType.aktifkanKembali,
-      ActionType.unduhPolis,
     ],
   };
+
+  static bool _hasPolisFile(String cobId, dynamic item) {
+    if (item == null) return false;
+
+    // PAR
+    if (cobId == "10002") {
+      final par = (item.filePolisParId ?? "").toString();
+      final eq  = (item.filePolisEqId ?? "").toString();
+      return par.isNotEmpty || eq.isNotEmpty;
+    }
+
+    // SELAIN PAR
+    try {
+      final v = (item.filePolisId ?? "").toString();
+      return v.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
 
   /*
   /**/
@@ -174,14 +190,24 @@ class FabActionHelper {
     return "";
   }
 
-  /// NEW: actions enabled berdasarkan prosesSource (utama)
-  /// Kalau prosesSource kosong, default: hanya alwaysEnabledActions
   static List<ActionMenuItem> getAvailableActions({
-    // currentStatusFilter sengaja dihapus: gak dipakai lagi
+    required BuildContext context,
     required List<dynamic> selectedItems,
   }) {
+    final cobId = _cobId(context);
+    final isPar = cobId == "10002";
+
     if (selectedItems.isEmpty) {
       return masterActions
+          .where((a) {
+        // aturan UNDuh berdasarkan COB
+        if (isPar) {
+          return a.type != ActionType.unduhPolis;
+        } else {
+          return a.type != ActionType.lihatPolisPar &&
+              a.type != ActionType.lihatPolisEq;
+        }
+      })
           .map((a) =>
           a.copyWith(isEnabled: alwaysEnabledActions.contains(a.type)))
           .toList();
@@ -190,31 +216,43 @@ class FabActionHelper {
     final item = selectedItems.first;
     final prosesSource = _prosesSourceFromItem(item);
 
-    // Utama: prosesSource
     final allowedByProses =
         prosesSourceEnabledMatrix[prosesSource] ?? const <ActionType>[];
 
-    /*
-    /**/
-    // OPTIONAL FALLBACK (untuk presentasi / sementara):
-    // Kalau prosesSource kosong, kamu bisa fallback pakai statusId filter
-    // final statusId = _statusIdFromContextOrNullSomehow(...); // see note below
-    // final statusKey = _mapStatusIdToKey(statusId);
-    // final allowedByStatus = statusEnabledMatrix[statusKey] ?? const <ActionType>[];
-    //
-    // final allowedActions = prosesSource.isNotEmpty ? allowedByProses : allowedByStatus;
-    /**/
-    */
+    final hasFile = _hasPolisFile(cobId, item);
 
-    final allowedActions = allowedByProses;
-
-    return masterActions.map((action) {
+    return masterActions
+        .where((a) {
+      // aturan UNDuh berdasarkan COB
+      if (isPar) {
+        return a.type != ActionType.unduhPolis;
+      } else {
+        return a.type != ActionType.lihatPolisPar &&
+            a.type != ActionType.lihatPolisEq;
+      }
+    })
+        .map((action) {
+      // selalu aktif
       if (alwaysEnabledActions.contains(action.type)) {
         return action.copyWith(isEnabled: true);
       }
-      return action.copyWith(isEnabled: allowedActions.contains(action.type));
-    }).toList();
+
+      // UNDuh → BERGANTUNG DATA
+      if (action.type == ActionType.unduhPolis ||
+          action.type == ActionType.lihatPolis ||
+          action.type == ActionType.lihatPolisPar ||
+          action.type == ActionType.lihatPolisEq) {
+        return action.copyWith(isEnabled: hasFile);
+      }
+
+      // lainnya → matrix proses
+      return action.copyWith(
+        isEnabled: allowedByProses.contains(action.type),
+      );
+    })
+        .toList();
   }
+
 
   static void handleAction({
     required BuildContext context,

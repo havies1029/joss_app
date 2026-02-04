@@ -49,3 +49,54 @@ class RadioButton extends StatelessWidget {
     );
   }
 }
+
+class CheckboxRadio extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  const CheckboxRadio({
+    super.key,
+    required this.value,
+    this.onChanged,
+  });
+
+  static const double _size = 16;
+  static const double _innerSize = 9;
+  static const double _borderWidth = 1.2;
+
+  static const Color _selectedColor = primaryColor;
+  static const Color _unselectedColor = sGrey;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onChanged?.call(!value),
+      child: SizedBox(
+        width: _size,
+        height: _size,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: value ? _selectedColor : _unselectedColor,
+              width: _borderWidth,
+            ),
+          ),
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              width: _innerSize,
+              height: _innerSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: value ? _selectedColor : Colors.transparent,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

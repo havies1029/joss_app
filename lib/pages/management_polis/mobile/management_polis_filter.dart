@@ -259,9 +259,15 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return PropertyCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          selectedItem: s.selectedItem,
           onSelectItem: (item) {
             context.read<AsetParCariBloc>().add(
               SelectParCariEvent(selectedItem: item),
+            );
+          },
+          onUnselectItem: (item) {
+            context.read<AsetParCariBloc>().add(
+              UnselectParCariEvent(selectedItem: item),
             );
           },
           onSelect: (id) {
@@ -308,9 +314,15 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return KendaraanCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          selectedItem: s.selectedItem,
           onSelectItem: (item) {
             context.read<AsetMvCariBloc>().add(
               SelectMvCariEvent(selectedItem: item),
+            );
+          },
+          onUnselectItem: (item) {
+            context.read<AsetMvCariBloc>().add(
+              UnselectMvCariEvent(selectedItem: item),
             );
           },
           onUnselect: (id) {

@@ -43,9 +43,8 @@ class FloatingMenuWrapper extends StatelessWidget {
     }
 
     final selectedItems = selectedItem == null ? const <dynamic>[] : <dynamic>[selectedItem];
-
     final baseActions = FabActionHelper.getAvailableActions(
-      // currentStatusFilter: statusId,
+      context: context,
       selectedItems: selectedItems,
     );
 
