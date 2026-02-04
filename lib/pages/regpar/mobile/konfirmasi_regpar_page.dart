@@ -9,6 +9,8 @@ import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form1.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form2.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form3.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form4.dart';
+import '../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../blocs/regpar/regpar1list_bloc.dart';
 import '../../../blocs/regpar/regpar2form_bloc.dart';
 import '../../../blocs/regpar/regpar3form_bloc.dart';
 import '../../../blocs/regpar/regpar4form_bloc.dart';
@@ -19,6 +21,8 @@ import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../payment/mobile/payment_page/payment_method/payment_method_page.dart';
+import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
+import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import '../../payment/paymentmethodcari_list.dart';
 
 
@@ -42,6 +46,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   Regpar2FormModel? regpar2Record;
   Regpar3FormModel? regpar3Record;
   Regpar4FormModel? regpar4Record;
+  late Regpar1ListBloc regpar1listBloc;
+  final TextEditingController _searchController = TextEditingController();
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -51,7 +57,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   @override
   void initState() {
     super.initState();
-
+    regpar1listBloc = context.read<Regpar1ListBloc>();
     // 🔥 Trigger load Form 1 saat halaman dibuka
     if (widget.viewMode == "ubah" && widget.recordId != null) {
       context.read<Regpar1CrudBloc>()
@@ -59,11 +65,80 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     }
   }
 
+  void refreshData() {
+    regpar1listBloc.add(
+        RefreshRegpar1ListEvent(searchText: _searchController.text, hal: 0));
+  }
+
+  void onViewPaymentMethods(String curr, double totalBayar) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
+    ); // Implement your ta
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Konfirmasi",
       blocListeners: [
+        BlocListener<DnRekap2invBloc, DnRekap2invState>(
+          listenWhen: (previous, current) {
+            return previous.isProcessed != current.isProcessed ||
+                previous.hasFailure != current.hasFailure;
+          },
+          listener: (context, state) {
+            if (state.isProcessed) {
+              if (state.paymentStatus == "20") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
+                    ),
+                  ),
+                );
+                onViewPaymentMethods(state.curr, state.totalBayar);
+              } else if (state.paymentStatus == "30") {
+                refreshData();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Silakan lakukan pembayaran.')),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentProcess(
+                      viewMode: "ubah",
+                      recordId: state.invoiceId,
+                    ),
+                  ),
+                );
+              } else if (state.paymentStatus == "40") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Proses pembayaran Berhasil.')),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaymentSuccess(display: "Pembayaran berhasil!",)),
+                );
+              } else if (state.paymentStatus == "91") {
+                refreshData();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Proses pembayaran gagal. Silakan coba lagi.'),
+                  ),
+                );
+              }
+            }
+
+            // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
+            // if (state.hasFailure) {
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
+            //   );
+            // }
+          },
+        ),
+
         _buildGenericListener<Regpar1CrudBloc, Regpar1CrudState, Regpar1CrudModel>(
           onPayload: (record) {
             setState(() => regpar1Record = record);
@@ -187,15 +262,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     child: AppButton.primary(
                       text: "Lanjutkan",
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PaymentMethodPage(curr: '', totalBayar:0,
-                              // recordId: widget.recordId ?? '',
-                              // viewMode: 'ubah',
-                            ),
-                          ),
-                        );
+                        context.read<DnRekap2invBloc>().add(
+                            RegPar2InvoiceEvent(regpar1Id: widget.recordId ?? ""));
                       },
                     ),
                   ),

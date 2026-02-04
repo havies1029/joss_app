@@ -133,7 +133,7 @@ class Calmv3FormFormPageFormState extends State<Calmv3FormFormPage> {
             fieldPremiCascoController.text = NumberFormat(
               "#,###",
             ).format(state.record!.premiCasco);
-            fieldCalmv1IdController.text = state.record!.calmv1Id;
+            fieldCalmv1IdController.text = state.record!.calmv3Id;
             fieldPremiDiskonController.text = NumberFormat(
               "#,###",
             ).format(state.record!.premiDiskon);
@@ -309,7 +309,6 @@ class Calmv3FormFormPageFormState extends State<Calmv3FormFormPage> {
       _formKey.currentState!.save();
       Calmv3FormModel record = Calmv3FormModel(
         calmv3Id: '',
-        calmv1Id: fieldCalmv1IdController.text,
         diskonPersen: double.parse(
           fieldDiskonPersenController.text.replaceAll(',', ''),
         ),

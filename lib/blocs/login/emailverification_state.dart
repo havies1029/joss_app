@@ -8,20 +8,24 @@ class EmailVerificationState extends Equatable {
   final bool isSaved;
   final bool hasFailure;
   final String token;
-  final bool verificationFailed;  
-	final List<String> errors;
+  final bool verificationFailed;
+  final List<String> errors;
   final bool isSimpanPassword;
-  const EmailVerificationState(
-      {this.record,
-      this.isLoading = false,
-      this.isLoaded = false,
-      this.isSaving = false,
-      this.isSaved = false,
-      this.hasFailure = false,
-      this.token = '',
-      this.verificationFailed = false,      
-		  this.errors = const [],
-      this.isSimpanPassword = true});
+  final String email;
+
+  const EmailVerificationState({
+    this.record,
+    this.isLoading = false,
+    this.isLoaded = false,
+    this.isSaving = false,
+    this.isSaved = false,
+    this.hasFailure = false,
+    this.token = '',
+    this.verificationFailed = false,
+    this.errors = const [],
+    this.isSimpanPassword = true,
+    this.email = '',
+  });
 
   EmailVerificationState copyWith({
     EmailVerificationModel? record,
@@ -33,8 +37,9 @@ class EmailVerificationState extends Equatable {
     bool? requestPinVerification,
     String? token,
     bool? verificationFailed,
-		List<String>? errors,
+    List<String>? errors,
     bool? isSimpanPassword,
+    String? email,
   }) {
     return EmailVerificationState(
       record: record ?? this.record,
@@ -44,13 +49,25 @@ class EmailVerificationState extends Equatable {
       isSaved: isSaved ?? this.isSaved,
       hasFailure: hasFailure ?? this.hasFailure,
       token: token ?? this.token,
-      verificationFailed: verificationFailed ?? this.verificationFailed,      
-			errors: errors ?? this.errors,
+      verificationFailed: verificationFailed ?? this.verificationFailed,
+      errors: errors ?? this.errors,
       isSimpanPassword: isSimpanPassword ?? this.isSimpanPassword,
+      email: email ?? this.email,
     );
   }
 
   @override
-  List<Object> get props =>
-      [isLoading, isLoaded, isSaving, isSaved, hasFailure, token, verificationFailed, errors, isSimpanPassword];
+  List<Object?> get props => [
+    isLoading,
+    isLoaded,
+    isSaving,
+    isSaved,
+    hasFailure,
+    token,
+    verificationFailed,
+    errors,
+    isSimpanPassword,
+    record,
+    email,
+  ];
 }

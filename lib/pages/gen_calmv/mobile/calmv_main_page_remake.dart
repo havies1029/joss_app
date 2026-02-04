@@ -27,8 +27,9 @@ import '../../../repositories/combobox/combomwilayah_repository.dart';
 import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
+import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
-import '../../gen_regmv/mobile/reg_main_page_remake.dart';
+import '../../gen_regmv/mobile/regmv_main_page_remake.dart';
 import '../../gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import '../../gen_regmv/mobile/regmv_main_page.dart';
 import 'calmv/calmv_form1_remake.dart';
@@ -235,7 +236,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   void _payloadform3(Calmv3FormModel record) {
-    fieldCalmv1IdController.text = record.calmv1Id;
     fieldDiskonPersenController.text = cleanNum(record.diskonPersen);
     fieldPremiAddController.text = cleanNum(record.premiAdd);
     fieldPremiCascoController.text = cleanNum(record.premiCasco);
@@ -487,17 +487,45 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
                   Form3Page(
                     context: context,
-                    title: "Hasil Perhitungan Premi",
+                    title: "Perhitungan Premi",
                     isExpanded: expanded[2],
                     onToggle: (v) => setState(() => expanded[2] = v),
                     child: (calmv3Id?.isNotEmpty == true)
                         ? Column(
                       children: [
-                        buildFieldPremiNet(),
-                        const SizedBox(height: hPadding),
-                        buildFieldPremiDiskon(),
-                        const SizedBox(height: hPadding),
-                        buildFieldPremiSubtotal(),
+                        HitungPremiWidget(
+                          rows: [
+                            HitungPremiRow(
+                              label: "Premi",
+                              controller: fieldPremiSubtotalController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              showValueBorder: true,
+                              formatNumber: true,
+                              valuePrefix: fieldComboUang?.rmatauangSimbol ?? "",
+                            ),
+                            HitungPremiRow(
+                              label: "Diskon",
+                              controller: fieldPremiDiskonController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              showValueBorder: true,
+                              formatNumber: true,
+                              valuePrefix: fieldComboUang?.rmatauangSimbol ?? "",
+                            ),
+                            HitungPremiRow(
+                              label: "Net Premi",
+                              controller: fieldPremiNetController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              showValueBorder: true,
+                              formatNumber: true,
+                              valuePrefix: fieldComboUang?.rmatauangSimbol ?? "",
+                            ),
+                          ],
+                        ),
+                        // buildFieldPremiNet(),
+                        // const SizedBox(height: hPadding),
+                        // buildFieldPremiDiskon(),
+                        // const SizedBox(height: hPadding),
+                        // buildFieldPremiSubtotal(),
                       ],
                     )
                         : const SizedBox(

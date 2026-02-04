@@ -117,13 +117,25 @@ class _LoginFormUserState extends State<LoginFormUser>
       },
     );
   }
-
   void onRegisterButtonPressed(BuildContext context) {
     if (!_formKey.currentState!.validate()) return;
 
-    final input = _emailOrPhoneController.text;
+    final input = _emailOrPhoneController.text.trim();
+    final isEmail = emailValidatorRegExp.hasMatch(input);
+
+    if (isEmail) {
+      context.read<EmailVerificationBloc>().add(
+        FieldEmailVerificationChangedEvent(email: input),
+      );
+    } else {
+      context.read<EmailVerificationBloc>().add(
+        const FieldEmailVerificationChangedEvent(email: ''),
+      );
+    }
+
     AuthInputRouter.handleInput(context, input);
   }
+
 
 
   Widget footerLoginText(BuildContext context) {

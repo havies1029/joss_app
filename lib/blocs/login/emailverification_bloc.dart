@@ -24,6 +24,14 @@ class EmailVerificationBloc
     on<EmailVerificationTambahEvent>(onTambahEmailVerification);
     on<ValidasiPinEmailEvent>(onValidasiPinEmail);
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
+    on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
+  }
+
+  Future<void> onFieldEmailVerificationChangedEvent(
+      FieldEmailVerificationChangedEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
+    emit(state.copyWith(email: event.email.trim()));
   }
 
   Future<void> onTambahEmailVerification(EmailVerificationTambahEvent event,
@@ -103,7 +111,7 @@ class EmailVerificationBloc
     ));
 
     if (!hasFailure && returnData.data.isNotEmpty) {
-      
+
       List<String> info = returnData.data.split(";");
       Token token = Token.split(info[0], info[1]);
 

@@ -19,13 +19,8 @@ class FabActionHelper {
   static String _cobId(BuildContext c) =>
       c.read<CobManPolBloc>().state.selectedCOBId;
 
-  /*
-  /**/
-  // LEGACY (dipakai untuk presentasi / fallback saja)
   static String? _statusId(BuildContext c) =>
       c.read<StatusAsetCariBloc>().state.selectedStatusId;
-  /**/
-  */
 
   static final List<ActionMenuItem> masterActions = [
     ActionMenuItem(
@@ -34,14 +29,6 @@ class FabActionHelper {
       iconAsset: 'assets/icons/beli_polis1.svg',
       gradientColors: const [Color(0xFFFFCA46), Color(0xFFD59900)],
       borderColor: const Color(0xFFFFDF8E),
-      isEnabled: false,
-    ),
-    ActionMenuItem(
-      type: ActionType.unduhPolis,
-      label: 'Unduh Polis',
-      iconAsset: 'assets/icons/unduh_polis.svg',
-      gradientColors: const [Color(0xFF42EF48), Color(0xFF05AD0A)],
-      borderColor: const Color(0xFF43FB49),
       isEnabled: false,
     ),
     ActionMenuItem(
@@ -76,52 +63,49 @@ class FabActionHelper {
       borderColor: const Color(0xFFFF787B),
       isEnabled: false,
     ),
-    ActionMenuItem(
-      type: ActionType.lihatPolisPar,
-      label: 'Unduh Polis PAR',
-      iconAsset: 'assets/icons/unduh_polis.svg',
-      gradientColors: const [Color(0xFF46A5FF), Color(0xFF0040D5)],
-      borderColor: const Color(0xFF8EB8FF),
-      isEnabled: false,
-    ),
-    ActionMenuItem(
-      type: ActionType.lihatPolisEq,
-      label: 'Unduh Polis EQ',
-      iconAsset: 'assets/icons/unduh_polis.svg',
-      gradientColors: const [Color(0xFFFFB546), Color(0xFFD57200)],
-      borderColor: const Color(0xFFFFC38E),
-      isEnabled: false,
-    ),
-    ActionMenuItem(
-      type: ActionType.lihatPolis,
-      label: 'Unduh Polis',
-      iconAsset: 'assets/icons/unduh_polis.svg',
-      gradientColors: const [Color(0xFF42EF48), Color(0xFF05AD0A)],
-      borderColor: const Color(0xFF43FB49),
-      isEnabled: false,
-    ),
   ];
+
+  static final ActionMenuItem downloadPolisItem = ActionMenuItem(
+    type: ActionType.unduhPolis,
+    label: 'Unduh Polis',
+    iconAsset: 'assets/icons/unduh_polis.svg',
+    gradientColors: const [Color(0xFF42EF48), Color(0xFF05AD0A)],
+    borderColor: const Color(0xFF43FB49),
+    isEnabled: true,
+  );
+
+  static final ActionMenuItem downloadParItem = ActionMenuItem(
+    type: ActionType.lihatPolisPar,
+    label: 'Unduh Polis PAR',
+    iconAsset: 'assets/icons/unduh_polis.svg',
+    gradientColors: const [Color(0xFF46A5FF), Color(0xFF0040D5)],
+    borderColor: const Color(0xFF8EB8FF),
+    isEnabled: true,
+  );
+
+  static final ActionMenuItem downloadEqItem = ActionMenuItem(
+    type: ActionType.lihatPolisEq,
+    label: 'Unduh Polis EQ',
+    iconAsset: 'assets/icons/unduh_polis.svg',
+    gradientColors: const [Color(0xFFFFB546), Color(0xFFD57200)],
+    borderColor: const Color(0xFFFFC38E),
+    isEnabled: true,
+  );
+
 
   static final List<ActionType> alwaysEnabledActions = [ActionType.beliPolis];
 
-  /// NEW: matrix utama berbasis prosesSource dari selected item
-  /// "E" = Endorse, "R" = Renewal, "A" = Aktifkan Kembali
   static final Map<String, List<ActionType>> prosesSourceEnabledMatrix = {
-    "E": <ActionType>[
-      ActionType.lacakPolis,
-      ActionType.endorse,
-      ActionType.unduhPolis,
-    ],
-    "R": <ActionType>[
-      ActionType.lacakPolis,
-      ActionType.perpanjangan,
-      ActionType.unduhPolis,
-    ],
-    "A": <ActionType>[
-      ActionType.lacakPolis,
-      ActionType.aktifkanKembali,
-      ActionType.unduhPolis,
-    ],
+    "E": <ActionType>[ActionType.lacakPolis],
+    "R": <ActionType>[ActionType.lacakPolis],
+    "A": <ActionType>[ActionType.lacakPolis],
+  };
+
+  static final Map<String, List<ActionType>> statusIdEnabledMatrix = {
+    "10001": <ActionType>[ActionType.endorse],
+    "10002": <ActionType>[ActionType.lacakPolis],        // <— lacak cuma di sini
+    "10003": <ActionType>[ActionType.aktifkanKembali],
+    "10004": <ActionType>[ActionType.perpanjangan],
   };
 
   /*
@@ -174,47 +158,77 @@ class FabActionHelper {
     return "";
   }
 
-  /// NEW: actions enabled berdasarkan prosesSource (utama)
-  /// Kalau prosesSource kosong, default: hanya alwaysEnabledActions
+  static bool _canLacak(dynamic item) {
+    // coba akses sebagai object
+    try {
+      final ps = (item.prosesSource ?? "").toString();
+      final pid = (item.prosesId ?? "").toString();
+      if (ps.isNotEmpty && pid.isNotEmpty) return true;
+    } catch (_) {}
+
+    // fallback kalau item Map
+    if (item is Map) {
+      final ps = (item["prosesSource"] ?? "").toString();
+      final pid = (item["prosesId"] ?? "").toString();
+      if (ps.isNotEmpty && pid.isNotEmpty) return true;
+    }
+
+    return false;
+  }
+
   static List<ActionMenuItem> getAvailableActions({
-    // currentStatusFilter sengaja dihapus: gak dipakai lagi
+    required BuildContext context,
     required List<dynamic> selectedItems,
   }) {
     if (selectedItems.isEmpty) {
       return masterActions
-          .map((a) =>
-          a.copyWith(isEnabled: alwaysEnabledActions.contains(a.type)))
+          .map((a) => a.copyWith(
+        isEnabled: alwaysEnabledActions.contains(a.type),
+      ))
           .toList();
     }
 
     final item = selectedItems.first;
-    final prosesSource = _prosesSourceFromItem(item);
+    final cobId = _cobId(context);
 
-    // Utama: prosesSource
-    final allowedByProses =
-        prosesSourceEnabledMatrix[prosesSource] ?? const <ActionType>[];
+    final statusId = _statusId(context) ?? "";
+    final allowedByStatus =
+        statusIdEnabledMatrix[statusId] ?? const <ActionType>[];
 
-    /*
-    /**/
-    // OPTIONAL FALLBACK (untuk presentasi / sementara):
-    // Kalau prosesSource kosong, kamu bisa fallback pakai statusId filter
-    // final statusId = _statusIdFromContextOrNullSomehow(...); // see note below
-    // final statusKey = _mapStatusIdToKey(statusId);
-    // final allowedByStatus = statusEnabledMatrix[statusKey] ?? const <ActionType>[];
-    //
-    // final allowedActions = prosesSource.isNotEmpty ? allowedByProses : allowedByStatus;
-    /**/
-    */
+    final lacakEnabled =
+    (allowedByStatus.contains(ActionType.lacakPolis) && _canLacak(item))
+        ? <ActionType>[ActionType.lacakPolis]
+        : const <ActionType>[];
 
-    final allowedActions = allowedByProses;
+    final allowedByStatusNoLacak =
+    allowedByStatus.where((t) => t != ActionType.lacakPolis).toList();
 
-    return masterActions.map((action) {
-      if (alwaysEnabledActions.contains(action.type)) {
-        return action.copyWith(isEnabled: true);
-      }
-      return action.copyWith(isEnabled: allowedActions.contains(action.type));
-    }).toList();
+    final allowed = <ActionType>{
+      ...alwaysEnabledActions,
+      ...lacakEnabled,
+      ...allowedByStatusNoLacak,
+    };
+
+    final base = masterActions
+        .where((a) => allowed.contains(a.type))
+        .map((a) => a.copyWith(isEnabled: true))
+        .toList();
+
+    if (cobId == "10002") {
+      final parId = (item.filePolisParId ?? "").toString();
+      final eqId = (item.filePolisEqId ?? "").toString();
+
+      base.add(downloadParItem.copyWith(isEnabled: parId.isNotEmpty));
+      base.add(downloadEqItem.copyWith(isEnabled: eqId.isNotEmpty));
+    } else {
+      final fileId = (item.filePolisId ?? "").toString();
+      base.add(downloadPolisItem.copyWith(isEnabled: fileId.isNotEmpty));
+    }
+
+    return base;
   }
+
+
 
   static void handleAction({
     required BuildContext context,
@@ -249,15 +263,17 @@ class FabActionHelper {
       case ActionType.aktifkanKembali:
         _openReactive(context, cobId, item, onActionComplete);
         break;
+
+      case ActionType.unduhPolis:
+        _downloadGeneric(context, cobId, item);
+        break;
       case ActionType.lihatPolisPar:
         _downloadPar(context, item);
         break;
       case ActionType.lihatPolisEq:
         _downloadEq(context, item);
         break;
-      case ActionType.lihatPolis:
-        _downloadGeneric(context, cobId, item);
-        break;
+
       default:
         _handleAlwaysEnabled(context, actionType, onActionComplete);
     }

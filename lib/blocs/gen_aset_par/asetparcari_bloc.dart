@@ -255,6 +255,12 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		on<SelectParCariEvent>((event, emit) {
 			emit(state.copyWith(selectedItem: event.selectedItem));
 		});
+		on<SelectProsesParIdEvent>((event, emit) {
+			emit(state.copyWith(selectedProsesId: event.prosesId));
+		});
+		on<ClearSelectedItemEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: null));
+		});
 	}
 
 	Future<void> onRefreshAsetParCari(

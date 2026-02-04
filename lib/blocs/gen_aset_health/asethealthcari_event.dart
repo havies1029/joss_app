@@ -106,3 +106,8 @@ class SelectHealthCariEvent extends AsetHealthCariEvents {
 	final AsetHealthCariModel selectedItem;
 	const SelectHealthCariEvent({required this.selectedItem});
 }
+
+class SelectProsesHealthIdEvent extends AsetHealthCariEvents {
+	final String? prosesId;
+	const SelectProsesHealthIdEvent(this.prosesId);
+}

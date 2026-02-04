@@ -5,6 +5,7 @@ import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/regendors/regendors1form_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
+import 'package:joss_app/pages/management_polis/mobile/form_button_page/polis_success.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
@@ -160,10 +161,9 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => DetailManagementPolisPage(
-              data: selectedItem,
-              cobId: cobId,
-              statusId: "", // tidak dipakai lagi untuk routing proses
+            builder: (_) => PolisSuccess(
+
+              display: "Pengajuan berhasil dikirim",
             ),
           ),
         );

@@ -98,3 +98,12 @@ class FieldObjectAlamatChangedEvent extends Regpar2FormEvents {
 	@override
 	List<Object> get props => [objectAlamat];
 }
+
+class Regpar2DraftEvent extends Regpar2FormEvents {
+	final Regpar2FormModel record;
+	const Regpar2DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}
+

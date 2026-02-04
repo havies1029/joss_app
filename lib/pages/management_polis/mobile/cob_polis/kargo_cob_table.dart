@@ -472,6 +472,7 @@ class KargoCobTable extends StatefulWidget {
   final List<AsetothersCariModel> items;
   final List<String> selectedIds;
   final void Function(AsetothersCariModel item)? onSelectItem;
+  final void Function(String id) selectedProsesId;
 
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
@@ -488,6 +489,7 @@ class KargoCobTable extends StatefulWidget {
     required this.items,
     required this.selectedIds,
     required this.onSelectItem,
+    required this.selectedProsesId,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisHealthId,
@@ -612,7 +614,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
                 children: [
                   _tableHeader(context, details),
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadio(
+                        (e) => _detailRowWithCheckbox(
                       context,
                       e.value,
                       e.key,
@@ -663,7 +665,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
           },
           children: [
             _tableHeader(context, details),
-            ...details.asMap().entries.map((e) => _detailRowWithRadio(
+            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
               e.key,
@@ -708,6 +710,117 @@ class _KargoCobTableState extends State<KargoCobTable> {
       ],
     );
   }
+
+  TableRow _detailRowWithCheckbox(
+      BuildContext context,
+      AsetothersCariModel d,
+      int index, {
+        required bool compact,
+      }) {
+    final isSelected = widget.selectedProsesId == d.prosesId;
+
+    return TableRow(
+      decoration: BoxDecoration(
+        color: (!widget.readOnly && isSelected)
+            ? primaryColor.withOpacity(0.3)
+            : (index.isEven ? pGrey : formGrey),
+      ),
+      children: [
+        if (!widget.readOnly)
+          Center(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: (checked) {
+                if (checked == true) {
+                  widget.onSelect(d.asetOthersId);
+                  widget.onSelectItem?.call(d);
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisHealthId(d.filePolisId);
+                  }
+                } else {
+                  widget.onUnselect(d.asetOthersId);
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisHealthId(d.filePolisId);
+                  }
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+              ),
+              side: MaterialStateBorderSide.resolveWith(
+                    (states) => const BorderSide(color: sGrey),
+              ),
+              fillColor: MaterialStateProperty.resolveWith(
+                    (states) =>
+                states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
+              ),
+              checkColor: primaryLightColor,
+            ),
+          )
+        else
+          const SizedBox(),
+
+        _cell(
+          child: Center(
+            child: Text(
+              d.nomor.toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            d.objectDesc,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            d.polisNo,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Center(
+            child: Text(
+              d.curr,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            formatNum(d.sumInsured),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            formatNum(d.premi),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+      ],
+    );
+  }
+
 
   TableRow _detailRowWithRadio(
       BuildContext context,

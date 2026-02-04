@@ -16,28 +16,80 @@ class Regpar4FormBloc extends Bloc<Regpar4FormEvents, Regpar4FormState> {
 		on<Regpar4FormHapusEvent>(onHapusRegpar4Form);
 		on<Regpar4FormLihatEvent>(onLihatRegpar4Form);
 		on<ComboRMatauangChangedEvent>(onComboRMatauangChanged);
+		on<Regpar4DraftEvent>(onDraftRegpar4Crud);
 	}
 
-	Future<void> onTambahRegpar4Form(
-		Regpar4FormTambahEvent event, Emitter<Regpar4FormState> emit) async {
+	Future<void> onDraftRegpar4Crud(
+			Regpar4DraftEvent event,
+			Emitter<Regpar4FormState> emit,
+			) async {
 
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.regpar4FormTambah(event.record);
-		hasFailure = !returnData.success;
 		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+			record: event.record,
+			isSaved: false,
+			hasFailure: false,
+		));
+	}
+
+
+	Future<void> onTambahRegpar4Form(
+			Regpar4FormTambahEvent event,
+			Emitter<Regpar4FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ReturnDataAPI returnData =
+		await repository.regpar4FormTambah(event.record);
+
+		final bool hasFailure = !returnData.success;
+
+		if (!hasFailure) {
+			// 🔥 ambil id baru dari server
+			final newId = returnData.data?.toString() ?? "";
+
+			// 🔥 update record (model mutable)
+			final updatedRecord = event.record;
+			updatedRecord.regpar1Id = newId; // <- sesuaikan nama field id
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: true,
+				hasFailure: false,
+				record: updatedRecord, // << PENTING
+			));
+		} else {
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: true,
+			));
+		}
 	}
 
 	Future<void> onUbahRegpar4Form(
-		Regpar4FormUbahEvent event, Emitter<Regpar4FormState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.regpar4FormUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Regpar4FormUbahEvent event,
+			Emitter<Regpar4FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final bool hasFailure = !await repository.regpar4FormUbah(event.record);
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,
+			hasFailure: hasFailure,
+			record: event.record, // penting biar state pegang data terbaru
+		));
 	}
+
 
 	Future<void> onHapusRegpar4Form(
 		Regpar4FormHapusEvent event, Emitter<Regpar4FormState> emit) async {

@@ -6,6 +6,7 @@ import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../../../models/payment/invbayarvaform_model.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -29,6 +30,8 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   final fieldVaNoController = TextEditingController();
   final fieldTotalBayarController = TextEditingController();
   final fieldCurrController = TextEditingController();
+  bool _isInvoicePayloadApplied = false;
+  String? _payloadInvoiceId;
 
   @override
   void initState() {
@@ -37,6 +40,42 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
+  }
+
+  @override
+  void dispose() {
+    fieldBatasBayarController.dispose();
+    fieldVaNoController.dispose();
+    fieldTotalBayarController.dispose();
+    fieldCurrController.dispose();
+    super.dispose();
+  }
+
+  void _payloadInvoiceOnce(InvbayarvaFormModel record) {
+    final invoiceId = widget.recordId;
+
+    if (_payloadInvoiceId != invoiceId) {
+      _payloadInvoiceId = invoiceId;
+      _isInvoicePayloadApplied = false;
+    }
+
+    if (_isInvoicePayloadApplied) return;
+
+    if (fieldBatasBayarController.text.trim().isEmpty) {
+      fieldBatasBayarController.text = record.batasBayar.toIso8601String();
+    }
+    if (fieldVaNoController.text.trim().isEmpty) {
+      fieldVaNoController.text = record.vaNo;
+    }
+    if (fieldCurrController.text.trim().isEmpty) {
+      fieldCurrController.text = record.curr;
+    }
+    if (fieldTotalBayarController.text.trim().isEmpty) {
+      fieldTotalBayarController.text =
+          NumberFormat("#,###").format(record.totalBayar);
+    }
+
+    _isInvoicePayloadApplied = true;
   }
 
   void loadData() {
@@ -48,111 +87,132 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<InvbayarvaFormBloc, InvbayarvaFormState>(
-      builder: (context, state) {
-        return BaseBackgroundSidePage(
-          title: state.record?.bankNama.isNotEmpty == true
-              ? state.record!.bankNama
-              : "Pembayaran",
-          child: Container(
-            color: secondaryBlackColor,
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
+          listenWhen: (prev, curr) =>
+          prev.record != curr.record && curr.record != null,
+          listener: (context, state) {
+            if (state.record != null) {
+              _payloadInvoiceOnce(state.record!);
+            }
+          },
+        ),
+      ],
+      child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
+        buildWhen: (prev, curr) =>
+        prev.record != curr.record ||
+            prev.isLoaded != curr.isLoaded ||
+            prev.isLoading != curr.isLoading,
+        builder: (context, state) {
+          return BaseBackgroundSidePage(
+            title: state.record?.bankNama.isNotEmpty == true
+                ? state.record!.bankNama
+                : "Pembayaran",
+            child: Container(
+              color: secondaryBlackColor,
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
                           color: primaryLightColor,
-                          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius))
-                      ),
-                      width: 120,
-                      height: 60,
-                      alignment: Alignment.center,
-                      child: buildBankLogo(
-                        state.record?.iconId ?? '',
-                        state.record?.iconUrl ?? '',
-                        size: 120,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    buildWaitingStatus(),
-                    const SizedBox(height: 6),
-                    buildFieldTotalBayar(),
-                    const SizedBox(height: 8),
-                    buildFieldVaNo(),
-                    const SizedBox(height: 18),
-                    buildFieldBatasBayar(),
-                    const SizedBox(height: 18),
-                    buildInstruksiPembayaran(state),
-                    const SizedBox(height: hPadding),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 60,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: ElevatedButton(
-                          onPressed: _dismissDialog,
-                          child: const Text('Close', style: TextStyle(fontSize: 13)),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(cardBorderRadius),
+                          ),
+                        ),
+                        width: 120,
+                        height: 60,
+                        alignment: Alignment.center,
+                        child: buildBankLogo(
+                          state.record?.iconId ?? '',
+                          state.record?.iconUrl ?? '',
+                          size: 120,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      buildWaitingStatus(),
+                      const SizedBox(height: 6),
+                      buildFieldTotalBayar(),
+                      const SizedBox(height: 8),
+                      buildFieldVaNo(),
+                      const SizedBox(height: 18),
+                      buildFieldBatasBayar(),
+                      const SizedBox(height: 18),
+                      buildInstruksiPembayaran(state),
+                      const SizedBox(height: hPadding),
 
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 100,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.read<DnRekap2invBloc>().add(
-                              CheckInvoiceStatusEvent(invoiceId: widget.recordId),
-                            );
-                          },
-                          child: const Text('Cek Payment Manual', style: TextStyle(fontSize: 13)),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: 60,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: ElevatedButton(
+                            onPressed: _dismissDialog,
+                            child: const Text(
+                              'Close',
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
 
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 100,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.read<DnRekap2invBloc>().add(
-                              ForcePaymentViaVaEvent(invoiceId: widget.recordId),
-                            );
-                          },
-                          child: const Text('Backend -> Payment Via VA', style: TextStyle(fontSize: 13)),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: 100,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<DnRekap2invBloc>().add(
+                                CheckInvoiceStatusEvent(
+                                  invoiceId: widget.recordId,
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Cek Payment Manual',
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    FormError(
-                      errors: errors,
-                      key: null,
-                    ),
-                  ],
+
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: 100,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<DnRekap2invBloc>().add(
+                                ForcePaymentViaVaEvent(
+                                  invoiceId: widget.recordId,
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Backend -> Payment Via VA',
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      FormError(errors: errors, key: null),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-      listener: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          fieldBatasBayarController.text =
-              state.record!.batasBayar.toIso8601String();
-          fieldVaNoController.text = state.record!.vaNo;
-          fieldCurrController.text = state.record!.curr;
-          fieldTotalBayarController.text =
-              NumberFormat("#,###").format(state.record!.totalBayar);
-        }
-      },
+          );
+        },
+      ),
     );
   }
 

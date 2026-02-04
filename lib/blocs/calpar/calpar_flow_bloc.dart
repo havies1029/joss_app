@@ -118,45 +118,33 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
   void _ensureCalpar1() {
     final form1 = calpar1CrudBloc.state.record!;
 
-    // debugPrint('[_ensureCalpar1] dipanggil');
-    // debugPrint('[_ensureCalpar1] calpar1Id = ${form1.calpar1Id}');
-    // debugPrint('[_ensureCalpar1] record = $form1');
-
     if (form1.calpar1Id.isEmpty) {
-      // debugPrint('[_ensureCalpar1] calpar1Id kosong → trigger TambahEvent');
       calpar1CrudBloc.add(Calpar1CrudTambahEvent(record: form1));
       return;
     }
 
-    // debugPrint('[_ensureCalpar1] calpar1Id ada → trigger UbahEvent');
     calpar1CrudBloc.add(Calpar1CrudUbahEvent(record: form1));
   }
 
 
   void _ensureCalpar2() {
     final form1 = calpar1CrudBloc.state.record!;
-    debugPrint("ENSURE CALPAR2 => form1.calpar1Id = ${form1.calpar1Id}");
 
     if (form1.calpar1Id.isEmpty) {
-      debugPrint("ENSURE CALPAR2 => STOP (calpar1Id kosong)");
       return;
     }
 
     _syncCalpar1IdToForm2And3(form1.calpar1Id);
 
     final form2 = calpar2FormBloc.state.record!;
-    debugPrint("ENSURE CALPAR2 => form2 sebelum copy: calpar2Id=${form2.calpar2Id}, calpar1Id=${form2.calpar1Id}");
 
     final form2WithParent = form2.copyWith(calpar1Id: form1.calpar1Id);
-    debugPrint("ENSURE CALPAR2 => form2 setelah copy: calpar2Id=${form2WithParent.calpar2Id}, calpar1Id=${form2WithParent.calpar1Id}");
 
     if (form2.calpar2Id.isEmpty) {
-      debugPrint("ENSURE CALPAR2 => TAMBAH (calpar2Id masih kosong)");
-      calpar2FormBloc.add(Calpar2FormTambahEvent(record: form2WithParent));
+      calpar2FormBloc.add(Calpar2FormUbahEvent(record: form2WithParent));
       return;
     }
 
-    debugPrint("ENSURE CALPAR2 => UBAH (calpar2Id sudah ada)");
     calpar2FormBloc.add(Calpar2FormUbahEvent(record: form2WithParent));
   }
 
@@ -171,7 +159,7 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
     final form3WithParent = form3.copyWith(calpar1Id: form1.calpar1Id);
 
     if (form3.calpar3Id.isEmpty) {
-      calpar3FormBloc.add(Calpar3FormTambahEvent(record: form3WithParent));
+      calpar3FormBloc.add(Calpar3FormUbahEvent(record: form3WithParent));
       return;
     }
     calpar3FormBloc.add(Calpar3FormUbahEvent(record: form3WithParent));

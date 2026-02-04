@@ -169,6 +169,9 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 		on<SelectHullCariEvent>((event, emit) {
 			emit(state.copyWith(selectedItem: event.selectedItem));
 		});
+		on<SelectProsesHullIdEvent>((event, emit) {
+			emit(state.copyWith(selectedProsesId: event.prosesId));
+		});
 	}
 
 	// -----------------------

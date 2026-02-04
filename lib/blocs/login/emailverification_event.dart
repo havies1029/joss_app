@@ -32,4 +32,12 @@ class FieldSimpanPasswordChangedEvent extends EmailVerificationEvents {
 	List<Object> get props => [isSimpanPassword];
 }
 
+class FieldEmailVerificationChangedEvent extends EmailVerificationEvents {
+	final String email;
+	const FieldEmailVerificationChangedEvent({required this.email});
+
+	@override
+	List<Object> get props => [email];
+}
+
 

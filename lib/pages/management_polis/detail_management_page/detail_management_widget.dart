@@ -76,19 +76,31 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
 
     _loading = true;
 
-    _triggerByProses(
-      prosesSource: _prosesSource,
-      prosesId: _prosesId,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _triggerByProses(
+        prosesSource: _prosesSource,
+        prosesId: _prosesId,
+      );
+    });
   }
 
-  /// NEW: routing tracking berdasarkan prosesSource + prosesId
   void _triggerByProses({
     required String prosesSource,
     required String prosesId,
   }) {
-    // Kalau tidak ada proses, langsung tampilkan empty state
-    if (prosesSource.isEmpty || prosesId.isEmpty) {
+    final cleanSource = prosesSource.trim().toUpperCase();
+    String resolvedId = prosesId.trim();
+
+    // RULE BARU:
+    // kalau prosesSource & prosesId kosong → langsung pakai sppa1Id dari Regendors1FormBloc
+    if (cleanSource.isEmpty && resolvedId.isEmpty) {
+      resolvedId = context.read<Regendors1FormBloc>().state.record?.sppa1Id ?? "";
+      cleanSource; // (no-op, biar jelas source kosong)
+      // langsung tembak endorse2 di bawah (tanpa butuh source)
+    }
+
+    // kalau masih kosong → empty
+    if (resolvedId.isEmpty) {
       setState(() {
         _loading = false;
         _items = const [];
@@ -99,25 +111,35 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
       return;
     }
 
-    switch (prosesSource) {
+    // kalau source kosong (karena rule baru) → default ke endorse (Regendors2)
+    if (cleanSource.isEmpty) {
+      regendors2 = context.read<Regendors2CariBloc>();
+      regendors2.add(
+        RefreshRegendors2CariEvent(regendors1Id: resolvedId),
+      );
+      return;
+    }
+
+    // normal routing kalau source ada
+    switch (cleanSource) {
       case "E":
         regendors2 = context.read<Regendors2CariBloc>();
         regendors2.add(
-          RefreshRegendors2CariEvent(regendors1Id: prosesId),
+          RefreshRegendors2CariEvent(regendors1Id: resolvedId),
         );
         break;
 
       case "A":
         regreaktif2formBloc = context.read<Regreaktif2CariBloc>();
         regreaktif2formBloc.add(
-          RefreshRegreaktif2CariEvent(regreaktif1Id: prosesId),
+          RefreshRegreaktif2CariEvent(regreaktif1Id: resolvedId),
         );
         break;
 
       case "R":
         regrenew2formBloc = context.read<Regrenewal2CariBloc>();
         regrenew2formBloc.add(
-          RefreshRegrenewal2CariEvent(regrenew1Id: prosesId),
+          RefreshRegrenewal2CariEvent(regrenew1Id: resolvedId),
         );
         break;
 
@@ -132,6 +154,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
         break;
     }
   }
+
 
   String extractAssetIdByCob(Map<String, dynamic> dataMap, String cobId) {
     return switch (cobId) {
@@ -163,8 +186,8 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                   listenWhen: (prev, next) =>
                   prev.status != next.status || prev.items != next.items,
                   listener: (context, state) {
-                    if (!mounted) return;
-                    if (_prosesSource != "E") return; // 🔐 GUARD
+                    // if (!mounted) return;
+                    // if (_prosesSource != "E") return; // 🔐 GUARD
 
                     if (state.status == ListStatus.initial) {
                       setState(() => _loading = true);
@@ -185,8 +208,8 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                   listenWhen: (prev, next) =>
                   prev.status != next.status || prev.items != next.items,
                   listener: (context, state) {
-                    if (!mounted) return;
-                    if (_prosesSource != "A") return; // 🔐 GUARD
+                    // if (!mounted) return;return
+                    // if (_prosesSource != "A") return; // 🔐 GUARD
 
                     if (state.status == ListStatus.initial) {
                       setState(() => _loading = true);
@@ -207,8 +230,8 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                   listenWhen: (prev, next) =>
                   prev.status != next.status || prev.items != next.items,
                   listener: (context, state) {
-                    if (!mounted) return;
-                    if (_prosesSource != "R") return; // 🔐 GUARD
+                    // if (!mounted) return;
+                    // if (_prosesSource != "R") return; // 🔐 GUARD
 
                     if (state.status == ListStatus.initial) {
                       setState(() => _loading = true);

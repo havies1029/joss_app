@@ -8,7 +8,9 @@ import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart
 import '../../base/base_background_sidepage.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../calpar/mobile/calpar_main_page.dart';
+import '../../calpar/mobile/calpar_main_page_remake.dart';
 import '../../gen_calmv/mobile/calmv_main_page.dart';
+import '../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../regother/mobile/regother_form/regother_form1.dart';
 
 enum CariAsuransiType { page, menu }
@@ -126,7 +128,7 @@ class CariAsuransiWidget extends StatelessWidget {
                       context,
                       "assets/icons/kendaraan.svg",
                       "Kendaraan",
-                      const CalmvFormMain(viewMode: '',),
+                      const CalmvMainPageRemake(),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -135,7 +137,7 @@ class CariAsuransiWidget extends StatelessWidget {
                       context,
                       "assets/icons/properti.svg",
                       "Properti",
-                      const CalparFormMain(viewMode: '',),
+                      const CalparMainPageRemake(),
                     ),
                   ),
                 ],

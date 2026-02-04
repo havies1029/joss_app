@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
+import 'package:joss_app/pages/management_polis/mobile/form_button_page/polis_success.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
@@ -156,10 +157,9 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => DetailManagementPolisPage(
-              data: selectedItem,
-              cobId: cobId,
-              statusId: "", // tidak dipakai lagi untuk routing proses
+            builder: (_) => PolisSuccess(
+
+              display: "Pengajuan berhasil dikirim",
             ),
           ),
         );

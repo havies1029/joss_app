@@ -463,6 +463,8 @@ class HullCobTable extends StatefulWidget {
   final List<AsethullCariModel> items;
   final List<String> selectedIds;
   final void Function(AsethullCariModel item)? onSelectItem;
+  final void Function(String id) selectedProsesId;
+  final AsethullCariModel? selectedItem;
 
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
@@ -479,10 +481,12 @@ class HullCobTable extends StatefulWidget {
     required this.items,
     required this.selectedIds,
     required this.onSelectItem,
+    required this.selectedProsesId,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisHullId,
     required this.onUnselectFilePolisHullId,
+    required this.selectedItem,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -608,7 +612,7 @@ class _HullCobTableState extends State<HullCobTable> {
                 children: [
                   _tableHeader(context, details),
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadio(
+                        (e) => _detailRowWithCheckbox(
                       context,
                       e.value,
                       e.key,
@@ -656,7 +660,7 @@ class _HullCobTableState extends State<HullCobTable> {
           },
           children: [
             _tableHeader(context, details),
-            ...details.asMap().entries.map((e) => _detailRowWithRadio(
+            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
               e.key,
@@ -694,6 +698,110 @@ class _HullCobTableState extends State<HullCobTable> {
             child: center ? Center(child: child) : child,
           );
         }).toList(),
+      ],
+    );
+  }
+
+  TableRow _detailRowWithCheckbox(
+      BuildContext context,
+      AsethullCariModel d,
+      int index, {
+        required bool compact,
+      }) {
+    final isSelected = widget.selectedItem == d;
+
+    return TableRow(
+      decoration: BoxDecoration(
+        color: (!widget.readOnly && isSelected)
+            ? primaryColor.withOpacity(0.3)
+            : (index.isEven ? pGrey : formGrey),
+      ),
+      children: [
+        if (!widget.readOnly)
+          Center(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: (checked) {
+                if (checked == true) {
+                  widget.onSelect(d.asetHullId);
+                  widget.onSelectItem?.call(d);
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisHullId(d.filePolisId);
+                  }
+                } else {
+                  widget.onUnselect(d.asetHullId);
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisHullId(d.filePolisId);
+                  }
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+              ),
+              side: MaterialStateBorderSide.resolveWith(
+                    (states) => const BorderSide(color: sGrey),
+              ),
+              fillColor: MaterialStateProperty.resolveWith(
+                    (states) =>
+                states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
+              ),
+              checkColor: primaryLightColor,
+            ),
+          )
+        else
+          const SizedBox(),
+
+        // No
+        _cell(
+          child: Center(
+            child: Text(
+              (index + 1).toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
+
+        // Tertanggung
+        _cell(
+          child: Text(
+            d.tertanggung,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        // Detail Rangka Kapal (namaKapal)
+        _cell(
+          child: Text(
+            d.namaKapal,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        // Nilai Tertanggung (TSI)
+        _cell(
+          child: Text(
+            formatNum(d.tsi),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        // Premi
+        _cell(
+          child: Text(
+            formatNum(d.premi),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
       ],
     );
   }

@@ -9,7 +9,7 @@ class Calpar2FormRepository {
 	Future<ReturnDataAPI> calpar2FormTambah(Calpar2FormModel record) async {
 		return await api.calpar2FormTambahAPI(record);
 	}
-	Future<bool> calpar2FormUbah(Calpar2FormModel record) async {
+	Future<ReturnDataAPI> calpar2FormUbah(Calpar2FormModel record) async {
 		return await api.calpar2FormUbahAPI(record);
 	}
 	Future<bool> calpar2FormHapus(String calpar2Id) async {

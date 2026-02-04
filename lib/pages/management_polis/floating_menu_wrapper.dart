@@ -11,71 +11,87 @@ import '../../../blocs/gen_status_aset/statusasetcari_bloc.dart';
 import '../../../helper/fab_action_helper.dart';
 import 'floating_action_menu_widget.dart';
 
-
 class FloatingMenuWrapper extends StatelessWidget {
   const FloatingMenuWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
-    T sel<B extends StateStreamable<S>, S, T>(T Function(S s) pick) =>
-        context.select<B, T>((b) => pick(b.state));
-    final cobId = sel<CobManPolBloc, CobManPolState, String>((s) => s.selectedCOBId);
-    final statusId = sel<StatusAsetCariBloc, StatusAsetCariState, String>((s) => s.selectedStatusId);
-    final selectedItem = _selectedItemByCob(context, cobId);
-    if (cobId == "10002") {
-      sel<AsetParCariBloc, AsetParCariState, String>((s) => s.selectedFilePolisParId);
-      sel<AsetParCariBloc, AsetParCariState, String>((s) => s.selectedFilePolisEqId);
-    } else {
-      switch (cobId) {
-        case "10003":
-          sel<AsetMvCariBloc, AsetMvCariState, String>((s) => s.selectedFilePolisId);
-          break;
-        case "10004":
-          sel<AsethullCariBloc, AsethullCariState, String>((s) => s.selectedFilePolisId);
-          break;
-        case "10005":
-          sel<AsetHealthCariBloc, AsetHealthCariState, String>((s) => s.selectedFilePolisId);
-          break;
-        case "10006":
-          sel<AsetothersCariBloc, AsetothersCariState, String>((s) => s.selectedFilePolisId);
-          break;
-      }
-    }
-
-    final selectedItems = selectedItem == null ? const <dynamic>[] : <dynamic>[selectedItem];
-
-    final baseActions = FabActionHelper.getAvailableActions(
-      // currentStatusFilter: statusId,
-      selectedItems: selectedItems,
-    );
-
-    final polisActions = _polisActionsFromState(
-      context: context,
-      base: FabActionHelper.masterActions,
-      disableBecauseMultiSelect: false,
-    );
-
-    final availableActions = _filterActionsByCobFromState(
-      context,
-      _mergeActionsByType(baseActions, polisActions),
-    );
-
-    return FloatingActionMenuWidget(
-      availableActions: availableActions,
-      selectedItems: selectedItems,
-      onActionTap: (actionType, selectedItems) {
-        FabActionHelper.handleAction(
-          context: context,
-          actionType: actionType,
-          selectedItems: selectedItems,
-          onActionComplete: () {
-            _clearSelectionFromState(context);
-            _refreshFromState(context);
-          },
-        );
+    return BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
+      listenWhen: (prev, curr) => prev.statusChangeTick != curr.statusChangeTick,
+      listener: (context, state) {
+        _clearSelectionFromState(context);
       },
+      child: Builder(
+        builder: (context) {
+          T sel<B extends StateStreamable<S>, S, T>(T Function(S s) pick) =>
+              context.select<B, T>((b) => pick(b.state));
+
+          final cobId =
+          sel<CobManPolBloc, CobManPolState, String>((s) => s.selectedCOBId);
+          final statusId =
+          sel<StatusAsetCariBloc, StatusAsetCariState, String>((s) => s.selectedStatusId);
+
+          final selectedItem = _selectedItemByCob(context, cobId);
+
+          if (cobId == "10002") {
+            sel<AsetParCariBloc, AsetParCariState, String>((s) => s.selectedFilePolisParId);
+            sel<AsetParCariBloc, AsetParCariState, String>((s) => s.selectedFilePolisEqId);
+          } else {
+            switch (cobId) {
+              case "10003":
+                sel<AsetMvCariBloc, AsetMvCariState, String>((s) => s.selectedFilePolisId);
+                break;
+              case "10004":
+                sel<AsethullCariBloc, AsethullCariState, String>((s) => s.selectedFilePolisId);
+                break;
+              case "10005":
+                sel<AsetHealthCariBloc, AsetHealthCariState, String>((s) => s.selectedFilePolisId);
+                break;
+              case "10006":
+                sel<AsetothersCariBloc, AsetothersCariState, String>((s) => s.selectedFilePolisId);
+                break;
+            }
+          }
+
+          final selectedItems =
+          selectedItem == null ? const <dynamic>[] : <dynamic>[selectedItem];
+
+          final baseActions = FabActionHelper.getAvailableActions(
+            context: context,
+            selectedItems: selectedItems,
+          );
+
+          final polisActions = _polisActionsFromState(
+            context: context,
+            base: FabActionHelper.masterActions,
+            disableBecauseMultiSelect: false,
+          );
+
+          final availableActions = _filterActionsByCobFromState(
+            context,
+            _mergeActionsByType(baseActions, polisActions),
+          );
+
+          return FloatingActionMenuWidget(
+            availableActions: availableActions,
+            selectedItems: selectedItems,
+            onActionTap: (actionType, selectedItems) {
+              FabActionHelper.handleAction(
+                context: context,
+                actionType: actionType,
+                selectedItems: selectedItems,
+                onActionComplete: () {
+                  _clearSelectionFromState(context);
+                  _refreshFromState(context);
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
+
 
   dynamic _selectedItemByCob(BuildContext context, String cobId) {
     return switch (cobId) {

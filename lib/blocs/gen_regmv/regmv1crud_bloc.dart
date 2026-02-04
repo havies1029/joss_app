@@ -22,8 +22,6 @@ class Regmv1CrudBloc extends Bloc<Regmv1CrudEvents, Regmv1CrudState> {
 			Regmv1DraftEvent event,
 			Emitter<Regmv1CrudState> emit,
 			) async {
-		debugPrint("📥 [BLOC][REGMV1] DraftEvent received");
-		debugPrint("📦 ttgNama='${event.record.ttgNama}', ttgAlamat='${event.record.ttgAlamat}', calmv1Id='${event.record.calmv1Id}', regmv1Id='${event.record.regmv1Id}'");
 
 		emit(state.copyWith(
 			record: event.record,

@@ -16,10 +16,18 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
   late Historybayar2CariBloc historybayar2cariBloc;
 
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  final ScrollController hController = ScrollController();
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     historybayar2cariBloc = context.read<Historybayar2CariBloc>();
+
 
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
@@ -40,31 +48,52 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
 
   // ========= TABLE COMPACT (NARROW) =========
   Widget _buildTableCompact(List<Historybayar2CariModel> items) {
+    if (items.isEmpty) return const Text("Tidak ada data");
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         decoration: _boxDecoration(),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                // ini kunci: table minimal selebar container
-                width: constraints.maxWidth,
-                child: Table(
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  border: _tableBorder(),
-                  columnWidths: const {
-                    0: FlexColumnWidth(1), // NO
-                    1: FlexColumnWidth(3), // NO POLIS
-                    2: FlexColumnWidth(3), // PREMI
-                  },
-                  children: [
-                    _headerRow(),
-                    ...items.asMap().entries.map(
-                          (e) => _row(e.value, e.key, compact: true),
+            return ScrollbarTheme(
+              data: ScrollbarThemeData(
+                thumbVisibility: MaterialStateProperty.all(true),
+                trackVisibility: MaterialStateProperty.all(false),
+                thickness: MaterialStateProperty.all(5),
+                radius: const Radius.circular(cardBorderRadius),
+                thumbColor: MaterialStateProperty.all(
+                  scrollBar.withOpacity(0.1),
+                ),
+              ),
+              child: Scrollbar(
+                controller: hController,
+                child: SingleChildScrollView(
+                  controller: hController,
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    // bikin "nempel" kalau muat
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: IntrinsicWidth(
+                      // bikin "ngikut isi" kalau nggak muat (jadi melebar & bisa scroll)
+                      child: Table(
+                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                        border: _tableBorder(),
+                        columnWidths: const {
+                          0: IntrinsicColumnWidth(), // NO
+                          1: IntrinsicColumnWidth(), // NO POLIS
+                          2: IntrinsicColumnWidth(), // PERIODE POLIS
+                          3: IntrinsicColumnWidth(), // PREMI
+                        },
+                        children: [
+                          _headerRow(),
+                          ...items.asMap().entries.map(
+                                (e) => _row(e.value, e.key, compact: true),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -73,6 +102,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
       ),
     );
   }
+
 
   // ========= TABLE NORMAL =========
   Widget _buildTableNormal(List<Historybayar2CariModel> items) {
@@ -89,8 +119,9 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                 border: _tableBorder(),
                 columnWidths: const {
                   0: FlexColumnWidth(1),
-                  1: FlexColumnWidth(3),
-                  2: FlexColumnWidth(3),
+                  1: FlexColumnWidth(2),
+                  2: FlexColumnWidth(2),
+                  3: FlexColumnWidth(2),
                 },
                 children: [
                   _headerRow(),
@@ -132,6 +163,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
       children: [
         _headerCell("NO", center: true),
         _headerCell("NO POLIS"),
+        _headerCell("PERIODE POLIS"),
         _headerCell("PREMI"),
       ],
     );
@@ -140,6 +172,8 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
   TableRow _row(Historybayar2CariModel d, int index, {required bool compact}) {
     final polisNo = d.polisNo.isNotEmpty ? d.polisNo : "-";
     final premi = "${d.curr} ${formatNum(d.nilaiBayar)}";
+    final periode = "${d.periodeMulai.toString().substring(0, 10)} → "
+        "${d.periodeAkhir.toString().substring(0, 10)}";
 
     return TableRow(
       decoration: BoxDecoration(
@@ -148,6 +182,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
       children: [
         _cellCenter((index + 1).toString()),
         _cellText(polisNo, compact: compact),
+        _cellText(periode, compact: compact),
         _cellText(premi, compact: compact),
       ],
     );
@@ -219,6 +254,8 @@ List<Historybayar2CariModel> _dummyItems() {
       nilaiBayar: 1250000.0 * (i + 1),
       polisNo: "POLIS-00$i",
       sppa1Id: "SPPA-$i",
+      periodeAkhir: DateTime.now(),
+      periodeMulai: DateTime.now(),
     );
   });
 }

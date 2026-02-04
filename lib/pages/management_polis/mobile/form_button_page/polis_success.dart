@@ -4,18 +4,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
-import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
+import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
+import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
+import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
+import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
+import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
+import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
-class PaymentSuccess extends StatefulWidget {
+import '../../detail_management_page/detail_management_widget.dart';
+
+class PolisSuccess extends StatefulWidget {
   final String display;
-  const PaymentSuccess({super.key, required this.display});
+  const PolisSuccess({super.key, required this.display});
 
   @override
-  State<PaymentSuccess> createState() => _PaymentSuccessState();
+  State<PolisSuccess> createState() => _PolisSuccessState();
 }
 
-class _PaymentSuccessState extends State<PaymentSuccess> {
+class _PolisSuccessState extends State<PolisSuccess> {
   late ConfettiController _controllerLeft;
   late ConfettiController _controllerRight;
 
@@ -24,7 +32,6 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
     super.initState();
     _controllerLeft = ConfettiController(duration: const Duration(seconds: 1));
     _controllerRight = ConfettiController(duration: const Duration(seconds: 1));
-
     _controllerLeft.play();
     _controllerRight.play();
   }
@@ -57,7 +64,6 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                 ),
               ),
 
-              // Confetti kanan–atas
               Align(
                 alignment: const Alignment(1, -1),
                 child: ConfettiWidget(
@@ -69,7 +75,6 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                 ),
               ),
 
-              // Konten utama
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -97,13 +102,50 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                       text: "Kembali",
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
-                      width: 245,
-                      onPressed: () {
-                        context
-                            .read<DnRekap2invBloc>()
-                            .add(InitializeDnRekap2invEvent());
-                        Navigator.popUntil(context, (route) => route.isFirst);
-                      },
+                      width: 245,onPressed: () {
+                      final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
+
+                      dynamic selectedItem;
+                      switch (cobId) {
+                        case "10002":
+                          selectedItem = context.read<AsetParCariBloc>().state.selectedItem;
+                          break;
+                        case "10003":
+                          selectedItem = context.read<AsetMvCariBloc>().state.selectedItem;
+                          break;
+                        case "10004":
+                          selectedItem = context.read<AsethullCariBloc>().state.selectedItem;
+                          break;
+                        case "10005":
+                          selectedItem = context.read<AsetHealthCariBloc>().state.selectedItem;
+                          break;
+                        case "10006":
+                          selectedItem = context.read<AsetothersCariBloc>().state.selectedItem;
+                          break;
+                        default:
+                          selectedItem = null;
+                      }
+
+                      if (selectedItem == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Data polis tidak ditemukan")),
+                        );
+                        return;
+                      }
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DetailManagementPolisPage(
+                            data: selectedItem,
+                            cobId: cobId,
+                            statusId: "", // kalau memang tidak dipakai
+                          ),
+                        ),
+                            (route) => route.isFirst,
+                      );
+                    },
+
                     ),
                   ],
                 ),

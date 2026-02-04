@@ -25,6 +25,15 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
   }
+
+  final ScrollController hController = ScrollController();
+
+  @override
+  void dispose() {
+    hController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -80,40 +89,55 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
           borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
           border: Border.all(color: sGrey),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: const TableBorder(
-              horizontalInside: BorderSide(color: sGrey),
-              verticalInside: BorderSide(color: sGrey),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            columnWidths: const {
-              0: FixedColumnWidth(50),
-              1: FixedColumnWidth(50),
-              2: FixedColumnWidth(110), // dibuat lebih lega
-              3: FixedColumnWidth(90),
-              4: FixedColumnWidth(55),
-              5: FixedColumnWidth(150),
-              6: FixedColumnWidth(120),
-            },
-            children: [
-              _tableHeader(context, [
-                "",
-                "NO",
-                "KATEGORI",
-                "JUMLAH\nPOLIS",
-                "CURR",
-                "TOTAL NILAI\nPERTANGGUNGAN",
-                "TOTAL PREMI",
-              ]),
-              _detailRowWithCheckbox(
-                context,
-                bodyItems,
-                index,
-                compact: true,
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: const TableBorder(
+                  horizontalInside: BorderSide(color: sGrey),
+                  verticalInside: BorderSide(color: sGrey),
+                ),
+                columnWidths: const {
+                  0: FixedColumnWidth(50),
+                  1: FixedColumnWidth(50),
+                  2: FixedColumnWidth(110), // dibuat lebih lega
+                  3: FixedColumnWidth(90),
+                  4: FixedColumnWidth(55),
+                  5: FixedColumnWidth(150),
+                  6: FixedColumnWidth(120),
+                },
+                children: [
+                  _tableHeader(context, [
+                    "",
+                    "NO",
+                    "KATEGORI",
+                    "JUMLAH\nPOLIS",
+                    "CURR",
+                    "TOTAL NILAI\nPERTANGGUNGAN",
+                    "TOTAL PREMI",
+                  ]),
+                  _detailRowWithCheckbox(
+                    context,
+                    bodyItems,
+                    index,
+                    compact: true,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

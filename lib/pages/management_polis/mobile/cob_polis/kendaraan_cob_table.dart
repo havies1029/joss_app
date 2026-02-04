@@ -485,6 +485,9 @@ class KendaraanCobTable extends StatefulWidget {
   final List<AsetMvCariModel> items;
   final List<String> selectedIds;
   final void Function(AsetMvCariModel item)? onSelectItem;
+  final void Function(String id) selectedProsesId;
+  final AsetMvCariModel? selectedItem;
+  final VoidCallback? onClearSelectedItem;
 
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
@@ -501,10 +504,13 @@ class KendaraanCobTable extends StatefulWidget {
     required this.items,
     required this.selectedIds,
     required this.onSelectItem,
+    required this.selectedProsesId,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisMvId,
     required this.onUnselectFilePolisMvId,
+    required this.selectedItem,
+    required this.onClearSelectedItem,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -514,61 +520,61 @@ class KendaraanCobTable extends StatefulWidget {
   State<KendaraanCobTable> createState() => _KendaraanCobTableState();
 }
 
-class _KendaraanCobTableState extends State<KendaraanCobTable> {
-  String formatNum(num value) => NumberFormat.decimalPattern().format(value);
-  late final ScrollController hController;
+  class _KendaraanCobTableState extends State<KendaraanCobTable> {
+    String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+    late final ScrollController hController;
 
-  @override
-  void initState() {
-    super.initState();
-    hController = ScrollController();
-  }
-
-  @override
-  void dispose() {
-    hController.dispose();
-    super.dispose();
-  }
-
-  List<AsetMvCariModel> get _filteredItems {
-    if (!widget.readOnly) return widget.items;
-    return widget.items.where((d) => widget.selectedIds.contains(d.asetMvId)).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 900;
-
-    final items = _filteredItems;
-
-    if (items.isEmpty) {
-      return const Center(child: Text("Data kosong"));
+    @override
+    void initState() {
+      super.initState();
+      hController = ScrollController();
     }
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.title != null) ...[
+    @override
+    void dispose() {
+      hController.dispose();
+      super.dispose();
+    }
+
+    List<AsetMvCariModel> get _filteredItems {
+      if (!widget.readOnly) return widget.items;
+      return widget.items.where((d) => widget.selectedIds.contains(d.asetMvId)).toList();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      final width = MediaQuery.of(context).size.width;
+      final bool isNarrow = width < 900;
+
+      final items = _filteredItems;
+
+      if (items.isEmpty) {
+        return const Center(child: Text("Data kosong"));
+      }
+
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.title != null) ...[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
+              ),
+              const SizedBox(height: hPadding),
+            ],
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
+              child: isNarrow
+                  ? _buildDetailTableCompact(context, items)
+                  : _buildDetailTableNormal(context, items),
             ),
             const SizedBox(height: hPadding),
           ],
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-            child: isNarrow
-                ? _buildDetailTableCompact(context, items)
-                : _buildDetailTableNormal(context, items),
-          ),
-          const SizedBox(height: hPadding),
-        ],
-      ),
-    );
+        ),
+      );
 
-  }
+    }
 
   Widget _buildHeaderTitle(BuildContext context, String cobNama) {
     return Text(
@@ -632,7 +638,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
                 children: [
                   _tableHeader(context, details),
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadio(
+                        (e) => _detailRowWithCheckbox(
                       context,
                       e.value,
                       e.key,
@@ -684,7 +690,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           },
           children: [
             _tableHeader(context, details),
-            ...details.asMap().entries.map((e) => _detailRowWithRadio(
+            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
               e.key,
@@ -728,7 +734,126 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     );
   }
 
-  TableRow _detailRowWithRadio(
+    TableRow _detailRowWithCheckbox(
+        BuildContext context,
+        AsetMvCariModel d,
+        int index, {
+          required bool compact,
+        }) {
+
+      final isSelected = widget.selectedItem == d;
+
+      return TableRow(
+        decoration: BoxDecoration(
+          color: (!widget.readOnly && isSelected)
+              ? primaryColor.withOpacity(0.3)
+              : (index.isEven ? pGrey : formGrey),
+        ),
+        children: [
+          if (!widget.readOnly)
+            Center(
+              child: Checkbox(
+                value: isSelected,
+                onChanged: (checked) {
+                  if (checked == true) {
+                    widget.onSelect(d.asetMvId);
+                    widget.onSelectItem?.call(d);
+
+                    if (d.filePolisId.isNotEmpty) {
+                      widget.onSelectFilePolisMvId(d.filePolisId);
+                    }
+                  } else {
+                    widget.onUnselect(d.asetMvId);
+                    widget.onClearSelectedItem?.call();
+                    if (d.filePolisId.isNotEmpty) {
+                      widget.onUnselectFilePolisMvId(d.filePolisId);
+                    }
+                  }
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+                ),
+                side: MaterialStateBorderSide.resolveWith(
+                      (states) => const BorderSide(color: sGrey),
+                ),
+                fillColor: MaterialStateProperty.resolveWith(
+                      (states) =>
+                  states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
+                ),
+                checkColor: primaryLightColor,
+              ),
+            )
+          else
+            const SizedBox(),
+
+          _cell(
+            child: Center(
+              child: Text(
+                d.nomor.toString(),
+                style: TextStyle(color: primaryLightColor),
+              ),
+            ),
+          ),
+
+          _cell(
+            child: Text(
+              d.tertanggung,
+              maxLines: compact ? 2 : 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+
+          _cell(
+            child: Text(
+              "${d.periodeMulai} -\n${d.periodeAkhir}",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: primaryLightColor),
+            ),
+          ),
+
+          _cell(
+            child: Text(
+              d.merk,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+
+          _cell(
+            child: Text(
+              d.noPolisi,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+
+          _cell(
+            child: Text(
+              "${d.curr} ${formatNum(d.sumInsured)}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: primaryLightColor),
+            ),
+          ),
+
+          _cell(
+            child: Text(
+              "${d.curr} ${formatNum(d.premi)}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ],
+      );
+    }
+
+
+    TableRow _detailRowWithRadio(
       BuildContext context,
       AsetMvCariModel d,
       int index, {

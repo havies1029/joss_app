@@ -29,6 +29,8 @@ class RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
   String formatDate(DateTime date) =>
       DateFormat('yyyy-MM-dd').format(date);
 
+  final ScrollController hController = ScrollController();
+
   void _openDetail(String inv1Id) {
     FocusScope.of(context).requestFocus(FocusNode());
 
@@ -68,6 +70,7 @@ class RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
 
   @override
   void dispose() {
+    hController.dispose();
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
@@ -114,29 +117,44 @@ class RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         decoration: _boxDecoration(),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width - (hPadding * 3),
+        child: ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(true),
+            trackVisibility: MaterialStateProperty.all(false),
+            thickness: MaterialStateProperty.all(5),
+            radius: const Radius.circular(cardBorderRadius),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
             ),
-            child: Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              border: _tableBorder(),
-              columnWidths: const {
-                0: FixedColumnWidth(50),
-                1: IntrinsicColumnWidth(),
-                2: IntrinsicColumnWidth(),
-                3: IntrinsicColumnWidth(),
-                4: IntrinsicColumnWidth(),
-                5: IntrinsicColumnWidth(),
-              },
-              children: [
-                _headerRow(),
-                ...items.asMap().entries.map(
-                      (e) => _row(e.value, e.key, compact: true),
+          ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              controller: hController,
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width - (hPadding * 3),
                 ),
-              ],
+                child: Table(
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: _tableBorder(),
+                  columnWidths: const {
+                    0: FixedColumnWidth(50),
+                    1: IntrinsicColumnWidth(),
+                    2: IntrinsicColumnWidth(),
+                    3: IntrinsicColumnWidth(),
+                    4: IntrinsicColumnWidth(),
+                    5: IntrinsicColumnWidth(),
+                  },
+                  children: [
+                    _headerRow(),
+                    ...items.asMap().entries.map(
+                          (e) => _row(e.value, e.key, compact: true),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

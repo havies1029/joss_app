@@ -15,8 +15,6 @@ import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regpar_page.dart';
 
-
-
 class RegparFormMain extends StatefulWidget {
   final String viewMode;
   final String? recordId;

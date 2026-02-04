@@ -1,21 +1,21 @@
 part of 'asetmvcari_bloc.dart';
 
 class AsetMvCariState extends Equatable {
-
 	final ListStatus status;
 	final List<AsetMvCariModel> items;
 	final bool hasReachedMax;
 	final int hal;
-  final String searchText;
-  final String statusId;
+	final String searchText;
+	final String statusId;
 	final Set<String> selectedIds;
 	final String selectedFilePolisId;
 	final String activeAsetMvId;
 	final String selectedId;
 	final AsetMvCariModel? selectedItem;
+	final String? selectedProsesId;
 
-	const AsetMvCariState(
-		{this.status = ListStatus.initial,
+	const AsetMvCariState({
+		this.status = ListStatus.initial,
 		this.items = const <AsetMvCariModel>[],
 		this.hasReachedMax = false,
 		this.hal = 0,
@@ -25,7 +25,8 @@ class AsetMvCariState extends Equatable {
 		this.selectedFilePolisId = "",
 		this.activeAsetMvId = "",
 		this.selectedId = "",
-		this.selectedItem
+		this.selectedItem,
+		this.selectedProsesId,
 	});
 
 	const AsetMvCariState.success(List<AsetMvCariModel> items)
@@ -33,8 +34,10 @@ class AsetMvCariState extends Equatable {
 
 	const AsetMvCariState.failure() : this(status: ListStatus.failure);
 
-	AsetMvCariState copyWith(
-		{List<AsetMvCariModel>? items,
+	static const _unset = Object();
+
+	AsetMvCariState copyWith({
+		List<AsetMvCariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
 		int? hal,
@@ -44,7 +47,11 @@ class AsetMvCariState extends Equatable {
 		String? selectedFilePolisId,
 		String? activeAsetMvId,
 		String? selectedId,
-		AsetMvCariModel? selectedItem,
+
+		// penting: pakai Object? + default _unset
+		Object? selectedItem = _unset,
+
+		String? selectedProsesId,
 	}) {
 		return AsetMvCariState(
 			items: items ?? this.items,
@@ -57,10 +64,29 @@ class AsetMvCariState extends Equatable {
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
 			activeAsetMvId: activeAsetMvId ?? this.activeAsetMvId,
 			selectedId: selectedId ?? this.selectedId,
-			selectedItem: selectedItem ?? this.selectedItem,
+
+			// ini yang bikin null beneran ke-set
+			selectedItem: identical(selectedItem, _unset)
+					? this.selectedItem
+					: selectedItem as AsetMvCariModel?,
+
+			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
 		);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetMvId, selectedId, selectedItem ?? ""];
+	List<Object?> get props => [
+		status,
+		items,
+		hasReachedMax,
+		hal,
+		searchText,
+		statusId,
+		selectedIds,
+		selectedFilePolisId,
+		activeAsetMvId,
+		selectedId,
+		selectedItem,
+		selectedProsesId,
+	];
 }

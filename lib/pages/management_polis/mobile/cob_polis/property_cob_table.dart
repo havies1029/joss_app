@@ -484,6 +484,9 @@ class PropertyCobTable extends StatefulWidget {
   final List<AsetParCariModel> items;
   final List<String> selectedIds;
   final void Function(AsetParCariModel item)? onSelectItem;
+  final void Function(String id) selectedProsesId;
+  final AsetParCariModel? selectedItem;
+  final VoidCallback? onClearSelectedItem;
 
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
@@ -503,12 +506,15 @@ class PropertyCobTable extends StatefulWidget {
     required this.items,
     required this.selectedIds,
     required this.onSelectItem,
+    required this.selectedProsesId,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisParId,
     required this.onUnselectFilePolisParId,
     required this.onSelectFilePolisEqId,
     required this.onUnselectFilePolisEqId,
+    required this.selectedItem,
+    required this.onClearSelectedItem,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -636,7 +642,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   _tableHeader(context, details, compact: true),
 
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadio(
+                        (e) => _detailRowWithCheckbox(
                       context,
                       e.value,
                       e.key,
@@ -689,7 +695,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           children: [
             _tableHeader(context, details, compact: false),
 
-            ...details.asMap().entries.map((e) => _detailRowWithRadio(
+            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
               e.key,
@@ -732,6 +738,122 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       ],
     );
   }
+
+  TableRow _detailRowWithCheckbox(
+      BuildContext context,
+      AsetParCariModel d,
+      int index, {
+        required bool compact,
+      }) {
+    final isSelected = widget.selectedItem == d;
+
+    return TableRow(
+      decoration: BoxDecoration(
+        color: (!widget.readOnly && isSelected)
+            ? primaryColor.withOpacity(0.3)
+            : (index.isEven ? pGrey : formGrey),
+      ),
+      children: [
+        if (!widget.readOnly)
+          Center(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: (checked) {
+                if (checked == true) {
+                  widget.onSelect(d.asetParId);
+                  widget.onSelectItem?.call(d);
+
+                  if (d.filePolisParId.isNotEmpty) {
+                    widget.onSelectFilePolisParId(d.filePolisParId);
+                  }
+                  if (d.filePolisEqId.isNotEmpty) {
+                    widget.onSelectFilePolisEqId(d.filePolisEqId);
+                  }
+                } else {
+                  widget.onUnselect(d.asetParId);
+                  widget.onClearSelectedItem?.call();
+                  if (d.filePolisParId.isNotEmpty) {
+                    widget.onUnselectFilePolisParId(d.filePolisParId);
+                  }
+                  if (d.filePolisEqId.isNotEmpty) {
+                    widget.onUnselectFilePolisEqId(d.filePolisEqId);
+                  }
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+              ),
+              side: MaterialStateBorderSide.resolveWith(
+                    (states) => const BorderSide(color: sGrey),
+              ),
+              fillColor: MaterialStateProperty.resolveWith(
+                    (states) => states.contains(MaterialState.selected)
+                    ? primaryColor
+                    : Colors.transparent,
+              ),
+              checkColor: primaryLightColor,
+            ),
+          )
+        else
+          const SizedBox(),
+
+        _cell(
+          child: Center(
+            child: Text(
+              d.nomor.toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            d.tertanggung,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            d.alamat,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            "${d.periodeMulai} -\n${d.periodeAkhir}",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            "${d.curr} ${formatNum(d.sumInsured)}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _cell(
+          child: Text(
+            "${d.curr} ${formatNum(d.premi)}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
+        ),
+      ],
+    );
+  }
+
 
   TableRow _detailRowWithRadio(
       BuildContext context,

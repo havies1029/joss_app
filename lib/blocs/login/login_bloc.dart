@@ -5,24 +5,34 @@ import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 import 'package:equatable/equatable.dart';
 
+import 'emailverification_bloc.dart';
+
 part 'login_event.dart';
 part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final UserRepository userRepository;
   final AuthenticationBloc authenticationBloc;
+  final EmailVerificationBloc emailVerificationBloc;
 
   LoginBloc({
     required this.userRepository,
     required this.authenticationBloc,
+    required this.emailVerificationBloc,
   }) : super(LoginInitial()) {
     on<LoginButtonPressed>(_onLoginButtonPressed);
     on<LoginReset>((event, emit) => emit(LoginInitial()));
     //on<PinVerified>(_onPinVerified);
   }
 
+  void _clearEmailVerificationState() {
+    emailVerificationBloc.add(const FieldEmailVerificationChangedEvent(email: ''));
+  }
+
   Future<void> _onLoginButtonPressed(
-      LoginButtonPressed event, Emitter<LoginState> emit) async {
+      LoginButtonPressed event,
+      Emitter<LoginState> emit,
+      ) async {
     emit(LoginInitial());
     emit(LoginLoading());
 
@@ -34,19 +44,21 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       AppData.user = user;
       AppData.userToken = user.token!;
-      print("🔑 Token yang diterima: ${AppData.userToken}");
       emit(LoginPreAuthenticate());
 
-      // Simpan password jika rememberMe true
       if (event.rememberMe) {
         userRepository.persistToken(userToken: user.token ?? "");
       }
 
-      authenticationBloc.add(LoggedIn(user: user));
+      _clearEmailVerificationState();
 
+      authenticationBloc.add(LoggedIn(user: user));
       emit(LoginPostAuthenticate());
     } catch (error) {
+      // _clearEmailVerificationState();
+
       emit(LoginFailure(error: "username atau password salah"));
     }
   }
+
 }

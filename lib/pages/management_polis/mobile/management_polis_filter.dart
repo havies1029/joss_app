@@ -259,10 +259,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return PropertyCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          selectedItem: s.selectedItem,
           onSelectItem: (item) {
             context.read<AsetParCariBloc>().add(
               SelectParCariEvent(selectedItem: item),
             );
+          },
+          onClearSelectedItem: () {
+            context.read<AsetParCariBloc>().add(ClearSelectedItemEvent());
+          },
+          selectedProsesId: (id) {
+            final bloc = context.read<AsetParCariBloc>();
+            bloc.add(SelectProsesParIdEvent(id));
           },
           onSelect: (id) {
             final bloc = context.read<AsetParCariBloc>();
@@ -308,10 +316,18 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return KendaraanCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          selectedItem: s.selectedItem,
+          onClearSelectedItem: () {
+            context.read<AsetMvCariBloc>().add(ClearSelectedMvItemEvent());
+          },
           onSelectItem: (item) {
             context.read<AsetMvCariBloc>().add(
               SelectMvCariEvent(selectedItem: item),
             );
+          },
+          selectedProsesId: (id) {
+            final bloc = context.read<AsetMvCariBloc>();
+            bloc.add(SelectProsesMvIdEvent(id));
           },
           onUnselect: (id) {
             final bloc = context.read<AsetMvCariBloc>();
@@ -353,10 +369,15 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return HullCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
+          selectedItem: s.selectedItem,
           onSelectItem: (item) {
             context.read<AsethullCariBloc>().add(
               SelectHullCariEvent(selectedItem: item),
             );
+          },
+          selectedProsesId: (id) {
+            final bloc = context.read<AsethullCariBloc>();
+            bloc.add(SelectProsesHullIdEvent(id));
           },
           onSelect: (id) {
             final bloc = context.read<AsethullCariBloc>();
@@ -405,6 +426,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
               SelectHealthCariEvent(selectedItem: item),
             );
           },
+          selectedProsesId: (id) {
+            final bloc = context.read<AsetHealthCariBloc>();
+            bloc.add(SelectProsesHealthIdEvent(id));
+          },
           onSelect: (id) {
             final bloc = context.read<AsetHealthCariBloc>();
             bloc.add(SelectHealthDetailEvent(id));
@@ -451,6 +476,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             context.read<AsetothersCariBloc>().add(
               SelectOthersCariEvent(selectedItem: item),
             );
+          },
+          selectedProsesId: (id) {
+            final bloc = context.read<AsetothersCariBloc>();
+            bloc.add(SelectProsesOthersIdEvent(id));
           },
           onSelect: (id) {
             final bloc = context.read<AsetothersCariBloc>();

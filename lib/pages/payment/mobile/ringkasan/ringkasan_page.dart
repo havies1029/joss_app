@@ -74,7 +74,7 @@ class RingkasanPageState extends State<RingkasanPage> {
             );
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PaymentSuccess()),
+              MaterialPageRoute(builder: (context) => PaymentSuccess(display: 'Pembayaran Berhasil!',)),
             );
           } else if (state.paymentStatus == "91") {
             refreshData();

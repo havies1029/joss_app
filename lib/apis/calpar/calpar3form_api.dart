@@ -70,29 +70,30 @@ class Calpar3FormAPI {
 		return returnData;
 	}
 
-	Future<bool> calpar3FormUbahAPI(Calpar3FormModel record) async {
+	Future<ReturnDataAPI> calpar3FormUbahAPI(Calpar3FormModel record) async {
 		String ubahEndpoint =
 				"${AppData.prefixEndPoint}/api/calpar/calpar3form/update";
 		Map<String, String> queryParams = {"modul_id": "calpar3FormUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
-		final http.Response response = await http.post(uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
-				body: jsonEncode(record.toJson()));
+		final http.Response response = await http.post(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}'
+			},
+			body: jsonEncode(record.toJson()),
+		);
 
-		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		}
-		return returnData.success;
+
+		return ReturnDataAPI(success: false, data: "", rowcount: 0);
 	}
+
 	Future<bool> calpar3FormHapusAPI(String calpar3Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calpar/calpar3form/delete";
 		Map<String, String> queryParams = {

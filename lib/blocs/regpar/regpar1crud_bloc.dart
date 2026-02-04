@@ -14,28 +14,79 @@ class Regpar1CrudBloc extends Bloc<Regpar1CrudEvents, Regpar1CrudState> {
 		on<Regpar1CrudTambahEvent>(onTambahRegpar1Crud);
 		on<Regpar1CrudHapusEvent>(onHapusRegpar1Crud);
 		on<Regpar1CrudLihatEvent>(onLihatRegpar1Crud);
+		on<Regpar1DraftEvent>(onDraftRegpar1Crud);
+	}
+
+	Future<void> onDraftRegpar1Crud(
+			Regpar1DraftEvent event,
+			Emitter<Regpar1CrudState> emit,
+			) async {
+
+		emit(state.copyWith(
+			record: event.record,
+			isSaved: false,
+			hasFailure: false,
+		));
 	}
 
 	Future<void> onTambahRegpar1Crud(
-		Regpar1CrudTambahEvent event, Emitter<Regpar1CrudState> emit) async {
-
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.regpar1CrudTambah(event.record);
-		hasFailure = !returnData.success;
+			Regpar1CrudTambahEvent event,
+			Emitter<Regpar1CrudState> emit,
+			) async {
 		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ReturnDataAPI returnData =
+		await repository.regpar1CrudTambah(event.record);
+
+		final bool hasFailure = !returnData.success;
+
+		if (!hasFailure) {
+			// 🔥 ambil regpar1Id baru dari server
+			final newId = returnData.data?.toString() ?? "";
+
+			// 🔥 update record
+			final updatedRecord = event.record;
+			updatedRecord.regpar1Id = newId;
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: true,
+				hasFailure: false,
+				record: updatedRecord, // << PENTING
+			));
+		} else {
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: true,
+			));
+		}
 	}
 
 	Future<void> onUbahRegpar1Crud(
-		Regpar1CrudUbahEvent event, Emitter<Regpar1CrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.regpar1CrudUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Regpar1CrudUbahEvent event,
+			Emitter<Regpar1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final bool hasFailure = !await repository.regpar1CrudUbah(event.record);
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: !hasFailure,
+			hasFailure: hasFailure,
+			record: event.record,
+		));
 	}
+
 
 	Future<void> onHapusRegpar1Crud(
 		Regpar1CrudHapusEvent event, Emitter<Regpar1CrudState> emit) async {

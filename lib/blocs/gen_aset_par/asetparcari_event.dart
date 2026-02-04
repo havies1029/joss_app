@@ -134,5 +134,10 @@ class SelectParCariEvent extends AsetParCariEvents {
 	const SelectParCariEvent({required this.selectedItem});
 }
 
+class SelectProsesParIdEvent extends AsetParCariEvents {
+	final String? prosesId;
+	const SelectProsesParIdEvent(this.prosesId);
+}
 
+class ClearSelectedItemEvent extends AsetParCariEvents {}
 

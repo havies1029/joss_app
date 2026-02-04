@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
 import 'package:joss_app/pages/gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import 'package:string_validator/string_validator.dart';
@@ -61,6 +60,7 @@ import '../../../repositories/combobox/combomwilayah_repository.dart';
 import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
+import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regmv_page.dart';
 
@@ -200,6 +200,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldPremiDiskonController = TextEditingController();
   final fieldPremiNetController = TextEditingController();
   final fieldPremiSubtotalController = TextEditingController();
+  final fieldRateDasarController = TextEditingController();
+  final fieldRateLoadingController = TextEditingController();
+  final fieldRateSrccController = TextEditingController();
+  final fieldRateFloodController = TextEditingController();
+  final fieldRateEqController = TextEditingController();
+  final fieldRateTerrorismController = TextEditingController();
+  final fieldRatePadController = TextEditingController();
+  final fieldRatePapController = TextEditingController();
+  final fieldBiayaPolisController = TextEditingController();
+  final fieldSumInsuredController = TextEditingController();
   //form6
 
   //form7
@@ -264,6 +274,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldPremiDiskonController.dispose();
     fieldPremiNetController.dispose();
     fieldPremiSubtotalController.dispose();
+    fieldRateDasarController.dispose();
+    fieldRateLoadingController.dispose();
+    fieldRateSrccController.dispose();
+    fieldRateFloodController.dispose();
+    fieldRateEqController.dispose();
+    fieldRateTerrorismController.dispose();
+    fieldRatePadController.dispose();
+    fieldRatePapController.dispose();
+    fieldBiayaPolisController.dispose();
+    fieldSumInsuredController.dispose();
     //form6
 
     super.dispose();
@@ -485,6 +505,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldPremiDiskonController.text = cleanNum(record.premiDiskon);
     fieldPremiNetController.text = cleanNum(record.premiNet);
     fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
+    fieldBiayaPolisController.text = cleanNum(record.biayaPolis);
+    fieldSumInsuredController.text = cleanNum(record.tsi);
+    fieldRateDasarController.text = record.rateDasar.toString();
+    fieldRateLoadingController.text = record.rateLoading.toString();
+    fieldRateSrccController.text = record.rateSrcc.toString();
+    fieldRateFloodController.text = record.rateFlood.toString();
+    fieldRateEqController.text = record.rateEq.toString();
+    fieldRateTerrorismController.text = record.rateTerrorism.toString();
+    fieldRatePadController.text = record.ratePad.toString();
+    fieldRatePapController.text = record.ratePap.toString();
   }
 
   @override
@@ -1075,11 +1105,135 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     child: (hasForm6Record)
                         ? Column(
                       children: [
-                        buildFieldPremiNet(),
-                        const SizedBox(height: hPadding),
-                        buildFieldPremiDiskon(),
-                        const SizedBox(height: hPadding),
-                        buildFieldPremiSubtotal(),
+                        Text(
+                          "RATE",
+                          textAlign: TextAlign.left,
+                          style: bodyTextStyle(context).copyWith(
+                            color: primaryLightColor,
+                            fontSize: getResponsiveFont(context, 20),
+                          ),
+                        ),
+                        HitungPremiWidget(
+                          rows: [
+                            HitungPremiRow(
+                              label: "Comprehensive:",
+                              controller: fieldRateDasarController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "Loading:",
+                              controller: fieldRateLoadingController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "RSCC:",
+                              controller: fieldRateSrccController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "TS:",
+                              controller: fieldRateTerrorismController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "Flood:",
+                              controller: fieldRateFloodController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "Eqvet:",
+                              controller: fieldRateEqController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "Pad:",
+                              controller: fieldRatePadController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "Pap:",
+                              controller: fieldRatePapController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                          ],
+
+                        ),
+                        const SizedBox(height: 2),
+                        const Divider(
+                          thickness: 1,
+                          color: sGrey,
+                        ),
+                        const SizedBox(height: 2),
+                        HitungPremiWidget(
+                          rows: [
+                            HitungPremiRow(
+                              label: "Annual Premium",
+                              // description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController} x ${fieldRateTotalController.text}% =",
+                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController}",
+                              controller: fieldPremiCascoController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+                            ),
+                            HitungPremiRow(
+                              label: "Additional Premium",
+                              description: "(For TPL & PAD & PAP)",
+                              controller: fieldPremiAddController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+                            ),
+                            HitungPremiRow(
+                              label: "Discount",
+                              controller: fieldPremiDiskonController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+                            ),
+                            HitungPremiRow(
+                              label: "Policy Cost:",
+                              controller: fieldBiayaPolisController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+
+                            ),
+                            HitungPremiRow(
+                              label: "Total Premium:",
+                              controller: fieldPremiNetController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+                            ),
+                          ],
+
+                        ),
+                        // buildFieldPremiNet(),
+                        // const SizedBox(height: hPadding),
+                        // buildFieldPremiDiskon(),
+                        // const SizedBox(height: hPadding),
+                        // buildFieldPremiSubtotal(),
                       ],
                     )
                         : const SizedBox(

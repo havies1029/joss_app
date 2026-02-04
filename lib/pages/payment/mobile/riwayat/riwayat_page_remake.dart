@@ -58,7 +58,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => PaymentSuccess()),
+                builder: (context) => PaymentSuccess(display: "Pembayaran Berhasil!",)),
           );
         }
         else if (state.paymentStatus == "91"){
@@ -112,11 +112,12 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
 
   Widget buildList() {
     return Expanded(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[RiwayatTablePageRemake(searchText: _searchController.text)],
-        ));
+      child: SingleChildScrollView(
+        child: RiwayatTablePageRemake(searchText: _searchController.text),
+      ),
+    );
   }
+
 
 
   void onViewPaymentMethods(String curr, double totalBayar) {

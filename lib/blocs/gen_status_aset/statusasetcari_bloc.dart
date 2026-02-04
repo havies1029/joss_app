@@ -56,10 +56,14 @@ Future<void> onFetchStatusAsetCari(
 
 	}
 
-  Future<void> onSelectButton(
-    SelectButton event, Emitter<StatusAsetCariState> emit) async {
-      emit(state.copyWith(
-        selectedStatusId: event.id,
-      ));
-    }
+	Future<void> onSelectButton(
+			SelectButton event, Emitter<StatusAsetCariState> emit) async {
+
+		if (event.id == state.selectedStatusId) return;
+
+		emit(state.copyWith(
+			selectedStatusId: event.id,
+			statusChangeTick: state.statusChangeTick + 1,
+		));
+	}
 }

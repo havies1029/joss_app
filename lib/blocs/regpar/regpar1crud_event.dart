@@ -39,3 +39,11 @@ class Regpar1CrudLihatEvent extends Regpar1CrudEvents {
 	List<Object> get props => [recordId];
 }
 
+class Regpar1DraftEvent extends Regpar1CrudEvents {
+	final Regpar1CrudModel record;
+	const Regpar1DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}
+

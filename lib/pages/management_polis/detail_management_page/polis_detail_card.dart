@@ -30,10 +30,21 @@ class PolisDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // filter entries kalau perlu
     final entries = dataMap.entries
-        .where((e) => !excludeKeys.contains(e.key))
+        .where((e) {
+      if (excludeKeys.contains(e.key)) return false;
+
+      final value = e.value?.toString().trim() ?? "";
+
+      // jangan tampilkan kalau kosong, "-", atau "null"
+      if (value.isEmpty || value == "-" || value.toLowerCase() == "null") {
+        return false;
+      }
+
+      return true;
+    })
         .toList();
+
 
     return Container(
       width: double.infinity,

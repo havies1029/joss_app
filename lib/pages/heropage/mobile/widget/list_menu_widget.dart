@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../widgets/hitung_premi_demo.dart';
 import '../../../aset/aset_cari.dart';
 import '../../../calpar/mobile/calpar_main_page_remake.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
@@ -318,7 +319,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -360,7 +361,7 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => RiwayatPage(  )));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalparMainPageRemake(  )));
         break;
 
       // case 'Test Page':

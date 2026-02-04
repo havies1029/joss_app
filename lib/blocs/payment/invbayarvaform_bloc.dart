@@ -18,5 +18,4 @@ class InvbayarvaFormBloc extends Bloc<InvbayarvaFormEvents, InvbayarvaFormState>
 		InvbayarvaFormModel record = await repository.invbayarvaFormLihat(event.invoiceId);
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
 	}
-
 }

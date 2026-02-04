@@ -103,3 +103,10 @@ class SelectMvCariEvent extends AsetMvCariEvents {
 	final AsetMvCariModel selectedItem;
 	const SelectMvCariEvent({required this.selectedItem});
 }
+
+class SelectProsesMvIdEvent extends AsetMvCariEvents {
+	final String? prosesId;
+	const SelectProsesMvIdEvent(this.prosesId);
+}
+
+class ClearSelectedMvItemEvent extends AsetMvCariEvents {}

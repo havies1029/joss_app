@@ -75,6 +75,7 @@ import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar6form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_download_fotoobject_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository.dart';
 import 'package:joss_app/repositories/regreaktif/regreaktif1_repository.dart';
@@ -198,7 +199,9 @@ import 'blocs/regpar/regpar3form_bloc.dart';
 import 'blocs/regpar/regpar4form_bloc.dart';
 import 'blocs/regpar/regpar5form_bloc.dart';
 import 'blocs/regpar/regpar6cari_bloc.dart';
+import 'blocs/regpar/regpar6form_bloc.dart';
 import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
+import 'blocs/regpar/regpar_flow_bloc.dart';
 import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
 import 'blocs/regreaktif/regreaktif2cari_bloc.dart';
 import 'blocs/regreaktif/regreaktifcari_bloc.dart';
@@ -269,6 +272,7 @@ Future<void> main() async {
           create: (ctx) => LoginBloc(
             authenticationBloc: ctx.read<AuthenticationBloc>(),
             userRepository: userRepository,
+            emailVerificationBloc: EmailVerificationBloc(repository: EmailVerificationRepository(), authenticationBloc: AuthenticationBloc(userRepository: userRepository)),
           ),
         ),
         // BlocProvider(
@@ -455,6 +459,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => RegparUploadFotoObjectBloc(repository: RegparUploadFotoObjectRepository())),
         BlocProvider(create: (context) => RegparDownloadFotoObjectBloc(repository: RegparDownloadFotoObjectRepository())),
         BlocProvider(create: (context) => Regpar6CariBloc()),
+        BlocProvider(create: (context) => Regpar6FormBloc(repository: Regpar6FormRepository())),
         BlocProvider(create: (context) => CobManPolBloc()),
         BlocProvider(create:  (context) => SppaDownloadPolisBloc(repository: DownloadPolisRepository())),
         BlocProvider<CalmvFlowBloc>(
@@ -480,6 +485,16 @@ Future<void> main() async {
             regmv6FormBloc: context.read<Regmv6FormBloc>(),
           ),
         ),
+        BlocProvider<RegparFlowBloc>(
+          create: (context) => RegparFlowBloc(
+            regpar1CrudBloc: context.read<Regpar1CrudBloc>(),
+            regpar2FormBloc: context.read<Regpar2FormBloc>(),
+            regpar3FormBloc: context.read<Regpar3FormBloc>(),
+            regpar4FormBloc: context.read<Regpar4FormBloc>(),
+            regpar5FormBloc: context.read<Regpar5FormBloc>(),
+          ),
+        ),
+        
         BlocProvider(
         create: (_) => PolisTanggalBloc()),
         BlocProvider(create: (context) => RegendorsCariBloc()),
@@ -708,9 +723,7 @@ class _AppState extends State<_App> {
               return null;
           }
         },
-        home: _showOnboarding
-            ? StartScreen(onCompleted: _onOnboardingCompleted)
-            : BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
               // 🔹 1. Bersihkan semua route sebelumnya

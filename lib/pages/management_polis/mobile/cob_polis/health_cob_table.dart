@@ -422,6 +422,7 @@ class HealthCobTable extends StatefulWidget {
   final List<AsetHealthCariModel> items;
   final List<String> selectedIds;
   final void Function(AsetHealthCariModel item)? onSelectItem;
+  final void Function(String id) selectedProsesId;
 
   final Function(String id) onSelect;
   final Function(String id) onUnselect;
@@ -438,6 +439,7 @@ class HealthCobTable extends StatefulWidget {
     required this.items,
     required this.selectedIds,
     required this.onSelectItem,
+    required this.selectedProsesId,
     required this.onSelect,
     required this.onUnselect,
     required this.onSelectFilePolisHealthId,
@@ -565,7 +567,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
                 children: [
                   _tableHeader(context, details),
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadio(
+                        (e) => _detailRowWithCheckbox(
                       context,
                       e.value,
                       e.key,
@@ -612,7 +614,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
           },
           children: [
             _tableHeader(context, details),
-            ...details.asMap().entries.map((e) => _detailRowWithRadio(
+            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
               context,
               e.value,
               e.key,
@@ -648,6 +650,92 @@ class _HealthCobTableState extends State<HealthCobTable> {
             child: center ? Center(child: child) : child,
           );
         }).toList(),
+      ],
+    );
+  }
+
+  TableRow _detailRowWithCheckbox(
+      BuildContext context,
+      AsetHealthCariModel d,
+      int index, {
+        required bool compact,
+      }) {
+    final isSelected = widget.selectedProsesId == d.prosesId;
+
+    return TableRow(
+      decoration: BoxDecoration(
+        color: (!widget.readOnly && isSelected)
+            ? primaryColor.withOpacity(0.3)
+            : (index.isEven ? pGrey : formGrey),
+      ),
+      children: [
+        if (!widget.readOnly)
+          Center(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: (checked) {
+                if (checked == true) {
+                  widget.selectedProsesId(d.prosesId);
+                  widget.onSelect(d.asethealthId);
+                  widget.onSelectItem?.call(d);
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisHealthId(d.filePolisId);
+                  }
+                } else {
+                  widget.onUnselect(d.asethealthId);
+                  widget.selectedProsesId("");
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisHealthId(d.filePolisId);
+                  }
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+              ),
+              side: MaterialStateBorderSide.resolveWith(
+                    (states) => const BorderSide(color: sGrey),
+              ),
+              fillColor: MaterialStateProperty.resolveWith(
+                    (states) =>
+                states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
+              ),
+              checkColor: primaryLightColor,
+            ),
+          )
+        else
+          const SizedBox(),
+
+        // No
+        _cell(
+          child: Center(
+            child: Text(
+              d.nomor.toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
+
+        // Nama
+        _cell(
+          child: Text(
+            d.nama,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        // Benefit: hanya ada di compact mode (karena compact table punya kolom Benefit)
+        if (compact)
+          _cell(
+            child: Text(
+              d.status ?? '-',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
       ],
     );
   }

@@ -102,3 +102,8 @@ class SelectHullCariEvent extends AsethullCariEvents {
 	final AsethullCariModel selectedItem;
 	const SelectHullCariEvent({required this.selectedItem});
 }
+
+class SelectProsesHullIdEvent extends AsethullCariEvents {
+	final String? prosesId;
+	const SelectProsesHullIdEvent(this.prosesId);
+}

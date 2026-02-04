@@ -87,3 +87,8 @@ class SelectOthersCariEvent extends AsetothersCariEvents {
 	final AsetothersCariModel selectedItem;
 	const SelectOthersCariEvent({required this.selectedItem});
 }
+
+class SelectProsesOthersIdEvent extends AsetothersCariEvents {
+	final String? prosesId;
+	const SelectProsesOthersIdEvent(this.prosesId);
+}

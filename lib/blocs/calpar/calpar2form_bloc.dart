@@ -76,22 +76,43 @@ class Calpar2FormBloc extends Bloc<Calpar2FormEvents, Calpar2FormState> {
 			Calpar2FormUbahEvent event,
 			Emitter<Calpar2FormState> emit,
 			) async {
-		emit(state.copyWith(
-			isSaving: true,
-			isSaved: false,
-			hasFailure: false,
-		));
+		emit(state.copyWith(isSaving: true, isSaved: false));
 
-		final ok = await repository.calpar2FormUbah(event.record);
-		final hasFailure = !ok;
+		final ReturnDataAPI returnData =
+		await repository.calpar2FormUbah(event.record);
+
+		final hasFailure = !returnData.success;
+		final incomingId = returnData.data.trim();
+		final fixedId =
+		incomingId.isNotEmpty ? incomingId : event.record.calpar2Id;
+
+		final savedRecord = Calpar2FormModel(
+			calpar2Id: fixedId,
+			calpar1Id: event.record.calpar1Id,
+
+			biIndexRate: event.record.biIndexRate,
+			biTotal: event.record.biTotal,
+			siBi: event.record.siBi,
+			siBuilding: event.record.siBuilding,
+			siContent: event.record.siContent,
+			siMachinery: event.record.siMachinery,
+			siOther: event.record.siOther,
+			siStock: event.record.siStock,
+			stockAdjustable: event.record.stockAdjustable,
+
+			comboMBiindemnityOjk: event.record.comboMBiindemnityOjk,
+			comboRMatauang: event.record.comboRMatauang,
+		);
 
 		emit(state.copyWith(
 			isSaving: false,
-			isSaved: !hasFailure,
+			isSaved: true,
 			hasFailure: hasFailure,
-			record: event.record,
+			record: savedRecord,
+			returnData: returnData,
 		));
 	}
+
 
 
 	Future<void> onHapusCalpar2Form(

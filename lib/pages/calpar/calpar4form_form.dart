@@ -397,6 +397,14 @@ class Calpar4FormFormPageFormState extends State<Calpar4FormFormPage> {
 				premiPar: double.parse(fieldPremiParController.text.replaceAll(',', '')),
 				premiRsmdcc: double.parse(fieldPremiRsmdccController.text.replaceAll(',', '')),
 				premiTsfwd: double.parse(fieldPremiTsfwdController.text.replaceAll(',', '')),
+				premiTotal:1,
+				calpar1Id: "",
+				rateEqvet: 1,
+				rateOther: 1,
+				ratePar: 1,
+				rateRsmdcc: 1,
+				rateTotal: 1,
+				rateTsfwd: 1,
 			);
 			if (widget.viewMode == "tambah") {
 				calpar4FormBloc.add(Calpar4FormTambahEvent(record: record));

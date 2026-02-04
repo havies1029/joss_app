@@ -4,6 +4,7 @@ import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../common/constants.dart';
 
 class LoginFormClient extends StatefulWidget {
@@ -15,18 +16,36 @@ class LoginFormClient extends StatefulWidget {
 
 class _LoginFormClientState extends State<LoginFormClient>
     with SingleTickerProviderStateMixin {
-  // Controller untuk input field
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // Untuk animasi
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
   bool _isPasswordVisible = false;
-  bool _rememberPassword = true; // Variabel untuk checkbox Remember Password
+  bool _rememberPassword = true;
+
+  bool _isInitialEmailApplied = false;
+
+  void _applyInitialEmailFromState() {
+    final emailState = context.read<EmailVerificationBloc>().state.email.trim();
+    if (emailState.isEmpty) return;
+
+    if (_usernameController.text.trim().isEmpty && !_isInitialEmailApplied) {
+      _usernameController.text = emailState;
+      _isInitialEmailApplied = true;
+    }
+  }
+
+  void _clearEmailStateAndController() {
+    _usernameController.clear();
+    _isInitialEmailApplied = false;
+
+    context.read<EmailVerificationBloc>().add(
+      const FieldEmailVerificationChangedEvent(email: ''),
+    );
+  }
 
   @override
   void initState() {
@@ -35,7 +54,13 @@ class _LoginFormClientState extends State<LoginFormClient>
       vsync: this,
       duration: defaultDuration,
     );
+
     Future.microtask(() => context.read<LoginBloc>().add(LoginReset()));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _applyInitialEmailFromState();
+    });
   }
 
   @override
@@ -47,8 +72,6 @@ class _LoginFormClientState extends State<LoginFormClient>
     _passwordFocusNode.dispose();
     super.dispose();
   }
-
-  // Ganti method _buildEmailField dan _buildPasswordField dengan:
 
   Widget _buildEmailField(double hPadding) {
     return appTextField(
@@ -69,8 +92,15 @@ class _LoginFormClientState extends State<LoginFormClient>
       onTap: () {
         _animationController.forward(from: 0);
       },
+
+      onChanged: (value) {
+        context.read<EmailVerificationBloc>().add(
+          FieldEmailVerificationChangedEvent(email: value),
+        );
+      },
     );
   }
+
 
   Widget _buildPasswordField(double hPadding) {
     return appTextField(
@@ -334,6 +364,7 @@ class _LoginFormClientState extends State<LoginFormClient>
                                         ),
                                         GestureDetector(
                                           onTap: () {
+                                            _clearEmailStateAndController(); // ✅ kosongin dulu
                                             context.read<AuthenticationBloc>().add(RequireLoginUser());
                                           },
                                           child: Text(

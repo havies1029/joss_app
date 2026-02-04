@@ -116,7 +116,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 );
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PaymentSuccess()),
+                  MaterialPageRoute(builder: (context) => PaymentSuccess(display: "Pembayaran berhasil!",)),
                 );
               } else if (state.paymentStatus == "91") {
                 refreshData();

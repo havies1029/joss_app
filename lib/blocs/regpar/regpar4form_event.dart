@@ -45,3 +45,10 @@ class ComboRMatauangChangedEvent extends Regpar4FormEvents{
 
 	@override	List<Object> get props => [comboRMatauang];}
 
+class Regpar4DraftEvent extends Regpar4FormEvents {
+	final Regpar4FormModel record;
+	const Regpar4DraftEvent({required this.record});
+
+	@override
+	List<Object> get props => [record];
+}
