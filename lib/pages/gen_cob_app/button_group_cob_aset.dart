@@ -40,60 +40,6 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
           return const Text("Gagal memuat data", style: TextStyle(color: Colors.red));
         }
 
-        // if (state.status == ListStatus.success) {
-        //   final filteredItems =
-        //   state.items.where((x) => x.mCobApp1Id != "10001").toList();
-        //
-        //   if (filteredItems.isEmpty) {
-        //     return const Center(child: Text("No items found"));
-        //   }
-        //
-        //   if (state.selectedCOBId.isEmpty || state.selectedCOBId == "10001") {
-        //     context.read<CobManPolBloc>().add(SelectButton(filteredItems.first.mCobApp1Id));
-        //   }
-        //
-        //   final chips = filteredItems.map((cob) {
-        //     final bool selected = state.selectedCOBId == cob.mCobApp1Id;
-        //
-        //     return Padding(
-        //       padding: const EdgeInsets.only(right: 8),
-        //       child: ChoiceChip(
-        //         label: ConstrainedBox(
-        //           constraints: const BoxConstraints(maxWidth: 180),
-        //           child: Text(
-        //             cob.cobNama,
-        //             style: textStyle.copyWith(
-        //               color: selected ? Colors.white : primaryLightColor,
-        //             ),
-        //             maxLines: 1,
-        //             overflow: TextOverflow.ellipsis,
-        //             softWrap: false,
-        //           ),
-        //         ),
-        //         selected: selected,
-        //         selectedColor: chipSelected,
-        //         showCheckmark: false,
-        //         side: BorderSide.none,
-        //         shape: RoundedRectangleBorder(
-        //           borderRadius: BorderRadius.circular(radius),
-        //         ),
-        //         labelPadding: const EdgeInsets.symmetric(
-        //           horizontal: 10,
-        //           vertical: 5,
-        //         ),
-        //         onSelected: (_) {
-        //           context.read<CobManPolBloc>().add(SelectButton(cob.mCobApp1Id));
-        //         },
-        //       ),
-        //     );
-        //   }).toList();
-        //
-        //   return SingleChildScrollView(
-        //     scrollDirection: Axis.horizontal,
-        //     child: Row(children: chips),
-        //   );
-        // }
-
         if (state.status == ListStatus.success) {
           final filteredItems = state.items.toList();
 
@@ -113,6 +59,7 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: ChoiceChip(
+                backgroundColor: pGrey,
                 label: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 180),
                   child: Text(

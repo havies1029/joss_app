@@ -7,7 +7,7 @@ class AppData {
   static bool kIsWeb = false;
   static User user = User();
   static var uriHtpp = useSSL ? Uri.https : Uri.http;
-  static String version = "1.0.2";
+  static String version = "1.   0.2";
   static bool isInOtpProcess = false;
 
   // static bool useSSL = false;
@@ -17,17 +17,17 @@ class AppData {
 
 
   //
-  // static bool useSSL = false;
-  // static String apiDomain =
-  //     "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
-  // static String prefixEndPoint = "";
-  // static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
-
-
   static bool useSSL = false;
-  static String httpAuthority = "localhost";
-  static String prefixEndPoint = "/eAssistToolsAPI/";
-  static String apiDomain = "http://localhost/eAssistToolsAPI/";
+  static String apiDomain =
+      "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
+  static String prefixEndPoint = "";
+  static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
+
+  // static bool useSSL = false;
+  // static String httpAuthority = "localhost";
+  // static String prefixEndPoint = "/eAssistToolsAPI/";
+  // static String apiDomain = "http://localhost/eAssistToolsAPI/";
+
 
 // static bool useSSL = false;
 // static String apiDomain = "http://localhost:1234/";

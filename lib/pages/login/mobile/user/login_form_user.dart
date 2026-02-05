@@ -242,6 +242,7 @@ class _LoginFormUserState extends State<LoginFormUser>
                               ),
                             ),
                             child: Card(
+                              color: secondaryBlackColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),

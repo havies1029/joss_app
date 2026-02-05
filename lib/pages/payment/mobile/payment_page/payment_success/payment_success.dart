@@ -9,7 +9,9 @@ import 'package:confetti/confetti.dart';
 
 class PaymentSuccess extends StatefulWidget {
   final String display;
-  const PaymentSuccess({super.key, required this.display});
+  final String description;
+  final String displayButton;
+  const PaymentSuccess({super.key, required this.display, required this.description, required this.displayButton});
 
   @override
   State<PaymentSuccess> createState() => _PaymentSuccessState();
@@ -87,14 +89,14 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                     ),
                     const SizedBox(height: hPadding),
                     Text(
-                      "Polis Anda kini aktif.",
+                      "${widget.description}",
                       textAlign: TextAlign.center,
                       style: bodyTextStyle(context, fontSize: 20)
                           .copyWith(color: hintGrey),
                     ),
                     const SizedBox(height: vPadding),
                     AppButton.primary(
-                      text: "Kembali",
+                      text: "${widget.displayButton}",
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
                       width: 245,

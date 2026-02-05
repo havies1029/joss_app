@@ -1161,7 +1161,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               label: "Pad:",
                               controller: fieldRatePadController,
                               layoutType: HitungPremiLayoutType.horizontal,
-                              showValueBorder: true,
+                              // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
@@ -1185,7 +1185,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                             HitungPremiRow(
                               label: "Annual Premium",
                               // description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController} x ${fieldRateTotalController.text}% =",
-                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController}",
+                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController.text}",
                               controller: fieldPremiCascoController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1649,7 +1649,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     if (!ok4 || !ok5 || !ok7) {
       if (!ok4) openForm4(recordId: regmv1Id);
       else if (!ok5) openForm5(recordId: regmv1Id);
-      else openForm6(recordId: regmv1Id);
+      else if(!ok7) openForm6(recordId: regmv1Id);
       return;
     }
 
@@ -1703,14 +1703,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     setState(() {
       expanded = [false, false, false, false, false, true, false];
     });
-    refreshForm6(recordId: recordId);
+    refreshForm7(recordId: recordId);
   }
 
   void openForm7({required String? recordId}) {
     setState(() {
       expanded = [false, false, false, false, false, false, true];
     });
-    refreshForm7(recordId: recordId);
+    // refreshForm6(recordId: recordId);
   }
 
     bool validateForm1() {

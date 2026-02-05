@@ -1,0 +1,265 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
+import '../../../blocs/gen_status_aset/statusasetcari_bloc.dart';
+import '../../../helper/fab_action_helper.dart'; // kalau snackBar/helper lain ada di sini
+import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
+import '../common/constants.dart';
+import '../pages/beli_polis/mobile/beli_polis_page.dart';
+import '../pages/management_polis/detail_management_page/detail_management_widget.dart';
+import '../pages/management_polis/floating_action_menu_widget.dart';
+import '../pages/management_polis/mobile/form_button_page/endorse_form_page.dart';
+import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';
+import '../pages/management_polis/mobile/form_button_page/renewal_form_page.dart';
+import 'fab_action_policy.dart';
+import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
+
+// import page & bloc download kamu sesuai project
+// import '.../endorse_form_page.dart';
+// import '.../renewal_form_page.dart';
+// import '.../reaktif_form_page.dart';
+// import '.../detail_management_polis_page.dart';
+// import '.../beli_polis_page.dart';
+// import '.../sppa_download_polis_bloc.dart';
+
+class FabActionExecutor {
+  final FabActionPolicy policy;
+  const FabActionExecutor(this.policy);
+
+  String _cobId(BuildContext c) => c.read<CobManPolBloc>().state.selectedCOBId;
+  String _statusId(BuildContext c) => c.read<StatusAsetCariBloc>().state.selectedStatusId;
+
+  void run({
+    required BuildContext context,
+    required ActionType actionType,
+    required Object? selectedItem,
+    VoidCallback? onDone,
+  }) {
+    final cobId = _cobId(context);
+    final statusId = _statusId(context);
+
+    // defensive gate (saklar beneran)
+    final allowed = policy.isActionAllowed(
+      cobId: cobId,
+      statusId: statusId,
+      selectedItem: selectedItem,
+      actionType: actionType,
+    );
+
+    if (!allowed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        infoSnackBar("Aksi tidak tersedia untuk kondisi ini."),
+      );
+      return;
+    }
+
+    // Always-enabled boleh jalan walau selectedItem null
+    if (FabActionPolicy.alwaysEnabled.contains(actionType)) {
+      _handleAlwaysEnabled(context, actionType, onDone);
+      return;
+    }
+
+    if (selectedItem == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(infoSnackBar("Pilih Minimal 1 Item!"));
+      return;
+    }
+
+    switch (actionType) {
+      case ActionType.lacakPolis:
+        _navigateToDetail(context, selectedItem, onDone);
+        break;
+
+      case ActionType.endorse:
+        _openEndorse(context, cobId, selectedItem, onDone);
+        break;
+
+      case ActionType.perpanjangan:
+        _openRenewal(context, cobId, selectedItem, onDone);
+        break;
+
+      case ActionType.aktifkanKembali:
+        _openReactive(context, cobId, selectedItem, onDone);
+        break;
+
+      case ActionType.lihatPolisPar:
+        _downloadPar(context, selectedItem);
+        break;
+
+      case ActionType.lihatPolisEq:
+        _downloadEq(context, selectedItem); // <- pastikan EQ
+        break;
+
+      case ActionType.lihatPolis:
+        _downloadGeneric(context, cobId, selectedItem);
+        break;
+
+    // optional kalau kamu masih pakai unduhPolis generic
+      case ActionType.unduhPolis:
+        _downloadGeneric(context, cobId, selectedItem);
+        break;
+
+      default:
+        _handleAlwaysEnabled(context, actionType, onDone);
+    }
+  }
+
+  // ---- helper field getter safe ----
+  String _get(dynamic item, String key) {
+    try {
+      // ignore: avoid_dynamic_calls
+      final v = (item as dynamic);
+      // ignore: avoid_dynamic_calls
+      return (v.__lookup(key) ?? "").toString();
+    } catch (_) {
+      if (item is Map) return (item[key] ?? "").toString();
+      return "";
+    }
+  }
+
+  // Karena kita gak pakai reflection beneran, kita ambil spesifik:
+  String _polisIdFromItem(String cobId, dynamic item) {
+    try {
+      // ignore: avoid_dynamic_calls
+      return switch (cobId) {
+        "10002" => (item.asetParId ?? "").toString(),
+        "10003" => (item.asetMvId ?? "").toString(),
+        "10004" => (item.asetHullId ?? "").toString(),
+        "10005" => (item.asethealthId ?? "").toString(),
+        "10006" => (item.asetOthersId ?? "").toString(),
+        _ => "",
+      };
+    } catch (_) {
+      if (item is Map) {
+        return switch (cobId) {
+          "10002" => (item["asetParId"] ?? "").toString(),
+          "10003" => (item["asetMvId"] ?? "").toString(),
+          "10004" => (item["asetHullId"] ?? "").toString(),
+          "10005" => (item["asethealthId"] ?? "").toString(),
+          "10006" => (item["asetOthersId"] ?? "").toString(),
+          _ => "",
+        };
+      }
+      return "";
+    }
+  }
+
+  void _openEndorse(BuildContext c, String cobId, dynamic item, VoidCallback? done) {
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
+
+    Navigator.push(
+      c,
+      MaterialPageRoute(
+        builder: (_) => EndorseFormPage(
+          viewMode: "tambah",
+          recordId: "",
+          polisId: polisId,
+          cobId: cobId,
+        ),
+      ),
+    ).then((_) => done?.call());
+  }
+
+  void _openRenewal(BuildContext c, String cobId, dynamic item, VoidCallback? done) {
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
+
+    Navigator.push(
+      c,
+      MaterialPageRoute(
+        builder: (_) => RenewalFormPage(
+          viewMode: "tambah",
+          recordId: "",
+          polisId: polisId,
+          cobId: cobId,
+        ),
+      ),
+    ).then((_) => done?.call());
+  }
+
+  void _openReactive(BuildContext c, String cobId, dynamic item, VoidCallback? done) {
+    final polisId = _polisIdFromItem(cobId, item);
+    if (polisId.isEmpty) return;
+
+    Navigator.push(
+      c,
+      MaterialPageRoute(
+        builder: (_) => ReaktifFormPage(
+          viewMode: "tambah",
+          recordId: "",
+          polisId: polisId,
+          cobId: cobId,
+        ),
+      ),
+    ).then((_) => done?.call());
+  }
+
+  void _navigateToDetail(BuildContext context, dynamic item, VoidCallback? onComplete) {
+    final cobId = _cobId(context);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DetailManagementPolisPage(
+          data: item,
+          cobId: cobId,
+          statusId: "",
+        ),
+      ),
+    ).then((_) => onComplete?.call());
+  }
+
+  void _downloadGeneric(BuildContext c, String cobId, dynamic item) {
+    // ignore: avoid_dynamic_calls
+    final polisFileId = (item.filePolisId ?? "").toString();
+    if (polisFileId.isEmpty) return;
+
+    final bloc = c.read<SppaDownloadPolisBloc>();
+
+    final cob = switch (cobId) {
+      "10003" => "MV",
+      "10004" => "HULL",
+      "10005" => "HEALTH",
+      "10006" => "OTHERS",
+      _ => "",
+    };
+    if (cob.isEmpty) return;
+
+    bloc.add(DownloadFileEvent(ePolisId: polisFileId, cob: cob));
+  }
+
+  void _downloadPar(BuildContext c, dynamic item) {
+    // ignore: avoid_dynamic_calls
+    final id = (item.filePolisParId ?? "").toString();
+    if (id.isEmpty) return;
+
+    c.read<SppaDownloadPolisBloc>().add(
+      DownloadFileEvent(ePolisId: id, cob: 'PAR'),
+    );
+  }
+
+  void _downloadEq(BuildContext c, dynamic item) {
+    // ignore: avoid_dynamic_calls
+    final id = (item.filePolisEqId ?? "").toString();
+    if (id.isEmpty) return;
+
+    c.read<SppaDownloadPolisBloc>().add(
+      DownloadFileEvent(ePolisId: id, cob: 'EQ'), // ✅ ini EQ
+    );
+  }
+
+  void _handleAlwaysEnabled(BuildContext context, ActionType type, VoidCallback? onComplete) {
+    switch (type) {
+      case ActionType.beliPolis:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BeliPolisPage()),
+        ).then((_) => onComplete?.call());
+        break;
+      default:
+        break;
+    }
+  }
+}

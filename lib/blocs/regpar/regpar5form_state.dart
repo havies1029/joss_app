@@ -44,5 +44,5 @@ class Regpar5FormState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isCalculating, isCalculated];
+	List<Object?> get props => [record, isLoading, isLoaded, isSaving, isSaved, hasFailure, isCalculating, isCalculated];
 }

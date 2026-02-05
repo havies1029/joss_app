@@ -727,9 +727,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return Material(
-          color: Colors.transparent,
-          child: Center(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: IntrinsicHeight( // ⬅️ INI KUNCI
             child: PopupWidget(
               title: "Pilih format file untuk diunduh",
               subtitle: "Tersedia Excel dan PDF",

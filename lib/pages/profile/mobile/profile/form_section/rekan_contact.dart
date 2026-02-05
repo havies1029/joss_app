@@ -317,11 +317,11 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
     validatorCallback: (v) => v == null ? kStringKodeposError : null,
     onChangedCallback: (v) {
-      if (v != null){
-        mRekanContactCrudBloc.add(
-          ComboRKodeposChangedEvent(comboRKodepos: v),
-        );
-      }
+      // if (v != null){
+      //   mRekanContactCrudBloc.add(
+      //     ComboRKodeposChangedEvent(comboRKodepos: v),
+      //   );
+      // }
       // fieldComboMKelurahan = v;
     },
     onSaveCallback: (value) => fieldComboRKodepos = value,

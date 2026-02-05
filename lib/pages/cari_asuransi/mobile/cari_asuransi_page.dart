@@ -39,9 +39,12 @@ class CariAsuransiWidget extends StatelessWidget {
   Widget _buildAsPage(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Cari Asuransi",
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: hPadding),
-        child: _buildContent(context),
+      child: Container(
+        color: secondaryBlackColor,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: hPadding),
+          child: _buildContent(context),
+        ),
       ),
     );
   }
@@ -73,20 +76,26 @@ class CariAsuransiWidget extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        HeaderCard(
-          iconPath: "assets/icons/menu_cari_asuransi.svg",
-          title: "Cari Asuransi",
-          subtitle:
-              "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
-        ),
-        Container(
-          color: primaryBlackColor,
-          child: Column(children: [_buildKategoriSection(context)]),
-        ),
-      ],
+    return Container(
+      color: secondaryBlackColor,
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeaderCard(
+            iconPath: "assets/icons/menu_cari_asuransi.svg",
+            title: "Cari Asuransi",
+            subtitle:
+            "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+          ),
+          Container(
+            color: primaryBlackColor,
+            child: _buildKategoriSection(context),
+          ),
+        ],
+      ),
     );
   }
 

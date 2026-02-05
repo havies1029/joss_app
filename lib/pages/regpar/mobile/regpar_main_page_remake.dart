@@ -1396,7 +1396,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     setState(() {
       expanded = [false, false, false, false, false, true];
     });
-    refreshForm5(recordId: recordId);
+    // refreshForm5(recordId: recordId);
   }
 
   bool validateForm1() {

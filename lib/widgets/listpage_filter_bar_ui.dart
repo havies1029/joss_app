@@ -10,26 +10,26 @@ class ListPageFilterBarUIWidget extends StatelessWidget {
     super.key,
     required this.searchController,
     required this.searchButton,
-    this.hintText = 'Cari ...',
+    this.hintText = 'Cari...',
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
+      height: 36,
       decoration: BoxDecoration(
         color: formGrey,
         borderRadius: BorderRadius.circular(cardBorderRadius),
         border: Border.all(color: sGrey, width: 1),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Row(
         children: [
           // 🔍 kiri
           SizedBox(
-            width: 40,
+            width: 36,
             child: IconButton(
-              icon: const Icon(Icons.search, color: Colors.white70),
+              icon: Icon(Icons.search, color: primaryLightColor),
               tooltip: 'Cari data',
               onPressed: searchButton.onPressed,
               padding: EdgeInsets.zero,
@@ -42,39 +42,38 @@ class ListPageFilterBarUIWidget extends StatelessWidget {
             child: TextField(
               controller: searchController,
               onSubmitted: (_) => searchButton.onPressed?.call(),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: primaryLightColor),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: const TextStyle(color: Colors.white54),
+                hintStyle: TextStyle(color: primaryLightColor.withOpacity(0.6)),
                 border: InputBorder.none,
-                isDense: true, // ✅ bikin teks & hint center secara vertikal
+                isDense: true,
                 contentPadding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               ),
             ),
           ),
 
-          // ❌ clear
           SizedBox(
             width: 36,
             child: IconButton(
-              icon: const Icon(Icons.clear, color: Colors.white70, size: 20),
+              icon: Icon(Icons.clear, size: 20, color: primaryLightColor),
               tooltip: 'Hapus teks',
               onPressed: () => searchController.clear(),
-              padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
           ),
 
-          // ➡️ kirim
           SizedBox(
-            width: 40,
+            width: 36,
             child: IconButton(
-              icon: const Icon(Icons.arrow_forward_rounded,
-                  size: 24, color: Colors.white),
+              icon: Icon(
+                Icons.arrow_forward_rounded,
+                size: 20,
+                color: primaryLightColor,
+              ),
               tooltip: 'Kirim pencarian',
               onPressed: searchButton.onPressed,
-              padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
           ),

@@ -92,14 +92,14 @@ class _PolisSuccessState extends State<PolisSuccess> {
                     ),
                     const SizedBox(height: hPadding),
                     Text(
-                      "Polis Anda kini aktif.",
+                      "Tim internal sedang meninjau permintaan Anda",
                       textAlign: TextAlign.center,
                       style: bodyTextStyle(context, fontSize: 20)
                           .copyWith(color: hintGrey),
                     ),
                     const SizedBox(height: vPadding),
                     AppButton.primary(
-                      text: "Kembali",
+                      text: "Lihat Detail",
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
                       width: 245,onPressed: () {

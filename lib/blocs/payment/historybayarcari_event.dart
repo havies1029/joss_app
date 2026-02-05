@@ -12,7 +12,7 @@ class FetchHistorybayarCariEvent extends HistorybayarCariEvents {}
 class RefreshHistorybayarCariEvent extends HistorybayarCariEvents {
   final String statusId;
   final String searchText;  
-  const RefreshHistorybayarCariEvent({this.statusId = '', this.searchText = ''});
+  const RefreshHistorybayarCariEvent({required this.statusId, required this.searchText});
   @override
   List<Object> get props => [statusId, searchText];
 }

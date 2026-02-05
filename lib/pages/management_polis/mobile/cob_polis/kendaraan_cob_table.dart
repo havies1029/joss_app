@@ -806,7 +806,8 @@ class KendaraanCobTable extends StatefulWidget {
 
           _cell(
             child: Text(
-              "${d.periodeMulai} -\n${d.periodeAkhir}",
+              "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} -\n"
+                  "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: primaryLightColor),

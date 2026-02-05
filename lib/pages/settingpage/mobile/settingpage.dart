@@ -162,11 +162,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
     return Scaffold(
+      backgroundColor: secondaryBlackColor,
       body: BaseBackgroundFirstPage(
         child: SafeArea(
           child: Container(
             decoration: BoxDecoration(
-              color: primaryBlackColor,
+              color: secondaryBlackColor,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),

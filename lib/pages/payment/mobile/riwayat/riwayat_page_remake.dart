@@ -58,7 +58,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => PaymentSuccess(display: "Pembayaran Berhasil!",)),
+                builder: (context) => PaymentSuccess(display: "Pembayaran Berhasil!",description: "Polis Anda kini aktif.", displayButton: "Kembali",)),
           );
         }
         else if (state.paymentStatus == "91"){

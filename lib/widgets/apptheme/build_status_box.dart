@@ -120,7 +120,7 @@ class _StatusChipState extends State<StatusChip> {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
-                    color: widget.isSelected ? pGrey : primaryColor,
+                    color: pYellow,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(6),
                       topRight: Radius.circular(6),

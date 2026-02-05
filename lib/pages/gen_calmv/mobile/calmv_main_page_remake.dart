@@ -396,13 +396,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-                        Row(
-                          children: [
-                            Flexible(child: _buildFieldMmvpakaiId()),
-                            const SizedBox(width: 8),
-                            Flexible(child: _buildComboMWilayah()),
-                          ],
-                        ),
+                        _buildComboMWilayah(),
+                        const SizedBox(height: hPadding),
+                        _buildFieldMmvpakaiId(),
                         const SizedBox(height: 15),
                       ],
                     ),

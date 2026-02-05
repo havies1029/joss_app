@@ -311,7 +311,13 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
   Widget _cell({required Widget child}) {
     return Padding(
       padding: const EdgeInsets.all(6),
-      child: child,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 32), // ✅ turunin
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: child,
+        ),
+      ),
     );
   }
 }
