@@ -63,7 +63,6 @@ class _StatusChipState extends State<StatusChip> {
   Widget build(BuildContext context) {
     final bool isJatuhTempo = widget.statusId == "10004";
 
-    // 🔥 INI INTI: icon normal/active sama-sama ditentukan dari statusId
     final String iconPath = widget.isSelected
         ? _activeIconByStatusId(widget.statusId)
         : _normalIconByStatusId(widget.statusId);
@@ -90,8 +89,6 @@ class _StatusChipState extends State<StatusChip> {
               height: widget.height,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                // kalau kamu mau warna ikut selected, keep ini.
-                // kalau mau warna tetap, ganti jadi: color: pGrey,
                 color: widget.isSelected ? primaryColor : pGrey,
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -113,23 +110,24 @@ class _StatusChipState extends State<StatusChip> {
             ),
 
             if (isJatuhTempo)
-              Positioned(
-                top: -8,
-                right: -2,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: pYellow,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(6),
-                      topRight: Radius.circular(6),
-                      bottomRight: Radius.circular(6),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Transform.translate(
+                  offset: const Offset(6, -10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: pYellow,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(6),
+                        topRight: Radius.circular(6),
+                        bottomRight: Radius.circular(6),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'H-60 hr',
-                    style: bodyTextStyle(context, fontSize: 9.65),
+                    child: Text(
+                      'H-60 hr',
+                      style: bodyTextStyle(context, fontSize: 9.65),
+                    ),
                   ),
                 ),
               ),

@@ -259,7 +259,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         return PropertyCobTable(
           items: s.items,
           selectedIds: s.selectedIds.toList(),
-          selectedItem: s.selectedItem,
+          selectedItem: s.selectedItem,statusId: statusId,
           onSelectItem: (item) {
             context.read<AsetParCariBloc>().add(
               SelectParCariEvent(selectedItem: item),

@@ -752,7 +752,7 @@ class KendaraanCobTable extends StatefulWidget {
         children: [
           if (!widget.readOnly)
             Center(
-              child: Checkbox(
+              child: CheckboxRadio(
                 value: isSelected,
                 onChanged: (checked) {
                   if (checked == true) {
@@ -770,17 +770,17 @@ class KendaraanCobTable extends StatefulWidget {
                     }
                   }
                 },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-                ),
-                side: MaterialStateBorderSide.resolveWith(
-                      (states) => const BorderSide(color: sGrey),
-                ),
-                fillColor: MaterialStateProperty.resolveWith(
-                      (states) =>
-                  states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
-                ),
-                checkColor: primaryLightColor,
+                // shape: RoundedRectangleBorder(
+                //   borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+                // ),
+                // side: MaterialStateBorderSide.resolveWith(
+                //       (states) => const BorderSide(color: sGrey),
+                // ),
+                // fillColor: MaterialStateProperty.resolveWith(
+                //       (states) =>
+                //   states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
+                // ),
+                // checkColor: primaryLightColor,
               ),
             )
           else
