@@ -11,10 +11,17 @@ import 'package:joss_app/blocs/gen_endors/endors2cari_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbanklist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
+import 'package:joss_app/blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
+import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
+import 'package:joss_app/blocs/klaimrinci/mstatusrincicari_bloc.dart';
+import 'package:joss_app/blocs/klaimringkas/klaimringkascari_bloc.dart';
+import 'package:joss_app/blocs/klaimringkas/mstatusringkascari_bloc.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
 import 'package:joss_app/blocs/regendors/regendorscari_bloc.dart';
+import 'package:joss_app/blocs/regklaim/cobklaimcari_bloc.dart';
+import 'package:joss_app/blocs/regklaim/regklaim1crud_bloc.dart';
 import 'package:joss_app/blocs/regreaktif/regreaktif1_bloc.dart';
 import 'package:joss_app/blocs/regrenewal/regrenewcari_bloc.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
@@ -70,6 +77,7 @@ import 'package:joss_app/repositories/payment/pay1crud_repository.dart';
 import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
 import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
 import 'package:joss_app/repositories/regendors/regendors1form_repository.dart';
+import 'package:joss_app/repositories/regklaim/regklaim1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
@@ -315,6 +323,14 @@ Future<void> main() async {
         BlocProvider(create: (_) => ShareMvStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareHealthStateCubit()), // hydrated
         BlocProvider(create: (_) => ShareHullStateCubit()), // hydrated
+
+        BlocProvider(create:  (context) => Regklaim1CrudBloc(repository: Regklaim1CrudRepository())),
+        BlocProvider(create:  (context) => CobklaimcariBloc()),
+        BlocProvider(create: (context) => KlaimrasiocobCariBloc()),
+        BlocProvider(create: (context) => KlaimringkasCariBloc()),
+        BlocProvider(create: (context) => MstatusringkasCariBloc()),
+        BlocProvider(create: (context) => MstatusrinciCariBloc()),
+        BlocProvider(create: (context) => GroupcobCariBloc()),
 
         BlocProvider(create: (_) => HasilSimulMvCubit()), // hydrated
         BlocProvider(create: (_) => HasilSimulParCubit()), // hydrated
