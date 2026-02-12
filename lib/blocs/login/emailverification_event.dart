@@ -40,4 +40,11 @@ class FieldEmailVerificationChangedEvent extends EmailVerificationEvents {
 	List<Object> get props => [email];
 }
 
+class FieldTeleponVerificationChangedEvent extends EmailVerificationEvents {
+	final String telepon;
+	const FieldTeleponVerificationChangedEvent({required this.telepon});
+
+	@override
+	List<Object> get props => [telepon];
+}
 

@@ -48,7 +48,7 @@ class HitungPremiWidget extends StatelessWidget {
     super.key,
     required this.rows,
     this.padding = const EdgeInsets.all(0),
-    this.rowSpacing = 0,
+    this.rowSpacing = 4,
   });
 
 

@@ -7,11 +7,21 @@ import 'package:joss_app/pages/base/base_background_firstpage.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
+import '../../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
+
 class PaymentSuccess extends StatefulWidget {
   final String display;
   final String description;
   final String displayButton;
-  const PaymentSuccess({super.key, required this.display, required this.description, required this.displayButton});
+  final VoidCallback? onButtonPressed;
+
+  const PaymentSuccess({
+    super.key,
+    required this.display,
+    required this.description,
+    required this.displayButton,
+    this.onButtonPressed
+  });
 
   @override
   State<PaymentSuccess> createState() => _PaymentSuccessState();
@@ -38,8 +48,18 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
     super.dispose();
   }
 
+  void _defaultButtonAction() {
+    context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
+    // Navigator.popUntil(context, (route) => route.isFirst);
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const TagihanPembayaranPage()),
+          (route) => route.isFirst,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final onPressed = widget.onButtonPressed ?? _defaultButtonAction;
     return Scaffold(
       backgroundColor: primaryBlackColor,
       body: BaseBackgroundFirstPage(
@@ -100,12 +120,7 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
                       width: 245,
-                      onPressed: () {
-                        context
-                            .read<DnRekap2invBloc>()
-                            .add(InitializeDnRekap2invEvent());
-                        Navigator.popUntil(context, (route) => route.isFirst);
-                      },
+                      onPressed: onPressed,
                     ),
                   ],
                 ),

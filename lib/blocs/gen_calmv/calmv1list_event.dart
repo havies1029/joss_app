@@ -40,3 +40,6 @@ class CalMv2RegMvEvent extends Calmv1ListEvents {
 	@override
 	List<Object> get props => [calmv1Id];
 }
+
+class ClearProcessMessageEvent extends Calmv1ListEvents {}
+

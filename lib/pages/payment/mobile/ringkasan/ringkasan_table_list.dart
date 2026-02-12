@@ -34,6 +34,109 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
     super.dispose();
   }
 
+
+  double _measureTextWidth(
+      BuildContext context,
+      String text, {
+        TextStyle? style,
+      }) {
+    final effectiveStyle = style ?? bodyTextStyle(context, fontSize: 15);
+
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: effectiveStyle),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+      ellipsis: '…',
+    )..layout();
+
+    return tp.width;
+  }
+
+  double _clampedWidthFromText(
+      BuildContext context, {
+        required String header,
+        required String value,
+        required double min,
+        required double max,
+        double padding = 20,
+      }) {
+    final style = bodyTextStyle(context, fontSize: 15);
+    final wHeader = _measureTextWidth(context, header, style: style);
+    final wValue = _measureTextWidth(context, value, style: style);
+    final target = (wHeader > wValue ? wHeader : wValue) + padding;
+    return target.clamp(min, max);
+  }
+
+  Map<int, TableColumnWidth> _compactColumnWidthsFor(
+      BuildContext context,
+      DnrekapcobCariModel row,
+      ) {
+    // kolom 0 = checkbox, ini jangan ikut data biar konsisten
+    const wCheckbox = 50.0;
+
+    // kolom 1 = NO, tetap fixed kecil
+    const wNo = 50.0;
+
+    // value string yang dipakai untuk ukur
+    final kategoriVal = row.cobNama;
+    final jmlPolisVal = formatNum(row.polisCount);
+    final currVal = row.currSimbol;
+    final tsiVal = formatNum(row.tsi);
+    final premiVal = formatNum(row.polisAmount);
+
+    final wKategori = _clampedWidthFromText(
+      context,
+      header: "KATEGORI",
+      value: kategoriVal,
+      min: 120,
+      max: 220, // mentok -> wrap maxLines
+    );
+
+    final wJmlPolis = _clampedWidthFromText(
+      context,
+      header: "JUMLAH POLIS",
+      value: jmlPolisVal,
+      min: 90,
+      max: 130,
+    );
+
+    final wCurr = _clampedWidthFromText(
+      context,
+      header: "CURR",
+      value: currVal,
+      min: 55,
+      max: 85,
+      padding: 14,
+    );
+
+    final wTsi = _clampedWidthFromText(
+      context,
+      header: "TOTAL NILAI PERTANGGUNGAN",
+      value: tsiVal,
+      min: 140,
+      max: 210,
+    );
+
+    final wPremi = _clampedWidthFromText(
+      context,
+      header: "TOTAL PREMI",
+      value: premiVal,
+      min: 110,
+      max: 170,
+    );
+
+    return {
+      0: const FixedColumnWidth(wCheckbox),
+      1: const FixedColumnWidth(wNo),
+      2: FixedColumnWidth(wKategori),
+      3: FixedColumnWidth(wJmlPolis),
+      4: FixedColumnWidth(wCurr),
+      5: FixedColumnWidth(wTsi),
+      6: FixedColumnWidth(wPremi),
+    };
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -52,6 +155,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
         return Padding(
           padding: const EdgeInsets.only(bottom: hPadding),
           child: Card(
+            color: secondaryBlackColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),

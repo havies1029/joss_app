@@ -1,24 +1,24 @@
 
 class Regpar5FormModel {
 	String regpar1Id;
-	double diskonNilai;
+	double diskonNilai; // diskon
 	double diskonPersen;
 	double premiEqvet;
 	double premiNet;
 	double premiOther;
 	double premiPar;
 	double premiRsmdcc;
-	double premiTotal;
+	double premiTotal; // total premi
 	double premiTsfwd;
 	String regpar5Id;
-	double ratePar;
-	double rateRsmdcc;
-	double rateTsfwd;
-	double rateEqvet;
-	double rateOther;
-	double rateTotal;
-	double biayaPolis;
-	double tsi;
+	double ratePar; // sementara flexas
+	double rateRsmdcc; // RSMDCC
+	double rateTsfwd; // TFSWD
+	double rateEqvet; // EQVET
+	double rateOther; // OTHERS
+	double rateTotal; // TOtal Rate
+	double biayaPolis; // biaya polis
+	double tsi; // Total sum insured
 
 	Regpar5FormModel({required this.diskonNilai, required this.diskonPersen,
 		required this.premiEqvet, required this.premiNet,

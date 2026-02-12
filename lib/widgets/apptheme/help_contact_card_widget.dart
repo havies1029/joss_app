@@ -28,12 +28,10 @@ class HelpContactCardWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 🔹 Bagian kiri (ikon + teks atas & bawah)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Baris atas: icon + title
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -69,8 +67,6 @@ class HelpContactCardWidget extends StatelessWidget {
               ],
             ),
           ),
-
-          // 🔹 Tombol kanan
           ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(

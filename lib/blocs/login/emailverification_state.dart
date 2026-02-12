@@ -12,6 +12,7 @@ class EmailVerificationState extends Equatable {
   final List<String> errors;
   final bool isSimpanPassword;
   final String email;
+  final String telepon;
 
   const EmailVerificationState({
     this.record,
@@ -25,6 +26,7 @@ class EmailVerificationState extends Equatable {
     this.errors = const [],
     this.isSimpanPassword = true,
     this.email = '',
+    this.telepon = '',
   });
 
   EmailVerificationState copyWith({
@@ -40,6 +42,7 @@ class EmailVerificationState extends Equatable {
     List<String>? errors,
     bool? isSimpanPassword,
     String? email,
+    String? telepon,
   }) {
     return EmailVerificationState(
       record: record ?? this.record,
@@ -53,6 +56,7 @@ class EmailVerificationState extends Equatable {
       errors: errors ?? this.errors,
       isSimpanPassword: isSimpanPassword ?? this.isSimpanPassword,
       email: email ?? this.email,
+      telepon: telepon ?? this.telepon,
     );
   }
 
@@ -69,5 +73,6 @@ class EmailVerificationState extends Equatable {
     isSimpanPassword,
     record,
     email,
+    telepon,
   ];
 }

@@ -1,478 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
-//
-// import '../../../../common/constants.dart';
-// import '../../../../models/gen_aset_par/asetparcari_model.dart';
-//
-// class PropertyCobTable extends StatefulWidget {
-//   final List<AsetParCariModel> items;
-//   final List<String> selectedIds;
-//   final Function(String id) onSelect;
-//   final Function(String id) onUnselect;
-//
-//   final Function(String id) onSelectFilePolisParId;
-//   final Function(String id) onUnselectFilePolisParId;
-//
-//   final Function(String id) onSelectFilePolisEqId;
-//   final Function(String id) onUnselectFilePolisEqId;
-//
-//   final bool readOnly;
-//   final bool showFooter;
-//   final String? title;
-//
-//   const PropertyCobTable({
-//     super.key,
-//     required this.items,
-//     required this.selectedIds,
-//     required this.onSelect,
-//     required this.onUnselect,
-//     required this.onSelectFilePolisParId,
-//     required this.onUnselectFilePolisParId,
-//     required this.onSelectFilePolisEqId,
-//     required this.onUnselectFilePolisEqId,
-//     this.readOnly = false,
-//     this.showFooter = true,
-//     this.title,
-//   });
-//
-//   @override
-//   State<PropertyCobTable> createState() => _PropertyCobTableState();
-// }
-//
-// class _PropertyCobTableState extends State<PropertyCobTable> {
-//   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
-//   late final ScrollController hController;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     hController = ScrollController();
-//   }
-//
-//   @override
-//   void dispose() {
-//     hController.dispose();
-//     super.dispose();
-//   }
-//
-//   bool _isAllSelected(List<AsetParCariModel> details) {
-//     if (details.isEmpty) return false;
-//     final selected = widget.selectedIds.toSet();
-//     return details.every((d) => selected.contains(d.asetParId));
-//   }
-//
-//   bool _isNoneSelected(List<AsetParCariModel> details) {
-//     final selected = widget.selectedIds.toSet();
-//     return details.every((d) => !selected.contains(d.asetParId));
-//   }
-//
-//   void _toggleSelectAll(bool checked, List<AsetParCariModel> details) {
-//     for (final d in details) {
-//       final id = d.asetParId;
-//       if (id.isEmpty) continue;
-//
-//       if (checked) {
-//         // select hanya yang belum kepilih (biar gak spam event)
-//         if (!widget.selectedIds.contains(id)) {
-//           widget.onSelect(id);
-//           if (d.filePolisParId.isNotEmpty) widget.onSelectFilePolisParId(d.filePolisParId);
-//           if (d.filePolisEqId.isNotEmpty) widget.onSelectFilePolisEqId(d.filePolisEqId);
-//         }
-//       } else {
-//         // unselect hanya yang memang kepilih
-//         if (widget.selectedIds.contains(id)) {
-//           widget.onUnselect(id);
-//           if (d.filePolisParId.isNotEmpty) widget.onUnselectFilePolisParId(d.filePolisParId);
-//           if (d.filePolisEqId.isNotEmpty) widget.onUnselectFilePolisEqId(d.filePolisEqId);
-//         }
-//       }
-//     }
-//   }
-//
-//   List<AsetParCariModel> get _filteredItems {
-//     if (!widget.readOnly) return widget.items;
-//     return widget.items.where((d) => widget.selectedIds.contains(d.asetParId)).toList();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final width = MediaQuery.of(context).size.width;
-//     final bool isNarrow = width < 900;
-//
-//     final items = _filteredItems;
-//
-//     if (items.isEmpty) {
-//       return const Center(child: Text("Data kosong"));
-//     }
-//
-//     return SingleChildScrollView(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           if (widget.title != null) ...[
-//             Padding(
-//               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-//               child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-//             ),
-//             const SizedBox(height: hPadding),
-//           ],
-//           Padding(
-//             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-//             child: isNarrow
-//                 ? _buildDetailTableCompact(context, items)
-//                 : _buildDetailTableNormal(context, items),
-//           ),
-//           const SizedBox(height: hPadding),
-//         ],
-//       ),
-//     );
-//
-//   }
-//
-//   Widget _buildHeaderTitle(BuildContext context, String cobNama) {
-//     return Text(
-//       "Polis $cobNama",
-//       style: headingStyle(context, fontSize: 14),
-//     );
-//   }
-//
-//   Widget _buildDetailTableCompact(
-//       BuildContext context,
-//       List<AsetParCariModel> details,
-//       ) {
-//     if (details.isEmpty) return const Text("Tidak ada detail polis");
-//
-//     return ClipRRect(
-//       borderRadius: BorderRadius.circular(cardBorderRadius),
-//       child: Container(
-//         decoration: BoxDecoration(
-//           color: formGrey,
-//           borderRadius: BorderRadius.circular(cardBorderRadius),
-//           border: const Border(
-//             top: BorderSide(color: sGrey, width: 1),
-//             left: BorderSide(color: sGrey, width: 1),
-//             right: BorderSide(color: sGrey, width: 1),
-//             bottom: BorderSide(color: sGrey, width: 1),
-//           ),
-//         ),
-//         child: ScrollbarTheme(
-//           data: ScrollbarThemeData(
-//             thumbVisibility: MaterialStateProperty.all(true),
-//             trackVisibility: MaterialStateProperty.all(false),
-//             thickness: MaterialStateProperty.all(5),
-//             radius: const Radius.circular(cardBorderRadius),
-//             thumbColor: MaterialStateProperty.all(
-//               scrollBar.withOpacity(0.1),
-//             ),
-//           ),
-//           child: Scrollbar(
-//             controller: hController,
-//             child: SingleChildScrollView(
-//               controller: hController,
-//               scrollDirection: Axis.horizontal,
-//               child: Table(
-//                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-//                 border: const TableBorder(
-//                   horizontalInside: BorderSide(color: sGrey, width: 1),
-//                   verticalInside: BorderSide(color: sGrey, width: 1),
-//                 ),
-//                 columnWidths: {
-//                   0: widget.readOnly
-//                       ? const FixedColumnWidth(0)
-//                       : const FixedColumnWidth(40), // checkbox
-//                   1: const FixedColumnWidth(50),  // No
-//                   2: const FixedColumnWidth(170), // Tertanggung
-//                   3: const FixedColumnWidth(240), // Alamat
-//                   4: const FixedColumnWidth(180), // Periode (gabungan)
-//                   5: const FixedColumnWidth(170), // Nilai Pertanggungan (curr + nilai)
-//                   6: const FixedColumnWidth(140), // Premi (curr + premi)
-//                 },
-//                 children: [
-//                   _tableHeaderWithSelectAll(context, details, compact: true),
-//
-//                   ...details.asMap().entries.map(
-//                         (e) => _detailRowWithCheckbox(
-//                       context,
-//                       e.value,
-//                       e.key,
-//                       compact: true,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//
-//   Widget _buildDetailTableNormal(BuildContext context, List<AsetParCariModel> details) {
-//     if (details.isEmpty) return const Text("Tidak ada detail polis");
-//
-//     return ClipRRect(
-//       borderRadius: BorderRadius.circular(cardBorderRadius),
-//       child: Container(
-//         decoration: BoxDecoration(
-//           color: formGrey,
-//           borderRadius: BorderRadius.circular(cardBorderRadius),
-//           border: const Border(
-//             top: BorderSide(color: sGrey, width: 1),
-//             left: BorderSide(color: sGrey, width: 1),
-//             right: BorderSide(color: sGrey, width: 1),
-//             bottom: BorderSide(color: sGrey, width: 1),
-//           ),
-//         ),
-//         child: Table(
-//           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-//           border: const TableBorder(
-//             horizontalInside: BorderSide(color: sGrey, width: 1),
-//             verticalInside: BorderSide(color: sGrey, width: 1),
-//           ),
-//           columnWidths: {
-//             0: widget.readOnly
-//                 ? const FixedColumnWidth(0)
-//                 : const FlexColumnWidth(0.8), // checkbox
-//             1: const FlexColumnWidth(1.0),   // No
-//             2: const FlexColumnWidth(2.2),   // Tertanggung
-//             3: const FlexColumnWidth(3.3),   // Alamat
-//             4: const FlexColumnWidth(2.0),   // Periode (gabungan)
-//             5: const FlexColumnWidth(2.0),   // Nilai Pertanggungan
-//             6: const FlexColumnWidth(1.6),   // Premi
-//           },
-//           children: [
-//             _tableHeaderWithSelectAll(context, details, compact: false),
-//
-//             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-//               context,
-//               e.value,
-//               e.key,
-//               compact: false,
-//             )),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   TableRow _tableHeaderWithSelectAll(
-//       BuildContext context,
-//       List<AsetParCariModel> details, {
-//         required bool compact,
-//       }) {
-//     if (widget.readOnly) {
-//       return _tableHeader(context, [
-//         "",
-//         "No",
-//         "Tertanggung",
-//         "Lokasi",
-//         "Periode",
-//         "Nilai Pertanggungan",
-//         "Premi",
-//       ]);
-//     }
-//
-//     final allSelected = _isAllSelected(details);
-//     final noneSelected = _isNoneSelected(details);
-//
-//     return TableRow(
-//       decoration: const BoxDecoration(color: formGrey),
-//       children: [
-//         Center(
-//           child: Checkbox(
-//             value: allSelected ? true : (noneSelected ? false : null),
-//             tristate: true,
-//             // onChanged: (val) {
-//             //   // kalau posisi "minus" (null) diklik -> treat jadi select all
-//             //   final checked = val ?? false;
-//             //   _toggleSelectAll(checked, details);
-//             // },
-//             onChanged: (_) {
-//               final checked = !_isAllSelected(details);
-//               _toggleSelectAll(checked, details);
-//             },
-//             shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-//             ),
-//             side: MaterialStateBorderSide.resolveWith(
-//                   (states) => const BorderSide(color: sGrey),
-//             ),
-//             fillColor: MaterialStateProperty.resolveWith(
-//                   (states) => states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
-//             ),
-//             checkColor: primaryLightColor,
-//           ),
-//         ),
-//         ...[
-//           "No",
-//           "Tertanggung",
-//           "Lokasi",
-//           "Periode",
-//           "Nilai Pertanggungan",
-//           "Premi",
-//         ].map((t) {
-//           final upper = t.toUpperCase();
-//           final center = upper == "NO";
-//           final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
-//           return Padding(
-//             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-//             child: center ? Center(child: child) : child,
-//           );
-//         }).toList(),
-//       ],
-//     );
-//   }
-//
-//
-//   TableRow _tableHeader(BuildContext context, List<String> cells) {
-//     return TableRow(
-//       decoration: const BoxDecoration(color: formGrey),
-//       children: cells.map((text) {
-//         final upper = text.trim().toUpperCase();
-//         final bool center = (upper == "NO" || upper == "STATUS" || text.trim().isEmpty);
-//
-//         final child = Text(text, style: bodyTextStyle(context, fontSize: 15));
-//
-//         return Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-//           child: center ? Center(child: child) : child,
-//         );
-//       }).toList(),
-//     );
-//   }
-//
-//   TableRow _detailRowWithCheckbox(
-//       BuildContext context,
-//       AsetParCariModel d,
-//       int index, {
-//         required bool compact,
-//       }) {
-//     final isSelected = widget.selectedIds.contains(d.asetParId);
-//
-//     return TableRow(
-//       decoration: BoxDecoration(
-//         color: (!widget.readOnly && isSelected)
-//             ? primaryColor.withOpacity(0.3)
-//             : (index.isEven ? pGrey : formGrey),
-//       ),
-//       children: [
-//         if (!widget.readOnly)
-//           Center(
-//             child: Checkbox(
-//               value: isSelected,
-//               onChanged: (checked) {
-//                 if (checked == true) {
-//                   widget.onSelect(d.asetParId);
-//                   if (d.filePolisParId.isNotEmpty) {
-//                     widget.onSelectFilePolisParId(d.filePolisParId);
-//                   }
-//                   if (d.filePolisEqId.isNotEmpty) {
-//                     widget.onSelectFilePolisEqId(d.filePolisEqId);
-//                   }
-//                 } else {
-//                   widget.onUnselect(d.asetParId);
-//                   if (d.filePolisParId.isNotEmpty) {
-//                     widget.onUnselectFilePolisParId(d.filePolisParId);
-//                   }
-//                   if (d.filePolisEqId.isNotEmpty) {
-//                     widget.onUnselectFilePolisEqId(d.filePolisEqId);
-//                   }
-//                 }
-//               },
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-//               ),
-//               side: MaterialStateBorderSide.resolveWith(
-//                     (states) => const BorderSide(color: sGrey),
-//               ),
-//               fillColor: MaterialStateProperty.resolveWith(
-//                     (states) =>
-//                 states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
-//               ),
-//               checkColor: primaryLightColor,
-//             ),
-//           )
-//         else
-//           const SizedBox(),
-//
-//         _cell(
-//           child: Center(
-//             child: Text(
-//               d.nomor.toString(),
-//               style: TextStyle(color: primaryLightColor),
-//             ),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             d.tertanggung,
-//             maxLines: compact ? 2 : 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             d.alamat,
-//             maxLines: compact ? 2 : 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         // Periode Mulai
-//         _cell(
-//           child: Text(
-//             "${d.periodeMulai} -\n${d.periodeAkhir}",
-//             maxLines: 2,
-//             overflow: TextOverflow.ellipsis,
-//             style: const TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             "${d.curr} ${formatNum(d.sumInsured)}",
-//             maxLines: 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: const TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//         _cell(
-//           child: Text(
-//             "${d.curr} ${formatNum(d.premi)}",
-//             maxLines: 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: const TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//
-//         // _cell(
-//         //   child: Center(
-//         //     child: Text(
-//         //       d.status,
-//         //       maxLines: 1,
-//         //       overflow: TextOverflow.ellipsis,
-//         //       style: TextStyle(color: primaryLightColor),
-//         //     ),
-//         //   ),
-//         // ),
-//       ],
-//     );
-//   }
-//
-//   Widget _cell({required Widget child}) {
-//     return Padding(
-//       padding: const EdgeInsets.all(6),
-//       child: child,
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
@@ -501,6 +26,8 @@ class PropertyCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
+  final String statusId;
+
   const PropertyCobTable({
     super.key,
     required this.items,
@@ -515,6 +42,7 @@ class PropertyCobTable extends StatefulWidget {
     required this.onUnselectFilePolisEqId,
     required this.selectedItem,
     required this.onClearSelectedItem,
+    required this.statusId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -523,7 +51,6 @@ class PropertyCobTable extends StatefulWidget {
   @override
   State<PropertyCobTable> createState() => _PropertyCobTableState();
 }
-
 class _PropertyCobTableState extends State<PropertyCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
@@ -545,11 +72,75 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     return widget.items.where((d) => widget.selectedIds.contains(d.asetParId)).toList();
   }
 
+  // =========================
+  // Dynamic width helpers
+  // =========================
+
+  double _measureTextWidth(
+      BuildContext context,
+      String text, {
+        TextStyle? style,
+      }) {
+    final effectiveStyle = style ??
+        bodyTextStyle(context, fontSize: 14).copyWith(
+          color: primaryLightColor,
+        );
+
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: effectiveStyle),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+      ellipsis: '…',
+    )..layout();
+
+    return tp.width;
+  }
+
+  double _columnWidthFromLongest(
+      BuildContext context,
+      Iterable<String> values, {
+        required double min,
+        required double max,
+        double padding = 16, // padding cell + sedikit buffer
+        TextStyle? style,
+      }) {
+    var longest = 0.0;
+    for (final v in values) {
+      final w = _measureTextWidth(context, v, style: style);
+      if (w > longest) longest = w;
+    }
+    final target = longest + padding;
+    return target.clamp(min, max);
+  }
+
+  // Helper cell text yang otomatis wrap (biar “mentok width => jadi baris”)
+  Widget _textCell(
+      String text, {
+        int maxLines = 1,
+        bool center = false,
+        bool softWrap = true,
+      }) {
+    final t = Text(
+      text,
+      maxLines: maxLines,
+      softWrap: softWrap,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(color: primaryLightColor),
+    );
+
+    return _cell(child: center ? Center(child: t) : t);
+  }
+
+  // =========================
+  // Build
+  // =========================
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
+    final showColumn = widget.statusId == "10002";
     final items = _filteredItems;
 
     if (items.isEmpty) {
@@ -570,28 +161,88 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
             child: isNarrow
-                ? _buildDetailTableCompact(context, items)
-                : _buildDetailTableNormal(context, items),
+                ? _buildDetailTableCompact(context, items, showColumn)
+                : _buildDetailTableNormal(context, items, showColumn),
           ),
           const SizedBox(height: hPadding),
         ],
       ),
     );
-
   }
 
-  Widget _buildHeaderTitle(BuildContext context, String cobNama) {
-    return Text(
-      "Polis $cobNama",
-      style: headingStyle(context, fontSize: 14),
-    );
+  // =========================
+  // Column width specs (caps)
+  // =========================
+  // Kamu bebas ubah cap max di sini (inilah “batas mentok”-nya)
+  // width akan ngikut data terpanjang tapi mentok di max.
+
+  Map<int, TableColumnWidth> _compactColumnWidths(
+      BuildContext context,
+      List<AsetParCariModel> details,
+      bool showColumn,
+      ) {
+    final selectCol = widget.readOnly ? 0.0 : 40.0;
+
+    // buat kumpulin string per kolom
+    final noProsesValues = details.map((d) => d.prosesId.isEmpty ? "-" : d.prosesId);
+    final noPolisValues = details.map((d) => d.polisNo);
+    final tertanggungValues = details.map((d) => d.tertanggung);
+    final alamatValues = details.map((d) => d.alamat);
+
+    // Periode: format cenderung sama panjang, aman fixed/cap
+    const periodeWidth = 180.0;
+
+    // Nilai/Premi: juga relatif, tapi tetap kita clamp kecil
+    final nilaiValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
+    final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
+
+    // Spec caps (min/max)
+    final wNoProses = _columnWidthFromLongest(context, noProsesValues, min: 90, max: 140);
+    final wNoPolis = _columnWidthFromLongest(context, noPolisValues, min: 110, max: showColumn ? 120 : 160);
+    final wTertanggung = _columnWidthFromLongest(context, tertanggungValues, min: 130, max: 170);
+    final wAlamat = _columnWidthFromLongest(context, alamatValues, min: 160, max: 240);
+    final wNilai = _columnWidthFromLongest(context, nilaiValues, min: 140, max: 170);
+    final wPremi = _columnWidthFromLongest(context, premiValues, min: 120, max: 140);
+
+    // Susun map berdasarkan showColumn
+    if (showColumn) {
+      return {
+        0: FixedColumnWidth(selectCol),
+        1: const FixedColumnWidth(50), // No
+        2: FixedColumnWidth(wNoProses),
+        3: FixedColumnWidth(wNoPolis),
+        4: FixedColumnWidth(wTertanggung),
+        5: FixedColumnWidth(wAlamat),
+        6: const FixedColumnWidth(periodeWidth),
+        7: FixedColumnWidth(wNilai),
+        8: FixedColumnWidth(wPremi),
+      };
+    }
+
+    return {
+      0: FixedColumnWidth(selectCol),
+      1: const FixedColumnWidth(50), // No
+      2: FixedColumnWidth(wNoPolis),
+      3: FixedColumnWidth(wTertanggung),
+      4: FixedColumnWidth(wAlamat),
+      5: const FixedColumnWidth(periodeWidth),
+      6: FixedColumnWidth(wNilai),
+      7: FixedColumnWidth(wPremi),
+    };
   }
+
+  // =========================
+  // Compact table (dynamic widths + wrap)
+  // =========================
 
   Widget _buildDetailTableCompact(
       BuildContext context,
       List<AsetParCariModel> details,
+      bool showColumn,
       ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
+
+    final columnWidths = _compactColumnWidths(context, details, showColumn);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -612,9 +263,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             trackVisibility: MaterialStateProperty.all(false),
             thickness: MaterialStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(
-              scrollBar.withOpacity(0.1),
-            ),
+            thumbColor: MaterialStateProperty.all(scrollBar.withOpacity(0.1)),
           ),
           child: Scrollbar(
             controller: hController,
@@ -627,25 +276,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   horizontalInside: BorderSide(color: sGrey, width: 1),
                   verticalInside: BorderSide(color: sGrey, width: 1),
                 ),
-                columnWidths: {
-                  0: widget.readOnly
-                      ? const FixedColumnWidth(0)
-                      : const FixedColumnWidth(40), // radio button
-                  1: const FixedColumnWidth(50),  // No
-                  2: const FixedColumnWidth(170), // Tertanggung
-                  3: const FixedColumnWidth(240), // Alamat
-                  4: const FixedColumnWidth(180), // Periode (gabungan)
-                  5: const FixedColumnWidth(170), // Nilai Pertanggungan (curr + nilai)
-                  6: const FixedColumnWidth(140), // Premi (curr + premi)
-                },
+                columnWidths: columnWidths,
                 children: [
-                  _tableHeader(context, details, compact: true),
-
+                  _tableHeader(context, showColumn),
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
                       e.value,
                       e.key,
+                      showColumn,
                       compact: true,
                     ),
                   ),
@@ -658,8 +297,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
+  // =========================
+  // Normal table (tetap fixed seperti awal)
+  // =========================
 
-  Widget _buildDetailTableNormal(BuildContext context, List<AsetParCariModel> details) {
+  Widget _buildDetailTableNormal(
+      BuildContext context,
+      List<AsetParCariModel> details,
+      bool showColumn,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
@@ -682,53 +328,63 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly
-                ? const FixedColumnWidth(0)
-                : const FlexColumnWidth(0.8), // radio button
-            1: const FlexColumnWidth(1.0),   // No
-            2: const FlexColumnWidth(2.2),   // Tertanggung
-            3: const FlexColumnWidth(3.3),   // Alamat
-            4: const FlexColumnWidth(2.0),   // Periode (gabungan)
-            5: const FlexColumnWidth(2.0),   // Nilai Pertanggungan
-            6: const FlexColumnWidth(1.6),   // Premi
+            0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40),
+            1: const FixedColumnWidth(50),
+
+            if (showColumn) ...{
+              2: const FixedColumnWidth(140),
+              3: const FixedColumnWidth(120),
+              4: const FixedColumnWidth(170),
+              5: const FixedColumnWidth(240),
+              6: const FixedColumnWidth(180),
+              7: const FixedColumnWidth(170),
+              8: const FixedColumnWidth(140),
+            } else ...{
+              2: const FixedColumnWidth(120),
+              3: const FixedColumnWidth(120),
+              4: const FixedColumnWidth(240),
+              5: const FixedColumnWidth(180),
+              6: const FixedColumnWidth(170),
+              7: const FixedColumnWidth(140),
+            },
           },
           children: [
-            _tableHeader(context, details, compact: false),
-
-            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-              context,
-              e.value,
-              e.key,
-              compact: false,
-            )),
+            _tableHeader(context, showColumn),
+            ...details.asMap().entries.map(
+                  (e) => _detailRowWithCheckbox(
+                context,
+                e.value,
+                e.key,
+                showColumn,
+                compact: false,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  TableRow _tableHeader(
-      BuildContext context,
-      List<AsetParCariModel> details, {
-        required bool compact,
-      }) {
+  // =========================
+  // Header
+  // =========================
+
+  TableRow _tableHeader(BuildContext context, bool showColumn) {
     return TableRow(
       decoration: const BoxDecoration(color: formGrey),
       children: [
-        if (!widget.readOnly)
-          const SizedBox() // kosong untuk kolom radio button
-        else
-          const SizedBox(),
+        const SizedBox(),
         ...[
           "No",
+          if (showColumn) "No Proses",
+          "No Polis",
           "Tertanggung",
           "Lokasi",
           "Periode",
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
-          final upper = t.toUpperCase();
-          final center = upper == "NO";
+          final center = t.toUpperCase() == "NO";
           final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
@@ -739,13 +395,24 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
+  // =========================
+  // Row
+  // =========================
+
   TableRow _detailRowWithCheckbox(
       BuildContext context,
       AsetParCariModel d,
-      int index, {
+      int index,
+      bool showColumn, {
         required bool compact,
       }) {
     final isSelected = widget.selectedItem == d;
+
+    // ⬇️ ini bagian “baris disesuaikan jadi 2/3 baris”
+    // saat compact, kita kasih ruang lebih banyak untuk kolom teks panjang.
+    final maxLinesPolis = compact ? 2 : 1;
+    final maxLinesTertanggung = compact ? 2 : 1;
+    final maxLinesAlamat = compact ? 3 : 1; // alamat paling sering panjang
 
     return TableRow(
       decoration: BoxDecoration(
@@ -756,7 +423,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       children: [
         if (!widget.readOnly)
           Center(
-            child: Checkbox(
+            child: CheckboxRadio(
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
@@ -772,6 +439,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                 } else {
                   widget.onUnselect(d.asetParId);
                   widget.onClearSelectedItem?.call();
+
                   if (d.filePolisParId.isNotEmpty) {
                     widget.onUnselectFilePolisParId(d.filePolisParId);
                   }
@@ -780,183 +448,55 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   }
                 }
               },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-              ),
-              side: MaterialStateBorderSide.resolveWith(
-                    (states) => const BorderSide(color: sGrey),
-              ),
-              fillColor: MaterialStateProperty.resolveWith(
-                    (states) => states.contains(MaterialState.selected)
-                    ? primaryColor
-                    : Colors.transparent,
-              ),
-              checkColor: primaryLightColor,
             ),
           )
         else
           const SizedBox(),
 
-        _cell(
-          child: Center(
-            child: Text(
-              d.nomor.toString(),
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
+        _textCell(d.nomor.toString(), center: true, softWrap: false),
 
-        _cell(
-          child: Text(
-            d.tertanggung,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            d.alamat,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} -\n"
-                "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-
-        _cell(
-          child: Text(
-            "${d.curr} ${formatNum(d.sumInsured)}",
+        if (showColumn)
+          _textCell(
+            d.prosesId.isEmpty ? "-" : d.prosesId,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
+            softWrap: false,
           ),
+
+        _textCell(
+          d.polisNo,
+          maxLines: maxLinesPolis,
+          softWrap: true,
         ),
 
-        _cell(
-          child: Text(
-            "${d.curr} ${formatNum(d.premi)}",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-      ],
-    );
-  }
-
-
-  TableRow _detailRowWithRadio(
-      BuildContext context,
-      AsetParCariModel d,
-      int index, {
-        required bool compact,
-      }) {
-    final isSelected = widget.selectedIds.contains(d.asetParId);
-
-    return TableRow(
-      decoration: BoxDecoration(
-        color: (!widget.readOnly && isSelected)
-            ? primaryColor.withOpacity(0.3)
-            : (index.isEven ? pGrey : formGrey),
-      ),
-      children: [
-        if (!widget.readOnly)
-          Center(
-            child: RadioButton(
-              isSelected: isSelected,
-              onTap: () {
-                // Unselect semua item yang sedang terpilih (kecuali yang diklik)
-                for (final item in widget.items) {
-                  if (widget.selectedIds.contains(item.asetParId) && item.asetParId != d.asetParId) {
-                    widget.onUnselect(item.asetParId);
-                    if (item.filePolisParId.isNotEmpty) {
-                      widget.onUnselectFilePolisParId(item.filePolisParId);
-                    }
-                    if (item.filePolisEqId.isNotEmpty) {
-                      widget.onUnselectFilePolisEqId(item.filePolisEqId);
-                    }
-                  }
-                }
-
-                widget.onSelect(d.asetParId);
-
-                widget.onSelectItem?.call(d); //ini coy
-
-                if (d.filePolisParId.isNotEmpty) {
-                  widget.onSelectFilePolisParId(d.filePolisParId);
-                }
-                if (d.filePolisEqId.isNotEmpty) {
-                  widget.onSelectFilePolisEqId(d.filePolisEqId);
-                }
-              },
-            ),
-          )
-        else
-          const SizedBox(),
-
-        _cell(
-          child: Center(
-            child: Text(
-              d.nomor.toString(),
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
+        _textCell(
+          d.tertanggung,
+          maxLines: maxLinesTertanggung,
+          softWrap: true,
         ),
 
-        _cell(
-          child: Text(
-            d.tertanggung,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          d.alamat,
+          maxLines: maxLinesAlamat,
+          softWrap: true,
         ),
 
-        _cell(
-          child: Text(
-            d.alamat,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} - "
+              "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
+          maxLines: compact ? 2 : 1, // 2 biar kalau sempit dia wrap natural
+          softWrap: true,
         ),
 
-        _cell(
-          child: Text(
-            "${d.periodeMulai} -\n${d.periodeAkhir}",
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          "${d.curr} ${formatNum(d.sumInsured)}",
+          maxLines: 1,
+          softWrap: false,
         ),
 
-        _cell(
-          child: Text(
-            "${d.curr} ${formatNum(d.sumInsured)}",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-        _cell(
-          child: Text(
-            "${d.curr} ${formatNum(d.premi)}",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          "${d.curr} ${formatNum(d.premi)}",
+          maxLines: 1,
+          softWrap: false,
         ),
       ],
     );

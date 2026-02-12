@@ -3,25 +3,28 @@ import 'package:intl/intl.dart';
 
 class TimelineItem<T> extends StatelessWidget {
   final T item;
-  final bool isLast;
+  final int index;
+
+  final int activeIndex;
 
   final DateTime Function(T item) getDateTime;
   final String Function(T item) getStatusText;
 
-  final Color lastTextColor;
+  final Color activeTextColor;
   final Color normalTextColor;
-  final Color lastDotColor;
+  final Color activeDotColor;
   final Color normalDotColor;
 
   const TimelineItem({
     super.key,
     required this.item,
-    required this.isLast,
+    required this.index,
+    required this.activeIndex,
     required this.getDateTime,
     required this.getStatusText,
-    required this.lastTextColor,
+    required this.activeTextColor,
     required this.normalTextColor,
-    required this.lastDotColor,
+    required this.activeDotColor,
     required this.normalDotColor,
   });
 
@@ -30,8 +33,10 @@ class TimelineItem<T> extends StatelessWidget {
     final dt = getDateTime(item);
     final status = getStatusText(item);
 
-    final textColor = isLast ? lastTextColor : normalTextColor;
-    final dotColor = isLast ? lastDotColor : normalDotColor;
+    final isActive = index == activeIndex;
+
+    final textColor = isActive ? activeTextColor : normalTextColor;
+    final dotColor = isActive ? activeDotColor : normalDotColor;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,17 +48,11 @@ class TimelineItem<T> extends StatelessWidget {
             children: [
               Text(
                 DateFormat('dd MMM yyyy,').format(dt),
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: textColor, fontSize: 14),
               ),
               Text(
                 DateFormat('HH:mm:ss').format(dt),
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: textColor, fontSize: 14),
               ),
             ],
           ),
@@ -61,27 +60,20 @@ class TimelineItem<T> extends StatelessWidget {
         const SizedBox(width: 5),
         Column(
           children: [
-            Icon(
-              Icons.circle,
-              size: 12,
-              color: dotColor,
+            Icon(Icons.circle, size: 12, color: dotColor),
+
+            Container(
+              width: 1.26,
+              height: 30,
+              color: normalDotColor,
             ),
-            if (!isLast)
-              Container(
-                width: 1.26,
-                height: 30,
-                color: normalDotColor,
-              ),
           ],
         ),
         const SizedBox(width: 5),
         Expanded(
           child: Text(
             status,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: textColor, fontSize: 16),
           ),
         ),
       ],

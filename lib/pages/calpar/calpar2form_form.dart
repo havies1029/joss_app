@@ -60,7 +60,6 @@ class Calpar2FormFormPageFormState extends State<Calpar2FormFormPage> {
 						child: Padding(
 							padding: const EdgeInsets.all(8.0),
 							child: Form(
-								key: _formKey,
 								child: Column(
 									children: [
 										const SizedBox(height: 10),

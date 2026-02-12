@@ -12,7 +12,11 @@ class ReusableComboBox<T> extends StatefulWidget {
   final String Function(T) displayText;
   final bool Function(T, T) compareItems;
   final Widget Function(BuildContext, T, bool, bool)? customItemBuilder;
+  final Future<List<T>> Function(String filter)? dataLoaderWithFilter;
 
+// opsional quality:
+  final Duration serverSearchDebounce;
+  final int serverSearchMinChars;
   final bool showClearButton;
   final bool enableSearch;
   final bool isEnabled;
@@ -38,6 +42,9 @@ class ReusableComboBox<T> extends StatefulWidget {
     this.maxHeight = 300,
     this.prefixIcon,
     this.errorText,
+    this.dataLoaderWithFilter,
+    this.serverSearchDebounce = const Duration(milliseconds: 350),
+    this.serverSearchMinChars = 0,
   }) : super(key: key);
 
   @override
@@ -46,7 +53,13 @@ class ReusableComboBox<T> extends StatefulWidget {
 
 class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
   List<T>? _cachedItems;
-
+  Timer? _debounceTimer;
+  int _reqSeq = 0;
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return DropdownSearch<T>(
@@ -101,14 +114,69 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
       // DATA LOADER
       items: (filter, infiniteScrollProps) async {
         try {
-          final items = await widget.dataLoader();
-          _cachedItems = items;
-          return items;
+          // MODE LAMA
+          if (widget.dataLoaderWithFilter == null) {
+            final items = await widget.dataLoader();
+            _cachedItems = items;
+            return items;
+          }
+
+          final q = (filter ?? "").trim();
+
+          // kalau search box dimatikan, langsung load default (tanpa debounce)
+          if (!widget.enableSearch) {
+            final items = await widget.dataLoaderWithFilter!(""); // atau q
+            _cachedItems = items;
+            return items;
+          }
+
+          // minimal char
+          if (q.isNotEmpty && q.length < widget.serverSearchMinChars) {
+            _cachedItems = const [];
+            return const [];
+          }
+
+          // kalau kosong, boleh langsung load default supaya dropdown gak kosong
+          if (q.isEmpty) {
+            final items = await widget.dataLoaderWithFilter!("");
+            _cachedItems = items;
+            return items;
+          }
+
+          // debounce
+          final completer = Completer<List<T>>();
+          _debounceTimer?.cancel();
+          final int mySeq = ++_reqSeq;
+
+          _debounceTimer = Timer(widget.serverSearchDebounce, () async {
+            try {
+              final result = await widget.dataLoaderWithFilter!(q);
+
+              // kalau stale, tetap complete supaya UI gak nunggu selamanya
+              if (mySeq != _reqSeq) {
+                if (!completer.isCompleted) completer.complete(const []);
+                return;
+              }
+
+              _cachedItems = result;
+              if (!completer.isCompleted) completer.complete(result);
+            } catch (_) {
+              if (mySeq != _reqSeq) {
+                if (!completer.isCompleted) completer.complete(const []);
+                return;
+              }
+              _cachedItems = const [];
+              if (!completer.isCompleted) completer.complete(const []);
+            }
+          });
+
+          return completer.future;
         } catch (_) {
-          _cachedItems = [];
-          return [];
+          _cachedItems = const [];
+          return const [];
         }
       },
+
       // CLEAR & DROPDOWN BUTTON
       suffixProps: DropdownSuffixProps(
         clearButtonProps: ClearButtonProps(

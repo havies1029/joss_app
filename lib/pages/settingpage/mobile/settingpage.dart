@@ -442,13 +442,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           svgAsset: 'assets/icons/bantuan.svg',
                           title: 'Bantuan',
                           onTap: () async {
-                            if (ChatInitService.I.isInitialized) {
-                              Navigator.pushNamed(context, 'chat');
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Chat belum siap, coba lagi')),
-                              );
-                            }
+                            // if (ChatInitService.I.isInitialized) {
+                            //   Navigator.pushNamed(context, 'chat');
+                            // } else {
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //     const SnackBar(content: Text('Chat belum siap, coba lagi')),
+                            //   );
+                            // }
                           },
                         ),
                       ],

@@ -17,6 +17,18 @@ class Calpar1ListBloc extends Bloc<Calpar1ListEvents, Calpar1ListState> {
 		on<HapusCalpar1ListEvent>(onHapusCalpar1List);
 		on<CloseDialogCalpar1ListEvent>(onCloseDialogCalpar1List);
 		on<CalPar2RegParEvent>(onCalPar2RegPar);
+		on<ClearProcessMessageEvent>(onClearProcessMessage);
+	}
+
+	Future<void> onClearProcessMessage(
+			ClearProcessMessageEvent event,
+			Emitter<Calpar1ListState> emit,
+			) async {
+		emit(state.copyWith(
+			processMessage: "",
+			isProcessed: false,
+			hasFailure: false,
+		));
 	}
 
 	Future<void> onRefreshCalpar1List(
@@ -84,17 +96,29 @@ class Calpar1ListBloc extends Bloc<Calpar1ListEvents, Calpar1ListState> {
 	}
 
 	Future<void> onCalPar2RegPar(
-			CalPar2RegParEvent event, Emitter<Calpar1ListState> emit) async {
-		emit(state.copyWith(isProcessing: true, isProcessed: false));
+			CalPar2RegParEvent event,
+			Emitter<Calpar1ListState> emit,
+			) async {
+		if (state.isProcessing) return; // ✅ anti double trigger
+
+		emit(state.copyWith(
+			isProcessing: true,
+			isProcessed: false,
+			hasFailure: false,
+			processMessage: "", // ✅ reset dulu biar listener gak ketarik nilai lama
+		));
+
 		Calpar1ListRepository repo = Calpar1ListRepository();
 		final result = await repo.calpar2Regpar(event.calpar1Id);
-		bool hasFailure = !result.success;
+
 		emit(state.copyWith(
-				isProcessing: false,
-				isProcessed: true,
-				hasFailure: hasFailure,
-				processMessage: result.data.toString()));
+			isProcessing: false,
+			isProcessed: true,
+			hasFailure: !result.success,
+			processMessage: result.data.toString(),
+		));
 	}
+
 
 
 }

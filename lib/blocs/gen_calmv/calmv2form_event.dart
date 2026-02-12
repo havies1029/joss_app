@@ -46,3 +46,7 @@ class Calmv2FormDraftEvent extends Calmv2FormEvents {
 	@override
 	List<Object> get props => [record];
 }
+
+class Calmv2ResetStatusEvent extends Calmv2FormEvents {
+	const Calmv2ResetStatusEvent();
+}

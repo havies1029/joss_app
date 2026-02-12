@@ -11,9 +11,12 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_cob_list_page.dart';
+import 'package:joss_app/pages/regother/mobile/regother_form/regother_success.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
 import '../../../../repositories/combobox/combomcobapp1_repository.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
+import '../../../management_polis/mobile/theme/polis_success.dart';
+import '../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 
 class Regother1CrudFormPage extends StatefulWidget {
   final String viewMode;
@@ -105,19 +108,44 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
         );
       },
       listener: (context, state) {
-        if (state.isLoaded) {
-          if (state.record != null) {
+        if (state.isLoaded && state.record != null) {
+          setState(() {
             fieldRemarkController.text = state.record!.remark;
-            fieldTsiController.text = NumberFormat(
-              "#,###",
-            ).format(state.record!.tsi);
-            // TODO: Load selected COB jika mode ubah
-          }
-          fieldComboRMatauang = state.comboRMatauang;
-          fieldComboMCobApp1 = state.comboMCobApp1;
+            fieldTsiController.text =
+                NumberFormat("#,###").format(state.record!.tsi);
+
+            fieldComboRMatauang = state.comboRMatauang;
+            fieldComboMCobApp1 = state.comboMCobApp1;
+          });
+        }
+
+        if (state.isSaved && state.hasFailure == false) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RegotherSucess(
+                display: "Berhasil dikirim!",
+                purpose: "O",
+              ),
+            ),
+          );
+          _resetForm();
         }
       },
     );
+  }
+
+  void _resetForm() {
+    _formKey.currentState?.reset();
+
+    setState(() {
+      fieldRemarkController.clear();
+      fieldTsiController.clear();
+      fieldComboMCobApp1 = null;
+      fieldComboRMatauang = null;
+    });
+
+    _loadDefaultCurrency();
   }
 
   void loadData() {
@@ -140,17 +168,18 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   Widget buildFieldMcobId() {
     return GestureDetector(
       onTap: () async {
-        final selected = await Navigator.push(
+        final ComboMCobApp1Model? selected =
+        await Navigator.push<ComboMCobApp1Model>(
           context,
-          MaterialPageRoute(
-            builder: (_) => const CobCariPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const CobCariPage()),
         );
 
         if (selected != null) {
-          setState(() {
-            fieldComboMCobApp1 = selected;
-          });
+          context.read<Regother1CrudBloc>().add(
+            ComboMCobApp1ChangedEvent(comboMCobApp1: selected),
+          );
+
+          setState(() => fieldComboMCobApp1 = selected);
         }
       },
       child: Column(
@@ -279,7 +308,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                   text: 'Ajukan Sekarang',
                   backgroundColor: const Color(0xFF0ED7FF),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // tutup dialog
                     _executeSave();
                   },
                 ),
@@ -294,16 +323,6 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   void _executeSave() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
-      /// DEBUG PRINT — LIHAT VALUE APA SAJA YANG TERKIRIM
-      print("========== DEBUG Regother1CrudModel ==========");
-      print("currId: ${fieldComboRMatauang?.rmatauangKode}");
-      print("mCobApp1Id: ${fieldComboMCobApp1?.mCobApp1Id}");
-      print("cobNama: ${fieldComboMCobApp1?.cobNama}");
-      print("remark: ${fieldRemarkController.text}");
-      print("tsi (raw): ${fieldTsiController.text}");
-      print("tsi (numeric): ${double.tryParse(fieldTsiController.text.replaceAll(',', ''))}");
-      print("==============================================");
 
       Regother1CrudModel record = Regother1CrudModel(
         currId: fieldComboRMatauang?.rmatauangKode,

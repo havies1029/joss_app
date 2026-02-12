@@ -49,3 +49,11 @@ class ValidasiPinHPEvent extends RegUserEvents {
 }
 
 
+class SetIsEmailEvent extends RegUserEvents {
+	final bool isEmail;
+
+	const SetIsEmailEvent({required this.isEmail});
+
+	@override
+	List<Object> get props => [isEmail];
+}

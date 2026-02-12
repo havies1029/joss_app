@@ -210,6 +210,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldRatePapController = TextEditingController();
   final fieldBiayaPolisController = TextEditingController();
   final fieldSumInsuredController = TextEditingController();
+  final fieldRateTotalController = TextEditingController();
   //form6
 
   //form7
@@ -284,6 +285,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldRatePapController.dispose();
     fieldBiayaPolisController.dispose();
     fieldSumInsuredController.dispose();
+    fieldRateTotalController.dispose();
     //form6
 
     super.dispose();
@@ -515,309 +517,444 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldRateTerrorismController.text = record.rateTerrorism.toString();
     fieldRatePadController.text = record.ratePad.toString();
     fieldRatePapController.text = record.ratePap.toString();
+    fieldRateTotalController.text = record.rateTotal.toString();
+  }
+
+  Future<bool?> showExitConfirmDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // SVG Warning Icon
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: SvgPicture.asset(
+                      "assets/icons/bi_exclamation-circle.svg",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Keluar halaman ini?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Anda memiliki data yang belum disimpan. Jika keluar dari halaman ini, seluruh data akan hilang.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              "Tidak",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              "Iya, Keluar",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleExit(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      context.read<Regmv1CrudBloc>().add(
+        Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
+      );
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: "Kendaraan",
-      blocListeners: [
-        BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regmv1Id = state.record!.regmv1Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform1(state.record!);
-            }
-          },
-        ),
+    return PopScope(
+      canPop: false, // penting: cegah pop otomatis dari back fisik/gesture
+      onPopInvokedWithResult: (didPop, result) async {
+        // kalau canPop=false, didPop biasanya false.
+        // tapi tetap aman kalau suatu saat route sudah ke-pop.
+        if (didPop) return;
 
-        BlocListener<Regmv2FormBloc, Regmv2FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regmv2Id = state.record!.regmv2Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform2(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Regmv3FormBloc, Regmv3FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regmv3Id = state.record!.regmv3Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform3(state.record!);
-            }
-          },
-        ),
-
-        // server list update
-        BlocListener<Regmv4CariBloc, Regmv4CariState>(
-          listener: (context, state) {
-            debugPrint("👂 Regmv4CariBloc listener CALLED");
-            debugPrint("state.status: ${state.status}");
-            debugPrint("state.items length: ${state.items.length}");
-
-            if (state.status == ListStatus.success) {
-              debugPrint("✅ Regmv4CariBloc SUCCESS");
-              setState(() => _serverPhotosRegmv4 = List.from(state.items));
-            }
-          },
-        ),
-
-// upload flow
-        BlocListener<RegmvUploadStnkBloc, RegmvUploadStnkState>(
-          listener: (context, state) {
-
-            if (state is UploadStnkListPreview) {
-              debugPrint("fileNames length: ${state.fileNames.length}");
-
-              setState(() {
-                _imagesRegmv4 = List.from(state.images);
-                _fileNamesRegmv4 = List.from(state.fileNames);
-              });
-            }
-
-            if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-              debugPrint("🔄 refreshForm4 CALLED (general)");
-              refreshForm4(recordId: regmv1Id);
-            }
-
-            if (state is UploadStnkSuccess) {
-              debugPrint("✅ UploadStnkSuccess");
-
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (success)");
-                refreshForm4(recordId: regmv1Id);
-              }
-            }
-
-            if (state is UploadStnkFailure) {
-              debugPrint("❌ UploadStnkFailure: ${state.error}");
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-        ),
-
-// delete server (state hanya flag)
-        BlocListener<Regmv4FormBloc, Regmv4FormState>(
-          listener: (context, state) {
-            debugPrint("👂 Regmv4FormBloc listener CALLED");
-            debugPrint("isSaved: ${state.isSaved}");
-            debugPrint("hasFailure: ${state.hasFailure}");
-
-            // kalau ada aksi hapus berhasil → clear pending + refresh
-            if (state.isSaved) {
-              debugPrint("✅ Delete SUCCESS");
-              _deletingServerIdsRegmv4.clear();
-
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (delete success)");
-                refreshForm4(recordId: regmv1Id);
-              }
-            }
-
-            // kalau gagal → clear pending + refresh (rollback by refresh)
-            if (state.hasFailure) {
-              debugPrint("❌ Delete FAILURE");
-
-              _deletingServerIdsRegmv4.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (delete failure)");
-                refreshForm4(recordId: regmv1Id);
-              }
-            }
-          },
-        ),
-
-
-        // server list update
-        BlocListener<Regmv5CariBloc, Regmv5CariState>(
-          listener: (context, state) {
-            if (state.status == ListStatus.success) {
-              setState(() => _serverPhotosRegmv5 = List.from(state.items));
-            }
-          },
-        ),
-
-        // upload flow
-        BlocListener<RegmvUploadFotoMobilBloc, RegmvUploadFotoMobilState>(
-          listener: (context, state) {
-            if (state is UploadFotoMobilListPreview) {
-              // cache untuk submit/delete preview
-              setState(() {
-                _imagesRegmv5 = List.from(state.images);
-                _fileNamesRegmv5 = List.from(state.fileNames);
-              });
-            }
-
-            if (state is UploadFotoMobilSuccess) {
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm5(recordId: regmv1Id);
-              }
-            }
-
-            if (state is UploadFotoMobilFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-        ),
-
-        // delete server (state hanya flag)
-        BlocListener<Regmv5FormBloc, Regmv5FormState>(
-          listener: (context, state) {
-            // kalau ada aksi hapus berhasil → clear pending + refresh
-            if (state.isSaved) {
-              _deletingServerIdsRegmv5.clear();
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm5(recordId: regmv1Id);
-              }
-            }
-
-            // kalau gagal → clear pending + refresh (rollback by refresh)
-            if (state.hasFailure) {
-              _deletingServerIdsRegmv5.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm5(recordId: regmv1Id);
-              }
-            }
-          },
-        ),
-
-
-        BlocListener<Regmv6FormBloc, Regmv6FormState>(
-          listener: (context, state) {
-            if (state.record != null) {
-              _payloadform6(state.record!);
-
-              openForm7(recordId: regmv1Id);
-              //
-              // if (state.isLoaded) {
-              //   setState(() {
-              //     regmv6Id = state.record!.regmv6Id;
-              //   });
-              //
-              //   _payloadform6(state.record!);
-              //
-              //   // if (state.record!.regmv6Id.isNotEmpty) {
-              //   //   openForm7();
-              //   // }
-              //   openForm7();
-              // }
-
-              if (state.isSaved) {
+        await _handleExit(context);
+      },
+      child: BaseBackgroundSidePage(
+        onBack: () async {
+          await _handleExit(context); // tombol back di BaseBackground → sama
+        },
+        title: "Kendaraan",
+        blocListeners: [
+          BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
-                  regmv6Id = state.record!.regmv6Id;
+                  regmv1Id = state.record!.regmv1Id;
                 });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform1(state.record!);
+              }
+            },
+          ),
 
-                if (state.record!.regmv6Id.isNotEmpty) {
-                  openForm7(recordId: regmv1Id);
+          BlocListener<Regmv2FormBloc, Regmv2FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  regmv2Id = state.record!.regmv2Id;
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform2(state.record!);
+              }
+            },
+          ),
+
+          BlocListener<Regmv3FormBloc, Regmv3FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  regmv3Id = state.record!.regmv3Id;
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform3(state.record!);
+              }
+            },
+          ),
+
+          // server list update
+          BlocListener<Regmv4CariBloc, Regmv4CariState>(
+            listener: (context, state) {
+              debugPrint("👂 Regmv4CariBloc listener CALLED");
+              debugPrint("state.status: ${state.status}");
+              debugPrint("state.items length: ${state.items.length}");
+
+              if (state.status == ListStatus.success) {
+                debugPrint("✅ Regmv4CariBloc SUCCESS");
+                setState(() => _serverPhotosRegmv4 = List.from(state.items));
+              }
+            },
+          ),
+
+          // upload flow
+          BlocListener<RegmvUploadStnkBloc, RegmvUploadStnkState>(
+            listener: (context, state) {
+              if (state is UploadStnkListPreview) {
+                debugPrint("fileNames length: ${state.fileNames.length}");
+
+                setState(() {
+                  _imagesRegmv4 = List.from(state.images);
+                  _fileNamesRegmv4 = List.from(state.fileNames);
+                });
+              }
+
+              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                debugPrint("🔄 refreshForm4 CALLED (general)");
+                refreshForm4(recordId: regmv1Id);
+              }
+
+              if (state is UploadStnkSuccess) {
+                debugPrint("✅ UploadStnkSuccess");
+
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  debugPrint("🔄 refreshForm4 CALLED (success)");
+                  refreshForm4(recordId: regmv1Id);
                 }
               }
-            }
-          },
-        ),
 
-        // server list update
-        BlocListener<Regmv7CariBloc, Regmv7CariState>(
-          listener: (context, state) {
-            if (state.status == ListStatus.success) {
-              setState(() => _serverPhotosRegmv7 = List.from(state.items));
-            }
-          },
-        ),
+              if (state is UploadStnkFailure) {
+                debugPrint("❌ UploadStnkFailure: ${state.error}");
 
-        // upload flow
-        BlocListener<RegmvUploadFotoAccBloc, RegmvUploadFotoAccState>(
-          listener: (context, state) {
-            if (state is UploadFotoAccListPreview) {
-              // cache untuk submit/delete preview
-              setState(() {
-                _imagesRegmv7 = List.from(state.images);
-                _fileNamesRegmv7 = List.from(state.fileNames);
-              });
-            }
-
-            if (state is UploadFotoAccSuccess) {
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm7(recordId: regmv1Id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
-            }
+            },
+          ),
 
-            if (state is UploadFotoAccFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-        ),
+          // delete server (state hanya flag)
+          BlocListener<Regmv4FormBloc, Regmv4FormState>(
+            listener: (context, state) {
+              debugPrint("👂 Regmv4FormBloc listener CALLED");
+              debugPrint("isSaved: ${state.isSaved}");
+              debugPrint("hasFailure: ${state.hasFailure}");
 
-        // delete server (state hanya flag)
-        BlocListener<Regmv7FormBloc, Regmv7FormState>(
-          listener: (context, state) {
-            // kalau ada aksi hapus berhasil → clear pending + refresh
-            if (state.isSaved) {
-              _deletingServerIdsRegmv7.clear();
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm7(recordId: regmv1Id);
+              if (state.isSaved) {
+                debugPrint("✅ Delete SUCCESS");
+                _deletingServerIdsRegmv4.clear();
+
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  debugPrint("🔄 refreshForm4 CALLED (delete success)");
+                  refreshForm4(recordId: regmv1Id);
+                }
               }
-            }
 
-            // kalau gagal → clear pending + refresh (rollback by refresh)
-            if (state.hasFailure) {
-              _deletingServerIdsRegmv7.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                refreshForm7(recordId: regmv1Id);
+              if (state.hasFailure) {
+                debugPrint("❌ Delete FAILURE");
+                _deletingServerIdsRegmv4.clear();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  debugPrint("🔄 refreshForm4 CALLED (delete failure)");
+                  refreshForm4(recordId: regmv1Id);
+                }
               }
-            }
-          },
-        ),
-      ],
+            },
+          ),
 
-      child: _buildForm(),
+          // server list update
+          BlocListener<Regmv5CariBloc, Regmv5CariState>(
+            listener: (context, state) {
+              if (state.status == ListStatus.success) {
+                setState(() => _serverPhotosRegmv5 = List.from(state.items));
+              }
+            },
+          ),
+
+          // upload flow
+          BlocListener<RegmvUploadFotoMobilBloc, RegmvUploadFotoMobilState>(
+            listener: (context, state) {
+              if (state is UploadFotoMobilListPreview) {
+                setState(() {
+                  _imagesRegmv5 = List.from(state.images);
+                  _fileNamesRegmv5 = List.from(state.fileNames);
+                });
+              }
+
+              if (state is UploadFotoMobilSuccess) {
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  refreshForm5(recordId: regmv1Id);
+                }
+              }
+
+              if (state is UploadFotoMobilFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+
+          // delete server (state hanya flag)
+          BlocListener<Regmv5FormBloc, Regmv5FormState>(
+            listener: (context, state) {
+              if (state.isSaved) {
+                _deletingServerIdsRegmv5.clear();
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  refreshForm5(recordId: regmv1Id);
+                }
+              }
+
+              if (state.hasFailure) {
+                _deletingServerIdsRegmv5.clear();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  refreshForm5(recordId: regmv1Id);
+                }
+              }
+            },
+          ),
+
+          BlocListener<Regmv6FormBloc, Regmv6FormState>(
+            listener: (context, state) {
+              if (state.record != null) {
+                _payloadform6(state.record!);
+                openForm7(recordId: regmv1Id);
+
+                if (state.isSaved) {
+                  setState(() {
+                    regmv6Id = state.record!.regmv6Id;
+                  });
+
+                  if (state.record!.regmv6Id.isNotEmpty) {
+                    openForm7(recordId: regmv1Id);
+                  }
+                }
+              }
+            },
+          ),
+
+          // server list update
+          BlocListener<Regmv7CariBloc, Regmv7CariState>(
+            listener: (context, state) {
+              if (state.status == ListStatus.success) {
+                setState(() => _serverPhotosRegmv7 = List.from(state.items));
+              }
+            },
+          ),
+
+          // upload flow
+          BlocListener<RegmvUploadFotoAccBloc, RegmvUploadFotoAccState>(
+            listener: (context, state) {
+              if (state is UploadFotoAccListPreview) {
+                setState(() {
+                  _imagesRegmv7 = List.from(state.images);
+                  _fileNamesRegmv7 = List.from(state.fileNames);
+                });
+              }
+
+              if (state is UploadFotoAccSuccess) {
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  refreshForm7(recordId: regmv1Id);
+                }
+              }
+
+              if (state is UploadFotoAccFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+
+          // delete server (state hanya flag)
+          BlocListener<Regmv7FormBloc, Regmv7FormState>(
+            listener: (context, state) {
+              if (state.isSaved) {
+                _deletingServerIdsRegmv7.clear();
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  refreshForm7(recordId: regmv1Id);
+                }
+              }
+
+              if (state.hasFailure) {
+                _deletingServerIdsRegmv7.clear();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
+                  refreshForm7(recordId: regmv1Id);
+                }
+              }
+            },
+          ),
+        ],
+        child: _buildForm(),
+      ),
     );
   }
 
@@ -1105,18 +1242,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     child: (hasForm6Record)
                         ? Column(
                       children: [
-                        Text(
-                          "RATE",
-                          textAlign: TextAlign.left,
-                          style: bodyTextStyle(context).copyWith(
-                            color: primaryLightColor,
-                            fontSize: getResponsiveFont(context, 20),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "RATE",
+                            style: bodyTextStyle(context).copyWith(
+                              color: primaryLightColor,
+                              fontSize: getResponsiveFont(context, 20),
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 6),
                         HitungPremiWidget(
                           rows: [
                             HitungPremiRow(
-                              label: "Comprehensive:",
+                              label: "Komprehensif::",
                               controller: fieldRateDasarController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
@@ -1130,43 +1270,36 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "RSCC:",
+                              label: "Kerusuhan:",
                               controller: fieldRateSrccController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "TS:",
+                              label: "Terorisme & Sabotase:",
                               controller: fieldRateTerrorismController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Flood:",
+                              label: "Banjir:",
                               controller: fieldRateFloodController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Eqvet:",
+                              label: "Gempa Bumi:",
                               controller: fieldRateEqController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Pad:",
-                              controller: fieldRatePadController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Pap:",
-                              controller: fieldRatePapController,
+                              label: "Total Rate:",
+                              controller: fieldRateTotalController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               showValueBorder: true,
                               valueSuffix: "%",
@@ -1183,9 +1316,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         HitungPremiWidget(
                           rows: [
                             HitungPremiRow(
-                              label: "Annual Premium",
-                              // description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController} x ${fieldRateTotalController.text}% =",
-                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController.text}",
+                              label: "PREMI TAHUNAN",
+                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController.text} x ${fieldRateTotalController.text}% =",
                               controller: fieldPremiCascoController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1193,7 +1325,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "Additional Premium",
+                              label: "PREMI TAMBAHAN",
                               description: "(For TPL & PAD & PAP)",
                               controller: fieldPremiAddController,
                               layoutType: HitungPremiLayoutType.vertical,
@@ -1202,7 +1334,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "Discount",
+                              label: "DISKON 25%",
                               controller: fieldPremiDiskonController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1210,7 +1342,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "Policy Cost:",
+                              label: "BIAYA POLIS",
                               controller: fieldBiayaPolisController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1219,7 +1351,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                             ),
                             HitungPremiRow(
-                              label: "Total Premium:",
+                              label: "TOTAL PREMI",
                               controller: fieldPremiNetController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,

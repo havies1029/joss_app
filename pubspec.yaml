@@ -62,7 +62,11 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   carousel_slider: 4.2.0
   shimmer: ^3.0.0
-  syncfusion_flutter_pdfviewer: ^29.1.38
+  syncfusion_flutter_pdfviewer: 27.2.5
+  pdf_image_renderer: ^0.7.0
+  lottie: ^3.1.2
+  flutter_chat_types: ^3.6.2
+#  pdfx: ^2.9.2
 
 dev_dependencies:
   flutter_test:
@@ -248,6 +252,10 @@ flutter:
     - assets/icons/unduh_invoice.svg
     - assets/icons/photo_img.svg
     - assets/icons/gallery_img.svg
+    - assets/icons/bi_exclamation-circle.svg
+    - assets/icons/infinity_loader_orange.json
+    - assets/icons/lainnya.svg
+    - assets/icons/centang2.svg
 
   fonts:
     - family: Delm-Regular

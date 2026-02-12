@@ -52,7 +52,6 @@ class Klaim2CrudFormPageFormState extends State<Klaim2CrudFormPage> {
 						child: Padding(
 							padding: const EdgeInsets.all(8.0),
 							child: Form(
-								key: _formKey,
 								child: Column(
 									children: [
 										const SizedBox(height: 10),

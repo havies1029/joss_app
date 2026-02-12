@@ -22,13 +22,63 @@ import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart
 // import '.../detail_management_polis_page.dart';
 // import '.../beli_polis_page.dart';
 // import '.../sppa_download_polis_bloc.dart';
-
 class FabActionExecutor {
   final FabActionPolicy policy;
   const FabActionExecutor(this.policy);
 
   String _cobId(BuildContext c) => c.read<CobManPolBloc>().state.selectedCOBId;
   String _statusId(BuildContext c) => c.read<StatusAsetCariBloc>().state.selectedStatusId;
+
+  void _snack(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(infoSnackBar(message));
+  }
+
+  bool? _boolFlag(Object item, String field) {
+    try {
+      final dyn = item as dynamic;
+      final raw = switch (field) {
+        'isReaktif' => dyn.isReaktif,
+        'isRenewal' => dyn.isRenewal,
+        _ => null,
+      };
+
+      if (raw == null) return null;
+      if (raw is bool) return raw;
+      return raw.toString().toLowerCase() == 'true';
+    } catch (_) {
+      if (item is Map) {
+        final raw = item[field];
+        if (raw == null) return null;
+        if (raw is bool) return raw;
+        return raw.toString().toLowerCase() == 'true';
+      }
+      return null;
+    }
+  }
+
+  bool _guardTahapan({
+    required BuildContext context,
+    required ActionType actionType,
+    required Object selectedItem,
+  }) {
+    if (actionType == ActionType.aktifkanKembali) {
+      final flag = _boolFlag(selectedItem, 'isReaktif');
+      if (flag == false) {
+        _snack(context, "Maaf polis ini sudah memiliki tahapan.");
+        return false;
+      }
+    }
+
+    if (actionType == ActionType.perpanjangan) {
+      final flag = _boolFlag(selectedItem, 'isRenewal');
+      if (flag == false) {
+        _snack(context, "Maaf polis ini sudah memiliki tahapan.");
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   void run({
     required BuildContext context,
@@ -39,7 +89,6 @@ class FabActionExecutor {
     final cobId = _cobId(context);
     final statusId = _statusId(context);
 
-    // defensive gate (saklar beneran)
     final allowed = policy.isActionAllowed(
       cobId: cobId,
       statusId: statusId,
@@ -48,21 +97,21 @@ class FabActionExecutor {
     );
 
     if (!allowed) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar("Aksi tidak tersedia untuk kondisi ini."),
-      );
+      _snack(context, "Aksi tidak tersedia untuk kondisi ini.");
       return;
     }
 
-    // Always-enabled boleh jalan walau selectedItem null
     if (FabActionPolicy.alwaysEnabled.contains(actionType)) {
       _handleAlwaysEnabled(context, actionType, onDone);
       return;
     }
 
     if (selectedItem == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Pilih Minimal 1 Item!"));
+      _snack(context, "Pilih Minimal 1 Item!");
+      return;
+    }
+
+    if (!_guardTahapan(context: context, actionType: actionType, selectedItem: selectedItem)) {
       return;
     }
 
@@ -88,14 +137,10 @@ class FabActionExecutor {
         break;
 
       case ActionType.lihatPolisEq:
-        _downloadEq(context, selectedItem); // <- pastikan EQ
+        _downloadEq(context, selectedItem);
         break;
 
       case ActionType.lihatPolis:
-        _downloadGeneric(context, cobId, selectedItem);
-        break;
-
-    // optional kalau kamu masih pakai unduhPolis generic
       case ActionType.unduhPolis:
         _downloadGeneric(context, cobId, selectedItem);
         break;
@@ -105,20 +150,8 @@ class FabActionExecutor {
     }
   }
 
-  // ---- helper field getter safe ----
-  String _get(dynamic item, String key) {
-    try {
-      // ignore: avoid_dynamic_calls
-      final v = (item as dynamic);
-      // ignore: avoid_dynamic_calls
-      return (v.__lookup(key) ?? "").toString();
-    } catch (_) {
-      if (item is Map) return (item[key] ?? "").toString();
-      return "";
-    }
-  }
-
   // Karena kita gak pakai reflection beneran, kita ambil spesifik:
+  // ✅ selain 10002-10005 => others (asetOthersId)
   String _polisIdFromItem(String cobId, dynamic item) {
     try {
       // ignore: avoid_dynamic_calls
@@ -127,8 +160,7 @@ class FabActionExecutor {
         "10003" => (item.asetMvId ?? "").toString(),
         "10004" => (item.asetHullId ?? "").toString(),
         "10005" => (item.asethealthId ?? "").toString(),
-        "10006" => (item.asetOthersId ?? "").toString(),
-        _ => "",
+        _ => (item.asetOthersId ?? "").toString(),
       };
     } catch (_) {
       if (item is Map) {
@@ -137,8 +169,7 @@ class FabActionExecutor {
           "10003" => (item["asetMvId"] ?? "").toString(),
           "10004" => (item["asetHullId"] ?? "").toString(),
           "10005" => (item["asethealthId"] ?? "").toString(),
-          "10006" => (item["asetOthersId"] ?? "").toString(),
-          _ => "",
+          _ => (item["asetOthersId"] ?? "").toString(),
         };
       }
       return "";
@@ -218,14 +249,13 @@ class FabActionExecutor {
 
     final bloc = c.read<SppaDownloadPolisBloc>();
 
+    // ✅ selain 10003-10005 => OTHERS (default)
     final cob = switch (cobId) {
       "10003" => "MV",
       "10004" => "HULL",
       "10005" => "HEALTH",
-      "10006" => "OTHERS",
-      _ => "",
+      _ => "OTHERS",
     };
-    if (cob.isEmpty) return;
 
     bloc.add(DownloadFileEvent(ePolisId: polisFileId, cob: cob));
   }
@@ -246,7 +276,7 @@ class FabActionExecutor {
     if (id.isEmpty) return;
 
     c.read<SppaDownloadPolisBloc>().add(
-      DownloadFileEvent(ePolisId: id, cob: 'EQ'), // ✅ ini EQ
+      DownloadFileEvent(ePolisId: id, cob: 'EQ'),
     );
   }
 

@@ -21,6 +21,16 @@ class Calmv3FormBloc extends Bloc<Calmv3FormEvents, Calmv3FormState> {
 		on<Calmv3FormLoadDataEvent>(onLoadDataCalmv3Form);
 		on<Calmv3FormHitungPremiEvent>(onHitungPremiCalmv3Form);
 		on<Calmv3FormDraftEvent>(onDraftCalmv3Form);
+		on<Calmv3ResetStatusEvent>((event, emit) {
+			emit(state.copyWith(
+				isLoading: false,
+				isLoaded: false,
+				isSaving: false,
+				isSaved: false,
+				hasFailure: false,
+			));
+		});
+
 	}
 
 	Future<void> onDraftCalmv3Form(
@@ -98,18 +108,48 @@ class Calmv3FormBloc extends Bloc<Calmv3FormEvents, Calmv3FormState> {
 			Calmv3FormHitungPremiEvent event,
 			Emitter<Calmv3FormState> emit,
 			) async {
+		debugPrint(
+			"[${DateTime.now().toIso8601String()}] Calmv3HitungPremi START "
+					"calmv1Id=${event.calmv1Id}",
+		);
+
 		emit(state.copyWith(isLoading: true, isLoaded: false));
+
+		debugPrint(
+			"[${DateTime.now().toIso8601String()}] Calmv3HitungPremi AFTER emit(isLoading=true) "
+					"state.isLoading=${state.isLoading} state.isLoaded=${state.isLoaded}",
+		);
 
 		try {
 			final result = await repository.calmv3FormHitungPremi(event.calmv1Id);
+
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv3HitungPremi REPO DONE "
+						"resultHash=${result.hashCode}",
+			);
 
 			emit(state.copyWith(
 				isLoading: false,
 				isLoaded: true,
 				record: result,
 			));
+
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv3HitungPremi END "
+						"emit(isLoading=false,isLoaded=true)",
+			);
 		} catch (e) {
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv3HitungPremi ERROR $e",
+			);
+
 			emit(state.copyWith(isLoading: false, isLoaded: false));
+
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv3HitungPremi END "
+						"emit(isLoading=false,isLoaded=false)",
+			);
 		}
 	}
+
 }

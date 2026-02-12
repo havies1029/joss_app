@@ -47,7 +47,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   }
 
   String toPercent1(double value) {
-    return '${value.toStringAsFixed(1)}%';
+    return '${value.toStringAsFixed(2)}%';
   }
 
 

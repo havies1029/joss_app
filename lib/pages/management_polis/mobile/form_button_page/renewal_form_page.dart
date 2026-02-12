@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/pages/management_polis/mobile/form_button_page/polis_success.dart';
+import 'package:joss_app/pages/management_polis/mobile/theme/polis_success.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
@@ -96,7 +96,12 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
                 text: 'Ajukan Perubahan',
                 backgroundColor: primaryColor,
                 onPressed: () {
-                  _showPengajuanDialog(context);
+                  final okForm1 = validateForm1();
+                  if (!okForm1) {
+                    return;
+                  }else {
+                    _showPengajuanDialog(context);
+                  }
                 },
               ),
             ),
@@ -158,7 +163,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
           context,
           MaterialPageRoute(
             builder: (_) => PolisSuccess(
-
+              purpose: "R",
               display: "Pengajuan berhasil dikirim",
             ),
           ),
@@ -229,21 +234,15 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
       controller: fieldNotePerubahanController,
       keyboardType: TextInputType.multiline,
       maxLines: 12,
+      errorText: err('form1.notePerubahan'),
       onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
+        if (value.trim().isNotEmpty) {
+          clearErr('form1.notePerubahan');
         }
-      },
-
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          addError(error: kStringNullError);
-          return "Catatan perubahan wajib diisi";
-        }
-        return null;
       },
     );
   }
+
 
   Widget buildFieldPeriodeAkhir(){
     return AppDateField(
@@ -371,7 +370,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   }
 
   void onSaveForm() {
-
+    _dismissDialog();
     final record = Regrenew1FormModel(
       isUbah: false,
       sppa1Id: widget.polisId,
@@ -379,7 +378,19 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
 
     regrenewal1FormBloc.add(Regrenew1FormTambahEvent(record: record));
-    _dismissDialog();
+  }
+
+  bool validateForm1() {
+    clearErrsByPrefix('form1.');
+    bool ok = true;
+
+    final note = fieldNotePerubahanController.text.trim();
+    if (note.isEmpty) {
+      setErr('form1.notePerubahan', 'Catatan perubahan wajib diisi');
+      ok = false;
+    }
+
+    return ok;
   }
 
   void addError({required String error}) {
@@ -398,6 +409,22 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
       });
       debugPrint("✅ [Endors1Crud] Error removed: $error");
     }
+  }
+
+  final Map<String, String?> fieldErrors = {};
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+  void clearErrsByPrefix(String prefix) {
+    setState(() {
+      fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
+    });
   }
 }
 double _safeDouble(String? text) {

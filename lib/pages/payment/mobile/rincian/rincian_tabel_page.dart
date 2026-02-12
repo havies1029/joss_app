@@ -52,6 +52,72 @@ class _RincianTablePageState extends State<RincianTablePage> {
     super.dispose();
   }
 
+  double _measureTextWidth(
+      BuildContext context,
+      String text, {
+        TextStyle? style,
+      }) {
+    final effectiveStyle = style ??
+        bodyTextStyle(context, fontSize: 14).copyWith(
+          color: primaryLightColor,
+        );
+
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: effectiveStyle),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+      ellipsis: '…',
+    )..layout();
+
+    return tp.width;
+  }
+
+  double _columnWidthFromLongest(
+      BuildContext context,
+      Iterable<String> values, {
+        required double min,
+        required double max,
+        double padding = 20, // ruang cell (biar ga mepet)
+        TextStyle? style,
+      }) {
+    var longest = 0.0;
+    for (final v in values) {
+      final w = _measureTextWidth(context, v, style: style);
+      if (w > longest) longest = w;
+    }
+    final target = longest + padding;
+    return target.clamp(min, max);
+  }
+
+
+  Map<int, TableColumnWidth> _compactColumnWidths(
+      BuildContext context,
+      List<DnDetailSppaModel> details,
+      ) {
+    final selectW = widget.readOnly ? 0.0 : 40.0;
+
+    final noPolisValues = details.map((d) => d.noPolis);
+    final periodeValues = details.map(
+          (d) => "${d.polisMulai.toString().substring(0, 10)} → ${d.polisAkhir.toString().substring(0, 10)}",
+    );
+    final currValues = details.map((d) => d.currSimbol);
+    final premiValues = details.map((d) => formatNum(d.dnOs));
+
+    final wNoPolis = _columnWidthFromLongest(context, noPolisValues, min: 140, max: 220);
+    final wPeriode = _columnWidthFromLongest(context, periodeValues, min: 170, max: 260);
+    final wCurr = _columnWidthFromLongest(context, currValues, min: 60, max: 90, padding: 16);
+    final wPremi = _columnWidthFromLongest(context, premiValues, min: 110, max: 160);
+
+    return {
+      0: FixedColumnWidth(selectW),
+      1: const FixedColumnWidth(50),
+      2: FixedColumnWidth(wNoPolis),
+      3: FixedColumnWidth(wPeriode),
+      4: FixedColumnWidth(wCurr),
+      5: FixedColumnWidth(wPremi),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -71,13 +137,14 @@ class _RincianTablePageState extends State<RincianTablePage> {
             _buildHeaderTitle(context, header),
             const SizedBox(height: hPadding),
 
-        isNarrow
-        ? _buildDetailTableCompact(filteredDetails)
-            : _buildDetailTableNormal(filteredDetails),
+            isNarrow
+                ? _buildDetailTableCompact(filteredDetails)
+                : _buildDetailTableNormal(filteredDetails),
 
-            if (widget.showFooter)
+            if (widget.showFooter) ...[
               _buildFooterTable(header.footers),
-
+              const SizedBox(height: vPadding),
+            ],
           ],
         );
       },
@@ -93,7 +160,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
   Widget _buildDetailTableCompact(List<DnDetailSppaModel> details) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
-
+    final widths = _compactColumnWidths(context, details);
     return StatefulBuilder(
       builder: (context, setState) {
         return ClipRRect(
@@ -138,16 +205,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
                       horizontalInside: BorderSide(color: sGrey, width: 1),
                       verticalInside: BorderSide(color: sGrey, width: 1),
                     ),
-                    columnWidths: {
-                      0: widget.readOnly
-                          ? const FixedColumnWidth(0)
-                          : const FixedColumnWidth(40),
-                      1: const FixedColumnWidth(50),
-                      2: const IntrinsicColumnWidth(),
-                      3: const IntrinsicColumnWidth(),
-                      4: const FixedColumnWidth(80),
-                      5: const FixedColumnWidth(120),
-                    },
+                    columnWidths: widths,
                     children: [
                       _tableHeader(context, [
                         "",
@@ -434,7 +492,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
           data: d,
           child: Text(
             d.noPolis,
-            maxLines: compact ? 2 : null,
+            maxLines: compact ? 3 : null,
             overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
             style: TextStyle(color: primaryLightColor),
           ),

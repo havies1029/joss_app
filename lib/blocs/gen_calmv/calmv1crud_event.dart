@@ -76,3 +76,7 @@ class Calmv1DraftEvent extends Calmv1CrudEvents {
 	@override
 	List<Object> get props => [record];
 }
+
+class Calmv1ResetStatusEvent extends Calmv1CrudEvents {
+	const Calmv1ResetStatusEvent();
+}

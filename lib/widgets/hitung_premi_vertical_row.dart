@@ -18,6 +18,7 @@ class HitungPremiVerticalRow extends StatelessWidget {
       displayValue,
       style: valueStyle,
       overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.right,
     );
 
     if (!row.showValueBorder) return valueText;
@@ -43,7 +44,7 @@ class HitungPremiVerticalRow extends StatelessWidget {
     final descStyle = row.descriptionStyle ??
         Theme.of(context).textTheme.bodySmall?.copyWith(
           fontSize: getResponsiveFont(context, 18),
-          color: sGrey,
+          color: hintGrey,
         );
 
     final baseValueStyle = row.valueStyle ??
@@ -56,8 +57,7 @@ class HitungPremiVerticalRow extends StatelessWidget {
         ? baseValueStyle?.copyWith(fontWeight: FontWeight.w700)
         : baseValueStyle;
 
-    final hasDesc = row.description != null && row.description!.isNotEmpty;
-
+    final hasDesc = row.description != null && row.description!.trim().isNotEmpty;
 
     String _cleanNum(num value) {
       final f = NumberFormat("#,###", "en_US");
@@ -94,24 +94,45 @@ class HitungPremiVerticalRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                row.label,
-                style: labelStyle,
-                overflow: TextOverflow.ellipsis,
-              ),
-              _buildValue(valueStyle, displayValue),
-            ],
-          ),
+          // ✅ kalau ada desc: label sendiri di atas
+          // ✅ kalau gak ada desc: label + value tetap sebaris
+          if (!hasDesc)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    row.label,
+                    style: labelStyle,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                _buildValue(valueStyle, displayValue),
+              ],
+            )
+          else
+            Text(
+              row.label,
+              style: labelStyle,
+              overflow: TextOverflow.ellipsis,
+            ),
 
           if (hasDesc) ...[
             const SizedBox(height: 4),
-            Text(
-              row.description!,
-              style: descStyle,
+            // ✅ value turun ke bawah (kanan), description di kiri
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    row.description!,
+                    style: descStyle,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                _buildValue(valueStyle, displayValue),
+              ],
             ),
           ],
         ],

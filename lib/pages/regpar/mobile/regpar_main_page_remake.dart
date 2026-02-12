@@ -103,6 +103,59 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Regpar5FormModel? form5Record;
   Regpar6FormModel? form6Record;
 
+  bool _lockCheckboxes = true;
+
+  void _setBool(TextEditingController c, bool v) {
+    c.text = v.toString();
+  }
+
+  void _applyCoverParRule(String? mjnscoverparId) {
+    // default: tidak ada yg kecentang, tidak terkunci
+    if (mjnscoverparId == null) {
+      setState(() {
+        _lockCheckboxes = false;
+        _setBool(fieldIsEqController, false);
+        _setBool(fieldIsTsfwdController, false);
+        _setBool(fieldIsFlexasController, false);
+        _setBool(fieldIsOtherController, false);
+        _setBool(fieldIsRsmdccController, false);
+      });
+      return;
+    }
+
+    if (mjnscoverparId == "10") {
+      // dengan gempa: semua centang termasuk gempa
+      setState(() {
+        _lockCheckboxes = true;
+        _setBool(fieldIsEqController, true);
+        _setBool(fieldIsTsfwdController, true);
+        _setBool(fieldIsFlexasController, true);
+        _setBool(fieldIsOtherController, true);
+        _setBool(fieldIsRsmdccController, true);
+      });
+    } else if (mjnscoverparId == "20") {
+      // tanpa gempa: semua centang selain gempa
+      setState(() {
+        _lockCheckboxes = true;
+        _setBool(fieldIsEqController, false);
+        _setBool(fieldIsTsfwdController, true);
+        _setBool(fieldIsFlexasController, true);
+        _setBool(fieldIsOtherController, true);
+        _setBool(fieldIsRsmdccController, true);
+      });
+    } else {
+      // id lain: balik ke default (atau sesuai kebutuhan)
+      setState(() {
+        _lockCheckboxes = false;
+        _setBool(fieldIsEqController, false);
+        _setBool(fieldIsTsfwdController, false);
+        _setBool(fieldIsFlexasController, false);
+        _setBool(fieldIsOtherController, false);
+        _setBool(fieldIsRsmdccController, false);
+      });
+    }
+  }
+
   String cleanNum(num value) {
     final f = NumberFormat("#,###", "en_US");
     return f.format(value);
@@ -404,8 +457,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
       }
 
-      if (fieldComboMJnscoverPar == null && record.comboMJnscoverPar != null) {
-        fieldComboMJnscoverPar = record.comboMJnscoverPar;
+
+      final jnsCoverPar = record.comboMJnscoverPar;
+      if (fieldComboMJnscoverPar == null && jnsCoverPar != null) {
+        fieldComboMJnscoverPar = jnsCoverPar;
+        _applyCoverParRule(jnsCoverPar.mjnscoverparId); // ✅ sync dari data
       }
 
       if (fieldComboMWilayah == null && record.comboMWilayah != null) {
@@ -462,179 +518,335 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     fieldBiayaPolisController.text = record.biayaPolis.toString();
   }
 
+  Future<bool?> showExitConfirmDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // SVG Warning Icon
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: SvgPicture.asset(
+                      "assets/icons/bi_exclamation-circle.svg",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Keluar halaman ini?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Anda memiliki data yang belum disimpan. Jika keluar dari halaman ini, seluruh data akan hilang.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              "Tidak",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              "Iya, Keluar",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleExit(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      context.read<Regpar1CrudBloc>().add(
+        Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
+      );
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: "Properti",
-      blocListeners: [
-        BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regpar1Id = state.record!.regpar1Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform1(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Regpar2FormBloc, Regpar2FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regpar2Id = state.record!.regpar2Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform2(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Regpar3FormBloc, Regpar3FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regpar3Id = state.record!.regpar3Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform3(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Regpar4FormBloc, Regpar4FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                regpar4Id = state.record!.regpar1Id;//anomali
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform4(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Regpar5FormBloc, Regpar5FormState>(
-          listener: (context, state) {
-            if (state.record != null) {
-              _payloadform5(state.record!);
-
-              openForm6(recordId: regpar1Id);
-              //
-              // if (state.isLoaded) {
-              //   setState(() {
-              //     regpar6Id = state.record!.regpar6Id;
-              //   });
-              //
-              //   _payloadform6(state.record!);
-              //
-              //   // if (state.record!.regpar6Id.isNotEmpty) {
-              //   //   openForm7();
-              //   // }
-              //   openForm7();
-              // }
-
-              if (state.isSaved) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _handleExit(context);
+      },
+      child: BaseBackgroundSidePage(
+        onBack: () async {
+          await _handleExit(context);
+        },
+        title: "Properti", // sesuaikan judulmu
+        blocListeners: [
+          BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
-                  regpar5Id = state.record!.regpar5Id;
+                  regpar1Id = state.record!.regpar1Id;
                 });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform1(state.record!);
+              }
+            },
+          ),
 
-                if (state.record!.regpar5Id.isNotEmpty) {
-                  openForm6(recordId: regpar1Id);
+          BlocListener<Regpar2FormBloc, Regpar2FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  regpar2Id = state.record!.regpar2Id;
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform2(state.record!);
+              }
+            },
+          ),
+
+          BlocListener<Regpar3FormBloc, Regpar3FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  regpar3Id = state.record!.regpar3Id;
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform3(state.record!);
+              }
+            },
+          ),
+
+          BlocListener<Regpar4FormBloc, Regpar4FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  regpar4Id = state.record!.regpar1Id;//anomali
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform4(state.record!);
+              }
+            },
+          ),
+
+          BlocListener<Regpar5FormBloc, Regpar5FormState>(
+            listener: (context, state) {
+              if (state.record != null) {
+                _payloadform5(state.record!);
+
+                openForm6(recordId: regpar1Id);
+                //
+                // if (state.isLoaded) {
+                //   setState(() {
+                //     regpar6Id = state.record!.regpar6Id;
+                //   });
+                //
+                //   _payloadform6(state.record!);
+                //
+                //   // if (state.record!.regpar6Id.isNotEmpty) {
+                //   //   openForm7();
+                //   // }
+                //   openForm7();
+                // }
+
+                if (state.isSaved) {
+                  setState(() {
+                    regpar5Id = state.record!.regpar5Id;
+                  });
+
+                  if (state.record!.regpar5Id.isNotEmpty) {
+                    openForm6(recordId: regpar1Id);
+                  }
                 }
               }
-            }
-          },
-        ),
+            },
+          ),
 
 
-        BlocListener<Regpar6CariBloc, Regpar6CariState>(
-          listener: (context, state) {
+          BlocListener<Regpar6CariBloc, Regpar6CariState>(
+            listener: (context, state) {
 
-            if (state.status == ListStatus.success) {
-              debugPrint("✅ Regpar4CariBloc SUCCESS");
-              setState(() => _serverPhotosRegpar6 = List.from(state.items));
-            }
-          },
-        ),
+              if (state.status == ListStatus.success) {
+                debugPrint("✅ Regpar4CariBloc SUCCESS");
+                setState(() => _serverPhotosRegpar6 = List.from(state.items));
+              }
+            },
+          ),
 
-        BlocListener<RegparUploadFotoObjectBloc, RegparUploadFotoObjectState>(
-          listener: (context, state) {
+          BlocListener<RegparUploadFotoObjectBloc, RegparUploadFotoObjectState>(
+            listener: (context, state) {
 
-            if (state is UploadFotoObjectListPreview) {
-              debugPrint("fileNames length: ${state.fileNames.length}");
+              if (state is UploadFotoObjectListPreview) {
+                debugPrint("fileNames length: ${state.fileNames.length}");
 
-              setState(() {
-                _imagesRegpar6 = List.from(state.images);
-                _fileNamesRegpar6 = List.from(state.fileNames);
-              });
-            }
-
-            if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-              debugPrint("🔄 refreshForm6 CALLED (general)");
-              refreshForm6(recordId: regpar1Id);
-            }
-
-            if (state is UploadFotoObjectSuccess) {
-              debugPrint("✅ UploadFotoObjectSuccess");
+                setState(() {
+                  _imagesRegpar6 = List.from(state.images);
+                  _fileNamesRegpar6 = List.from(state.fileNames);
+                });
+              }
 
               if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (success)");
+                debugPrint("🔄 refreshForm6 CALLED (general)");
                 refreshForm6(recordId: regpar1Id);
               }
-            }
 
-            if (state is UploadFotoObjectFailure) {
-              debugPrint("❌ UploadFotoObjectFailure: ${state.error}");
+              if (state is UploadFotoObjectSuccess) {
+                debugPrint("✅ UploadFotoObjectSuccess");
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-        ),
-
-        BlocListener<Regpar6FormBloc, Regpar6FormState>(
-          listener: (context, state) {
-
-            if (state.isSaved) {
-              _deletingServerIdsRegpar6.clear();
-
-              if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                refreshForm6(recordId: regpar1Id);
+                if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                  debugPrint("🔄 refreshForm4 CALLED (success)");
+                  refreshForm6(recordId: regpar1Id);
+                }
               }
-            }
 
-            if (state.hasFailure) {
-              debugPrint("❌ Delete FAILURE");
+              if (state is UploadFotoObjectFailure) {
+                debugPrint("❌ UploadFotoObjectFailure: ${state.error}");
 
-              _deletingServerIdsRegpar6.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-
-              if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm6 CALLED (delete failure)");
-                refreshForm6(recordId: regpar1Id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
-            }
-          },
-        ),
+            },
+          ),
 
-      ],
+          BlocListener<Regpar6FormBloc, Regpar6FormState>(
+            listener: (context, state) {
 
-      child: _buildForm(),
+              if (state.isSaved) {
+                _deletingServerIdsRegpar6.clear();
+
+                if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                  refreshForm6(recordId: regpar1Id);
+                }
+              }
+
+              if (state.hasFailure) {
+                debugPrint("❌ Delete FAILURE");
+
+                _deletingServerIdsRegpar6.clear();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+
+                if (regpar1Id != null && regpar1Id!.isNotEmpty) {
+                  debugPrint("🔄 refreshForm6 CALLED (delete failure)");
+                  refreshForm6(recordId: regpar1Id);
+                }
+              }
+            },
+          ),
+
+        ],
+        child: _buildForm(),
+      ),
     );
   }
 
@@ -870,53 +1082,56 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     child: (hasForm5Record)
                         ? Column(
                       children: [
-                        Text(
-                          "RATE",
-                          textAlign: TextAlign.left,
-                          style: bodyTextStyle(context).copyWith(
-                            color: primaryLightColor,
-                            fontSize: getResponsiveFont(context, 20),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "RATE",
+                            style: bodyTextStyle(context).copyWith(
+                              color: primaryLightColor,
+                              fontSize: getResponsiveFont(context, 20),
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 6),
                         HitungPremiWidget(
                           rows: [
                             HitungPremiRow(
-                              label: "Par:",
+                              label: "Kebakaran:",
                               controller: fieldRateParController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Rsmdcc:",
+                              label: "Kerusuhan:",
                               controller: fieldRateRsmdccController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "TSfwd:",
+                              label: "Banjir:",
                               controller: fieldRateTsfwdController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Eqvet:",
+                              label: "Gempa Bumi:",
                               controller: fieldRateEqvetController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Other:",
+                              label: "Lain-Lain:",
                               controller: fieldRateOtherController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
                             ),
                             HitungPremiRow(
-                              label: "Total:",
+                              label: "Total Rate:",
                               controller: fieldRateTotalController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               showValueBorder: true,
@@ -934,7 +1149,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                         HitungPremiWidget(
                           rows: [
                             HitungPremiRow(
-                              label: "Annual Premium",
+                              label: "PERHITUNGAN PREMI\n(Asuransi PAR Termasuk EQVET)",
                               description: "${fieldComboRMatauang?.rmatauangSimbol} ${formatControllerNumber(fieldSumInsuredController)} x ${fieldRateTotalController.text}% =",
                               controller: fieldPremiNetController,
                               layoutType: HitungPremiLayoutType.vertical,
@@ -943,24 +1158,15 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "Additional Premium",
-                              description: "(For TPL & PAD & PAP)",
-                              controller: fieldPremiNetController,
+                              label: "DISKON",
+                              controller: fieldDiskonNilaiController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "Discount",
-                              controller: fieldDiskonPersenController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "Policy Cost:",
+                              label: "BIAYA POLIS",
                               controller: fieldBiayaPolisController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -969,7 +1175,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
                             ),
                             HitungPremiRow(
-                              label: "Total Premium:",
+                              label: "TOTAL PREMI",
                               controller: fieldPremiTotalController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1799,6 +2005,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     initialValue: toBoolean(fieldIsEqController.text),
     callback: (v) => fieldIsEqController.text = v.toString(),
     leftLabel: "",
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsFlexas() => CheckboxWidget(
@@ -1806,6 +2013,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     rightLabel: "Kebakaran/Petir",
     initialValue: toBoolean(fieldIsFlexasController.text),
     callback: (v) => fieldIsFlexasController.text = v.toString(),
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsOther() => CheckboxWidget(
@@ -1813,6 +2021,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     rightLabel: "Lain-Lain",
     initialValue: toBoolean(fieldIsOtherController.text),
     callback: (v) => fieldIsOtherController.text = v.toString(),
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsRsmdcc() => CheckboxWidget(
@@ -1820,6 +2029,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     rightLabel: "Kerusuhan",
     initialValue: toBoolean(fieldIsRsmdccController.text),
     callback: (v) => fieldIsRsmdccController.text = v.toString(),
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsTsfwd() => CheckboxWidget(
@@ -1827,6 +2037,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     rightLabel: "Banjir",
     initialValue: toBoolean(fieldIsTsfwdController.text),
     callback: (v) => fieldIsTsfwdController.text = v.toString(),
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
@@ -1842,6 +2053,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     onChangedCallback: (v) {
       fieldComboMJnscoverPar = v;
       if (v != null) clearErr('form3.jenisJaminan');
+      _applyCoverParRule(v?.mjnscoverparId);
     },
     onSaveCallback: (value) => fieldComboMJnscoverPar = value,
   );
@@ -1860,13 +2072,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       fieldComboMWilayah = v;
       if (v != null) {
         clearErr('form3.wilayah');
-
-        // reset dependent combo: Zona Gempa
         fieldComboMKabZonaGempa = null;
-        // kalau kamu punya key untuk combo zona gempa, clear juga:
-        // comboMKabZonaGempaKey.currentState?.clear();
-
-        // biar error lama gak nyangkut
+        regpar3formbloc?.add(ComboMWilayahChangedEvent(comboMWilayah: v));
+        comboMWilayahKey.currentState?.clear();
         clearErr('form3.zonaGempa');
       }
     },
@@ -1876,11 +2084,20 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
     hintText: "Zona gempa Bumi",
     initItem: fieldComboMKabZonaGempa,
-    dataLoader: () => ComboMKabZonaGempaRepository()
-        .getComboMKabZonaGempa(fieldComboMWilayah?.mwilayahId ?? ""),
+    dataLoader: () {
+      final wid = fieldComboMWilayah?.mwilayahId;
+      final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(payload);
+    },
+    dataLoaderWithFilter: (q) {
+      final wid = fieldComboMWilayah?.mwilayahId;
+      if (wid == null || wid.isEmpty) return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("");
+      final queryUser = (q ?? "").trim();
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("$wid|$queryUser");
+    },
+    serverSearchMinChars: 2,
     displayText: (i) => i.kabupaten,
     compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
-
     validatorCallback: (_) => err('form3.zonaGempa'),
     errorText: err('form3.zonaGempa'),
 

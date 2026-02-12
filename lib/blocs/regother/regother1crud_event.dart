@@ -54,3 +54,12 @@ class ComboRMatauangChangedEvent extends Regother1CrudEvents{
 
 class ResetRegother1CrudEvent extends Regother1CrudEvents {}
 
+class SelectButton extends Regother1CrudEvents {
+	final String id;
+
+	const SelectButton(this.id);
+
+	@override
+	List<Object> get props => [id];
+}
+

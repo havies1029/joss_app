@@ -5,6 +5,8 @@ import 'package:joss_app/widgets/list_extension.dart';
 import 'package:joss_app/models/payment/historybayarcari_model.dart';
 import 'package:joss_app/repositories/payment/historybayarcari_repository.dart';
 
+import '../../repositories/payment/invoice_download_repository.dart';
+
 part 'historybayarcari_event.dart';
 part 'historybayarcari_state.dart';
 
@@ -15,6 +17,19 @@ class HistorybayarCariBloc extends Bloc<HistorybayarCariEvents, HistorybayarCari
 		on<SelectHistorybayarCariEvent>((event, emit) {
 			emit(state.copyWith(selectedItem: event.selected));
 		});
+		on<DownloadInvoiceEvent>(onDownloadInvoice);
+	}
+
+	Future<void> onDownloadInvoice(
+			DownloadInvoiceEvent event, Emitter<HistorybayarCariState> emit) async {
+		emit(state.copyWith(isDownloading: true, downloadPath: ''));
+		try {
+			InvoiceDownloadRepository repo = InvoiceDownloadRepository();
+			String path = await repo.downloadInvoice(event.noInv);
+			emit(state.copyWith(isDownloading: false, downloadPath: path));
+		} catch (e) {
+			emit(state.copyWith(isDownloading: false, downloadPath: ''));
+		}
 	}
 
 	Future<void> onRefreshHistorybayarCari(

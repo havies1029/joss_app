@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
-import 'dart:math' as math; // buat sin shake
+import 'dart:math' as math;
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
-import '../../../../../models/login/emailverification_model.dart';
 import '../../../../../models/reguser/reguser_model.dart';
-import '../../../../../repositories/user/user_repository.dart';
 import '../../../../base/base_background_firstpage.dart';
-import '../../../../home/home_tab_widget.dart';
 
 class PopupClientWidget extends StatefulWidget {
   final String phoneNumber;
@@ -28,7 +24,6 @@ class PopupClientWidget extends StatefulWidget {
 
 class _PopupClientWidgetState extends State<PopupClientWidget>
     with TickerProviderStateMixin {
-  // 🎬 Animations
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -39,7 +34,6 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  // 📌 OTP
   final List<TextEditingController> _otpControllers = [];
   final List<FocusNode> _focusNodes = [];
 
@@ -192,7 +186,6 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
     // final user = await userRepo.getUserByToken(await userRepo.getToken());
     // context.read<AuthenticationBloc>().add(LoggedIn(user: user));
 
-    // 🚪 Tutup popup
     Navigator.of(context, rootNavigator: true).pop();
   }
 
@@ -226,7 +219,6 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // adaptif: kalau layar kecil, jaraknya lebih kecil
     final double topSpacing =
     screenHeight < 700 ? screenHeight * 0.06 : screenHeight * 0.095;
 
@@ -296,7 +288,6 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
                               children: [
                                 SizedBox(height: screenHeight * 0.04),
 
-                                // 🔒 Icon
                                 ScaleTransition(
                                   scale: _scaleAnimation,
                                   child: Container(

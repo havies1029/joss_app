@@ -140,6 +140,9 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 		on<SelectProsesOthersIdEvent>((event, emit) {
 			emit(state.copyWith(selectedProsesId: event.prosesId));
 		});
+		on<ClearSelectedOthersItemEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: null));
+		});
 	}
 
 	// -----------------------

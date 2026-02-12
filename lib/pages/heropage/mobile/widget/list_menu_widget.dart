@@ -6,11 +6,11 @@ import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../widgets/hitung_premi_demo.dart';
+import '../../../../widgets/image_picker_dummy_page.dart';
 import '../../../aset/aset_cari.dart';
 import '../../../calpar/mobile/calpar_main_page_remake.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../../gen_endors/endors1crud_form.dart';
-import '../../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../management_polis/mobile/management_polis_filter.dart';
@@ -25,7 +25,9 @@ import '../../../payment/rincian/rinciansoa_page.dart';
 import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
+import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
+import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String userType;
@@ -319,7 +321,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -361,7 +363,8 @@ class ListMenuWidget extends StatelessWidget {
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalparMainPageRemake(  )));
+        // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
         break;
 
       // case 'Test Page':

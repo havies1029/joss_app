@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/pages/management_polis/mobile/form_button_page/polis_success.dart';
+import 'package:joss_app/pages/management_polis/mobile/theme/polis_success.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
@@ -95,7 +95,12 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
                 text: 'Ajukan Perubahan',
                 backgroundColor: primaryColor,
                 onPressed: () {
-                  _showPengajuanDialog(context);
+                  final okForm1 = validateForm1();
+                  if (!okForm1) {
+                    return;
+                  }else {
+                    _showPengajuanDialog(context);
+                  }
                 },
               ),
             ),
@@ -157,7 +162,7 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
           context,
           MaterialPageRoute(
             builder: (_) => PolisSuccess(
-
+              purpose: "A",
               display: "Pengajuan berhasil dikirim",
             ),
           ),
@@ -228,18 +233,11 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
       controller: fieldNotePerubahanController,
       keyboardType: TextInputType.multiline,
       maxLines: 12,
+      errorText: err('form1.notePerubahan'),
       onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kStringNullError);
+        if (value.trim().isNotEmpty) {
+          clearErr('form1.notePerubahan');
         }
-      },
-
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          addError(error: kStringNullError);
-          return "Catatan perubahan wajib diisi";
-        }
-        return null;
       },
     );
   }
@@ -369,8 +367,37 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     Navigator.pop(context);
   }
 
-  void onSaveForm() {
+  bool validateForm1() {
+    clearErrsByPrefix('form1.');
+    bool ok = true;
 
+    final note = fieldNotePerubahanController.text.trim();
+    if (note.isEmpty) {
+      setErr('form1.notePerubahan', 'Catatan perubahan wajib diisi');
+      ok = false;
+    }
+
+    return ok;
+  }
+
+  final Map<String, String?> fieldErrors = {};
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+  void clearErrsByPrefix(String prefix) {
+    setState(() {
+      fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
+    });
+  }
+
+  void onSaveForm() {
+    _dismissDialog();
     final record = Regreaktif1Model(
       isUbah: false,
       sppa1Id: widget.polisId,
@@ -378,7 +405,6 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     );
 
     regreaktif1Bloc.add(Regreaktif1TambahEvent(record: record));
-    _dismissDialog();
   }
 
   void addError({required String error}) {

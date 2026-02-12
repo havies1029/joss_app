@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -12,15 +13,29 @@ class Calmv1CrudAPI {
 		Map<String, String> queryParams = {"modul_id": "calmv1CrudTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		ReturnDataAPI returnData;
-		final http.Response response = await http.post(uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
-				body: jsonEncode(record.toJson()));
+		// 🔍 DEBUG REQUEST
+		debugPrint(
+			"[API] Calmv1Tambah REQUEST\n"
+					"URI: $uri\n"
+					"BODY: ${jsonEncode(record.toJson())}",
+		);
 
+		final http.Response response = await http.post(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}'
+			},
+			body: jsonEncode(record.toJson()),
+		);
+
+		// 🔍 DEBUG RESPONSE
+		debugPrint(
+			"[API] Calmv1Tambah RESPONSE status=${response.statusCode} body=${response.body}",
+		);
+
+		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
@@ -28,20 +43,34 @@ class Calmv1CrudAPI {
 		}
 		return returnData;
 	}
+
 	Future<bool> calmv1CrudUbahAPI(Calmv1CrudModel record) async {
 		String ubahEndpoint =
 				"${AppData.prefixEndPoint}/api/calmv/calmv1crud/update";
 		Map<String, String> queryParams = {"modul_id": "calmv1CrudUbahAPI"};
-
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
-		final http.Response response = await http.post(uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
-				body: jsonEncode(record.toJson()));
+		// 🔍 DEBUG REQUEST
+		debugPrint(
+			"[API] Calmv1Ubah REQUEST\n"
+					"URI: $uri\n"
+					"BODY: ${jsonEncode(record.toJson())}",
+		);
+
+		final http.Response response = await http.post(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}'
+			},
+			body: jsonEncode(record.toJson()),
+		);
+
+		// 🔍 DEBUG RESPONSE
+		debugPrint(
+			"[API] Calmv1Ubah RESPONSE status=${response.statusCode} body=${response.body}",
+		);
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
@@ -51,6 +80,7 @@ class Calmv1CrudAPI {
 		}
 		return returnData.success;
 	}
+
 	Future<bool> calmv1CrudHapusAPI(String calmv1Id) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv1crud/delete";
 		Map<String, String> queryParams = {

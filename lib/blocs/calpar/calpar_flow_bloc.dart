@@ -7,8 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'calpar1crud_bloc.dart';
 import 'calpar2form_bloc.dart';
 import 'calpar3form_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
-
 import 'calpar4form_bloc.dart';
 
 part 'calpar_flow_event.dart';
@@ -23,6 +21,10 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
   late final StreamSubscription _subCalpar1;
   late final StreamSubscription _subCalpar2;
   late final StreamSubscription _subCalpar3;
+
+  Calpar1CrudState? _prev1;
+  Calpar2FormState? _prev2;
+  Calpar3FormState? _prev3;
 
   CalparFlowBloc({
     required this.calpar1CrudBloc,
@@ -40,35 +42,64 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
 
   void _wireListeners() {
     _subCalpar1 = calpar1CrudBloc.stream.listen((s) {
+      final prev = _prev1;
+      _prev1 = s;
+
       final id = s.record?.calpar1Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
 
-      if (!ok) return;
+      final justFinished =
+          (prev?.isSaving == true) &&
+              (s.isSaving == false) &&
+              (s.isSaved == true) &&
+              (s.hasFailure == false) &&
+              id.isNotEmpty;
 
-      // hindari trigger berkali-kali
-      if (!state.step2Triggered) {
+      if (justFinished && !state.step2Triggered) {
+        debugPrint(
+          "[${DateTime.now().toIso8601String()}] CalparFlow ENQUEUE EnsureCalpar2 (justFinished Calpar1)",
+        );
         add(const CalparFlowEnsureCalpar2Event());
       }
     });
 
     _subCalpar2 = calpar2FormBloc.stream.listen((s) {
+      final prev = _prev2;
+      _prev2 = s;
+
       final id = s.record?.calpar2Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
 
-      if (!ok) return;
+      final justFinished =
+          (prev?.isSaving == true) &&
+              (s.isSaving == false) &&
+              (s.isSaved == true) &&
+              (s.hasFailure == false) &&
+              id.isNotEmpty;
 
-      if (!state.step3Triggered) {
+      if (justFinished && !state.step3Triggered) {
+        debugPrint(
+          "[${DateTime.now().toIso8601String()}] CalparFlow ENQUEUE EnsureCalpar3 (justFinished Calpar2)",
+        );
         add(const CalparFlowEnsureCalpar3Event());
       }
     });
 
     _subCalpar3 = calpar3FormBloc.stream.listen((s) {
+      final prev = _prev3;
+      _prev3 = s;
+
       final id = s.record?.calpar3Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
 
-      if (!ok) return;
+      final justFinished =
+          (prev?.isSaving == true) &&
+              (s.isSaving == false) &&
+              (s.isSaved == true) &&
+              (s.hasFailure == false) &&
+              id.isNotEmpty;
 
-      if (!state.step4Triggered) {
+      if (justFinished && !state.step4Triggered) {
+        debugPrint(
+          "[${DateTime.now().toIso8601String()}] CalparFlow ENQUEUE HitungPremi (justFinished Calpar3)",
+        );
         add(const CalparFlowHitungPremiIfReadyEvent());
       }
     });
@@ -82,72 +113,64 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
     return super.close();
   }
 
-  void _onFlowStart(
-      CalparFlowStartEvent event,
-      Emitter<CalparFlowState> emit,
-      ) {
-    emit(const CalparFlowState());
+  void _onFlowStart(CalparFlowStartEvent event, Emitter<CalparFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] CalparFlow START");
 
+    _prev1 = null;
+    _prev2 = null;
+    _prev3 = null;
+
+    emit(const CalparFlowState());
     _ensureCalpar1();
   }
 
   void _onEnsureCalpar2(
-      CalparFlowEnsureCalpar2Event event,
-      Emitter<CalparFlowState> emit,
-      ) {
+      CalparFlowEnsureCalpar2Event event, Emitter<CalparFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] CalparFlow STEP2 EnsureCalpar2");
     emit(state.copyWith(step2Triggered: true));
     _ensureCalpar2();
   }
 
   void _onEnsureCalpar3(
-      CalparFlowEnsureCalpar3Event event,
-      Emitter<CalparFlowState> emit,
-      ) {
+      CalparFlowEnsureCalpar3Event event, Emitter<CalparFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] CalparFlow STEP3 EnsureCalpar3");
     emit(state.copyWith(step3Triggered: true));
     _ensureCalpar3();
   }
 
   void _onHitungPremiIfReady(
-      CalparFlowHitungPremiIfReadyEvent event,
-      Emitter<CalparFlowState> emit,
-      ) {
+      CalparFlowHitungPremiIfReadyEvent event, Emitter<CalparFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] CalparFlow STEP4 HitungPremiIfReady");
     emit(state.copyWith(step4Triggered: true));
     _triggerHitungPremiIfReady();
   }
 
   void _ensureCalpar1() {
     final form1 = calpar1CrudBloc.state.record!;
-
     if (form1.calpar1Id.isEmpty) {
       calpar1CrudBloc.add(Calpar1CrudTambahEvent(record: form1));
       return;
     }
-
     calpar1CrudBloc.add(Calpar1CrudUbahEvent(record: form1));
   }
 
-
   void _ensureCalpar2() {
     final form1 = calpar1CrudBloc.state.record!;
-
-    if (form1.calpar1Id.isEmpty) {
-      return;
-    }
+    if (form1.calpar1Id.isEmpty) return;
 
     _syncCalpar1IdToForm2And3(form1.calpar1Id);
 
     final form2 = calpar2FormBloc.state.record!;
-
     final form2WithParent = form2.copyWith(calpar1Id: form1.calpar1Id);
 
     if (form2.calpar2Id.isEmpty) {
+      // ✅ ini yang tadi kebalik
       calpar2FormBloc.add(Calpar2FormUbahEvent(record: form2WithParent));
       return;
     }
 
     calpar2FormBloc.add(Calpar2FormUbahEvent(record: form2WithParent));
   }
-
 
   void _ensureCalpar3() {
     final form1 = calpar1CrudBloc.state.record!;
@@ -164,7 +187,6 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
     }
     calpar3FormBloc.add(Calpar3FormUbahEvent(record: form3WithParent));
   }
-
 
   void _triggerHitungPremiIfReady() {
     final form1 = calpar1CrudBloc.state.record!;
@@ -184,18 +206,14 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
     final form2 = calpar2FormBloc.state.record!;
     if (form2.calpar1Id != calpar1Id) {
       calpar2FormBloc.add(
-        Calpar2DraftEvent(
-          record: form2.copyWith(calpar1Id: calpar1Id),
-        ),
+        Calpar2DraftEvent(record: form2.copyWith(calpar1Id: calpar1Id)),
       );
     }
 
     final form3 = calpar3FormBloc.state.record!;
     if (form3.calpar1Id != calpar1Id) {
       calpar3FormBloc.add(
-        Calpar3DraftEvent(
-          record: form3.copyWith(calpar1Id: calpar1Id),
-        ),
+        Calpar3DraftEvent(record: form3.copyWith(calpar1Id: calpar1Id)),
       );
     }
   }

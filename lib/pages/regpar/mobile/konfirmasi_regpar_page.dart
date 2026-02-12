@@ -58,7 +58,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   void initState() {
     super.initState();
     regpar1listBloc = context.read<Regpar1ListBloc>();
-    // 🔥 Trigger load Form 1 saat halaman dibuka
     if (widget.viewMode == "ubah" && widget.recordId != null) {
       context.read<Regpar1CrudBloc>()
           .add(Regpar1CrudLihatEvent(recordId: widget.recordId!));

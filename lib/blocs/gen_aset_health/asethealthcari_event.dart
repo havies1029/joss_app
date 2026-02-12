@@ -111,3 +111,5 @@ class SelectProsesHealthIdEvent extends AsetHealthCariEvents {
 	final String? prosesId;
 	const SelectProsesHealthIdEvent(this.prosesId);
 }
+
+class ClearSelectedHealthItemEvent extends AsetHealthCariEvents {}

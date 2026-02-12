@@ -68,7 +68,6 @@ class Calmv2FormFormPageFormState extends State<Calmv2FormFormPage> {
           title: 'Perlindungan Tambahan',
           child: SingleChildScrollView(
             child: Form(
-              key: _formKey,
               child: Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(

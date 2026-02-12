@@ -21,21 +21,47 @@ class Regother1CrudBloc extends Bloc<Regother1CrudEvents, Regother1CrudState> {
 		on<ResetRegother1CrudEvent>((event, emit) {
 			emit(Regother1CrudState.initial());
 		});
+		on<SelectButton>(onSelectButton);
+	}
+
+	Future<void> onSelectButton(
+			SelectButton event, Emitter<Regother1CrudState> emit) async {
+		emit(state.copyWith(
+			selectedCOBId: event.id,
+		));
 	}
 
 	Future<void> onTambahRegother1Crud(
-			Regother1CrudTambahEvent event, Emitter<Regother1CrudState> emit) async {
-
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.regother1CrudTambah(event.record);
-		hasFailure = !returnData.success;
+			Regother1CrudTambahEvent event,
+			Emitter<Regother1CrudState> emit,
+			) async {
 		emit(state.copyWith(
-				isSaving: false,
-				isSaved: true,
-				hasFailure: hasFailure));
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+			record: event.record.copyWith(regother1Id: ""),
+		));
+
+		final returnData = await repository.regother1CrudTambah(event.record);
+		final hasFailure = !returnData.success;
+
+		final newId = (!hasFailure && returnData.data != null)
+				? returnData.data.toString()
+				: "";
+
+		final updatedRecord = (state.record ?? event.record).copyWith(
+			regother1Id: newId,
+		);
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: hasFailure,
+			record: updatedRecord,
+			selectedItem: hasFailure ? state.selectedItem : updatedRecord,
+		));
 	}
+
 
 	Future<void> onUbahRegother1Crud(
 			Regother1CrudUbahEvent event, Emitter<Regother1CrudState> emit) async {

@@ -117,22 +117,25 @@ class _LoginFormUserState extends State<LoginFormUser>
       },
     );
   }
+
   void onRegisterButtonPressed(BuildContext context) {
     if (!_formKey.currentState!.validate()) return;
 
     final input = _emailOrPhoneController.text.trim();
     final isEmail = emailValidatorRegExp.hasMatch(input);
 
+    // optional: tetap update state biar UI/validasi lain ikut kebawa
     if (isEmail) {
       context.read<EmailVerificationBloc>().add(
         FieldEmailVerificationChangedEvent(email: input),
       );
     } else {
       context.read<EmailVerificationBloc>().add(
-        const FieldEmailVerificationChangedEvent(email: ''),
+        FieldTeleponVerificationChangedEvent(telepon: input),
       );
     }
 
+    // penting: submit pakai input yang baru diketik user
     AuthInputRouter.handleInput(context, input);
   }
 
@@ -321,18 +324,18 @@ class _LoginFormUserState extends State<LoginFormUser>
                                     ),
                                     SizedBox(height: 10),
                                     // Tombol Google
-                                    kIsWeb
-                                        ? const CachedGoogleSigninButton()
-                                        : AppButton.iconLeft(
-                                      text: 'Masuk Dengan Google',
-                                      icon: SvgPicture.asset(
-                                        'assets/icons/google-icon.svg',
-                                        width: 20,
-                                        height: 20,
-                                      ),
-                                      onPressed: () => _handleGmailRegisterForMobile(context),
-                                      backgroundColor: pGrey,
-                                    ),
+                                    // kIsWeb
+                                    //     ? const CachedGoogleSigninButton()
+                                    //     : AppButton.iconLeft(
+                                    //   text: 'Masuk Dengan Google',
+                                    //   icon: SvgPicture.asset(
+                                    //     'assets/icons/google-icon.svg',
+                                    //     width: 20,
+                                    //     height: 20,
+                                    //   ),
+                                    //   onPressed: () => _handleGmailRegisterForMobile(context),
+                                    //   backgroundColor: pGrey,
+                                    // ),
 
                                     SizedBox(height: vPadding,),
                                     footerLoginText(context),

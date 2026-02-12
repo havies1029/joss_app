@@ -85,6 +85,7 @@ class RingkasanPageState extends State<RingkasanPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: secondaryBlackColor,
         body: Stack(
           children: [
             // ===== MAIN CONTENT =====

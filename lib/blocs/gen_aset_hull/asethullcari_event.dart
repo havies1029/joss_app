@@ -107,3 +107,5 @@ class SelectProsesHullIdEvent extends AsethullCariEvents {
 	final String? prosesId;
 	const SelectProsesHullIdEvent(this.prosesId);
 }
+
+class ClearSelectedHullItemEvent extends AsethullCariEvents {}

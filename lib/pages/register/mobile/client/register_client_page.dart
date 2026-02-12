@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/register/mobile/client/register_form_client.dart';
+import 'package:joss_app/pages/register/mobile/client/register_form_client_remake.dart';
 
 import '../../../../common/constants.dart';
 import '../../../base/base_background_firstpage.dart';
@@ -39,7 +40,7 @@ class _RegisterClientState extends State<RegisterClient>
 
   // Widget yang mengandung RegisterFormClient
   Widget _buildDesignRegisterFormClient() {
-    return RegisterFormClient(requestFrom: widget.requestFrom,);
+    return RegisterFormClientRemake(requestFrom: widget.requestFrom,);
   }
 
   @override

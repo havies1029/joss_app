@@ -24,7 +24,6 @@ class Endors1CrudFormPageFormState extends State<Endors1CrudFormPage> {
 	Widget build(BuildContext context) {
 		endors1CrudBloc = BlocProvider.of<Endors1CrudBloc>(context);
 		return Form(
-      key: _formKey,
       child: Column(
         children: [
           const SizedBox(height: 10),

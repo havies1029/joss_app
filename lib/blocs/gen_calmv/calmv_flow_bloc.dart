@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'calmv1crud_bloc.dart';
@@ -34,26 +35,45 @@ class CalmvFlowBloc extends Bloc<CalmvFlowEvent, CalmvFlowState> {
     _wireListeners();
   }
 
+  Calmv1CrudState? _prev1;
+  Calmv2FormState? _prev2;
+
+
   void _wireListeners() {
     _subCalmv1 = calmv1CrudBloc.stream.listen((s) {
+      final prev = _prev1;
+      _prev1 = s;
+
       final id = s.record?.calmv1Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
 
-      if (!ok) return;
+      final justFinished =
+          (prev?.isSaving == true) &&
+              (s.isSaving == false) &&
+              (s.isSaved == true) &&
+              (s.hasFailure == false) &&
+              id.isNotEmpty;
 
-      // hindari trigger berkali-kali
-      if (!state.step2Triggered) {
+      if (justFinished && !state.step2Triggered) {
+        debugPrint("[${DateTime.now().toIso8601String()}] Flow ENQUEUE EnsureCalmv2 (justFinished Calmv1)");
         add(const CalmvFlowEnsureCalmv2Event());
       }
     });
 
     _subCalmv2 = calmv2FormBloc.stream.listen((s) {
+      final prev = _prev2;
+      _prev2 = s;
+
       final id = s.record?.calmv2Id ?? "";
-      final ok = s.isSaved && !s.hasFailure && id.isNotEmpty;
 
-      if (!ok) return;
+      final justFinished =
+          (prev?.isSaving == true) &&
+              (s.isSaving == false) &&
+              (s.isSaved == true) &&
+              (s.hasFailure == false) &&
+              id.isNotEmpty;
 
-      if (!state.step3Triggered) {
+      if (justFinished && !state.step3Triggered) {
+        debugPrint("[${DateTime.now().toIso8601String()}] Flow ENQUEUE HitungPremi (justFinished Calmv2)");
         add(const CalmvFlowHitungPremiIfReadyEvent());
       }
     });
@@ -66,27 +86,26 @@ class CalmvFlowBloc extends Bloc<CalmvFlowEvent, CalmvFlowState> {
     return super.close();
   }
 
-  void _onFlowStart(
-      CalmvFlowStartEvent event,
-      Emitter<CalmvFlowState> emit,
-      ) {
+  void _onFlowStart(CalmvFlowStartEvent event, Emitter<CalmvFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] Flow START");
+
+    _prev1 = null;
+    _prev2 = null;
+
     emit(const CalmvFlowState());
 
     _ensureCalmv1();
   }
 
-  void _onEnsureCalmv2(
-      CalmvFlowEnsureCalmv2Event event,
-      Emitter<CalmvFlowState> emit,
-      ) {
+
+  void _onEnsureCalmv2(CalmvFlowEnsureCalmv2Event event, Emitter<CalmvFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] Flow STEP2 EnsureCalmv2");
     emit(state.copyWith(step2Triggered: true));
     _ensureCalmv2();
   }
 
-  void _onHitungPremiIfReady(
-      CalmvFlowHitungPremiIfReadyEvent event,
-      Emitter<CalmvFlowState> emit,
-      ) {
+  void _onHitungPremiIfReady(CalmvFlowHitungPremiIfReadyEvent event, Emitter<CalmvFlowState> emit) {
+    debugPrint("[${DateTime.now().toIso8601String()}] Flow STEP3 HitungPremiIfReady");
     emit(state.copyWith(step3Triggered: true));
     _triggerHitungPremiIfReady();
   }

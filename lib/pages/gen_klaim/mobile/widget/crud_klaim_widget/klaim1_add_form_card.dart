@@ -426,7 +426,6 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
-              key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

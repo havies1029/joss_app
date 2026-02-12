@@ -134,7 +134,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
       controller: _passwordController,
       focusNode: _passwordFocusNode,
       obscureText: !_isPasswordVisible,
-      // Gunakan state dari parent
 
       suffixIcon: IconButton(
         icon: Icon(
@@ -311,7 +310,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                 // Spasi antara logo & tombol
                                 SizedBox(height: vPadding * 0.6),
 
-                                // 🔹 Tombol kembali
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Padding(
@@ -367,6 +365,7 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                   ),
                                 ),
                                 child: Card(
+                                  color: secondaryBlackColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -394,7 +393,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                               ? null
                                               : () {
                                             if (_formKey.currentState!.validate()) {
-                                              // Semua valid, baru kirim
                                               _animationController.forward(from: 0);
 
                                               final record = RegUserModel(
@@ -404,10 +402,6 @@ class _RegisterFormClientState extends State<RegisterFormClient>
                                                 password: _passwordController.text,
                                                 jnsClientId: _selectedChoice,
                                                 email: AppData.user.email ?? "",
-                                              );
-
-                                              debugPrint(
-                                                'Dispatching RegUserTambahEvent: ${record.personalNama}, telepon=${record.telepon}',
                                               );
 
                                               context.read<RegUserBloc>().add(

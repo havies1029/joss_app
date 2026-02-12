@@ -1,466 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
-//
-// import '../../../../common/constants.dart';
-// import '../../../../models/asetothers/asetotherscari_model.dart';
-//
-// class KargoCobTable extends StatefulWidget {
-//   final List<AsetothersCariModel> items;
-//   final List<String> selectedIds;
-//   final Function(String id) onSelect;
-//   final Function(String id) onUnselect;
-//
-//   final Function(String id) onSelectFilePolisHealthId;
-//   final Function(String id) onUnselectFilePolisHealthId;
-//
-//   final bool readOnly;
-//   final bool showFooter;
-//   final String? title;
-//
-//   const KargoCobTable({
-//     super.key,
-//     required this.items,
-//     required this.selectedIds,
-//     required this.onSelect,
-//     required this.onUnselect,
-//     required this.onSelectFilePolisHealthId,
-//     required this.onUnselectFilePolisHealthId,
-//     this.readOnly = false,
-//     this.showFooter = true,
-//     this.title,
-//   });
-//
-//   @override
-//   State<KargoCobTable> createState() => _KargoCobTableState();
-// }
-//
-// class _KargoCobTableState extends State<KargoCobTable> {
-//   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
-//   late final ScrollController hController;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     hController = ScrollController();
-//   }
-//
-//   @override
-//   void dispose() {
-//     hController.dispose();
-//     super.dispose();
-//   }
-//
-//   bool _isAllSelected(List<AsetothersCariModel> details) {
-//     if (details.isEmpty) return false;
-//     final selected = widget.selectedIds.toSet();
-//     return details.every((d) => selected.contains(d.asetOthersId));
-//   }
-//
-//   bool _isNoneSelected(List<AsetothersCariModel> details) {
-//     final selected = widget.selectedIds.toSet();
-//     return details.every((d) => !selected.contains(d.asetOthersId));
-//   }
-//
-//   void _toggleSelectAll(bool checked, List<AsetothersCariModel> details) {
-//     for (final d in details) {
-//       final id = d.asetOthersId;
-//       if (id.isEmpty) continue;
-//
-//       if (checked) {
-//         if (!widget.selectedIds.contains(id)) {
-//           widget.onSelect(id);
-//           if (d.filePolisId.isNotEmpty) {
-//             widget.onSelectFilePolisHealthId(d.filePolisId);
-//           }
-//         }
-//       } else {
-//         if (widget.selectedIds.contains(id)) {
-//           widget.onUnselect(id);
-//           if (d.filePolisId.isNotEmpty) {
-//             widget.onUnselectFilePolisHealthId(d.filePolisId);
-//           }
-//         }
-//       }
-//     }
-//   }
-//
-//
-//   List<AsetothersCariModel> get _filteredItems {
-//     if (!widget.readOnly) return widget.items;
-//     return widget.items
-//         .where((d) => widget.selectedIds.contains(d.asetOthersId))
-//         .toList();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final width = MediaQuery.of(context).size.width;
-//     final bool isNarrow = width < 900;
-//
-//     final items = _filteredItems;
-//
-//     if (items.isEmpty) {
-//       return const Center(child: Text("Data kosong"));
-//     }
-//
-//     return SingleChildScrollView(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           if (widget.title != null) ...[
-//             Padding(
-//               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-//               child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-//             ),
-//             const SizedBox(height: hPadding),
-//           ],
-//           Padding(
-//             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-//             child: isNarrow
-//                 ? _buildDetailTableCompact(context, items)
-//                 : _buildDetailTableNormal(context, items),
-//           ),
-//           const SizedBox(height: hPadding),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildDetailTableCompact(
-//       BuildContext context,
-//       List<AsetothersCariModel> details,
-//       ) {
-//     if (details.isEmpty) return const Text("Tidak ada detail");
-//
-//     return ClipRRect(
-//       borderRadius: BorderRadius.circular(cardBorderRadius),
-//       child: Container(
-//         decoration: BoxDecoration(
-//           color: formGrey,
-//           borderRadius: BorderRadius.circular(cardBorderRadius),
-//           border: const Border(
-//             top: BorderSide(color: sGrey, width: 1),
-//             left: BorderSide(color: sGrey, width: 1),
-//             right: BorderSide(color: sGrey, width: 1),
-//             bottom: BorderSide(color: sGrey, width: 1),
-//           ),
-//         ),
-//         child: ScrollbarTheme(
-//           data: ScrollbarThemeData(
-//             thumbVisibility: MaterialStateProperty.all(true),
-//             trackVisibility: MaterialStateProperty.all(false),
-//             thickness: MaterialStateProperty.all(5),
-//             radius: const Radius.circular(cardBorderRadius),
-//             thumbColor: MaterialStateProperty.all(
-//               scrollBar.withOpacity(0.1),
-//             ),
-//           ),
-//           child: Scrollbar(
-//             controller: hController,
-//             child: SingleChildScrollView(
-//               controller: hController,
-//               scrollDirection: Axis.horizontal,
-//               child: Table(
-//                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-//                 border: const TableBorder(
-//                   horizontalInside: BorderSide(color: sGrey, width: 1),
-//                   verticalInside: BorderSide(color: sGrey, width: 1),
-//                 ),
-//                 columnWidths: {
-//                   0: widget.readOnly
-//                       ? const FixedColumnWidth(0)
-//                       : const FixedColumnWidth(40), // checkbox
-//                   1: const FixedColumnWidth(50),  // No
-//                   2: const FixedColumnWidth(310), // Object Desc
-//                   3: const FixedColumnWidth(180), // Polis No
-//                   4: const FixedColumnWidth(80),  // Curr
-//                   5: const FixedColumnWidth(200), // Sum Insured
-//                   6: const FixedColumnWidth(140), // Premi
-//                 },
-//                 children: [
-//                   _tableHeaderWithSelectAll(context, details),
-//                   ...details.asMap().entries.map(
-//                         (e) => _detailRowWithCheckbox(
-//                       context,
-//                       e.value,
-//                       e.key,
-//                       compact: true,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//
-//   Widget _buildDetailTableNormal(
-//       BuildContext context, List<AsetothersCariModel> details) {
-//     if (details.isEmpty) return const Text("Tidak ada detail");
-//
-//     return ClipRRect(
-//       borderRadius: BorderRadius.circular(cardBorderRadius),
-//       child: Container(
-//         decoration: BoxDecoration(
-//           color: formGrey,
-//           borderRadius: BorderRadius.circular(cardBorderRadius),
-//           border: const Border(
-//             top: BorderSide(color: sGrey, width: 1),
-//             left: BorderSide(color: sGrey, width: 1),
-//             right: BorderSide(color: sGrey, width: 1),
-//             bottom: BorderSide(color: sGrey, width: 1),
-//           ),
-//         ),
-//         child: Table(
-//           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-//           border: const TableBorder(
-//             horizontalInside: BorderSide(color: sGrey, width: 1),
-//             verticalInside: BorderSide(color: sGrey, width: 1),
-//           ),
-//           columnWidths: {
-//             0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8), // checkbox
-//             1: const FlexColumnWidth(1.0),   // No
-//             2: const FlexColumnWidth(3.6),   // Object Desc
-//             3: const FlexColumnWidth(2.3),   // Polis No
-//             4: const FlexColumnWidth(1.0),   // Curr
-//             5: const FlexColumnWidth(2.7),   // Sum Insured
-//             6: const FlexColumnWidth(1.6),   // Premi
-//             // 7: const FlexColumnWidth(1.4), // Status
-//           },
-//           children: [
-//             _tableHeaderWithSelectAll(context, details),
-//             ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-//               context,
-//               e.value,
-//               e.key,
-//               compact: false,
-//             )),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   TableRow _tableHeaderWithSelectAll(
-//       BuildContext context,
-//       List<AsetothersCariModel> details,
-//       ) {
-//     if (widget.readOnly) {
-//       return _tableHeader(context, [
-//         "",
-//         "No",
-//         "Object",
-//         "Polis No",
-//         "Curr",
-//         "Sum Insured",
-//         "Premi",
-//       ]);
-//     }
-//
-//     final allSelected = _isAllSelected(details);
-//     final noneSelected = _isNoneSelected(details);
-//
-//     return TableRow(
-//       decoration: const BoxDecoration(color: formGrey),
-//       children: [
-//         Center(
-//           child: Checkbox(
-//             value: allSelected ? true : (noneSelected ? false : null),
-//             tristate: true,
-//             onChanged: (_) {
-//               // sama persis: false/null => select all, true => unselect all
-//               final checked = !_isAllSelected(details);
-//               _toggleSelectAll(checked, details);
-//             },
-//             shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-//             ),
-//             side: MaterialStateBorderSide.resolveWith(
-//                   (states) => const BorderSide(color: sGrey),
-//             ),
-//             fillColor: MaterialStateProperty.resolveWith(
-//                   (states) => states.contains(MaterialState.selected)
-//                   ? primaryColor
-//                   : Colors.transparent,
-//             ),
-//             checkColor: primaryLightColor,
-//           ),
-//         ),
-//         ...[
-//           "No",
-//           "Object",
-//           "Polis No",
-//           "Curr",
-//           "Sum Insured",
-//           "Premi",
-//         ].map((t) {
-//           final upper = t.trim().toUpperCase();
-//           final center = (upper == "NO" ||
-//               upper == "CURR" ||
-//               upper == "PREMI" ||
-//               upper == "SUM INSURED");
-//           final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
-//           return Padding(
-//             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-//             child: center ? Center(child: child) : child,
-//           );
-//         }).toList(),
-//       ],
-//     );
-//   }
-//
-//   TableRow _tableHeader(BuildContext context, List<String> cells) {
-//     return TableRow(
-//       decoration: const BoxDecoration(color: formGrey),
-//       children: cells.map((text) {
-//         final upper = text.trim().toUpperCase();
-//         final bool center = (upper == "NO" ||
-//             upper == "STATUS" ||
-//             upper == "CURR" ||
-//             upper == "PREMI" ||
-//             upper == "SUM INSURED" ||
-//             text.trim().isEmpty);
-//
-//         final child = Text(text, style: bodyTextStyle(context, fontSize: 15));
-//
-//         return Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-//           child: center ? Center(child: child) : child,
-//         );
-//       }).toList(),
-//     );
-//   }
-//
-//   TableRow _detailRowWithCheckbox(
-//       BuildContext context,
-//       AsetothersCariModel d,
-//       int index, {
-//         required bool compact,
-//       }) {
-//     final isSelected = widget.selectedIds.contains(d.asetOthersId);
-//
-//     return TableRow(
-//       decoration: BoxDecoration(
-//         color: (!widget.readOnly && isSelected)
-//             ? primaryColor.withOpacity(0.3)
-//             : (index.isEven ? pGrey : formGrey),
-//       ),
-//       children: [
-//         if (!widget.readOnly)
-//           Center(
-//             child: Checkbox(
-//               value: isSelected,
-//               onChanged: (checked) {
-//                 if (checked == true) {
-//                   widget.onSelect(d.asetOthersId);
-//                   if (d.filePolisId.isNotEmpty) {
-//                     widget.onSelectFilePolisHealthId(d.filePolisId);
-//                   }
-//                 } else {
-//                   widget.onUnselect(d.asetOthersId);
-//                   if (d.filePolisId.isNotEmpty) {
-//                     widget.onUnselectFilePolisHealthId(d.filePolisId);
-//                   }
-//                 }
-//               },
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-//               ),
-//               side: MaterialStateBorderSide.resolveWith(
-//                     (states) => const BorderSide(color: sGrey),
-//               ),
-//               fillColor: MaterialStateProperty.resolveWith(
-//                     (states) => states.contains(MaterialState.selected)
-//                     ? primaryColor
-//                     : Colors.transparent,
-//               ),
-//               checkColor: primaryLightColor,
-//             ),
-//           )
-//         else
-//           const SizedBox(),
-//
-//         _cell(
-//           child: Center(
-//             child: Text(
-//               d.nomor.toString(),
-//               style: TextStyle(color: primaryLightColor),
-//             ),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             d.objectDesc,
-//             maxLines: compact ? 2 : 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             d.polisNo,
-//             maxLines: 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Center(
-//             child: Text(
-//               d.curr,
-//               maxLines: 1,
-//               overflow: TextOverflow.ellipsis,
-//               style: TextStyle(color: primaryLightColor),
-//             ),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             formatNum(d.sumInsured),
-//             maxLines: 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         _cell(
-//           child: Text(
-//             formatNum(d.premi),
-//             maxLines: 1,
-//             overflow: TextOverflow.ellipsis,
-//             style: TextStyle(color: primaryLightColor),
-//           ),
-//         ),
-//
-//         // _cell(
-//         //   child: Center(
-//         //     child: Text(
-//         //       d.status,
-//         //       maxLines: 1,
-//         //       overflow: TextOverflow.ellipsis,
-//         //       style: TextStyle(color: primaryLightColor),
-//         //     ),
-//         //   ),
-//         // ),
-//       ],
-//     );
-//   }
-//
-//   Widget _cell({required Widget child}) {
-//     return Padding(
-//       padding: const EdgeInsets.all(6),
-//       child: child,
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
@@ -471,7 +8,11 @@ import '../../../../models/asetothers/asetotherscari_model.dart';
 class KargoCobTable extends StatefulWidget {
   final List<AsetothersCariModel> items;
   final List<String> selectedIds;
+
+  final AsetothersCariModel? selectedItem;
   final void Function(AsetothersCariModel item)? onSelectItem;
+  final VoidCallback? onClearSelectedItem;
+
   final void Function(String id) selectedProsesId;
 
   final Function(String id) onSelect;
@@ -488,7 +29,9 @@ class KargoCobTable extends StatefulWidget {
     super.key,
     required this.items,
     required this.selectedIds,
+    required this.selectedItem,
     required this.onSelectItem,
+    required this.onClearSelectedItem,
     required this.selectedProsesId,
     required this.onSelect,
     required this.onUnselect,
@@ -502,7 +45,6 @@ class KargoCobTable extends StatefulWidget {
   @override
   State<KargoCobTable> createState() => _KargoCobTableState();
 }
-
 class _KargoCobTableState extends State<KargoCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
@@ -521,10 +63,97 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
   List<AsetothersCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
-    return widget.items
-        .where((d) => widget.selectedIds.contains(d.asetOthersId))
-        .toList();
+    return widget.items.where((d) => widget.selectedIds.contains(d.asetOthersId)).toList();
   }
+
+  // =========================
+  // Dynamic width helpers
+  // =========================
+
+  double _measureTextWidth(
+      BuildContext context,
+      String text, {
+        TextStyle? style,
+      }) {
+    final effectiveStyle = style ??
+        bodyTextStyle(context, fontSize: 14).copyWith(
+          color: primaryLightColor,
+        );
+
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: effectiveStyle),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+      ellipsis: '…',
+    )..layout();
+
+    return tp.width;
+  }
+
+  double _columnWidthFromLongest(
+      BuildContext context,
+      Iterable<String> values, {
+        required double min,
+        required double max,
+        double padding = 16,
+        TextStyle? style,
+      }) {
+    var longest = 0.0;
+    for (final v in values) {
+      final w = _measureTextWidth(context, v, style: style);
+      if (w > longest) longest = w;
+    }
+    final target = longest + padding;
+    return target.clamp(min, max);
+  }
+
+  // helper text cell (wrap saat compact)
+  Widget _textCell(
+      String text, {
+        int maxLines = 1,
+        bool center = false,
+        bool softWrap = true,
+      }) {
+    final t = Text(
+      text,
+      maxLines: maxLines,
+      softWrap: softWrap,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(color: primaryLightColor),
+    );
+    return _cell(child: center ? Center(child: t) : t);
+  }
+
+  Map<int, TableColumnWidth> _compactColumnWidths(
+      BuildContext context,
+      List<AsetothersCariModel> details,
+      ) {
+    final selectCol = widget.readOnly ? 0.0 : 40.0;
+
+    final objectValues = details.map((d) => d.objectDesc);
+    final polisValues = details.map((d) => d.polisNo);
+    final sumInsuredValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
+    final premiValues = details.map((d) => formatNum(d.premi));
+
+    // caps = “batas mentok”
+    final wObject = _columnWidthFromLongest(context, objectValues, min: 180, max: 310);
+    final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 180);
+    final wSumInsured = _columnWidthFromLongest(context, sumInsuredValues, min: 170, max: 240);
+    final wPremi = _columnWidthFromLongest(context, premiValues, min: 110, max: 140);
+
+    return {
+      0: FixedColumnWidth(selectCol),
+      1: const FixedColumnWidth(50), // No
+      2: FixedColumnWidth(wObject),
+      3: FixedColumnWidth(wPolis),
+      4: FixedColumnWidth(wSumInsured),
+      5: FixedColumnWidth(wPremi),
+    };
+  }
+
+  // =========================
+  // UI
+  // =========================
 
   @override
   Widget build(BuildContext context) {
@@ -566,6 +195,8 @@ class _KargoCobTableState extends State<KargoCobTable> {
       ) {
     if (details.isEmpty) return const Text("Tidak ada detail");
 
+    final columnWidths = _compactColumnWidths(context, details);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
@@ -585,9 +216,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
             trackVisibility: MaterialStateProperty.all(false),
             thickness: MaterialStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(
-              scrollBar.withOpacity(0.1),
-            ),
+            thumbColor: MaterialStateProperty.all(scrollBar.withOpacity(0.1)),
           ),
           child: Scrollbar(
             controller: hController,
@@ -600,21 +229,11 @@ class _KargoCobTableState extends State<KargoCobTable> {
                   horizontalInside: BorderSide(color: sGrey, width: 1),
                   verticalInside: BorderSide(color: sGrey, width: 1),
                 ),
-                columnWidths: {
-                  0: widget.readOnly
-                      ? const FixedColumnWidth(0)
-                      : const FixedColumnWidth(40), // radio button
-                  1: const FixedColumnWidth(50),  // No
-                  2: const FixedColumnWidth(310), // Object Desc
-                  3: const FixedColumnWidth(180), // Polis No
-                  4: const FixedColumnWidth(80),  // Curr
-                  5: const FixedColumnWidth(200), // Sum Insured
-                  6: const FixedColumnWidth(140), // Premi
-                },
+                columnWidths: columnWidths,
                 children: [
-                  _tableHeader(context, details),
+                  _tableHeader(context),
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithCheckbox(
+                        (e) => _detailRowWithRadioLikeProperty(
                       context,
                       e.value,
                       e.key,
@@ -630,9 +249,10 @@ class _KargoCobTableState extends State<KargoCobTable> {
     );
   }
 
-
   Widget _buildDetailTableNormal(
-      BuildContext context, List<AsetothersCariModel> details) {
+      BuildContext context,
+      List<AsetothersCariModel> details,
+      ) {
     if (details.isEmpty) return const Text("Tidak ada detail");
 
     return ClipRRect(
@@ -655,52 +275,42 @@ class _KargoCobTableState extends State<KargoCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8), // radio button
-            1: const FlexColumnWidth(1.0),   // No
-            2: const FlexColumnWidth(3.6),   // Object Desc
-            3: const FlexColumnWidth(2.3),   // Polis No
-            4: const FlexColumnWidth(1.0),   // Curr
-            5: const FlexColumnWidth(2.7),   // Sum Insured
-            6: const FlexColumnWidth(1.6),   // Premi
+            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
+            1: const FlexColumnWidth(1.0),
+            2: const FlexColumnWidth(3.6),
+            3: const FlexColumnWidth(2.3),
+            4: const FlexColumnWidth(3.0),
+            5: const FlexColumnWidth(1.6),
           },
           children: [
-            _tableHeader(context, details),
-            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-              context,
-              e.value,
-              e.key,
-              compact: false,
-            )),
+            _tableHeader(context),
+            ...details.asMap().entries.map(
+                  (e) => _detailRowWithRadioLikeProperty(
+                context,
+                e.value,
+                e.key,
+                compact: false,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  TableRow _tableHeader(
-      BuildContext context,
-      List<AsetothersCariModel> details,
-      ) {
+  TableRow _tableHeader(BuildContext context) {
     return TableRow(
       decoration: const BoxDecoration(color: formGrey),
       children: [
-        if (!widget.readOnly)
-          const SizedBox() // kosong untuk kolom radio button
-        else
-          const SizedBox(),
+        const SizedBox(),
         ...[
           "No",
           "Object",
           "Polis No",
-          "Curr",
           "Sum Insured",
           "Premi",
         ].map((t) {
-          final upper = t.trim().toUpperCase();
-          final center = (upper == "NO" ||
-              upper == "CURR" ||
-              upper == "PREMI" ||
-              upper == "SUM INSURED");
+          final center = t.toUpperCase() == "NO";
           final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
@@ -711,13 +321,17 @@ class _KargoCobTableState extends State<KargoCobTable> {
     );
   }
 
-  TableRow _detailRowWithCheckbox(
+  TableRow _detailRowWithRadioLikeProperty(
       BuildContext context,
       AsetothersCariModel d,
       int index, {
         required bool compact,
       }) {
-    final isSelected = widget.selectedProsesId == d.prosesId;
+    final isSelected = widget.selectedItem == d;
+
+    // wrap rules saat mentok max width
+    final maxLinesObject = compact ? 3 : 1;
+    final maxLinesPolis = compact ? 2 : 1;
 
     return TableRow(
       decoration: BoxDecoration(
@@ -728,203 +342,72 @@ class _KargoCobTableState extends State<KargoCobTable> {
       children: [
         if (!widget.readOnly)
           Center(
-            child: Checkbox(
+            child: CheckboxRadio(
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
+                  final prev = widget.selectedItem;
+                  if (prev != null && prev != d) {
+                    widget.onUnselect(prev.asetOthersId);
+                    if (prev.filePolisId.isNotEmpty) {
+                      widget.onUnselectFilePolisHealthId(prev.filePolisId);
+                    }
+                  }
+
                   widget.onSelect(d.asetOthersId);
                   widget.onSelectItem?.call(d);
+
+                  if (d.prosesId.isNotEmpty) {
+                    widget.selectedProsesId(d.prosesId);
+                  }
 
                   if (d.filePolisId.isNotEmpty) {
                     widget.onSelectFilePolisHealthId(d.filePolisId);
                   }
                 } else {
                   widget.onUnselect(d.asetOthersId);
+                  widget.onClearSelectedItem?.call();
 
                   if (d.filePolisId.isNotEmpty) {
                     widget.onUnselectFilePolisHealthId(d.filePolisId);
                   }
                 }
               },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-              ),
-              side: MaterialStateBorderSide.resolveWith(
-                    (states) => const BorderSide(color: sGrey),
-              ),
-              fillColor: MaterialStateProperty.resolveWith(
-                    (states) =>
-                states.contains(MaterialState.selected) ? primaryColor : Colors.transparent,
-              ),
-              checkColor: primaryLightColor,
             ),
           )
         else
           const SizedBox(),
 
-        _cell(
-          child: Center(
-            child: Text(
-              d.nomor.toString(),
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
+        _textCell(d.nomor.toString(), center: true, softWrap: false),
+
+        _textCell(
+          d.objectDesc,
+          maxLines: maxLinesObject,
+          softWrap: true,
         ),
 
-        _cell(
-          child: Text(
-            d.objectDesc,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          d.polisNo,
+          maxLines: maxLinesPolis,
+          softWrap: true,
         ),
 
-        _cell(
-          child: Text(
-            d.polisNo,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          "${d.curr} ${formatNum(d.sumInsured)}",
+          maxLines: 1,
+          softWrap: false,
         ),
 
-        _cell(
-          child: Center(
-            child: Text(
-              d.curr,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            formatNum(d.sumInsured),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            formatNum(d.premi),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
+        _textCell(
+          formatNum(d.premi),
+          maxLines: 1,
+          softWrap: false,
         ),
       ],
     );
   }
 
-
-  TableRow _detailRowWithRadio(
-      BuildContext context,
-      AsetothersCariModel d,
-      int index, {
-        required bool compact,
-      }) {
-    final isSelected = widget.selectedIds.contains(d.asetOthersId);
-
-    return TableRow(
-      decoration: BoxDecoration(
-        color: (!widget.readOnly && isSelected)
-            ? primaryColor.withOpacity(0.3)
-            : (index.isEven ? pGrey : formGrey),
-      ),
-      children: [
-        if (!widget.readOnly)
-          Center(
-            child: RadioButton(
-              isSelected: isSelected,
-              onTap: () {
-                // Unselect semua item yang sedang terpilih (kecuali yang diklik)
-                for (final item in widget.items) {
-                  if (widget.selectedIds.contains(item.asetOthersId) && item.asetOthersId != d.asetOthersId) {
-                    widget.onUnselect(item.asetOthersId);
-                    if (item.filePolisId.isNotEmpty) {
-                      widget.onUnselectFilePolisHealthId(item.filePolisId);
-                    }
-                  }
-                }
-
-                // Kemudian select item yang baru diklik
-                widget.onSelect(d.asetOthersId);
-
-                widget.onSelectItem?.call(d);
-
-                if (d.filePolisId.isNotEmpty) {
-                  widget.onSelectFilePolisHealthId(d.filePolisId);
-                }
-              },
-            ),
-          )
-        else
-          const SizedBox(),
-
-        _cell(
-          child: Center(
-            child: Text(
-              d.nomor.toString(),
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            d.objectDesc,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            d.polisNo,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _cell(
-          child: Center(
-            child: Text(
-              d.curr,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            formatNum(d.sumInsured),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _cell(
-          child: Text(
-            formatNum(d.premi),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
-          ),
-        ),
-      ],
-    );
-  }
-
+  // kamu minta cell jangan diubah: tetap sama
   Widget _cell({required Widget child}) {
     return Padding(
       padding: const EdgeInsets.all(6),

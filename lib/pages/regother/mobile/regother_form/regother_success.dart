@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
@@ -13,17 +14,18 @@ import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
-import '../../detail_management_page/detail_management_widget.dart';
+import '../../../management_polis/detail_management_page/detail_management_widget.dart';
 
-class PolisSuccess extends StatefulWidget {
+class RegotherSucess extends StatefulWidget {
   final String display;
-  const PolisSuccess({super.key, required this.display});
+  final String? purpose;
+  const RegotherSucess({super.key, required this.display, this.purpose});
 
   @override
-  State<PolisSuccess> createState() => _PolisSuccessState();
+  State<RegotherSucess> createState() => _RegotherSucessState();
 }
 
-class _PolisSuccessState extends State<PolisSuccess> {
+class _RegotherSucessState extends State<RegotherSucess> {
   late ConfettiController _controllerLeft;
   late ConfettiController _controllerRight;
 
@@ -103,47 +105,29 @@ class _PolisSuccessState extends State<PolisSuccess> {
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
                       width: 245,onPressed: () {
-                      final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
+                      final cobOthers = context.read<Regother1CrudBloc>().state.selectedCOBId;
 
                       dynamic selectedItem;
-                      switch (cobId) {
-                        case "10002":
-                          selectedItem = context.read<AsetParCariBloc>().state.selectedItem;
-                          break;
-                        case "10003":
-                          selectedItem = context.read<AsetMvCariBloc>().state.selectedItem;
-                          break;
-                        case "10004":
-                          selectedItem = context.read<AsethullCariBloc>().state.selectedItem;
-                          break;
-                        case "10005":
-                          selectedItem = context.read<AsetHealthCariBloc>().state.selectedItem;
-                          break;
-                        case "10006":
-                          selectedItem = context.read<AsetothersCariBloc>().state.selectedItem;
-                          break;
-                        default:
-                          selectedItem = null;
-                      }
-
+                      selectedItem = context.read<Regother1CrudBloc>().state.selectedItem;
+                      
                       if (selectedItem == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Data polis tidak ditemukan")),
                         );
                         return;
                       }
-
-                      Navigator.pushAndRemoveUntil(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => DetailManagementPolisPage(
                             data: selectedItem,
-                            cobId: cobId,
-                            statusId: "", // kalau memang tidak dipakai
+                            cobId: cobOthers,
+                            statusId: "",
+                            jenisProses: widget.purpose,
                           ),
                         ),
-                            (route) => route.isFirst,
                       );
+
                     },
 
                     ),

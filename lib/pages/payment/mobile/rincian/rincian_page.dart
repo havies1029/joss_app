@@ -106,6 +106,7 @@ class _RincianPageState extends State<RincianPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: secondaryBlackColor,
         body: Stack(
           children: [
             Column(

@@ -63,6 +63,61 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Calpar3FormModel? form3Record;
   Calpar4FormModel? form4Record;
 
+  Calpar3FormBloc? calpar3formBloc;
+
+  bool _lockCheckboxes = true;
+
+  void _setBool(TextEditingController c, bool v) {
+    c.text = v.toString();
+  }
+
+  void _applyCoverParRule(String? mjnscoverparId) {
+    // default: tidak ada yg kecentang, tidak terkunci
+    if (mjnscoverparId == null) {
+      setState(() {
+        _lockCheckboxes = false;
+        _setBool(fieldIsEqController, false);
+        _setBool(fieldIsTsfwdController, false);
+        _setBool(fieldIsFlexasController, false);
+        _setBool(fieldIsOtherController, false);
+        _setBool(fieldIsRsmdccController, false);
+      });
+      return;
+    }
+
+    if (mjnscoverparId == "10") {
+      // dengan gempa: semua centang termasuk gempa
+      setState(() {
+        _lockCheckboxes = true;
+        _setBool(fieldIsEqController, true);
+        _setBool(fieldIsTsfwdController, true);
+        _setBool(fieldIsFlexasController, true);
+        _setBool(fieldIsOtherController, true);
+        _setBool(fieldIsRsmdccController, true);
+      });
+    } else if (mjnscoverparId == "20") {
+      // tanpa gempa: semua centang selain gempa
+      setState(() {
+        _lockCheckboxes = true;
+        _setBool(fieldIsEqController, false);
+        _setBool(fieldIsTsfwdController, true);
+        _setBool(fieldIsFlexasController, true);
+        _setBool(fieldIsOtherController, true);
+        _setBool(fieldIsRsmdccController, true);
+      });
+    } else {
+      // id lain: balik ke default (atau sesuai kebutuhan)
+      setState(() {
+        _lockCheckboxes = false;
+        _setBool(fieldIsEqController, false);
+        _setBool(fieldIsTsfwdController, false);
+        _setBool(fieldIsFlexasController, false);
+        _setBool(fieldIsOtherController, false);
+        _setBool(fieldIsRsmdccController, false);
+      });
+    }
+  }
+
   String cleanNum(num value) {
     final f = NumberFormat("#,###", "en_US");
     return f.format(value);
@@ -116,6 +171,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   final fieldIsRsmdccController = TextEditingController();
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
+  final ComboMWilayah = GlobalKey<DropdownSearchState<ComboMWilayahModel>>();
   ComboMWilayahModel? fieldComboMWilayah;
   //form3
 
@@ -202,6 +258,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       final jnsCoverPar = record.comboMJnscoverPar;
       if (fieldComboMJnscoverPar == null && jnsCoverPar != null) {
         fieldComboMJnscoverPar = jnsCoverPar;
+        _applyCoverParRule(jnsCoverPar.mjnscoverparId); // ✅ sync dari data
       }
 
       final konstruksi = record.comboRKonstruksiojk;
@@ -334,7 +391,7 @@ void _payloadform2(Calpar2FormModel record) {
           },
           listener: (context, state) {
             final calpar1 = context.read<Calpar1CrudBloc>().state.record?.calpar1Id ?? "";
-
+            context.read<Calpar1ListBloc>().add(ClearProcessMessageEvent());
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -631,22 +688,27 @@ void _payloadform2(Calpar2FormModel record) {
                   if (calpar4Id?.isNotEmpty == true) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "*Dengan melanjutkan, Anda akan diminta mengisi detail tambahan terkait kategori yang dipilih untuk memastikan data polis lebih akurat.",
-                            style: bodyTextStyle(context).copyWith(
-                              color: primaryLightColor,
-                              fontSize: getResponsiveFont(context, 14),
-                            ),
-                          ),
-                          const SizedBox(height: hPadding),
-                          AppButton.primary(
-                            text: "Lanjutkan",
-                            onPressed: onLanjutkanPressed,
-                          ),
-                        ],
+                      child: BlocBuilder<Calpar1ListBloc, Calpar1ListState>(
+                        builder: (context, state) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "*Dengan melanjutkan, Anda akan diminta mengisi detail tambahan terkait kategori yang dipilih untuk memastikan data polis lebih akurat.",
+                                style: bodyTextStyle(context).copyWith(
+                                  color: primaryLightColor,
+                                  fontSize: getResponsiveFont(context, 14),
+                                ),
+                              ),
+                              const SizedBox(height: hPadding),
+                              AppButton.primary(
+                                text: state.isProcessing ? "Memproses..." : "Lanjutkan",
+                                isLoading: state.isProcessing,
+                                onPressed: state.isProcessing ? null : onLanjutkanPressed,
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -806,6 +868,8 @@ void _payloadform2(Calpar2FormModel record) {
   }
 
   Future<void> onLanjutkanPressed() async {
+    if (context.read<Calpar1ListBloc>().state.isProcessing) return;
+
     context.read<Calpar1ListBloc>().add(
       CalPar2RegParEvent(calpar1Id: calpar1Id!),
     );
@@ -1267,6 +1331,7 @@ void _payloadform2(Calpar2FormModel record) {
     initialValue: toBoolean(fieldIsEqController.text),
     callback: (v) => fieldIsEqController.text = v.toString(),
     leftLabel: "",
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsTsfwd()=> CheckboxWidget(
@@ -1274,6 +1339,7 @@ void _payloadform2(Calpar2FormModel record) {
     initialValue: toBoolean(fieldIsTsfwdController.text),
     callback: (v) => fieldIsTsfwdController.text = v.toString(),
     leftLabel: "",
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsFlexas()=> CheckboxWidget(
@@ -1281,6 +1347,7 @@ void _payloadform2(Calpar2FormModel record) {
     initialValue: toBoolean(fieldIsFlexasController.text),
     callback: (v) => fieldIsFlexasController.text = v.toString(),
     leftLabel: "",
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsOther()=> CheckboxWidget(
@@ -1288,6 +1355,7 @@ void _payloadform2(Calpar2FormModel record) {
     initialValue: toBoolean(fieldIsOtherController.text),
     callback: (v) => fieldIsOtherController.text = v.toString(),
     leftLabel: "",
+    enabled: !_lockCheckboxes,
   );
 
   Widget buildFieldIsRsmdcc()=> CheckboxWidget(
@@ -1295,6 +1363,8 @@ void _payloadform2(Calpar2FormModel record) {
     initialValue: toBoolean(fieldIsRsmdccController.text),
     callback: (v) => fieldIsRsmdccController.text = v.toString(),
     leftLabel: "",
+    enabled: !_lockCheckboxes,
+
   );
 
   Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
@@ -1308,13 +1378,17 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form3.mjnscoverparId'),
     onChangedCallback: (v) {
       fieldComboMJnscoverPar = v;
-      if (v != null) clearErr('form3.mjnscoverparId');
+      if (v != null) {
+        clearErr('form3.mjnscoverparId');
+      }
+
+      _applyCoverParRule(v?.mjnscoverparId);
     },
     onSaveCallback: (value) => fieldComboMJnscoverPar = value,
   );
 
   Widget buildFieldMwilayahId() => ReusableComboBox<ComboMWilayahModel>(
-    hintText: "Banjir",
+    hintText: "Wilayah",
     initItem: fieldComboMWilayah,
     maxHeight: 150,
     dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
@@ -1324,7 +1398,13 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form3.mwilayahId'),
     onChangedCallback: (v) {
       fieldComboMWilayah = v;
-      if (v != null) clearErr('form3.mwilayahId');
+
+      if (v != null) {
+        clearErr('form3.mwilayahId');
+        calpar3formBloc?.add(ComboMWilayahChangedEvent(comboMWilayah: v));
+        ComboMWilayah.currentState?.clear();
+      }
+
     },
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
@@ -1332,8 +1412,19 @@ void _payloadform2(Calpar2FormModel record) {
   Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
     hintText: "Zona Gempa Bumi",
     initItem: fieldComboMKabZonaGempa,
-    dataLoader: () => ComboMKabZonaGempaRepository().getComboMKabZonaGempa(""),
-    displayText: (i) => "${i.mzonagempaId} - ${i.kabupaten}",
+    dataLoader: () {
+      final wid = fieldComboMWilayah?.mwilayahId;
+      final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(payload);
+    },
+    dataLoaderWithFilter: (q) {
+      final wid = fieldComboMWilayah?.mwilayahId;
+      if (wid == null || wid.isEmpty) return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("");
+      final queryUser = (q ?? "").trim();
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("$wid|$queryUser");
+    },
+    serverSearchMinChars: 2,
+    displayText: (i) => i.kabupaten,
     compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
     errorText: err('form3.kab2zonagempaId'),
@@ -1343,6 +1434,7 @@ void _payloadform2(Calpar2FormModel record) {
     },
     onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
   );
+
   //form3
 
 

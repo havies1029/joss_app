@@ -25,6 +25,13 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
 		on<ComboMMvgrupOjkChangedEvent>(onComboMMvgrupOjkChanged);
 		on<Calmv1DraftEvent>(onDraftCalmv1Crud);
+		on<Calmv1ResetStatusEvent>((event, emit) {
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: false,
+			));
+		});
 	}
 
 	Future<void> onDraftCalmv1Crud(
@@ -40,50 +47,109 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 	}
 
 	Future<void> onTambahCalmv1Crud(
-			Calmv1CrudTambahEvent event, Emitter<Calmv1CrudState> emit) async {
+			Calmv1CrudTambahEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		debugPrint(
+			"[${DateTime.now().toIso8601String()}] Calmv1Tambah START "
+					"oldId=${event.record.calmv1Id} hash=${event.record.hashCode}",
+		);
 
-		emit(state.copyWith(isSaving: true, isSaved: false));
+		emit(state.copyWith(isSaving: true, isSaved: false, hasFailure: false));
 
-		final returnData = await repository.calmv1CrudTambah(event.record);
+		debugPrint(
+			"[${DateTime.now().toIso8601String()}] Calmv1Tambah AFTER emit(isSaving=true) "
+					"state.isSaving=${state.isSaving} state.isSaved=${state.isSaved} state.fail=${state.hasFailure}",
+		);
 
+		try {
+			final returnData = await repository.calmv1CrudTambah(event.record);
 
-		bool hasFailure = !returnData.success;
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Tambah REPO DONE "
+						"success=${returnData.success} data=${returnData.data}",
+			);
 
-		Calmv1CrudModel newRecord = event.record;
-		if (returnData.success && returnData.data != null) {
-			newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
+			final hasFailure = !returnData.success;
 
+			Calmv1CrudModel newRecord = event.record;
+			if (returnData.success && returnData.data != null) {
+				newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
+			}
+
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Tambah BEFORE FINAL emit "
+						"newId=${newRecord.calmv1Id} hasFailure=$hasFailure",
+			);
+
+			emit(state.copyWith(
+				isSaving: false,
+				// ⚠️ saran konsisten:
+				isSaved: returnData.success,
+				hasFailure: hasFailure,
+				record: newRecord,
+			));
+
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Tambah END "
+						"emit(isSaving=false,isSaved=${returnData.success},fail=$hasFailure) "
+						"finalId=${newRecord.calmv1Id}",
+			);
+		} catch (e) {
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Tambah ERROR $e",
+			);
+			emit(state.copyWith(isSaving: false, isSaved: false, hasFailure: true));
 		}
-
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure,
-			record: newRecord,
-		));
 	}
 
 	Future<void> onUbahCalmv1Crud(
 			Calmv1CrudUbahEvent event,
 			Emitter<Calmv1CrudState> emit,
 			) async {
+		debugPrint(
+			"[${DateTime.now().toIso8601String()}] Calmv1Ubah START "
+					"id=${event.record.calmv1Id} hash=${event.record.hashCode}",
+		);
+
 		emit(state.copyWith(
 			isSaving: true,
 			isSaved: false,
 			hasFailure: false,
 		));
 
-		final ok = await repository.calmv1CrudUbah(event.record);
-		final hasFailure = !ok;
+		debugPrint(
+			"[${DateTime.now().toIso8601String()}] Calmv1Ubah AFTER emit(isSaving=true) "
+					"state.isSaving=${state.isSaving} state.isSaved=${state.isSaved} state.fail=${state.hasFailure}",
+		);
 
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: !hasFailure,     // ✅ jangan true kalau gagal
-			hasFailure: hasFailure,
-			record: event.record,     // ✅ pegang data terbaru di state
-		));
+		try {
+			final ok = await repository.calmv1CrudUbah(event.record);
+			final hasFailure = !ok;
 
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Ubah REPO DONE ok=$ok",
+			);
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: !hasFailure,
+				hasFailure: hasFailure,
+				record: event.record,
+			));
+
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Ubah END "
+						"emit(isSaving=false,isSaved=${!hasFailure},fail=$hasFailure)",
+			);
+		} catch (e) {
+			debugPrint(
+				"[${DateTime.now().toIso8601String()}] Calmv1Ubah ERROR $e",
+			);
+			emit(state.copyWith(isSaving: false, isSaved: false, hasFailure: true));
+		}
 	}
+
 
 
 	Future<void> onHapusCalmv1Crud(

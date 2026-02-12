@@ -7,16 +7,18 @@ class Regmv6FormModel {
 	double premiNet;
 	double premiSubtotal;
 	String regmv6Id;
-	double rateDasar;
-	double rateLoading;
-	double rateSrcc;
-	double rateFlood;
-	double rateEq;
-	double rateTerrorism;
+	double rateDasar; // sementara komprehensif
+	double rateLoading; // loading
+	double rateSrcc; //kerusuhan
+	double rateFlood; //banjir
+	double rateEq; // gempa bumi
+	double rateTerrorism; // terorisme dan sabotase
 	double ratePad;
+	double rateAw; // komprehensif
 	double ratePap;
 	double biayaPolis;
 	double tsi;
+	double rateTotal; //total
 
 	Regmv6FormModel({required this.diskonPersen, required this.premiAdd,
 		required this.premiCasco, required this.premiDiskon,
@@ -31,7 +33,10 @@ class Regmv6FormModel {
 		this.ratePad = 0,
 		this.ratePap = 0,
 		this.biayaPolis = 0,
-		this.tsi = 0,});
+		this.tsi = 0,
+		this.rateTotal = 0,
+		this.rateAw = 0,
+	});
 
 	factory Regmv6FormModel.fromJson(Map<String, dynamic> data) {
 		return Regmv6FormModel(
@@ -52,6 +57,8 @@ class Regmv6FormModel {
 			ratePap: double.tryParse(data['ratePap'].toString())??0,
 			biayaPolis: double.tryParse(data['biayaPolis'].toString())??0,
 			tsi: double.tryParse(data['tsi'].toString())??0,
+			rateTotal: double.tryParse(data['rateTotal'].toString())??0,
+			rateAw: double.tryParse(data['rateAw'].toString())??0,
 		);
 
 	}
@@ -74,6 +81,8 @@ class Regmv6FormModel {
 				'ratePap': ratePap.toString(),
 				'biayaPolis': biayaPolis.toString(),
 				'tsi': tsi.toString(),
+				'rateTotal': rateTotal.toString(),
+				'rateAw': rateAw.toString(),
 			};
 
 }

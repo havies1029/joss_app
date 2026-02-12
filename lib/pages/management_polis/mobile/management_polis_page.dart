@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/management_polis/mobile/theme/loading_flow_overlay_host.dart';
 import 'package:open_filex/open_filex.dart';
 import '../../../../../../common/constants.dart';
 import '../../../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
@@ -58,7 +59,7 @@ class _ManagementPolisPageState extends State<ManagementPolisPage>
         ),
       ],
       child: Scaffold(
-        backgroundColor: primaryBlackColor,
+        backgroundColor: secondaryBlackColor,
         body: SafeArea(
           child: Stack(
             children: [
@@ -78,6 +79,9 @@ class _ManagementPolisPageState extends State<ManagementPolisPage>
                           "Kelola dan pantau semua polis Anda dalam satu aplikasi.",
                         ),
                         ManagementPolisFilter(),
+                        // LoadingFlowOverlayHost(
+                        //   child: ManagementPolisFilter(),
+                        // ),
                       ],
                     ),
                   ),

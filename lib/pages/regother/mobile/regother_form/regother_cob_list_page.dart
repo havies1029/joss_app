@@ -4,6 +4,8 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
 import 'package:joss_app/repositories/combobox/combomcobapp1_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/regother/regother1crud_bloc.dart';
 
 class CobCariPage extends StatefulWidget {
   const CobCariPage({super.key});
@@ -34,7 +36,7 @@ class _CobCariPageState extends State<CobCariPage> {
         child: FutureBuilder<List<ComboMCobApp1Model>>(
           future: futureData,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                 child: Padding(
                   padding: EdgeInsets.only(top: 50),
@@ -43,7 +45,29 @@ class _CobCariPageState extends State<CobCariPage> {
               );
             }
 
-            final items = snapshot.data!;
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  "Gagal memuat kategori: ${snapshot.error}",
+                  style: bodyTextStyle(context),
+                ),
+              );
+            }
+
+            final rawItems = snapshot.data ?? [];
+
+            final items = rawItems
+                .where((e) => e.mCobApp1Id != "10002" && e.mCobApp1Id != "10003")
+                .toList();
+
+            if (items.isEmpty) {
+              return Center(
+                child: Text(
+                  "Kategori asuransi kosong.",
+                  style: bodyTextStyle(context),
+                ),
+              );
+            }
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +81,7 @@ class _CobCariPageState extends State<CobCariPage> {
                 ),
                 const SizedBox(height: 15),
                 AppButton.primary(
-                  text: "Selesai",
+                  text: "Tambah",
                   onPressed: selectedCobModel == null
                       ? null
                       : () => Navigator.pop(context, selectedCobModel),
@@ -74,25 +98,24 @@ class _CobCariPageState extends State<CobCariPage> {
   Widget _buildCobItem(ComboMCobApp1Model item) {
     final isSelected = selectedCobId == item.mCobApp1Id;
 
+    void pick() {
+      setState(() {
+        selectedCobId = item.mCobApp1Id;
+        selectedCobModel = item;
+      });
+
+      context.read<Regother1CrudBloc>().add(SelectButton(item.mCobApp1Id));
+    }
+
     return InkWell(
-      onTap: () {
-        setState(() {
-          selectedCobId = item.mCobApp1Id;
-          selectedCobModel = item;
-        });
-      },
+      onTap: pick,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           children: [
             RadioButton(
               isSelected: isSelected,
-              onTap: () {
-                setState(() {
-                  selectedCobId = item.mCobApp1Id;
-                  selectedCobModel = item;
-                });
-              },
+              onTap: pick,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -106,4 +129,5 @@ class _CobCariPageState extends State<CobCariPage> {
       ),
     );
   }
+
 }

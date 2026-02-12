@@ -4,12 +4,9 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 import '../../../common/constants.dart';
-import '../../../widgets/section/polis/simul_polis/simul_mv/simul_mv_page.dart';
-import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart';
-import '../../calpar/mobile/calpar_main_page.dart';
 import '../../calpar/mobile/calpar_main_page_remake.dart';
-import '../../gen_calmv/mobile/calmv_main_page.dart';
 import '../../gen_calmv/mobile/calmv_main_page_remake.dart';
+import '../../regother/mobile/regother_form/regother_form1.dart';
 
 class BeliPolisPage extends StatelessWidget {
   const BeliPolisPage({super.key});
@@ -36,11 +33,10 @@ class BeliPolisPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeaderCard(
+        const HeaderCard(
           iconPath: "assets/icons/menu_beli_polis.svg",
           title: "Beli Polis",
-          subtitle:
-          "Pilih jenis asuransi dan hitung premi langsung di sini.",
+          subtitle: "Pilih jenis asuransi dan hitung premi langsung di sini.",
         ),
         const SizedBox(height: 10),
         _buildKategoriSection(context),
@@ -56,11 +52,7 @@ class BeliPolisPage extends StatelessWidget {
           color: secondaryBlackColor,
           child: Column(
             children: [
-              Text(
-                "Kategori Asuransi",
-                style: bodyTextStyle(context),
-                textAlign: TextAlign.center,
-              ),
+              Text("Kategori Asuransi", style: bodyTextStyle(context), textAlign: TextAlign.center),
               const SizedBox(height: 10),
               kDivider(),
             ],
@@ -73,12 +65,42 @@ class BeliPolisPage extends StatelessWidget {
           ),
           color: primaryBlackColor,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildCategoryRow(context, [
-                ("assets/icons/kendaraan.svg", "Kendaraan"),
-                ("assets/icons/properti.svg", "Rumah & Property"),
-              ]),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCategory(
+                      context,
+                      "assets/icons/kendaraan.svg",
+                      "Kendaraan",
+                      const CalmvMainPageRemake(),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildCategory(
+                      context,
+                      "assets/icons/properti.svg",
+                      "Rumah & Property",
+                      const CalparMainPageRemake(),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // ✅ full width di bawah row
+              _buildCategory(
+                context,
+                "null",
+                "Lainnya",
+                const Regother1CrudFormPage(
+                  viewMode: 'tambah',
+                  recordId: '',
+                ),
+              ),
             ],
           ),
         ),
@@ -86,28 +108,23 @@ class BeliPolisPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryRow(
-      BuildContext context,
-      List<(String, String)> categories,
-      ) {
-    return Row(
-      children: [
-        Expanded(child: _buildCategory(context, categories[0].$1, categories[0].$2, const CalmvMainPageRemake(),)),
-        const SizedBox(width: 12),
-        Expanded(child: _buildCategory(context, categories[1].$1, categories[1].$2, const CalparMainPageRemake())),
-      ],
-    );
-  }
 
-  Widget _buildCategory(BuildContext context, String svgPath, String label, Widget? targetPage) {
+  Widget _buildCategory(
+      BuildContext context,
+      String svgPath,
+      String label,
+      Widget? targetPage,
+      ) {
+    final bool hasIcon = svgPath != "null" && svgPath.trim().isNotEmpty;
+
     return InkWell(
-      onTap: () {
-        if (targetPage != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => targetPage),
-          );
-        }
+      onTap: targetPage == null
+          ? null
+          : () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => targetPage),
+        );
       },
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
@@ -117,14 +134,21 @@ class BeliPolisPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(cardBorderRadius),
           border: Border.all(color: sGrey),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+
+        child: hasIcon
+            ? Row(
           children: [
             SvgPicture.asset(svgPath, width: 40, height: 40),
             const SizedBox(width: 10),
-            Flexible(child: Text(label, style: bodyTextStyle(context))),
+            Expanded(child: Text(label, style: bodyTextStyle(context))),
           ],
+        )
+            : Center(
+          child: Text(
+            label,
+            style: bodyTextStyle(context),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

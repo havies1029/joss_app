@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/models/regother/regother3cari_model.dart';
 import 'package:joss_app/models/regreaktif/regreaktif2cari_model.dart';
 import 'package:joss_app/models/regrenewal/regrenewal2cari_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/management_polis/detail_management_page/polis_detail_card.dart';
 import 'package:joss_app/pages/management_polis/detail_management_page/timeline_page.dart';
+import 'package:joss_app/pages/management_polis/mobile/management_polis_page.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../widgets/apptheme/help_contact_card_widget.dart';
 import 'package:joss_app/models/gen_endors/endors2cari_model.dart';
 
 import '../../../blocs/regendors/regendors1form_bloc.dart';
 import '../../../blocs/regendors/regendors2cari_bloc.dart';
+import '../../../blocs/regother/regother1crud_bloc.dart';
+import '../../../blocs/regother/regother3cari_bloc.dart';
 import '../../../blocs/regreaktif/regreaktif1_bloc.dart';
 import '../../../blocs/regreaktif/regreaktif2cari_bloc.dart';
 import '../../../blocs/regrenewal/regrenew1form_bloc.dart';
@@ -21,9 +25,7 @@ import '../../../models/regendors/regendors2cari_model.dart';
 class DetailManagementPolisPage extends StatefulWidget {
   final dynamic data;
   final String cobId;
-
-  /// statusId masih diterima biar ga breaking API pemanggil,
-  /// tapi tidak dipakai buat routing tracking proses.
+  final String? jenisProses;
   final String statusId;
 
   const DetailManagementPolisPage({
@@ -31,6 +33,7 @@ class DetailManagementPolisPage extends StatefulWidget {
     required this.data,
     required this.cobId,
     required this.statusId,
+    this.jenisProses,
   });
 
   @override
@@ -45,7 +48,6 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
   late final Map<String, dynamic> _dataMap;
   late final String _sppa1Id;
 
-  /// NEW: proses discriminator
   late final String _prosesSource; // "E" | "R" | "A" | ""
   late final String _prosesId;
   late final String _prosesRemarks;
@@ -58,9 +60,14 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
 
   late Regrenew1FormBloc regrenew1formBloc;
   late Regrenewal2CariBloc regrenew2formBloc;
+  //
+  // late Regothers1FormBloc regrenew1formBloc;
+  late Regother1CrudBloc regother1crudBloc;
+  late Regother3cariBloc regother3cariBloc;
 
-  DateTime Function(dynamic item)? _getDateTime;
-  String Function(dynamic item)? _getStatusText;
+  DateTime Function(dynamic x)? _getDateTime;
+  String Function(dynamic x)? _getStatusText;
+
   String _emptyText = "Belum ada data";
 
   @override
@@ -80,6 +87,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
       _triggerByProses(
         prosesSource: _prosesSource,
         prosesId: _prosesId,
+        jenisProses: widget.jenisProses,
       );
     });
   }
@@ -87,19 +95,36 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
   void _triggerByProses({
     required String prosesSource,
     required String prosesId,
+    required String? jenisProses,
   }) {
-    final cleanSource = prosesSource.trim().toUpperCase();
+    String cleanSource = prosesSource.trim().toUpperCase();
     String resolvedId = prosesId.trim();
+    final jp = (jenisProses ?? "").trim().toUpperCase();
 
-    // RULE BARU:
-    // kalau prosesSource & prosesId kosong → langsung pakai sppa1Id dari Regendors1FormBloc
-    if (cleanSource.isEmpty && resolvedId.isEmpty) {
-      resolvedId = context.read<Regendors1FormBloc>().state.record?.sppa1Id ?? "";
-      cleanSource; // (no-op, biar jelas source kosong)
-      // langsung tembak endorse2 di bawah (tanpa butuh source)
+    if (cleanSource.isEmpty && resolvedId.isEmpty && jp.isNotEmpty) {
+
+      if (jp == "E") {
+        resolvedId =
+            context.read<Regendors1FormBloc>().state.record?.sppa1Id ?? "";
+      } else if (jp == "A") {
+        resolvedId =
+            context.read<Regreaktif1Bloc>().state.record?.sppa1Id ?? "";
+      } else if (jp == "R") {
+        resolvedId =
+            context.read<Regrenew1FormBloc>().state.record?.sppa1Id ?? "";
+      } else if (jp == "O") {
+        resolvedId =
+            context.read<Regother1CrudBloc>().state.record?.regother1Id ?? "";
+      }
+
+      if (resolvedId.isNotEmpty) {
+        cleanSource = jp;
+        // _prosesSource = jp;
+      }
+    } else {
+      // debugPrint('>> fallback skipped');
     }
 
-    // kalau masih kosong → empty
     if (resolvedId.isEmpty) {
       setState(() {
         _loading = false;
@@ -111,16 +136,6 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
       return;
     }
 
-    // kalau source kosong (karena rule baru) → default ke endorse (Regendors2)
-    if (cleanSource.isEmpty) {
-      regendors2 = context.read<Regendors2CariBloc>();
-      regendors2.add(
-        RefreshRegendors2CariEvent(regendors1Id: resolvedId),
-      );
-      return;
-    }
-
-    // normal routing kalau source ada
     switch (cleanSource) {
       case "E":
         regendors2 = context.read<Regendors2CariBloc>();
@@ -143,6 +158,13 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
         );
         break;
 
+      case "O":
+        regother3cariBloc = context.read<Regother3cariBloc>();
+        regother3cariBloc.add(
+          RefreshRegother3cariEvent(regother1Id: resolvedId),
+        );
+        break;
+
       default:
         setState(() {
           _loading = false;
@@ -155,6 +177,58 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     }
   }
 
+  int _findActiveIndexBySource(String prosesSource, List<dynamic> items) {
+    final jp = (widget.jenisProses ?? "").trim().toUpperCase(); // "E" | "A" | "R" | ""
+    final ps = prosesSource.trim().toUpperCase();
+
+    final s = jp.isNotEmpty ? jp : ps;
+
+
+    if (s.isEmpty) {
+      return -1;
+    }
+
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+
+      switch (s) {
+        case "E":
+          if (item is! Regendors2CariModel) {
+            continue;
+          }
+          if (item.regendors2Id.trim().isNotEmpty) return i;
+          break;
+
+        case "A":
+          if (item is! Regreaktif2CariModel) {
+            continue;
+          }
+          if (item.regreaktif2Id.trim().isNotEmpty) return i;
+          break;
+
+        case "R":
+          if (item is! Regrenewal2CariModel) {
+            continue;
+          }
+          if (item.regrenew2Id.trim().isNotEmpty) return i;
+          break;
+
+        case "O":
+          if (item is! Regother3cariModel) {
+            continue;
+          }
+          if (item.regother3Id.trim().isNotEmpty) return i;
+          break;
+
+
+        default:
+          return -1;
+      }
+    }
+
+    return -1;
+  }
+
 
   String extractAssetIdByCob(Map<String, dynamic> dataMap, String cobId) {
     return switch (cobId) {
@@ -162,8 +236,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
       "10003" => dataMap["asetMvId"]?.toString() ?? "",
       "10004" => dataMap["asetHullId"]?.toString() ?? "",
       "10005" => dataMap["asethealthId"]?.toString() ?? "",
-      "10006" => dataMap["asetOthersId"]?.toString() ?? "",
-      _ => "",
+      _ => dataMap["asetOthersId"]?.toString() ?? "",
     };
   }
 
@@ -171,122 +244,176 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     final dataMap = _toMap(widget.data);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: BaseBackgroundSidePage(
+          onBack: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const ManagementPolisPage()),
+                  (route) => route.isFirst,
+            );
+          },
           title: 'Detail Management Polis',
           child: Container(
             width: double.infinity,
             height: double.infinity,
             color: secondaryBlackColor,
-            child: MultiBlocListener(
-              listeners: [
-                BlocListener<Regendors2CariBloc, Regendors2CariState>(
-                  listenWhen: (prev, next) =>
-                  prev.status != next.status || prev.items != next.items,
-                  listener: (context, state) {
-                    // if (!mounted) return;
-                    // if (_prosesSource != "E") return; // 🔐 GUARD
 
-                    if (state.status == ListStatus.initial) {
-                      setState(() => _loading = true);
-                      return;
-                    }
+            child: Column(
+              children: [
+                Expanded(
+                  child: MultiBlocListener(
+                    listeners: [
+                      BlocListener<Regendors2CariBloc, Regendors2CariState>(
+                        listenWhen: (prev, next) =>
+                        prev.status != next.status || prev.items != next.items,
+                        listener: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            setState(() => _loading = true);
+                            return;
+                          }
 
-                    setState(() {
-                      _loading = false;
-                      _items = List.from(state.items);
-                      _emptyText = "Belum ada proses Endorsement";
-                      _getDateTime = (x) => (x as Regendors2CariModel).tglStatus;
-                      _getStatusText = (x) => (x as Regendors2CariModel).remarks;
-                    });
-                  },
+                          setState(() {
+                            _loading = false;
+                            _items = List.from(state.items);
+                            _emptyText = "Belum ada proses Endorsement";
+                            _getDateTime =
+                                (x) => (x as Regendors2CariModel).tglStatus;
+                            _getStatusText =
+                                (x) => (x as Regendors2CariModel).progressNama;
+                          });
+                        },
+                      ),
+                      BlocListener<Regreaktif2CariBloc, Regreaktif2CariState>(
+                        listenWhen: (prev, next) =>
+                        prev.status != next.status || prev.items != next.items,
+                        listener: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            setState(() => _loading = true);
+                            return;
+                          }
+
+                          setState(() {
+                            _loading = false;
+                            _items = List.from(state.items);
+                            _emptyText = "Belum ada proses Aktifkan Kembali";
+                            _getDateTime =
+                                (x) => (x as Regreaktif2CariModel).tglStatus;
+                            _getStatusText =
+                                (x) => (x as Regreaktif2CariModel).progressNama;
+                          });
+                        },
+                      ),
+                      BlocListener<Regrenewal2CariBloc, Regrenewal2CariState>(
+                        listenWhen: (prev, next) =>
+                        prev.status != next.status || prev.items != next.items,
+                        listener: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            setState(() => _loading = true);
+                            return;
+                          }
+
+                          setState(() {
+                            _loading = false;
+                            _items = List.from(state.items);
+                            _emptyText = "Belum ada proses Perpanjang";
+                            _getDateTime =
+                                (x) => (x as Regrenewal2CariModel).tglStatus;
+                            _getStatusText =
+                                (x) => (x as Regrenewal2CariModel).progressNama;
+                          });
+                        },
+                      ),
+                      BlocListener<Regother3cariBloc, Regother3cariState>(
+                        listenWhen: (prev, next) =>
+                        prev.status != next.status || prev.items != next.items,
+                        listener: (context, state) {
+                          if (state.status == ListStatus.initial) {
+                            setState(() => _loading = true);
+                            return;
+                          }
+
+                          setState(() {
+                            _loading = false;
+                            _items = List.from(state.items);
+                            _emptyText = "Belum ada proses Perpanjang";
+                            _getDateTime =
+                                (x) => (x as Regother3cariModel).tglStatus;
+                            _getStatusText =
+                                (x) => (x as Regother3cariModel).progressNama;
+                          });
+                        },
+                      ),
+                    ],
+
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hPadding * 1.5,
+                        vertical: hPadding,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PolisDetailCard(
+                            dataMap: dataMap,
+                            title: null,
+                            excludeKeys: const {},
+                            cardColor: pGrey,
+                            borderColor: sGrey,
+                            dividerColor: sGrey,
+                            labelColor: hintGrey,
+                            valueColor: primaryLightColor,
+                            borderRadius: cardBorderRadius,
+                            fontSize: (ctx, base) => getResponsiveFont(ctx, base),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildTimeline(),
+                          // const SizedBox(height: 20),
+                          // HelpContactCardWidget(
+                          //   title: "Butuh bantuan?",
+                          //   contactText: "Hubungi 021-123456 atau support@email.com",
+                          //   onPressed: () => debugPrint("☎️ Tombol Hubungi diklik!"),
+                          // ),
+
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
 
-                BlocListener<Regreaktif2CariBloc, Regreaktif2CariState>(
-                  listenWhen: (prev, next) =>
-                  prev.status != next.status || prev.items != next.items,
-                  listener: (context, state) {
-                    // if (!mounted) return;return
-                    // if (_prosesSource != "A") return; // 🔐 GUARD
-
-                    if (state.status == ListStatus.initial) {
-                      setState(() => _loading = true);
-                      return;
-                    }
-
-                    setState(() {
-                      _loading = false;
-                      _items = List.from(state.items);
-                      _emptyText = "Belum ada proses Aktifkan Kembali";
-                      _getDateTime = (x) => (x as Regreaktif2CariModel).tglStatus;
-                      _getStatusText = (x) => (x as Regreaktif2CariModel).remarks;
-                    });
-                  },
-                ),
-
-                BlocListener<Regrenewal2CariBloc, Regrenewal2CariState>(
-                  listenWhen: (prev, next) =>
-                  prev.status != next.status || prev.items != next.items,
-                  listener: (context, state) {
-                    // if (!mounted) return;
-                    // if (_prosesSource != "R") return; // 🔐 GUARD
-
-                    if (state.status == ListStatus.initial) {
-                      setState(() => _loading = true);
-                      return;
-                    }
-
-                    setState(() {
-                      _loading = false;
-                      _items = List.from(state.items);
-                      _emptyText = "Belum ada proses Perpanjang";
-                      _getDateTime = (x) => (x as Regrenewal2CariModel).tglStatus;
-                      _getStatusText = (x) => (x as Regrenewal2CariModel).remaks;
-                    });
-                  },
+                Container(
+                  width: double.infinity,
+                  color: secondaryBlackColor,
+                  padding: EdgeInsets.fromLTRB(
+                    hPadding * 1.5,
+                    12,
+                    hPadding * 1.5,
+                    12 + MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: AppButton(
+                    text: "Kembali ke Polis",
+                    // icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      // int count = 0;
+                      // Navigator.popUntil(context, (route) => count++ == 4);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const ManagementPolisPage()),
+                            (route) => route.isFirst,
+                      );
+                    },
+                  ),
                 ),
               ],
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: hPadding * 1.5,
-                  vertical: hPadding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    PolisDetailCard(
-                      dataMap: dataMap,
-                      title: null,
-                      excludeKeys: const {},
-                      cardColor: pGrey,
-                      borderColor: sGrey,
-                      dividerColor: sGrey,
-                      labelColor: hintGrey,
-                      valueColor: primaryLightColor,
-                      borderRadius: cardBorderRadius,
-                      fontSize: (ctx, base) => getResponsiveFont(ctx, base),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildTimeline(),
-                    const SizedBox(height: 20),
-                    HelpContactCardWidget(
-                      title: "Butuh bantuan?",
-                      contactText:
-                      "Hubungi 021-123456 atau support@email.com",
-                      onPressed: () =>
-                          debugPrint("☎️ Tombol Hubungi diklik!"),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildTimeline() {
     if (_loading) {
@@ -336,19 +463,18 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
           ..._items.asMap().entries.map((entry) {
             final index = entry.key;
             final item = entry.value;
-            final isLast = index == _items.length - 1;
-
+            final activeIndex = _findActiveIndexBySource(_prosesSource, _items);
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: TimelineItem<dynamic>(
                 item: item,
-                isLast: isLast,
+                activeIndex: activeIndex,
                 getDateTime: (x) => _getDateTime!(x),
                 getStatusText: (x) => _getStatusText!(x),
-                lastTextColor: primaryLightColor,
+                activeTextColor: primaryLightColor,
                 normalTextColor: hintGrey,
-                lastDotColor: primaryColor,
-                normalDotColor: hintGrey,
+                activeDotColor: primaryColor,
+                normalDotColor: hintGrey, index: index,
               ),
             );
           }).toList(),

@@ -26,7 +26,6 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
       keepPage: true,
     );
 
-    // trigger ambil data
     context.read<GalleryeventCariBloc>().add(RefreshGalleryeventCariEvent());
   }
 
@@ -105,7 +104,7 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final height = width * 0.38; // lebih ramping & responsif
+        final height = width * 0.38;
         return SizedBox(
           height: height,
           child: PageView.builder(
@@ -113,14 +112,25 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
             itemCount: images.length,
             physics: const BouncingScrollPhysics(),
             onPageChanged: (index) {
+              final lastIndex = images.length - 1;
+
               if (index == 0) {
-                Future.microtask(() => _pageController.jumpToPage(images.length - 2));
-              } else if (index == images.length - 1) {
-                Future.microtask(() => _pageController.jumpToPage(1));
-              } else {
-                setState(() => _currentIndex = index);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _pageController.jumpToPage(images.length - 2);
+                });
+                return;
               }
+
+              if (index == lastIndex) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _pageController.jumpToPage(1);
+                });
+                return;
+              }
+
+              setState(() => _currentIndex = index);
             },
+
             itemBuilder: (context, index) {
               final item = images[index];
               return AnimatedBuilder(
@@ -153,30 +163,19 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   Widget _buildCachedImage(String imageUrl) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        imageUrl,
+      child: CachedNetworkImage(
+        imageUrl: imageUrl,
         fit: BoxFit.cover,
         width: double.infinity,
-
-        // loading sementara
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-            ),
-          );
-        },
-
-        // fallback error
-        errorBuilder: (context, error, stackTrace) => Container(
-          color: Colors.grey.shade900,
-          alignment: Alignment.center,
-          child: const Icon(
-            Icons.broken_image,
-            color: Colors.grey,
-            size: 40,
+        placeholder: (_, __) => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(primaryColor),
           ),
+        ),
+        errorWidget: (_, __, ___) => Container(
+          color: Colors.grey,
+          alignment: Alignment.center,
+          child: const Icon(Icons.broken_image),
         ),
       ),
     );

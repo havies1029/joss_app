@@ -15,6 +15,8 @@ class AsethullCariModel {
 	String prosesId;
 	String prosesRemarks;
 	String prosesSource;
+	bool isReaktif;
+	bool isRenewal;
 
 	AsethullCariModel({required this.asetHullId,
 		required this.tertanggung,
@@ -24,25 +26,28 @@ class AsethullCariModel {
 		required this.namaKapal, required this.polisNo,
 		required this.premi, required this.status,
 		required this.tsi, required this.nomor, required this.filePolisId,
-		required this.prosesId, required this.prosesRemarks, required this.prosesSource});
+		required this.prosesId, required this.prosesRemarks, required this.prosesSource,
+		this.isReaktif = false, this.isRenewal = false});
 
 	factory AsethullCariModel.fromJson(Map<String, dynamic> data) {
 		return AsethullCariModel(
-			asetHullId: data['asetHullId']??'',
-			tertanggung: data['tertanggung']??'',
-			periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
-			periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
-			curr: data['curr']??'',
-			namaKapal: data['namaKapal']??'',
-			polisNo: data['polisNo']??'',
-			premi: double.tryParse(data['premi'].toString())??0,
-			status: data['status']??'',
-			tsi: double.tryParse(data['tsi'].toString())??0,
-			nomor: int.tryParse(data['nomor'].toString())??0,
-			filePolisId: data['filePolisId']??'',
-			prosesId: data['prosesId']??'',
-			prosesRemarks: data['prosesRemarks']??'',
-			prosesSource: data['prosesSource']??'',
+				asetHullId: data['asetHullId']??'',
+				tertanggung: data['tertanggung']??'',
+				periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
+				periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
+				curr: data['curr']??'',
+				namaKapal: data['namaKapal']??'',
+				polisNo: data['polisNo']??'',
+				premi: double.tryParse(data['premi'].toString())??0,
+				status: data['status']??'',
+				tsi: double.tryParse(data['tsi'].toString())??0,
+				nomor: int.tryParse(data['nomor'].toString())??0,
+				filePolisId: data['filePolisId']??'',
+				prosesId: data['prosesId']??'',
+				prosesRemarks: data['prosesRemarks']??'',
+				prosesSource: data['prosesSource']??'',
+				isReaktif: data['isReaktif']??false,
+				isRenewal: data['isRenewal']??false
 		);
 
 	}
@@ -63,6 +68,8 @@ class AsethullCariModel {
 				'prosesId': prosesId,
 				'prosesRemarks': prosesRemarks,
 				'prosesSource': prosesSource,
+				'isReaktif': isReaktif,
+				'isRenewal': isRenewal
 			};
 
 }

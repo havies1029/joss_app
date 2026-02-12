@@ -9,6 +9,8 @@ class HistorybayarCariState extends Equatable {
   final String statusId;
   final String searchText;
 	final HistorybayarCariModel? selectedItem;
+	final bool isDownloading;
+	final String downloadPath;
 
 	const HistorybayarCariState(
 		{this.status = ListStatus.initial,
@@ -17,7 +19,10 @@ class HistorybayarCariState extends Equatable {
 		this.hal = 0,
     this.statusId = '',
     this.searchText = '',
-		this.selectedItem});
+		this.selectedItem,
+		this.isDownloading = false,
+		this.downloadPath = '',
+	});
 
 	const HistorybayarCariState.success(List<HistorybayarCariModel> items)
 			: this(status: ListStatus.success, items: items);
@@ -31,8 +36,10 @@ class HistorybayarCariState extends Equatable {
 		int? hal,
     String? statusId,
     String? searchText,
-			HistorybayarCariModel? selectedItem,
-    }) {
+		HistorybayarCariModel? selectedItem,
+		bool? isDownloading,
+		String? downloadPath
+   }) {
 
 		return HistorybayarCariState(
 			items: items ?? this.items,
@@ -41,9 +48,12 @@ class HistorybayarCariState extends Equatable {
 			hal: hal ?? this.hal,
       statusId: statusId ?? this.statusId,
       searchText: searchText ?? this.searchText,
-			selectedItem: selectedItem ?? this.selectedItem);
+			selectedItem: selectedItem ?? this.selectedItem,
+			isDownloading: isDownloading ?? this.isDownloading,
+			downloadPath: downloadPath ?? this.downloadPath
+		);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, statusId, searchText, selectedItem ?? ""];
+	List<Object?> get props => [status, items, hasReachedMax, hal, statusId, searchText, selectedItem,  isDownloading, downloadPath];
 }

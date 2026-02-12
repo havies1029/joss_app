@@ -19,7 +19,10 @@ enum CategoryType {
   hull,
   sdm,
   lain_lain,
-  rincian
+  rincian,
+  klaimrasio,
+  klaim,
+  klaimrincian,
 }
 
 class ExportHelper {
@@ -307,6 +310,7 @@ class ExportHelper {
       'sdm': 'Sumber Daya Manusia',
       'lain_lain': 'Lain-lain',
       'rincian': 'Rincian',
+      'klaimrasio': 'Rasio Klaim',
     };
     return categoryLabels[name] ?? name;
   }

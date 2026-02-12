@@ -36,7 +36,7 @@ class HitungPremiHorizontalRow extends StatelessWidget {
     final labelStyle = row.labelStyle ??
         Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: getResponsiveFont(context, 18),
-          color: primaryLightColor,
+          color: hintGrey,
         );
 
     final baseValueStyle = row.valueStyle ??

@@ -256,7 +256,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           },
           listener: (context, state) {
             final calmv1Id = context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
-
+            context.read<Calmv1ListBloc>().add(ClearProcessMessageEvent());
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -538,22 +538,27 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   if (calmv3Id?.isNotEmpty == true) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "*Dengan melanjutkan, Anda akan diminta mengisi detail tambahan terkait kategori yang dipilih untuk memastikan data polis lebih akurat.",
-                            style: bodyTextStyle(context).copyWith(
-                              color: primaryLightColor,
-                              fontSize: getResponsiveFont(context, 14),
-                            ),
-                          ),
-                          const SizedBox(height: hPadding),
-                          AppButton.primary(
-                            text: "Lanjutkan",
-                            onPressed: onLanjutkanPressed,
-                          ),
-                        ],
+                      child: BlocBuilder<Calmv1ListBloc, Calmv1ListState>(
+                        builder: (context, state) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "*Dengan melanjutkan, Anda akan diminta mengisi detail tambahan terkait kategori yang dipilih untuk memastikan data polis lebih akurat.",
+                                style: bodyTextStyle(context).copyWith(
+                                  color: primaryLightColor,
+                                  fontSize: getResponsiveFont(context, 14),
+                                ),
+                              ),
+                              const SizedBox(height: hPadding),
+                              AppButton.primary(
+                                text: state.isProcessing ? "Memproses..." : "Lanjutkan",
+                                isLoading: state.isProcessing,
+                                onPressed: state.isProcessing ? null : onLanjutkanPressed,
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -877,6 +882,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   Future<void> onLanjutkanPressed() async {
+    if (context.read<Calmv1ListBloc>().state.isProcessing) return;
+
     context.read<Calmv1ListBloc>().add(
       CalMv2RegMvEvent(calmv1Id: calmv1Id!),
     );

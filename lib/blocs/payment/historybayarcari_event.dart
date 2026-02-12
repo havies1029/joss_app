@@ -22,4 +22,9 @@ class SelectHistorybayarCariEvent extends HistorybayarCariEvents {
   const SelectHistorybayarCariEvent({required this.selected});
 }
 
-
+class DownloadInvoiceEvent extends HistorybayarCariEvents {
+  final String noInv;
+  const DownloadInvoiceEvent({required this.noInv});
+  @override
+  List<Object> get props => [noInv];
+}

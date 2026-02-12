@@ -25,14 +25,29 @@ class EmailVerificationBloc
     on<ValidasiPinEmailEvent>(onValidasiPinEmail);
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
     on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
+    on<FieldTeleponVerificationChangedEvent>(onFieldTeleponVerificationChangedEvent);
   }
 
   Future<void> onFieldEmailVerificationChangedEvent(
       FieldEmailVerificationChangedEvent event,
       Emitter<EmailVerificationState> emit,
       ) async {
-    emit(state.copyWith(email: event.email.trim()));
+    emit(state.copyWith(
+      email: event.email.trim(),
+      telepon: '',
+    ));
   }
+
+  Future<void> onFieldTeleponVerificationChangedEvent(
+      FieldTeleponVerificationChangedEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
+    emit(state.copyWith(
+      telepon: event.telepon.trim(),
+      email: '',
+    ));
+  }
+
 
   Future<void> onTambahEmailVerification(EmailVerificationTambahEvent event,
       Emitter<EmailVerificationState> emit) async {

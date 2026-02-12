@@ -17,6 +17,18 @@ class Calmv1ListBloc extends Bloc<Calmv1ListEvents, Calmv1ListState> {
 		on<HapusCalmv1ListEvent>(onHapusCalmv1List);
 		on<CloseDialogCalmv1ListEvent>(onCloseDialogCalmv1List);
 		on<CalMv2RegMvEvent>(onCalMv2RegMv);
+		on<ClearProcessMessageEvent>(onClearProcessMessage);
+	}
+
+	Future<void> onClearProcessMessage(
+			ClearProcessMessageEvent event,
+			Emitter<Calmv1ListState> emit,
+			) async {
+		emit(state.copyWith(
+			processMessage: "",
+			isProcessed: false,
+			hasFailure: false,
+		));
 	}
 
 	Future<void> onRefreshCalmv1List(
@@ -85,15 +97,25 @@ class Calmv1ListBloc extends Bloc<Calmv1ListEvents, Calmv1ListState> {
 
 	Future<void> onCalMv2RegMv(
 			CalMv2RegMvEvent event, Emitter<Calmv1ListState> emit) async {
-		emit(state.copyWith(isProcessing: true, isProcessed: false));
+		if (state.isProcessing) return;
+		emit(state.copyWith(
+			isProcessing: true,
+			isProcessed: false,
+			hasFailure: false,
+			processMessage: "",
+		));
+
+
 		Calmv1ListRepository repo = Calmv1ListRepository();
 		final result = await repo.calmv2Regmv(event.calmv1Id);
-		bool hasFailure = !result.success;
+
+
 		emit(state.copyWith(
-				isProcessing: false,
-				isProcessed: true,
-				hasFailure: hasFailure,
-				processMessage: result.data.toString()));
+			isProcessing: false,
+			isProcessed: true,
+			hasFailure: !result.success,
+			processMessage: result.data.toString(),
+		));
 	}
 
 

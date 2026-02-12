@@ -18,6 +18,7 @@ import '../gen_klaim/mobile/klaim_main_page.dart';
 import '../heropage/mobile/heropage.dart';
 import '../qontak/mobile/chat_init_service.dart';
 import '../qontak/mobile/customer_service_page.dart';
+import '../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
 import '../settingpage/mobile/settingpage.dart';
 import 'draggable_chat_button.dart';
 
@@ -39,7 +40,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
     pages = [
       const HeroPage(),
       const CariAsuransiWidget.menu(),
-      const KlaimMainPage.menu(),
+      const DaftarCobKlaimMenu(),
       const LiterasiPage(),
       const SettingsPage(),
     ];
@@ -105,17 +106,17 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
               index: selectedIndex,
               children: pages,
             ),
-            DraggableChatButton(
-              onTap: () {
-                if (ChatInitService.I.isInitialized) {
-                  Navigator.pushNamed(context, 'chat');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Chat belum siap, coba lagi')),
-                  );
-                }
-              },
-            ),
+            // DraggableChatButton(
+            //   onTap: () {
+            //     if (ChatInitService.I.isInitialized) {
+            //       Navigator.pushNamed(context, 'chat');
+            //     } else {
+            //       ScaffoldMessenger.of(context).showSnackBar(
+            //         const SnackBar(content: Text('Chat belum siap, coba lagi')),
+            //       );
+            //     }
+            //   },
+            // ),
           ],
         ),
 

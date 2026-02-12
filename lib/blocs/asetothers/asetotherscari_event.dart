@@ -92,3 +92,5 @@ class SelectProsesOthersIdEvent extends AsetothersCariEvents {
 	final String? prosesId;
 	const SelectProsesOthersIdEvent(this.prosesId);
 }
+
+class ClearSelectedOthersItemEvent extends AsetothersCariEvents {}

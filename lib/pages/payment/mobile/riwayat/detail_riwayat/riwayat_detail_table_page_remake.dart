@@ -183,8 +183,10 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                               );
                             } else {
                               // unduh invoice
-                              context.read<DnRekap2invBloc>().add(
-                                CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                              context.read<HistorybayarCariBloc>().add(
+                                DownloadInvoiceEvent(
+                                  noInv: selected.inv1Id,
+                                ),
                               );
                             }
                           },

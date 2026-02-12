@@ -9,7 +9,7 @@ import '../../../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../blocs/gen_status_aset/statusasetcari_bloc.dart';
 
-import '../../../helper/fab_action_helper.dart'; // untuk masterActions + download items
+import '../../../helper/fab_action_helper.dart';
 
 import '../../helper/fab_action_executor.dart';
 import '../../helper/fab_action_policy.dart';
@@ -75,8 +75,9 @@ class FloatingMenuWrapper extends StatelessWidget {
       "10003" => context.select((AsetMvCariBloc b) => b.state.selectedItem),
       "10004" => context.select((AsethullCariBloc b) => b.state.selectedItem),
       "10005" => context.select((AsetHealthCariBloc b) => b.state.selectedItem),
-      "10006" => context.select((AsetothersCariBloc b) => b.state.selectedItem),
-      _ => null,
+
+    // Selain 10002-10005 => Others/Kargo
+      _ => context.select((AsetothersCariBloc b) => b.state.selectedItem),
     };
   }
 
@@ -89,24 +90,38 @@ class FloatingMenuWrapper extends StatelessWidget {
       bloc.add(const ClearParSelectionEvent());
       bloc.add(const ClearPolisParSelectionEvent());
       bloc.add(const ClearPolisEqSelectionEvent());
-    } else if (cobId == "10003") {
+      return;
+    }
+
+    if (cobId == "10003") {
       final bloc = context.read<AsetMvCariBloc>();
       bloc.add(ClearSelectedMvItemEvent());
       bloc.add(const ClearMvSelectionEvent());
       bloc.add(const ClearPolisMvSelectionEvent());
-    } else if (cobId == "10004") {
+      return;
+    }
+
+    if (cobId == "10004") {
       final bloc = context.read<AsethullCariBloc>();
+      bloc.add(ClearSelectedHullItemEvent());
       bloc.add(const ClearHullSelectionEvent());
       bloc.add(const ClearPolisHullSelectionEvent());
-    } else if (cobId == "10005") {
+      return;
+    }
+
+    if (cobId == "10005") {
       final bloc = context.read<AsetHealthCariBloc>();
+      bloc.add(ClearSelectedHealthItemEvent());
       bloc.add(const ClearHealthSelectionEvent());
       bloc.add(const ClearPolisHealthSelectionEvent());
-    } else if (cobId == "10006") {
-      final bloc = context.read<AsetothersCariBloc>();
-      bloc.add(const ClearOthersSelectionEvent());
-      bloc.add(const ClearPolisOthersSelectionEvent());
+      return;
     }
+
+    // Selain 10002-10005 => Others/Kargo
+    final bloc = context.read<AsetothersCariBloc>();
+    bloc.add(ClearSelectedOthersItemEvent());
+    bloc.add(const ClearOthersSelectionEvent());
+    bloc.add(const ClearPolisOthersSelectionEvent());
   }
 
   void _refreshFromState(BuildContext context) {
@@ -118,26 +133,37 @@ class FloatingMenuWrapper extends StatelessWidget {
       context.read<AsetParCariBloc>().add(
         RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
       );
-    } else if (cobId == "10003") {
+      return;
+    }
+
+    if (cobId == "10003") {
       context.read<AsetMvCariBloc>().add(
         RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
       );
-    } else if (cobId == "10004") {
+      return;
+    }
+
+    if (cobId == "10004") {
       context.read<AsethullCariBloc>().add(
         RefreshAsethullCariEvent(statusId: statusId, searchText: searchText),
       );
-    } else if (cobId == "10005") {
+      return;
+    }
+
+    if (cobId == "10005") {
       context.read<AsetHealthCariBloc>().add(
         RefreshAsetHealthCariEvent(statusId: statusId, searchText: searchText),
       );
-    } else if (cobId == "10006") {
-      context.read<AsetothersCariBloc>().add(
-        RefreshAsetothersCariEvent(
-          statusId: statusId,
-          searchText: searchText,
-          cobId: cobId,
-        ),
-      );
+      return;
     }
+
+    // Selain 10002-10005 => Others/Kargo
+    context.read<AsetothersCariBloc>().add(
+      RefreshAsetothersCariEvent(
+        statusId: statusId,
+        searchText: searchText,
+        cobId: cobId, // tetap kirim cobId biar backend bisa bedain
+      ),
+    );
   }
 }

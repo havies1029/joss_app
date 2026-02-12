@@ -34,7 +34,26 @@ class Regother1CrudModel {
 				mcobId: data['mcobId']??'',
 				comboMCobApp1: comboMCobApp1
 		);
+	}
 
+	Regother1CrudModel copyWith({
+		String? regother1Id,
+		String? remark,
+		double? tsi,
+		String? currId,
+		ComboRMatauangModel? comboRMatauang,
+		String? mcobId,
+		ComboMCobApp1Model? comboMCobApp1,
+	}) {
+		return Regother1CrudModel(
+			regother1Id: regother1Id ?? this.regother1Id,
+			remark: remark ?? this.remark,
+			tsi: tsi ?? this.tsi,
+			currId: currId ?? this.currId,
+			comboRMatauang: comboRMatauang ?? this.comboRMatauang,
+			mcobId: mcobId ?? this.mcobId,
+			comboMCobApp1: comboMCobApp1 ?? this.comboMCobApp1,
+		);
 	}
 
 	Map<String, dynamic> toJson() =>

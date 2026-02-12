@@ -1,5 +1,7 @@
 library constants;
 
+import 'dart:async';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
@@ -81,6 +83,7 @@ const Color sGrey = Color(0xFF4E4E4E);
 const Color hintGrey = Color(0xFFBCBCBC);
 const Color unselectedColor = Color(0xFF666666);
 const Color scrollBar = Color(0xFFD9D9D9);
+const Color greyKlaim = Color(0xFFA8A8A8);
 
 const Color bGrey = Color(0xFFA1A1AA);
 const Color bdGrey = Color(0xFFBCBCC7);
@@ -95,7 +98,7 @@ const Color pGreen = Color(0xFF90DE24);
 const Color successGreen = Color(0xFF4BB34B);
 const Color GreenforPayment = Color(0xFF12C127);
 const Color pDarkRed = Color(0xFFDC1C1C);
-
+const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
 

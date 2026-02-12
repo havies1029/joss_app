@@ -7,6 +7,7 @@ class CheckboxWidget extends StatefulWidget {
   final Function(bool) callback;
 
   // 🔥 BARU
+  final bool enabled;
   final bool forceActive;
 
   const CheckboxWidget({
@@ -15,12 +16,14 @@ class CheckboxWidget extends StatefulWidget {
     required this.rightLabel,
     required this.initialValue,
     required this.callback,
-    this.forceActive = false, 
+    this.forceActive = false,
+    this.enabled = true,
   });
 
   @override
   CheckboxWidgetState createState() => CheckboxWidgetState();
 }
+
 
 class CheckboxWidgetState extends State<CheckboxWidget> {
   late bool _checkbox;
@@ -35,66 +38,62 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
   void didUpdateWidget(CheckboxWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.forceActive) {
-      _checkbox = true;
-    } else if (oldWidget.initialValue != widget.initialValue) {
-      _checkbox = widget.initialValue;
+    final next = widget.forceActive ? true : widget.initialValue;
+    if (next != _checkbox) {
+      setState(() => _checkbox = next);
     }
+  }
+
+  void _toggleCheck() {
+    if (!widget.enabled) return;     // ✅ disable klik
+    if (widget.forceActive) return;  // 🔒 tetap kunci forceActive
+    setState(() => _checkbox = !_checkbox);
+    widget.callback(_checkbox);
   }
 
   @override
   Widget build(BuildContext context) {
+    final disabled = !widget.enabled;
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4), // biar stabil tinggi
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // ❗ sejajarkan vertikal
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Kotak checkbox
           GestureDetector(
-            onTap: _toggleCheck,
-            child: Container(
-              width: 18,
-              height: 18,
-              decoration: BoxDecoration(
-                color: _checkbox
-                    ? (widget.forceActive ? pGrey : primaryColor)
-                    : Colors.transparent,
-                border: Border.all(
-                  color: _checkbox
-                      ? (widget.forceActive ? pGrey : primaryColor)
-                      : sGrey,
-                  width: 1,
+            onTap: disabled ? null : _toggleCheck,
+            child: Opacity(
+              opacity: disabled ? 0.5 : 1,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: _checkbox ? primaryColor : Colors.transparent,
+                  border: Border.all(
+                    color: _checkbox ? primaryColor : sGrey,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                borderRadius: BorderRadius.circular(4),
+                child: _checkbox ? const Icon(Icons.check, size: 14) : null,
               ),
-              child: _checkbox
-                  ? const Icon(Icons.check, size: 14)
-                  : null,
             ),
           ),
-
           const SizedBox(width: 10),
-
-          // Label — tidak lagi Expanded (biar tidak stretchy!)
           Flexible(
             child: GestureDetector(
               onTap: _toggleCheck,
-              child: Text(
-                widget.rightLabel,
-                style: bodyTextStyle(context, fontSize: 15.5),
-                overflow: TextOverflow.visible,
+              child: Opacity(
+                opacity: disabled ? 0.6 : 1,
+                child: Text(
+                  widget.rightLabel,
+                  style: bodyTextStyle(context, fontSize: 15.5),
+                ),
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-// biar gak ulang2 kode
-  void _toggleCheck() {
-    if (widget.forceActive) return; // 🔒 KUNCI
-    setState(() => _checkbox = !_checkbox);
-    widget.callback(_checkbox);
   }
 }

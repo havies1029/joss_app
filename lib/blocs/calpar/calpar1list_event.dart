@@ -40,3 +40,5 @@ class CalPar2RegParEvent extends Calpar1ListEvents {
 	@override
 	List<Object> get props => [calpar1Id];
 }
+
+class ClearProcessMessageEvent extends Calpar1ListEvents {}

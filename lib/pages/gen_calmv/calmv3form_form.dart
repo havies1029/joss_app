@@ -52,7 +52,6 @@ class Calmv3FormFormPageFormState extends State<Calmv3FormFormPage> {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Form(
-              key: _formKey,
               child: Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(

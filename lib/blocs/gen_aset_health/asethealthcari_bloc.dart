@@ -192,6 +192,9 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 		on<SelectProsesHealthIdEvent>((event, emit) {
 			emit(state.copyWith(selectedProsesId: event.prosesId));
 		});
+		on<ClearSelectedHealthItemEvent>((event, emit) {
+			emit(state.copyWith(selectedItem: null));
+		});
 	}
 
 	// -----------------------
