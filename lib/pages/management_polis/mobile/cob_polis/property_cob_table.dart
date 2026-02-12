@@ -51,6 +51,7 @@ class PropertyCobTable extends StatefulWidget {
   @override
   State<PropertyCobTable> createState() => _PropertyCobTableState();
 }
+
 class _PropertyCobTableState extends State<PropertyCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
@@ -72,75 +73,21 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     return widget.items.where((d) => widget.selectedIds.contains(d.asetParId)).toList();
   }
 
-  // =========================
-  // Dynamic width helpers
-  // =========================
-
-  double _measureTextWidth(
-      BuildContext context,
-      String text, {
-        TextStyle? style,
-      }) {
-    final effectiveStyle = style ??
-        bodyTextStyle(context, fontSize: 14).copyWith(
-          color: primaryLightColor,
-        );
-
-    final tp = TextPainter(
-      text: TextSpan(text: text, style: effectiveStyle),
-      textDirection: Directionality.of(context),
-      maxLines: 1,
-      ellipsis: '…',
-    )..layout();
-
-    return tp.width;
-  }
-
-  double _columnWidthFromLongest(
-      BuildContext context,
-      Iterable<String> values, {
-        required double min,
-        required double max,
-        double padding = 16, // padding cell + sedikit buffer
-        TextStyle? style,
-      }) {
-    var longest = 0.0;
-    for (final v in values) {
-      final w = _measureTextWidth(context, v, style: style);
-      if (w > longest) longest = w;
-    }
-    final target = longest + padding;
-    return target.clamp(min, max);
-  }
-
-  // Helper cell text yang otomatis wrap (biar “mentok width => jadi baris”)
-  Widget _textCell(
-      String text, {
-        int maxLines = 1,
-        bool center = false,
-        bool softWrap = true,
-      }) {
-    final t = Text(
-      text,
-      maxLines: maxLines,
-      softWrap: softWrap,
-      overflow: TextOverflow.ellipsis,
-      style: const TextStyle(color: primaryLightColor),
-    );
-
-    return _cell(child: center ? Center(child: t) : t);
-  }
-
-  // =========================
-  // Build
-  // =========================
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
     final showColumn = widget.statusId == "10002";
+
+    // 🔍 DEBUG PRINTS
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('PropertyCobTable Build:');
+    print('  statusId: "${widget.statusId}"');
+    print('  showColumn: $showColumn');
+    print('  items count: ${widget.items.length}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final items = _filteredItems;
 
     if (items.isEmpty) {
@@ -170,79 +117,19 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
-  // =========================
-  // Column width specs (caps)
-  // =========================
-  // Kamu bebas ubah cap max di sini (inilah “batas mentok”-nya)
-  // width akan ngikut data terpanjang tapi mentok di max.
-
-  Map<int, TableColumnWidth> _compactColumnWidths(
-      BuildContext context,
-      List<AsetParCariModel> details,
-      bool showColumn,
-      ) {
-    final selectCol = widget.readOnly ? 0.0 : 40.0;
-
-    // buat kumpulin string per kolom
-    final noProsesValues = details.map((d) => d.prosesId.isEmpty ? "-" : d.prosesId);
-    final noPolisValues = details.map((d) => d.polisNo);
-    final tertanggungValues = details.map((d) => d.tertanggung);
-    final alamatValues = details.map((d) => d.alamat);
-
-    // Periode: format cenderung sama panjang, aman fixed/cap
-    const periodeWidth = 180.0;
-
-    // Nilai/Premi: juga relatif, tapi tetap kita clamp kecil
-    final nilaiValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
-    final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
-
-    // Spec caps (min/max)
-    final wNoProses = _columnWidthFromLongest(context, noProsesValues, min: 90, max: 140);
-    final wNoPolis = _columnWidthFromLongest(context, noPolisValues, min: 110, max: showColumn ? 120 : 160);
-    final wTertanggung = _columnWidthFromLongest(context, tertanggungValues, min: 130, max: 170);
-    final wAlamat = _columnWidthFromLongest(context, alamatValues, min: 160, max: 240);
-    final wNilai = _columnWidthFromLongest(context, nilaiValues, min: 140, max: 170);
-    final wPremi = _columnWidthFromLongest(context, premiValues, min: 120, max: 140);
-
-    // Susun map berdasarkan showColumn
-    if (showColumn) {
-      return {
-        0: FixedColumnWidth(selectCol),
-        1: const FixedColumnWidth(50), // No
-        2: FixedColumnWidth(wNoProses),
-        3: FixedColumnWidth(wNoPolis),
-        4: FixedColumnWidth(wTertanggung),
-        5: FixedColumnWidth(wAlamat),
-        6: const FixedColumnWidth(periodeWidth),
-        7: FixedColumnWidth(wNilai),
-        8: FixedColumnWidth(wPremi),
-      };
-    }
-
-    return {
-      0: FixedColumnWidth(selectCol),
-      1: const FixedColumnWidth(50), // No
-      2: FixedColumnWidth(wNoPolis),
-      3: FixedColumnWidth(wTertanggung),
-      4: FixedColumnWidth(wAlamat),
-      5: const FixedColumnWidth(periodeWidth),
-      6: FixedColumnWidth(wNilai),
-      7: FixedColumnWidth(wPremi),
-    };
+  Widget _buildHeaderTitle(BuildContext context, String cobNama) {
+    return Text(
+      "Polis $cobNama",
+      style: headingStyle(context, fontSize: 14),
+    );
   }
-
-  // =========================
-  // Compact table (dynamic widths + wrap)
-  // =========================
 
   Widget _buildDetailTableCompact(
       BuildContext context,
       List<AsetParCariModel> details,
-      bool showColumn,
+      bool showColumn
       ) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
-
-    final columnWidths = _compactColumnWidths(context, details, showColumn);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -263,7 +150,9 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             trackVisibility: MaterialStateProperty.all(false),
             thickness: MaterialStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(scrollBar.withOpacity(0.1)),
+            thumbColor: MaterialStateProperty.all(
+              scrollBar.withOpacity(0.1),
+            ),
           ),
           child: Scrollbar(
             controller: hController,
@@ -276,9 +165,33 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   horizontalInside: BorderSide(color: sGrey, width: 1),
                   verticalInside: BorderSide(color: sGrey, width: 1),
                 ),
-                columnWidths: columnWidths,
+                columnWidths: {
+                  0: widget.readOnly
+                      ? const FixedColumnWidth(0)
+                      : const FixedColumnWidth(40),
+
+                  1: const FixedColumnWidth(50), // No
+
+                  if (showColumn) ...{
+                    2: const FixedColumnWidth(140), // No Proses
+                    3: const FixedColumnWidth(120), // No Polis
+                    4: const FixedColumnWidth(170), // Tertanggung
+                    5: const FixedColumnWidth(240), // Alamat
+                    6: const FixedColumnWidth(180), // Periode
+                    7: const FixedColumnWidth(170), // Nilai Pertanggungan
+                    8: const FixedColumnWidth(140), // Premi
+                  } else ...{
+                    2: const FixedColumnWidth(160), // No Polis
+                    3: const FixedColumnWidth(170), // Tertanggung
+                    4: const FixedColumnWidth(240), // Alamat
+                    5: const FixedColumnWidth(180), // Periode
+                    6: const FixedColumnWidth(170), // Nilai Pertanggungan
+                    7: const FixedColumnWidth(140), // Premi
+                  },
+                },
                 children: [
-                  _tableHeader(context, showColumn),
+                  _tableHeader(context, details, showColumn, compact: true),
+
                   ...details.asMap().entries.map(
                         (e) => _detailRowWithCheckbox(
                       context,
@@ -297,15 +210,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
-  // =========================
-  // Normal table (tetap fixed seperti awal)
-  // =========================
-
-  Widget _buildDetailTableNormal(
-      BuildContext context,
-      List<AsetParCariModel> details,
-      bool showColumn,
-      ) {
+  Widget _buildDetailTableNormal(BuildContext context, List<AsetParCariModel> details, bool showColumn) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
@@ -328,52 +233,59 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FixedColumnWidth(40),
-            1: const FixedColumnWidth(50),
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FixedColumnWidth(40),
+
+            1: const FixedColumnWidth(50), // No
 
             if (showColumn) ...{
-              2: const FixedColumnWidth(140),
-              3: const FixedColumnWidth(120),
-              4: const FixedColumnWidth(170),
-              5: const FixedColumnWidth(240),
-              6: const FixedColumnWidth(180),
-              7: const FixedColumnWidth(170),
-              8: const FixedColumnWidth(140),
+              2: const FixedColumnWidth(140), // No Proses
+              3: const FixedColumnWidth(120), // No Polis
+              4: const FixedColumnWidth(170), // Tertanggung
+              5: const FixedColumnWidth(240), // Alamat
+              6: const FixedColumnWidth(180), // Periode
+              7: const FixedColumnWidth(170), // Nilai Pertanggungan
+              8: const FixedColumnWidth(140), // Premi
             } else ...{
-              2: const FixedColumnWidth(120),
-              3: const FixedColumnWidth(120),
-              4: const FixedColumnWidth(240),
-              5: const FixedColumnWidth(180),
-              6: const FixedColumnWidth(170),
-              7: const FixedColumnWidth(140),
+              2: const FixedColumnWidth(120), // No Polis
+              3: const FixedColumnWidth(120), // Tertanggung
+              4: const FixedColumnWidth(240), // Alamat
+              5: const FixedColumnWidth(180), // Periode
+              6: const FixedColumnWidth(170), // Nilai Pertanggungan
+              7: const FixedColumnWidth(140), // Premi
             },
           },
           children: [
-            _tableHeader(context, showColumn),
-            ...details.asMap().entries.map(
-                  (e) => _detailRowWithCheckbox(
-                context,
-                e.value,
-                e.key,
-                showColumn,
-                compact: false,
-              ),
-            ),
+            _tableHeader(context, details, showColumn, compact: false),
+
+            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
+              context,
+              e.value,
+              e.key,
+              showColumn,
+              compact: false,
+            )),
           ],
         ),
       ),
     );
   }
 
-  // =========================
-  // Header
-  // =========================
-
-  TableRow _tableHeader(BuildContext context, bool showColumn) {
+  TableRow _tableHeader(
+      BuildContext context,
+      List<AsetParCariModel> details,
+      bool showColumn,
+      {
+        required bool compact,
+      }) {
     return TableRow(
       decoration: const BoxDecoration(color: formGrey),
       children: [
-        const SizedBox(),
+        if (!widget.readOnly)
+          const SizedBox()
+        else
+          const SizedBox(),
         ...[
           "No",
           if (showColumn) "No Proses",
@@ -384,7 +296,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
-          final center = t.toUpperCase() == "NO";
+          final upper = t.toUpperCase();
+          final center = upper == "NO";
           final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
@@ -395,24 +308,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
-  // =========================
-  // Row
-  // =========================
-
   TableRow _detailRowWithCheckbox(
       BuildContext context,
       AsetParCariModel d,
       int index,
-      bool showColumn, {
+      bool showColumn,
+      {
         required bool compact,
       }) {
     final isSelected = widget.selectedItem == d;
-
-    // ⬇️ ini bagian “baris disesuaikan jadi 2/3 baris”
-    // saat compact, kita kasih ruang lebih banyak untuk kolom teks panjang.
-    final maxLinesPolis = compact ? 2 : 1;
-    final maxLinesTertanggung = compact ? 2 : 1;
-    final maxLinesAlamat = compact ? 3 : 1; // alamat paling sering panjang
 
     return TableRow(
       decoration: BoxDecoration(
@@ -439,7 +343,6 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                 } else {
                   widget.onUnselect(d.asetParId);
                   widget.onClearSelectedItem?.call();
-
                   if (d.filePolisParId.isNotEmpty) {
                     widget.onUnselectFilePolisParId(d.filePolisParId);
                   }
@@ -453,50 +356,77 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         else
           const SizedBox(),
 
-        _textCell(d.nomor.toString(), center: true, softWrap: false),
+        _cell(
+          child: Center(
+            child: Text(
+              d.nomor.toString(),
+              style: TextStyle(color: primaryLightColor),
+            ),
+          ),
+        ),
 
         if (showColumn)
-          _textCell(
-            d.prosesId.isEmpty ? "-" : d.prosesId,
-            maxLines: 1,
-            softWrap: false,
+          _cell(
+            child: Text(
+              d.prosesId.isEmpty ? "-" : d.prosesId,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: primaryLightColor),
+            ),
           ),
 
-        _textCell(
-          d.polisNo,
-          maxLines: maxLinesPolis,
-          softWrap: true,
+        _cell(
+          child: Text(
+            d.polisNo,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
         ),
 
-        _textCell(
-          d.tertanggung,
-          maxLines: maxLinesTertanggung,
-          softWrap: true,
+        _cell(
+          child: Text(
+            d.tertanggung,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
         ),
 
-        _textCell(
-          d.alamat,
-          maxLines: maxLinesAlamat,
-          softWrap: true,
+        _cell(
+          child: Text(
+            d.alamat,
+            maxLines: compact ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: primaryLightColor),
+          ),
         ),
 
-        _textCell(
-          "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} - "
-              "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
-          maxLines: compact ? 2 : 1, // 2 biar kalau sempit dia wrap natural
-          softWrap: true,
+        _cell(
+          child: Text(
+            "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} -\n"
+                "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
         ),
 
-        _textCell(
-          "${d.curr} ${formatNum(d.sumInsured)}",
-          maxLines: 1,
-          softWrap: false,
+        _cell(
+          child: Text(
+            "${d.curr} ${formatNum(d.sumInsured)}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
         ),
 
-        _textCell(
-          "${d.curr} ${formatNum(d.premi)}",
-          maxLines: 1,
-          softWrap: false,
+        _cell(
+          child: Text(
+            "${d.curr} ${formatNum(d.premi)}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
         ),
       ],
     );
