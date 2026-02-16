@@ -264,6 +264,7 @@ class SimulmvCrudFormPageFormCascoState
 
   Widget buildFieldJenisCover() {
     return buildFieldComboMMvjnscover(
+      enabled: true,
       comboKey: comboMMvjnscoverKey,
       labelText: 'Jenis Cover',
       initItem: fieldComboMMvjnscover,

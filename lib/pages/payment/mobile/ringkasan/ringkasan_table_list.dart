@@ -215,17 +215,17 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
                   verticalInside: BorderSide(color: sGrey),
                 ),
                 columnWidths: const {
+                  // 0: FixedColumnWidth(50),
                   0: FixedColumnWidth(50),
-                  1: FixedColumnWidth(50),
-                  2: FixedColumnWidth(110), // dibuat lebih lega
-                  3: FixedColumnWidth(90),
-                  4: FixedColumnWidth(55),
-                  5: FixedColumnWidth(150),
-                  6: FixedColumnWidth(120),
+                  1: FixedColumnWidth(110), // dibuat lebih lega
+                  2: FixedColumnWidth(90),
+                  3: FixedColumnWidth(55),
+                  4: FixedColumnWidth(150),
+                  5: FixedColumnWidth(120),
                 },
                 children: [
                   _tableHeader(context, [
-                    "",
+                    // "",
                     "NO",
                     "KATEGORI",
                     "JUMLAH\nPOLIS",
@@ -268,17 +268,17 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
             verticalInside: BorderSide(color: sGrey),
           ),
           columnWidths: const {
+            // 0: FlexColumnWidth(1),
             0: FlexColumnWidth(1),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(2.3),
-            3: FlexColumnWidth(1.5),
-            4: FlexColumnWidth(1),
-            5: FlexColumnWidth(2.5),
-            6: FlexColumnWidth(2),
+            1: FlexColumnWidth(2.3),
+            2: FlexColumnWidth(1.5),
+            3: FlexColumnWidth(1),
+            4: FlexColumnWidth(2.5),
+            5: FlexColumnWidth(2),
           },
           children: [
             _tableHeader(context, [
-              "",
+              // "",
               "NO",
               "KATEGORI",
               "JUMLAH POLIS",
@@ -403,34 +403,34 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
             : (index.isEven ? pGrey : formGrey),
       ),
       children: [
-        // Checkbox
-        TableCell(
-          child: Center(
-            child: Checkbox(
-              value: isSelected,
-              onChanged: (checked) {
-                if (checked == true) {
-                  widget.onSelect(rows.cobId);
-                } else {
-                  widget.onUnselect(rows.cobId);
-                }
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
-              ),
-              side: MaterialStateBorderSide.resolveWith(
-                    (states) => const BorderSide(color: sGrey, width: 1),
-              ),
-              fillColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.selected)) {
-                  return primaryColor;
-                }
-                return Colors.transparent;
-              }),
-              checkColor: primaryLightColor,
-            ),
-          ),
-        ),
+        // // Checkbox
+        // TableCell(
+        //   child: Center(
+        //     child: Checkbox(
+        //       value: isSelected,
+        //       onChanged: (checked) {
+        //         if (checked == true) {
+        //           widget.onSelect(rows.cobId);
+        //         } else {
+        //           widget.onUnselect(rows.cobId);
+        //         }
+        //       },
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+        //       ),
+        //       side: MaterialStateBorderSide.resolveWith(
+        //             (states) => const BorderSide(color: sGrey, width: 1),
+        //       ),
+        //       fillColor: MaterialStateProperty.resolveWith((states) {
+        //         if (states.contains(MaterialState.selected)) {
+        //           return primaryColor;
+        //         }
+        //         return Colors.transparent;
+        //       }),
+        //       checkColor: primaryLightColor,
+        //     ),
+        //   ),
+        // ),
 
         // NO
         TableCell(

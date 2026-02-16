@@ -974,6 +974,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvdoccrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvstatuscrud_repository.dart';
+import 'package:joss_app/blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
+import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
+import 'package:joss_app/repositories/perbaruiklaimpar/klaimparklaimcrud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
@@ -1241,6 +1254,8 @@ import 'blocs/regreaktif/regreaktifcari_bloc.dart';
 import 'blocs/regreaktif/regreaktif2cari_bloc.dart';
 
 import 'blocs/loading_flow/loading_flow_bloc.dart';
+import 'repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
+import 'repositories/perbaruiklaimmv/klaimmvpoliscrud_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -1301,6 +1316,23 @@ Future<void> main() async {
         BlocProvider(
           create: (_) => ProfileDownloadFotoBloc(repository: UserFotoRepository()),
         ),
+
+
+        //Klaim
+        BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
+        BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
+        // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),
+        BlocProvider(create: (context) => KlaimmvbengkelcrudBloc(repository: KlaimmvbengkelcrudRepository())),
+        BlocProvider(create: (context) => KlaimmvstatuscrudBloc(repository: KlaimmvstatuscrudRepository())),
+        BlocProvider(create: (context) => KlaimmvaccordionBloc()),
+        BlocProvider(create: (context) => Klaim5cariBloc()),
+        BlocProvider(create: (context) => KlaimmvstatuscariBloc()),
+
+
+        BlocProvider(create: (context) => KlaimparklaimcrudBloc(repository: KlaimparklaimcrudRepository())),
+        // BlocProvider(create: (context) => Klaim5parListBloc()),
+        // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),
+        BlocProvider(create: (context) => KlaimparaccordionBloc()),
 
         // Profile / Rekan
         BlocProvider(create: (_) => MRekan1CrudBloc(repository: MRekan1CrudRepository())),

@@ -81,7 +81,14 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           children: [
             ListPageFilterBarUIWidget(
               searchController: _searchController,
-              searchButton: buildSearchButton(),
+              onSearch: (value) {
+                historybayarCariBloc.add(
+                  RefreshHistorybayarCariEvent(
+                    searchText: value,
+                    statusId: '10001',
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 10),
             buildList(),

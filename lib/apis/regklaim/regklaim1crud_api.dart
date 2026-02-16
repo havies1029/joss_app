@@ -48,6 +48,25 @@ class Regklaim1CrudAPI {
 		}
 	}
 
+  Future<ReturnDataAPI> regklaimToKlaimAPI(String regklaim1Id) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/regklaimtoklaim";
+		Map<String, String> queryParams = {'regklaim1Id': regklaim1Id, 'modul_id': 'regklaimToKlaimAPI'};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		final http.Response response =
+			await http.get(uri, headers: <String, String>{
+			'Content-Type': 'application/json; odata=verbos',
+			'Accept': 'application/json; odata=verbos',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		});
+
+		if (response.statusCode == 200) {
+			var returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			return returnData;
+		} else {
+			return throw Exception("Failed to load data");
+		}
+	}
+
 	Future<bool> regklaim1CrudUbahAPI(Regklaim1CrudModel record) async {
 		String ubahEndpoint =
 			"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/update";

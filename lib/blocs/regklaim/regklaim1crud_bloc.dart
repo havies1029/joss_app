@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/models/combobox/combominsurance_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,38 +17,24 @@ class Regklaim1CrudBloc extends Bloc<Regklaim1CrudEvents, Regklaim1CrudState> {
 		on<Regklaim1CrudLihatEvent>(onLihatRegklaim1Crud);
     on<Regklaim1Tambah4PolisJpsEvent>(onTambah4PolisJps);
 		on<ComboMInsuranceChangedEvent>(onComboMInsuranceChanged);
+    on<RegklaimToKlaimEvent>(onRegklaimToKlaim);
 	}
 
 	Future<void> onTambahRegklaim1Crud(
-			Regklaim1CrudTambahEvent event,
-			Emitter<Regklaim1CrudState> emit,
-			) async {
+		Regklaim1CrudTambahEvent event, Emitter<Regklaim1CrudState> emit) async {
 
-		emit(state.copyWith(
-			isSaving: true,
-			isSaved: false,
-			hasFailure: false,
-			regklaim1Id: "",
-		));
-
-		final returnData = await repository.regklaim1CrudTambah(event.record);
-
-		final hasFailure = !returnData.success;
-
-		final newId = (!hasFailure && returnData.data != null)
-				? returnData.data.toString()
-				: "";
-
+		ReturnDataAPI returnData;
+		bool hasFailure = true;
+		emit(state.copyWith(isSaving: true, isSaved: false));
+		returnData = await repository.regklaim1CrudTambah(event.record);
+		hasFailure = !returnData.success;
 		emit(state.copyWith(
 			isSaving: false,
 			isSaved: true,
-			hasFailure: hasFailure,
-			viewMode: hasFailure ? "tambah" : "ubah",
-			regklaim1Id: newId,
-		));
+      viewMode: hasFailure ? "tambah" : "ubah",
+      regklaim1Id: hasFailure ? null : returnData.data,
+			hasFailure: hasFailure));
 	}
-
-
 
 	Future<void> onUbahRegklaim1Crud(
 		Regklaim1CrudUbahEvent event, Emitter<Regklaim1CrudState> emit) async {
@@ -91,5 +76,13 @@ class Regklaim1CrudBloc extends Bloc<Regklaim1CrudEvents, Regklaim1CrudState> {
 			isLoaded: true,
 			comboMInsurance: comboMInsurance));
 	}
+
+  Future<void> onRegklaimToKlaim(
+      RegklaimToKlaimEvent event, Emitter<Regklaim1CrudState> emit) async {
+    emit(state.copyWith(isSaving: true, isSaved: false));
+    ReturnDataAPI returnData = await repository.regklaimToKlaim(event.regklaim1Id);
+    bool hasFailure = !returnData.success;
+    emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+  }
 
 }

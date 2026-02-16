@@ -248,6 +248,8 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
             value: isSelected,
             onChanged: (checked) {
               if (checked == true) {
+                debugPrint("=== SELECT DETAIL ===");
+                debugPrint("Selected klaim1Id: ${d.klaim1Id}");
                 groupcobCariBloc.add(SelectDetailEvent(d.klaim1Id));
               } else {
                 groupcobCariBloc.add(UnselectDetailEvent(d.klaim1Id));

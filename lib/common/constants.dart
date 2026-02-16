@@ -101,6 +101,8 @@ const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
+const Color excelGreen = Color(0xFF27AE68);
+const Color pdfRed = Color(0xFFDA1618);
 
 // 🔥 Direct LinearGradients (Light → Dark, top → bottom)
 

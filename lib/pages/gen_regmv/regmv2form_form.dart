@@ -313,6 +313,7 @@ class Regmv2FormFormPageFormState extends State<Regmv2FormFormPage> {
 
 	Widget buildFieldMmvjnscoverId() {
 		return buildFieldComboMMvjnscover(
+			enabled: true,
 			comboKey: comboMMvjnscoverKey,
 			labelText: 'mmvjnscoverId',
 			initItem: fieldComboMMvjnscover,

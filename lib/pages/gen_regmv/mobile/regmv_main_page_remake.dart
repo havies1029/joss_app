@@ -997,7 +997,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                 children: [
                   Form1Page(
                     context: context,
-                    title: "Data Kendaraan",
+                    title: "Data Tertanggung",
                     isExpanded: expanded[0],
                     onToggle: (v) => setState(() => expanded[0] = v),
                     onRefresh: () {
@@ -1022,7 +1022,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   Form2Page(
                     context: context,
-                    title: "Pertanggungan",
+                    title: "Data Polis",
                     isExpanded: expanded[1],
                     onToggle: (v) => setState(() => expanded[1] = v),
                     onRefresh: () {
@@ -1113,7 +1113,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   Form3Page(
                     context: context,
-                    title: "Premi",
+                    title: "Data Kendaraan",
                     isExpanded: expanded[2],
                     onToggle: (v) => setState(() => expanded[2] = v),
                     onRefresh: () {
@@ -1172,7 +1172,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   Form4Page(
                     context: context,
-                    title: "Upload Foto STNK",
+                    title: "Foto STNK",
                     isExpanded: expanded[3],
                     onToggle: (v) => setState(() => expanded[3] = v),
                     onRefresh: () {
@@ -1192,7 +1192,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   Form5Page(
                     context: context,
-                    title: "Upload Foto Mobil",
+                    title: "Foto Mobil",
                     isExpanded: expanded[4],
                     onToggle: (v) => setState(() => expanded[4] = v),
                     onRefresh: () {
@@ -1212,7 +1212,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   Form7Page(
                     context: context,
-                    title: "Upload Foto Aksesoris",
+                    title: "Foto Aksesoris",
                     isExpanded: expanded[5],
                     onToggle: (v) => setState(() => expanded[5] = v),
                     onRefresh: () {

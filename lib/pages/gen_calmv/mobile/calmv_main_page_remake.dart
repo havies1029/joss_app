@@ -780,8 +780,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     } else {
       final clean = hargaRaw.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form1.hargaKendaraan', kString0);
+      if (angka == null || angka <= 0) {
+        setErr('form1.hargaKendaraan', "Harga harus lebih dari 0");
         ok = false;
       }
     }
@@ -1029,7 +1029,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     onChanged: (v) {
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) {
+      if (angka != null && angka > 0) {
         clearErr('form1.hargaKendaraan');
       }
     },

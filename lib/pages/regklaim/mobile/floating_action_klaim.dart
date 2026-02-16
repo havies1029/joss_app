@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
+import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
+import 'package:joss_app/pages/perbaruiklaimmv/perbaruiklaimmv_page.dart';
+import 'package:joss_app/pages/perbaruiklaimpar/perbaruiklaimpar_page.dart';
+
+class FabActionKlaim extends StatelessWidget {
+  final int selectedTab;
+
+  const FabActionKlaim({
+    super.key,
+    required this.selectedTab,
+  });
+
+  List<ActionMenuItem> _allActions() {
+    return [
+      ActionMenuItem(
+        type: ActionType.klaimBaru,
+        label: "Klaim Baru",
+        iconAsset: "assets/icons/plus.svg",
+        gradientColors: const [
+          Color(0xFF2ECC71),
+          Color(0xFF2F9F22),
+        ],
+        borderColor: const Color(0xFF99FF98),
+      ),
+      ActionMenuItem(
+        type: ActionType.perbaruiKlaim,
+        label: "Perbarui Klaim",
+        iconAsset: "assets/icons/aktifkan_kembali.svg",
+        gradientColors: const [
+          Color(0xFFFFEB39),
+          Color(0xFFAC8C0A),
+        ],
+        borderColor: const Color(0xFFFFDB78),
+      ),
+      ActionMenuItem(
+        type: ActionType.lacakKlaim,
+        label: "Lacak Klaim",
+        iconAsset: "assets/icons/lacak_polis.svg",
+        gradientColors: const [
+          Color(0xFF48E0FF),
+          Color(0xFF02B1D5),
+        ],
+        borderColor: const Color(0xFF78E8FF),
+      ),
+      ActionMenuItem(
+        type: ActionType.batalKlaim,
+        label: "Batal Klaim",
+        iconAsset: "assets/icons/close.svg",
+        gradientColors: const [
+          Color(0xFFFF484B),
+          Color(0xFFC30003),
+        ],
+        borderColor: const Color(0xFFFF787A),
+      ),
+    ];
+  }
+
+  List<ActionMenuItem> _computeActions() {
+    final all = _allActions();
+
+    if (selectedTab == 1) {
+      return all;
+    }
+
+    return [
+      all.firstWhere((a) => a.type == ActionType.klaimBaru),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionMenuWidget(
+      availableActions: _computeActions(),
+      selectedItems: const [],
+      onActionTap: (type, _) {
+        if (type == ActionType.perbaruiKlaim) {
+          final state = context.read<GroupcobCariBloc>().state;
+          final selected = state.selectedKlaimRecord;
+
+          if (selected == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Pilih data terlebih dahulu")),
+            );
+            return;
+          }
+
+          final cobId = selected.cobId;
+          final klaim1Id = selected.klaim1Id;
+          final cobNama = selected.cobNama;
+
+          // if (selectedDetail == null) {
+          //     ScaffoldMessenger.of(context).showSnackBar(
+          //       const SnackBar(content: Text("Data tidak ditemukan")),
+          //     );
+          //     return;
+          //   }
+          //
+          //   final cobId = selectedDetail.cobId;
+          //   final klaim1Id = selectedDetail.klaim1Id;
+          //   final String cobNama = selectedKlaimRecord.cobNama;
+
+          debugPrint("=== NAVIGATION DEBUG ===");
+          debugPrint("klaim1Id : $klaim1Id");
+          debugPrint("cobId    : $cobId");
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) {
+              if (cobId == "10002") {
+                return PerbaruiKlaimMvPage(
+                    klaim1Id: klaim1Id,
+                    cobGroupNama:
+                    cobNama); // Sesuaikan parameter sesuai kebutuhan
+              } else if (cobId == "10001") {
+                return PerbaruiKlaimParPage(
+                    klaim1Id: klaim1Id,
+                    cobGroupNama: cobNama,
+                    cobGroupId: cobId);
+              } // Sesuaikan parameter sesuai kebutuhan                }
+              else {
+                return PerbaruiKlaimMvPage(
+                    klaim1Id: klaim1Id,
+                    cobGroupNama:
+                    cobNama); // Sesuaikan parameter sesuai kebutuhan
+              }
+            }),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Pilih data terlebih dahulu")),
+          );
+        }
+
+        debugPrint("Klaim action tapped: $type");
+      },
+    );
+  }
+}

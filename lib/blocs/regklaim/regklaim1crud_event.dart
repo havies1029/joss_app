@@ -52,4 +52,12 @@ class ComboMInsuranceChangedEvent extends Regklaim1CrudEvents{
 	const ComboMInsuranceChangedEvent({required this.comboMInsurance});
 
 	@override	List<Object> get props => [comboMInsurance];
-  }
+}
+
+class RegklaimToKlaimEvent extends Regklaim1CrudEvents {
+  final String regklaim1Id;
+  const RegklaimToKlaimEvent({required this.regklaim1Id});
+
+  @override
+  List<Object> get props => [regklaim1Id];
+}

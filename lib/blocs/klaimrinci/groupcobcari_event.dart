@@ -27,3 +27,18 @@ class UnselectDetailEvent extends GroupcobCariEvents {
   final String klaim1Id;
   const UnselectDetailEvent(this.klaim1Id);
 }
+
+class SelectItemEvent extends GroupcobCariEvents {
+  final String klaim1Id;
+  const SelectItemEvent(this.klaim1Id);
+}
+
+class UnselectItemEvent extends GroupcobCariEvents {
+  final String klaim1Id;
+  const UnselectItemEvent(this.klaim1Id);
+}
+
+class SelectKlaimRecordEvent extends GroupcobCariEvents {
+  final KlaimdetailCariModel klaimRecord;
+  const SelectKlaimRecordEvent(this.klaimRecord);
+}

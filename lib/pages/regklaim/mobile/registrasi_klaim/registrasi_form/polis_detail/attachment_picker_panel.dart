@@ -288,7 +288,7 @@ class _PdfThumbImage extends StatelessWidget {
 
   Future<Uint8List?> _renderPage1() async {
     // ✅ versi 0.7.0: pakai PdfImageRendererPdf
-    final pdf = PdfImageRendererPdf(path: path);
+    final pdf = PdfImageRenderer(path: path);
 
     await pdf.open();                 // buka dokumen
     await pdf.openPage(pageIndex: 0); // buka page 1 (index mulai 0)
