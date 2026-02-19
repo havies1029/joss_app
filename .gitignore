@@ -43,3 +43,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# iOS
+ios/Podfile.lock
+ios/Flutter/Profile.xcconfig
+ios/Flutter/*.xcconfig
+ios/Flutter/**/*.xcconfig
+ios/Pods/
+ios/.symlinks/
