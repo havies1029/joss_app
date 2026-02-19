@@ -263,17 +263,26 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 		});
 	}
 
+	String buildKey({required String search, required String statusId, String? cobId}) {
+		final s = search.trim().toLowerCase();
+		final c = cobId ?? '';
+		return '$s|$c|$statusId';
+	}
+
 	Future<void> onRefreshAsetParCari(
 			RefreshAsetParCariEvent event,
 			Emitter<AsetParCariState> emit,
 			) async {
+		final newKey = buildKey(search: event.searchText, statusId: event.statusId);
+
 		emit(state.copyWith(
 			status: ListStatus.initial,
+			hasReachedMax: false,
 			hal: 0,
 			searchText: event.searchText,
 			statusId: event.statusId,
-			hasReachedMax: false,
-			// items: state.items (tetap)
+			queryKey: newKey,
+			// items: state.items  // tetap biar ga kedip
 		));
 
 		add(FetchAsetParCariEvent());
@@ -284,11 +293,96 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			Emitter<AsetParCariState> emit,
 			) async {
 		if (state.hasReachedMax) return;
+		if (state.isFetching) return;
+
+		final repo = AsetParCariRepository();
+		final keyAtRequest = state.queryKey;
+
+		emit(state.copyWith(isFetching: true));
+
+		try {
+			final nextHal = state.hal; // 0 untuk first page, dst.
+			final items = await repo.getAsetParCari(
+				state.statusId,
+				state.searchText,
+				nextHal,
+			);
+
+			// kalau query berubah saat nunggu -> buang hasil
+			if (state.queryKey != keyAtRequest) return;
+
+			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
+			List<String> _first5IdsFrom(List<AsetParCariModel> list) {
+				return list
+						.take(5)
+						.map((e) => e.asetParId) // ganti kalau field id kamu beda
+						.toList();
+			}
+
+			if (nextHal == 0) {
+				// FIRST PAGE selalu REPLACE, bukan append
+				emit(state.copyWith(
+					items: items,
+					hasReachedMax: items.isEmpty,
+					status: ListStatus.success,
+					hal: 1,
+					isFetching: false,
+				));
+
+				_recomputeActiveAndFiles(emit);
+				return;
+			}
+
+			if (items.isEmpty) {
+				emit(state.copyWith(hasReachedMax: true, isFetching: false));
+				return;
+			}
+
+			final merged = List.of(state.items)..addAll(items);
+
+			// (opsional) debug cepat kalau mau dipakai:
+			// debugPrint("PAR merge peek stateFirst5=${_first5IdsFrom(state.items)} newFirst5=${_first5IdsFrom(items)}");
+
+			// dedupe (kalau kamu mau samain persis MV yang tanpa dedupe, biarkan commented)
+			// final result = merged
+			//     .whereWithIndex((e, index) =>
+			//         merged.indexWhere((e2) => e2.asetParId == e.asetParId) == index)
+			//     .toList();
+
+			emit(state.copyWith(
+				items: merged, // atau items: result,
+				status: ListStatus.success,
+				hal: state.hal + 1,
+				hasReachedMax: false,
+				isFetching: false,
+			));
+
+			_recomputeActiveAndFiles(emit);
+		} catch (_) {
+			// kalau error: isFetching false
+			if (state.queryKey == keyAtRequest) {
+				emit(state.copyWith(status: ListStatus.failure, isFetching: false));
+			}
+		}
+	}
+
+
+	/*
+	Future<void> onFetchAsetParCari(
+			FetchAsetParCariEvent event,
+			Emitter<AsetParCariState> emit,
+			) async {
+		if (state.hasReachedMax) return;
+
+		// ✅ guard: kalau lagi loadingMore, jangan spam
+		if (state.status == ListStatus.loadingMore) return;
 
 		final repo = AsetParCariRepository();
 
+		// FIRST LOAD
 		if (state.status == ListStatus.initial) {
 			final items = await repo.getAsetParCari(state.statusId, state.searchText, 0);
+
 			emit(state.copyWith(
 				items: items,
 				hasReachedMax: false,
@@ -296,14 +390,20 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 				hal: 1,
 			));
 
-			// Setelah items berubah, pastikan active/file masih valid jika ada selected
 			_recomputeActiveAndFiles(emit);
 			return;
 		}
 
+		// ✅ next page load: tandai loadingMore tapi JANGAN hapus items
+		emit(state.copyWith(status: ListStatus.loadingMore));
+
 		final items = await repo.getAsetParCari(state.statusId, state.searchText, state.hal);
+
 		if (items.isEmpty) {
-			emit(state.copyWith(hasReachedMax: true));
+			emit(state.copyWith(
+				hasReachedMax: true,
+				status: ListStatus.success, // balik ke success
+			));
 			return;
 		}
 
@@ -321,12 +421,9 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			hal: state.hal + 1,
 		));
 
-		if (state.selectedId.isNotEmpty) {
-			_recomputeSingleActiveAndFiles(emit);
-		} else {
-			_recomputeActiveAndFiles(emit);
-		}
+		_recomputeActiveAndFiles(emit);
 	}
+	*/
 
 	Future<void> _onDebugFetchAsetParCari(
 			DebugFetchAsetParCariEvent event,

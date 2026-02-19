@@ -7,6 +7,8 @@ class GroupcobCariState extends Equatable {
   final String selectedStatusId;
   final String searchText;
   final List<String> selectedIds;
+  final String selectedId;
+	final KlaimdetailCariModel? selectedKlaimRecord;
 
 	const GroupcobCariState(
 		{this.status = ListStatus.initial,
@@ -14,6 +16,8 @@ class GroupcobCariState extends Equatable {
     this.selectedStatusId = '',
     this.searchText = '', 
     this.selectedIds = const [],
+			this.selectedId = '',
+			this.selectedKlaimRecord,
 		});
 
 	const GroupcobCariState.success(List<GroupcobCariModel> items)
@@ -28,6 +32,8 @@ class GroupcobCariState extends Equatable {
     String? selectedStatusId,
     String? searchText,
     List<String>? selectedIds,
+    String? selectedId,
+			KlaimdetailCariModel? selectedKlaimRecord,
 		}){
 		return GroupcobCariState(
 			items: items ?? this.items,
@@ -35,9 +41,11 @@ class GroupcobCariState extends Equatable {
       selectedStatusId: selectedStatusId ?? this.selectedStatusId,
       searchText: searchText ?? this.searchText,
       selectedIds: selectedIds ?? this.selectedIds,
+      selectedId: selectedId ?? this.selectedId,
+			selectedKlaimRecord: selectedKlaimRecord ?? this.selectedKlaimRecord,
 			);
 	}
 
 	@override
-	List<Object> get props => [status, items, selectedStatusId, searchText, selectedIds];
+	List<Object> get props => [status, items, selectedStatusId, searchText, selectedIds, selectedId, selectedKlaimRecord ?? ''];
 }

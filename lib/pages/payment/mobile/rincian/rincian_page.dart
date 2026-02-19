@@ -15,6 +15,7 @@ import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
+import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import '../bayar_button.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import 'package:joss_app/pages/payment/mobile/payment_page/payment_process/payment_process.dart';
@@ -62,8 +63,21 @@ class _RincianPageState extends State<RincianPage> {
   void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
-    ); // Implement your ta
+      MaterialPageRoute(
+        builder: (_) => PaymentMethodPage(
+          curr: curr,
+          totalBayar: totalBayar,
+          onBack: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => const TagihanPembayaranPage(initialTab: 2),
+              ),
+                  (route) => route.isFirst,
+            );
+          },
+        ),
+      ),
+    );
   }
 
   @override

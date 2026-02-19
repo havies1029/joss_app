@@ -22,10 +22,10 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<RegUserHapusEvent>(onHapusRegUser);
     on<RegUserLihatEvent>(onLihatRegUser);
     on<ValidasiPinHPEvent>(onValidasiPinHP);
-    on<SetIsEmailEvent>(_onSetIsEmail);
+    on<SetIsEmailRegEvent>(_onSetIsEmail);
   }
 
-  void _onSetIsEmail(SetIsEmailEvent event, Emitter<RegUserState> emit) {
+  void _onSetIsEmail(SetIsEmailRegEvent event, Emitter<RegUserState> emit) {
     emit(state.copyWith(isEmail: event.isEmail));
   }
 

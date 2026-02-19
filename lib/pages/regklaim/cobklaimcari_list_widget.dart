@@ -68,11 +68,10 @@ class CobklaimcariListWidgetState extends State<CobklaimcariListWidget> {
                 child: Column(
                   children: <Widget>[
                     CobklaimcariTileWidget(
-                      cobIcon: state.items[index].cobIcon,
+                      cobIcon: state.items[index].cobNama,
                       cobNama: state.items[index].cobNama,
-                      isAktif: state.items[index].isAktif,
-                      mcobklaim1Id: state.items[index].mcobklaim1Id,
-                      noUrut: state.items[index].noUrut,
+                      isAktif: true,
+                      mcobklaim1Id: state.items[index].mcobklaim1Id, noUrut: 1,
                     )
                   ],
                 ),

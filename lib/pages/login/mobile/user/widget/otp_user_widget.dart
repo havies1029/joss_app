@@ -39,11 +39,9 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  // 📌 OTP
   final List<TextEditingController> _otpControllers = [];
   final List<FocusNode> _focusNodes = [];
 
-  // ⏱ Timer
   Timer? _timer;
   int _remainingTime = 59;
   bool _isResendAvailable = false;
@@ -136,7 +134,6 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     });
     _startTimer();
 
-    // Kirim event ke BLoC untuk request OTP baru
     context.read<EmailVerificationBloc>().add(
       ValidasiPinEmailEvent(
         record: EmailVerificationModel(email: widget.email, pin: otp),

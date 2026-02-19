@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../models/gen_aset_mv/asetmvcari_model.dart';
 
@@ -46,16 +47,38 @@ class KendaraanCobTable extends StatefulWidget {
 class _KendaraanCobTableState extends State<KendaraanCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
+  late final ScrollController vController;
 
   @override
   void initState() {
     super.initState();
     hController = ScrollController();
+    vController = ScrollController();
+    vController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final bloc = context.read<AsetMvCariBloc>();
+    final s = bloc.state;
+
+    if (!vController.hasClients) return;
+    final max = vController.position.maxScrollExtent;
+    final cur = vController.position.pixels;
+
+    const threshold = 100.0;
+
+    if (max - cur <= threshold) {
+      if (!s.hasReachedMax && !s.isFetching) {
+        bloc.add(FetchAsetMvCariEvent());
+      }
+    }
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.removeListener(_onScroll);
+    vController.dispose();
     super.dispose();
   }
 
@@ -174,6 +197,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     if (items.isEmpty) return const Center(child: Text("Data kosong"));
 
     return SingleChildScrollView(
+      controller: vController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

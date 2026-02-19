@@ -14,35 +14,70 @@ class KlaimRinciCariMainPage extends StatefulWidget {
 
 class KlaimRinciCariMainPageState extends State<KlaimRinciCariMainPage> {
 
-	@override
-	Widget build(BuildContext context) {
-		return MultiBlocListener(
-      listeners: [
-        BlocListener<MstatusrinciCariBloc, MstatusrinciCariState>(
-            listener: (context, state) {
-              context.read<GroupcobCariBloc>().add(
-                RefreshGroupcobCariEvent(
-                  statusId: state.selectedStatusId, searchText: state.searchText,
-                ),
-              );
-            }, listenWhen: (previous, current) {
-          return ((previous.selectedStatusId != current.selectedStatusId) ||
-              (previous.searchText != current.searchText));
-        }),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Klaim Rincian"),
+      ),
+      backgroundColor: Colors.grey[100],
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange,
+        onPressed: () {
+          final selectedKlaimRecord = context.read<GroupcobCariBloc>().state.selectedKlaimRecord;
+          if (selectedKlaimRecord != null) {
+            final String cobId = selectedKlaimRecord.cobId;
+            final String cobNama = selectedKlaimRecord.cobNama;
 
-      ],
-      child: Column(
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) {
+            //     if (cobId == "10002") {
+            //       return PerbaruiKlaimMvPage( klaim1Id: selectedKlaimRecord.klaim1Id, cobGroupNama: cobNama); // Sesuaikan parameter sesuai kebutuhan
+            //     }
+            //     else if (cobId == "10001") {
+            //       return PerbaruiKlaimParPage(klaim1Id: selectedKlaimRecord.klaim1Id, cobGroupNama: cobNama, cobGroupId: cobId); // Sesuaikan parameter sesuai kebutuhan
+            //     }
+            //     else {
+            //       return PerbaruiKlaimParPage(klaim1Id: selectedKlaimRecord.klaim1Id, cobGroupNama: cobNama, cobGroupId: cobId); // Sesuaikan parameter sesuai kebutuhan
+            //     }
+            //   }),
+            // );
 
-        children: [
-          SizedBox(
-            height: 152,
-            child: MstatusrinciCariPage(),
-          ),
+          }
 
-          const SizedBox(height: 8),
-          Expanded(child: const GroupcobCariPage())
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<MstatusrinciCariBloc, MstatusrinciCariState>(
+              listener: (context, state) {
+                // Ketika selectedStatusId berubah, refresh data KlaimringkasCariBloc
+                context.read<GroupcobCariBloc>().add(
+                  RefreshGroupcobCariEvent(
+                    statusId: state.selectedStatusId, searchText: state.searchText,
+                  ),
+                );
+              }, listenWhen: (previous, current) {
+            return ((previous.selectedStatusId != current.selectedStatusId) ||
+                (previous.searchText != current.searchText));
+          }),
+
         ],
+        child: Column(
+
+          children: [
+            SizedBox(
+              height: 152, // tinggi bar tombol (silakan adjust)
+              child: MstatusrinciCariPage(), // ini yg ListView horizontal
+            ),
+
+            const SizedBox(height: 8),
+            Expanded(child: const GroupcobCariPage())
+          ],
+        ),
       ),
     );
-	}
+  }
 }

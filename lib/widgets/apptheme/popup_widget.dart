@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
-/// Format yang didukung
 enum ExportFormat { excel, pdf }
 
 class PopupWidget extends StatelessWidget {
-  final String title;             // Baris pertama (fontSize 18)
-  final String subtitle;          // Baris kedua (fontSize 16)
-  final String button1Text;       // Tulisan tombol kiri
-  final String button2Text;       // Tulisan tombol kanan
-  final Color button1Color;       // Warna tombol kiri
-  final Color button2Color;       // Warna tombol kanan
+  final String title;
+  final String subtitle;
+  final String button1Text;
+  final String button2Text;
+  final Color button1Color;
+  final Color button2Color;
   final void Function(ExportFormat format)? onExportSelected;
 
   const PopupWidget({
     super.key,
-    required this.title,
-    required this.subtitle,
-    required this.button1Text,
-    required this.button2Text,
-    this.button1Color = Colors.green,
-    this.button2Color = Colors.red,
+    this.title = "Pilih format file untuk diunduh",
+    this.subtitle = "Tersedia Excel dan PDF",
+    this.button1Text = "Excel",
+    this.button2Text = "PDF",
+    this.button1Color = excelGreen,
+    this.button2Color = pdfRed,
     this.onExportSelected,
   });
 
@@ -29,9 +29,9 @@ class PopupWidget extends StatelessWidget {
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: vPadding),
-        padding: const EdgeInsets.all(hPadding + 4),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: secondaryBlackColor,
+          color: formGrey,
           borderRadius: BorderRadius.circular(cardBorderRadius),
         ),
         child: Column(
@@ -39,19 +39,19 @@ class PopupWidget extends StatelessWidget {
           children: [
             // Judul
             Text(
-              title,
-              style: headingStyle(context, fontSize: getResponsiveFont(context, 18)),
+              "Pilih format file untuk diunduh",
+              style: headingStyle(context, fontSize: 17.49),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 6.0),
+            const SizedBox(height: 2),
 
             // Sub Judul
             Text(
-              subtitle,
-              style: bodyTextStyle(context).copyWith(fontSize: getResponsiveFont(context, 16)),
+              "Tersedia Excel dan PDF",
+              style: bodyTextStyle(context, fontSize: 14.31).copyWith(color: hintGrey),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: vPadding),
+            const SizedBox(height: 12),
 
             // Tombol Aksi
             Row(
@@ -60,18 +60,21 @@ class PopupWidget extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: button1Color,
+                      backgroundColor: excelGreen,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(cardBorderRadius),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.all(10),
                     ),
-                    // ✅ klik tombol 1 = Excel
                     onPressed: () => onExportSelected?.call(ExportFormat.excel),
-                    icon: const Icon(Icons.table_chart, color: Colors.white),
+                    icon: SvgPicture.asset(
+                      "assets/icons/excel.svg",
+                      width: 16,
+                      height: 16,
+                    ),
                     label: Text(
-                      button1Text,
-                      style: const TextStyle(color: Colors.white),
+                      "Excel",
+                      style:  headingStyle(context, fontSize: 17.49),
                     ),
                   ),
                 ),
@@ -79,18 +82,21 @@ class PopupWidget extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: button2Color,
+                      backgroundColor: pdfRed,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(cardBorderRadius),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.all(10),
                     ),
-                    // ✅ klik tombol 2 = PDF
                     onPressed: () => onExportSelected?.call(ExportFormat.pdf),
-                    icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+                    icon: SvgPicture.asset(
+                      "assets/icons/pdf.svg",
+                      width: 16,
+                      height: 16,
+                    ),
                     label: Text(
-                      button2Text,
-                      style: const TextStyle(color: Colors.white),
+                      "PDF",
+                      style:  headingStyle(context, fontSize: 17.49),
                     ),
                   ),
                 ),

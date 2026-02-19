@@ -57,7 +57,7 @@ class Regendors2CariListWidgetState extends State<Regendors2CariListWidget> {
 								Regendors2CariTileWidget(
 									regendors2Id: state.items[index].regendors2Id,
 									remarks: state.items[index].remarks,
-									tglStatus: state.items[index].tglStatus,
+									tglStatus: state.items[index].tglStatus ?? DateTime.now(),
 								)
 							],
 						),

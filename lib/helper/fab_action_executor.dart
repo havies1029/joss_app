@@ -8,6 +8,7 @@ import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import '../common/constants.dart';
 import '../pages/beli_polis/mobile/beli_polis_page.dart';
 import '../pages/management_polis/detail_management_page/detail_management_widget.dart';
+import '../pages/management_polis/detail_management_page/detail_management_widget_2.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 import '../pages/management_polis/mobile/form_button_page/endorse_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';
@@ -233,7 +234,7 @@ class FabActionExecutor {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => DetailManagementPolisPage(
+        builder: (_) => DetailManagementPolisPage2(
           data: item,
           cobId: cobId,
           statusId: "",

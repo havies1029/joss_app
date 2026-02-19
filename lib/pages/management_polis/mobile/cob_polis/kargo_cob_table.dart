@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../models/asetothers/asetotherscari_model.dart';
 
@@ -48,16 +49,38 @@ class KargoCobTable extends StatefulWidget {
 class _KargoCobTableState extends State<KargoCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
+  late final ScrollController vController;
 
   @override
   void initState() {
     super.initState();
     hController = ScrollController();
+    vController = ScrollController();
+    vController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final bloc = context.read<AsetothersCariBloc>();
+    final s = bloc.state;
+
+    if (!vController.hasClients) return;
+    final max = vController.position.maxScrollExtent;
+    final cur = vController.position.pixels;
+
+    const threshold = 100.0;
+
+    if (max - cur <= threshold) {
+      if (!s.hasReachedMax && !s.isFetching) {
+        bloc.add(FetchAsetothersCariEvent());
+      }
+    }
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.removeListener(_onScroll);
+    vController.dispose();
     super.dispose();
   }
 
@@ -167,6 +190,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
     }
 
     return SingleChildScrollView(
+      controller: vController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

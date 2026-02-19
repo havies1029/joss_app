@@ -227,7 +227,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                 // Transaction type
                 Text(
                   item.jenis_trs ?? "-",
-                  style: bodyTextStyle(context, fontSize: 20),
+                  style: bodyTextStyle(context, fontSize: 18).copyWith(color: primaryLightColor),
                 ),
                 const SizedBox(height: 4),
 
@@ -244,21 +244,43 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
           ),
 
           // status
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            decoration: BoxDecoration(
-              color: _getStatusColor(item.status_nama),
-              borderRadius: BorderRadius.circular(20),
-            ),
+          SizedBox(
+            width: 90,
             child: Text(
               item.status_nama ?? "-",
-              style: bodyTextStyle(context, fontSize: 16),
+              textAlign: TextAlign.right,
+              style: bodyTextStyle(
+                context,
+                fontSize: 16,
+              ).copyWith(
+                color: _getStatusColor(item.status_nama),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _transactionIcon(String assetPath) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: transactionColor2, // background
+        border: Border.all(
+          color: transactionColor1, // border tipis
+          width: 1,
+        ),
+      ),
+      alignment: Alignment.center,
+      child: SvgPicture.asset(
+        assetPath,
+        width: 36,  // hampir nutup background (silakan adjust 28-32)
+        height: 36,
+        fit: BoxFit.contain,
       ),
     );
   }

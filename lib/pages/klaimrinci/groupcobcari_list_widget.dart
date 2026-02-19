@@ -164,6 +164,7 @@ class GroupcobCariListWidgetState extends State<GroupcobCariListWidget> {
             onChanged: (checked) {
               if (checked == true) {
                 groupcobCariBloc.add(SelectDetailEvent(d.klaim1Id));   // kirim ke BLoC
+                groupcobCariBloc.add(SelectKlaimRecordEvent(d));
               } else {
                 groupcobCariBloc.add(UnselectDetailEvent(d.klaim1Id)); // kirim ke BLoC
               }

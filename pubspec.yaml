@@ -256,6 +256,8 @@ flutter:
     - assets/icons/infinity_loader_orange.json
     - assets/icons/lainnya.svg
     - assets/icons/centang2.svg
+    - assets/icons/no-alarm.svg
+    - assets/icons/notification-1.svg
 
   fonts:
     - family: Delm-Regular

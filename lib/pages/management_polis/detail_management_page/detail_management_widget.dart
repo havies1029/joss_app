@@ -65,8 +65,10 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
   late Regother1CrudBloc regother1crudBloc;
   late Regother3cariBloc regother3cariBloc;
 
-  DateTime Function(dynamic x)? _getDateTime;
+  DateTime? Function(dynamic x)? _getDateTime;
   String Function(dynamic x)? _getStatusText;
+  DateTime? _newestDate;
+  int _activeIndex = -1;
 
   String _emptyText = "Belum ada data";
 
@@ -85,46 +87,39 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _triggerByProses(
-        prosesSource: _prosesSource,
-        prosesId: _prosesId,
         jenisProses: widget.jenisProses,
       );
     });
   }
 
   void _triggerByProses({
-    required String prosesSource,
-    required String prosesId,
     required String? jenisProses,
   }) {
-    String cleanSource = prosesSource.trim().toUpperCase();
-    String resolvedId = prosesId.trim();
-    final jp = (jenisProses ?? "").trim().toUpperCase();
+    final cleanSource = (jenisProses ?? "").trim().toUpperCase();
+    String resolvedId = "";
 
-    if (cleanSource.isEmpty && resolvedId.isEmpty && jp.isNotEmpty) {
-
-      if (jp == "E") {
-        resolvedId =
-            context.read<Regendors1FormBloc>().state.record?.sppa1Id ?? "";
-      } else if (jp == "A") {
-        resolvedId =
-            context.read<Regreaktif1Bloc>().state.record?.sppa1Id ?? "";
-      } else if (jp == "R") {
-        resolvedId =
-            context.read<Regrenew1FormBloc>().state.record?.sppa1Id ?? "";
-      } else if (jp == "O") {
-        resolvedId =
-            context.read<Regother1CrudBloc>().state.record?.regother1Id ?? "";
-      }
-
-      if (resolvedId.isNotEmpty) {
-        cleanSource = jp;
-        // _prosesSource = jp;
-      }
-    } else {
-      // debugPrint('>> fallback skipped');
+    if (cleanSource.isEmpty) {
+      setState(() {
+        _loading = false;
+        _items = const [];
+        _emptyText = "Belum ada proses";
+        _getDateTime = null;
+        _getStatusText = null;
+      });
+      return;
     }
 
+    if (cleanSource == "E") {
+      resolvedId = context.read<Regendors1FormBloc>().state.record?.sppa1Id ?? "";
+    } else if (cleanSource == "A") {
+      resolvedId = context.read<Regreaktif1Bloc>().state.record?.sppa1Id ?? "";
+    } else if (cleanSource == "R") {
+      resolvedId = context.read<Regrenew1FormBloc>().state.record?.sppa1Id ?? "";
+    } else if (cleanSource == "O") {
+      resolvedId = context.read<Regother1CrudBloc>().state.record?.regother1Id ?? "";
+    }
+
+    resolvedId = resolvedId.trim();
     if (resolvedId.isEmpty) {
       setState(() {
         _loading = false;
@@ -136,6 +131,13 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
       return;
     }
 
+    _dispatchBySource(cleanSource: cleanSource, resolvedId: resolvedId);
+  }
+
+  void _dispatchBySource({
+    required String cleanSource,
+    required String resolvedId,
+  }) {
     switch (cleanSource) {
       case "E":
         regendors2 = context.read<Regendors2CariBloc>();
@@ -176,6 +178,40 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
         break;
     }
   }
+
+
+  void _recomputeNewest() {
+    if (_items.isEmpty || _getDateTime == null) {
+      _newestDate = null;
+      _activeIndex = -1;
+      return;
+    }
+
+    // ambil semua tanggal yang tidak null
+    final validDates = _items
+        .map((e) => _getDateTime!(e))
+        .where((d) => d != null)
+        .cast<DateTime>()
+        .toList();
+
+    // kalau SEMUA tanggal kosong → fallback
+    if (validDates.isEmpty) {
+      _newestDate = null;
+      _activeIndex = 0; // atau -1 kalau mau tidak ada yg nyala
+      return;
+    }
+
+    // cari tanggal paling baru
+    final newest = validDates.reduce((a, b) => a.isAfter(b) ? a : b);
+    _newestDate = newest;
+
+    // cari index item yg punya tanggal tersebut
+    _activeIndex = _items.indexWhere(
+          (e) => _getDateTime!(e)?.isAtSameMomentAs(newest) ?? false,
+    );
+  }
+
+
 
   int _findActiveIndexBySource(String prosesSource, List<dynamic> items) {
     final jp = (widget.jenisProses ?? "").trim().toUpperCase(); // "E" | "A" | "R" | ""
@@ -283,6 +319,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                                 (x) => (x as Regendors2CariModel).tglStatus;
                             _getStatusText =
                                 (x) => (x as Regendors2CariModel).progressNama;
+                            _recomputeNewest();
                           });
                         },
                       ),
@@ -303,6 +340,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                                 (x) => (x as Regreaktif2CariModel).tglStatus;
                             _getStatusText =
                                 (x) => (x as Regreaktif2CariModel).progressNama;
+                            _recomputeNewest();
                           });
                         },
                       ),
@@ -323,6 +361,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                                 (x) => (x as Regrenewal2CariModel).tglStatus;
                             _getStatusText =
                                 (x) => (x as Regrenewal2CariModel).progressNama;
+                            _recomputeNewest();
                           });
                         },
                       ),
@@ -357,6 +396,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           PolisDetailCard(
+                            cobId: widget.cobId,
                             dataMap: dataMap,
                             title: null,
                             excludeKeys: const {},
@@ -468,7 +508,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
               padding: const EdgeInsets.only(bottom: 10),
               child: TimelineItem<dynamic>(
                 item: item,
-                activeIndex: activeIndex,
+                activeIndex: _activeIndex,
                 getDateTime: (x) => _getDateTime!(x),
                 getStatusText: (x) => _getStatusText!(x),
                 activeTextColor: primaryLightColor,

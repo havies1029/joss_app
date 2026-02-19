@@ -98,3 +98,24 @@ class UserRoleChanged extends AuthenticationEvent {
   @override
   List<Object> get props => [user, authenticatedFrom];
 }
+
+
+class ForceUnauthenticated extends AuthenticationEvent {
+  final String reason;
+  const ForceUnauthenticated({required this.reason});
+
+  @override
+  List<Object> get props => [reason];
+}
+
+class ForceAuthenticated extends AuthenticationEvent {
+  final User user;
+  final String authenticatedFrom;
+  const ForceAuthenticated({
+    required this.user,
+    required this.authenticatedFrom,
+  });
+
+  @override
+  List<Object> get props => [user, authenticatedFrom];
+}

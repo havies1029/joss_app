@@ -226,13 +226,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final regmv1 = context.read<Regmv1CrudBloc>().state.record?.regmv1Id ?? "";
     regmv1Id = widget.regmv1Id ?? regmv1;
 
+    if (selectedPassengerCount.trim().isEmpty) {
+      selectedPassengerCount = "1";
+    }
+    if (fieldAwController.text.trim().isEmpty) {
+      fieldAwController.text = "0.01";
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
     });
   }
+
 
   @override
   void dispose(){
@@ -313,21 +320,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   void refreshForm4({required String? recordId}) {
-    debugPrint("🔄 refreshForm4 CALLED");
-    debugPrint("👉 recordId = $recordId");
-
     if (recordId == null || recordId.isEmpty) {
-      debugPrint("❌ recordId null atau empty, RETURN");
       return;
     }
-
-    debugPrint("➡️ Dispatch RefreshRegmv4CariEvent");
-
     context.read<Regmv4CariBloc>().add(
       RefreshRegmv4CariEvent(regmv1Id: recordId),
     );
-
-    debugPrint("✅ RefreshRegmv4CariEvent SENT");
   }
 
 
@@ -1882,21 +1880,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     clearErrsByPrefix('form2.');
     bool ok = true;
 
-    // NOTE: Polis Mulai & Polis Berakhir sementara DISKIP dulu
-
-    // Mata Uang (required)
     if (fieldComboRMatauang == null) {
       setErr('form2.mataUang', kStringNullError);
       ok = false;
     }
 
-    // Jenis Cover (required)
     if (fieldComboMMvjnscover == null) {
       setErr('form2.jenisCover', kStringNullError);
       ok = false;
     }
 
-    // AW (required, 0..100)
     final awRaw = fieldAwController.text.trim();
     if (awRaw.isEmpty) {
       setErr('form2.aw', kStringNullError);
@@ -1915,57 +1908,62 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       }
     }
 
-    // Jumlah Penumpang (required)
     if (selectedPassengerCount.trim().isEmpty) {
       setErr('form2.passengerCount', kStringNullError);
       ok = false;
     }
 
-    // TPL (optional, >= 0)
-    final tplRaw = fieldTplController.text.trim();
-    if (tplRaw.isNotEmpty) {
-      final clean = tplRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.tpl', "Tidak boleh minus");
-        ok = false;
+    String cleanNum(String v) => v.replaceAll(",", "").trim();
+
+    final tplC = cleanNum(fieldTplController.text);
+    final padC = cleanNum(fieldPadController.text);
+    final papC = cleanNum(fieldPapController.text);
+    final pllC = cleanNum(fieldPllController.text);
+
+    final allEmpty = tplC.isEmpty && padC.isEmpty && papC.isEmpty && pllC.isEmpty;
+
+    if (allEmpty) {
+      const msg = "Isi minimal salah satu (TPL/PAD/PAP/PLL)";
+      setErr('form2.tpl', msg);
+      setErr('form2.pad', msg);
+      setErr('form2.pap', msg);
+      setErr('form2.pll', msg);
+      ok = false;
+    } else {
+      bool validateOrDefaultZero({
+        required String key,
+        required TextEditingController controller,
+      }) {
+        final c = cleanNum(controller.text);
+
+        if (c.isEmpty) {
+          controller.text = "0";
+          clearErr(key);
+          return true;
+        }
+
+        final angka = double.tryParse(c);
+        if (angka == null) {
+          setErr(key, "Format tidak valid");
+          return false;
+        }
+        if (angka < 0) {
+          setErr(key, "Tidak boleh minus");
+          return false;
+        }
+
+        clearErr(key);
+        return true;
       }
+
+      final a = validateOrDefaultZero(key: 'form2.tpl', controller: fieldTplController);
+      final b = validateOrDefaultZero(key: 'form2.pad', controller: fieldPadController);
+      final c = validateOrDefaultZero(key: 'form2.pap', controller: fieldPapController);
+      final d = validateOrDefaultZero(key: 'form2.pll', controller: fieldPllController);
+
+      if (!(a && b && c && d)) ok = false;
     }
 
-    // PAD (optional, >= 0)
-    final padRaw = fieldPadController.text.trim();
-    if (padRaw.isNotEmpty) {
-      final clean = padRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.pad', "Tidak boleh minus");
-        ok = false;
-      }
-    }
-
-    // PAP (optional, >= 0)
-    final papRaw = fieldPapController.text.trim();
-    if (papRaw.isNotEmpty) {
-      final clean = papRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.pap', "Tidak boleh minus");
-        ok = false;
-      }
-    }
-
-    // PLL (optional, >= 0)
-    final pllRaw = fieldPllController.text.trim();
-    if (pllRaw.isNotEmpty) {
-      final clean = pllRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.pll', "Tidak boleh minus");
-        ok = false;
-      }
-    }
-
-    // Kalau gagal, buka panel form2
     if (!ok) {
       setState(() => expanded[1] = true);
     }
@@ -2340,6 +2338,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ThousandsSeparatorInputFormatter(),
     ],
     validator: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       if (v == null || v.isEmpty) return null;
       final clean = v.replaceAll(",", "");
       final angka = double.tryParse(clean);
@@ -2357,6 +2360,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ThousandsSeparatorInputFormatter(),
     ],
     validator: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       if (v == null || v.isEmpty) return null;
       final clean = v.replaceAll(",", "");
       final angka = double.tryParse(clean);
@@ -2374,6 +2382,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ThousandsSeparatorInputFormatter(),
     ],
     validator: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       if (v == null || v.isEmpty) return null;
       final clean = v.replaceAll(",", "");
       final angka = double.tryParse(clean);
@@ -2391,6 +2404,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ThousandsSeparatorInputFormatter(),
     ],
     validator: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       if (v == null || v.isEmpty) return null;
       final clean = v.replaceAll(",", "");
       final angka = double.tryParse(clean);

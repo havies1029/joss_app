@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../models/gen_aset_par/asetparcari_model.dart';
 
@@ -55,16 +56,38 @@ class PropertyCobTable extends StatefulWidget {
 class _PropertyCobTableState extends State<PropertyCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
+  late final ScrollController vController;
 
   @override
   void initState() {
     super.initState();
     hController = ScrollController();
+    vController = ScrollController();
+    vController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final bloc = context.read<AsetParCariBloc>();
+    final s = bloc.state;
+
+    if (!vController.hasClients) return;
+    final max = vController.position.maxScrollExtent;
+    final cur = vController.position.pixels;
+
+    const threshold = 100.0;
+
+    if (max - cur <= threshold) {
+      if (!s.hasReachedMax && !s.isFetching) {
+        bloc.add(FetchAsetParCariEvent());
+      }
+    }
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.removeListener(_onScroll);
+    vController.dispose();
     super.dispose();
   }
 
@@ -80,14 +103,6 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
 
     final showColumn = widget.statusId == "10002";
 
-    // 🔍 DEBUG PRINTS
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('PropertyCobTable Build:');
-    print('  statusId: "${widget.statusId}"');
-    print('  showColumn: $showColumn');
-    print('  items count: ${widget.items.length}');
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
     final items = _filteredItems;
 
     if (items.isEmpty) {
@@ -95,6 +110,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     }
 
     return SingleChildScrollView(
+      controller: vController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

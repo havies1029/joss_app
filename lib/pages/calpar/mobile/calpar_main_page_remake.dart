@@ -1025,33 +1025,66 @@ void _payloadform2(Calpar2FormModel record) {
     clearErrsByPrefix('form2.');
     bool ok = true;
 
-    bool _requiredPositiveNum(TextEditingController c, String key) {
-      final raw = c.text.trim();
-      if (raw.isEmpty) {
-        setErr(key, kStringNullError);
+    String cleanNum(String v) => v.replaceAll(",", "").trim();
+
+    bool validateOrDefaultZero({
+      required String key,
+      required TextEditingController controller,
+    }) {
+      final c = cleanNum(controller.text);
+
+      if (c.isEmpty) {
+        controller.text = "0"; // auto default
+        clearErr(key);
+        return true;
+      }
+
+      final angka = double.tryParse(c);
+      if (angka == null) {
+        setErr(key, "Format tidak valid");
         return false;
       }
-      final clean = raw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka <= 0) {
-        setErr(key, kString0);
+      if (angka < 0) {
+        setErr(key, "Tidak boleh minus");
         return false;
       }
+
+      clearErr(key);
       return true;
     }
 
-    // Mata Uang (combo)
+    // Mata Uang (required)
     if (fieldComboRMatauang == null) {
       setErr('form2.mataUang', kStringNullError);
       ok = false;
     }
 
-    // SI fields yang dipakai di UI
-    ok = _requiredPositiveNum(fieldSiMachineryController, 'form2.siMachinery') && ok;
-    ok = _requiredPositiveNum(fieldSiBuildingController, 'form2.siBuilding') && ok;
-    ok = _requiredPositiveNum(fieldSiContentController, 'form2.siContent') && ok;
-    ok = _requiredPositiveNum(fieldSiStockController, 'form2.siStock') && ok;
-    ok = _requiredPositiveNum(fieldSiOtherController, 'form2.siOther') && ok;
+    // GROUP RULE: minimal isi salah satu dari 5 SI field
+    final m = cleanNum(fieldSiMachineryController.text);
+    final b = cleanNum(fieldSiBuildingController.text);
+    final c = cleanNum(fieldSiContentController.text);
+    final s = cleanNum(fieldSiStockController.text);
+    final o = cleanNum(fieldSiOtherController.text);
+
+    final allEmpty = m.isEmpty && b.isEmpty && c.isEmpty && s.isEmpty && o.isEmpty;
+
+    if (allEmpty) {
+      const msg = "Isi minimal salah satu nilai SI";
+      setErr('form2.siMachinery', msg);
+      setErr('form2.siBuilding', msg);
+      setErr('form2.siContent', msg);
+      setErr('form2.siStock', msg);
+      setErr('form2.siOther', msg);
+      ok = false;
+    } else {
+      final a1 = validateOrDefaultZero(key: 'form2.siMachinery', controller: fieldSiMachineryController);
+      final a2 = validateOrDefaultZero(key: 'form2.siBuilding', controller: fieldSiBuildingController);
+      final a3 = validateOrDefaultZero(key: 'form2.siContent', controller: fieldSiContentController);
+      final a4 = validateOrDefaultZero(key: 'form2.siStock', controller: fieldSiStockController);
+      final a5 = validateOrDefaultZero(key: 'form2.siOther', controller: fieldSiOtherController);
+
+      if (!(a1 && a2 && a3 && a4 && a5)) ok = false;
+    }
 
     if (!ok) {
       setState(() => expanded[1] = true);
@@ -1059,6 +1092,7 @@ void _payloadform2(Calpar2FormModel record) {
 
     return ok;
   }
+
 
   bool validateForm3() {
     clearErrsByPrefix('form3.');
@@ -1249,6 +1283,12 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form2.siBuilding'),
     validator: (_) => err('form2.siBuilding'),
     onChanged: (v) {
+      clearErr('form2.siMachinery');
+      clearErr('form2.siBuilding');
+      clearErr('form2.siContent');
+      clearErr('form2.siStock');
+      clearErr('form2.siOther');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka > 0) clearErr('form2.siBuilding');
@@ -1266,6 +1306,12 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form2.siContent'),
     validator: (_) => err('form2.siContent'),
     onChanged: (v) {
+      clearErr('form2.siMachinery');
+      clearErr('form2.siBuilding');
+      clearErr('form2.siContent');
+      clearErr('form2.siStock');
+      clearErr('form2.siOther');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka > 0) clearErr('form2.siContent');
@@ -1283,6 +1329,12 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form2.siMachinery'),
     validator: (_) => err('form2.siMachinery'),
     onChanged: (v) {
+      clearErr('form2.siMachinery');
+      clearErr('form2.siBuilding');
+      clearErr('form2.siContent');
+      clearErr('form2.siStock');
+      clearErr('form2.siOther');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka > 0) clearErr('form2.siMachinery');
@@ -1301,6 +1353,12 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form2.siOther'),
     validator: (_) => err('form2.siOther'),
     onChanged: (v) {
+      clearErr('form2.siMachinery');
+      clearErr('form2.siBuilding');
+      clearErr('form2.siContent');
+      clearErr('form2.siStock');
+      clearErr('form2.siOther');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka > 0) clearErr('form2.siOther');
@@ -1318,6 +1376,12 @@ void _payloadform2(Calpar2FormModel record) {
     errorText: err('form2.siStock'),
     validator: (_) => err('form2.siStock'),
     onChanged: (v) {
+      clearErr('form2.siMachinery');
+      clearErr('form2.siBuilding');
+      clearErr('form2.siContent');
+      clearErr('form2.siStock');
+      clearErr('form2.siOther');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka > 0) clearErr('form2.siStock');

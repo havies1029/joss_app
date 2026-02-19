@@ -1709,52 +1709,73 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     clearErrsByPrefix('form4.');
     bool ok = true;
 
-    if (fieldComboRMatauang == null) {
-      setErr('form4.mataUang', kStringNullError);
-      ok = false;
-    }
+    String cleanNum(String v) => v.replaceAll(",", "").trim();
 
-    bool validateMoneyNonNegativeRequired({
+    bool validateOrDefaultZero({
       required String key,
       required TextEditingController controller,
     }) {
-      final raw = controller.text.trim();
-      if (raw.isEmpty) {
-        setErr(key, kStringNullError);
-        return false;
+      final c = cleanNum(controller.text);
+
+      if (c.isEmpty) {
+        controller.text = "0"; // auto default
+        clearErr(key);
+        return true;
       }
 
-      final clean = raw.replaceAll(",", "");
-      final x = double.tryParse(clean);
-
+      final x = double.tryParse(c);
       if (x == null) {
         setErr(key, "Format tidak valid");
         return false;
       }
-
       if (x < 0) {
         setErr(key, "Tidak boleh minus");
         return false;
       }
 
-      return true; // >= 0 OK
+      clearErr(key);
+      return true;
     }
 
-    // SI fields (required, >= 0)
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siBuilding', controller: fieldSiBuildingController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siContent', controller: fieldSiContentController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siMachinery', controller: fieldSiMachineryController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siOther', controller: fieldSiOtherController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siStock', controller: fieldSiStockController)) ok = false;
+    // Mata Uang (required)
+    if (fieldComboRMatauang == null) {
+      setErr('form4.mataUang', kStringNullError);
+      ok = false;
+    }
+
+    // GROUP RULE: minimal isi salah satu SI
+    final b = cleanNum(fieldSiBuildingController.text);
+    final c = cleanNum(fieldSiContentController.text);
+    final m = cleanNum(fieldSiMachineryController.text);
+    final o = cleanNum(fieldSiOtherController.text);
+    final s = cleanNum(fieldSiStockController.text);
+
+    final allEmpty = b.isEmpty && c.isEmpty && m.isEmpty && o.isEmpty && s.isEmpty;
+
+    if (allEmpty) {
+      const msg = "Isi minimal salah satu nilai SI";
+      setErr('form4.siBuilding', msg);
+      setErr('form4.siContent', msg);
+      setErr('form4.siMachinery', msg);
+      setErr('form4.siOther', msg);
+      setErr('form4.siStock', msg);
+      ok = false;
+    } else {
+      final a1 = validateOrDefaultZero(key: 'form4.siBuilding', controller: fieldSiBuildingController);
+      final a2 = validateOrDefaultZero(key: 'form4.siContent', controller: fieldSiContentController);
+      final a3 = validateOrDefaultZero(key: 'form4.siMachinery', controller: fieldSiMachineryController);
+      final a4 = validateOrDefaultZero(key: 'form4.siOther', controller: fieldSiOtherController);
+      final a5 = validateOrDefaultZero(key: 'form4.siStock', controller: fieldSiStockController);
+
+      if (!(a1 && a2 && a3 && a4 && a5)) ok = false;
+    }
 
     if (!ok) {
-      setState(() => expanded[3] = true); // form4 panel index
+      setState(() => expanded[3] = true);
     }
 
     return ok;
   }
-
-
 
   //form1
   Widget buildFieldTtgNama() => appTextField(
@@ -2662,6 +2683,12 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
 
   void _clearIfNonNegativeNumber(String key, String v) {
+    clearErr('form4.siBuilding');
+    clearErr('form4.siContent');
+    clearErr('form4.siMachinery');
+    clearErr('form4.siOther');
+    clearErr('form4.siStock');
+
     final clean = v.replaceAll(",", "").trim();
     final angka = double.tryParse(clean);
     if (angka != null && angka >= 0) clearErr(key);

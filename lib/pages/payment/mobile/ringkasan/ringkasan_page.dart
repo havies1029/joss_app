@@ -20,6 +20,7 @@ import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
+import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import '../bayar_button.dart';
 import '../payment_page/payment_success/payment_success.dart';
 import 'detail/ringkasan_detail_page.dart';
@@ -460,7 +461,20 @@ ${selectedItems.map((e) => '• ${e.cobNama}: ${e.polisCount} polis').join('\n')
   void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
+      MaterialPageRoute(
+        builder: (_) => PaymentMethodPage(
+          curr: curr,
+          totalBayar: totalBayar,
+          onBack: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => const TagihanPembayaranPage(initialTab: 2),
+              ),
+                  (route) => route.isFirst,
+            );
+          },
+        ),
+      ),
     );
   }
 

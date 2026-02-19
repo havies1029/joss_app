@@ -13,6 +13,10 @@ enum ActionType {
   lihatPolis,
   lihatPolisPar,
   lihatPolisEq,
+  klaimBaru,
+  perbaruiKlaim,
+  lacakKlaim,
+  batalKlaim,
 }
 
 class ActionMenuItem {

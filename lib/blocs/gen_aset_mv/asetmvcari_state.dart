@@ -13,6 +13,9 @@ class AsetMvCariState extends Equatable {
 	final String selectedId;
 	final AsetMvCariModel? selectedItem;
 	final String? selectedProsesId;
+	final String queryKey;
+	final bool isFetching;
+
 
 	const AsetMvCariState({
 		this.status = ListStatus.initial,
@@ -27,12 +30,18 @@ class AsetMvCariState extends Equatable {
 		this.selectedId = "",
 		this.selectedItem,
 		this.selectedProsesId,
+		this.queryKey = '',
+		this.isFetching = false,
 	});
 
 	const AsetMvCariState.success(List<AsetMvCariModel> items)
-			: this(status: ListStatus.success, items: items);
+			: this(
+		status: ListStatus.success,
+		items: items,
+	);
 
-	const AsetMvCariState.failure() : this(status: ListStatus.failure);
+	const AsetMvCariState.failure()
+			: this(status: ListStatus.failure);
 
 	static const _unset = Object();
 
@@ -47,11 +56,10 @@ class AsetMvCariState extends Equatable {
 		String? selectedFilePolisId,
 		String? activeAsetMvId,
 		String? selectedId,
-
-		// penting: pakai Object? + default _unset
 		Object? selectedItem = _unset,
-
 		String? selectedProsesId,
+		String? queryKey,
+		bool? isFetching,
 	}) {
 		return AsetMvCariState(
 			items: items ?? this.items,
@@ -61,16 +69,18 @@ class AsetMvCariState extends Equatable {
 			searchText: searchText ?? this.searchText,
 			statusId: statusId ?? this.statusId,
 			selectedIds: selectedIds ?? this.selectedIds,
-			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
-			activeAsetMvId: activeAsetMvId ?? this.activeAsetMvId,
+			selectedFilePolisId:
+			selectedFilePolisId ?? this.selectedFilePolisId,
+			activeAsetMvId:
+			activeAsetMvId ?? this.activeAsetMvId,
 			selectedId: selectedId ?? this.selectedId,
-
-			// ini yang bikin null beneran ke-set
 			selectedItem: identical(selectedItem, _unset)
 					? this.selectedItem
 					: selectedItem as AsetMvCariModel?,
-
-			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
+			selectedProsesId:
+			selectedProsesId ?? this.selectedProsesId,
+			queryKey: queryKey ?? this.queryKey,
+			isFetching: isFetching ?? this.isFetching,
 		);
 	}
 
@@ -88,5 +98,7 @@ class AsetMvCariState extends Equatable {
 		selectedId,
 		selectedItem,
 		selectedProsesId,
+		queryKey,
+		isFetching,
 	];
 }
