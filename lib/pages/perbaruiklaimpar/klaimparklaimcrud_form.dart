@@ -11,7 +11,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 
 
 class KlaimparklaimcrudFormPage extends StatefulWidget {
-	final String cobGroupId;
+  final String cobGroupId;
 	final String viewMode;
 	final String recordId;
 
@@ -36,8 +36,8 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	var fieldPicJabatanController = TextEditingController();
 	var fieldPicNamaController = TextEditingController();
 	var fieldPicTelpController = TextEditingController();
-	var isPolisJps = false;
-	var fieldCobNamaController = TextEditingController();
+  var isPolisJps = false;
+  var fieldCobNamaController = TextEditingController();
 
 	@override
 	void initState() {
@@ -56,68 +56,68 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 					child: Padding(
 						padding: const EdgeInsets.all(8.0),
 						child: Form(
-								key: _formKey,
-								child: Column(
-									children: [
-										const SizedBox(height: 10),
-										if (widget.cobGroupId == "10003") buildFieldCobNama(),
-										buildFieldDol(),
-										buildFieldLaporJps(),
-										buildFieldLaporAsuransi(),
-										buildFieldPicNama(),
-										buildFieldPicJabatan(),
-										buildFieldPicEmail(),
-										buildFieldPicTelp(),
-										buildFieldMjenisrugiId(),
-										buildFieldPenyebab(),
-										buildFieldKeterangan(),
-										const SizedBox(height: 25),
-										FormError(
-											errors: errors,
-											key: null,
-										),
-									],
-								)),
+							key: _formKey,
+							child: Column(
+								children: [
+									const SizedBox(height: 10),
+                  if (widget.cobGroupId == "10003") buildFieldCobNama(),
+									buildFieldDol(),
+									buildFieldLaporJps(),
+									buildFieldLaporAsuransi(),
+									buildFieldPicNama(),
+									buildFieldPicJabatan(),
+									buildFieldPicEmail(),
+									buildFieldPicTelp(),
+									buildFieldMjenisrugiId(),
+									buildFieldPenyebab(),
+									buildFieldKeterangan(),
+									const SizedBox(height: 25),
+									FormError(
+										errors: errors,
+										key: null,
+									),									
+								],
+							)),
 					),
 				);
-			},
-			listener: (context, state) {
-				if (state.isLoaded) {
-					if (state.record != null){
-						fieldDolController.text = state.record!.dol.toIso8601String();
-						fieldKeteranganController.text = state.record!.keterangan;
-						fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
-						fieldLaporJpsController.text = state.record!.laporJps.toIso8601String();
-						fieldPenyebabController.text = state.record!.penyebab;
-						fieldPicEmailController.text = state.record!.picEmail;
-						fieldPicJabatanController.text = state.record!.picJabatan;
-						fieldPicNamaController.text = state.record!.picNama;
-						fieldPicTelpController.text = state.record!.picTelp;
-						isPolisJps = state.record!.isPolisJps;
-						fieldCobNamaController.text = state.record!.cobNama;
+				},
+				listener: (context, state) {
+					if (state.isLoaded) {
+						if (state.record != null){
+							fieldDolController.text = state.record!.dol.toIso8601String();
+							fieldKeteranganController.text = state.record!.keterangan;
+							fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
+							fieldLaporJpsController.text = state.record!.laporJps.toIso8601String();
+							fieldPenyebabController.text = state.record!.penyebab;
+							fieldPicEmailController.text = state.record!.picEmail;
+							fieldPicJabatanController.text = state.record!.picJabatan;
+							fieldPicNamaController.text = state.record!.picNama;
+							fieldPicTelpController.text = state.record!.picTelp;
+              isPolisJps = state.record!.isPolisJps;
+              fieldCobNamaController.text = state.record!.cobNama;
+						}
+						fieldComboMJenisrugi = state.comboMJenisrugi;
 					}
-					fieldComboMJenisrugi = state.comboMJenisrugi;
-				}
-			},
-		);
-	}
+				},
+			);
+		}
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-			klaimparklaimcrudBloc.add(
-					KlaimparklaimcrudLihatEvent(recordId: widget.recordId));
+		klaimparklaimcrudBloc.add(
+			KlaimparklaimcrudLihatEvent(recordId: widget.recordId));
 		}
 	}
 
-	Widget buildFieldCobNama() {
-		return TextFormField(
-				enabled: false,
-				controller: fieldCobNamaController,
-				decoration: const InputDecoration(
-					labelText: "Nama COB",
-					floatingLabelBehavior: FloatingLabelBehavior.always,
-				)
-		);
-	}
+  Widget buildFieldCobNama() {
+    return TextFormField(
+      enabled: false,
+      controller: fieldCobNamaController,
+      decoration: const InputDecoration(
+        labelText: "Nama COB",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      )
+    );
+  }
 
 	Widget buildFieldDol(){
 		return DateTimeFormField(
@@ -130,9 +130,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value != null) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 					fieldDolController.text = value.toIso8601String();
-					klaimparklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
+          klaimparklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
 				}
 
 			},
@@ -158,9 +158,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 				}
-				klaimparklaimcrudBloc.add(FieldKeteranganChangedEvent(keterangan: value));
+        klaimparklaimcrudBloc.add(FieldKeteranganChangedEvent(keterangan: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -183,9 +183,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value != null) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 					fieldLaporAsuransiController.text = value.toIso8601String();
-					klaimparklaimcrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
+          klaimparklaimcrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
 				}
 			},
 			validator: (value) {
@@ -209,9 +209,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value != null) {
-					removeError(error: kStringNullError);
-					fieldLaporJpsController.text = value.toIso8601String();
-					klaimparklaimcrudBloc.add(FieldLaporJpsChangedEvent(laporJps: value));
+				  removeError(error: kStringNullError);
+					fieldLaporJpsController.text = value.toIso8601String();                    
+          klaimparklaimcrudBloc.add(FieldLaporJpsChangedEvent(laporJps: value));       
 				}
 			},
 			validator: (value) {
@@ -232,9 +232,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-							error: "Field ComboMJenisrugi tidak boleh kosong.");
-					klaimparklaimcrudBloc.add(ComboMJenisrugiChangedEvent(comboMJenisrugi: value));
-				}
+						error: "Field ComboMJenisrugi tidak boleh kosong.");
+				  klaimparklaimcrudBloc.add(ComboMJenisrugiChangedEvent(comboMJenisrugi: value));
+				}        
 			},
 			onSaveCallback: (value) {
 				if (value != null) {
@@ -244,7 +244,7 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-							error: "Field ComboMJenisrugi tidak boleh kosong.");
+						error: "Field ComboMJenisrugi tidak boleh kosong.");
 				}
 			},
 		);
@@ -262,9 +262,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 				}
-				klaimparklaimcrudBloc.add(FieldPenyebabChangedEvent(penyebab: value));
+        klaimparklaimcrudBloc.add(FieldPenyebabChangedEvent(penyebab: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -288,9 +288,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
+				removeError(error: kStringNullError);
 				}
-				klaimparklaimcrudBloc.add(FieldPicEmailChangedEvent(picEmail: value));
+        klaimparklaimcrudBloc.add(FieldPicEmailChangedEvent(picEmail: value)); 
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -314,9 +314,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 				}
-				klaimparklaimcrudBloc.add(FieldPicJabatanChangedEvent(picJabatan: value));
+        klaimparklaimcrudBloc.add(FieldPicJabatanChangedEvent(picJabatan: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -340,9 +340,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 				}
-				klaimparklaimcrudBloc.add(FieldPicNamaChangedEvent(picNama: value));
+        klaimparklaimcrudBloc.add(FieldPicNamaChangedEvent(picNama: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -363,9 +363,9 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-					removeError(error: kStringNullError);
+				  removeError(error: kStringNullError);
 				}
-				klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(picTelp: value));
+        klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(picTelp: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {

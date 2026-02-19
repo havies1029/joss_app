@@ -18,8 +18,9 @@ import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
 class PerbaruiKlaimMvPage extends StatefulWidget {
+  final String cobGroupNama;
   final String klaim1Id;
-  const PerbaruiKlaimMvPage({super.key, required this.klaim1Id});
+  const PerbaruiKlaimMvPage({super.key, required this.klaim1Id, required this.cobGroupNama});
 
   @override
   PerbaruiKlaimMvPageState createState() => PerbaruiKlaimMvPageState();
@@ -28,8 +29,12 @@ class PerbaruiKlaimMvPage extends StatefulWidget {
 class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   @override
   Widget build(BuildContext context) {
+    var klaimmvpoliscrudBloc = BlocProvider.of<KlaimmvpoliscrudBloc>(context);
+    var klaimmvklaimcrudBloc = BlocProvider.of<KlaimmvklaimcrudBloc>(context);
+    var klaimmvbengkelcrudBloc = BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
+
     return BaseBackgroundSidePage(
-      title: "Kendaraan",
+      title: widget.cobGroupNama,
       child: Container(
         color: secondaryBlackColor,
         child: BlocConsumer<KlaimmvaccordionBloc, KlaimmvaccordionState>(
@@ -52,14 +57,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
                 // progress (contoh: hitung completion dari tiap bloc)
                 BlocBuilder<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
-                  builder: (_, polis) =>
-                      BlocBuilder<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
-                    builder: (_, klaim) =>
-                        BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
-                      builder: (_, dok) => BlocBuilder<KlaimmvstatuscrudBloc,
-                          KlaimmvstatuscrudState>(
-                        builder: (_, st) => BlocBuilder<KlaimmvbengkelcrudBloc,
-                            KlaimmvbengkelcrudState>(
+                  builder: (_, polis) => BlocBuilder<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
+                    builder: (_, klaim) => BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
+                      builder: (_, dok) => BlocBuilder<KlaimmvstatuscrudBloc, KlaimmvstatuscrudState>(
+                        builder: (_, st) => BlocBuilder<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
                           builder: (_, beng) {
                             final done = [
                               polis.isComplete,
@@ -154,66 +155,46 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: dispatch submit final (bisa bloc khusus submit)
+                        switch(acc.openedIndex) {
+                          case 0:
+                            klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
+                            break;
+                          case 1:
+                            klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
+                            break;
+                          case 4:
+                            klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
+                            break;
+                        }
                       },
-                      child: const Text('Selesai'),
+                      child: const Text('Perbarui Klaim'),
                     ),
                   ),
                 ),
               ],
             );
           },
-          listener: (BuildContext context, KlaimmvaccordionState state) async {
-            if (state.previousIndex != null &&
-                state.previousIndex != state.openedIndex) {
-              debugPrint("=== ACCORDION CHANGE ===");
-              debugPrint("Previous: ${state.previousIndex}");
-              debugPrint("Opened: ${state.openedIndex}");
-
-              if (state.openedIndex == 2) {
-                debugPrint(
-                    ">>> Dokumen Klaim OPENED for klaim1Id: ${widget.klaim1Id}");
-              }
-
+            listener: (BuildContext context, KlaimmvaccordionState state) async {
               if (state.previousIndex != null &&
                   state.previousIndex != state.openedIndex) {
+
                 FocusManager.instance.primaryFocus?.unfocus();
                 await Future.delayed(const Duration(milliseconds: 50));
 
-                switch (state.previousIndex) {
-                  case 2:
-                    debugPrint("<<< Leaving Dokumen Klaim accordion");
+                switch(state.previousIndex) {
+                  case 0:
+                    klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
+                    break;
+                  case 1:
+                    klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
+                    break;
+                  case 4:
+                    klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
                     break;
                 }
-              }
-              var klaimmvpoliscrudBloc =
-                  BlocProvider.of<KlaimmvpoliscrudBloc>(context);
-              var klaimmvklaimcrudBloc =
-                  BlocProvider.of<KlaimmvklaimcrudBloc>(context);
-              var klaimmvbengkelcrudBloc =
-                  BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
-              FocusManager.instance.primaryFocus?.unfocus();
-              await Future.delayed(const Duration(milliseconds: 50));
 
-              switch (state.previousIndex) {
-                case 0:
-                  klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
-                  break;
-                case 1:
-                  klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
-                  break;
-                case 2:
-                  //context.read<KlaimmvdoccrudBloc>().add(KlaimmvDocAutoSaveEvent());
-                  break;
-                case 3:
-                  //context.read<KlaimmvstatuscrudBloc>().add(KlaimmvStatusAutoSaveEvent());
-                  break;
-                case 4:
-                  klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
-                  break;
               }
-            }
-          },
+            },
         ),
       ),
     );

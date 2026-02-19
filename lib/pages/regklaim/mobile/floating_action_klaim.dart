@@ -105,27 +105,20 @@ class FabActionKlaim extends StatelessWidget {
 
           debugPrint("=== NAVIGATION DEBUG ===");
           debugPrint("klaim1Id : $klaim1Id");
+          debugPrint("cobNama : $cobNama");
           debugPrint("cobId    : $cobId");
 
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               if (cobId == "10002") {
-                return PerbaruiKlaimMvPage(
-                    klaim1Id: klaim1Id,
-                    cobGroupNama:
-                    cobNama); // Sesuaikan parameter sesuai kebutuhan
-              } else if (cobId == "10001") {
-                return PerbaruiKlaimParPage(
-                    klaim1Id: klaim1Id,
-                    cobGroupNama: cobNama,
-                    cobGroupId: cobId);
-              } // Sesuaikan parameter sesuai kebutuhan                }
+                return PerbaruiKlaimMvPage( klaim1Id: klaim1Id, cobGroupNama: cobNama);
+              }
+              else if (cobId == "10001") {
+                return PerbaruiKlaimParPage(klaim1Id: klaim1Id, cobGroupNama: cobNama, cobGroupId: cobId);
+              }
               else {
-                return PerbaruiKlaimMvPage(
-                    klaim1Id: klaim1Id,
-                    cobGroupNama:
-                    cobNama); // Sesuaikan parameter sesuai kebutuhan
+                return PerbaruiKlaimParPage(klaim1Id: klaim1Id, cobGroupNama: cobNama, cobGroupId: cobId);
               }
             }),
           );

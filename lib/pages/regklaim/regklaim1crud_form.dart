@@ -1,5 +1,7 @@
+import 'package:joss_app/blocs/regklaim/cobklaimcari_bloc.dart';
 import 'package:joss_app/blocs/regklaim/regklaim1crud_bloc.dart';
 import 'package:joss_app/models/regklaim/regklaim1crud_model.dart';
+import 'package:joss_app/pages/regklaim/upload_section_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
@@ -12,8 +14,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 
 
 class Regklaim1CrudFormPage extends StatefulWidget {
-
-	const Regklaim1CrudFormPage({super.key});
+  final String cobKlaimId;  
+  final String cobKlaimNama;
+	const Regklaim1CrudFormPage({super.key, required this.cobKlaimId, required this.cobKlaimNama});
 
 	@override
 	Regklaim1CrudFormPageState createState() => Regklaim1CrudFormPageState();
@@ -30,6 +33,7 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 	var fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
 	var fieldPolisNoController = TextEditingController();
   var fieldLokasiObjectController = TextEditingController();
+  String regklaim1Id = "";
 
 	@override
 	void initState() {
@@ -39,6 +43,7 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 	@override
 	Widget build(BuildContext context) {
 		regklaim1formBloc = BlocProvider.of<Regklaim1CrudBloc>(context);
+    fieldComboMInsurance = context.read<CobklaimcariBloc>().state.selectedItem?.comboMInsurance;
 		return BlocConsumer<Regklaim1CrudBloc, Regklaim1CrudState>(
 			builder: (context, state) {
 				return SingleChildScrollView(
@@ -50,7 +55,7 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 								children: [
 									const SizedBox(height: 10),
 									Text(
-										"Input Klaim",
+										"Input Klaim ${widget.cobKlaimNama}",
 										style: const TextStyle(
 											fontSize: 20.0,
 											color: Color(0xffff6101),
@@ -61,12 +66,13 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 										),
 									),
 									const SizedBox(height: 25),
-									buildFieldMinsuranceId(),
+                  if (widget.cobKlaimId == '10003')
+									  buildFieldMinsuranceId(),
 									buildFieldPolisNo(),
 									buildFieldPolisMulai(),
 									buildFieldPolisAkhir(),
 									buildFieldInsuredNama(),
-				                    buildFieldLokasiResiko(),
+				          buildFieldLokasiResiko(),									
 									const SizedBox(height: 25),
 									FormError(
 										errors: errors,
@@ -74,25 +80,9 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 									),
 									Row(
 										mainAxisAlignment: MainAxisAlignment.spaceAround,
-										children: [
+										children: [											
 											SizedBox(
-												width: MediaQuery.of(context).size.width * 0.3,
-												height: 60,
-												child: Padding(
-													padding: const EdgeInsets.only(top: 30.0),
-													child: ElevatedButton(
-														onPressed: () {
-															_dismissDialog();
-														},
-														child: const Text(
-															'Close',
-															style: TextStyle(fontSize: 13.0),
-														),
-													),
-												),
-											),
-											SizedBox(
-												width: MediaQuery.of(context).size.width * 0.3,
+												width: MediaQuery.of(context).size.width * 0.8,
 												height: 60,
 												child: Padding(
 													padding: const EdgeInsets.only(top: 30.0),
@@ -101,7 +91,7 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 															onSaveForm();
 														},
 														child: const Text(
-															'Save',
+															'Simpan Informasi Polis',
 															style: TextStyle(fontSize: 13.0),
 														),
 													),
@@ -109,6 +99,19 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 											),
 										],
 									),
+                  const SizedBox(height: 20),
+                  UploadSectionWidget(
+										regklaim1Id: regklaim1Id,
+                    viewMode: state.viewMode,
+									),
+                  ElevatedButton(
+                    onPressed: () {
+                      regklaim1formBloc.add(RegklaimToKlaimEvent(regklaim1Id: regklaim1Id));
+                      _dismissDialog();                      
+                    },
+                    child: Text('Lapor Klaim'),
+                  )
+
 								],
 							)),
 					),
@@ -121,10 +124,15 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 							fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
 							fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
 							fieldPolisNoController.text = state.record!.polisNo;
-              fieldLokasiObjectController.text = state.record!.lokasiObject;
+							fieldLokasiObjectController.text = state.record!.lokasiObject;
 						}
 						fieldComboMInsurance = state.comboMInsurance;
-					}
+					}		
+          if (state.isSaved) {
+            if (!state.hasFailure) {
+              regklaim1Id = state.regklaim1Id;
+            } 
+          }
 				},
 			);
 		}
@@ -157,7 +165,7 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 	Widget buildFieldMinsuranceId(){
 		return buildFieldComboMInsurance(
 			comboKey: comboMInsuranceKey,
-			labelText: 'minsuranceId',
+			labelText: 'Kategory Asuransi',
 			initItem: fieldComboMInsurance,
 			onChangedCallback: (value) {
 				if (value != null) {
@@ -266,10 +274,13 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
 				polisAkhir: DateTime.parse(fieldPolisAkhirController.text),
 				polisMulai: DateTime.parse(fieldPolisMulaiController.text),
 				polisNo: fieldPolisNoController.text,
-				regklaim1Id: '',
+				regklaim1Id: regklaim1Id,
 			);
+      if (regklaim1Id.isNotEmpty) {
+        regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
+      } else {
 			regklaim1formBloc.add(Regklaim1CrudTambahEvent(record: record));
-      _dismissDialog();
+      }
     }
 	}
 
@@ -294,7 +305,7 @@ class Regklaim1CrudFormPageState extends State<Regklaim1CrudFormPage> {
       keyboardType: TextInputType.multiline,
       minLines: 2,
       maxLines: 4,
-      controller: TextEditingController(),
+      controller: fieldLokasiObjectController,
       decoration: const InputDecoration(
         labelText: "lokasiResiko",
         floatingLabelBehavior: FloatingLabelBehavior.always,

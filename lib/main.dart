@@ -981,6 +981,8 @@ import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
+// import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
+// import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvdoccrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvstatuscrud_repository.dart';
@@ -1318,7 +1320,7 @@ Future<void> main() async {
         ),
 
 
-        //Klaim
+        //Klaimq
         BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
         BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
         // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),

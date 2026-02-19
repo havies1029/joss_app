@@ -11,10 +11,10 @@ class PerbaruiKlaimParPage extends StatefulWidget {
   final String cobGroupId;
   final String cobGroupNama;
   final String klaim1Id;
-  const PerbaruiKlaimParPage({super.key, required this.klaim1Id, required this.cobGroupId, required this.cobGroupNama});
+	const PerbaruiKlaimParPage({super.key, required this.klaim1Id, required this.cobGroupId, required this.cobGroupNama});
 
-  @override
-  PerbaruiKlaimParPageState createState() => PerbaruiKlaimParPageState();
+	@override
+	PerbaruiKlaimParPageState createState() => PerbaruiKlaimParPageState();
 }
 
 
@@ -33,25 +33,25 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: BlocBuilder<KlaimparklaimcrudBloc, KlaimparklaimcrudState>(
-                  builder: (_, klaim) => BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
-                    builder: (_, dok) {
-                      final done = [
-                        klaim.isComplete,
-                        dok.isComplete,
-                      ].where((x) => x).length;
+                    builder: (_, klaim) => BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
+                          builder: (_, dok) {
+                            final done = [
+                              klaim.isComplete,
+                              dok.isComplete,
+                            ].where((x) => x).length;
 
-                      final progress = done / 5.0;
+                            final progress = done / 5.0;
 
-                      return Row(
-                        children: [
-                          Expanded(child: LinearProgressIndicator(value: progress)),
-                          const SizedBox(width: 12),
-                          Text('${(progress * 100).round()}%'),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+                            return Row(
+                              children: [
+                                Expanded(child: LinearProgressIndicator(value: progress)),
+                                const SizedBox(width: 12),
+                                Text('${(progress * 100).round()}%'),
+                              ],
+                            );
+                          },
+                        ),
+                    ),
               ),
 
               Expanded(
@@ -59,21 +59,21 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-
+                      
                       Klaimparaccordioncard(
                         title: 'Data Klaim',
                         isOpen: acc.openedIndex == 0,
                         onTap: () => context.read<KlaimparaccordionBloc>().add(KlaimparaccordionToggleEvent(index: 0)),
                         child: KlaimparklaimcrudFormPage(recordId:  widget.klaim1Id, viewMode: "ubah", cobGroupId: widget.cobGroupId),
                       ),
-
+                      
                       Klaimparaccordioncard(
                         title: 'Dokumen Klaim',
                         isOpen: acc.openedIndex == 1,
                         onTap: () => context.read<KlaimparaccordionBloc>().add(KlaimparaccordionToggleEvent(index: 1)),
                         child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
                       ),
-
+                                            
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -90,7 +90,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                       switch(acc.openedIndex) {
                         case 0:
                           klaimparklaimcrudBloc.add(KlaimparklaimcrudAutoSaveEvent());
-                          break;
+                          break;              
                       }
                     },
                     child: const Text('Perbarui Klaim'),
@@ -99,20 +99,20 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
               ),
             ],
           );
-        }, listener: (BuildContext context, KlaimparaccordionState state) async {
-        if (state.previousIndex != null &&
+        }, listener: (BuildContext context, KlaimparaccordionState state) async { 
+          if (state.previousIndex != null &&
             state.previousIndex != state.openedIndex) {
 
-          FocusManager.instance.primaryFocus?.unfocus();
-          await Future.delayed(const Duration(milliseconds: 50));
+            FocusManager.instance.primaryFocus?.unfocus();
+            await Future.delayed(const Duration(milliseconds: 50));
 
-          switch(state.previousIndex) {
-            case 0:
-              klaimparklaimcrudBloc.add(KlaimparklaimcrudAutoSaveEvent());
-              break;
+            switch(state.previousIndex) {
+              case 0:
+                klaimparklaimcrudBloc.add(KlaimparklaimcrudAutoSaveEvent());
+                break;              
+            }
           }
-        }
-      },
+         },        
       ),
     );
   }

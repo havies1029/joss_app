@@ -8,18 +8,18 @@ class Regklaim1CrudAPI {
 
 	Future<ReturnDataAPI> regklaim1CrudTambahAPI(Regklaim1CrudModel record) async {
 		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create";
+				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create";
 		Map<String, String> queryParams = {"modul_id": "regklaim1CrudTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -34,7 +34,7 @@ class Regklaim1CrudAPI {
 		Map<String, String> queryParams = {'sppa1Id': sppa1Id, 'modul_id': 'regklaim1Tambah4PolisJpsAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -48,12 +48,12 @@ class Regklaim1CrudAPI {
 		}
 	}
 
-  Future<ReturnDataAPI> regklaimToKlaimAPI(String regklaim1Id) async {
+	Future<ReturnDataAPI> regklaimToKlaimAPI(String regklaim1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/regklaimtoklaim";
 		Map<String, String> queryParams = {'regklaim1Id': regklaim1Id, 'modul_id': 'regklaimToKlaimAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -69,18 +69,18 @@ class Regklaim1CrudAPI {
 
 	Future<bool> regklaim1CrudUbahAPI(Regklaim1CrudModel record) async {
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/update";
+				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/update";
 		Map<String, String> queryParams = {"modul_id": "regklaim1CrudUbahAPI"};
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
 
 		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: jsonEncode(record.toJson()));
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
@@ -97,7 +97,7 @@ class Regklaim1CrudAPI {
 			'modul_id': 'regklaim1CrudHapusAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
@@ -116,7 +116,7 @@ class Regklaim1CrudAPI {
 		Map<String, String> queryParams = {'regklaim1Id': regklaim1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'

@@ -54,7 +54,8 @@ class KlaimmvdoccrudAPI {
 		}
 		return returnData.success;
 	}
-	Future<bool> klaimmvdoccrudHapusAPI(String klaim1Id, String mjenisdocId, String jenisDocLain) async {		String hapusEndpoint = "${AppData.prefixEndPoint}/api/perbaruiklaimmv/klaimmvdoccrud/delete";
+	Future<bool> klaimmvdoccrudHapusAPI(String klaim1Id, String mjenisdocId, String jenisDocLain) async {
+		String hapusEndpoint = "${AppData.prefixEndPoint}/api/perbaruiklaimmv/klaimmvdoccrud/delete";
 		Map<String, String> queryParams = {
 			'klaim1Id': klaim1Id,
 			'mjenisdocId': mjenisdocId,
