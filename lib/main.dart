@@ -1807,7 +1807,7 @@ class _AppState extends State<_App> {
             }
 
             if (state is AuthenticationUnauthenticated) {
-              context.read<LoginBloc>().add(LoginReset());
+              context.read<LoginBloc>().add(LoginReset()); // balikin kondisi state bloc ke konidsi semula
               return const LoginUser();
             }
 

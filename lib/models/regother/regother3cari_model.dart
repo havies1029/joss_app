@@ -1,8 +1,10 @@
 
+import '../../common/constants.dart';
+
 class Regother3cariModel {
 	String regother3Id;
 	String remarks;
-	DateTime tglStatus;
+	DateTime? tglStatus;
   String progressNama;
 
 	Regother3cariModel({required this.regother3Id, required this.remarks, 
@@ -12,7 +14,7 @@ class Regother3cariModel {
 		return Regother3cariModel(
 			regother3Id: data['regother3Id']??'',
 			remarks: data['remarks']??'',
-			tglStatus: DateTime.tryParse(data['tglStatus'].toString())??DateTime.now(), 
+			tglStatus: parseDate(data['tglStatus']),
       progressNama: data['progressNama']??'',
 		);
 
@@ -21,7 +23,7 @@ class Regother3cariModel {
 	Map<String, dynamic> toJson() =>
     {'regother3Id': regother3Id,
 		'remarks': remarks,
-		'tglStatus': tglStatus.toIso8601String(),
+		'tglStatus': tglStatus?.toIso8601String(),
     'progressNama': progressNama,
     };
 

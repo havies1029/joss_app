@@ -4,13 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/models/klaimrasio/klaimrasiodetailcari_model.dart';
-import 'package:joss_app/pages/klaim/mobile/rasio/klaim_rasio_table_widget.dart';
-import '../../../../blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
-import '../../../../common/constants.dart';
-import '../../../../helper/expert_helper.dart';
-import '../../../../helper/mobile_expert_helper.dart';
-import '../../../../widgets/apptheme/polis_button.dart';
-import '../../../../widgets/apptheme/popup_widget.dart';
+
+import '../../../../../blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../helper/expert_helper.dart';
+import '../../../../../helper/mobile_expert_helper.dart';
+import '../../../../../widgets/apptheme/polis_button.dart';
+import '../../../../../widgets/apptheme/popup_widget.dart';
+import 'klaim_rasio_table_widget.dart';
 
 class KlaimRasioMainPage extends StatefulWidget {
   const KlaimRasioMainPage({super.key});
@@ -119,7 +120,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
               onExportSelected: (format) async {
                 // ambil semua detail dari semua cobs
                 final allDetails =
-                    state.klaimRasio.cobs.expand((h) => h.details).toList();
+                state.klaimRasio.cobs.expand((h) => h.details).toList();
 
                 if (allDetails.isEmpty) {
                   Navigator.pop(context);
@@ -130,7 +131,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
 
                 // mapping export
                 final data =
-                    allDetails.map((d) => _detailToExportMap(d)).toList();
+                allDetails.map((d) => _detailToExportMap(d)).toList();
 
                 Navigator.pop(context);
                 await _exportDataRincian(context, format, data);
@@ -141,12 +142,12 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) =>
           FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-          child: child,
-        ),
-      ),
+            opacity: animation,
+            child: ScaleTransition(
+              scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+              child: child,
+            ),
+          ),
     );
   }
 
@@ -164,10 +165,10 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
   }
 
   Future<void> _exportDataRincian(
-    BuildContext context,
-    ExportFormat format,
-    List<Map<String, dynamic>> data,
-  ) async {
+      BuildContext context,
+      ExportFormat format,
+      List<Map<String, dynamic>> data,
+      ) async {
     final fileName =
         "KlaimRasio_${DateTime.now().millisecondsSinceEpoch}.${format == ExportFormat.excel ? "xlsx" : "pdf"}";
 

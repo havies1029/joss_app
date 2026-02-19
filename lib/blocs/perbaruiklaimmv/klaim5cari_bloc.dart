@@ -11,41 +11,41 @@ part 'klaim5cari_event.dart';
 part 'klaim5cari_state.dart';
 
 class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
-  Klaim5cariBloc() : super(const Klaim5cariState()) {
-    on<FetchKlaim5cariEvent>(onFetchKlaim5cari);
-    on<RefreshKlaim5cariEvent>(onRefreshKlaim5cari);
+	Klaim5cariBloc() : super(const Klaim5cariState()) {
+		on<FetchKlaim5cariEvent>(onFetchKlaim5cari);
+		on<RefreshKlaim5cariEvent>(onRefreshKlaim5cari);
     on<Klaim5LocalFileSetEvent>(onKlaim5LocalFileSet);
     on<Klaim5DeleteRequestedEvent>(onKlaim5DeleteRequested);
     on<Klaim5UploadRequestedEvent>(onKlaim5UploadRequested);
-  }
+	}
 
-  Future<void> onRefreshKlaim5cari(
-      RefreshKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
-    emit(const Klaim5cariState());
-    emit(state.copyWith(klaim1Id: event.klaim1Id));
-    add(FetchKlaim5cariEvent());
-  }
+Future<void> onRefreshKlaim5cari(
+		RefreshKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
+	emit(const Klaim5cariState());
+  emit(state.copyWith(klaim1Id: event.klaim1Id));
+	add(FetchKlaim5cariEvent());
+}
 
-  Future<void> onFetchKlaim5cari(
-      FetchKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
-    if (state.hasReachedMax) return;
+Future<void> onFetchKlaim5cari(
+		FetchKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
+	if (state.hasReachedMax) return;
 
-    Klaim5cariRepository repo = Klaim5cariRepository();
-    if (state.status == ListStatus.initial) {
-      List<Klaim5cariModel> items = await repo.getKlaim5cari(state.klaim1Id);
-      return emit(state.copyWith(
-        items: items,
-        hasReachedMax: true,
-        status: ListStatus.success,
-      ));
-    }
+	Klaim5cariRepository repo = Klaim5cariRepository();
+	if (state.status == ListStatus.initial) {
+		List<Klaim5cariModel> items = await repo.getKlaim5cari(state.klaim1Id);
+		return emit(state.copyWith(
+			items: items,
+			hasReachedMax: true,
+			status: ListStatus.success,
+			));
+	  }
   }
 
   Future<void> onKlaim5LocalFileSet(
-      Klaim5LocalFileSetEvent event, Emitter<Klaim5cariState> emit) async {
+    Klaim5LocalFileSetEvent event, Emitter<Klaim5cariState> emit) async {
     // cari existing item
     final idx = state.items.indexWhere((x) =>
-    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
 
     // copy list dulu
@@ -72,10 +72,10 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
 
       final newItem = Klaim5cariModel(
         klaim1Id: event.klaim1Id,
-        jenisDocLain: event.jenisDocLain,
-        klaim5Id: '',
-        mjenisdocId: '',
-        jenisNama: '',
+        jenisDocLain: event.jenisDocLain,            
+        klaim5Id: '',    
+        mjenisdocId: '', 
+        jenisNama: '',                  
         fileUrl: '',
         fileName: event.fileName,
         mimeType: event.mimeType ?? '',
@@ -93,13 +93,13 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       newItems.add(newItem);
     }
 
-    emit(state.copyWith(items: newItems));
-  }
+  emit(state.copyWith(items: newItems));
+}
 
   Future<void> onKlaim5DeleteRequested(
-      Klaim5DeleteRequestedEvent event, Emitter<Klaim5cariState> emit) async {
+    Klaim5DeleteRequestedEvent event, Emitter<Klaim5cariState> emit) async {
     final idx = state.items.indexWhere((x) =>
-    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
     if (idx < 0) return;
 
@@ -158,7 +158,7 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
 
   Future<void> onKlaim5UploadRequested(Klaim5UploadRequestedEvent event, Emitter<Klaim5cariState> emit) async {
     final idx = state.items.indexWhere((x) =>
-    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
     if (idx < 0) return;
 

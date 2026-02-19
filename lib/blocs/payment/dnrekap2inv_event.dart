@@ -10,20 +10,29 @@ abstract class DnRekap2invEvent extends Equatable {
 
 class DnToInvByListCobProcessEvent extends DnRekap2invEvent {
   final String listCob;
+  final String? curr;
 
-  const DnToInvByListCobProcessEvent({required this.listCob});
+  const DnToInvByListCobProcessEvent({
+    required this.listCob,
+    this.curr,
+  });
 
   @override
-  List<Object> get props => [listCob];
+  List<Object> get props => [listCob, curr ?? ""];
 }
+
 
 class DnToInvByListDnProcessEvent extends DnRekap2invEvent {
   final String listDn;
+  final String? curr;
 
-  const DnToInvByListDnProcessEvent({required this.listDn});
+  const DnToInvByListDnProcessEvent({
+    required this.listDn,
+    this.curr,
+  });
 
   @override
-  List<Object> get props => [listDn];
+  List<Object> get props => [listDn, curr ?? ""];
 }
 
 class CheckInvoiceStatusEvent extends DnRekap2invEvent {
@@ -89,4 +98,17 @@ class RegPar2InvoiceEvent extends DnRekap2invEvent {
 
   @override
   List<Object> get props => [regpar1Id];
+}
+
+class SetPaymentSummaryEvent extends DnRekap2invEvent {
+  final String curr;
+  final double totalBayar;
+
+  const SetPaymentSummaryEvent({
+    required this.curr,
+    required this.totalBayar,
+  });
+
+  @override
+  List<Object> get props => [curr, totalBayar];
 }

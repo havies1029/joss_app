@@ -7,7 +7,7 @@ class Klaim5cariState extends Equatable {
 	final bool hasReachedMax;
   final String klaim1Id;
   final String? errorMessage;
-	final bool isComplete;
+  final bool isComplete;
 
 	const Klaim5cariState(
 		{this.status = ListStatus.initial,
@@ -15,7 +15,7 @@ class Klaim5cariState extends Equatable {
 		this.hasReachedMax = false,
     this.klaim1Id = '',
     this.errorMessage,
-			this.isComplete = false,
+    this.isComplete = false,
 		});
 
 	const Klaim5cariState.success(List<Klaim5cariModel> items)
@@ -29,7 +29,7 @@ class Klaim5cariState extends Equatable {
 		ListStatus? status,
     String? klaim1Id,
     String? errorMessage,
-			bool? isComplete,
+    bool? isComplete,
 		}){
 		return Klaim5cariState(
 			items: items ?? this.items,
@@ -37,9 +37,10 @@ class Klaim5cariState extends Equatable {
 			status: status ?? this.status,
       klaim1Id: klaim1Id ?? this.klaim1Id,
       errorMessage: errorMessage ?? this.errorMessage,
-			isComplete: isComplete ?? this.isComplete,
+      isComplete: isComplete ?? this.isComplete,
 			);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, klaim1Id, errorMessage ?? '', isComplete];}
+	List<Object> get props => [status, items, hasReachedMax, klaim1Id, errorMessage ?? '', isComplete];
+}

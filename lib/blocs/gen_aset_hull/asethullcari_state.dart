@@ -14,6 +14,9 @@ class AsethullCariState extends Equatable {
 	final String selectedId;
 	final AsethullCariModel? selectedItem;
 	final String? selectedProsesId;
+	final String queryKey;
+	final bool isFetching;
+
 
 	const AsethullCariState(
 		{this.status = ListStatus.initial,
@@ -28,6 +31,8 @@ class AsethullCariState extends Equatable {
 		this.selectedId = "",
 		this.selectedItem,
 		this.selectedProsesId,
+		this.queryKey = '',
+		this.isFetching = false,
 		});
 
 	const AsethullCariState.success(List<AsethullCariModel> items)
@@ -48,6 +53,8 @@ class AsethullCariState extends Equatable {
 		String? selectedId,
 		AsethullCariModel? selectedItem,
 		String? selectedProsesId,
+		String? queryKey,
+		bool? isFetching,
 		}){
 		return AsethullCariState(
 			items: items ?? this.items,
@@ -62,9 +69,11 @@ class AsethullCariState extends Equatable {
 			selectedId: selectedId ?? this.selectedId,
 			selectedItem: selectedItem ?? this.selectedItem,
 			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
+			queryKey: queryKey ?? this.queryKey,
+			isFetching: isFetching ?? this.isFetching,
 		);
 	}
 
 	@override
-	List<Object?> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetHullId, selectedId, selectedItem, selectedProsesId];
+	List<Object?> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetHullId, selectedId, selectedItem, selectedProsesId, queryKey, isFetching,];
 }

@@ -36,11 +36,6 @@ class _LoginUserState extends State<LoginUser>
     super.dispose();
   }
 
-  // Widget yang mengandung LoginFormUser
-  Widget _buildDesignLoginFormUser() {
-    return const LoginFormUser();
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -62,7 +57,7 @@ class _LoginUserState extends State<LoginUser>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(height: headerSpacing),
-                        _buildDesignLoginFormUser(),
+                        LoginFormUser(),
                       ],
                     ),
                   ),

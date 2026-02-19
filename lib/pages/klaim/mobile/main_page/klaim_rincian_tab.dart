@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/klaim/mobile/rincian/klaim_rincian_main_page.dart';
+import 'package:joss_app/pages/regklaim/mobile/main_page/rincian/klaim_rincian_main_page.dart';
 
 class KlaimRincianTab extends StatelessWidget {
   const KlaimRincianTab({super.key});

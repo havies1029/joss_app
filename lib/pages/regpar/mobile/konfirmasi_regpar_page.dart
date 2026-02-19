@@ -24,6 +24,7 @@ import '../../payment/mobile/payment_page/payment_method/payment_method_page.dar
 import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
 import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import '../../payment/paymentmethodcari_list.dart';
+import '../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 
 
@@ -72,8 +73,21 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentMethodPage(curr: curr, totalBayar: totalBayar)),
-    ); // Implement your ta
+      MaterialPageRoute(
+        builder: (_) => PaymentMethodPage(
+          curr: curr,
+          totalBayar: totalBayar,
+          onBack: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => const TagihanPembayaranPage(initialTab: 2),
+              ),
+                  (route) => route.isFirst,
+            );
+          },
+        ),
+      ),
+    );
   }
 
   @override

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../models/gen_aset_hull/asethullcari_model.dart';
 
@@ -49,16 +50,38 @@ class HullCobTable extends StatefulWidget {
 class _HullCobTableState extends State<HullCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
   late final ScrollController hController;
+  late final ScrollController vController;
 
   @override
   void initState() {
     super.initState();
     hController = ScrollController();
+    vController = ScrollController();
+    vController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final bloc = context.read<AsethullCariBloc>();
+    final s = bloc.state;
+
+    if (!vController.hasClients) return;
+    final max = vController.position.maxScrollExtent;
+    final cur = vController.position.pixels;
+
+    const threshold = 100.0;
+
+    if (max - cur <= threshold) {
+      if (!s.hasReachedMax && !s.isFetching) {
+        bloc.add(FetchAsethullCariEvent());
+      }
+    }
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.removeListener(_onScroll);
+    vController.dispose();
     super.dispose();
   }
 
@@ -172,6 +195,7 @@ class _HullCobTableState extends State<HullCobTable> {
     }
 
     return SingleChildScrollView(
+      controller: vController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -416,7 +440,7 @@ class _HullCobTableState extends State<HullCobTable> {
         ),
 
         _textCell(
-          formatNum(d.premi),
+          "${d.curr} ${formatNum(d.premi)}",
           maxLines: 1,
           softWrap: false,
         ),

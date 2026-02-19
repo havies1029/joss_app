@@ -1,8 +1,10 @@
 
+import '../../common/constants.dart';
+
 class Regrenewal2CariModel {
 	String regrenew2Id;
 	String remaks;
-	DateTime tglStatus;
+	DateTime? tglStatus;
 	String progressNama;
 
 	Regrenewal2CariModel({
@@ -13,17 +15,16 @@ class Regrenewal2CariModel {
 		return Regrenewal2CariModel(
 				regrenew2Id: data['regrenew2Id']??'',
 				remaks: data['remaks']??'',
-				tglStatus: DateTime.tryParse(data['tglStatus'].toString())??DateTime.now(),
+				tglStatus: parseDate(data['tglStatus'].toString()),
 				progressNama: data['progressNama']??''
 		);
-
 	}
 
 	Map<String, dynamic> toJson() =>
 			{
 				'regrenew2Id': regrenew2Id,
 				'remaks': remaks,
-				'tglStatus': tglStatus.toIso8601String(),
+				'tglStatus': tglStatus?.toIso8601String(),
 				'progressNama': progressNama,
 			};
 

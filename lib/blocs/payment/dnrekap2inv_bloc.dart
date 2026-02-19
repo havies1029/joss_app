@@ -26,11 +26,22 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
     on<ForcePaymentViaVaEvent>(onForcePaymentViaVa);
     on<RegMv2InvoiceEvent>(onRegMv2Inv);
     on<RegPar2InvoiceEvent>(onRegPar2Inv);
+    on<SetPaymentSummaryEvent>(onSetPaymentSummary);
+  }
+
+  Future<void> onSetPaymentSummary(
+      SetPaymentSummaryEvent event,
+      Emitter<DnRekap2invState> emit,
+      ) async {
+    emit(state.copyWith(
+      curr: event.curr,
+      totalBayar: event.totalBayar,
+    ));
   }
 
   Future<void> onDnToInvByListCobProcess(
       DnToInvByListCobProcessEvent event, Emitter<DnRekap2invState> emit) async {
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false, curr: event.curr ?? state.curr));
 
     try {
 
@@ -44,6 +55,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus[0].invoiceId,
         paymentStatus: invoiceStatus[0].status,
         totalBayar: invoiceStatus[0].totalBayar,
+        curr: state.curr,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -52,16 +64,23 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       ));
     }
   }
-
   Future<void> onDnToInvByListDnProcess(
-      DnToInvByListDnProcessEvent event, Emitter<DnRekap2invState> emit) async {
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
+      DnToInvByListDnProcessEvent event,
+      Emitter<DnRekap2invState> emit,
+      ) async {
+    emit(state.copyWith(
+      isProcessing: true,
+      isProcessed: false,
+      hasFailure: false,
+      curr: event.curr ?? state.curr,
+    ));
 
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
-      List<InvoiceStatusModel> invoiceStatus = await repo.fetchDnToInvByListDn(event.listDn);
+
+      List<InvoiceStatusModel> invoiceStatus =
+      await repo.fetchDnToInvByListDn(event.listDn);
 
       emit(state.copyWith(
         isProcessing: false,
@@ -69,6 +88,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         invoiceId: invoiceStatus[0].invoiceId,
         paymentStatus: invoiceStatus[0].status,
         totalBayar: invoiceStatus[0].totalBayar,
+        // curr: invoiceStatus[0].curr ?? state.curr,
       ));
     } catch (e) {
       emit(state.copyWith(

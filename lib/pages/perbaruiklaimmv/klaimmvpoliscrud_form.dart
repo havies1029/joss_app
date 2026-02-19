@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/repositories/combobox/combominsurer_repository.dart';
-import 'package:joss_app/repositories/combobox/combommvjnscover_repository.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'package:joss_app/models/combobox/combominsurer_model.dart';
@@ -56,41 +54,33 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 		return BlocConsumer<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
 			builder: (context, state) {
 				return SingleChildScrollView(
-					child: Form(
+					child: Padding(
+						padding: const EdgeInsets.all(8.0),
+						child: Form(
 							key: _formKey,
 							child: Column(
 								children: [
-									Row(
-										children: [
-											Flexible(child: buildFieldPolisMulai()),
-											const SizedBox(width: 8),
-											Flexible(child: buildFieldPolisAkhir()),
-										],
-									),
-									const SizedBox(height: hPadding),
+									const SizedBox(height: 10),
+                  
+									buildFieldPolisMulai(),
+									buildFieldPolisAkhir(),
 									buildFieldLaporAsuransi(),
-									const SizedBox(height: hPadding),
 									buildFieldInsuredNama(),
-									const SizedBox(height: hPadding),
 									buildFieldNoPlat(),
-									const SizedBox(height: hPadding),
 									buildFieldNoChasis(),
-									const SizedBox(height: hPadding),
 									buildFieldMinsurerId(),
-									const SizedBox(height: hPadding),
 									buildFieldPolisNo(),
-									const SizedBox(height: hPadding),
 									buildFieldMmvjnscoverId(),
-									const SizedBox(height: hPadding),
-									if (isPolisJps)
-										buildFieldSppa1Id(),
-									const SizedBox(height: 15),
+                  if (isPolisJps) 
+									  buildFieldSppa1Id(),
+									const SizedBox(height: 25),
 									FormError(
 										errors: errors,
 										key: null,
-									),
+									),									
 								],
-							))
+							)),
+					),
 				);
 				},
 				listener: (context, state) {
@@ -126,12 +116,16 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	}
 
 	Widget buildFieldInsuredNama(){
-		return appTextField(
-			label: 'Tertanggung',
+		return TextFormField(
       enabled: isPolisJps ? false : true,
 			keyboardType: TextInputType.multiline,
+			minLines: 1,
 			maxLines: 3,
 			controller: fieldInsuredNamaController,
+			decoration: const InputDecoration(
+				labelText: "insuredNama",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 				removeError(error: kStringNullError);
@@ -148,12 +142,15 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	}
 
 	Widget buildFieldLaporAsuransi(){
-		return AppDateField(
-			label: 'Tanggal ke Asuransi',
-			lastDate: DateTime(2100),
-			firstDate: DateTime(2000),
+		return DateTimeFormField(
       enabled: isPolisJps ? false : true,
+			mode: DateTimeFieldPickerMode.date,
+			dateFormat: DateFormat('dd/MM/yyyy'),
 			initialValue: DateTime.tryParse(fieldLaporAsuransiController.text),
+			decoration: const InputDecoration(
+				labelText: "laporAsuransi",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value != null) {
 				removeError(error: kStringNullError);
@@ -172,52 +169,16 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 		);
 	}
 
-	// Widget buildFieldMinsurerId(){
-	// 	return buildFieldComboMInsurer(
-  //     enabled: isPolisJps ? false : true,
-	// 		comboKey: comboMInsurerKey,
-	// 		labelText: 'minsurerId',
-	// 		initItem: fieldComboMInsurer,
-	// 		onChangedCallback: (value) {
-	// 			if (value != null) {
-	// 				removeError(
-	// 					error: "Field ComboMInsurer tidak boleh kosong.");
-	// 				klaimmvpoliscrudBloc.add(ComboMInsurerChangedEvent(comboMInsurer: value));
-	// 			}
-	// 		},
-	// 		onSaveCallback: (value) {
-	// 			if (value != null) {
-	// 				fieldComboMInsurer = value;
-	// 			}
-	// 		},
-	// 		validatorCallback: (value) {
-	// 			if (value == null) {
-	// 				addError(
-	// 					error: "Field ComboMInsurer tidak boleh kosong.");
-	// 			}
-	// 		},
-	// 	);
-	// }
-
-	Widget buildFieldMinsurerId() {
-		return ReusableComboBox<ComboMInsurerModel>(
-			hintText: 'Insurance',
+	Widget buildFieldMinsurerId(){
+		return buildFieldComboMInsurer(     
+      enabled: isPolisJps ? false : true,       
 			comboKey: comboMInsurerKey,
+			labelText: 'minsurerId',
 			initItem: fieldComboMInsurer,
-			isEnabled: isPolisJps ? false : true,
-			dataLoaderWithFilter: (filter) {
-				return ComboMInsurerRepository().getComboMInsurer(filter);
-			},
-			dataLoader: () {
-				return ComboMInsurerRepository().getComboMInsurer("");
-			},
-			displayText: (item) => item.insurerNama,
-			compareItems: (item, selectedItem) =>
-			item.minsurerId == selectedItem.minsurerId,
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-							error: "Field ComboMInsurer tidak boleh kosong.");
+						error: "Field ComboMInsurer tidak boleh kosong.");
 					klaimmvpoliscrudBloc.add(ComboMInsurerChangedEvent(comboMInsurer: value));
 				}
 			},
@@ -229,57 +190,22 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-							error: "Field ComboMInsurer tidak boleh kosong.");
+						error: "Field ComboMInsurer tidak boleh kosong.");
 				}
 			},
 		);
 	}
 
-
-	// Widget buildFieldMmvjnscoverId(){
-	// 	return buildFieldComboMMvjnscover(
-  //     enabled: isPolisJps ? false : true,
-	// 		comboKey: comboMMvjnscoverKey,
-	// 		labelText: 'mmvjnscoverId',
-	// 		initItem: fieldComboMMvjnscover,
-	// 		onChangedCallback: (value) {
-	// 			if (value != null) {
-	// 				removeError(
-	// 					error: "Field ComboMMvjnscover tidak boleh kosong.");
-	// 				klaimmvpoliscrudBloc.add(ComboMMvjnscoverChangedEvent(comboMMvjnscover: value));
-	// 			}
-	// 		},
-	// 		onSaveCallback: (value) {
-	// 			if (value != null) {
-	// 				fieldComboMMvjnscover = value;
-	// 			}
-	// 		},
-	// 		validatorCallback: (value) {
-	// 			if (value == null) {
-	// 				addError(
-	// 					error: "Field ComboMMvjnscover tidak boleh kosong.");
-	// 			}
-	// 		},
-	// 	);
-	// }
-
-	Widget buildFieldMmvjnscoverId() {
-		return ReusableComboBox<ComboMMvjnscoverModel>(
-			hintText: 'Coverage',
+	Widget buildFieldMmvjnscoverId(){
+		return buildFieldComboMMvjnscover(
+      enabled: isPolisJps ? false : true,
 			comboKey: comboMMvjnscoverKey,
+			labelText: 'mmvjnscoverId',
 			initItem: fieldComboMMvjnscover,
-			isEnabled: isPolisJps ? false : true,
-			dataLoader: () {
-				return ComboMMvjnscoverRepository().getComboMMvjnscover();
-			},
-			enableSearch: false,
-			displayText: (item) => item.coverName,
-			compareItems: (item, selectedItem) =>
-			item.mmvjnscoverId == selectedItem.mmvjnscoverId,
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-							error: "Field ComboMMvjnscover tidak boleh kosong.");
+						error: "Field ComboMMvjnscover tidak boleh kosong.");
 					klaimmvpoliscrudBloc.add(ComboMMvjnscoverChangedEvent(comboMMvjnscover: value));
 				}
 			},
@@ -291,16 +217,19 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-							error: "Field ComboMMvjnscover tidak boleh kosong.");
+						error: "Field ComboMMvjnscover tidak boleh kosong.");
 				}
 			},
 		);
 	}
 
 	Widget buildFieldNoChasis(){
-		return appTextField(
-			label: 'No Chassis',
+		return TextFormField(
 			controller: fieldNoChasisController,
+			decoration: const InputDecoration(
+				labelText: "noChasis",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 				  removeError(error: kStringNullError);
@@ -318,9 +247,12 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	}
 
 	Widget buildFieldNoPlat(){
-		return appTextField(
-			label: 'No Plat',
+		return TextFormField(
 			controller: fieldNoPlatController,
+			decoration: const InputDecoration(
+				labelText: "noPlat",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 				removeError(error: kStringNullError);
@@ -338,9 +270,15 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	}
 
 	Widget buildFieldPolisAkhir(){
-		return AppDateField(
+		return DateTimeFormField(
+			mode: DateTimeFieldPickerMode.date,
       enabled: isPolisJps ? false : true,
+			dateFormat: DateFormat('dd/MM/yyyy'),
 			initialValue: DateTime.tryParse(fieldPolisAkhirController.text),
+			decoration: const InputDecoration(
+				labelText: "polisAkhir",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value != null) {
 				removeError(error: kStringNullError);
@@ -355,16 +293,19 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 				}
 				return null;
 			},
-			label: 'Sampai',
-			firstDate: DateTime(2000),
-			lastDate: DateTime(2100),
 		);
 	}
 
 	Widget buildFieldPolisMulai(){
-		return AppDateField(
+		return DateTimeFormField(
       enabled: isPolisJps ? false : true,
+			mode: DateTimeFieldPickerMode.date,
+			dateFormat: DateFormat('dd/MM/yyyy'),
 			initialValue: DateTime.tryParse(fieldPolisMulaiController.text),
+			decoration: const InputDecoration(
+				labelText: "polisMulai",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value != null) {
           removeError(error: kStringNullError);
@@ -379,17 +320,17 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 				}
 				return null;
 			},
-			label: 'Dari',
-			firstDate: DateTime(2000),
-			lastDate: DateTime(2100),
 		);
 	}
 
 	Widget buildFieldPolisNo(){
-		return appTextField(
-			label: 'No Polis',
+		return TextFormField(
       enabled: isPolisJps ? false : true,
 			controller: fieldPolisNoController,
+			decoration: const InputDecoration(
+				labelText: "polisNo",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 				removeError(error: kStringNullError);
@@ -407,10 +348,13 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	}
 
 	Widget buildFieldSppa1Id(){
-		return appTextField(
-			label: 'ID SPPA',
+		return TextFormField(
       enabled: false,
 			controller: fieldSppa1IdController,
+			decoration: const InputDecoration(
+				labelText: "sppa1Id",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 				removeError(error: kStringNullError);

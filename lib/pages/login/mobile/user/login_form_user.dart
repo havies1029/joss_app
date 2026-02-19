@@ -39,18 +39,14 @@ class LoginFormUser extends StatefulWidget {
 class _LoginFormUserState extends State<LoginFormUser>
     with SingleTickerProviderStateMixin {
   late final Widget _cachedGoogleButton;
-  // Controller untuk input field
   final TextEditingController _emailOrPhoneController = TextEditingController();
 
   String? _emailError;
-  // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // Untuk animasi
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
   bool _isHoveringGmail = false;
-  bool _rememberPassword = true; // Variabel untuk checkbox Remember Password
-
+  bool _rememberPassword = true;
   @override
   void initState() {
     super.initState();
@@ -87,13 +83,12 @@ class _LoginFormUserState extends State<LoginFormUser>
       label: "Email atau No. Handphone",
       hint: "Masukkan email atau nomor HP kamu",
       controller: _emailOrPhoneController,
-      keyboardType: TextInputType.emailAddress, // biar bisa input campuran
+      keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return "Mohon isi email atau nomor handphone";
         }
 
-        // validasi email atau hp
         final isEmail = emailValidatorRegExp.hasMatch(value.trim());
         final isPhone = RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$').hasMatch(value.trim());
 
@@ -112,7 +107,7 @@ class _LoginFormUserState extends State<LoginFormUser>
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           _animationController.forward(from: 0);
-          onRegisterButtonPressed(context); // ⬅️ kirim context ke fungsi
+          onRegisterButtonPressed(context);
         }
       },
     );
@@ -123,19 +118,17 @@ class _LoginFormUserState extends State<LoginFormUser>
 
     final input = _emailOrPhoneController.text.trim();
     final isEmail = emailValidatorRegExp.hasMatch(input);
+    //
+    // if (isEmail) {
+    //   context.read<EmailVerificationBloc>().add(
+    //     FieldEmailVerificationChangedEvent(email: input),
+    //   );
+    // } else {
+    //   context.read<EmailVerificationBloc>().add(
+    //     FieldTeleponVerificationChangedEvent(telepon: input),
+    //   );
+    // }
 
-    // optional: tetap update state biar UI/validasi lain ikut kebawa
-    if (isEmail) {
-      context.read<EmailVerificationBloc>().add(
-        FieldEmailVerificationChangedEvent(email: input),
-      );
-    } else {
-      context.read<EmailVerificationBloc>().add(
-        FieldTeleponVerificationChangedEvent(telepon: input),
-      );
-    }
-
-    // penting: submit pakai input yang baru diketik user
     AuthInputRouter.handleInput(context, input);
   }
 
@@ -324,18 +317,18 @@ class _LoginFormUserState extends State<LoginFormUser>
                                     ),
                                     SizedBox(height: 10),
                                     // Tombol Google
-                                    // kIsWeb
-                                    //     ? const CachedGoogleSigninButton()
-                                    //     : AppButton.iconLeft(
-                                    //   text: 'Masuk Dengan Google',
-                                    //   icon: SvgPicture.asset(
-                                    //     'assets/icons/google-icon.svg',
-                                    //     width: 20,
-                                    //     height: 20,
-                                    //   ),
-                                    //   onPressed: () => _handleGmailRegisterForMobile(context),
-                                    //   backgroundColor: pGrey,
-                                    // ),
+                                    kIsWeb
+                                        ? const CachedGoogleSigninButton()
+                                        : AppButton.iconLeft(
+                                      text: 'Masuk Dengan Google',
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/google-icon.svg',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      onPressed: () => _handleGmailRegisterForMobile(context),
+                                      backgroundColor: pGrey,
+                                    ),
 
                                     SizedBox(height: vPadding,),
                                     footerLoginText(context),
@@ -371,12 +364,7 @@ class _LoginFormUserState extends State<LoginFormUser>
         user ??= await googleSignIn.signIn();
       }
 
-      // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
-
       if (user != null && context.mounted) {
-        // 🔒 Simpan email & display name ke AuthLocalCubi
-
-        // ⛳ Kirim ke EmailVerificationBloc
         context.read<EmailVerificationBloc>().add(
           EmailVerificationTambahEvent(
             record: EmailVerificationModel(

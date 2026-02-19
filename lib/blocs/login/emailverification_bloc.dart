@@ -26,7 +26,18 @@ class EmailVerificationBloc
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
     on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
     on<FieldTeleponVerificationChangedEvent>(onFieldTeleponVerificationChangedEvent);
+    on<SetIsEmailEvent>(_onSetIsEmail);
+    on<SetIsTeleponEvent>(_onSetIsTelepon);
   }
+
+  void _onSetIsEmail(SetIsEmailEvent event, Emitter<EmailVerificationState> emit) {
+    emit(state.copyWith(email: event.isEmail));
+  }
+
+  void _onSetIsTelepon(SetIsTeleponEvent event, Emitter<EmailVerificationState> emit) {
+    emit(state.copyWith(telepon: event.isTelepon));
+  }
+
 
   Future<void> onFieldEmailVerificationChangedEvent(
       FieldEmailVerificationChangedEvent event,
@@ -97,7 +108,6 @@ class EmailVerificationBloc
       }
     }
 
-    debugPrint("onTambahEmailVerification returnData: ${returnData.data}");
     emit(state.copyWith(
       isLoading: false,
       isLoaded: true,

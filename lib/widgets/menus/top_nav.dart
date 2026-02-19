@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../common/constants.dart';
+import '../../pages/notification/mobile/notification_page.dart';
 
 AppBar MobileTopNavigationBar({
   required BuildContext context,
@@ -44,48 +45,19 @@ AppBar MobileTopNavigationBar({
           ),
           Expanded(child: SizedBox()),
           GestureDetector(
-            onTap:
-            onNotifTap ??
+            onTap: onNotifTap ??
                     () {
-                  ScaffoldMessenger.of(
+                  Navigator.push(
                     context,
-                  ).showSnackBar(infoSnackBar('Notifikasi diklik!'));
-                },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/notification.svg',
-                  height: 39,
-                  width: 40,
-                ),
-                if (notifCount > 0)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(vPadding / 10),
-                      decoration: BoxDecoration(
-                        color: pRed,
-                        borderRadius: BorderRadius.circular(
-                          cardBorderRadius,
-                        ),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Text(
-                        notifCount > 99 ? '99+' : '$notifCount',
-                        style: TextStyle(
-                          fontSize: getResponsiveFont(context, 10),
-                          color: primaryLightColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationPage(),
                     ),
-                  ),
-              ],
+                  );
+                },
+            child: SvgPicture.asset(
+              'assets/icons/notification.svg',
+              height: 39,
+              width: 40,
             ),
           ),
         ],

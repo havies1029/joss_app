@@ -251,18 +251,26 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 	// Refresh / Fetch
 	// -----------------------
 
+	String buildKey({required String search, required String statusId, String? cobId}) {
+		final s = search.trim().toLowerCase();
+		final c = cobId ?? '';
+		return '$s|$c|$statusId';
+	}
+
 	Future<void> onRefreshAsetMvCari(
 			RefreshAsetMvCariEvent event,
 			Emitter<AsetMvCariState> emit,
 			) async {
-		// ✅ Fix C: jangan clear items biar nggak kedip.
+		final newKey = buildKey(search: event.searchText, statusId: event.statusId);
+
 		emit(state.copyWith(
 			status: ListStatus.initial,
 			hasReachedMax: false,
 			hal: 0,
 			searchText: event.searchText,
 			statusId: event.statusId,
-			// items tetap
+			queryKey: newKey,
+			// items: state.items  // tetap biar ga kedip
 		));
 
 		add(FetchAsetMvCariEvent());
@@ -273,44 +281,74 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			Emitter<AsetMvCariState> emit,
 			) async {
 		if (state.hasReachedMax) return;
+		if (state.isFetching) return;
 
 		final repo = AsetMvCariRepository();
+		final keyAtRequest = state.queryKey;
 
-		if (state.status == ListStatus.initial) {
-			final items = await repo.getAsetMvCari(state.statusId, state.searchText, 0);
+		emit(state.copyWith(isFetching: true));
+
+		try {
+			final nextHal = state.hal; // 0 untuk first page, dst.
+			final items = await repo.getAsetMvCari(
+				state.statusId,
+				state.searchText,
+				nextHal,
+			);
+
+			// kalau query berubah saat nunggu -> buang hasil
+			if (state.queryKey != keyAtRequest) return;
+
+			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
+			List<int> _first5IdsFrom(List<AsetMvCariModel> list) {
+				return list
+						.take(5)
+						.map((e) => e.nomor) // ganti kalau field id kamu beda
+						.toList();
+			}
+
+			if (nextHal == 0) {
+				// FIRST PAGE selalu REPLACE, bukan append
+				emit(state.copyWith(
+					items: items,
+					hasReachedMax: items.isEmpty,
+					status: ListStatus.success,
+					hal: 1,
+					isFetching: false,
+				));
+				_recomputeActiveAndFile(emit);
+				return;
+			}
+
+			if (items.isEmpty) {
+				emit(state.copyWith(hasReachedMax: true, isFetching: false));
+				return;
+			}
+
+			final merged = List.of(state.items)..addAll(items);
+
+			// ini mencegah duplikasi, tidak dibutuhkan selama be tidak punya persyaratan bahwa duplikasi tidak diuperbolehkan
+			// final result = merged
+			// 		.whereWithIndex((e, index) =>
+			// merged.indexWhere((e2) => e2.nomor == e.nomor) == index)
+			// 		.toList();
+
 			emit(state.copyWith(
-				items: items,
-				hasReachedMax: false,
+				// items: result,
+				items: merged,
 				status: ListStatus.success,
-				hal: 1,
+				hal: state.hal + 1,
+				hasReachedMax: false,
+				isFetching: false,
 			));
 
-			// setelah items update, pastikan active/file masih valid
 			_recomputeActiveAndFile(emit);
-			return;
+		} catch (_) {
+			// kalau error: isFetching false
+			if (state.queryKey == keyAtRequest) {
+				emit(state.copyWith(status: ListStatus.failure, isFetching: false));
+			}
 		}
-
-		final items = await repo.getAsetMvCari(state.statusId, state.searchText, state.hal);
-		if (items.isEmpty) {
-			emit(state.copyWith(hasReachedMax: true));
-			return;
-		}
-
-		final asetMvCari = List.of(state.items)..addAll(items);
-
-		final result = asetMvCari
-				.whereWithIndex((e, index) =>
-		asetMvCari.indexWhere((e2) => e2.asetMvId == e.asetMvId) == index)
-				.toList();
-
-		emit(state.copyWith(
-			items: result,
-			hasReachedMax: false,
-			status: ListStatus.success,
-			hal: state.hal + 1,
-		));
-
-		_recomputeActiveAndFile(emit);
 	}
 
 	// -----------------------

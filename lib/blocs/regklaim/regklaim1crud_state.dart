@@ -49,5 +49,5 @@ class Regklaim1CrudState extends Equatable {
 	}
 
 	@override
-	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, regklaim1Id, viewMode, record];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, regklaim1Id, viewMode];
 }

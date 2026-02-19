@@ -40,76 +40,76 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
         if (state.status == ListStatus.success) {
           return state.klaimRasio.cobs.isNotEmpty
               ? ListView.builder(
-                  itemCount: state.klaimRasio.cobs.length,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                  ),
-                  itemBuilder: (context, index) {
-                    final header = state.klaimRasio.cobs[index];
-                    return Container(
-                      color: secondaryBlackColor,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHeaderTitle(context, header),
-                          const SizedBox(height: hPadding),
-                          isNarrow
-                              ? ScrollbarTheme(
-                                  data: ScrollbarThemeData(
-                                    thumbVisibility:
-                                        MaterialStateProperty.all(true),
-                                    trackVisibility:
-                                        MaterialStateProperty.all(false),
-                                    thickness: MaterialStateProperty.all(5),
-                                    radius: Radius.circular(cardBorderRadius),
-                                    thumbColor: MaterialStateProperty.all(
-                                      scrollBar.withOpacity(0.25),
-                                    ),
-                                  ),
-                                  child: Scrollbar(
-                                    controller: hController,
-                                    child: SingleChildScrollView(
-                                      controller: hController,
-                                      scrollDirection: Axis.horizontal,
-                                      child: Column(
-                                        children: [
-                                          _buildDetailTableCompact(
-                                              header.details),
-                                          _buildFooterTable(
-                                              header.footers, isNarrow),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Column(
-                                  children: [
-                                    _buildDetailTableNormal(header.details),
-                                    _buildFooterTable(header.footers, isNarrow),
-                                  ],
-                                ),
-                          const SizedBox(height: hPadding),
-                          if (index == state.klaimRasio.cobs.length - 1 &&
-                              state.klaimRasio.grandcurrs.isNotEmpty)
-                            _buildGrandTotalCard(state.klaimRasio.grandcurrs),
-                        ],
+            itemCount: state.klaimRasio.cobs.length,
+            padding: EdgeInsets.symmetric(
+              horizontal: hPadding * 1.5,
+            ),
+            itemBuilder: (context, index) {
+              final header = state.klaimRasio.cobs[index];
+              return Container(
+                color: secondaryBlackColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeaderTitle(context, header),
+                    const SizedBox(height: hPadding),
+                    isNarrow
+                        ? ScrollbarTheme(
+                      data: ScrollbarThemeData(
+                        thumbVisibility:
+                        MaterialStateProperty.all(true),
+                        trackVisibility:
+                        MaterialStateProperty.all(false),
+                        thickness: MaterialStateProperty.all(5),
+                        radius: Radius.circular(cardBorderRadius),
+                        thumbColor: MaterialStateProperty.all(
+                          scrollBar.withOpacity(0.25),
+                        ),
                       ),
-                    );
-                  },
-                )
-              : const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 80.0),
-                    child: Text(
-                      'No Data Available x!!',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
+                      child: Scrollbar(
+                        controller: hController,
+                        child: SingleChildScrollView(
+                          controller: hController,
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            children: [
+                              _buildDetailTableCompact(
+                                  header.details),
+                              _buildFooterTable(
+                                  header.footers, isNarrow),
+                            ],
+                          ),
+                        ),
                       ),
+                    )
+                        : Column(
+                      children: [
+                        _buildDetailTableNormal(header.details),
+                        _buildFooterTable(header.footers, isNarrow),
+                      ],
                     ),
-                  ),
-                );
+                    const SizedBox(height: hPadding),
+                    if (index == state.klaimRasio.cobs.length - 1 &&
+                        state.klaimRasio.grandcurrs.isNotEmpty)
+                      _buildGrandTotalCard(state.klaimRasio.grandcurrs),
+                  ],
+                ),
+              );
+            },
+          )
+              : const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 80.0),
+              child: Text(
+                'No Data Available x!!',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
         } else {
           return const Center(
             child: Text(
@@ -184,11 +184,11 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
             ]),
             ...details.asMap().entries.map(
                   (e) => _detailRow(
-                    e.value,
-                    e.key,
-                    compact: true,
-                  ),
-                ),
+                e.value,
+                e.key,
+                compact: true,
+              ),
+            ),
           ],
         ),
       ),
@@ -244,11 +244,11 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
             ]),
             ...details.asMap().entries.map(
                   (e) => _detailRow(
-                    e.value,
-                    e.key,
-                    compact: false,
-                  ),
-                ),
+                e.value,
+                e.key,
+                compact: false,
+              ),
+            ),
           ],
         ),
       ),
@@ -293,22 +293,22 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
       ),
       columnWidths: compact
           ? const {
-              0: FixedColumnWidth(240),
-              1: FixedColumnWidth(50),
-              2: FixedColumnWidth(120),
-              3: FixedColumnWidth(100),
-              4: FixedColumnWidth(50),
-            }
+        0: FixedColumnWidth(240),
+        1: FixedColumnWidth(50),
+        2: FixedColumnWidth(120),
+        3: FixedColumnWidth(100),
+        4: FixedColumnWidth(50),
+      }
           : const {
-              0: FlexColumnWidth(6),
-              1: FlexColumnWidth(1.5),
-              2: FlexColumnWidth(4),
-              3: FlexColumnWidth(3),
-              4: FlexColumnWidth(1),
-            },
+        0: FlexColumnWidth(6),
+        1: FlexColumnWidth(1.5),
+        2: FlexColumnWidth(4),
+        3: FlexColumnWidth(3),
+        4: FlexColumnWidth(1),
+      },
       children: [
         ...footers.map(
-          (f) => TableRow(
+              (f) => TableRow(
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
@@ -377,25 +377,25 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
           child: isNo
               ? Center(
-                  child: Text(
-                    text,
-                    style: bodyTextStyle(context, fontSize: 15),
-                  ),
-                )
+            child: Text(
+              text,
+              style: bodyTextStyle(context, fontSize: 15),
+            ),
+          )
               : Text(
-                  text,
-                  style: bodyTextStyle(context, fontSize: 15),
-                ),
+            text,
+            style: bodyTextStyle(context, fontSize: 15),
+          ),
         );
       }).toList(),
     );
   }
 
   TableRow _detailRow(
-    KlaimrasiodetailCariModel d,
-    int index, {
-    required bool compact,
-  }) {
+      KlaimrasiodetailCariModel d,
+      int index, {
+        required bool compact,
+      }) {
     return TableRow(
       decoration: BoxDecoration(
         color: index.isEven ? pGrey : formGrey,
@@ -423,7 +423,7 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
           padding: const EdgeInsets.all(6),
           child: Text(
             "${d.periodeMulai.toString().substring(0, 10)} - "
-            "${d.periodeAkhir.toString().substring(0, 10)}",
+                "${d.periodeAkhir.toString().substring(0, 10)}",
             maxLines: compact ? 2 : null,
             overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
             style: TextStyle(color: primaryLightColor),
@@ -551,7 +551,7 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
                   ),
                   // DATA ROWS
                   ...totals.asMap().entries.map(
-                    (entry) {
+                        (entry) {
                       final index = entry.key;
                       final g = entry.value;
                       return TableRow(

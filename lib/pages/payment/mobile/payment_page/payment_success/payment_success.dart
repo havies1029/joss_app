@@ -52,7 +52,7 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
     context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
     // Navigator.popUntil(context, (route) => route.isFirst);
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const TagihanPembayaranPage()),
+      MaterialPageRoute(builder: (_) => const TagihanPembayaranPage(initialTab: 2,)),
           (route) => route.isFirst,
     );
   }

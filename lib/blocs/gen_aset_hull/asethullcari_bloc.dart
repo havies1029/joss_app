@@ -8,150 +8,6 @@ import 'package:joss_app/repositories/gen_aset_hull/asethullcari_repository.dart
 
 part 'asethullcari_event.dart';
 part 'asethullcari_state.dart';
-//
-// class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
-// 	AsethullCariBloc() : super(const AsethullCariState()) {
-// 		on<FetchAsethullCariEvent>(onFetchAsethullCari);
-// 		on<RefreshAsethullCariEvent>(onRefreshAsethullCari);
-// 		on<DebugFetchAsethullCariEvent>(_onDebugFetchAsethullCari);
-//
-// 		on<SelectHullDetailEvent>(onSelectDetail);
-// 		on<UnselectHullDetailEvent>(onUnselectDetail);
-// 		on<ClearHullSelectionEvent>(onClearSelection);
-//
-// 		on<SelectPolisHullDetailEvent>(onSelectPolisHullrDetail);
-// 		on<UnselectPolisHullDetailEvent>(onUnselectPolisHullDetail);
-// 		on<ClearPolisHullSelectionEvent>(onClearPolisHullSelection);
-// 	}
-//
-// Future<void> onRefreshAsethullCari(
-// 		RefreshAsethullCariEvent event, Emitter<AsethullCariState> emit) async {
-// 	emit(const AsethullCariState());
-//
-//   emit(state.copyWith(statusId: event.statusId, searchText: event.searchText));
-//
-// 	add(FetchAsethullCariEvent());
-// }
-//
-// Future<void> onFetchAsethullCari(
-// 		FetchAsethullCariEvent event, Emitter<AsethullCariState> emit) async {
-// 	if (state.hasReachedMax) return;
-//
-// 	AsethullCariRepository repo = AsethullCariRepository();
-// 	if (state.status == ListStatus.initial) {
-// 		List<AsethullCariModel> items = await repo.getAsethullCari(state.statusId, state.searchText, 0);
-// 		return emit(state.copyWith(
-// 			items: items,
-// 			hasReachedMax: false,
-// 			status: ListStatus.success,
-//       hal: 1
-// 			));
-// 	}
-// 	List<AsethullCariModel> items = await repo.getAsethullCari(state.statusId, state.searchText, state.hal);
-// 	if (items.isEmpty) {
-// 		return emit(state.copyWith(hasReachedMax: true));
-// 	} else {
-// 		List<AsethullCariModel> asethullCari = List.of(state.items)..addAll(items);
-//
-// 		final result = asethullCari
-// 			.whereWithIndex((e, index) =>
-// 				asethullCari.indexWhere((e2) => e2.asetHullId == e.asetHullId) ==
-// 				index)
-// 			.toList();
-//
-// 		return emit(state.copyWith(
-// 			items: result,
-// 			hasReachedMax: false,
-// 			status: ListStatus.success,
-//       hal: state.hal + 1
-// 			));
-// 		}
-//
-// 	}
-//
-// 	Future<void> _onDebugFetchAsethullCari(
-// 			DebugFetchAsethullCariEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		final repo = AsethullCariRepository();
-//
-// 		debugPrint("🚢 [DebugFetch] Mulai ambil data Hull untuk '${event.searchText}'...");
-//
-// 		try {
-// 			final results = await repo.getAsethullCari(
-// 				event.statusId,
-// 				event.searchText,
-// 				0, // offset awal
-// 			);
-//
-// 			debugPrint("✅ [DebugFetch] ${results.length} hasil ditemukan untuk '${event.searchText}'");
-// 			for (final i in results) {
-// 				debugPrint("⚓ Nama Kapal: ${i.namaKapal} | Polis: ${i.polisNo} | Curr: ${i.curr} | "
-// 						"Premi: ${i.premi} | TSI: ${i.tsi} | Status: ${i.status}");
-// 			}
-// 			debugPrint("-----------------------------------------------------");
-// 		} catch (e, stack) {
-// 			debugPrint("💥 [DebugFetch] Error saat ambil data Hull: $e");
-// 			debugPrint(stack.toString());
-// 		}
-// 	}
-//
-// 	Future<void> onSelectDetail(
-// 			SelectHullDetailEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		final updatedSelectedIds = Set<String>.from(state.selectedIds)
-// 			..add(event.asetHullId);
-//
-// 		emit(state.copyWith(selectedIds: updatedSelectedIds));
-// 	}
-//
-// 	Future<void> onUnselectDetail(
-// 			UnselectHullDetailEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		final updatedSelectedIds = Set<String>.from(state.selectedIds)
-// 			..remove(event.asetHullId);
-//
-// 		emit(state.copyWith(selectedIds: updatedSelectedIds));
-// 	}
-//
-// 	Future<void> onClearSelection(
-// 			ClearHullSelectionEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		if (state.selectedIds.isEmpty) return;
-// 		emit(state.copyWith(selectedIds: <String>{}));
-// 	}
-//
-// 	Future<void> onSelectPolisHullrDetail(
-// 			SelectPolisHullDetailEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		emit(state.copyWith(
-// 			selectedFilePolisId: event.filePolisId,
-// 		));
-// 	}
-//
-// 	Future<void> onUnselectPolisHullDetail(
-// 			UnselectPolisHullDetailEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		emit(state.copyWith(
-// 			selectedFilePolisId: "",
-// 		));
-// 	}
-//
-// 	Future<void> onClearPolisHullSelection(
-// 			ClearPolisHullSelectionEvent event,
-// 			Emitter<AsethullCariState> emit,
-// 			) async {
-// 		if (state.selectedFilePolisId.isEmpty) return;
-// 		emit(state.copyWith(
-// 			selectedFilePolisId: "",
-// 		));
-// 	}
-// }
 
 class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 	AsethullCariBloc() : super(const AsethullCariState()) {
@@ -220,18 +76,26 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 	// Refresh / Fetch
 	// -----------------------
 
+	String buildKey({required String search, required String statusId, String? cobId}) {
+		final s = search.trim().toLowerCase();
+		final c = cobId ?? '';
+		return '$s|$c|$statusId';
+	}
+
 	Future<void> onRefreshAsethullCari(
 			RefreshAsethullCariEvent event,
 			Emitter<AsethullCariState> emit,
 			) async {
-		// ✅ Fix C: jangan emit(const State()) karena itu ngilangin items dan bikin kedip.
+		final newKey = buildKey(search: event.searchText, statusId: event.statusId);
+
 		emit(state.copyWith(
 			status: ListStatus.initial,
 			hasReachedMax: false,
 			hal: 0,
-			statusId: event.statusId,
 			searchText: event.searchText,
-			// items tetap
+			statusId: event.statusId,
+			queryKey: newKey,
+			// items: state.items  // tetap biar ga kedip
 		));
 
 		add(FetchAsethullCariEvent());
@@ -242,11 +106,93 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			Emitter<AsethullCariState> emit,
 			) async {
 		if (state.hasReachedMax) return;
+		if (state.isFetching) return;
+
+		final repo = AsethullCariRepository();
+		final keyAtRequest = state.queryKey;
+
+		emit(state.copyWith(isFetching: true));
+
+		try {
+			final nextHal = state.hal; // 0 untuk first page, dst.
+			final items = await repo.getAsethullCari(
+				state.statusId,
+				state.searchText,
+				nextHal,
+			);
+
+			// kalau query berubah saat nunggu -> buang hasil
+			if (state.queryKey != keyAtRequest) return;
+
+			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
+			List<String> _first5IdsFrom(List<AsethullCariModel> list) {
+				return list
+						.take(5)
+						.map((e) => e.asetHullId) // ganti kalau field id kamu beda
+						.toList();
+			}
+
+			if (nextHal == 0) {
+				// FIRST PAGE selalu REPLACE, bukan append
+				emit(state.copyWith(
+					items: items,
+					hasReachedMax: items.isEmpty,
+					status: ListStatus.success,
+					hal: 1,
+					isFetching: false,
+				));
+				_recomputeActiveAndFile(emit);
+				return;
+			}
+
+			if (items.isEmpty) {
+				emit(state.copyWith(hasReachedMax: true, isFetching: false));
+				return;
+			}
+
+			final merged = List.of(state.items)..addAll(items);
+
+			// dedupe (kalau mau samain MV tanpa dedupe, biarkan commented)
+			// final result = merged
+			//     .whereWithIndex((e, index) =>
+			//         merged.indexWhere((e2) => e2.asetHullId == e.asetHullId) == index)
+			//     .toList();
+
+			emit(state.copyWith(
+				items: merged, // atau items: result,
+				status: ListStatus.success,
+				hal: state.hal + 1,
+				hasReachedMax: false,
+				isFetching: false,
+			));
+
+			_recomputeActiveAndFile(emit);
+		} catch (_) {
+			// kalau error: isFetching false
+			if (state.queryKey == keyAtRequest) {
+				emit(state.copyWith(status: ListStatus.failure, isFetching: false));
+			}
+		}
+	}
+
+
+	/*
+		Future<void> onFetchAsethullCari(
+			FetchAsethullCariEvent event,
+			Emitter<AsethullCariState> emit,
+			) async {
+		if (state.hasReachedMax) return;
+
+		// ✅ guard: kalau lagi loadingMore, jangan spam
+		if (state.status == ListStatus.loadingMore) return;
 
 		final repo = AsethullCariRepository();
 
+		// FIRST LOAD
 		if (state.status == ListStatus.initial) {
-			final items = await repo.getAsethullCari(state.statusId, state.searchText, 0);
+			final items =
+			await repo.getAsethullCari(state.statusId, state.searchText, 0);
+
 			emit(state.copyWith(
 				items: items,
 				hasReachedMax: false,
@@ -254,14 +200,21 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 				hal: 1,
 			));
 
-			// setelah items update, jaga active/file kalau ada selected
 			_recomputeActiveAndFile(emit);
 			return;
 		}
 
-		final items = await repo.getAsethullCari(state.statusId, state.searchText, state.hal);
+		// ✅ next page load: tandai loadingMore tapi JANGAN hapus items
+		emit(state.copyWith(status: ListStatus.loadingMore));
+
+		final items =
+		await repo.getAsethullCari(state.statusId, state.searchText, state.hal);
+
 		if (items.isEmpty) {
-			emit(state.copyWith(hasReachedMax: true));
+			emit(state.copyWith(
+				hasReachedMax: true,
+				status: ListStatus.success, // balik ke success
+			));
 			return;
 		}
 
@@ -281,6 +234,7 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 
 		_recomputeActiveAndFile(emit);
 	}
+	 */
 
 	// -----------------------
 	// Debug Fetch

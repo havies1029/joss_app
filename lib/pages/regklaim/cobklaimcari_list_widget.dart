@@ -66,19 +66,14 @@ class CobklaimcariListWidgetState extends State<CobklaimcariListWidget> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15.0)),
                 child: Column(
-                  children:
-									// <Widget>[
-                  //   CobklaimcariTileWidget(
-                  //     cobIcon: state.items[index].cobNama,
-                  //     cobNama: state.items[index].cobNama,
-                  //     isAktif: state.items[index].isAktif,
-                  //     mcobklaim1Id: state.items[index].mcobklaim1Id,
-                  //     noUrut: state.items[index].noUrut,
-                  //   )
-                  // ],
-									[
-
-									]
+                  children: <Widget>[
+                    CobklaimcariTileWidget(
+                      cobIcon: state.items[index].cobNama,
+                      cobNama: state.items[index].cobNama,
+                      isAktif: true,
+                      mcobklaim1Id: state.items[index].mcobklaim1Id, noUrut: 1,
+                    )
+                  ],
                 ),
               ),
             );

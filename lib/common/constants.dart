@@ -19,6 +19,16 @@ part '../widgets/apptheme/textstyles.dart';
 part '../widgets/apptheme/dropdown.dart';
 part '../widgets/apptheme/checkbox_widget.dart';
 
+
+DateTime? parseDate(dynamic value) {
+  if (value == null) return null;
+
+  final str = value.toString().trim();
+  if (str.isEmpty) return null;
+
+  return DateTime.tryParse(str);
+}
+
 const List<String> scopes = <String>[
   'email',
 ];
@@ -89,6 +99,7 @@ const Color bGrey = Color(0xFFA1A1AA);
 const Color bdGrey = Color(0xFFBCBCC7);
 const Color bBlue = Color(0xFF295EFF);
 const Color bdBlue = Color(0xFF5D86FF);
+const Color cGrey = Color(0xFFA1A1A1);
 
 const Color pYellow = Color(0xFFEFA728);
 const Color pBlue = Color(0xFF377BFC);
@@ -101,6 +112,11 @@ const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
+const Color excelGreen = Color(0xFF27AE68);
+const Color pdfRed = Color(0xFFDA1618);
+
+const Color transactionColor1 = Color(0xFF3C3C3C);
+const Color transactionColor2 = Color(0xFF343434);
 const Color excelGreen = Color(0xFF27AE68);
 const Color pdfRed = Color(0xFFDA1618);
 

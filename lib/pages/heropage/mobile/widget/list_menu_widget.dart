@@ -9,6 +9,7 @@ import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../management_polis/mobile/management_polis_filter.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../payment/dnsppamvcari_list.dart';
+import '../../../payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
 import '../../../payment/mobile/riwayat/riwayat_page.dart';
 import '../../../payment/rincian/rinciansoa_page.dart';
@@ -134,9 +135,6 @@ class ListMenuWidget extends StatelessWidget {
           topRight: Radius.circular(20),
         ),
         onTap: () {
-          // optional: haptic biar terasa "klik"
-          // HapticFeedback.lightImpact();
-
           context.read<AuthenticationBloc>().add(
             RequireRegisterClient(
               requiredFrom: 'daftarclient_page',
@@ -354,7 +352,9 @@ class ListMenuWidget extends StatelessWidget {
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
         // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodPage(
+          curr: "idr", totalBayar: 0,
+        )));
         break;
 
       // case 'Test Page':
@@ -374,7 +374,7 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Tagihan Pembayaran':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => TagihanPembayaranPage(initialTab: 0,)));
         break;
 
       default:

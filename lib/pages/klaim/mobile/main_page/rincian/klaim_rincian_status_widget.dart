@@ -39,39 +39,39 @@ class _KlaimRincianStatusWidgetState extends State<KlaimRincianStatusWidget> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
             context.read<MstatusrinciCariBloc>().add(
-                  SelectedIdChanged(state.items.first.mgroupstatusclaimId),
-                );
+              SelectedIdChanged(state.items.first.mgroupstatusclaimId),
+            );
           });
         }
 
         if (state.status == ListStatus.success) {
           return state.items.isNotEmpty
               ? SizedBox(
-                  height: 44,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.zero,
-                    itemCount: state.items.length,
-                    itemBuilder: (_, index) {
-                      final item = state.items[index];
-                      final id = item.mgroupstatusclaimId;
-                      final isSelected = (id == state.selectedStatusId);
+            height: 44,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemCount: state.items.length,
+              itemBuilder: (_, index) {
+                final item = state.items[index];
+                final id = item.mgroupstatusclaimId;
+                final isSelected = (id == state.selectedStatusId);
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 3),
-                        child: StatusChip(
-                          statusId: id,
-                          label: item.groupNama,
-                          isSelected: isSelected,
-                          onTap: () {
-                            mstatusrinciCariBloc.add(SelectedIdChanged(id));
-                          },
-                        ),
-                      );
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 5, vertical: 3),
+                  child: StatusChip(
+                    statusId: id,
+                    label: item.groupNama,
+                    isSelected: isSelected,
+                    onTap: () {
+                      mstatusrinciCariBloc.add(SelectedIdChanged(id));
                     },
                   ),
-                )
+                );
+              },
+            ),
+          )
               : const SizedBox.shrink();
         }
         return const SizedBox.shrink();

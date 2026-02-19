@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
-import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
-import 'package:joss_app/repositories/combobox/combormatauang_repository.dart';
 import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
@@ -47,22 +44,23 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 		return BlocConsumer<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
 			builder: (context, state) {
 				return SingleChildScrollView(
-					child:  Form(
+					child: Padding(
+						padding: const EdgeInsets.all(8.0),
+						child: Form(
 							key: _formKey,
 							child: Column(
 								children: [
+									const SizedBox(height: 10),
+									buildFieldCurrId(),
 									buildFieldDol(),
-									const SizedBox(height: hPadding),
-									buildFieldKronologis(),
-									// const SizedBox(height: hPadding),
-									// buildFieldCurrId(),
-									const SizedBox(height: hPadding),
 									buildFieldKlaimAmount(),
-									const SizedBox(height: hPadding),
 									buildFieldKlaimBayar(),
-									const SizedBox(height: 15),
+									buildFieldKronologis(),
+									const SizedBox(height: 25),
+									
 								],
 							)),
+					),
 				);
 				},
 				listener: (context, state) {
@@ -106,177 +104,79 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 	}
 
 	Widget buildFieldDol(){
-		return AppDateField(
-			label: 'Date Of Accident',
-			firstDate: DateTime(2000),
-			lastDate: DateTime(2100),
+		return DateTimeFormField(
+			mode: DateTimeFieldPickerMode.date,
+			dateFormat: DateFormat('dd/MM/yyyy'),
 			initialValue: DateTime.tryParse(fieldDolController.text),
+			decoration: const InputDecoration(
+				labelText: "dol",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value != null) {
           klaimmvklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
 				}
 			},
+			
 		);
 	}
 
-	// Widget buildFieldKlaimAmount(){
-	// 	return TextFormField(
-	// 		keyboardType: TextInputType.number,
-	// 		inputFormatters: [ThousandsSeparatorInputFormatter()],
-	// 		controller: fieldKlaimAmountController,
-	// 		decoration: const InputDecoration(
-	// 			labelText: "klaimAmount",
-	// 			floatingLabelBehavior: FloatingLabelBehavior.always,
-	// 		),
-	// 		onChanged: (value) {
-	// 			final amount = parseAmount(value);
-  //       klaimmvklaimcrudBloc.add(FieldKlaimAmountChangedEvent(klaimAmount: amount));
-	// 		},
-	// 		textAlign: TextAlign.right,
-	// 	);
-	// }
-
-	Widget buildFieldKlaimAmount() {
-		return AppCurrencyAmountField(
-			label: "Nilai Tagihan",
-			currency: fieldComboRMatauang,
-			onCurrencyChanged: (v) {
-				setState(() => fieldComboRMatauang = v);
-				if (v != null) {
-					klaimmvklaimcrudBloc.add(
-						ComboRMatauangChangedEvent(comboRMatauang: v),
-					);
-				}
-			},
-			amountController: fieldKlaimAmountController,
-			onAmountChanged: (rawText) {
-				final amount = parseAmount(rawText);
-				klaimmvklaimcrudBloc.add(
-					FieldKlaimAmountChangedEvent(klaimAmount: amount),
-				);
-			},
-			validator: (v) {
-				if (v == null || v.trim().isEmpty) return kStringNullError;
-				return null;
-			},
+	Widget buildFieldKlaimAmount(){
+		return TextFormField(
+			keyboardType: TextInputType.number,
+			inputFormatters: [ThousandsSeparatorInputFormatter()],
+			controller: fieldKlaimAmountController,
+			decoration: const InputDecoration(
+				labelText: "klaimAmount",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
+			onChanged: (value) {
+				final amount = parseAmount(value);
+        klaimmvklaimcrudBloc.add(FieldKlaimAmountChangedEvent(klaimAmount: amount));
+			},			
+			textAlign: TextAlign.right,
 		);
 	}
 
 	Widget buildFieldKlaimBayar(){
-		return appTextField(
-			label: 'Nilai Terbayar',
+		return TextFormField(
       enabled: false,
 			keyboardType: TextInputType.number,
 			inputFormatters: [ThousandsSeparatorInputFormatter()],
 			controller: fieldKlaimBayarController,
+			decoration: const InputDecoration(
+				labelText: "klaimBayar",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
+		
+			textAlign: TextAlign.right,
 		);
 	}
 
 	Widget buildFieldKronologis(){
-		return appTextField(
-			label: 'Kronologis Kejadian',
+		return TextFormField(
 			keyboardType: TextInputType.multiline,
+			minLines: 5,
 			maxLines: 10,
 			controller: fieldKronologisController,
+			decoration: const InputDecoration(
+				labelText: "kronologis",
+				floatingLabelBehavior: FloatingLabelBehavior.always,
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 				  klaimmvklaimcrudBloc.add(FieldKronologisChangedEvent(kronologis: value));
 				}
 			},
+			
 		);
 	}
 
 double parseAmount(String s) {
-  final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), '');
+  final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), ''); // buang koma/spasi/dll
   if (cleaned.isEmpty) return 0;
   return double.tryParse(cleaned) ?? 0;
 }
 
 
-}
-
-class AppCurrencyAmountField extends StatelessWidget {
-	final String label;
-	final ComboRMatauangModel? currency;
-	final ValueChanged<ComboRMatauangModel?> onCurrencyChanged;
-
-	final TextEditingController amountController;
-	final ValueChanged<String> onAmountChanged;
-	final FormFieldValidator<String>? validator;
-
-	const AppCurrencyAmountField({
-		super.key,
-		required this.label,
-		required this.currency,
-		required this.onCurrencyChanged,
-		required this.amountController,
-		required this.onAmountChanged,
-		this.validator,
-	});
-
-	@override
-	Widget build(BuildContext context) {
-		return Column(
-			crossAxisAlignment: CrossAxisAlignment.start,
-			children: [
-				Text(label, style: inputTextStyle(context)),
-				const SizedBox(height: 6),
-
-				Container(
-					height: 50,
-					decoration: BoxDecoration(
-						color: formGrey,
-						borderRadius: BorderRadius.circular(cardBorderRadius),
-						border: Border.all(color: sGrey),
-					),
-					child: Row(
-						children: [
-							Padding(
-								padding: const EdgeInsets.all(5),
-								child: SizedBox(
-									width: 100,
-									child: ReusableComboBox<ComboRMatauangModel>(
-										hintText: "",
-										initItem: currency,
-										displayText: (m) => m.rmatauangSimbol,
-										compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-										dataLoader: () =>
-												ComboRMatauangRepository().getComboRMatauang(),
-										enableSearch: false,
-										onChangedCallback: onCurrencyChanged,
-										onSaveCallback: onCurrencyChanged,
-										maxHeight: 200,
-									),
-								),
-							),
-
-							Container(width: 1, height: 30, color: sGrey),
-
-							Expanded(
-								child: TextFormField(
-									controller: amountController,
-									keyboardType: TextInputType.number,
-									textAlign: TextAlign.right,
-									inputFormatters: [
-										FilteringTextInputFormatter.digitsOnly,
-										ThousandsSeparatorInputFormatter(),
-									],
-									onChanged: onAmountChanged,
-									validator: validator,
-									cursorColor: primaryLightColor,
-									style: bodyTextStyle(context),
-									decoration: const InputDecoration(
-										hintText: "0",
-										border: InputBorder.none,
-										contentPadding:
-										EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-									),
-								),
-							),
-						],
-					),
-				),
-			],
-		);
-	}
 }

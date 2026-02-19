@@ -104,6 +104,19 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   //form3
 
   @override
+  void initState() {
+    super.initState();
+
+    // default passenger count = 1
+    selectedPassengerCount = selectedPassengerCount.trim().isEmpty ? "1" : selectedPassengerCount;
+
+    // default AW = 0.01
+    if (fieldAwController.text.trim().isEmpty) {
+      fieldAwController.text = "0.01";
+    }
+  }
+
+  @override
   void dispose() {
     //form1
     fieldCoverBulanController.dispose();
@@ -798,21 +811,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     bool ok = true;
     clearErrsByPrefix('form2.');
 
-    // TPL (required, > 0)
-    final tplRaw = fieldTplController.text.trim();
-    if (tplRaw.isEmpty) {
-      setErr('form2.tpl', kStringNullError);
-      ok = false;
-    } else {
-      final clean = tplRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.tpl', "Tidak Boleh Minus");
-        ok = false;
-      }
-    }
-
-    // AW (required, 0..100)
+    // AW (required, 0..100) - default 0.01 dari initState
     final awRaw = fieldAwController.text.trim();
     if (awRaw.isEmpty) {
       setErr('form2.aw', kStringNullError);
@@ -831,55 +830,68 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       }
     }
 
-    // Passenger Count (required)
+    // Passenger Count (required) - default 1 dari initState
     if (selectedPassengerCount.trim().isEmpty) {
       setErr('form2.passengerCount', kStringNullError);
       ok = false;
     }
 
-    // PAD (optional, >=0)
-    final padRaw = fieldPadController.text.trim();
-    if (padRaw.isEmpty) {
-      setErr('form2.pad', kStringNullError);
-      ok = false;
-    } else {
-      final clean = padRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.pad', "Tidak Boleh Minus");
-        ok = false;
-      }
-    }
+    // ---- GROUP RULE: TPL/PAD/PAP/PLL -> minimal isi 1 ----
+    String cleanNum(String v) => v.replaceAll(",", "").trim();
 
-    final papRaw = fieldPapController.text.trim();
-    if (papRaw.isEmpty) {
-      setErr('form2.pap', kStringNullError);
-      ok = false;
-    } else {
-      final clean = papRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.pap', "Tidak Boleh Minus");
-        ok = false;
-      }
-    }
+    final tplC = cleanNum(fieldTplController.text);
+    final padC = cleanNum(fieldPadController.text);
+    final papC = cleanNum(fieldPapController.text);
+    final pllC = cleanNum(fieldPllController.text);
 
-    // PLL (optional, >=0)
-    final pllRaw = fieldPllController.text.trim();
-    if (pllRaw.isEmpty) {
-      setErr('form2.pll', kStringNullError);
+    final allEmpty = tplC.isEmpty && padC.isEmpty && papC.isEmpty && pllC.isEmpty;
+
+    if (allEmpty) {
+      const msg = "Isi minimal salah satu (TPL/PAD/PAP/PLL)";
+      setErr('form2.tpl', msg);
+      setErr('form2.pad', msg);
+      setErr('form2.pap', msg);
+      setErr('form2.pll', msg);
       ok = false;
     } else {
-      final clean = pllRaw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
-        setErr('form2.pll', "Tidak Boleh Minus");
-        ok = false;
+      // helper validate + auto default 0 untuk yang kosong
+      bool validateOrDefaultZero({
+        required String key,
+        required TextEditingController controller,
+      }) {
+        final c = cleanNum(controller.text);
+
+        if (c.isEmpty) {
+          controller.text = "0";       // auto default
+          clearErr(key);
+          return true;
+        }
+
+        final angka = double.tryParse(c);
+        if (angka == null) {
+          setErr(key, "Format tidak valid");
+          return false;
+        }
+        if (angka < 0) {
+          setErr(key, "Tidak boleh minus");
+          return false;
+        }
+
+        clearErr(key);
+        return true;
       }
+
+      final a = validateOrDefaultZero(key: 'form2.tpl', controller: fieldTplController);
+      final b = validateOrDefaultZero(key: 'form2.pad', controller: fieldPadController);
+      final c = validateOrDefaultZero(key: 'form2.pap', controller: fieldPapController);
+      final d = validateOrDefaultZero(key: 'form2.pll', controller: fieldPllController);
+
+      if (!(a && b && c && d)) ok = false;
     }
 
     return ok;
   }
+
 
   Future<void> onLanjutkanPressed() async {
     if (context.read<Calmv1ListBloc>().state.isProcessing) return;
@@ -1061,6 +1073,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         return newValue;
       }),
     ],
+
     errorText: err('form2.aw'),
     validator: (_) => err('form2.aw'),
     onChanged: (v) {
@@ -1083,6 +1096,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     errorText: err('form2.pad'),
     validator: (_) => err('form2.pad'),
     onChanged: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka >= 0) clearErr('form2.pad');
@@ -1100,6 +1118,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     errorText: err('form2.pap'),
     validator: (_) => err('form2.pap'),
     onChanged: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka >= 0) clearErr('form2.pap');
@@ -1142,6 +1165,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     errorText: err('form2.pll'),
     validator: (_) => err('form2.pll'),
     onChanged: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka >= 0) {
@@ -1161,6 +1189,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     errorText: err('form2.tpl'),
     validator: (_) => err('form2.tpl'),
     onChanged: (v) {
+      clearErr('form2.tpl');
+      clearErr('form2.pad');
+      clearErr('form2.pap');
+      clearErr('form2.pll');
+
       final clean = v.replaceAll(",", "").trim();
       final angka = double.tryParse(clean);
       if (angka != null && angka >= 0) {

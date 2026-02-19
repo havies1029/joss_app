@@ -13,7 +13,9 @@ import '../literasi/mobile/tentang_jps_page.dart';
 import '../literasi/mobile/testimoni_page.dart';
 
 class TagihanPembayaranPage extends StatefulWidget {
-  const TagihanPembayaranPage({super.key});
+  final int initialTab; // 0=Ringkasan, 1=Rincian, 2=Riwayat
+
+  const TagihanPembayaranPage({super.key, required this.initialTab});
 
   @override
   _TagihanPembayaranPageState createState() => _TagihanPembayaranPageState();
@@ -42,6 +44,9 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
   @override
   void initState() {
     super.initState();
+    final maxIndex = tabItems.length - 1;
+    selectedTab = widget.initialTab.clamp(0, maxIndex);
+
     _animationController = AnimationController(
       duration: defaultDuration,
       vsync: this,

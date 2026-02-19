@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:joss_app/common/app_data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/common/constants.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfx/pdfx.dart';
 
 class Klaim5cariTileWidget extends StatelessWidget {
   final String mjenisdocId;
@@ -59,21 +58,24 @@ class Klaim5cariTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardBg = const Color(0xFF2F2F2F);
+    final border = Colors.white.withOpacity(0.12);
+
     final displayName = fileName ?? _inferName(localPath, fileUrl) ?? 'Belum ada file';
     final displaySize = fileSizeBytes != null ? _formatBytes(fileSizeBytes!) : null;
 
     return InkWell(
       onTap: onPreview,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: sGrey),
+          color: cardBg,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: border),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ===== thumbnail kiri =====
             _Thumb(
@@ -82,7 +84,7 @@ class Klaim5cariTileWidget extends StatelessWidget {
               isImage: isImage,
               isPdf: isPdf,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
 
             // ===== kanan: info + buttons =====
             Expanded(
@@ -94,41 +96,39 @@ class Klaim5cariTileWidget extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          jenisNama,
-                          style: headingStyle(context, fontSize: 16)
+                          jenisNama.isNotEmpty ? jenisNama : jenisDocLain,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                       if (hasFile)
                         Container(
-                          width: 14,
-                          height: 14,
+                          width: 18,
+                          height: 18,
                           decoration: const BoxDecoration(
-                            color: Color(0xFF34C759),
+                            color: Color(0xFF22C55E),
                             shape: BoxShape.circle,
                           ),
-                          child: SvgPicture.asset(
-                            "assets/icons/checklist2.svg",
-                            width: 13,
-                            height: 13,
-                            colorFilter: const ColorFilter.mode(
-                              primaryLightColor,
-                              BlendMode.srcIn,
-                            ),
-                          ),
+                          child: const Icon(Icons.check, size: 13, color: Colors.white),
                         ),
                     ],
                   ),
+                  const SizedBox(height: 4),
+
                   Text(
                     displayName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: bodyTextStyle(context, fontSize: 14).copyWith(color: cardGrey),
+                    style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 12),
                   ),
                   if (displaySize != null) ...[
                     const SizedBox(height: 2),
                     Text(
                       'Ukuran: $displaySize',
-                      style: bodyTextStyle(context, fontSize: 14).copyWith(color: cardGrey),
+                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
                     ),
                   ],
 
@@ -137,56 +137,35 @@ class Klaim5cariTileWidget extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: AppButton.iconLeft(
-                          text: 'Ambil Fie',
-                          icon: SvgPicture.asset(
-                            "assets/icons/btn_lapor_klaim.svg",
-                            width: 14,
-                            height: 14,
-                            colorFilter: const ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          backgroundColor: sGrey,
-                          textStyle: headingStyle(context, fontSize: 14),
-                          padding: const EdgeInsets.all(10),
-                          onPressed: onPickFile,
+                        child: _DocButton(
+                          label: hasFile
+                              ? 'Ganti File'
+                              : 'Ambil File',
+                          icon: Icons.insert_drive_file_outlined,
+                          bg: const Color(0xFF4A4A4A),
+                          fg: Colors.white,
+                          onTap: onPickFile,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 12),
 
                       // kalau sudah ada file: tampilkan Hapus (merah)
                       // kalau belum ada file: tampilkan Ambil Foto (oranye)
                       Expanded(
                         child: hasFile
-                            ? AppButton.iconLeft(
-                          text: 'Hapus',
-                          icon: SvgPicture.asset(
-                            "assets/icons/btn_delete.svg",
-                            width: 14,
-                            height: 14,
-                          ),
-                          backgroundColor: const Color(0xFFFF383C),
-                          textStyle: headingStyle(context, fontSize: 14),
-                          padding: const EdgeInsets.all(10),
-                          onPressed: onDelete,
+                            ? _DocButton(
+                          label: 'Hapus',
+                          icon: Icons.delete_outline,
+                          bg: const Color(0xFFEF4444),
+                          fg: Colors.white,
+                          onTap: onDelete,
                         )
-                            : AppButton.iconLeft(
-                          text: 'Ambil Foto',
-                          icon: SvgPicture.asset(
-                            "assets/icons/camera icon.svg",
-                            width: 14,
-                            height: 14,
-                            colorFilter: const ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          backgroundColor: primaryColor,
-                          textStyle: headingStyle(context, fontSize: 14),
-                          padding: const EdgeInsets.all(10),
-                          onPressed: onPickPhoto,
+                            : _DocButton(
+                          label: 'Ambil Foto',
+                          icon: Icons.photo_camera_outlined,
+                          bg: const Color(0xFFF28C28),
+                          fg: Colors.white,
+                          onTap: onPickPhoto,
                         ),
                       ),
                     ],
@@ -232,23 +211,35 @@ class _Thumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const w = 86.0;
+    const h = 68.0;
+    final bg = const Color(0xFF1F1F1F);
+    final border = Colors.white.withOpacity(0.10);
+
     Widget child;
 
     final hasLocal = localPath != null && localPath!.isNotEmpty;
     final hasUrl = fileUrl != null && fileUrl!.isNotEmpty;
-
+    //debugPrint("fileUrl: $fileUrl");
     if (isImage && hasLocal) {
       child = Image.file(File(localPath!), fit: BoxFit.cover);
     } else if (isPdf && hasLocal) {
-      child = _PdfThumbImage(path: localPath!, width: 90, height: 90);
+      child = _PdfThumbImage(path: localPath!, width: w, height: h);
     } else if (isImage && hasUrl) {
-      child = Image.network(
-        fileUrl!,
+      child = Image(
+        image: NetworkImage(
+          fileUrl!,
+          headers: {
+            'Authorization': 'Bearer ${AppData.userToken}',
+          },
+        ),
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => _FileIconPlaceholder(isPdf: isPdf, isImage: isImage),
-        loadingBuilder: (ctx, wdg, progress) {
-          if (progress == null) return wdg;
-          return const Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)));
+        loadingBuilder: (ctx, child, progress) {
+          if (progress == null) return child;
+          return const Center(
+            child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+          );
         },
       );
     } else {
@@ -259,11 +250,11 @@ class _Thumb extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        width: 90,
-        height: 90,
+        width: w,
+        height: h,
         decoration: BoxDecoration(
-          color: pGrey,
-          border: Border.all(color: sGrey),
+          color: bg,
+          border: Border.all(color: border),
         ),
         child: child,
       ),
@@ -271,7 +262,7 @@ class _Thumb extends StatelessWidget {
   }
 }
 
-  class _FileIconPlaceholder extends StatelessWidget {
+class _FileIconPlaceholder extends StatelessWidget {
   final bool isPdf;
   final bool isImage;
   const _FileIconPlaceholder({required this.isPdf, required this.isImage});
@@ -289,14 +280,14 @@ class _Thumb extends StatelessWidget {
     }
 
     return Container(
-      color: pGrey,
+      color: const Color(0xFF101010),
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: Colors.white70, size: 26),
           const SizedBox(height: 4),
-          Text(label, style: bodyTextStyle(context, fontSize: 14)),
+          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w800)),
         ],
       ),
     );
@@ -334,7 +325,7 @@ class _DocButton extends StatelessWidget {
           disabledBackgroundColor: bg,
           disabledForegroundColor: fg,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -352,28 +343,46 @@ class _PdfThumbImage extends StatelessWidget {
     required this.height,
   });
 
+  Future<Uint8List?> _renderPage1() async {
+    final doc = await PdfDocument.openFile(path);
+    final page = await doc.getPage(1);
+
+    final img = await page.render(
+      width: (width * 2).toDouble(),
+      height: (height * 2).toDouble(),
+      format: PdfPageImageFormat.png,
+    );
+
+    await page.close();
+    await doc.close();
+    return img?.bytes;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      color: const Color(0xFF101010),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.picture_as_pdf_outlined, color: Colors.white70, size: 26),
-          SizedBox(height: 4),
-          Text(
-            "PDF",
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
+    return FutureBuilder<Uint8List?>(
+      future: _renderPage1(),
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return Container(
+            width: width,
+            height: height,
+            color: const Color(0xFF101010),
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-          ),
-        ],
-      ),
+          );
+        }
+        return Image.memory(
+          snap.data!,
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+        );
+      },
     );
   }
 }

@@ -27,6 +27,8 @@ class RingkasanDetailTableWidgetState
     _scrollController.addListener(_onScroll);
   }
 
+  late String? curr;
+
   @override
   void dispose() {
     _scrollController
@@ -45,6 +47,8 @@ class RingkasanDetailTableWidgetState
           if (state.items.isEmpty) {
             return const Center(child: Text("No Data Available!!"));
           }
+          final items = state.items;
+          final curr = items.isNotEmpty ? items.first.currSimbol : "";
 
           return Column(
             children: [
@@ -56,7 +60,7 @@ class RingkasanDetailTableWidgetState
                   ),
                 ),
               ),
-              _buildBottomButton(context),
+              _buildBottomButton(context, curr: curr),
             ],
           );
         }
@@ -67,7 +71,7 @@ class RingkasanDetailTableWidgetState
     );
   }
 
-  Widget _buildBottomButton(BuildContext context) {
+  Widget _buildBottomButton(BuildContext context, {required String curr}) {
     return AppButton.primary(
       text: "Lanjut Pembayaran",
       onPressed: () {
@@ -81,10 +85,11 @@ class RingkasanDetailTableWidgetState
         }
 
         context.read<DnRekap2invBloc>().add(
-              DnToInvByListCobProcessEvent(
-                listCob: dnrekapcobCariBloc.state.selectedIds.join(";"),
-              ),
-            );
+          DnToInvByListCobProcessEvent(
+            listCob: dnrekapcobCariBloc.state.selectedIds.join(";"),
+            curr: curr,
+          ),
+        );
       },
     );
   }

@@ -91,6 +91,7 @@ class appTextField extends StatelessWidget {
       enabled: enabled,
       maxLines: maxLines ?? 1,
       keyboardType: keyboardType,
+      obscuringCharacter: '*',
       inputFormatters: _getDefaultFormatters(),
       onTap: onTap,
       onChanged: onChanged,

@@ -503,7 +503,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       return;
     }
 
-    // selain 10001-10005 => Others/Kargo
+
     context.read<AsetothersCariBloc>().add(
       RefreshAsetothersCariEvent(
         statusId: statusId,

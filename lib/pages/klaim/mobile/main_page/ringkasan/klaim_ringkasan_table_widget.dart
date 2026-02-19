@@ -38,30 +38,30 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
         if (state.status == ListStatus.success) {
           return state.items.isNotEmpty
               ? Padding(
-                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: hPadding),
-                      isNarrow
-                          ? _buildDetailTableCompact(state.items)
-                          : _buildDetailTableNormal(state.items),
-                      const SizedBox(height: hPadding),
-                    ],
-                  ),
-                )
+            padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+            child: Column(
+              children: [
+                const SizedBox(height: hPadding),
+                isNarrow
+                    ? _buildDetailTableCompact(state.items)
+                    : _buildDetailTableNormal(state.items),
+                const SizedBox(height: hPadding),
+              ],
+            ),
+          )
               : const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 80.0),
-                    child: Text(
-                      'No Data Available x!!',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
+            child: Padding(
+              padding: EdgeInsets.only(top: 80.0),
+              child: Text(
+                'No Data Available x!!',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
         } else {
           return const Center(
             child: Text(
@@ -115,11 +115,11 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
                 context, ["NO", "KATEGORI", "JUMLAH\n KLAIM", "TOTAL NILAI"]),
             ...details.asMap().entries.map(
                   (e) => _detailRow(
-                    e.value,
-                    e.key,
-                    compact: true,
-                  ),
-                ),
+                e.value,
+                e.key,
+                compact: true,
+              ),
+            ),
           ],
         ),
       ),
@@ -159,11 +159,11 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
                 context, ["NO", "KATEGORI", "JUMLAH\NKLAIM", "TOTAL NILAI"]),
             ...details.asMap().entries.map(
                   (e) => _detailRow(
-                    e.value,
-                    e.key,
-                    compact: false,
-                  ),
-                ),
+                e.value,
+                e.key,
+                compact: false,
+              ),
+            ),
           ],
         ),
       ),
@@ -180,25 +180,25 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
           child: isNo
               ? Center(
-                  child: Text(
-                    text,
-                    style: bodyTextStyle(context, fontSize: 15),
-                  ),
-                )
+            child: Text(
+              text,
+              style: bodyTextStyle(context, fontSize: 15),
+            ),
+          )
               : Text(
-                  text,
-                  style: bodyTextStyle(context, fontSize: 15),
-                ),
+            text,
+            style: bodyTextStyle(context, fontSize: 15),
+          ),
         );
       }).toList(),
     );
   }
 
   TableRow _detailRow(
-    KlaimringkasCariModel d,
-    int index, {
-    required bool compact,
-  }) {
+      KlaimringkasCariModel d,
+      int index, {
+        required bool compact,
+      }) {
     return TableRow(
       decoration: BoxDecoration(
         color: index.isEven ? pGrey : formGrey,

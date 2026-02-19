@@ -14,6 +14,8 @@ class AsetParCariState extends Equatable {
 	final String selectedId;
 	final AsetParCariModel? selectedItem;
 	final String? selectedProsesId;
+	final String queryKey;
+	final bool isFetching;
 
 	const AsetParCariState({
 		this.status = ListStatus.initial,
@@ -29,6 +31,8 @@ class AsetParCariState extends Equatable {
 		this.selectedId = "",
 		this.selectedItem,
 		this.selectedProsesId,
+		this.queryKey = '',
+		this.isFetching = false,
 	});
 
 	const AsetParCariState.success(List<AsetParCariModel> items)
@@ -50,11 +54,10 @@ class AsetParCariState extends Equatable {
 		String? selectedFilePolisEqId,
 		String? activeAsetParId,
 		String? selectedId,
-
-		// penting: Object? biar bisa distinguish "tidak diisi" vs "sengaja null"
 		Object? selectedItem = _unset,
-
 		String? selectedProsesId,
+		String? queryKey,
+		bool? isFetching,
 	}) {
 		return AsetParCariState(
 			items: items ?? this.items,
@@ -68,13 +71,12 @@ class AsetParCariState extends Equatable {
 			selectedFilePolisEqId: selectedFilePolisEqId ?? this.selectedFilePolisEqId,
 			activeAsetParId: activeAsetParId ?? this.activeAsetParId,
 			selectedId: selectedId ?? this.selectedId,
-
-			// ini inti fix-nya
 			selectedItem: identical(selectedItem, _unset)
 					? this.selectedItem
 					: selectedItem as AsetParCariModel?,
-
 			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
+			queryKey: queryKey ?? this.queryKey,
+			isFetching: isFetching ?? this.isFetching,
 		);
 	}
 
@@ -93,5 +95,7 @@ class AsetParCariState extends Equatable {
 		selectedId,
 		selectedItem,
 		selectedProsesId,
+		queryKey,
+		isFetching,
 	];
 }

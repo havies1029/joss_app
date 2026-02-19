@@ -9,11 +9,12 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
-import 'package:joss_app/pages/klaim/mobile/rincian/klaim_rincian_status_widget.dart';
-import 'package:joss_app/pages/klaim/mobile/rincian/klaim_rincian_table_widget.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
+
+import 'klaim_rincian_status_widget.dart';
+import 'klaim_rincian_table_widget.dart';
 
 class KlaimRincianMainPage extends StatefulWidget {
   const KlaimRincianMainPage({super.key});
@@ -61,10 +62,17 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     return MultiBlocListener(
       listeners: [
         BlocListener<MstatusrinciCariBloc, MstatusrinciCariState>(
-          listenWhen: (previous, current) =>
-              previous.selectedStatusId != current.selectedStatusId,
-          listener: (context, state) => _refreshData(),
-        ),
+            listener: (context, state) {
+              // Ketika selectedStatusId berubah, refresh data KlaimringkasCariBloc
+              context.read<GroupcobCariBloc>().add(
+                RefreshGroupcobCariEvent(
+                  statusId: state.selectedStatusId, searchText: state.searchText,
+                ),
+              );
+            }, listenWhen: (previous, current) {
+          return ((previous.selectedStatusId != current.selectedStatusId) ||
+              (previous.searchText != current.searchText));
+        }),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -199,12 +207,12 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) =>
           FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-          child: child,
-        ),
-      ),
+            opacity: animation,
+            child: ScaleTransition(
+              scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+              child: child,
+            ),
+          ),
     );
   }
 
@@ -221,10 +229,10 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   }
 
   Future<void> _exportData(
-    BuildContext context,
-    ExportFormat format,
-    List<Map<String, dynamic>> data,
-  ) async {
+      BuildContext context,
+      ExportFormat format,
+      List<Map<String, dynamic>> data,
+      ) async {
     final ext = format == ExportFormat.excel ? "xlsx" : "pdf";
     final fileName =
         "KlaimRincian_${DateTime.now().millisecondsSinceEpoch}.$ext";

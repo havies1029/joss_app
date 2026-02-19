@@ -1,8 +1,10 @@
 
+import '../../common/constants.dart';
+
 class Regendors2CariModel {
 	String regendors2Id;
 	String remarks;
-	DateTime tglStatus;
+	DateTime? tglStatus;
 	String progressNama;
 
 	Regendors2CariModel({
@@ -11,20 +13,17 @@ class Regendors2CariModel {
 
 	factory Regendors2CariModel.fromJson(Map<String, dynamic> data) {
 		return Regendors2CariModel(
-				regendors2Id: data['regendors2Id']??'',
-				remarks: data['remarks']??'',
-				tglStatus: DateTime.tryParse(data['tglStatus'].toString())??DateTime.now(),
-				progressNama: data['progressNama']??''
+			regendors2Id: data['regendors2Id'] ?? '',
+			remarks: data['remarks'] ?? '',
+			tglStatus: parseDate(data['tglStatus']),
+			progressNama: data['progressNama'] ?? '',
 		);
-
 	}
 
-	Map<String, dynamic> toJson() =>
-			{
-				'regendors2Id': regendors2Id,
-				'remarks': remarks,
-				'tglStatus': tglStatus.toIso8601String(),
-				'progressNama': progressNama,
-			};
-
+	Map<String, dynamic> toJson() => {
+		'regendors2Id': regendors2Id,
+		'remarks': remarks,
+		'tglStatus': tglStatus?.toIso8601String(),
+		'progressNama': progressNama,
+	};
 }

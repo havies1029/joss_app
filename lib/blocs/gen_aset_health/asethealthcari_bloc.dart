@@ -8,166 +8,6 @@ import 'package:joss_app/repositories/gen_aset_health/asethealthcari_repository.
 
 part 'asethealthcari_event.dart';
 part 'asethealthcari_state.dart';
-//
-// class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState> {
-// 	AsetHealthCariBloc() : super(const AsetHealthCariState()) {
-// 		on<FetchAsetHealthCariEvent>(onFetchAsetHealthCari);
-// 		on<RefreshAsetHealthCariEvent>(onRefreshAsetHealthCari);
-// 		on<DebugFetchAsetHealthCariEvent>(_onDebugFetchAsetHealthCari);
-//
-// 		on<SelectHealthDetailEvent>(onSelectDetail);
-// 		on<UnselectHealthDetailEvent>(onUnselectDetail);
-// 		on<ClearHealthSelectionEvent>(onClearSelection);
-//
-// 		on<SelectPolisHealthDetailEvent>(onSelectPolisHealthDetail);
-// 		on<UnselectPolisHealthDetailEvent>(onUnselectPolisHealthDetail);
-// 		on<ClearPolisHealthSelectionEvent>(onClearPolisHealthSelection);
-// 	}
-//
-// 	// 🔁 Normal Refresh (memperbarui tabel)
-// 	Future<void> onRefreshAsetHealthCari(
-// 			RefreshAsetHealthCariEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		emit(const AsetHealthCariState());
-// 		emit(state.copyWith(statusId: event.statusId, searchText: event.searchText));
-// 		add(FetchAsetHealthCariEvent());
-// 	}
-//
-// 	// 📦 Normal Fetch (memperbarui state)
-// 	Future<void> onFetchAsetHealthCari(
-// 			FetchAsetHealthCariEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		if (state.hasReachedMax) return;
-//
-// 		final repo = AsetHealthCariRepository();
-//
-// 		if (state.status == ListStatus.initial) {
-// 			final items = await repo.getAsetHealthCari(
-// 				state.statusId,
-// 				state.searchText,
-// 				0,
-// 			);
-//
-// 			return emit(state.copyWith(
-// 				items: items,
-// 				hasReachedMax: false,
-// 				status: ListStatus.success,
-// 				hal: 1,
-// 			));
-// 		}
-//
-// 		final items = await repo.getAsetHealthCari(
-// 			state.statusId,
-// 			state.searchText,
-// 			state.hal,
-// 		);
-//
-// 		if (items.isEmpty) {
-// 			return emit(state.copyWith(hasReachedMax: true));
-// 		} else {
-// 			final asetHealthCari = List.of(state.items)..addAll(items);
-//
-// 			final result = asetHealthCari
-// 					.whereWithIndex(
-// 						(e, index) =>
-// 				asetHealthCari.indexWhere(
-// 								(e2) => e2.asethealthId == e.asethealthId) ==
-// 						index,
-// 			)
-// 					.toList();
-//
-// 			return emit(state.copyWith(
-// 				items: result,
-// 				hasReachedMax: false,
-// 				status: ListStatus.success,
-// 				hal: state.hal + 1,
-// 			));
-// 		}
-// 	}
-//
-//
-// 	// 🧠 Debug Fetch (tidak mengubah state UI)
-// 	Future<void> _onDebugFetchAsetHealthCari(
-// 			DebugFetchAsetHealthCariEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		final repo = AsetHealthCariRepository();
-//
-// 		debugPrint("🔍 [DebugFetch] Memulai fetch debug untuk '${event.searchText}'...");
-//
-// 		try {
-// 			final results = await repo.getAsetHealthCari(event.statusId, event.searchText, 0);
-//
-// 			debugPrint("✅ [DebugFetch] ${results.length} hasil ditemukan untuk '${event.searchText}'");
-// 			for (final i in results) {
-// 				debugPrint("➡️ ${i.nama} | Polis: ${i.polisNo} | Status: ${i.status}");
-// 			}
-// 			debugPrint("-----------------------------------------------------");
-// 		} catch (e, stack) {
-// 			debugPrint("💥 [DebugFetch] Error: $e");
-// 			debugPrint(stack.toString());
-// 		}
-// 	}
-//
-// 	Future<void> onSelectDetail(
-// 			SelectHealthDetailEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		final updatedSelectedIds = Set<String>.from(state.selectedIds)
-// 			..add(event.asethealthId);
-//
-// 		emit(state.copyWith(selectedIds: updatedSelectedIds));
-// 	}
-//
-// 	Future<void> onUnselectDetail(
-// 			UnselectHealthDetailEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		final updatedSelectedIds = Set<String>.from(state.selectedIds)
-// 			..remove(event.asethealthId);
-//
-// 		emit(state.copyWith(selectedIds: updatedSelectedIds));
-// 	}
-//
-// 	Future<void> onClearSelection(
-// 			ClearHealthSelectionEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		if (state.selectedIds.isEmpty) return;
-// 		emit(state.copyWith(selectedIds: <String>{}));
-// 	}
-//
-//
-// 	Future<void> onSelectPolisHealthDetail(
-// 			SelectPolisHealthDetailEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		emit(state.copyWith(
-// 			selectedFilePolisId: event.filePolisId,
-// 		));
-// 	}
-//
-// 	Future<void> onUnselectPolisHealthDetail(
-// 			UnselectPolisHealthDetailEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		emit(state.copyWith(
-// 			selectedFilePolisId: "",
-// 		));
-// 	}
-//
-// 	Future<void> onClearPolisHealthSelection(
-// 			ClearPolisHealthSelectionEvent event,
-// 			Emitter<AsetHealthCariState> emit,
-// 			) async {
-// 		if (state.selectedFilePolisId.isEmpty) return;
-// 		emit(state.copyWith(
-// 			selectedFilePolisId: "",
-// 		));
-// 	}
-// }
 
 class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState> {
 	AsetHealthCariBloc() : super(const AsetHealthCariState()) {
@@ -240,20 +80,28 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 	// Refresh / Fetch
 	// -----------------------
 
+	String buildKey({required String search, required String statusId, String? cobId}) {
+		final s = search.trim().toLowerCase();
+		final c = cobId ?? '';
+		return '$s|$c|$statusId';
+	}
+
 	Future<void> onRefreshAsetHealthCari(
 			RefreshAsetHealthCariEvent event,
 			Emitter<AsetHealthCariState> emit,
 			) async {
 		// ✅ Fix C: jangan emit(const State()) supaya UI nggak kedip kosong
+		final newKey = buildKey(search: event.searchText, statusId: event.statusId);
+
 		emit(state.copyWith(
 			status: ListStatus.initial,
 			hasReachedMax: false,
 			hal: 0,
-			statusId: event.statusId,
 			searchText: event.searchText,
-			// items tetap
+			statusId: event.statusId,
+			queryKey: newKey,
+			// items: state.items  // tetap biar ga kedip
 		));
-
 		add(FetchAsetHealthCariEvent());
 	}
 
@@ -262,11 +110,92 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			Emitter<AsetHealthCariState> emit,
 			) async {
 		if (state.hasReachedMax) return;
+		if (state.isFetching) return;
+
+		final repo = AsetHealthCariRepository();
+		final keyAtRequest = state.queryKey;
+
+		emit(state.copyWith(isFetching: true));
+
+		try {
+			final nextHal = state.hal; // 0 untuk first page, dst.
+			final items = await repo.getAsetHealthCari(
+				state.statusId,
+				state.searchText,
+				nextHal,
+			);
+
+			// kalau query berubah saat nunggu -> buang hasil
+			if (state.queryKey != keyAtRequest) return;
+
+			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
+			List<String> _first5IdsFrom(List<AsetHealthCariModel> list) {
+				return list
+						.take(5)
+						.map((e) => e.asethealthId) // ganti kalau field id kamu beda
+						.toList();
+			}
+
+			if (nextHal == 0) {
+				// FIRST PAGE selalu REPLACE, bukan append
+				emit(state.copyWith(
+					items: items,
+					hasReachedMax: items.isEmpty,
+					status: ListStatus.success,
+					hal: 1,
+					isFetching: false,
+				));
+				_recomputeActiveAndFile(emit);
+				return;
+			}
+
+			if (items.isEmpty) {
+				emit(state.copyWith(hasReachedMax: true, isFetching: false));
+				return;
+			}
+
+			final merged = List.of(state.items)..addAll(items);
+
+			// dedupe (kalau mau samain MV tanpa dedupe, biarkan commented)
+			// final result = merged
+			//     .whereWithIndex((e, index) =>
+			//         merged.indexWhere((e2) => e2.asethealthId == e.asethealthId) == index)
+			//     .toList();
+
+			emit(state.copyWith(
+				items: merged, // atau items: result,
+				status: ListStatus.success,
+				hal: state.hal + 1,
+				hasReachedMax: false,
+				isFetching: false,
+			));
+
+			_recomputeActiveAndFile(emit);
+		} catch (_) {
+			// kalau error: isFetching false
+			if (state.queryKey == keyAtRequest) {
+				emit(state.copyWith(status: ListStatus.failure, isFetching: false));
+			}
+		}
+	}
+
+
+	/*
+	Future<void> onFetchAsetHealthCari(
+			FetchAsetHealthCariEvent event,
+			Emitter<AsetHealthCariState> emit,
+			) async {
+		if (state.hasReachedMax) return;
+
+		// ✅ guard: kalau lagi loadingMore, jangan spam
+		if (state.status == ListStatus.loadingMore) return;
 
 		final repo = AsetHealthCariRepository();
 
+		// FIRST LOAD
 		if (state.status == ListStatus.initial) {
-			final items = await repo.getAsetHealthCari(state.statusId, state.searchText, 0);
+			final items =
+			await repo.getAsetHealthCari(state.statusId, state.searchText, 0);
 
 			emit(state.copyWith(
 				items: items,
@@ -275,15 +204,21 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 				hal: 1,
 			));
 
-			// jaga active/file kalau ada selected
 			_recomputeActiveAndFile(emit);
 			return;
 		}
 
-		final items = await repo.getAsetHealthCari(state.statusId, state.searchText, state.hal);
+		// ✅ next page load: tandai loadingMore tapi JANGAN hapus items
+		emit(state.copyWith(status: ListStatus.loadingMore));
+
+		final items =
+		await repo.getAsetHealthCari(state.statusId, state.searchText, state.hal);
 
 		if (items.isEmpty) {
-			emit(state.copyWith(hasReachedMax: true));
+			emit(state.copyWith(
+				hasReachedMax: true,
+				status: ListStatus.success, // balik ke success
+			));
 			return;
 		}
 
@@ -291,7 +226,8 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 
 		final result = asetHealthCari
 				.whereWithIndex((e, index) =>
-		asetHealthCari.indexWhere((e2) => e2.asethealthId == e.asethealthId) == index)
+		asetHealthCari.indexWhere((e2) => e2.asethealthId == e.asethealthId) ==
+				index)
 				.toList();
 
 		emit(state.copyWith(
@@ -303,6 +239,7 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 
 		_recomputeActiveAndFile(emit);
 	}
+	 */
 
 	// -----------------------
 	// Debug Fetch (tetap)

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../models/gen_aset_health/asethealthcari_model.dart';
 
@@ -47,16 +48,38 @@ class HealthCobTable extends StatefulWidget {
 }
 class _HealthCobTableState extends State<HealthCobTable> {
   late final ScrollController hController;
+  late final ScrollController vController;
 
   @override
   void initState() {
     super.initState();
     hController = ScrollController();
+    vController = ScrollController();
+    vController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final bloc = context.read<AsetHealthCariBloc>();
+    final s = bloc.state;
+
+    if (!vController.hasClients) return;
+    final max = vController.position.maxScrollExtent;
+    final cur = vController.position.pixels;
+
+    const threshold = 100.0;
+
+    if (max - cur <= threshold) {
+      if (!s.hasReachedMax && !s.isFetching) {
+        bloc.add(FetchAsetHealthCariEvent());
+      }
+    }
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.removeListener(_onScroll);
+    vController.dispose();
     super.dispose();
   }
 
@@ -159,6 +182,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
     }
 
     return SingleChildScrollView(
+      controller: vController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

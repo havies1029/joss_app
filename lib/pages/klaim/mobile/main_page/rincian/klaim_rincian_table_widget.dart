@@ -44,50 +44,50 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     return BlocConsumer<GroupcobCariBloc, GroupcobCariState>(
       buildWhen: (previous, current) {
         return (current.status == ListStatus.success) ||
-            (previous.selectedIds != current.selectedIds);
+            (previous.selectedId != current.selectedId);
       },
       listener: (context, state) {},
       builder: (context, state) {
         if (state.status == ListStatus.success) {
           return state.items.isNotEmpty
               ? ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: state.items.length,
-                  itemBuilder: (_, index) {
-                    final header = state.items[index];
-                    final isLainnya = header.cobNama.toLowerCase() == "lainnya";
+            padding: EdgeInsets.zero,
+            itemCount: state.items.length,
+            itemBuilder: (_, index) {
+              final header = state.items[index];
+              final isLainnya = header.cobNama.toLowerCase() == "lainnya";
 
-                    return Container(
-                      color: secondaryBlackColor,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHeaderTitle(context, header),
-                          const SizedBox(height: hPadding),
-                          _buildDetailTable(
-                            header.details,
-                            state.selectedIds,
-                            isLainnya: isLainnya,
-                            compact: isNarrow,
-                          ),
-                          const SizedBox(height: hPadding),
-                        ],
-                      ),
-                    );
-                  },
-                )
-              : const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 80.0),
-                    child: Text(
-                      'No Data Available!!',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold),
+              return Container(
+                color: secondaryBlackColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeaderTitle(context, header),
+                    const SizedBox(height: hPadding),
+                    _buildDetailTable(
+                      header.details,
+                      state.selectedId,
+                      isLainnya: isLainnya,
+                      compact: isNarrow,
                     ),
-                  ),
-                );
+                    const SizedBox(height: hPadding),
+                  ],
+                ),
+              );
+            },
+          )
+              : const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 80.0),
+              child: Text(
+                'No Data Available!!',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
         } else {
           return const Center(
             child: Text(
@@ -114,11 +114,11 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   }
 
   Widget _buildDetailTable(
-    List<KlaimdetailCariModel> details,
-    List<String> selectedIds, {
-    required bool isLainnya,
-    required bool compact,
-  }) {
+      List<KlaimdetailCariModel> details,
+  final String? selectedId, {
+        required bool isLainnya,
+        required bool compact,
+      }) {
     if (details.isEmpty) return const Text("Tidak ada detail klaim");
 
     return Padding(
@@ -160,22 +160,22 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
                     ),
                     columnWidths: isLainnya
                         ? const {
-                            0: FixedColumnWidth(50),
-                            1: FixedColumnWidth(50),
-                            2: FixedColumnWidth(100),
-                            3: FixedColumnWidth(120),
-                            4: FixedColumnWidth(120), // COB
-                            5: FixedColumnWidth(80), // TANGGAL
-                            6: FixedColumnWidth(100), // ESTIMASI
-                          }
+                      0: FixedColumnWidth(50),
+                      1: FixedColumnWidth(50),
+                      2: FixedColumnWidth(100),
+                      3: FixedColumnWidth(120),
+                      4: FixedColumnWidth(120), // COB
+                      5: FixedColumnWidth(80), // TANGGAL
+                      6: FixedColumnWidth(100), // ESTIMASI
+                    }
                         : const {
-                            0: FixedColumnWidth(50),
-                            1: FixedColumnWidth(50),
-                            2: FixedColumnWidth(100),
-                            3: FixedColumnWidth(120),
-                            4: FixedColumnWidth(80), // TANGGAL
-                            5: FixedColumnWidth(100), // ESTIMASI
-                          },
+                      0: FixedColumnWidth(50),
+                      1: FixedColumnWidth(50),
+                      2: FixedColumnWidth(100),
+                      3: FixedColumnWidth(120),
+                      4: FixedColumnWidth(80), // TANGGAL
+                      5: FixedColumnWidth(100), // ESTIMASI
+                    },
                     children: [
                       _tableHeader(context, [
                         "",
@@ -188,13 +188,13 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
                       ]),
                       ...details.asMap().entries.map(
                             (e) => _detailRow(
-                              e.value,
-                              e.key,
-                              selectedIds,
-                              compact: compact,
-                              isLainnya: isLainnya,
-                            ),
-                          ),
+                          e.value,
+                          e.key,
+                          selectedId,
+                          compact: compact,
+                          isLainnya: isLainnya,
+                        ),
+                      ),
                     ],
                   )),
             ),
@@ -213,28 +213,44 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
           child: isNo
               ? Center(
-                  child: Text(
-                    text,
-                    style: bodyTextStyle(context, fontSize: 13),
-                  ),
-                )
+            child: Text(
+              text,
+              style: bodyTextStyle(context, fontSize: 13),
+            ),
+          )
               : Text(
-                  text,
-                  style: bodyTextStyle(context, fontSize: 13),
-                ),
+            text,
+            style: bodyTextStyle(context, fontSize: 13),
+          ),
         );
       }).toList(),
     );
   }
 
   TableRow _detailRow(
-    KlaimdetailCariModel d,
-    int index,
-    List<String> selectedIds, {
-    required bool compact,
-    required bool isLainnya,
-  }) {
-    final isSelected = selectedIds.contains(d.klaim1Id);
+      KlaimdetailCariModel d,
+      int index,
+  final String? selectedId
+  , {
+        required bool compact,
+        required bool isLainnya,
+      }) {
+    final isSelected = selectedId == d.klaim1Id;
+
+    void _logSelectedRow(KlaimdetailCariModel d, int index) {
+      debugPrint("=========== ROW SELECTED ===========");
+      debugPrint("Index         : $index");
+      debugPrint("No Urut       : ${d.nourut}");
+      debugPrint("Klaim1Id      : ${d.klaim1Id}");
+      debugPrint("COB ID        : ${d.cobId}");
+      debugPrint("COB Nama      : ${d.cobNama}");
+      debugPrint("No Polis      : ${d.noPolis}");
+      debugPrint("Status        : ${d.statusDesc}");
+      debugPrint("Tanggal       : ${DateFormat('yyyy-MM-dd').format(d.tglKejadian)}");
+      debugPrint("Currency      : ${d.curr}");
+      debugPrint("Nilai Klaim   : ${d.curr} ${formatNum(d.klaimAmount)}");
+      debugPrint("====================================");
+    }
 
     return TableRow(
       decoration: BoxDecoration(
@@ -247,12 +263,13 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           child: CheckboxRadio(
             value: isSelected,
             onChanged: (checked) {
+              _logSelectedRow(d, index);
               if (checked == true) {
-                debugPrint("=== SELECT DETAIL ===");
-                debugPrint("Selected klaim1Id: ${d.klaim1Id}");
-                groupcobCariBloc.add(SelectDetailEvent(d.klaim1Id));
+                groupcobCariBloc.add(SelectItemEvent(d.klaim1Id));
+                groupcobCariBloc.add(SelectKlaimRecordEvent(d));
               } else {
-                groupcobCariBloc.add(UnselectDetailEvent(d.klaim1Id));
+                debugPrint("=== ROW UNSELECTED === ${d.klaim1Id}");
+                groupcobCariBloc.add(UnselectItemEvent(d.klaim1Id));
               }
             },
           ),

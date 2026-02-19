@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
-import 'package:joss_app/pages/klaim/mobile/ringkasan/klaim_ringkasan_status_widget.dart';
-import 'package:joss_app/pages/klaim/mobile/ringkasan/klaim_ringkasan_table_widget.dart';
 import 'package:joss_app/widgets/EmptyStateWidget.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
+
+import 'klaim_ringkasan_status_widget.dart';
+import 'klaim_ringkasan_table_widget.dart';
 
 class KlaimRingkasanMainPage extends StatefulWidget {
   const KlaimRingkasanMainPage({super.key});
@@ -45,13 +46,13 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
       listeners: [
         BlocListener<MstatusringkasCariBloc, MstatusringkasCariState>(
           listenWhen: (previous, current) =>
-              previous.selectedStatusId != current.selectedStatusId,
+          previous.selectedStatusId != current.selectedStatusId,
           listener: (context, state) {
             context.read<KlaimringkasCariBloc>().add(
-                  RefreshKlaimringkasCariEvent(
-                    selectedStatusId: state.selectedStatusId,
-                  ),
-                );
+              RefreshKlaimringkasCariEvent(
+                selectedStatusId: state.selectedStatusId,
+              ),
+            );
           },
         ),
       ],
@@ -110,7 +111,7 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
     return BlocBuilder<KlaimringkasCariBloc, KlaimringkasCariState>(
       builder: (context, s) {
         final statusId = context.select<MstatusringkasCariBloc, String>(
-          (b) => b.state.selectedStatusId,
+              (b) => b.state.selectedStatusId,
         );
 
         if (s.status == ListStatus.initial ||
@@ -136,21 +137,21 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
         context.read<MstatusringkasCariBloc>().state.selectedStatusId;
 
     context.read<KlaimringkasCariBloc>().add(
-          RefreshKlaimringkasCariEvent(
-            selectedStatusId: statusId,
-          ),
-        );
+      RefreshKlaimringkasCariEvent(
+        selectedStatusId: statusId,
+      ),
+    );
   }
 
   List<Map<String, dynamic>> _exportRows() {
     final st = context.read<KlaimringkasCariBloc>().state;
     return st.items
         .map((d) => {
-              "No": d.nourut,
-              "Kategori": d.cobNama,
-              "Total Nilai": d.klaimQty,
-              "Jumlah Klaim": d.klaimAmount,
-            })
+      "No": d.nourut,
+      "Kategori": d.cobNama,
+      "Total Nilai": d.klaimQty,
+      "Jumlah Klaim": d.klaimAmount,
+    })
         .toList();
   }
 
@@ -190,20 +191,20 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) =>
           FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-          child: child,
-        ),
-      ),
+            opacity: animation,
+            child: ScaleTransition(
+              scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+              child: child,
+            ),
+          ),
     );
   }
 
   Future<void> _exportData(
-    BuildContext context,
-    ExportFormat format,
-    List<Map<String, dynamic>> rows,
-  ) async {
+      BuildContext context,
+      ExportFormat format,
+      List<Map<String, dynamic>> rows,
+      ) async {
     final ext = (format == ExportFormat.excel) ? "xlsx" : "pdf";
     final exportFormat = (format == ExportFormat.excel) ? "excel" : "pdf";
     final fileName =
@@ -250,7 +251,7 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
 
     final detailText = rows.map((m) {
       final parts =
-          m.entries.map((e) => "${e.key}: ${fmt(e.value)}").join(" | ");
+      m.entries.map((e) => "${e.key}: ${fmt(e.value)}").join(" | ");
       return "• $parts";
     }).join("\n");
 

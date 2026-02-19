@@ -87,7 +87,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                     onButtonPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
-                          builder: (_) => const TagihanPembayaranPage(),
+                          builder: (_) => const TagihanPembayaranPage(initialTab: 2,),
                         ),
                             (route) => route.isFirst,
                       );

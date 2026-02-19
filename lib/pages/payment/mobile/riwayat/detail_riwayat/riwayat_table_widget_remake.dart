@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/historybayar2cari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../models/payment/historybayar2cari_model.dart';
 
 class RiwayatTableWidgetRemake extends StatefulWidget {
@@ -32,7 +33,22 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
-    return BlocBuilder<Historybayar2CariBloc, Historybayar2CariState>(
+    return BlocConsumer<Historybayar2CariBloc, Historybayar2CariState>(
+      listenWhen: (p, c) =>
+      p.status != c.status || p.items != c.items,
+      listener: (context, state) {
+        if (state.status == ListStatus.success && state.items.isNotEmpty) {
+          final d = state.items.first;
+          context.read<DnRekap2invBloc>().add(
+            SetPaymentSummaryEvent(
+              curr: d.curr,
+              totalBayar: d.nilaiBayar,
+            ),
+          );
+          debugPrint(" curr: d.curr,= ${d.curr}" );
+          debugPrint("totalBayar: d.nilaiBayar, = ${d.nilaiBayar}" );
+        }
+      },
       buildWhen: (p, c) => p.status != c.status || p.items != c.items,
       builder: (context, state) {
         if (state.status != ListStatus.success) {
@@ -40,10 +56,10 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
         }
 
         final items = state.items.isNotEmpty ? state.items : _dummyItems();
-
         return isNarrow ? _buildTableCompact(items) : _buildTableNormal(items);
       },
     );
+
   }
 
   // ========= TABLE COMPACT (NARROW) =========
@@ -166,6 +182,15 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
         _headerCell("PERIODE POLIS"),
         _headerCell("PREMI"),
       ],
+    );
+  }
+
+  void _onSelect(Historybayar2CariModel d) {
+    context.read<DnRekap2invBloc>().add(
+      SetPaymentSummaryEvent(
+        curr: d.curr,
+        totalBayar: d.nilaiBayar,
+      ),
     );
   }
 

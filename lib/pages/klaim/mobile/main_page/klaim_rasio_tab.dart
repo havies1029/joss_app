@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/klaim/mobile/rasio/klaim_rasio_main_page.dart';
+import 'package:joss_app/pages/regklaim/mobile/main_page/rasio/klaim_rasio_main_page.dart';
 
 class KlaimRasioTab extends StatelessWidget {
   const KlaimRasioTab({super.key});

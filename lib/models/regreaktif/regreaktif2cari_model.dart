@@ -1,9 +1,11 @@
 
+import '../../common/constants.dart';
+
 class Regreaktif2CariModel {
 	String progressNama;
 	String regreaktif2Id;
 	String remarks;
-	DateTime tglStatus;
+	DateTime? tglStatus;
 
 	Regreaktif2CariModel({required this.progressNama, required this.regreaktif2Id, 
 		required this.remarks, required this.tglStatus});
@@ -13,7 +15,7 @@ class Regreaktif2CariModel {
 			progressNama: data['progressNama']??'',
 			regreaktif2Id: data['regreaktif2Id']??'',
 			remarks: data['remarks']??'',
-			tglStatus: DateTime.tryParse(data['tglStatus'].toString())??DateTime.now()
+			tglStatus: parseDate(data['tglStatus'].toString()),
 		);
 
 	}
@@ -22,6 +24,6 @@ class Regreaktif2CariModel {
 		{'progressNama': progressNama,
 		'regreaktif2Id': regreaktif2Id,
 		'remarks': remarks,
-		'tglStatus': tglStatus.toIso8601String()};
+		'tglStatus': tglStatus?.toIso8601String()};
 
 }

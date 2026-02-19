@@ -11,76 +11,77 @@ class KlaimringkasCariTileWidget extends StatelessWidget {
 	final int nourut;
 
 	const KlaimringkasCariTileWidget(
-		{super.key,
-		required this.cobNama, 
-		required this.currNama, 
-		required this.klaimAmount, 
-		required this.klaimQty, 
-		required this.nourut});
+			{super.key,
+				required this.cobNama,
+				required this.currNama,
+				required this.klaimAmount,
+				required this.klaimQty,
+				required this.nourut});
 
 	@override
 	Widget build(BuildContext context) {
 		return Card(
-			shape: RoundedRectangleBorder(
-				borderRadius: BorderRadius.circular(15),
-			),
-			color: Colors.white,
-			margin: const EdgeInsets.symmetric(horizontal: 10),
-			elevation: 2,
-			clipBehavior: Clip.antiAliasWithSaveLayer,
-			child: Container(
-				alignment: Alignment.topLeft,
-				padding: const EdgeInsets.all(15),
-				child: Column(
-					crossAxisAlignment: CrossAxisAlignment.start,
-					children: [
-						Text("cobNama",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							cobNama,
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("currNama",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							currNama,
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("klaimAmount",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							NumberFormat("#,###").format(klaimAmount),
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("klaimQty",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							NumberFormat("#,###").format(klaimQty),
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("nourut",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							NumberFormat("#,###").format(nourut),
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),						
-				]),
-			)
+				shape: RoundedRectangleBorder(
+					borderRadius: BorderRadius.circular(15),
+				),
+				color: Colors.white,
+				margin: const EdgeInsets.symmetric(horizontal: 10),
+				elevation: 2,
+				clipBehavior: Clip.antiAliasWithSaveLayer,
+				child: Container(
+					alignment: Alignment.topLeft,
+					padding: const EdgeInsets.all(15),
+					child: Column(
+							crossAxisAlignment: CrossAxisAlignment.start,
+							children: [
+								Text("cobNama",
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_40)),
+								Container(height: 5),
+								Text(
+										cobNama,
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_80)),
+								Container(height: 10),
+								Text("currNama",
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_40)),
+								Container(height: 5),
+								Text(
+										currNama,
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_80)),
+								Container(height: 10),
+								Text("klaimAmount",
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_40)),
+								Container(height: 5),
+								Text(
+										NumberFormat("#,###").format(klaimAmount),
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_80)),
+								Container(height: 10),
+								Text("klaimQty",
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_40)),
+								Container(height: 5),
+								Text(
+										NumberFormat("#,###").format(klaimQty),
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_80)),
+								Container(height: 10),
+								Text("nourut",
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_40)),
+								Container(height: 5),
+								Text(
+										NumberFormat("#,###").format(nourut),
+										style: MyText.bodyLarge(context)!
+												.copyWith(color: MyColors.grey_80)),
+								Container(height: 10),
+
+							]),
+				)
 		);
 	}
 }

@@ -37,7 +37,8 @@ class Klaim5UploadFileApi {
           'file': await MultipartFile.fromFile(
             file.path,
             filename: p.basename(file.path),
-            contentType: DioMediaType.parse(item.mimeType??"application/octet-stream"),          ),
+            contentType: DioMediaType.parse(item.mimeType??"application/octet-stream"),
+          ),
         }),
       );
 

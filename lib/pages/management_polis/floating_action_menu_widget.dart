@@ -13,8 +13,6 @@ enum ActionType {
   lihatPolis,
   lihatPolisPar,
   lihatPolisEq,
-
-  // ===== KLAIM =====
   klaimBaru,
   perbaruiKlaim,
   lacakKlaim,

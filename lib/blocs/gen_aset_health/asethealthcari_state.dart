@@ -14,6 +14,8 @@ class AsetHealthCariState extends Equatable {
 	final String selectedId;
 	final AsetHealthCariModel? selectedItem;
 	final String? selectedProsesId;
+	final String queryKey;
+	final bool isFetching;
 
 	const AsetHealthCariState(
 		{this.status = ListStatus.initial,
@@ -27,7 +29,10 @@ class AsetHealthCariState extends Equatable {
 		this.activeAsetHealthId = "",
 		this.selectedId = "",
 		this.selectedItem,
-		this.selectedProsesId,});
+		this.selectedProsesId,
+		this.queryKey = '',
+		this.isFetching = false,
+	});
 
 	const AsetHealthCariState.success(List<AsetHealthCariModel> items)
 			: this(status: ListStatus.success, items: items);
@@ -47,6 +52,8 @@ class AsetHealthCariState extends Equatable {
 		String? selectedId,
 		AsetHealthCariModel? selectedItem,
 		String? selectedProsesId,
+		String? queryKey,
+		bool? isFetching,
 		}) {
 		return AsetHealthCariState(
 			items: items ?? this.items,
@@ -61,9 +68,11 @@ class AsetHealthCariState extends Equatable {
 			selectedId: selectedId ?? this.selectedId,
 			selectedItem: selectedItem ?? this.selectedItem,
 			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
+			queryKey: queryKey ?? this.queryKey,
+			isFetching: isFetching ?? this.isFetching,
 		);
 	}
 
 	@override
-	List<Object?> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetHealthId, selectedId, selectedItem, selectedProsesId];
+	List<Object?> get props => [status, items, hasReachedMax, hal, searchText, statusId, selectedIds, selectedFilePolisId, activeAsetHealthId, selectedId, selectedItem, selectedProsesId,	queryKey, isFetching,];
 }
