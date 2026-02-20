@@ -11,18 +11,20 @@ import '../../../../../models/reguser/reguser_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
 class PopupClientWidget extends StatefulWidget {
-  final String phoneNumber;
+  final String sentTo;
+  final String sentVia;
 
   const PopupClientWidget({
     super.key,
-    required this.phoneNumber,
+    required this.sentTo,
+    required this.sentVia,
   });
 
   @override
-  _PopupClientWidgetState createState() => _PopupClientWidgetState();
+  PopupClientWidgetState createState() => PopupClientWidgetState();
 }
 
-class _PopupClientWidgetState extends State<PopupClientWidget>
+class PopupClientWidgetState extends State<PopupClientWidget>
     with TickerProviderStateMixin {
   late AnimationController _slideController;
   late AnimationController _fadeController;
@@ -146,7 +148,9 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
 
     context.read<RegUserBloc>().add(
       ValidasiPinHPEvent(
-          record: record!
+          record: record!,
+          sentTo: widget.sentTo,
+          sentVia: widget.sentVia
       ),
     );
   }
@@ -178,7 +182,11 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
 
     // Kirim event validasi OTP ke RegUserBloc
     context.read<RegUserBloc>().add(
-      ValidasiPinHPEvent(record: record!),
+      ValidasiPinHPEvent(
+          record: record!,
+          sentTo: widget.sentTo,
+          sentVia: widget.sentVia
+      ),
     );
 
     // // 🚀 Trigger AuthenticationAuthenticated langsung
@@ -337,7 +345,7 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
                                           text:
                                           'Kami sudah mengirim kode OTP ke\n'),
                                       TextSpan(
-                                        text: widget.phoneNumber,
+                                        text: widget.sentTo,
                                         style: const TextStyle(
                                           color: primaryColor,
                                           fontWeight: FontWeight.w600,

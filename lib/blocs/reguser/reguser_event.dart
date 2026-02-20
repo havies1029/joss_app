@@ -10,10 +10,12 @@ abstract class RegUserEvents extends Equatable {
 class RegUserTambahEvent extends RegUserEvents {
 	final RegUserModel record;
   final String requestFrom;
-	const RegUserTambahEvent({required this.record, required this.requestFrom});
+  final String pinSentTo; // email atau hpno
+  final String pinSentVia; // email atau sms
+	const RegUserTambahEvent({required this.record, required this.requestFrom, required this.pinSentTo, required this.pinSentVia});
 
 	@override
-	List<Object> get props => [record, requestFrom];
+	List<Object> get props => [record, requestFrom, pinSentTo, pinSentVia];
 }
 
 class RegUserUbahEvent extends RegUserEvents {
@@ -42,10 +44,12 @@ class RegUserLihatEvent extends RegUserEvents {
 
 class ValidasiPinHPEvent extends RegUserEvents {
 	final RegUserModel record;
-	const ValidasiPinHPEvent({required this.record});
+  final String sentTo; // email atau hpno
+  final String sentVia; // email atau sms
+	const ValidasiPinHPEvent({required this.record, required this.sentTo, required this.sentVia});
 
 	@override
-	List<Object> get props => [record];
+	List<Object> get props => [record, sentTo, sentVia];
 }
 
 

@@ -59,15 +59,29 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       setErr('form1.jenisClient', kStringNullError);
       ok = false;
     }
-
-    final telp = fieldTeleponController.text.trim();
-    if (telp.isEmpty) {
-      setErr('form1.telepon', kStringNullError);
-      ok = false;
-    } else {
-      if (!RegExp(r'^\d+$').hasMatch(telp)) {
-        setErr('form1.telepon', "Format tidak valid");
+    
+    if (lastLoginBy == 'hp') {
+      final email = fieldEmailController.text.trim();
+      if (email.isEmpty) {
+        setErr('form1.email', kStringNullError);
         ok = false;
+      } else {
+        if (!emailValidatorRegExp.hasMatch(email)) {
+          setErr('form1.email', "Format tidak valid");
+          ok = false;
+        }
+      }
+    }
+    if (lastLoginBy == 'email') {
+      final telp = fieldTeleponController.text.trim();
+      if (telp.isEmpty) {
+        setErr('form1.telepon', kStringNullError);
+        ok = false;
+      } else {
+        if (!RegExp(r'^\d+$').hasMatch(telp)) {
+          setErr('form1.telepon', "Format tidak valid");
+          ok = false;
+        }
       }
     }
 
@@ -397,6 +411,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       RegUserTambahEvent(
         record: record,
         requestFrom: widget.requestFrom,
+        pinSentTo: fromEmail ? teleponNormalized : email,
+        pinSentVia: fromEmail ? "hp" : "email",
       ),
     );
   }

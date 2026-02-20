@@ -52,7 +52,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
     if (!hasFailure) {
         authenticationBloc
-            .add(RequirePinHPVerification(hpno: event.record.telepon));
+            .add(RequirePinHPVerification(sentTo: event.pinSentTo, sentVia: event.pinSentVia));
     }
   }
 
@@ -120,6 +120,9 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       
       authenticationBloc.add(UserRoleChanged(user: user, authenticatedFrom: state.requestFrom));
 
+    }
+    else {
+      authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));
     }
   }
 }

@@ -51,12 +51,14 @@ class AuthenticationRequireLoginClient extends AuthenticationState {
 }
 
 class AuthenticationRequirePinHPVerification extends AuthenticationState {
-  final String hpno;
+  final String sentTo; // email atau hpno
+  final String sentVia; // email atau sms
+  final DateTime requestedAt;
 
-  AuthenticationRequirePinHPVerification({required this.hpno});
+  AuthenticationRequirePinHPVerification({required this.sentTo, required this.sentVia, required this.requestedAt});
 
   @override
-  List<Object> get props => [hpno];
+  List<Object> get props => [sentTo, sentVia, requestedAt];
 }
 
 class AuthenticationForgotPassword extends AuthenticationState {}

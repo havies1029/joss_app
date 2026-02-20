@@ -38,7 +38,7 @@ class AuthenticationBloc
       emit(AuthenticationRequireRegisterClient(requiredFrom: event.requiredFrom));
     });
     on<RequirePinHPVerification>((event, emit) {
-      emit(AuthenticationRequirePinHPVerification(hpno: event.hpno));
+      emit(AuthenticationRequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia, requestedAt: DateTime.now()));
     });
     on<PhonePinVerified>((event, emit) {
       emit(AuthenticationPhonePinVerified());

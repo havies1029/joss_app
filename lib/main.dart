@@ -1653,7 +1653,7 @@ class _AppState extends State<_App> {
           listenWhen: (_, curr) => curr is AuthenticationRequirePinHPVerification,
           listener: (_, state) {
             if (state is AuthenticationRequirePinHPVerification) {
-              _showPopup(PopupClientWidget(phoneNumber: state.hpno));
+              _showPopup(PopupClientWidget(sentTo: state.sentTo, sentVia: state.sentVia));
             }
           },
         ),
