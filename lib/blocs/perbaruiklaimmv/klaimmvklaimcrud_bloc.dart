@@ -73,7 +73,9 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
 			isLoaded: true,
 			comboRMatauang: comboRMatauang,
       record: updatedRecord,
-      isDirty: true));
+      isDirty: true,
+      isValid: _validate(updatedRecord),
+    ));
 	}
 
   Future<void> onFieldCurrIdChanged(
@@ -82,7 +84,11 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       KlaimmvklaimcrudModel updatedRecord = state.record!.copyWith(
         currId: event.currId,
       );
-      emit(state.copyWith(record: updatedRecord, isDirty: true));
+      emit(state.copyWith(
+        record: updatedRecord, 
+        isDirty: true,
+        isValid: _validate(updatedRecord),
+      ));
     }
   }
 
@@ -93,7 +99,11 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       KlaimmvklaimcrudModel updatedRecord = state.record!.copyWith(
         dol: parsedDol,
       );
-      emit(state.copyWith(record: updatedRecord, isDirty: true));
+      emit(state.copyWith(
+        record: updatedRecord, 
+        isDirty: true,
+        isValid: _validate(updatedRecord),
+      ));
     }
   }
 
@@ -104,7 +114,11 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       KlaimmvklaimcrudModel updatedRecord = state.record!.copyWith(
         klaimAmount: parsedKlaimAmount,
       );
-      emit(state.copyWith(record: updatedRecord, isDirty: true));
+      emit(state.copyWith(
+        record: updatedRecord, 
+        isDirty: true,
+        isValid: _validate(updatedRecord),
+      ));
     }
   }
 
@@ -114,7 +128,11 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       KlaimmvklaimcrudModel updatedRecord = state.record!.copyWith(
         kronologis: event.kronologis,
       );
-      emit(state.copyWith(record: updatedRecord, isDirty: true));
+      emit(state.copyWith(
+        record: updatedRecord, 
+        isDirty: true,
+        isValid: _validate(updatedRecord),
+      ));
     }
   }
 
@@ -125,6 +143,24 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       bool hasFailure = !await repository.klaimmvklaimcrudUbah(state.record!);
       emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure, isDirty: false));
     }
+  }
+
+  bool _validate(KlaimmvklaimcrudModel? record) {
+    if (record == null) return false;
+
+    return
+        _isSameOrBeforeToday(record.dol) &&
+        record.klaimAmount > 0 &&
+        record.kronologis.trim().isNotEmpty &&
+        (record.currId?.isNotEmpty ?? false);
+  }
+
+
+  bool _isSameOrBeforeToday(DateTime date) {
+    final today = DateTime.now();
+    final d1 = DateTime(date.year, date.month, date.day);
+    final d2 = DateTime(today.year, today.month, today.day);
+    return !d1.isAfter(d2);
   }
 
 }

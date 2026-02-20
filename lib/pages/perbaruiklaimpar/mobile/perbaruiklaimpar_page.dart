@@ -34,6 +34,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
       title: widget.cobGroupNama,
       child: Container(
         color: secondaryBlackColor,
+        padding: const EdgeInsets.symmetric(
+            horizontal: 15, vertical: 10),
         child: BlocConsumer<KlaimparaccordionBloc, KlaimparaccordionState>(
           builder: (context, acc) {
             return Column(
@@ -77,8 +79,6 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
                     child: Column(
                       children: [
                         Klaimparaccordioncard(

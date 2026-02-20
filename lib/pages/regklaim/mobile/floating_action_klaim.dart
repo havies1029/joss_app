@@ -4,6 +4,8 @@ import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
 
+// import '../../klaimlacak/klaimprogresscari_main.dart';
+import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
 import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
 import '../../perbaruiklaimpar/mobile/perbaruiklaimpar_page.dart';
 // import 'package:joss_app/pages/perbaruiklaimmv/perbaruiklaimmv_page.dart';
@@ -80,54 +82,50 @@ class FabActionKlaim extends StatelessWidget {
       availableActions: _computeActions(),
       selectedItems: const [],
       onActionTap: (type, _) {
+
+        final state = context.read<GroupcobCariBloc>().state;
+        final selected = state.selectedKlaimRecord;
+
+        if (selected == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Pilih data terlebih dahulu")),
+          );
+          return;
+        }
+
+        final cobId = selected.cobId;
+        final klaim1Id = selected.klaim1Id;
+        final cobNama = selected.cobNama;
+
         if (type == ActionType.perbaruiKlaim) {
-          final state = context.read<GroupcobCariBloc>().state;
-          final selected = state.selectedKlaimRecord;
-
-          if (selected == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Pilih data terlebih dahulu")),
-            );
-            return;
-          }
-
-          final cobId = selected.cobId;
-          final klaim1Id = selected.klaim1Id;
-          final cobNama = selected.cobNama;
-
-          // if (selectedDetail == null) {
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //       const SnackBar(content: Text("Data tidak ditemukan")),
-          //     );
-          //     return;
-          //   }
-          //
-          //   final cobId = selectedDetail.cobId;
-          //   final klaim1Id = selectedDetail.klaim1Id;
-          //   final String cobNama = selectedKlaimRecord.cobNama;
-
-          debugPrint("=== NAVIGATION DEBUG ===");
-          debugPrint("klaim1Id : $klaim1Id");
-          debugPrint("cobNama : $cobNama");
-          debugPrint("cobId    : $cobId");
 
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               if (cobId == "10002") {
-                return PerbaruiKlaimMvPage( klaim1Id: klaim1Id, cobGroupNama: cobNama);
-              }
-              else if (cobId == "10001") {
-                return PerbaruiKlaimParPage(klaim1Id: klaim1Id, cobGroupNama: cobNama, cobGroupId: cobId);
-              }
-              else {
-                return PerbaruiKlaimParPage(klaim1Id: klaim1Id, cobGroupNama: cobNama, cobGroupId: cobId);
+                return PerbaruiKlaimMvPage(
+                  klaim1Id: klaim1Id,
+                  cobGroupNama: cobNama,
+                );
+              } else {
+                return PerbaruiKlaimParPage(
+                  klaim1Id: klaim1Id,
+                  cobGroupNama: cobNama,
+                  cobGroupId: cobId,
+                );
               }
             }),
           );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Pilih data terlebih dahulu")),
+        }
+
+        else if (type == ActionType.lacakKlaim) {
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  KlaimProgressCariMainPage(klaim1Id: klaim1Id),
+            ),
           );
         }
 

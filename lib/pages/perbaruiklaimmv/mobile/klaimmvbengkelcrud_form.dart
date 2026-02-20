@@ -19,8 +19,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 class KlaimmvbengkelcrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
+	final GlobalKey<FormState> formKey;
 
-	const KlaimmvbengkelcrudFormPage({super.key, required this.viewMode, required this.recordId});
+	const KlaimmvbengkelcrudFormPage({super.key, required this.viewMode, required this.recordId, required this.formKey});
 
 	@override
 	KlaimmvbengkelcrudFormPageFormState createState() => KlaimmvbengkelcrudFormPageFormState();
@@ -28,7 +29,6 @@ class KlaimmvbengkelcrudFormPage extends StatefulWidget {
 
 class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPage> {
 	late KlaimmvbengkelcrudBloc klaimmvbengkelcrudBloc;
-	final _formKey = GlobalKey<FormState>();
 	final List<String> errors = [];
 	ComboMBengkelModel? fieldComboMBengkel;
 	final comboMBengkelKey = GlobalKey<DropdownSearchState<ComboMBengkelModel>>();
@@ -53,7 +53,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 			builder: (context, state) {
 				return SingleChildScrollView(
 					child: Form(
-							key: _formKey,
+							key: widget.formKey,
 							child: Column(
 								children: [
 									buildFieldMjnsbengkelId(),
@@ -320,8 +320,8 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 	}
 
 	void onSaveForm() {
-		if (_formKey.currentState!.validate()) {
-			_formKey.currentState!.save();
+		if (widget.formKey.currentState!.validate()) {
+			widget.formKey.currentState!.save();
 			KlaimmvbengkelcrudModel record = KlaimmvbengkelcrudModel(
 				klaim1Id: '',
 				mbengkelId: fieldComboMBengkel?.mbengkelId,

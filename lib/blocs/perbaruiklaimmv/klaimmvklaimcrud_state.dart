@@ -11,6 +11,7 @@ class KlaimmvklaimcrudState extends Equatable {
 	final ComboRMatauangModel? comboRMatauang;
   final bool isComplete;
   final bool isDirty;
+  final bool isValid;
 	const KlaimmvklaimcrudState(
 		{this.record,
 		this.isLoading = false,
@@ -20,7 +21,8 @@ class KlaimmvklaimcrudState extends Equatable {
 		this.hasFailure = false,
 		this.comboRMatauang,
     this.isComplete = false,
-    this.isDirty = false
+    this.isDirty = false,
+    this.isValid = false,
 });
 
 	KlaimmvklaimcrudState copyWith({
@@ -33,6 +35,7 @@ class KlaimmvklaimcrudState extends Equatable {
 		ComboRMatauangModel? comboRMatauang,
     bool? isComplete,
     bool? isDirty,
+    bool? isValid,
     }) {
 		return KlaimmvklaimcrudState(
 			record: record ?? this.record,
@@ -43,10 +46,11 @@ class KlaimmvklaimcrudState extends Equatable {
 			hasFailure: hasFailure ?? this.hasFailure,
 			comboRMatauang: comboRMatauang?? this.comboRMatauang,
       isComplete: isComplete ?? this.isComplete,
-      isDirty: isDirty ?? this.isDirty
+      isDirty: isDirty ?? this.isDirty,
+      isValid: isValid ?? this.isValid,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record ?? '', isDirty];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record ?? '', isDirty, isValid];
 }

@@ -46,34 +46,40 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
           final extra = showButton ? 1 : 0;
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 18),
             controller: _scrollController,
             itemCount: stateProgress.items.length + extra,
             itemBuilder: (_, index) {
 
               // ===== item tambahan terakhir: tombol =====
               if (showButton && index == stateProgress.items.length) {
-                return BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
-                    selector: (s) {
-                      final groupStatusId = stateProgress.klaimProgressInfo?.groupStatusId ?? '';
-                      final klaimProgressNilaiId = (stateProgress.klaimProgressInfo?.klaimNilaiId ?? '').trim();
-                      final klaimCrudNilaiId = s.klaimNilaiId.trim();
-                      return groupStatusId == "20" && klaimProgressNilaiId.isEmpty && klaimCrudNilaiId.isEmpty;
-                    },
-                    builder: (context, enabledByBloc) {
-                      return KlaimProgressBtnMasukan(
-                        enabled: enabledByBloc,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-
-                              return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
-                            }),
-                          );
-                        },
-                      );
-                    }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 14, left: 30),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
+                      selector: (s) {
+                        final groupStatusId = stateProgress.klaimProgressInfo?.groupStatusId ?? '';
+                        final klaimProgressNilaiId = (stateProgress.klaimProgressInfo?.klaimNilaiId ?? '').trim();
+                        final klaimCrudNilaiId = s.klaimNilaiId.trim();
+                        return groupStatusId == "20" && klaimProgressNilaiId.isEmpty && klaimCrudNilaiId.isEmpty;
+                      },
+                      builder: (context, enabledByBloc) {
+                        return KlaimProgressBtnMasukan(
+                          enabled: enabledByBloc,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) {
+                                
+                                return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
+                              }),
+                            );
+                          },
+                        );
+                      }
+                    ),
+                  ),
                 );
               }
 
