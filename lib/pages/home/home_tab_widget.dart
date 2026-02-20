@@ -7,20 +7,13 @@ import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
 import '../../blocs/login/emailverification_bloc.dart';
 import '../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../blocs/reguser_profile/reguser_profile_cubit.dart';
-import '../../blocs/user_profile/user_profile_cubit.dart';
 import '../../common/constants.dart';
 import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
-import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
 import '../cari_asuransi/mobile/cari_asuransi_page.dart';
-import '../gen_klaim/mobile/klaim_main_page.dart';
 import '../heropage/mobile/heropage.dart';
-import '../qontak/mobile/chat_init_service.dart';
-import '../qontak/mobile/customer_service_page.dart';
 import '../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
 import '../settingpage/mobile/settingpage.dart';
-import 'draggable_chat_button.dart';
 
 class HomeTabWidget extends StatefulWidget {
   final UserRepository userRepository;
@@ -64,7 +57,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           listenWhen: (prev, curr) =>
           curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
           listener: (context, state) {
-            final nama = state.record?.rekanNama?.trim();
+            final nama = state.record?.rekanNama.trim();
             final mrekan1Id = state.record?.mrekan1Id;
             final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 

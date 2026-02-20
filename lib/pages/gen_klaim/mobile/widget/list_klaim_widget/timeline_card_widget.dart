@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -126,7 +125,7 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
                       kDivider(color: sGrey),
                       _buildDetailRow(
                           "Tanggal Kejadian",
-                          widget.record.kejadianTgl?.toString() ?? "-"),
+                          widget.record.kejadianTgl.toString() ?? "-"),
                       kDivider(color: sGrey),
                       _buildDetailRow(
                         "Nilai Klaim",
@@ -149,7 +148,7 @@ class _TimelineCardWidgetState extends State<TimelineCardWidget>
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: (widget.record.statusNama?.toLowerCase() ==
+                                color: (widget.record.statusNama.toLowerCase() ==
                                     "waiting")
                                     ? primaryColor
                                     : pGreen,

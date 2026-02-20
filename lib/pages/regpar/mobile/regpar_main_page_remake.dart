@@ -1,6 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -394,16 +393,14 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       bool sameDay(DateTime a, DateTime b) =>
           a.year == b.year && a.month == b.month && a.day == b.day;
 
-      if (mulai != null) {
-        if (akhir != null && sameDay(mulai, akhir)) {
-          debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
-        }
-
-        context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
-          DateTime(mulai.year, mulai.month, mulai.day), // normalize
-        ));
+      if (sameDay(mulai, akhir)) {
+        debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
       }
 
+      context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
+        DateTime(mulai.year, mulai.month, mulai.day), // normalize
+      ));
+    
       if (fieldComboRKonstruksiojk == null && record.comboRKonstruksiojk != null) {
         fieldComboRKonstruksiojk = record.comboRKonstruksiojk;
       }
@@ -2417,7 +2414,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final hasPreview =
         uploadState is UploadFotoObjectListPreview && uploadState.images.isNotEmpty;
 
-    if (hasPreview && uploadState is UploadFotoObjectListPreview) {
+    if (hasPreview) {
       final images = uploadState.images;
 
       return SizedBox(

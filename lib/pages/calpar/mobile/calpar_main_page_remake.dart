@@ -1,5 +1,4 @@
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -1025,7 +1024,7 @@ void _payloadform2(Calpar2FormModel record) {
     clearErrsByPrefix('form2.');
     bool ok = true;
 
-    bool _requiredPositiveNum(TextEditingController c, String key) {
+    bool requiredPositiveNum(TextEditingController c, String key) {
       final raw = c.text.trim();
       if (raw.isEmpty) {
         setErr(key, kStringNullError);
@@ -1047,11 +1046,11 @@ void _payloadform2(Calpar2FormModel record) {
     }
 
     // SI fields yang dipakai di UI
-    ok = _requiredPositiveNum(fieldSiMachineryController, 'form2.siMachinery') && ok;
-    ok = _requiredPositiveNum(fieldSiBuildingController, 'form2.siBuilding') && ok;
-    ok = _requiredPositiveNum(fieldSiContentController, 'form2.siContent') && ok;
-    ok = _requiredPositiveNum(fieldSiStockController, 'form2.siStock') && ok;
-    ok = _requiredPositiveNum(fieldSiOtherController, 'form2.siOther') && ok;
+    ok = requiredPositiveNum(fieldSiMachineryController, 'form2.siMachinery') && ok;
+    ok = requiredPositiveNum(fieldSiBuildingController, 'form2.siBuilding') && ok;
+    ok = requiredPositiveNum(fieldSiContentController, 'form2.siContent') && ok;
+    ok = requiredPositiveNum(fieldSiStockController, 'form2.siStock') && ok;
+    ok = requiredPositiveNum(fieldSiOtherController, 'form2.siOther') && ok;
 
     if (!ok) {
       setState(() => expanded[1] = true);

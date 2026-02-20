@@ -8,14 +8,10 @@ import '../../../blocs/gen_regmv/regmv1crud_bloc.dart';
 import '../../../blocs/gen_regmv/regmv1list_bloc.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv3form_bloc.dart';
-import '../../../blocs/gen_regmv/regmv4form_bloc.dart';
 import '../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../models/gen_regmv/regmv1crud_model.dart';
 import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
-import '../../../models/gen_regmv/regmv4form_model.dart';
-import '../../../widgets/apptheme/custom_progress_bar.dart';
-import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
 import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
@@ -347,11 +343,11 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
           _buildDetailRow(
             "Tanggal Mulai:",
-            DateFormat('dd MMM yyyy').format(data.polisMulai!),
+            DateFormat('dd MMM yyyy').format(data.polisMulai),
           ),
           _buildDetailRow(
             "Tanggal Berakhir:",
-            DateFormat('dd MMM yyyy').format(data.polisAkhir!),
+            DateFormat('dd MMM yyyy').format(data.polisAkhir),
           ),
 
           // _buildDetailRow(

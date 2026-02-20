@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../blocs/calpar/calpar1crud_bloc.dart';
 import '../../../blocs/calpar/calpar1list_bloc.dart';
-import '../../../blocs/calpar/calpar2form_bloc.dart';
-import '../../../blocs/calpar/calpar3form_bloc.dart';
 import '../../../blocs/calpar/calpar4form_bloc.dart';
 import '../../../helper/form_exit_guard.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
@@ -71,7 +69,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calpar1Id;
 
-              if (newId != null && newId.isNotEmpty) {
+              if (newId.isNotEmpty) {
                 setState(() {
                   calpar1Id = newId;
                 });

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
@@ -64,7 +63,7 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 		final bool hasFailure = !returnData.success;
 
 		if (!hasFailure) {
-			final newId = returnData.data?.toString() ?? "";
+			final newId = returnData.data.toString() ?? "";
 
 			final updatedRecord = event.record;
 			updatedRecord.regmv3Id = newId;

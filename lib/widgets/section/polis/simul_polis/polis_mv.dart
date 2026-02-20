@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
 
-import '../../../../common/thousand_separator_input_formatter.dart';
 
 class PolisMVPage extends StatefulWidget {
   const PolisMVPage({super.key});
@@ -53,7 +51,7 @@ class PolisMVPageState extends State<PolisMVPage> {
             child: Column(
               children: [
                 Center(
-                  child: Container(
+                  child: SizedBox(
                     width: responsive.maxWidth,
                     child: Form(
                       key: _formKey,
@@ -486,7 +484,7 @@ class PolisMVPageState extends State<PolisMVPage> {
             color: Colors.white,
           ),
           child: DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             hint: Text(
               hint,
               style: TextStyle(

@@ -3,8 +3,6 @@ import 'package:joss_app/common/constants.dart';
 
 import '../widgets/company_profile_widget.dart';
 import '../../../widgets/klien_jps_widget.dart';
-import '../widgets/milestone_jps_widget.dart';
-import '../widgets/peran_jps_widget.dart';
 import '../widgets/tentang_jps_widget.dart';
 import '../../../widgets/testimoni_widget.dart';
 

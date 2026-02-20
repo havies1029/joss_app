@@ -139,11 +139,11 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           ),
           child: ScrollbarTheme(
             data: ScrollbarThemeData(
-              thumbVisibility: MaterialStateProperty.all(true),
-              trackVisibility: MaterialStateProperty.all(false),
-              thickness: MaterialStateProperty.all(5),
+              thumbVisibility: WidgetStateProperty.all(true),
+              trackVisibility: WidgetStateProperty.all(false),
+              thickness: WidgetStateProperty.all(5),
               radius: const Radius.circular(cardBorderRadius),
-              thumbColor: MaterialStateProperty.all(
+              thumbColor: WidgetStateProperty.all(
                 scrollBar.withOpacity(0.1),
               ),
             ),
@@ -237,7 +237,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
       }) {
     final isSelected = selectedId == d.klaim1Id;
 
-    void _logSelectedRow(KlaimdetailCariModel d, int index) {
+    void logSelectedRow(KlaimdetailCariModel d, int index) {
       debugPrint("=========== ROW SELECTED ===========");
       debugPrint("Index         : $index");
       debugPrint("No Urut       : ${d.nourut}");
@@ -263,7 +263,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           child: CheckboxRadio(
             value: isSelected,
             onChanged: (checked) {
-              _logSelectedRow(d, index);
+              logSelectedRow(d, index);
               if (checked == true) {
                 groupcobCariBloc.add(SelectItemEvent(d.klaim1Id));
                 groupcobCariBloc.add(SelectKlaimRecordEvent(d));

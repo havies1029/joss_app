@@ -7,7 +7,7 @@ import '../../../common/constants.dart';
 
 class StartScreen extends StatefulWidget {
   final VoidCallback? onCompleted; // Tambahkan callback
-  const StartScreen({Key? key, this.onCompleted}) : super(key: key);
+  const StartScreen({super.key, this.onCompleted});
 
   @override
   State<StartScreen> createState() => _StartScreenState();

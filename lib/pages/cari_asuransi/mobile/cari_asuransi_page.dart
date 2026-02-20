@@ -3,13 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 import '../../../common/constants.dart';
-import '../../../widgets/section/polis/simul_polis/simul_mv/simul_mv_page.dart';
-import '../../../widgets/section/polis/simul_polis/simul_par/simul_par_page.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../base/base_background_firstpage.dart';
-import '../../calpar/mobile/calpar_main_page.dart';
 import '../../calpar/mobile/calpar_main_page_remake.dart';
-import '../../gen_calmv/mobile/calmv_main_page.dart';
 import '../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../regother/mobile/regother_form/regother_form1.dart';
 
@@ -20,13 +16,11 @@ class CariAsuransiWidget extends StatelessWidget {
 
   const CariAsuransiWidget({super.key, this.type = CariAsuransiType.page});
 
-  const CariAsuransiWidget.page({Key? key})
-    : type = CariAsuransiType.page,
-      super(key: key);
+  const CariAsuransiWidget.page({super.key})
+    : type = CariAsuransiType.page;
 
-  const CariAsuransiWidget.menu({Key? key})
-    : type = CariAsuransiType.menu,
-      super(key: key);
+  const CariAsuransiWidget.menu({super.key})
+    : type = CariAsuransiType.menu;
 
   @override
   Widget build(BuildContext context) {

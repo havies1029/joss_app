@@ -156,7 +156,7 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
           },
           children: [
             _tableHeader(
-                context, ["NO", "KATEGORI", "JUMLAH\NKLAIM", "TOTAL NILAI"]),
+                context, ["NO", "KATEGORI", "JUMLAHNKLAIM", "TOTAL NILAI"]),
             ...details.asMap().entries.map(
                   (e) => _detailRow(
                     e.value,

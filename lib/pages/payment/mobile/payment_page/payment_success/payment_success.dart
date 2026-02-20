@@ -103,20 +103,20 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                     ),
                     const SizedBox(height: vPadding),
                     Text(
-                      "${widget.display}",
+                      widget.display,
                       textAlign: TextAlign.center,
                       style: headingStyle(context),
                     ),
                     const SizedBox(height: hPadding),
                     Text(
-                      "${widget.description}",
+                      widget.description,
                       textAlign: TextAlign.center,
                       style: bodyTextStyle(context, fontSize: 20)
                           .copyWith(color: hintGrey),
                     ),
                     const SizedBox(height: vPadding),
                     AppButton.primary(
-                      text: "${widget.displayButton}",
+                      text: widget.displayButton,
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
                       width: 245,

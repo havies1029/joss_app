@@ -60,11 +60,11 @@ class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
         decoration: _boxDecoration(),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: MaterialStateProperty.all(true),
-            trackVisibility: MaterialStateProperty.all(false),
-            thickness: MaterialStateProperty.all(5),
+            thumbVisibility: WidgetStateProperty.all(true),
+            trackVisibility: WidgetStateProperty.all(false),
+            thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(scrollBar.withOpacity(0.25)),
+            thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.25)),
           ),
           child: Scrollbar(
             controller: hController,
@@ -196,9 +196,8 @@ class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
 // header cell helper biar const TableRow bisa dipakai
 class _HeaderCell extends StatelessWidget {
   final String text;
-  final bool center;
 
-  const _HeaderCell(this.text, {this.center = false});
+  const _HeaderCell(this.text);
 
   @override
   Widget build(BuildContext context) {
@@ -210,9 +209,7 @@ class _HeaderCell extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-      child: center
-          ? Center(child: Text(text, style: style))
-          : Text(text, style: style),
+      child: Center(child: Text(text, style: style)),
     );
   }
 }

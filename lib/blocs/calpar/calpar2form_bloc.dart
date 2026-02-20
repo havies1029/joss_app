@@ -43,7 +43,7 @@ class Calpar2FormBloc extends Bloc<Calpar2FormEvents, Calpar2FormState> {
 
 		final hasFailure = !returnData.success;
 
-		final newId = returnData.data?.toString() ?? "";
+		final newId = returnData.data.toString() ?? "";
 
 		final savedRecord = Calpar2FormModel(
 			calpar2Id: newId,

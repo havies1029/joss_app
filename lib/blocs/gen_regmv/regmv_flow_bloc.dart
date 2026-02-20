@@ -9,11 +9,6 @@ import 'regmv2form_bloc.dart';
 import 'regmv3form_bloc.dart';
 import 'regmv6form_bloc.dart';
 
-import 'package:joss_app/models/gen_regmv/regmv1crud_model.dart';
-import 'package:joss_app/models/gen_regmv/regmv2form_model.dart';
-import 'package:joss_app/models/gen_regmv/regmv3form_model.dart';
-import 'package:joss_app/models/gen_regmv/regmv6form_model.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 
 part 'regmv_flow_event.dart';
 part 'regmv_flow_state.dart';

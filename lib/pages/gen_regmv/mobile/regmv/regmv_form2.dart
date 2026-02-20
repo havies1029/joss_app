@@ -14,7 +14,6 @@ import '../../../../models/combobox/combormatauang_model.dart';
 import '../../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../../repositories/combobox/combommvjnscover_repository.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
-import '../../../../widgets/apptheme/numeric_to_one_decimal_formatter.dart';
 
 class RegmvForm2Section extends StatefulWidget {
   final String viewMode;
@@ -264,8 +263,8 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     fieldPllController.text = cleanNum(record.pll);
     fieldTplController.text = cleanNum(record.tpl);
 
-    fieldPolisMulaiController.text = record.polisMulai!.toIso8601String();
-    fieldPolisAkhirController.text = record.polisAkhir!.toIso8601String();
+    fieldPolisMulaiController.text = record.polisMulai.toIso8601String();
+    fieldPolisAkhirController.text = record.polisAkhir.toIso8601String();
 
     kejadianMulaiTgl = record.polisMulai;
     if (_isPayloadInjected) {

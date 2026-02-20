@@ -13,7 +13,7 @@ class RegmvUploadStnkApi {
       Uint8List imageBytes,
       String filename,
       ) async {
-    String url = _base + "api/regmv/regmv4form/uploadbinaryfotostnk";
+    String url = "${_base}api/regmv/regmv4form/uploadbinaryfotostnk";
 
     debugPrint("");
     debugPrint("🟦================ UPLOAD STNK START ================");

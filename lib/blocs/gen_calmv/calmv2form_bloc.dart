@@ -63,7 +63,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 			);
 
 			var newRecord = event.record;
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				final newId = returnData.data.toString();
 				if (newId.isNotEmpty) {
 					newRecord = event.record.copyWith(calmv2Id: newId);

@@ -46,7 +46,7 @@ class Regpar1CrudBloc extends Bloc<Regpar1CrudEvents, Regpar1CrudState> {
 
 		if (!hasFailure) {
 			// 🔥 ambil regpar1Id baru dari server
-			final newId = returnData.data?.toString() ?? "";
+			final newId = returnData.data.toString() ?? "";
 
 			// 🔥 update record
 			final updatedRecord = event.record;

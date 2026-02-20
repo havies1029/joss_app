@@ -17,21 +17,21 @@ class ComboMMvmodelModel extends Equatable {
 		// debug optional
 		// debugPrint('[ComboMMvmodelModel.fromJson] raw: $data');
 
-		String _asString(dynamic v) => (v ?? '').toString();
+		String asString(dynamic v) => (v ?? '').toString();
 
 		return ComboMMvmodelModel(
-			mmvmodelId: _asString(
+			mmvmodelId: asString(
 				data['mmvmodelId'] ?? data['mmvmodel_id'],
 			),
-			mmvtipeId: _asString(
+			mmvtipeId: asString(
 				data['mmvtipeId'] ??
 						data['mvtipeId'] ??      // kalau backend pakai ini
 						data['mmvtipe_id'],
 			),
-			nmModel: _asString(
+			nmModel: asString(
 				data['nmModel'] ?? data['nm_model'],
 			),
-			nmTipe: _asString(
+			nmTipe: asString(
 				data['nmTipe'] ?? data['nm_tipe'], // mungkin ada join ke tipe
 			),
 		);

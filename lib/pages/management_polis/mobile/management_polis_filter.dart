@@ -10,7 +10,6 @@ import 'package:joss_app/blocs/gen_status_aset/statusasetcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/gen_cob_app/button_group_cob_aset.dart';
 import 'package:joss_app/pages/gen_status_aset/button_group_status_aset.dart';
-import 'package:joss_app/pages/management_polis/mobile/theme/polis_full_page_loader.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

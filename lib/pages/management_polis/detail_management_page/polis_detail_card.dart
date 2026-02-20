@@ -131,7 +131,7 @@ class PolisDetailCard extends StatelessWidget {
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

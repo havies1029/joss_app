@@ -968,7 +968,6 @@
 //     );
 //   }
 // }
-import 'package:dio/dio.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -982,7 +981,6 @@ import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
-import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvdoccrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvstatuscrud_repository.dart';
 import 'package:joss_app/blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
@@ -1061,7 +1059,6 @@ import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
 
 import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
-import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
 import 'package:joss_app/repositories/payment/invbayarvaform_repository.dart';
 import 'package:joss_app/repositories/payment/pay1crud_repository.dart';
 
@@ -1069,8 +1066,6 @@ import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 import 'package:joss_app/repositories/regother/regother1crud_repository.dart';
 import 'package:joss_app/repositories/regother/regother2form_repository.dart';
 
-import 'package:joss_app/repositories/regklaim/picker_repository.dart';
-import 'package:joss_app/repositories/regklaim/upload_repository.dart';
 import 'package:joss_app/repositories/regklaim/regklaim1crud_repository.dart';
 import 'package:joss_app/repositories/regklaim/sppaheader_repository.dart';
 
@@ -1079,7 +1074,6 @@ import 'package:joss_app/repositories/regreaktif/regreaktif1_repository.dart';
 
 import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
 import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
-import 'package:joss_app/repositories/simulpar/simulparlist_repository.dart';
 
 import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
@@ -1226,7 +1220,6 @@ import 'blocs/regother/regother1list_bloc.dart';
 import 'blocs/regother/regother2form_bloc.dart';
 import 'blocs/regother/regother3cari_bloc.dart';
 
-import 'blocs/regklaim/attach_bloc.dart';
 import 'blocs/regklaim/cobklaimcari_bloc.dart';
 import 'blocs/regklaim/polissourcecari_bloc.dart';
 import 'blocs/regklaim/regklaim1crud_bloc.dart';
@@ -1587,42 +1580,7 @@ Future<void> main() async {
                 context.read<MRekanContactCrudBloc>().add(MRekanContactCrudLihatEvent());
               }
             },
-          ),
-          BlocListener<EmailVerificationBloc, EmailVerificationState>(
-            listenWhen: (prev, curr) =>
-            prev.record != curr.record && curr.record != null && !curr.hasFailure,
-            listener: (context, state) {
-              // no-op (sesuai kode kamu)
-            },
-          ),
-          BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
-            listenWhen: (prev, curr) => curr.isLoaded && prev.record != curr.record,
-            listener: (context, state) {
-              // no-op (sesuai kode kamu)
-            },
-          ),
-          BlocListener<NetworkBloc, NetworkState>(
-            listener: (context, state) {
-              final messenger = ScaffoldMessenger.of(context);
-              messenger.clearSnackBars();
-
-              if (state is NetworkFailure) {
-                messenger.showSnackBar(
-                  errorSnackBar(
-                    "You're not Connected to Internet",
-                    icon: Icons.signal_wifi_off,
-                  ),
-                );
-              } else if (state is NetworkSuccess) {
-                messenger.showSnackBar(
-                  successSnackBar(
-                    "You're Connected to Internet",
-                    icon: Icons.wifi,
-                  ),
-                );
-              }
-            },
-          ),
+          ),                    
           BlocListener<AuthenticationBloc, AuthenticationState>(
             listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
             listener: (context, state) {
@@ -1641,12 +1599,7 @@ Future<void> main() async {
               }
             },
           ),
-          BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-            listenWhen: (_, c) => c is ProfileDownloadFotoLoaded,
-            listener: (context, state) {
-              // no-op (sesuai kode kamu)
-            },
-          ),
+          
         ],
         child: _App(
           userRepository: userRepository,
@@ -1662,7 +1615,6 @@ class _App extends StatefulWidget {
   final bool seenOnboarding;
 
   const _App({
-    super.key,
     required this.userRepository,
     required this.seenOnboarding,
   });
@@ -1713,6 +1665,29 @@ class _AppState extends State<_App> {
             }
           },
         ),
+
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
+          listener: (_, state) {
+            if (state is AuthenticationAuthenticated) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final nav = _navigatorKey.currentState;
+                if (nav == null) return;
+
+                if (state.authenticatedFrom != "calmv_page"){
+                  while (nav.canPop()) {
+                    nav.pop();
+                  }
+                }
+                else {
+                  if (nav.canPop()) {
+                    nav.pop();
+                  }
+                }
+              });
+            }
+          },
+        ),
       ],
       child: MaterialApp(
         navigatorKey: _navigatorKey,
@@ -1741,11 +1716,9 @@ class _AppState extends State<_App> {
         },
         home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
+            //micky
             if (state is AuthenticationAuthenticated) {
-              while (_navigatorKey.currentState?.canPop() ?? false) {
-                _navigatorKey.currentState?.pop();
-              }
-
+              
               final user = state.user;
               final homeWidget =
               HomeTabWidget(userRepository: widget.userRepository);
@@ -1755,20 +1728,20 @@ class _AppState extends State<_App> {
                 return homeWidget;
               }
 
-              if ((user.userType ?? '').toUpperCase() == 'C') {
+              if ((user.userType).toUpperCase() == 'C') {
                 return BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
                   listenWhen: (prev, curr) =>
                   prev.record?.mrekan1Id != curr.record?.mrekan1Id &&
                       curr.record?.mrekan1Id != null &&
-                      curr.record!.mrekan1Id!.trim().isNotEmpty,
+                      curr.record!.mrekan1Id.trim().isNotEmpty,
                   listener: (context, state) async {
                     if (ChatInitService.I.isInitialized) return;
 
                     try {
-                      final userId = state.record!.mrekan1Id!.trim();
+                      final userId = state.record!.mrekan1Id.trim();
                       final displayName =
-                      (state.record?.rekanNama?.trim().isNotEmpty ?? false)
-                          ? state.record!.rekanNama!.trim()
+                      (state.record?.rekanNama.trim().isNotEmpty ?? false)
+                          ? state.record!.rekanNama.trim()
                           : "Guest";
 
                       await ChatInitService.I.ensureInit(

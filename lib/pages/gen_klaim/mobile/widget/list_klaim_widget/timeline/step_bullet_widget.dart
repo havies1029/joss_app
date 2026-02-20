@@ -9,7 +9,7 @@ class StepBulletWithText extends StatelessWidget {
   final bool isActive;
   final bool isDone;
 
-  const StepBulletWithText({
+  const StepBulletWithText({super.key, 
     required this.label,
     required this.icon,
     required this.isActive,
@@ -45,7 +45,7 @@ class StepBulletWithText extends StatelessWidget {
       textColor = unselectedColor;
     }
 
-    return Container(
+    return SizedBox(
       width: 90, // 50% lebih pendek dari 180 -> 90
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -86,7 +86,7 @@ class StepBulletWithText extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Label text - centered
-          Container(
+          SizedBox(
             width: 80, // Disesuaikan dengan container width yang lebih kecil
             child: Text(
               label,

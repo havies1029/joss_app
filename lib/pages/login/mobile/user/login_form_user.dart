@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
@@ -14,7 +13,6 @@ import '../../../../helper/auth_input_router.dart';
 import '../../../../models/login/emailverification_model.dart';
 import 'package:joss_app/widgets/google/google_signin_button_stub.dart'
   if (dart.library.js_interop) 'package:joss_app/widgets/google/google_signin_button_web.dart';
-import '../client/login_client_page.dart';
 
 const List<String> scopes = <String>[
   'email',
@@ -48,7 +46,7 @@ class _LoginFormUserState extends State<LoginFormUser>
   // Untuk animasi
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
-  bool _isHoveringGmail = false;
+  final bool _isHoveringGmail = false;
   bool _rememberPassword = true; // Variabel untuk checkbox Remember Password
 
   @override
@@ -95,7 +93,7 @@ class _LoginFormUserState extends State<LoginFormUser>
 
         // validasi email atau hp
         final isEmail = emailValidatorRegExp.hasMatch(value.trim());
-        final isPhone = RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$').hasMatch(value.trim());
+        final isPhone = phoneValidatorRegExp.hasMatch(value.trim());
 
         if (!isEmail && !isPhone) {
           return "Masukkan format email atau nomor HP yang valid";

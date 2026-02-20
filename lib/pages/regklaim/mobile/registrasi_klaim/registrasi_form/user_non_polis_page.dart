@@ -8,7 +8,6 @@ import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_state.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
-import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
@@ -199,10 +198,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     }
 
     final tglMulai = context.read<PolisTanggalBloc>().state.mulai;
-    if (tglMulai == null) {
-      setErr('form1.tglMulai', kStringNullError);
-      ok = false;
-    }
 
     return ok;
   }

@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/comborokupasi_model.dart';
 import 'package:joss_app/models/combobox/comborkonstruksiojk_model.dart';
 import 'package:joss_app/models/combobox/combomjnscoverpar_model.dart';
@@ -43,7 +41,7 @@ class 	Calpar1CrudBloc extends Bloc<Calpar1CrudEvents, Calpar1CrudState> {
 		final returnData = await repository.calpar1CrudTambah(event.record);
 		bool hasFailure = !returnData.success;
 		Calpar1CrudModel newRecord = event.record;
-		if (returnData.success && returnData.data is String) {
+		if (returnData.success) {
 			newRecord = event.record.copyWith(calpar1Id: returnData.data.toString());
 		}
 

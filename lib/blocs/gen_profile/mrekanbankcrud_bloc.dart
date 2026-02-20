@@ -82,7 +82,7 @@ class MRekanBankCrudBloc extends Bloc<MRekanBankCrudEvents, MRekanBankCrudState>
 					comboMBank: record.comboMBank,
 				));
 			}
-		} catch (e, stack) {
+		} catch (e) {
 			emit(state.copyWith(isLoading: false, isLoaded: true, record: null));
 		}
 	}

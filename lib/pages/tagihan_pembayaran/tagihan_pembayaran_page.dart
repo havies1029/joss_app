@@ -1,16 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:joss_app/pages/payment/ringkasan/detail/dnsppacari_list_widget.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/payment_rincian_tab.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/payment_ringkasan_tab.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/payment_riwayat_tab.dart';
 import '../../common/constants.dart';
 import '../../widgets/apptheme/header_card.dart';
 import '../base/base_background_sidepage.dart';
-import '../literasi/mobile/artikel/artikel_page.dart';
-import '../literasi/mobile/tentang_jps_page.dart';
-import '../literasi/mobile/testimoni_page.dart';
 
 class TagihanPembayaranPage extends StatefulWidget {
   const TagihanPembayaranPage({super.key});

@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/regother/regother1crud_model.dart';
@@ -45,7 +44,7 @@ class Regother1CrudBloc extends Bloc<Regother1CrudEvents, Regother1CrudState> {
 		final returnData = await repository.regother1CrudTambah(event.record);
 		final hasFailure = !returnData.success;
 
-		final newId = (!hasFailure && returnData.data != null)
+		final newId = (!hasFailure)
 				? returnData.data.toString()
 				: "";
 

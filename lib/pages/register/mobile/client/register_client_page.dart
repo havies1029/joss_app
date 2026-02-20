@@ -1,7 +1,5 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/register/mobile/client/register_form_client.dart';
 import 'package:joss_app/pages/register/mobile/client/register_form_client_remake.dart';
 
 import '../../../../common/constants.dart';
@@ -12,10 +10,10 @@ class RegisterClient extends StatefulWidget {
   const RegisterClient({super.key, required this.requestFrom});
 
   @override
-  _RegisterClientState createState() => _RegisterClientState();
+  RegisterClientState createState() => RegisterClientState();
 }
 
-class _RegisterClientState extends State<RegisterClient>
+class RegisterClientState extends State<RegisterClient>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
@@ -40,14 +38,12 @@ class _RegisterClientState extends State<RegisterClient>
 
   // Widget yang mengandung RegisterFormClient
   Widget _buildDesignRegisterFormClient() {
-    return RegisterFormClientRemake(requestFrom: widget.requestFrom,);
+    return RegisterFormClientRemake(requestFrom: widget.requestFrom);
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('[RegisterClient] build requestFrom=${widget.requestFrom}');
     final screenHeight = MediaQuery.of(context).size.height;
-    final verticalPadding = screenHeight * 0.03;
     final headerSpacing = screenHeight * 0.025;
 
     return Scaffold(

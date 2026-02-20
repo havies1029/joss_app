@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -9,10 +8,8 @@ import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../blocs/gen_invite/invite_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
-import '../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/gen_profile/mrekanpiclist_model.dart';
-import '../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../repositories/gen_invite/invite_repository.dart';
 import '../../../../../widgets/apptheme/invite_success_popup.dart';
 import '../../../../../widgets/showdialoghapus_widget.dart';

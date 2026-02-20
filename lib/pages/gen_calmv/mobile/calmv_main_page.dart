@@ -6,7 +6,6 @@ import '../../../blocs/gen_calmv/calmv1crud_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1list_bloc.dart';
 import '../../../blocs/gen_calmv/calmv2form_bloc.dart';
 import '../../../blocs/gen_calmv/calmv3form_bloc.dart';
-import '../../../blocs/reguser/reguser_bloc.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
@@ -66,8 +65,8 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
           listener: (context, state) {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calmv1Id;
-              debugPrint("ini id apaan dh " + newId);
-              if (newId != null && newId.isNotEmpty) {
+              debugPrint("ini id apaan dh $newId");
+              if (newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calmv1 saved → result ID = $newId");
                 final regmv = state.record!.regmv1Id;
                 setState(() {
@@ -96,7 +95,7 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calmv2Id;
 
-              if (newId != null && newId.isNotEmpty) {
+              if (newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calmv2 saved → result ID = $newId");
 
                 setState(() {
@@ -259,7 +258,7 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
                           ),
                           const SizedBox(height: hPadding),
                           AppButton.primary(
-                            text: "Lanjutkan",
+                            text: "Lanjutkanx",
                             onPressed: onLanjutkanPressed,
                           ),
                         ],

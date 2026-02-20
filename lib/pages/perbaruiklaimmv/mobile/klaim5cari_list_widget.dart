@@ -113,10 +113,12 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     if (p.endsWith('.png')) return 'image/png';
     if (p.endsWith('.webp')) return 'image/webp';
     if (p.endsWith('.pdf')) return 'application/pdf';
-    if (p.endsWith('.doc') || p.endsWith('.docx'))
+    if (p.endsWith('.doc') || p.endsWith('.docx')) {
       return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    if (p.endsWith('.xls') || p.endsWith('.xlsx'))
+    }
+    if (p.endsWith('.xls') || p.endsWith('.xlsx')) {
       return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    }
     if (p.endsWith('.txt')) return 'text/plain';
     return null;
   }

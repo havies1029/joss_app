@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/pages/base/base_background_firstpage.dart';
-import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
 import 'package:joss_app/pages/payment/mobile/ringkasan/detail/ringkasan_detail_table_widget.dart';
 

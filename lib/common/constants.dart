@@ -1,4 +1,4 @@
-library constants;
+library;
 
 import 'dart:async';
 
@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';

@@ -14,7 +14,6 @@ import '../../../../../models/combobox/combomkabzonagempa_model.dart';
 import '../../../../../models/combobox/combomwilayah_model.dart';
 import '../../../../../models/combobox/comborkonstruksiojk_model.dart';
 import '../../../../../models/combobox/comborokupasi_model.dart';
-import '../../../../../pages/polis/sppa/sppa_polis_par.dart';
 import '../../real_polis/sppa_par/sppa_par_page.dart';
 
 class SimulParPage extends StatefulWidget {
@@ -26,7 +25,7 @@ class SimulParPage extends StatefulWidget {
 
 class _SimulParPageState extends State<SimulParPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _showPremiSection = false;
+  final bool _showPremiSection = false;
 
   @override
   void initState() {

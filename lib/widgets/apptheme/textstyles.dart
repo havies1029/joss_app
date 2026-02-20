@@ -43,13 +43,13 @@ class HoverableText extends StatefulWidget {
   final TextOverflow? overflow;
 
   const HoverableText({
-    Key? key,
+    super.key,
     required this.text,
     required this.styleBuilder,
     this.onTap,
     this.maxLines,
     this.overflow,
-  }) : super(key: key);
+  });
 
   @override
   State<HoverableText> createState() => _HoverableTextState();

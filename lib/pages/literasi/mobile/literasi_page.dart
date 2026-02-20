@@ -6,7 +6,7 @@ import 'package:joss_app/pages/literasi/mobile/testimoni_page.dart';
 import 'package:joss_app/common/constants.dart';
 
 class LiterasiPage extends StatefulWidget {
-  const LiterasiPage({Key? key}) : super(key: key);
+  const LiterasiPage({super.key});
 
   @override
   State<LiterasiPage> createState() => _LiterasiPageState();

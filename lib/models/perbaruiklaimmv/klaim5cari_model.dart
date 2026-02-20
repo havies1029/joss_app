@@ -80,7 +80,7 @@ class Klaim5cariModel {
     return Klaim5cariModel(
       jenisDocLain: jenisDocLain ?? this.jenisDocLain,
       klaim5Id: klaim5Id ?? this.klaim5Id,
-      mjenisdocId: mjenisdocId ?? this.mjenisdocId,
+      mjenisdocId: mjenisdocId ?? mjenisdocId,
       klaim1Id: klaim1Id ?? this.klaim1Id,
       jenisNama: jenisNama ?? this.jenisNama,
       localPath: localPath ?? this.localPath,

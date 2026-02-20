@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/gen_profile/mrekancontactcrud_bloc.dart';
@@ -13,9 +10,6 @@ import 'package:joss_app/models/combobox/combompropinsi_model.dart';
 import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../../blocs/user_profile/user_profile_state.dart';
-import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../../repositories/combobox/comborkodepos_repository.dart';
@@ -45,7 +39,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
   ComboRKodeposModel? fieldComboRKodepos;
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
 
-  bool _isFirstLoad = true;
+  final bool _isFirstLoad = true;
 
   @override
   void initState() {

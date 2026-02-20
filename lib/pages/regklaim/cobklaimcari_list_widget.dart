@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/regklaim/cobklaimcari_bloc.dart';
-import 'package:joss_app/pages/regklaim/cobklaimcari_tile_widget.dart';
 import 'package:joss_app/pages/regklaim/polissourcecari_main.dart';
 import 'package:joss_app/models/regklaim/cobklaimcari_model.dart';
 

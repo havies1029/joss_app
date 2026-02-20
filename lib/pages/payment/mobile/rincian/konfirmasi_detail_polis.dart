@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/pages/payment/mobile/rincian/rincian_grand_total_widget.dart';
 import 'package:joss_app/pages/payment/mobile/rincian/rincian_tabel_page.dart';
 
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';

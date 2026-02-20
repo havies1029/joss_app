@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
@@ -90,7 +89,7 @@ class MilestoneJPSWidget extends StatelessWidget {
 
         const SizedBox(height: 24),
 
-        ...milestones.map((m) => _MilestoneTile(m)).toList(),
+        ...milestones.map((m) => _MilestoneTile(m)),
       ],
     );
   }

@@ -59,7 +59,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
               .where((e) => allowedIds.contains(e.mstatusasetId))
               .toList();
 
-          String _statusNama(String id) {
+          String statusNama(String id) {
             switch (id) {
               case "10001":
                 return "Aktif";
@@ -90,7 +90,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
                   padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
                   child: StatusChip(
                     statusId: id,
-                    label: _statusNama(id),
+                    label: statusNama(id),
                     isSelected: isSelected,
                     onTap: () {
                       context.read<StatusAsetCariBloc>().add(SelectButton(id));

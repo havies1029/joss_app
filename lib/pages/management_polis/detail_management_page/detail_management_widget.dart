@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/models/regother/regother3cari_model.dart';
 import 'package:joss_app/models/regreaktif/regreaktif2cari_model.dart';
 import 'package:joss_app/models/regrenewal/regrenewal2cari_model.dart';
@@ -9,8 +8,6 @@ import 'package:joss_app/pages/management_polis/detail_management_page/polis_det
 import 'package:joss_app/pages/management_polis/detail_management_page/timeline_page.dart';
 import 'package:joss_app/pages/management_polis/mobile/management_polis_page.dart';
 import '../../../../../common/constants.dart';
-import '../../../../../widgets/apptheme/help_contact_card_widget.dart';
-import 'package:joss_app/models/gen_endors/endors2cari_model.dart';
 
 import '../../../blocs/regendors/regendors1form_bloc.dart';
 import '../../../blocs/regendors/regendors2cari_bloc.dart';
@@ -477,7 +474,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                 normalDotColor: hintGrey, index: index,
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/regreaktif/regreaktif1_model.dart';
 import 'package:joss_app/repositories/regreaktif/regreaktif1_repository.dart';
 
@@ -29,7 +28,7 @@ class Regreaktif1Bloc extends Bloc<Regreaktif1Events, Regreaktif1State> {
 
 			Regreaktif1Model newRecord = event.record;
 
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				newRecord = event.record.copyWith(
 					sppa1Id: returnData.data.toString(),
 				);

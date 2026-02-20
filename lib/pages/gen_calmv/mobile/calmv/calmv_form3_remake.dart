@@ -42,9 +42,9 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
     if (form3Record == null) return;
 
     setState(() {
-      diskonPremiCtrl.text = form3Record!.premiDiskon.toString();
-      netCtrl.text = form3Record!.premiNet.toString();
-      subtotalCtrl.text = form3Record!.premiSubtotal.toString();
+      diskonPremiCtrl.text = form3Record.premiDiskon.toString();
+      netCtrl.text = form3Record.premiNet.toString();
+      subtotalCtrl.text = form3Record.premiSubtotal.toString();
     });
   }
 

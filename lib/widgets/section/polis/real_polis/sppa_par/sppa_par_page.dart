@@ -1,7 +1,6 @@
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/section/polis/real_polis/sppa_par/sppa_form/sppaparcrud_form.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../../../common/constants.dart';
@@ -15,7 +14,7 @@ class SppaParPage extends StatefulWidget {
 
 class _SppaParPageState extends State<SppaParPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _showPremiSection = true;
+  final bool _showPremiSection = true;
 
   @override
   Widget build(BuildContext context) {

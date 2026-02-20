@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/common/app_data.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../blocs/login/login_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
@@ -22,7 +22,7 @@ class RegisterFormClientRemake extends StatefulWidget {
 
 class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 {
-
+  var lastLoginBy = "";
   final fieldNameController = TextEditingController();
   final fieldPasswordController = TextEditingController();
   final fieldTeleponController = TextEditingController();
@@ -34,14 +34,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
   late EmailVerificationBloc emailVerificationBloc;
   late final RegUserModel? record;
-  String requestFrom = '';
-
-  @override
-  void initState() {
-    super.initState();
-    emailVerificationBloc = context.read<EmailVerificationBloc>();
-    requestFrom = emailVerificationBloc.state.record!.requestFrom!;
-  }
 
   @override
   void dispose(){
@@ -223,6 +215,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
   @override
   Widget build(BuildContext context) {
+    var email = AppData.user.email??"";
+    final isEmail = emailValidatorRegExp.hasMatch(email.trim());
+    lastLoginBy = isEmail ? "email" : "hp";
     return BlocConsumer<RegUserBloc, RegUserState>(
       listener: (context, state) {
         // gagal dari API
@@ -230,25 +225,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
           final msg = state.errors.first;
           ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
           return;
-        }
-
-        // sukses
-        if (state.isSaved) {
-          final email = state.record!.email;
-          final password = state.record!.password;
-
-          context.read<LoginBloc>().add(
-            LoginButtonPressed(
-              email: email,
-              password: password,
-              rememberMe: true,
-            ),
-          );
-
-
-
-          // kalau mau langsung balik halaman:
-          // Navigator.of(context, rootNavigator: true).pop();
         }
       },
       builder: (context, state) {
@@ -351,10 +327,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                 _buildNameField(),
                                 SizedBox(height: vPadding),
 
-                                if (requestFrom == 'email') ...[
+                                if (lastLoginBy == 'email') ...[
                                   _buildTeleponField(),
                                   SizedBox(height: vPadding),
-                                ] else if (requestFrom == 'hp') ...[
+                                ] else if (lastLoginBy == 'hp') ...[
                                   _buildEmailField(),
                                   SizedBox(height: vPadding),
                                 ],
@@ -372,6 +348,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                   text: "Submit",
                                   onPressed: onSubmit,
                                 ),
+
                                 const Spacer(),
                               ],
                             ),
@@ -395,8 +372,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
     final evState = context.read<EmailVerificationBloc>().state;
 
-    final bool fromEmail = widget.requestFrom == 'email';
-    final bool fromHp = widget.requestFrom == 'hp';
+    final bool fromEmail = lastLoginBy == 'email';
 
     final String email = fromEmail
         ? evState.email

@@ -1,18 +1,12 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import '../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../blocs/profile/profile_upload_foto_bloc.dart';
-import '../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../common/constants.dart';
-import '../../../../repositories/user/user_repository.dart';
-import '../../../base/base_background_firstpage.dart';
 import '../../../base/base_background_sidepage.dart';
-import '../../../home/home_tab_widget.dart';
-import 'package:joss_app/blocs/user_profile/user_profile_cubit.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

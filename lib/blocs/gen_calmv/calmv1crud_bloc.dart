@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
 import 'package:joss_app/models/combobox/combommvgrupojk_model.dart';
@@ -73,7 +72,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			final hasFailure = !returnData.success;
 
 			Calmv1CrudModel newRecord = event.record;
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
 			}
 

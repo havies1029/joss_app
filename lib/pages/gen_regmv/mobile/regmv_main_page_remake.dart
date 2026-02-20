@@ -1,6 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
-import 'package:joss_app/pages/gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import 'package:string_validator/string_validator.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
@@ -418,17 +416,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       bool sameDay(DateTime a, DateTime b) =>
           a.year == b.year && a.month == b.month && a.day == b.day;
 
-      if (mulai != null) {
-        if (akhir != null && sameDay(mulai, akhir)) {
-          debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
-        }
-
-        context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
-          DateTime(mulai.year, mulai.month, mulai.day), // normalize
-        ));
+      if (sameDay(mulai, akhir)) {
+        debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
       }
-      if (selectedPassengerCount.trim().isEmpty && record.passangerCount != null) {
-        final v = record.passangerCount!.toString();
+
+      context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
+        DateTime(mulai.year, mulai.month, mulai.day), // normalize
+      ));
+          if (selectedPassengerCount.trim().isEmpty) {
+        final v = record.passangerCount.toString();
         if (v.isNotEmpty) selectedPassengerCount = v;
       }
 
@@ -470,7 +466,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     setState(() {
       final thn = record.thnBuat;
-      if (selectedYearform3.trim().isEmpty && thn != null && thn != 0) {
+      if (selectedYearform3.trim().isEmpty && thn != 0) {
         selectedYearform3 = thn.toString();
       }
 
@@ -975,7 +971,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
                 title: "Kendaraan",
-                subtitle: "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
+                subtitle: "Isi detail kendaraan a, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
             ),
 
@@ -1001,7 +997,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     isExpanded: expanded[0],
                     onToggle: (v) => setState(() => expanded[0] = v),
                     onRefresh: () {
-                      debugPrint("regmv1Id : ${regmv1Id} + widget.regmv1Id : ${widget.regmv1Id}");
+                      debugPrint("regmv1Id : $regmv1Id + widget.regmv1Id : ${widget.regmv1Id}");
                       if (regmv1Id != null && regmv1Id!.isNotEmpty) {
                         refreshForm1(recordId: regmv1Id);
                       }
@@ -1381,7 +1377,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   if (hasForm6Record) ...[
                     AppButton.iconRight(
-                      text: "Lanjutkan",
+                      text: "Lanjutkanx",
                       icon: Icon(Icons.arrow_forward),
                       onPressed: () {
                         Navigator.push(
@@ -1779,8 +1775,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     });
 
     if (!ok4 || !ok5 || !ok7) {
-      if (!ok4) openForm4(recordId: regmv1Id);
-      else if (!ok5) openForm5(recordId: regmv1Id);
+      if (!ok4) {
+        openForm4(recordId: regmv1Id);
+      } else if (!ok5) openForm5(recordId: regmv1Id);
       else if(!ok7) openForm6(recordId: regmv1Id);
       return;
     }
@@ -2775,7 +2772,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final hasPreview =
         uploadState is UploadStnkListPreview && uploadState.images.isNotEmpty;
 
-    if (hasPreview && uploadState is UploadStnkListPreview) {
+    if (hasPreview) {
       final images = uploadState.images;
 
       return SizedBox(
@@ -3129,7 +3126,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final hasPreview =
         uploadState is UploadFotoMobilListPreview && uploadState.images.isNotEmpty;
 
-    if (hasPreview && uploadState is UploadFotoMobilListPreview) {
+    if (hasPreview) {
       final images = uploadState.images;
 
       return SizedBox(
@@ -3578,7 +3575,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final hasPreview =
         uploadState is UploadFotoAccListPreview && uploadState.images.isNotEmpty;
 
-    if (hasPreview && uploadState is UploadFotoAccListPreview) {
+    if (hasPreview) {
       final images = uploadState.images;
 
       return SizedBox(

@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -212,7 +211,7 @@ class RegmvForm4SectionState extends State<RegmvForm4Section> {
     final hasPreview =
         uploadState is UploadStnkListPreview && uploadState.images.isNotEmpty;
 
-    if (hasPreview && uploadState is UploadStnkListPreview) {
+    if (hasPreview) {
       final images = uploadState.images;
 
       return SizedBox(

@@ -48,7 +48,7 @@ class Regmv1CrudBloc extends Bloc<Regmv1CrudEvents, Regmv1CrudState> {
 
 		if (!hasFailure) {
 			// 🔥 ambil regmv1Id baru dari server
-			final newId = returnData.data?.toString() ?? "";
+			final newId = returnData.data.toString() ?? "";
 				debugPrint("🔥 [BLOC][REGMV1] new regmv1Id from API = $newId");
 
 			// 🔥 update record di event (model kamu mutable kan)

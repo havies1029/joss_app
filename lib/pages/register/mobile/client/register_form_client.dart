@@ -9,7 +9,6 @@ import '../../../../common/constants.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../widgets/combobox/combomjnsclient_widget.dart';
-import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
 
 class RegisterFormClient extends StatefulWidget {

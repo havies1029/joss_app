@@ -1,10 +1,8 @@
 
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/preview_pages.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../blocs/regklaim/attach_bloc.dart';
 import '../../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../../common/app_data.dart';
@@ -12,7 +10,6 @@ import '../../../../../../common/constants.dart';
 import '../../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../../repositories/regklaim/upload_repository.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'attachment_picker_panel.dart';
 

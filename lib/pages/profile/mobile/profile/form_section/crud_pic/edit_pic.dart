@@ -10,18 +10,14 @@ import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
 import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
-import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
-import '../../../../../../apis/gen_profile/rekanpiccobcari_api.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import '../../../../../gen_profile/common/rekanpiccobcari_list.dart';
-import '../../../../../gen_profile/rekanpiccobmultipage.dart';
 
 class EditPicWidget extends StatefulWidget {
   final String mrekanpicId;
@@ -142,7 +138,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     ComboMJabatanModel? selected = _jabatan;
     try {
       final st = _comboKey.currentState;
-      if (selected == null) selected = st?.getSelectedItem;
+      selected ??= st?.getSelectedItem;
     } catch (_) {}
     final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
@@ -398,7 +394,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                               ),
                                               const SizedBox(height: 4),
 
-                                              if (_pendingCobList!.isEmpty)
+                                              if (_pendingCobList.isEmpty)
                                                 const Text(
                                                   'Pilih Daftar COB',
                                                   style: TextStyle(
@@ -412,7 +408,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                   spacing: 6,
                                                   runSpacing: 6,
                                                   children: _pendingCobList
-                                                      !.map(
+                                                      .map(
                                                         (e) => Container(
                                                       padding: const EdgeInsets.symmetric(
                                                           horizontal: 10, vertical: 6),

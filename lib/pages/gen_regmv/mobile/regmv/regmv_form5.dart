@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
 import '../../../../blocs/gen_regmv/regmv5cari_bloc.dart';
 import '../../../../blocs/gen_regmv/regmv5form_bloc.dart';
@@ -42,7 +37,7 @@ class RegmvForm5Section extends StatefulWidget {
 
 class RegmvForm5SectionState extends State<RegmvForm5Section> {
   final _regmvform5key = GlobalKey<FormState>();
-  bool _showError = false;
+  final bool _showError = false;
   Completer<bool>? _validationCompleter;
 
   List<Uint8List> _images = [];

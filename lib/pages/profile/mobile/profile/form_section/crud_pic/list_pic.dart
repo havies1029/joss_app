@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpiclist_bloc.dart';
@@ -12,7 +11,6 @@ import 'package:joss_app/widgets/showdialoghapus_widget.dart';
 
 import '../../../../../../blocs/gen_invite/invite_bloc.dart';
 import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../repositories/gen_invite/invite_repository.dart';
 import '../../../../../../widgets/apptheme/invite_success_popup.dart';
 import '../../../../../base/base_background_sidepage.dart';
@@ -145,8 +143,7 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                 return Column(
                                   children: List.generate(state.items.length, (i) {
                                     final it = state.items[i];
-                                    if (it.mrekanpicId == null ||
-                                        it.mrekanpicId!.isEmpty) {
+                                    if (it.mrekanpicId.isEmpty) {
                                       debugPrint(
                                           '⛔ Skip card karena mrekanpicId kosong untuk ${it.picNama}');
                                       return const SizedBox.shrink();
@@ -162,11 +159,11 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                         email: it.picEmail ?? '-',
                                         telp: it.picHp ?? '-',
                                         jabatan: it.jabatanDesc ?? '-',
-                                        mrekanpicId: it.mrekanpicId!,
+                                        mrekanpicId: it.mrekanpicId,
                                         statusPic: it.statusPic,
                                         onEdit: () async {
                                           final jabatanModelFromList = ComboMJabatanModel(
-                                            mjabatanId: it.mjabatanId!.toString(),
+                                            mjabatanId: it.mjabatanId.toString(),
                                             jabatanDesc: it.jabatanDesc ?? '',
                                           );
 
@@ -179,7 +176,7 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                                   BlocProvider(create: (_) => RekanPicCobCariBloc()), // ✅ Tambah ini
                                                 ],
                                                 child: EditPicWidget(
-                                                  mrekanpicId: it.mrekanpicId!,
+                                                  mrekanpicId: it.mrekanpicId,
                                                   initNama: it.picNama,
                                                   initEmail: it.picEmail,
                                                   initHp: it.picHp,

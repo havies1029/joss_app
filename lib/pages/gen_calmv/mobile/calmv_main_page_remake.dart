@@ -1,9 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
+import 'package:joss_app/models/user/user_model.dart';
+import 'package:joss_app/pages/register/mobile/client/register_client_page.dart';
 import 'package:string_validator/string_validator.dart';
 import '../../../blocs/gen_calmv/calmv1crud_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1list_bloc.dart';
@@ -30,11 +32,6 @@ import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../gen_regmv/mobile/regmv_main_page_remake.dart';
-import '../../gen_regmv/mobile/regmv/regmv_form4_remake.dart';
-import '../../gen_regmv/mobile/regmv_main_page.dart';
-import 'calmv/calmv_form1_remake.dart';
-import 'calmv/calmv_form2_remake.dart';
-import 'calmv/calmv_form3_remake.dart';
 
 class CalmvMainPageRemake extends StatefulWidget {
 
@@ -187,49 +184,48 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   void _payloadform2(Calmv2FormModel record) {
-    if (fieldAwController.text.trim().isEmpty && record.aw != null) {
+    if (fieldAwController.text.trim().isEmpty) {
       fieldAwController.text = cleanNum(record.aw);
     }
 
-    if (fieldPadController.text.trim().isEmpty && record.pad != null) {
+    if (fieldPadController.text.trim().isEmpty) {
       fieldPadController.text = cleanNum(record.pad);
     }
 
-    if (fieldPapController.text.trim().isEmpty && record.pap != null) {
+    if (fieldPapController.text.trim().isEmpty) {
       fieldPapController.text = cleanNum(record.pap);
     }
 
-    if (fieldPllController.text.trim().isEmpty && record.pll != null) {
+    if (fieldPllController.text.trim().isEmpty) {
       fieldPllController.text = cleanNum(record.pll);
     }
 
-    if (fieldTplController.text.trim().isEmpty && record.tpl != null) {
+    if (fieldTplController.text.trim().isEmpty) {
       fieldTplController.text = cleanNum(record.tpl);
     }
 
-    if (fieldIsEqController.text.trim().isEmpty && record.isEq != null) {
+    if (fieldIsEqController.text.trim().isEmpty) {
       fieldIsEqController.text = record.isEq.toString();
     }
 
-    if (fieldIsFloodController.text.trim().isEmpty && record.isFlood != null) {
+    if (fieldIsFloodController.text.trim().isEmpty) {
       fieldIsFloodController.text = record.isFlood.toString();
     }
 
-    if (fieldIsSrccController.text.trim().isEmpty && record.isSrcc != null) {
+    if (fieldIsSrccController.text.trim().isEmpty) {
       fieldIsSrccController.text = record.isSrcc.toString();
     }
 
-    if (fieldIsTbodController.text.trim().isEmpty && record.isTbod != null) {
+    if (fieldIsTbodController.text.trim().isEmpty) {
       fieldIsTbodController.text = record.isTbod.toString();
     }
 
-    if (fieldIsTerrorismController.text.trim().isEmpty &&
-        record.isTerrorism != null) {
+    if (fieldIsTerrorismController.text.trim().isEmpty) {
       fieldIsTerrorismController.text = record.isTerrorism.toString();
     }
 
     setState(() {
-      if (selectedPassengerCount.isEmpty && record.passangerCount != null) {
+      if (selectedPassengerCount.isEmpty) {
         selectedPassengerCount = record.passangerCount.toString();
       }
     });
@@ -346,7 +342,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
                 title: "Kendaraan",
-                subtitle: "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
+                subtitle: "Isi detail kendaraan x, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
             ),
 
@@ -884,9 +880,38 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Future<void> onLanjutkanPressed() async {
     if (context.read<Calmv1ListBloc>().state.isProcessing) return;
 
-    context.read<Calmv1ListBloc>().add(
-      CalMv2RegMvEvent(calmv1Id: calmv1Id!),
-    );
+
+    if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
+      User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user; 
+      if (user.userType == "C"){
+        context.read<Calmv1ListBloc>().add(
+          CalMv2RegMvEvent(calmv1Id: calmv1Id!));
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Only Client user can perform this action.'),
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RegisterClient(requestFrom: 'calmv_page')
+          ),
+        );
+        //micky
+        /*
+        context
+            .read<AuthenticationBloc>()
+            .add(RequireRegisterClient(requiredFrom: 'calmv1list_tile_widget'));
+        */
+      }
+    }
+    /*
+      context.read<Calmv1ListBloc>().add(
+        CalMv2RegMvEvent(calmv1Id: calmv1Id!),
+      );
+    */
   }
 
   void openForm1() {

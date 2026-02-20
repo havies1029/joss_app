@@ -34,7 +34,7 @@ class Regmv7CariAPI{
 
 		// Only print preview of body (avoids flooding logs)
 		String previewBody = response.body.length > 300
-				? response.body.substring(0, 300) + "..."
+				? "${response.body.substring(0, 300)}..."
 				: response.body;
 
 		debugPrint("📄 Response Preview: $previewBody");

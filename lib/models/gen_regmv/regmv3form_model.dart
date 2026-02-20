@@ -4,7 +4,6 @@ import 'package:joss_app/models/combobox/combommvpakai_model.dart';
 import 'package:joss_app/models/combobox/combommvtipe_model.dart';
 import 'package:joss_app/models/combobox/combomwarna_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
-import 'package:flutter/material.dart';
 
 class Regmv3FormModel {
 	String regmv1Id;

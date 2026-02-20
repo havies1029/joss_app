@@ -209,8 +209,12 @@ class _PopupClientWidgetState extends State<PopupClientWidget>
     _shakeController.dispose();
     _timer?.cancel();
 
-    for (var c in _otpControllers) c.dispose();
-    for (var n in _focusNodes) n.dispose();
+    for (var c in _otpControllers) {
+      c.dispose();
+    }
+    for (var n in _focusNodes) {
+      n.dispose();
+    }
 
     super.dispose();
   }

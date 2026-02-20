@@ -6,13 +6,7 @@ import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
-import '../../../management_polis/mobile/management_polis_filter.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
-import '../../../payment/dnsppamvcari_list.dart';
-import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
-import '../../../payment/mobile/riwayat/riwayat_page.dart';
-import '../../../payment/rincian/rinciansoa_page.dart';
-import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
@@ -31,9 +25,12 @@ class ListMenuWidget extends StatelessWidget {
 
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
+        /*
+        micky - 2026-02-20 
         if (state is AuthenticationRequireRegisterClient) {
           _openRegisterClientDialog(context, requestFrom: state.requiredFrom);
         }
+        */
       },
       child: Column(
         children: [
@@ -94,6 +91,7 @@ class ListMenuWidget extends StatelessWidget {
     );
   }
 
+/*
   void _openRegisterClientDialog(BuildContext context, {required String requestFrom}) {
     showGeneralDialog(
       context: context,
@@ -113,6 +111,7 @@ class ListMenuWidget extends StatelessWidget {
           ),
         );
       },
+      /*
       transitionBuilder: (_, anim, __, child) {
         return SlideTransition(
           position: Tween(
@@ -122,8 +121,10 @@ class ListMenuWidget extends StatelessWidget {
           child: child,
         );
       },
+      */
     );
   }
+  */
 
   Widget _buildDaftarKlienButton(BuildContext context) {
     return Material(
@@ -137,11 +138,19 @@ class ListMenuWidget extends StatelessWidget {
           // optional: haptic biar terasa "klik"
           // HapticFeedback.lightImpact();
 
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RegisterClient(requestFrom: 'daftarclient_page'),
+            ),
+          );
+          /*
           context.read<AuthenticationBloc>().add(
             RequireRegisterClient(
               requiredFrom: 'daftarclient_page',
             ),
           );
+          */
         },
         child: Ink(
           width: double.infinity,
@@ -399,7 +408,7 @@ class MenuItem {
 }
 
 class SuccessPage extends StatefulWidget {
-  const SuccessPage({Key? key}) : super(key: key);
+  const SuccessPage({super.key});
 
   @override
   State<SuccessPage> createState() => _SuccessPageState();

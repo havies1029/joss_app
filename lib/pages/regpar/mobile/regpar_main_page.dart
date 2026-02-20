@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/blocs/regpar/regpar1crud_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form1.dart';
 import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form2.dart';

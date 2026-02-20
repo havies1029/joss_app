@@ -35,7 +35,7 @@ class RegmvForm7SectionState extends State<RegmvForm7Section> {
   final netCtrl = TextEditingController();
   final subtotalCtrl = TextEditingController();
 
-  bool _isPayloadInjected = false;
+  final bool _isPayloadInjected = false;
   late final Regmv6FormBloc regmv6Bloc;
   final _rupiah0 = NumberFormat.decimalPattern('id_ID');
 

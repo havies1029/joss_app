@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:joss_app/blocs/gen_profile/mrekancontactcrud_bloc.dart';
 
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
@@ -14,8 +13,6 @@ import 'package:joss_app/models/combobox/combomjnskel_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combomjnskel_repository.dart';
 import '../../../../../repositories/combobox/combompekerjaan_repository.dart';

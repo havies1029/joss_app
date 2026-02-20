@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class Klaim5cariTileWidget extends StatelessWidget {
   final String mjenisdocId;

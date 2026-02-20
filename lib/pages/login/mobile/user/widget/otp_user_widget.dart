@@ -7,12 +7,9 @@ import 'dart:math' as math; // buat sin shake
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/login/emailverification_model.dart';
-import '../../../../../repositories/user/user_repository.dart';
 import '../../../../base/base_background_firstpage.dart';
-import '../../../../home/home_tab_widget.dart';
 
 class PopupUserWidget extends StatefulWidget {
   final String email;
@@ -216,8 +213,12 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     _shakeController.dispose();
     _timer?.cancel();
 
-    for (var c in _otpControllers) c.dispose();
-    for (var n in _focusNodes) n.dispose();
+    for (var c in _otpControllers) {
+      c.dispose();
+    }
+    for (var n in _focusNodes) {
+      n.dispose();
+    }
 
     super.dispose();
   }

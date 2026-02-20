@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:joss_app/widgets/my_colors.dart';
 import 'package:joss_app/widgets/my_text.dart';

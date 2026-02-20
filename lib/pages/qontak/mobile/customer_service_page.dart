@@ -171,10 +171,6 @@ import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
-import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
-import '../../../blocs/reguser_profile/reguser_profile_state.dart';
-import '../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../blocs/user_profile/user_profile_state.dart';
 
 class CustomerServicePage extends StatefulWidget {
   const CustomerServicePage({super.key});
@@ -327,8 +323,8 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
         context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
 
     if (mrekan1Id != null &&
-        mrekan1Id!.trim().isNotEmpty) {
-      return mrekan1Id!;
+        mrekan1Id.trim().isNotEmpty) {
+      return mrekan1Id;
     }
 
     final prefs = await SharedPreferences.getInstance();

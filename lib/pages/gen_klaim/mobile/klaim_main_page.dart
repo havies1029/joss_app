@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/gen_klaim/mobile/widget/crud_klaim_widget/klaim1_inline_editor_page.dart';
 import '../../../../common/constants.dart';
-import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../base/base_background_sidepage.dart';
 
@@ -12,13 +11,11 @@ class KlaimMainPage extends StatefulWidget {
 
   const KlaimMainPage({super.key, this.type = KlaimPageType.page});
 
-  const KlaimMainPage.page({Key? key})
-      : type = KlaimPageType.page,
-        super(key: key);
+  const KlaimMainPage.page({super.key})
+      : type = KlaimPageType.page;
 
-  const KlaimMainPage.menu({Key? key})
-      : type = KlaimPageType.menu,
-        super(key: key);
+  const KlaimMainPage.menu({super.key})
+      : type = KlaimPageType.menu;
 
   @override
   _KlaimMainPageState createState() => _KlaimMainPageState();

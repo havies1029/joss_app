@@ -5,8 +5,6 @@ import 'package:joss_app/blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import 'package:joss_app/pages/gen_profile/common/rekanpiccobcari_list_widget.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import '../../../common/constants.dart';
-import '../../../models/gen_profile/rekanpiccobcari_model.dart';
-import '../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../base/base_background_sidepage.dart';
 
 class RekanPicCobCariPage extends StatefulWidget {
