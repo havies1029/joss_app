@@ -139,8 +139,8 @@ class Klaim5cariTileWidget extends StatelessWidget {
                       Expanded(
                         child: _DocButton(
                           label: hasFile
-                            ? 'Ganti File'
-                            : 'Ambil File',
+                              ? 'Ganti File'
+                              : 'Ambil File',
                           icon: Icons.insert_drive_file_outlined,
                           bg: const Color(0xFF4A4A4A),
                           fg: Colors.white,
@@ -154,19 +154,19 @@ class Klaim5cariTileWidget extends StatelessWidget {
                       Expanded(
                         child: hasFile
                             ? _DocButton(
-                                label: 'Hapus',
-                                icon: Icons.delete_outline,
-                                bg: const Color(0xFFEF4444),
-                                fg: Colors.white,
-                                onTap: onDelete,
-                              )
+                          label: 'Hapus',
+                          icon: Icons.delete_outline,
+                          bg: const Color(0xFFEF4444),
+                          fg: Colors.white,
+                          onTap: onDelete,
+                        )
                             : _DocButton(
-                                label: 'Ambil Foto',
-                                icon: Icons.photo_camera_outlined,
-                                bg: const Color(0xFFF28C28),
-                                fg: Colors.white,
-                                onTap: onPickPhoto,
-                              ),
+                          label: 'Ambil Foto',
+                          icon: Icons.photo_camera_outlined,
+                          bg: const Color(0xFFF28C28),
+                          fg: Colors.white,
+                          onTap: onPickPhoto,
+                        ),
                       ),
                     ],
                   ),
@@ -220,7 +220,6 @@ class _Thumb extends StatelessWidget {
 
     final hasLocal = localPath != null && localPath!.isNotEmpty;
     final hasUrl = fileUrl != null && fileUrl!.isNotEmpty;
-    //debugPrint("fileUrl: $fileUrl");
     if (isImage && hasLocal) {
       child = Image.file(File(localPath!), fit: BoxFit.cover);
     } else if (isPdf && hasLocal) {

@@ -1246,7 +1246,9 @@ import 'blocs/regpar/regpar6form_bloc.dart';
 import 'blocs/regpar/regpar_download_foto_object_bloc.dart';
 import 'blocs/regpar/regpar_upload_foto_object_bloc.dart';
 import 'blocs/regpar/regpar_flow_bloc.dart';
-
+import 'package:joss_app/blocs/klaimlacak/klaimnilaicrud_bloc.dart';
+import 'package:joss_app/blocs/klaimlacak/klaimprogresscari_bloc.dart';
+import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'blocs/regrenewal/regrenewcari_bloc.dart';
 import 'blocs/regrenewal/regrenew1form_bloc.dart';
 import 'blocs/regrenewal/regrenewal2cari_bloc.dart';
@@ -1330,7 +1332,8 @@ Future<void> main() async {
         BlocProvider(create: (context) => Klaim5cariBloc()),
         BlocProvider(create: (context) => KlaimmvstatuscariBloc()),
 
-
+        BlocProvider(create: (context) => KlaimprogresscariBloc()),
+        BlocProvider(create: (context) => KlaimnilaicrudBloc(repository: KlaimnilaicrudRepository())),
         BlocProvider(create: (context) => KlaimparklaimcrudBloc(repository: KlaimparklaimcrudRepository())),
         // BlocProvider(create: (context) => Klaim5parListBloc()),
         // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),

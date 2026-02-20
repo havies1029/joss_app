@@ -3,8 +3,11 @@ import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
 import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/perbaruiklaimmv_page.dart';
-import 'package:joss_app/pages/perbaruiklaimpar/perbaruiklaimpar_page.dart';
+
+import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
+import '../../perbaruiklaimpar/mobile/perbaruiklaimpar_page.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/perbaruiklaimmv_page.dart';
+// import 'package:joss_app/pages/perbaruiklaimpar/perbaruiklaimpar_page.dart';
 
 class FabActionKlaim extends StatelessWidget {
   final int selectedTab;

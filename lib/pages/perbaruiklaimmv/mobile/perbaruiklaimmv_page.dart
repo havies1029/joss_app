@@ -6,16 +6,26 @@ import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/klaim5cari_list.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/klaimmvaccordioncard.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/klaimmvbengkelcrud_form.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/klaimmvklaimcrud_form.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/klaimmvpoliscrud_form.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/klaimmvstatuscari_list.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaim5cari_list.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvaccordioncard.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvbengkelcrud_form.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvklaimcrud_form.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvpoliscrud_form.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvstatuscari_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
+
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvbengkelcrud_form.dart';
+// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvstatuscari_list.dart';
+
+import 'klaim5cari_list.dart';
+import 'klaimmvaccordioncard.dart';
+import 'klaimmvbengkelcrud_form.dart';
+import 'klaimmvklaimcrud_form.dart';
+import 'klaimmvpoliscrud_form.dart';
+import 'klaimmvstatuscari_list.dart';
 
 class PerbaruiKlaimMvPage extends StatefulWidget {
   final String cobGroupNama;
@@ -148,28 +158,23 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        switch(acc.openedIndex) {
-                          case 0:
-                            klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
-                            break;
-                          case 1:
-                            klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
-                            break;
-                          case 4:
-                            klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
-                            break;
-                        }
-                      },
-                      child: const Text('Perbarui Klaim'),
-                    ),
-                  ),
+                AppButton.primary(
+                  onPressed: () {
+                    switch(acc.openedIndex) {
+                      case 0:
+                        klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
+                        break;
+                      case 1:
+                        klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
+                        break;
+                      case 4:
+                        klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
+                        break;
+                    }
+                  },
+                  text: 'Perbarui',
+                  backgroundColor: pBlue,
+                  textStyle: headingStyle(context, fontSize: 18),
                 ),
               ],
             );
