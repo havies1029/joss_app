@@ -95,4 +95,21 @@ class Calmv2FormModel {
 		'pll': pll.toString(),
 		'tpl': tpl.toString(),
 	};
+	factory Calmv2FormModel.empty() {
+		return Calmv2FormModel(
+			aw: 0,
+			calmv2Id: '',
+			calmv1Id: '',
+			isEq: false,
+			isFlood: false,
+			isSrcc: false,
+			isTbod: false,
+			isTerrorism: false,
+			pad: 0,
+			pap: 0,
+			passangerCount: 0,
+			pll: 0,
+			tpl: 0,
+		);
+	}
 }

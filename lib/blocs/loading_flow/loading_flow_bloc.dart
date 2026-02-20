@@ -95,7 +95,7 @@ class LoadingFlowBloc extends Bloc<LoadingFlowEvent, LoadingFlowState> {
     );
 
     // Listen target sampai DONE (success/failure) dengan rising-edge
-    _subTarget = target.stream.listen((s) {
+    _subTarget = target?.stream.listen((s) {
       final st = (s as dynamic).status as ListStatus;
 
       final doneNow = (st == ListStatus.success || st == ListStatus.failure);
@@ -129,53 +129,61 @@ class LoadingFlowBloc extends Bloc<LoadingFlowEvent, LoadingFlowState> {
     ));
   }
 
-  BlocBase<dynamic> _dispatchTargetByCob({
+  BlocBase<dynamic>? _dispatchTargetByCob({
     required String cobId,
     required String statusId,
     required String searchText,
   }) {
-    if (cobId == "10001") {
-      asetRingkasanCariBloc.add(
-        RefreshAsetRingkasanCariEvent(statusId: statusId, searchText: searchText),
-      );
-      return asetRingkasanCariBloc;
-    }
+    final cleanCobId = cobId.trim();
+    final cleanStatusId = statusId.trim();
 
-    if (cobId == "10002") {
-      asetParCariBloc.add(
-        RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
-      );
-      return asetParCariBloc;
-    }
+    // guard: kalau input invalid, gak dispatch apa-apa
+    if (cleanCobId.isEmpty || cleanStatusId.isEmpty) return null;
 
-    if (cobId == "10003") {
-      asetMvCariBloc.add(
-        RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
-      );
-      return asetMvCariBloc;
-    }
+    switch (cleanCobId) {
+      case "10001":
+        asetRingkasanCariBloc.add(
+          RefreshAsetRingkasanCariEvent(
+            statusId: cleanStatusId,
+            searchText: searchText,
+          ),
+        );
+        return asetRingkasanCariBloc;
 
-    if (cobId == "10004") {
-      asethullCariBloc.add(
-        RefreshAsethullCariEvent(statusId: statusId, searchText: searchText),
-      );
-      return asethullCariBloc;
-    }
+      case "10002":
+        asetParCariBloc.add(
+          RefreshAsetParCariEvent(statusId: cleanStatusId, searchText: searchText),
+        );
+        return asetParCariBloc;
 
-    if (cobId == "10005") {
-      asetHealthCariBloc.add(
-        RefreshAsetHealthCariEvent(statusId: statusId, searchText: searchText),
-      );
-      return asetHealthCariBloc;
-    }
+      case "10003":
+        asetMvCariBloc.add(
+          RefreshAsetMvCariEvent(statusId: cleanStatusId, searchText: searchText),
+        );
+        return asetMvCariBloc;
 
-    asetothersCariBloc.add(
-      RefreshAsetothersCariEvent(
-        statusId: statusId,
-        searchText: searchText,
-        cobId: cobId,
-      ),
-    );
-    return asetothersCariBloc;
+      case "10004":
+        asethullCariBloc.add(
+          RefreshAsethullCariEvent(statusId: cleanStatusId, searchText: searchText),
+        );
+        return asethullCariBloc;
+
+      case "10005":
+        asetHealthCariBloc.add(
+          RefreshAsetHealthCariEvent(statusId: cleanStatusId, searchText: searchText),
+        );
+        return asetHealthCariBloc;
+
+      default:
+        asetothersCariBloc.add(
+          RefreshAsetothersCariEvent(
+            statusId: cleanStatusId,
+            searchText: searchText,
+            cobId: cleanCobId,
+          ),
+        );
+        return asetothersCariBloc;
+    }
   }
+
 }

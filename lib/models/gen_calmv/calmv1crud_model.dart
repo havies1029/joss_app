@@ -62,7 +62,6 @@ class Calmv1CrudModel {
 			mwilayahId: data['mwilayahId']??'',
 			comboMWilayah: comboMWilayah
 		);
-
 	}
 
 	Map<String, dynamic> toJson() =>
@@ -113,5 +112,22 @@ class Calmv1CrudModel {
 			comboMWilayah: comboMWilayah ?? this.comboMWilayah,
 		);
 	}
-
+	factory Calmv1CrudModel.empty() {
+		return Calmv1CrudModel(
+			regmv1Id: null,
+			calmv1Id: '',
+			coverBulan: 0,
+			currId: '',
+			harga: 0,
+			thnBuat: 0,
+			mmvgrupojkId: null,
+			comboMMvgrupOjk: null,
+			mmvjnscoverId: null,
+			comboMMvjnscover: null,
+			mmvpakaiId: null,
+			comboMMvpakai: null,
+			mwilayahId: null,
+			comboMWilayah: null,
+		);
+	}
 }

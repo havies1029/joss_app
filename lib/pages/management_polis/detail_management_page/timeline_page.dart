@@ -5,7 +5,6 @@ class TimelineItem<T> extends StatelessWidget {
   final T item;
   final int index;
 
-  /// Index yang sedang "nyala" (misalnya index dari item dengan tanggal paling baru)
   final int activeIndex;
 
   final DateTime? Function(T item) getDateTime;
@@ -15,27 +14,18 @@ class TimelineItem<T> extends StatelessWidget {
   final Color normalTextColor;
   final Color activeDotColor;
   final Color normalDotColor;
-
-  /// Kalau true, garis vertikal akan disembunyikan pada item yang aktif (nyala).
-  /// Cocok untuk kasus "newest item" jadi ujung timeline.
+  final bool isLast;
   final bool hideLineWhenActive;
-
-  /// Tinggi garis vertikal
   final double lineHeight;
-
-  /// Ukuran dot
   final double dotSize;
-
-  /// Lebar kolom tanggal
   final double dateColumnWidth;
-
-  /// Jarak antar elemen
   final double gap;
 
   const TimelineItem({
     super.key,
     required this.item,
     required this.index,
+    required this.isLast,
     required this.activeIndex,
     required this.getDateTime,
     required this.getStatusText,
@@ -62,7 +52,8 @@ class TimelineItem<T> extends StatelessWidget {
     final textColor = isActive ? activeTextColor : normalTextColor;
     final dotColor = isActive ? activeDotColor : normalDotColor;
 
-    final showLine = !(hideLineWhenActive && isActive);
+    final showLine = !isLast;
+
     final lineColor = isActive ? activeDotColor : normalDotColor; // bisa kamu ubah kalau mau selalu normal
 
     return Row(

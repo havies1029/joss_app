@@ -72,4 +72,24 @@ class Calmv3FormModel {
 				'biayaPolis': biayaPolis.toString(),
 			};
 
+	factory Calmv3FormModel.empty() {
+		return Calmv3FormModel(
+			calmv3Id: '',
+			diskonPersen: 0,
+			premiAdd: 0,
+			premiCasco: 0,
+			premiDiskon: 0,
+			premiNet: 0,
+			premiSubtotal: 0,
+			rateDasar: 0,
+			rateLoading: 0,
+			rateSrcc: 0,
+			rateFlood: 0,
+			rateEq: 0,
+			rateTerrorism: 0,
+			ratePad: 0,
+			ratePap: 0,
+			biayaPolis: 0,
+		);
+	}
 }

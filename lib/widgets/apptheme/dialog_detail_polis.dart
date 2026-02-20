@@ -56,10 +56,15 @@ class DialogDetailPolis extends StatelessWidget {
             ),
 
             // Content
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: items.map((item) => _buildDetailRow(item)).toList(),
+            // Content (scrollable)
+            Flexible(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: items.map((item) => _buildDetailRow(item)).toList(),
+                  ),
+                ),
               ),
             ),
           ],

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/payment/dnsppacari_model.dart';
-import 'package:joss_app/pages/payment/dnsppamvcari_list.dart';
+
+import '../../../../../widgets/apptheme/dialog_detail_polis.dart';
+// import 'package:joss_app/pages/payment/dnsppamvcari_list.dart';
 
 class RingkasanDetailTableList extends StatelessWidget {
   final List<DnsppaCariModel> items;
@@ -111,16 +113,29 @@ class RingkasanDetailTableList extends StatelessWidget {
       ],
     );
   }
+
   Widget _polisCell(BuildContext context, DnsppaCariModel row) {
+    final dateFmt = DateFormat("dd/MM/yyyy");
+
     return Padding(
       padding: const EdgeInsets.all(6),
       child: InkWell(
         onTap: () {
-          Navigator.push(
+          DialogDetailPolis.show(
             context,
-            MaterialPageRoute(
-              builder: (_) => DnsppamvCariPage(sppa1Id: row.sppa1Id),
-            ),
+            title: "Detail Polis",
+            items: [
+              DetailItem(label: "NO POLIS", value: row.noPolis),
+              DetailItem(
+                label: "PERIODE",
+                value: "${dateFmt.format(row.polisMulai)} - ${dateFmt.format(row.polisAkhir)}",
+              ),
+              DetailItem(label: "CURR", value: row.currSimbol),
+              DetailItem(label: "PREMI", value: formatNum(row.dnOs)),
+              // kalau ada field lain tinggal tambah:
+              // DetailItem(label: "SPPA1 ID", value: row.sppa1Id),
+              // DetailItem(label: "OBJECT", value: row.objectDesc ?? "-"),
+            ],
           );
         },
         child: Text(
@@ -137,6 +152,7 @@ class RingkasanDetailTableList extends StatelessWidget {
     );
   }
 
+
   Widget _cell(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.all(6),
@@ -148,23 +164,23 @@ class RingkasanDetailTableList extends StatelessWidget {
     );
   }
 
-  Widget _actionCell(BuildContext context, String sppa1Id) {
-    return Padding(
-      padding: const EdgeInsets.all(6),
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DnsppamvCariPage(sppa1Id: sppa1Id),
-            ),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        child: const Text("View", style: TextStyle(fontSize: 12)),
-      ),
-    );
-  }
+  // Widget _actionCell(BuildContext context, String sppa1Id) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(6),
+  //     child: ElevatedButton(
+  //       onPressed: () {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (_) => DnsppamvCariPage(sppa1Id: sppa1Id),
+  //           ),
+  //         );
+  //       },
+  //       style: ElevatedButton.styleFrom(
+  //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  //       ),
+  //       child: const Text("View", style: TextStyle(fontSize: 12)),
+  //     ),
+  //   );
+  // }
 }

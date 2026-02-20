@@ -131,12 +131,19 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
   }
 
   Widget buildList() {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: RiwayatTablePageRemake(searchText: _searchController.text),
+    return Flexible(
+      child: FractionallySizedBox(
+        heightFactor: 0.85,
+        alignment: Alignment.topCenter,
+        child: SingleChildScrollView(
+          child: RiwayatTablePageRemake(
+            searchText: _searchController.text,
+          ),
+        ),
       ),
     );
   }
+
 
 
 

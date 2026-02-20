@@ -1083,6 +1083,7 @@ import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
+import 'blocs/gen_calmv/calmvaccordion_bloc.dart';
 import 'blocs/gen_dn1/dn1cari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
@@ -1421,6 +1422,7 @@ Future<void> main() async {
         BlocProvider(create: (_) => Dn1CariBloc()),
 
         // CALMV
+        BlocProvider(create: (_) => CalmvAccordionBloc()),
         BlocProvider(create: (_) => Calmv1ListBloc()),
         BlocProvider(create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
         BlocProvider(create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),

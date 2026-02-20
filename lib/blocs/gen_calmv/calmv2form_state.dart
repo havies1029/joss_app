@@ -9,6 +9,9 @@ class Calmv2FormState extends Equatable {
 	final bool isSaved;
 	final bool hasFailure;
 	final ReturnDataAPI? returnData;
+	final bool isComplete;
+	final bool isDirty;
+
 	const Calmv2FormState(
 		{this.record,
 		this.isLoading = false,
@@ -17,6 +20,8 @@ class Calmv2FormState extends Equatable {
 		this.isSaved = false,
 		this.hasFailure = false,
 		this.returnData,
+		this.isComplete = false,
+		this.isDirty = false,
 });
 
 	Calmv2FormState copyWith({
@@ -27,6 +32,8 @@ class Calmv2FormState extends Equatable {
 		bool? isSaved,
 		bool? hasFailure,
 		ReturnDataAPI? returnData,
+		bool? isComplete,
+		bool? isDirty,
 	}){
 		return Calmv2FormState(
 			record: record ?? this.record,
@@ -36,6 +43,8 @@ class Calmv2FormState extends Equatable {
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
 			returnData: returnData ?? this.returnData,
+			isComplete: isComplete ?? this.isComplete,
+			isDirty: isDirty ?? this.isDirty,
 		);
 	}
 
@@ -48,6 +57,8 @@ class Calmv2FormState extends Equatable {
 		isSaved,
 		hasFailure,
 		returnData,
+		isComplete,
+		isDirty,
 	];
 
 

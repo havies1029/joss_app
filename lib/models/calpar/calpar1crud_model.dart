@@ -82,4 +82,18 @@ class Calpar1CrudModel {
 			comboROkupasi: comboROkupasi ?? this.comboROkupasi,
 		);
 	}
+
+	factory Calpar1CrudModel.empty() {
+		return Calpar1CrudModel(
+			regpar1Id: null,
+			calpar1Id: '',
+			coverBulan: 0,
+			mjnscoverparId: null,
+			comboMJnscoverPar: null,
+			rkonstruksiojkId: null,
+			comboRKonstruksiojk: null,
+			rokupasiId: null,
+			comboROkupasi: null,
+		);
+	}
 }

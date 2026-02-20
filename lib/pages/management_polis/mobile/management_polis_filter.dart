@@ -453,62 +453,67 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       onPressed: refreshData,
     );
   }
-
   void refreshData() {
     final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
     final statusId = context.read<StatusAsetCariBloc>().state.selectedStatusId;
     final searchText = _searchController.text;
 
+    if (cobId == null || cobId.trim().isEmpty ||
+        statusId == null || statusId.trim().isEmpty) {
+      return;
+    }
+
+    final cleanCobId = cobId.trim();
+
     context.read<LoadingFlowBloc>().add(
       LoadingFlowStartEvent(
-        cobId: cobId,
+        cobId: cleanCobId,
         statusId: statusId,
         searchText: searchText,
         timeoutMs: 15000,
       ),
     );
 
-    if (cobId == "10001") {
+    if (cleanCobId == "10001") {
       context.read<AsetRingkasanCariBloc>().add(
         RefreshAsetRingkasanCariEvent(statusId: statusId, searchText: searchText),
       );
       return;
     }
 
-    if (cobId == "10002") {
+    if (cleanCobId == "10002") {
       context.read<AsetParCariBloc>().add(
         RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
       );
       return;
     }
 
-    if (cobId == "10003") {
+    if (cleanCobId == "10003") {
       context.read<AsetMvCariBloc>().add(
         RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
       );
       return;
     }
 
-    if (cobId == "10004") {
+    if (cleanCobId == "10004") {
       context.read<AsethullCariBloc>().add(
         RefreshAsethullCariEvent(statusId: statusId, searchText: searchText),
       );
       return;
     }
 
-    if (cobId == "10005") {
+    if (cleanCobId == "10005") {
       context.read<AsetHealthCariBloc>().add(
         RefreshAsetHealthCariEvent(statusId: statusId, searchText: searchText),
       );
       return;
     }
 
-
     context.read<AsetothersCariBloc>().add(
       RefreshAsetothersCariEvent(
         statusId: statusId,
         searchText: searchText,
-        cobId: cobId, // penting: tetap kirim cobId supaya “others by cob” tetap jalan
+        cobId: cleanCobId,
       ),
     );
   }

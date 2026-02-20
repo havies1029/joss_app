@@ -110,4 +110,23 @@ class Calpar2FormModel {
 		);
 	}
 
+	factory Calpar2FormModel.empty() {
+		return Calpar2FormModel(
+			biIndexRate: 0,
+			biTotal: 0,
+			calpar2Id: '',
+			calpar1Id: '',
+			siBi: 0,
+			siBuilding: 0,
+			siContent: 0,
+			siMachinery: 0,
+			siOther: 0,
+			siStock: 0,
+			stockAdjustable: 0,
+			mbiindemnityojkId: null,
+			comboMBiindemnityOjk: null,
+			rmatauangKode: null,
+			comboRMatauang: null,
+		);
+	}
 }

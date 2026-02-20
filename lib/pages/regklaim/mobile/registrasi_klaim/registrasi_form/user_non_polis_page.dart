@@ -13,6 +13,7 @@ import '../../../../../common/constants.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
+import '../../../../gen_klaim/mobile/klaim_main_page.dart';
 
 class UserNonPolisPage extends StatefulWidget {
   final String cobKlaimId;
@@ -76,7 +77,15 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               setState(() {
                 regklaim1Id = state.regklaim1Id;
               });
+
+              // Navigator.of(context).pushAndRemoveUntil(
+              //   MaterialPageRoute(builder: (_) => const Polis()),
+              //       (route) => route.isFirst,
+              // );
+
             }
+
+
             // debugPrint("AWAADSDDASAS");
             // debugPrint("regklaim1Id = ${regklaim1Id}");
           },

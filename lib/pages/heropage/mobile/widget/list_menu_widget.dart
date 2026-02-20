@@ -10,6 +10,7 @@ import '../../../../widgets/image_picker_dummy_page.dart';
 import '../../../aset/aset_cari.dart';
 import '../../../calpar/mobile/calpar_main_page_remake.dart';
 import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
+import '../../../gen_calmv/mobile/calmv_main_page_remake2.dart';
 import '../../../gen_endors/endors1crud_form.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
@@ -362,8 +363,7 @@ class ListMenuWidget extends StatelessWidget {
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
         // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodPage(
-          curr: "idr", totalBayar: 0,
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake2(
         )));
         break;
 

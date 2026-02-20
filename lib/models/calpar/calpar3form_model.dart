@@ -104,5 +104,23 @@ class Calpar3FormModel {
 			comboMWilayah: comboMWilayah ?? this.comboMWilayah,
 		);
 	}
+
+	factory Calpar3FormModel.empty() {
+		return Calpar3FormModel(
+			calpar1Id: '',
+			calpar3Id: '',
+			isEq: false,
+			isFlexas: false,
+			isOther: false,
+			isRsmdcc: false,
+			isTsfwd: false,
+			kab2zonagempaId: null,
+			comboMKabZonaGempa: null,
+			mjnscoverparId: null,
+			comboMJnscoverPar: null,
+			mwilayahId: null,
+			comboMWilayah: null,
+		);
+	}
 }
 
