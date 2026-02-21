@@ -199,7 +199,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 
 	Widget buildFieldMmvjnscoverId(){
 		return buildFieldComboMMvjnscover(
-      // enabled: isPolisJps ? false : true,
+      enabled: isPolisJps ? false : true,
 			comboKey: comboMMvjnscoverKey,
 			labelText: 'Jenis Cover',
 			initItem: fieldComboMMvjnscover,

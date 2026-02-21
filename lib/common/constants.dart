@@ -117,9 +117,6 @@ const Color pdfRed = Color(0xFFDA1618);
 
 const Color transactionColor1 = Color(0xFF3C3C3C);
 const Color transactionColor2 = Color(0xFF343434);
-const Color excelGreen = Color(0xFF27AE68);
-const Color pdfRed = Color(0xFFDA1618);
-
 // 🔥 Direct LinearGradients (Light → Dark, top → bottom)
 
 const LinearGradient yellowGradient = LinearGradient(

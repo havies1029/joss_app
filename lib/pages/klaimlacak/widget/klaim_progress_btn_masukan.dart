@@ -16,7 +16,6 @@ class KlaimProgressBtnMasukan extends StatelessWidget {
   Widget build(BuildContext context) {
     const bgEnabled = Color(0xFFF5B33B);
 
-    // ===== DISABLED STYLE (lebih terbaca) =====
     const bgDisabled = Color(0xFFF2D9A1);      // krem, masih “kuning” tapi tida›k pudar banget
     const fgDisabled = Color(0xFF6B4B10);      // coklat gelap (kontras tinggi)
     const borderDisabled = Color(0xFFB98A2A);  // border kuning tua

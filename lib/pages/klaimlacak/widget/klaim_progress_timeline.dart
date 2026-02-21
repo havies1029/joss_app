@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/constants.dart';
 import 'klaim_progress_tile_styles.dart';
 
 class KlaimProgressTimeline extends StatelessWidget {
@@ -26,20 +27,14 @@ class KlaimProgressTimeline extends StatelessWidget {
           const SizedBox(height: 10),
 
           if (isLastActive)
-            Container(
-              width: 18,
-              height: 18,
-              decoration: BoxDecoration(
-                color: lastActiveColor.withOpacity(0.18),
-                shape: BoxShape.circle,
-                border: Border.all(color: lastActiveColor.withOpacity(0.55), width: 1),
-              ),
-              child: Icon(
-                Icons.lightbulb_rounded,
-                size: 12,
-                color: lastActiveColor.withOpacity(0.85),
-              ),
-            )
+    Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: pGreen,
+        shape: BoxShape.circle,
+      ),
+    )
           else
             Container(
               width: 10,

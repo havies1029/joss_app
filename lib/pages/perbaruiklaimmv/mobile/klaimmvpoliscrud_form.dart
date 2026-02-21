@@ -93,23 +93,26 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 							))
 				);
 				},
-				listener: (context, state) {
-					if (state.isLoaded) {
-						if (state.record != null){
-							fieldInsuredNamaController.text = state.record!.insuredNama;
-							isPolisJps = state.record!.isPolisJps;
-							fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
-							fieldNoChasisController.text = state.record!.noChasis;
-							fieldNoPlatController.text = state.record!.noPlat;
-							fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
-							fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
-							fieldPolisNoController.text = state.record!.polisNo;
-							fieldSppa1IdController.text = state.record!.sppa1Id;
-						}
+			listener: (context, state) {
+				if (state.isLoaded) {
+					if (state.record != null) {
+						fieldInsuredNamaController.text = state.record!.insuredNama;
+						fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
+						fieldNoChasisController.text = state.record!.noChasis;
+						fieldNoPlatController.text = state.record!.noPlat;
+						fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
+						fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
+						fieldPolisNoController.text = state.record!.polisNo;
+						fieldSppa1IdController.text = state.record!.sppa1Id ?? '';
+					}
+					// ✅ Tambahkan setState agar combo & isPolisJps di-render ulang
+					setState(() {
 						fieldComboMInsurer = state.comboMInsurer;
 						fieldComboMMvjnscover = state.comboMMvjnscover;
-					}
-				},
+						isPolisJps = state.record?.isPolisJps ?? false;
+					});
+				}
+			},
         buildWhen: (previous, current) {
           return previous.isLoaded != current.isLoaded;
         },
