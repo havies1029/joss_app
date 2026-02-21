@@ -11,6 +11,7 @@ class Calmv2FormState extends Equatable {
 	final ReturnDataAPI? returnData;
 	final bool isComplete;
 	final bool isDirty;
+	final bool isValid;
 
 	const Calmv2FormState(
 		{this.record,
@@ -22,6 +23,7 @@ class Calmv2FormState extends Equatable {
 		this.returnData,
 		this.isComplete = false,
 		this.isDirty = false,
+		this.isValid = false,
 });
 
 	Calmv2FormState copyWith({
@@ -34,6 +36,7 @@ class Calmv2FormState extends Equatable {
 		ReturnDataAPI? returnData,
 		bool? isComplete,
 		bool? isDirty,
+		bool? isValid,
 	}){
 		return Calmv2FormState(
 			record: record ?? this.record,
@@ -45,6 +48,7 @@ class Calmv2FormState extends Equatable {
 			returnData: returnData ?? this.returnData,
 			isComplete: isComplete ?? this.isComplete,
 			isDirty: isDirty ?? this.isDirty,
+			isValid: isValid ?? this.isValid,
 		);
 	}
 
@@ -59,6 +63,7 @@ class Calmv2FormState extends Equatable {
 		returnData,
 		isComplete,
 		isDirty,
+		isValid
 	];
 
 

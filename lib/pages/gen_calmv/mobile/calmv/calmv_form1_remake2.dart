@@ -23,9 +23,11 @@ import '../../../../repositories/combobox/combormatauang_repository.dart';
 
 
 class CalmvForm1Section2 extends StatefulWidget {
+  final GlobalKey<FormState> formKey;
+
   const CalmvForm1Section2({
     super.key,
-
+    required this.formKey,
   });
 
   @override
@@ -53,6 +55,10 @@ class CalmvForm1Section2State extends State<CalmvForm1Section2> {
   void initState() {
     super.initState();
     calmv1Bloc = context.read<Calmv1CrudBloc>();
+
+    calmv1Bloc
+        .add(FieldCoverBulanChangedEvent(coverBulan:12));
+
     Future.microtask(_loadData);
   }
 

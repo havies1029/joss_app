@@ -15,6 +15,7 @@ class Calmv1CrudState extends Equatable {
 	final ComboRMatauangModel? comboRMatauangModel;
 	final bool isComplete;
 	final bool isDirty;
+	final bool isValid;
 
 	const Calmv1CrudState(
 		{this.record,
@@ -30,6 +31,7 @@ class Calmv1CrudState extends Equatable {
 		this.comboRMatauangModel,
 		this.isComplete = false,
 		this.isDirty = false,
+		this.isValid = false,
 });
 
 	Calmv1CrudState copyWith({
@@ -46,6 +48,7 @@ class Calmv1CrudState extends Equatable {
 		ComboRMatauangModel? comboRMatauangModel,
 		bool? isComplete,
 		bool? isDirty,
+		bool? isValid,
 	}){
 		return Calmv1CrudState(
 			record: record ?? this.record,
@@ -61,6 +64,7 @@ class Calmv1CrudState extends Equatable {
 			comboRMatauangModel: comboRMatauangModel?? this.comboRMatauangModel,
 			isComplete: isComplete ?? this.isComplete,
 			isDirty: isDirty ?? this.isDirty,
+			isValid: isValid ?? this.isValid,
 		);
 	}
 
@@ -74,5 +78,6 @@ class Calmv1CrudState extends Equatable {
 		hasFailure,
 		isComplete,
 		isDirty,
+		isValid
 	];
 }

@@ -181,6 +181,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(aw: event.aw),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -192,6 +193,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(pad: event.pad),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -203,6 +205,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(pap: event.pap),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -214,6 +217,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(pll: event.pll),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -225,6 +229,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(tpl: event.tpl),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -236,6 +241,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(isEq: event.isEq),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -247,6 +253,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(isFlood: event.isFlood),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -258,6 +265,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(isSrcc: event.isSrcc),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -269,6 +277,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(isTbod: event.isTbod),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -280,6 +289,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(isTerrorism: event.isTerrorism),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -291,6 +301,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(passangerCount: event.passangerCount),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -302,6 +313,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(
 			record: record.copyWith(calmv1Id: event.calmv1Id),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -358,5 +370,40 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 				isDirty: true,
 			));
 		}
+	}
+
+	bool _validate(Calmv2FormModel? record) {
+		if (record == null) return false;
+
+		final hasCoverage =
+				record.isEq ||
+						record.isFlood ||
+						record.isSrcc ||
+						record.isTbod ||
+						record.isTerrorism;
+
+		final isValid =
+				record.calmv1Id.isNotEmpty &&
+						record.aw > 0 &&
+						record.pad > 0 &&
+						record.pap > 0 &&
+						record.pll > 0 &&
+						record.tpl > 0 &&
+						record.passangerCount > 0 &&
+						hasCoverage;
+
+		debugPrint("=== CALMV2 VALIDATION DEBUG ===");
+		debugPrint("calmv1Id : ${record.calmv1Id}");
+		debugPrint("aw       : ${record.aw}");
+		debugPrint("pad      : ${record.pad}");
+		debugPrint("pap      : ${record.pap}");
+		debugPrint("pll      : ${record.pll}");
+		debugPrint("tpl      : ${record.tpl}");
+		debugPrint("passenger: ${record.passangerCount}");
+		debugPrint("coverage : EQ=${record.isEq}, Flood=${record.isFlood}, SRCC=${record.isSrcc}, TBOD=${record.isTbod}, Terror=${record.isTerrorism}");
+		debugPrint("hasCoverage : $hasCoverage");
+		debugPrint("RESULT VALID : $isValid");
+
+		return isValid;
 	}
 }

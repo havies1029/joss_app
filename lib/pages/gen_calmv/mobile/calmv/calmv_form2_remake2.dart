@@ -8,11 +8,14 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 
+import '../../../../blocs/gen_calmv/calmv1crud_bloc.dart';
 import '../../../../blocs/gen_calmv/calmv2form_bloc.dart';
 
 class CalmvForm2Section2 extends StatefulWidget {
+  final GlobalKey<FormState> formKey;
   const CalmvForm2Section2({
     super.key,
+    required this.formKey,
   });
 
   @override
@@ -20,7 +23,7 @@ class CalmvForm2Section2 extends StatefulWidget {
 }
 
 class CalmvForm2Section2State extends State<CalmvForm2Section2> {
-
+  final _calmvform2key = GlobalKey<FormState>();
   //form2
   final fieldAwController = TextEditingController();
   final fieldPadController = TextEditingController();
@@ -36,20 +39,24 @@ class CalmvForm2Section2State extends State<CalmvForm2Section2> {
 //form2
 
   String? calmv2Id;
+  String? calmv1Id;
   late final Calmv2FormBloc calmv2Bloc;
+  late final Calmv1CrudBloc calmv1Bloc;
 
   @override
   void initState() {
     super.initState();
     calmv2Bloc = context.read<Calmv2FormBloc>();
+    calmv1Bloc = context.read<Calmv1CrudBloc>();
     Future.microtask(_loadData);
   }
 
   void _loadData() {
-    final calmv2State = context.read<Calmv2FormBloc>().state;
-    calmv2Id = calmv2State.record?.calmv2Id;
-
-    if (calmv2Id?.isNotEmpty == true) {
+    final calmv1State = context.read<Calmv1CrudBloc>().state;
+    calmv1Id = calmv1State.record?.calmv1Id;
+    debugPrint("calmv1Id ini isinya : ${calmv1Id}");
+    if (calmv1Id?.isNotEmpty == true) {
+      calmv2Bloc.add(FieldCalmv1IdChangedEvent(calmv1Id: calmv1Id ?? ""));
       calmv2Bloc.add(Calmv2FormLihatEvent(recordId: calmv2Id!));
     }
   }
@@ -97,6 +104,7 @@ class CalmvForm2Section2State extends State<CalmvForm2Section2> {
         return Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Form(
+            key: _calmvform2key,
             child: Column(
               children: [
                 Row(
@@ -258,10 +266,19 @@ class CalmvForm2Section2State extends State<CalmvForm2Section2> {
       validatorCallback: (_) => err('form2.passengerCount'),
 
       onChangedCallback: (v) {
-        int passengerCountInt = int.tryParse(selectedPassengerCount) ?? 0;
-        if (selectedPassengerCount.isNotEmpty){
+        final str = (v ?? "").toString();
+        final passengerCountInt = int.tryParse(str) ?? 0;
+
+        debugPrint("🔁 onChanged v='$v' parsed=$passengerCountInt");
+
+        if (passengerCountInt > 0) {
+          setState(() => selectedPassengerCount = str); // biar initItem sinkron juga
           clearErr('form2.passengerCount');
-          calmv2Bloc.add(FieldPassengerCountChangedEvent(passangerCount: passengerCountInt));
+          calmv2Bloc.add(
+            FieldPassengerCountChangedEvent(passangerCount: passengerCountInt),
+          );
+        } else {
+          debugPrint("⚠️ parsing gagal / 0");
         }
       },
 

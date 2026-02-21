@@ -171,6 +171,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			comboMMvjnscover: combo,
 			record: updatedRecord,
 			isDirty: true,
+			isValid: _validate(updatedRecord),
 		));
 	}
 
@@ -191,6 +192,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			comboMWilayah: combo,
 			record: updatedRecord,
 			isDirty: true,
+			isValid: _validate(updatedRecord),
 		));
 	}
 
@@ -211,6 +213,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			comboMMvgrupOjk: combo,
 			record: updatedRecord,
 			isDirty: true,
+			isValid: _validate(updatedRecord),
 		));
 	}
 
@@ -231,6 +234,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			comboMMvpakaiModel: combo,
 			record: updatedRecord,
 			isDirty: true,
+			isValid: _validate(updatedRecord),
 		));
 	}
 
@@ -255,6 +259,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			comboRMatauangModel: comboRMatauang,
 			record: updatedRecord,
 			isDirty: true,
+			isValid: _validate(updatedRecord),
 		));
 	}
 
@@ -267,6 +272,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		emit(state.copyWith(
 			record: record.copyWith(coverBulan: event.coverBulan),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -279,6 +285,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		emit(state.copyWith(
 			record: record.copyWith(harga: event.harga),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -291,6 +298,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		emit(state.copyWith(
 			record: record.copyWith(currId: event.currId),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -303,6 +311,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		emit(state.copyWith(
 			record: record.copyWith(thnBuat: event.thnBuat),
 			isDirty: true,
+			isValid: _validate(record),
 		));
 	}
 
@@ -381,5 +390,19 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 				isDirty: true,
 			));
 		}
+	}
+
+	bool _validate(Calmv1CrudModel? record) {
+		if (record == null) return false;
+		// record.calmv1Id.isNotEmpty &&
+		return
+				record.coverBulan > 0 &&
+				record.currId.isNotEmpty &&
+				record.harga > 0 &&
+				record.thnBuat > 0 &&
+				record.mmvgrupojkId?.isNotEmpty == true &&
+				record.mmvjnscoverId?.isNotEmpty == true &&
+				record.mmvpakaiId?.isNotEmpty == true &&
+				record.mwilayahId?.isNotEmpty == true;
 	}
 }

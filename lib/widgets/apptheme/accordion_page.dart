@@ -19,11 +19,6 @@ class AccordionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: pGrey,
-      margin: const EdgeInsets.only(
-        left: hPadding * 1.5,
-        right: hPadding * 1.5,
-        bottom: hPadding,
-      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(cardBorderRadius),
       ),
