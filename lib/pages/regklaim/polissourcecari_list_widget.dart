@@ -138,11 +138,11 @@ class PolissourcecariListWidgetState extends State<PolissourcecariListWidget> {
         return SppapoliscariPage(cobKlaimId: widget.cobKlaimId, cobKlaimNama: widget.cobKlaimNama); 
 
       case '20': // contoh: Bukan Polis JPS
-        return const Regklaim1CrudFormPage(); 
+        return Regklaim1CrudFormPage(cobKlaimId: widget.cobKlaimId, cobKlaimNama: widget.cobKlaimNama); 
         // return const RegklaimNonJpsListPage();
 
       default:
-        return const Regklaim1CrudFormPage();
+        return Regklaim1CrudFormPage(cobKlaimId: widget.cobKlaimId, cobKlaimNama: widget.cobKlaimNama);
     }
   }
 }

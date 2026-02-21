@@ -77,6 +77,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
 			comboMInsurer: comboMInsurer,
       record: updatedRecord,
       isDirty: true,
+      isValid: _validate(updatedRecord),
     ));
 	}
 
@@ -95,6 +96,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
 			comboMMvjnscover: comboMMvjnscover,
       record: updatedRecord,  
       isDirty: true,
+      isValid: _validate(updatedRecord),
     ));
 	}
 
@@ -109,6 +111,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));
   }
 
@@ -123,6 +126,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));
   }
 
@@ -137,6 +141,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));    
 
   }
@@ -152,6 +157,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));
     
   }
@@ -167,6 +173,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));
   }
 
@@ -203,6 +210,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));
   }
 
@@ -217,7 +225,19 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     emit(state.copyWith(
       record: record,
       isDirty: true,
+      isValid: _validate(record),
     ));
+  }
+
+  bool _validate(KlaimmvpoliscrudModel? record) {
+    if (record == null) return false;
+
+    return record.insuredNama.isNotEmpty &&
+          record.noChasis.isNotEmpty &&
+          record.noPlat.isNotEmpty &&
+          record.polisNo.isNotEmpty &&
+          record.minsurerId?.isNotEmpty == true &&
+          record.mmvjnscoverId?.isNotEmpty == true;
   }
 
 }

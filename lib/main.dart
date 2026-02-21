@@ -974,6 +974,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvpoliscrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvstatuscrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimpar/klaimparklaimcrud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
@@ -1088,6 +1094,8 @@ import 'blocs/gen_dn1/dn1cari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
 import 'blocs/gen_trslog/trslogcari_bloc.dart';
+import 'blocs/klaimlacak/klaimnilaicrud_bloc.dart';
+import 'blocs/klaimlacak/klaimprogresscari_bloc.dart';
 import 'blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
 import 'blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'blocs/klaimrinci/mstatusrincicari_bloc.dart';
@@ -1130,6 +1138,15 @@ import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
 import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_endors/endors2cari_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
+import 'blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
+import 'blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'blocs/regendors/regendorscari_bloc.dart';
 import 'blocs/regendors/regendors1form_bloc.dart';
 import 'blocs/regendors/regendors2cari_bloc.dart';
@@ -1378,11 +1395,22 @@ Future<void> main() async {
         // Trslog
         BlocProvider(create: (_) => TrslogCariBloc()),
 
-        // Klaim
-        BlocProvider(create: (_) => Klaim1ListBloc()),
-        BlocProvider(create: (_) => Klaim2ListBloc()),
-        BlocProvider(create: (_) => Klaim1CrudBloc(repository: Klaim1CrudRepository())),
-        BlocProvider(create: (_) => Klaim2CrudBloc(repository: Klaim2CrudRepository())),
+        //Klaimq
+        BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
+        BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
+        // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),
+        BlocProvider(create: (context) => KlaimmvbengkelcrudBloc(repository: KlaimmvbengkelcrudRepository())),
+        BlocProvider(create: (context) => KlaimmvstatuscrudBloc(repository: KlaimmvstatuscrudRepository())),
+        BlocProvider(create: (context) => KlaimmvaccordionBloc()),
+        BlocProvider(create: (context) => Klaim5cariBloc()),
+        BlocProvider(create: (context) => KlaimmvstatuscariBloc()),
+
+        BlocProvider(create: (context) => KlaimprogresscariBloc()),
+        BlocProvider(create: (context) => KlaimnilaicrudBloc(repository: KlaimnilaicrudRepository())),
+        BlocProvider(create: (context) => KlaimparklaimcrudBloc(repository: KlaimparklaimcrudRepository())),
+        // BlocProvider(create: (context) => Klaim5parListBloc()),
+        // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),
+        BlocProvider(create: (context) => KlaimparaccordionBloc()),
 
         // Aset
         BlocProvider(create: (_) => StatusAsetCariBloc()),

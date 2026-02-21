@@ -13,6 +13,7 @@ class KlaimmvbengkelcrudState extends Equatable {
 	final ComboMBengkelModel? comboMBengkel;
   final bool isComplete;
   final bool isDirty;
+  final bool isValid;
 
 	const KlaimmvbengkelcrudState(
 		{this.record,
@@ -25,7 +26,8 @@ class KlaimmvbengkelcrudState extends Equatable {
 		this.comboMWilayahBengkel,
 		this.comboMBengkel,
     this.isComplete = false,
-    this.isDirty = false
+    this.isDirty = false,
+    this.isValid = false,
 });
 
 	KlaimmvbengkelcrudState copyWith({
@@ -40,6 +42,7 @@ class KlaimmvbengkelcrudState extends Equatable {
 		Object? comboMBengkel = _sentinel,
     bool? isComplete,
     bool? isDirty,
+    bool? isValid,
 	}){
 		return KlaimmvbengkelcrudState(
 			record: record ?? this.record,
@@ -52,12 +55,13 @@ class KlaimmvbengkelcrudState extends Equatable {
 			comboMWilayahBengkel: comboMWilayahBengkel == _sentinel ? this.comboMWilayahBengkel : comboMWilayahBengkel as ComboMWilayahBengkelModel?,
 			comboMBengkel: comboMBengkel == _sentinel ? this.comboMBengkel : comboMBengkel as ComboMBengkelModel?,
       isComplete: isComplete ?? this.isComplete,
-      isDirty: isDirty ?? this.isDirty
+      isDirty: isDirty ?? this.isDirty,
+      isValid: isValid ?? this.isValid,
 		);
 	}
 
   static const _sentinel = Object();
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record ?? '', isDirty];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record ?? '', isDirty, isValid];
 }

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfx/pdfx.dart';
 
 import '../../../../../../models/regklaim/attachment_item.dart';
 
@@ -29,29 +29,31 @@ void openPreview(BuildContext context, AttachmentItem item) {
 
 class PdfPreviewPage extends StatefulWidget {
   final String path;
-  const PdfPreviewPage({super.key, required this.path});
+
+  const PdfPreviewPage({
+    super.key,
+    required this.path,
+  });
 
   @override
   State<PdfPreviewPage> createState() => _PdfPreviewPageState();
 }
 
 class _PdfPreviewPageState extends State<PdfPreviewPage> {
-  final PdfViewerController _controller = PdfViewerController();
+  late PdfControllerPinch _pdfController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pdfController = PdfControllerPinch(
+      document: PdfDocument.openFile(widget.path),
+    );
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pdfController.dispose();
     super.dispose();
-  }
-
-  void _zoomIn() {
-    final next = (_controller.zoomLevel + 0.25).clamp(1.0, 5.0);
-    _controller.zoomLevel = next;
-  }
-
-  void _zoomOut() {
-    final next = (_controller.zoomLevel - 0.25).clamp(1.0, 5.0);
-    _controller.zoomLevel = next;
   }
 
   @override
@@ -59,29 +61,17 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Preview PDF"),
-        actions: [
-          IconButton(
-            tooltip: 'Zoom In',
-            icon: const Icon(Icons.zoom_in),
-            onPressed: _zoomIn,
-          ),
-          IconButton(
-            tooltip: 'Zoom Out',
-            icon: const Icon(Icons.zoom_out),
-            onPressed: _zoomOut,
-          ),
-        ],
       ),
-      body: SfPdfViewer.file(
-        File(widget.path),
-        controller: _controller,
-        canShowScrollHead: true,
-        canShowScrollStatus: true,
-        enableDoubleTapZooming: true,
-        onDocumentLoadFailed: (details) {
+      body: PdfViewPinch(
+        controller: _pdfController,
+        onDocumentLoaded: (doc) {
+          debugPrint("✅ PDF Loaded - pages: ${doc.pagesCount}");
+        },
+        onDocumentError: (error) {
+          debugPrint("❌ PDF Load Error: $error");
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal buka PDF: ${details.error}')),
+            SnackBar(content: Text('Gagal buka PDF: $error')),
           );
         },
       ),

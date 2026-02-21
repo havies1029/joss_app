@@ -10,7 +10,8 @@ plugins {
 
 android {
     namespace = "com.example.joss_app"
-    compileSdk = flutter.compileSdkVersion
+//    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     defaultConfig {

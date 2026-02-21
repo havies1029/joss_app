@@ -3,19 +3,14 @@ import 'package:joss_app/widgets/my_colors.dart';
 import 'package:joss_app/widgets/my_text.dart';
 
 class CobklaimcariTileWidget extends StatelessWidget {
-	final String cobIcon;
 	final String cobNama;
-	final bool isAktif;
 	final String mcobklaim1Id;
-	final int noUrut;
 
 	const CobklaimcariTileWidget(
 		{super.key,
-		required this.cobIcon, 
 		required this.cobNama, 
-		required this.isAktif, 
-		required this.mcobklaim1Id, 
-		required this.noUrut});
+    required this.mcobklaim1Id, 
+    });
 
 	@override
 	Widget build(BuildContext context) {

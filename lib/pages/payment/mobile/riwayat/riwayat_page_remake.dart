@@ -11,6 +11,7 @@ import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_success/payment_success.dart';
+import 'invoice_preview_page.dart';
 
 class RiwayatPageRemake extends StatefulWidget {
   const RiwayatPageRemake({super.key});
@@ -36,6 +37,20 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
     return MultiBlocListener(
       listeners: [
         // Listener lama kamu (contoh)
+        BlocListener<HistorybayarCariBloc, HistorybayarCariState>(
+          listenWhen: (prev, curr) =>
+          prev.downloadPath != curr.downloadPath &&
+              curr.downloadPath.isNotEmpty &&
+              !curr.isDownloading,
+          listener: (context, state) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => InvoicePreviewFromBase64Page(base64Pdf: state.downloadPath),
+              ),
+            );
+          },
+        ),
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
           listener: (context, state) {
             if (state.isProcessed) {

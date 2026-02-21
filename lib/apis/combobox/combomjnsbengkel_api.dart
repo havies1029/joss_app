@@ -18,8 +18,8 @@ class ComboMJnsbengkelAPI {
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-				.map<ComboMJnsbengkelModel>((json) => ComboMJnsbengkelModel.fromJson(json))
-				.toList();
+					.map<ComboMJnsbengkelModel>((json) => ComboMJnsbengkelModel.fromJson(json))
+					.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}
