@@ -17,8 +17,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 class KlaimmvpoliscrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
+	final GlobalKey<FormState> formKey;
 
-	const KlaimmvpoliscrudFormPage({super.key, required this.viewMode, required this.recordId});
+	const KlaimmvpoliscrudFormPage({super.key, required this.viewMode, required this.recordId, required this.formKey});
 
 	@override
 	KlaimmvpoliscrudFormPageFormState createState() => KlaimmvpoliscrudFormPageFormState();
@@ -26,7 +27,6 @@ class KlaimmvpoliscrudFormPage extends StatefulWidget {
 
 class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> {
 	late KlaimmvpoliscrudBloc klaimmvpoliscrudBloc;
-	final _formKey = GlobalKey<FormState>();
 	final List<String> errors = [];
 	var fieldInsuredNamaController = TextEditingController();
 	var fieldLaporAsuransiController = TextEditingController(text: DateTime.now().toIso8601String());
@@ -57,7 +57,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			builder: (context, state) {
 				return SingleChildScrollView(
 					child: Form(
-							key: _formKey,
+							key: widget.formKey,
 							child: Column(
 								children: [
 									Row(
@@ -134,12 +134,13 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			controller: fieldInsuredNamaController,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: "Nama Tertanggung tidak boleh kosong");
 				}
+				klaimmvpoliscrudBloc.add(FieldInsuredNamaChangedEvent(insuredNama: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
+					addError(error: "Nama Tertanggung tidak boleh kosong");
 					return "";
 				}
 				return null;
@@ -156,15 +157,15 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			initialValue: DateTime.tryParse(fieldLaporAsuransiController.text),
 			onChanged: (value) {
 				if (value != null) {
-				removeError(error: kStringNullError);
+					removeError(error: "Lapor Asuransi tidak boleh kosong");
 					fieldLaporAsuransiController.text = value.toIso8601String();
 
-          klaimmvpoliscrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
+					klaimmvpoliscrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
 				}
 			},
 			validator: (value) {
 				if (value == null) {
-					addError(error: kStringNullError);
+					addError(error: "Lapor Asuransi tidak boleh kosong");
 					return "";
 				}
 				return null;
@@ -217,7 +218,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-							error: "Field ComboMInsurer tidak boleh kosong.");
+							error: "Asuransi tidak boleh kosong.");
 					klaimmvpoliscrudBloc.add(ComboMInsurerChangedEvent(comboMInsurer: value));
 				}
 			},
@@ -229,7 +230,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-							error: "Field ComboMInsurer tidak boleh kosong.");
+							error: "Asuransi tidak boleh kosong.");
 				}
 			},
 		);
@@ -279,7 +280,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			onChangedCallback: (value) {
 				if (value != null) {
 					removeError(
-							error: "Field ComboMMvjnscover tidak boleh kosong.");
+							error: "Jenis Cover tidak boleh kosong.");
 					klaimmvpoliscrudBloc.add(ComboMMvjnscoverChangedEvent(comboMMvjnscover: value));
 				}
 			},
@@ -291,7 +292,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-							error: "Field ComboMMvjnscover tidak boleh kosong.");
+							error: "Jenis Cover tidak boleh kosong.");
 				}
 			},
 		);
@@ -303,13 +304,13 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			controller: fieldNoChasisController,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				  removeError(error: kStringNullError);
+					removeError(error: "No Chasis tidak boleh kosong");
 				}
-        klaimmvpoliscrudBloc.add(FieldNoChasisChangedEvent(noChasis: value));
+				klaimmvpoliscrudBloc.add(FieldNoChasisChangedEvent(noChasis: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
+					addError(error: "No Chasis tidak boleh kosong");
 					return "";
 				}
 				return null;
@@ -323,13 +324,13 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			controller: fieldNoPlatController,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: "No Plat tidak boleh kosong");
 				}
-        klaimmvpoliscrudBloc.add(FieldNoPlatChangedEvent(noPlat: value));
+				klaimmvpoliscrudBloc.add(FieldNoPlatChangedEvent(noPlat: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
+					addError(error: "No Plat tidak boleh kosong");
 					return "";
 				}
 				return null;
@@ -343,14 +344,14 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			initialValue: DateTime.tryParse(fieldPolisAkhirController.text),
 			onChanged: (value) {
 				if (value != null) {
-				removeError(error: kStringNullError);
+					removeError(error: "Polis Akhir tidak boleh kosong");
 					fieldPolisAkhirController.text = value.toIso8601String();
-          klaimmvpoliscrudBloc.add(FieldPolisAkhirChangedEvent(polisAkhir: value));
+					klaimmvpoliscrudBloc.add(FieldPolisAkhirChangedEvent(polisAkhir: value));
 				}
 			},
 			validator: (value) {
 				if (value == null) {
-					addError(error: kStringNullError);
+					addError(error: "Polis Akhir tidak boleh kosong");
 					return "";
 				}
 				return null;
@@ -367,14 +368,14 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			initialValue: DateTime.tryParse(fieldPolisMulaiController.text),
 			onChanged: (value) {
 				if (value != null) {
-          removeError(error: kStringNullError);
-            fieldPolisMulaiController.text = value.toIso8601String();
-            klaimmvpoliscrudBloc.add(FieldPolisMulaiChangedEvent(polisMulai: value));
+					removeError(error: "Polis Mulai tidak boleh kosong");
+					fieldPolisMulaiController.text = value.toIso8601String();
+					klaimmvpoliscrudBloc.add(FieldPolisMulaiChangedEvent(polisMulai: value));
 				}
 			},
 			validator: (value) {
 				if (value == null) {
-					addError(error: kStringNullError);
+					addError(error: "Polis Mulai tidak boleh kosong");
 					return "";
 				}
 				return null;
@@ -392,13 +393,13 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			controller: fieldPolisNoController,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: "Polis No tidak boleh kosong");
 				}
-        klaimmvpoliscrudBloc.add(FieldPolisNoChangedEvent(polisNo: value));
+				klaimmvpoliscrudBloc.add(FieldPolisNoChangedEvent(polisNo: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
+					addError(error: "Polis No tidak boleh kosong");
 					return "";
 				}
 				return null;

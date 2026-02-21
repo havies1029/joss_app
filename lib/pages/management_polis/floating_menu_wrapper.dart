@@ -129,6 +129,11 @@ class FloatingMenuWrapper extends StatelessWidget {
     final statusId = context.read<StatusAsetCariBloc>().state.selectedStatusId;
     const searchText = "";
 
+    if (cobId == null || cobId.isEmpty ||
+        statusId == null || statusId.isEmpty) {
+      return;
+    }
+
     if (cobId == "10002") {
       context.read<AsetParCariBloc>().add(
         RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),

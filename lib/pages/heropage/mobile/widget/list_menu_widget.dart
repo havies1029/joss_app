@@ -4,6 +4,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../widgets/hitung_premi_demo.dart';
+import '../../../../widgets/image_picker_dummy_page.dart';
+import '../../../aset/aset_cari.dart';
+import '../../../calpar/mobile/calpar_main_page_remake.dart';
+import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
+import '../../../gen_calmv/mobile/calmv_main_page_remake2.dart';
+import '../../../gen_endors/endors1crud_form.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../management_polis/mobile/management_polis_filter.dart';
@@ -11,6 +19,9 @@ import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../payment/dnsppamvcari_list.dart';
 import '../../../payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
+// import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
+// import '../../../payment/mobile/rincian/rincian_page.dart';
+// import '../../../payment/mobile/ringkasan/payment_ringkasan_page.dart';
 import '../../../payment/mobile/riwayat/riwayat_page.dart';
 import '../../../payment/rincian/rinciansoa_page.dart';
 import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
@@ -345,15 +356,14 @@ class ListMenuWidget extends StatelessWidget {
       //   } else {
       //     ScaffoldMessenger.of(context).showSnackBar(
       //       const SnackBar(content: Text('Chat belum siap, coba lagi')),
-      //     );  
+      //     );
       //   }
       //   break;
       //
       case 'Test Page':
         // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
         // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodPage(
-          curr: "idr", totalBayar: 0,
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake2(
         )));
         break;
 

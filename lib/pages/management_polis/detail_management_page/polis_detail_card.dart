@@ -169,7 +169,7 @@ class PolisDetailCard extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(borderRadius),
-      onTap: hasCobId ? () => _navigateByCobId(context) : null,
+      // onTap: hasCobId ? () => _navigateByCobId(context) : null,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -181,7 +181,6 @@ class PolisDetailCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// TITLE
             if (title != null) ...[
               Text(
                 title!,

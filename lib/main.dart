@@ -974,18 +974,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
+import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
-import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvdoccrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
+import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvpoliscrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvstatuscrud_repository.dart';
-import 'package:joss_app/blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
-import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/repositories/perbaruiklaimpar/klaimparklaimcrud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar1crud_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar2form_repository.dart';
@@ -1096,10 +1089,13 @@ import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
+import 'blocs/gen_calmv/calmvaccordion_bloc.dart';
 import 'blocs/gen_dn1/dn1cari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
 import 'blocs/gen_trslog/trslogcari_bloc.dart';
+import 'blocs/klaimlacak/klaimnilaicrud_bloc.dart';
+import 'blocs/klaimlacak/klaimprogresscari_bloc.dart';
 import 'blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
 import 'blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'blocs/klaimrinci/mstatusrincicari_bloc.dart';
@@ -1142,6 +1138,15 @@ import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
 import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_endors/endors2cari_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
+import 'blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
+import 'blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
+import 'blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'blocs/regendors/regendorscari_bloc.dart';
 import 'blocs/regendors/regendors1form_bloc.dart';
 import 'blocs/regendors/regendors2cari_bloc.dart';
@@ -1254,8 +1259,6 @@ import 'blocs/regreaktif/regreaktifcari_bloc.dart';
 import 'blocs/regreaktif/regreaktif2cari_bloc.dart';
 
 import 'blocs/loading_flow/loading_flow_bloc.dart';
-import 'repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
-import 'repositories/perbaruiklaimmv/klaimmvpoliscrud_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -1316,23 +1319,6 @@ Future<void> main() async {
         BlocProvider(
           create: (_) => ProfileDownloadFotoBloc(repository: UserFotoRepository()),
         ),
-
-
-        //Klaim
-        BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
-        BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
-        // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),
-        BlocProvider(create: (context) => KlaimmvbengkelcrudBloc(repository: KlaimmvbengkelcrudRepository())),
-        BlocProvider(create: (context) => KlaimmvstatuscrudBloc(repository: KlaimmvstatuscrudRepository())),
-        BlocProvider(create: (context) => KlaimmvaccordionBloc()),
-        BlocProvider(create: (context) => Klaim5cariBloc()),
-        BlocProvider(create: (context) => KlaimmvstatuscariBloc()),
-
-
-        BlocProvider(create: (context) => KlaimparklaimcrudBloc(repository: KlaimparklaimcrudRepository())),
-        // BlocProvider(create: (context) => Klaim5parListBloc()),
-        // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),
-        BlocProvider(create: (context) => KlaimparaccordionBloc()),
 
         // Profile / Rekan
         BlocProvider(create: (_) => MRekan1CrudBloc(repository: MRekan1CrudRepository())),
@@ -1409,11 +1395,22 @@ Future<void> main() async {
         // Trslog
         BlocProvider(create: (_) => TrslogCariBloc()),
 
-        // Klaim
-        BlocProvider(create: (_) => Klaim1ListBloc()),
-        BlocProvider(create: (_) => Klaim2ListBloc()),
-        BlocProvider(create: (_) => Klaim1CrudBloc(repository: Klaim1CrudRepository())),
-        BlocProvider(create: (_) => Klaim2CrudBloc(repository: Klaim2CrudRepository())),
+        //Klaimq
+        BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
+        BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
+        // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),
+        BlocProvider(create: (context) => KlaimmvbengkelcrudBloc(repository: KlaimmvbengkelcrudRepository())),
+        BlocProvider(create: (context) => KlaimmvstatuscrudBloc(repository: KlaimmvstatuscrudRepository())),
+        BlocProvider(create: (context) => KlaimmvaccordionBloc()),
+        BlocProvider(create: (context) => Klaim5cariBloc()),
+        BlocProvider(create: (context) => KlaimmvstatuscariBloc()),
+
+        BlocProvider(create: (context) => KlaimprogresscariBloc()),
+        BlocProvider(create: (context) => KlaimnilaicrudBloc(repository: KlaimnilaicrudRepository())),
+        BlocProvider(create: (context) => KlaimparklaimcrudBloc(repository: KlaimparklaimcrudRepository())),
+        // BlocProvider(create: (context) => Klaim5parListBloc()),
+        // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),
+        BlocProvider(create: (context) => KlaimparaccordionBloc()),
 
         // Aset
         BlocProvider(create: (_) => StatusAsetCariBloc()),
@@ -1453,6 +1450,7 @@ Future<void> main() async {
         BlocProvider(create: (_) => Dn1CariBloc()),
 
         // CALMV
+        BlocProvider(create: (_) => CalmvAccordionBloc()),
         BlocProvider(create: (_) => Calmv1ListBloc()),
         BlocProvider(create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
         BlocProvider(create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),

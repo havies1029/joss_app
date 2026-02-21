@@ -19,8 +19,8 @@ class ComboMInsurerAPI {
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-				.map<ComboMInsurerModel>((json) => ComboMInsurerModel.fromJson(json))
-				.toList();
+					.map<ComboMInsurerModel>((json) => ComboMInsurerModel.fromJson(json))
+					.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}

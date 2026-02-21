@@ -81,7 +81,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       comboMWilayahBengkel: null,
       comboMBengkel: null,
       record: updatedRecord,
-      isDirty: true));
+      isDirty: true,
+      isValid: _validate(updatedRecord),
+    ));
 	}
 
 	Future<void> onComboMWilayahBengkelChanged(
@@ -97,7 +99,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
 			comboMWilayahBengkel: comboMWilayahBengkel,
       comboMBengkel: null,
       record: updatedRecord,
-      isDirty: true));
+      isDirty: true,
+      isValid: _validate(updatedRecord),
+    ));
 	}
 
 	Future<void> onComboMBengkelChanged(
@@ -115,7 +119,9 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       record: updatedRecord,
       isLoading: false,
       isLoaded: true,
-      isDirty: true));
+      isDirty: true,
+      isValid: _validate(updatedRecord),
+    ));
 	}
 
   Future<void> onKlaimmvbengkelAutoSave(
@@ -142,7 +148,33 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       updatedRecord = updatedRecord.copyWith(
         namaBengkelLain: event.namaBengkelLain,
       );
-      emit(state.copyWith(record: updatedRecord, isDirty: true));
+      emit(state.copyWith(
+        record: updatedRecord, 
+        isDirty: true,
+        isValid: _validate(updatedRecord),
+      ));
     
   }
+
+  bool _validate(KlaimmvbengkelcrudModel? record) {
+    if (record == null) return false;
+
+    final mjns = record.mjnsbengkelId?.trim() ?? '';
+    if (mjns.isEmpty) return false;
+
+    if (mjns == '10') {
+      final wilayah = record.mwilayahbengkelId?.trim() ?? '';
+      final bengkel = record.mbengkelId?.trim() ?? '';
+      if (wilayah.isEmpty) return false;
+      if (bengkel.isEmpty) return false;
+    }
+
+    if (mjns == '20') {
+      final lain = record.namaBengkelLain?.trim() ?? '';
+      if (lain.isEmpty) return false;
+    }
+
+    return true;
+  }
+
 }

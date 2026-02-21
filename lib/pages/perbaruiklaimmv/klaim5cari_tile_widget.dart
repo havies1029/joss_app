@@ -220,7 +220,6 @@ class _Thumb extends StatelessWidget {
 
     final hasLocal = localPath != null && localPath!.isNotEmpty;
     final hasUrl = fileUrl != null && fileUrl!.isNotEmpty;
-    //debugPrint("fileUrl: $fileUrl");
     if (isImage && hasLocal) {
       child = Image.file(File(localPath!), fit: BoxFit.cover);
     } else if (isPdf && hasLocal) {

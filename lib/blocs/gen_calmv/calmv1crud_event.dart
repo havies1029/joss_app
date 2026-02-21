@@ -80,3 +80,29 @@ class Calmv1DraftEvent extends Calmv1CrudEvents {
 class Calmv1ResetStatusEvent extends Calmv1CrudEvents {
 	const Calmv1ResetStatusEvent();
 }
+
+class FieldCoverBulanChangedEvent extends Calmv1CrudEvents {
+	final int coverBulan;
+	const FieldCoverBulanChangedEvent({required this.coverBulan});
+	@override List<Object> get props => [coverBulan];
+}
+
+class FieldHargaChangedEvent extends Calmv1CrudEvents {
+	final double harga;
+	const FieldHargaChangedEvent({required this.harga});
+	@override List<Object> get props => [harga];
+}
+
+class FieldCurrIdChangedEvent extends Calmv1CrudEvents {
+	final String currId;
+	const FieldCurrIdChangedEvent({required this.currId});
+	@override List<Object> get props => [currId];
+}
+
+class FieldThnBuatChangedEvent extends Calmv1CrudEvents {
+	final int thnBuat;
+	const FieldThnBuatChangedEvent({required this.thnBuat});
+	@override List<Object> get props => [thnBuat];
+}
+
+class ClaimmvPolisAutoSaveEvent extends Calmv1CrudEvents {}

@@ -30,6 +30,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
     var klaimmvpoliscrudBloc = BlocProvider.of<KlaimmvpoliscrudBloc>(context);
     var klaimmvklaimcrudBloc = BlocProvider.of<KlaimmvklaimcrudBloc>(context);
     var klaimmvbengkelcrudBloc = BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
+    final _polisFormKey = GlobalKey<FormState>();
+    final _klaimFormKey = GlobalKey<FormState>();
+    final _bengkelFormKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(title: Text(widget.cobGroupNama)),
       body: BlocConsumer<KlaimmvaccordionBloc, KlaimmvaccordionState>(
@@ -78,15 +81,48 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       Klaimmvaccordioncard(
                         title: 'Data Polis',
                         isOpen: acc.openedIndex == 0,
-                        onTap: () => context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 0)),
-                        child: KlaimmvpoliscrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah"),
+                        onTap: () {
+
+                          if (acc.openedIndex == 1) {
+                            final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
+                            if (!klaimState.isValid) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Data Klaim belum valid")),
+                              );
+                              return; // tahan pindah
+                            }
+                          }
+
+                          context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 0));
+                        },
+                        child: KlaimmvpoliscrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: _polisFormKey),
                       ),
                       
                       Klaimmvaccordioncard(
                         title: 'Data Klaim',
                         isOpen: acc.openedIndex == 1,
-                        onTap: () => context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 1)),
-                        child: KlaimmvklaimcrudFormPage(recordId:  widget.klaim1Id, viewMode: "ubah"),
+                        onTap: () {
+                          if (acc.openedIndex == 0) {
+                            final isFormPolisValid = _polisFormKey.currentState?.validate() ?? false;
+                            if (!isFormPolisValid) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Data Polis belum valid")),
+                              );
+                              return; // tahan pindah
+                            }
+
+                            final polisState = context.read<KlaimmvpoliscrudBloc>().state;
+                            if (!polisState.isValid) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Data Polis belum valid")),
+                              );
+                              return; // tahan pindah
+                            }
+                          }
+
+                          context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 1));
+                        },
+                        child: KlaimmvklaimcrudFormPage(recordId:  widget.klaim1Id, viewMode: "ubah", formKey: _klaimFormKey),
                       ),
                       
                       Klaimmvaccordioncard(
@@ -107,7 +143,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                         title: 'Bengkel yang dipilih',
                         isOpen: acc.openedIndex == 4,
                         onTap: () => context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 4)),
-                        child: KlaimmvbengkelcrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah"),
+                        child: KlaimmvbengkelcrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: _bengkelFormKey),
                       ),
                       
                       const SizedBox(height: 24),
@@ -141,8 +177,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
               ),
             ],
           );
-        },
-        listener: (BuildContext context, KlaimmvaccordionState state) async {
+        }, listener: (BuildContext context, KlaimmvaccordionState state) async { 
           if (state.previousIndex != null &&
             state.previousIndex != state.openedIndex) {
             

@@ -15,8 +15,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 class KlaimmvklaimcrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
+	final GlobalKey<FormState> formKey;
 
-	const KlaimmvklaimcrudFormPage({super.key, required this.viewMode, required this.recordId});
+	const KlaimmvklaimcrudFormPage({super.key, required this.viewMode, required this.recordId, required this.formKey});
 
 	@override
 	KlaimmvklaimcrudFormPageFormState createState() => KlaimmvklaimcrudFormPageFormState();
@@ -24,7 +25,6 @@ class KlaimmvklaimcrudFormPage extends StatefulWidget {
 
 class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> {
 	late KlaimmvklaimcrudBloc klaimmvklaimcrudBloc;
-	final _formKey = GlobalKey<FormState>();
 	final List<String> errors = [];
 	ComboRMatauangModel? fieldComboRMatauang;
 	final comboRMatauangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
@@ -48,7 +48,7 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 			builder: (context, state) {
 				return SingleChildScrollView(
 					child:  Form(
-							key: _formKey,
+							key: widget.formKey,
 							child: Column(
 								children: [
 									buildFieldDol(),

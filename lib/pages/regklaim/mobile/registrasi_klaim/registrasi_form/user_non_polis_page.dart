@@ -13,6 +13,8 @@ import '../../../../../common/constants.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
+import '../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
+import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
 class UserNonPolisPage extends StatefulWidget {
   final String cobKlaimId;
@@ -76,7 +78,25 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               setState(() {
                 regklaim1Id = state.regklaim1Id;
               });
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => PaymentSuccess(
+                    displayButton: "Kembali",
+                    description: "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
+                    display: "Klaim Kamu Berhasil Didaftarkan!",
+                    onButtonPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const KlaimMainPage()),
+                            (route) => route.isFirst,
+                      );
+                    },
+                  ),
+                ),
+              );
             }
+
             // debugPrint("AWAADSDDASAS");
             // debugPrint("regklaim1Id = ${regklaim1Id}");
           },

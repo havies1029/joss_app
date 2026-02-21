@@ -81,4 +81,28 @@ class Calpar4FormModel {
 				'rateTotal': rateTotal.toString(),
 				'biayaPolis': biayaPolis.toString(),
 			};
+
+	factory Calpar4FormModel.empty() {
+		return Calpar4FormModel(
+			calpar1Id: '',
+			calpar4Id: '',
+			discNilai: 0,
+			discPersen: 0,
+			premiBi: 0,
+			premiEqvet: 0,
+			premiNet: 0,
+			premiOther: 0,
+			premiPar: 0,
+			premiRsmdcc: 0,
+			premiTsfwd: 0,
+			premiTotal: 0,
+			ratePar: 0,
+			rateRsmdcc: 0,
+			rateTsfwd: 0,
+			rateEqvet: 0,
+			rateOther: 0,
+			rateTotal: 0,
+			biayaPolis: 0,
+		);
+	}
 }

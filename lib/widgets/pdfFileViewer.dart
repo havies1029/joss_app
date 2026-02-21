@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfx/pdfx.dart';
 
-class PdfFileViewPage extends StatelessWidget {
+class PdfFileViewPage extends StatefulWidget {
   final String title;
   final File pdfFile;
 
@@ -13,15 +13,39 @@ class PdfFileViewPage extends StatelessWidget {
   });
 
   @override
+  State<PdfFileViewPage> createState() => _PdfFileViewPageState();
+}
+
+class _PdfFileViewPageState extends State<PdfFileViewPage> {
+  late PdfController _pdfController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pdfController = PdfController(
+      document: PdfDocument.openFile(widget.pdfFile.path),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pdfController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: FutureBuilder<bool>(
-        future: _checkFile(pdfFile),
+        future: _checkFile(widget.pdfFile),
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
+
           if (snap.hasError || snap.data != true) {
             return Center(
               child: Text(
@@ -31,13 +55,15 @@ class PdfFileViewPage extends StatelessWidget {
             );
           }
 
-          return SfPdfViewer.file(
-            pdfFile,
-            onDocumentLoaded: (details) {
-              debugPrint("✅ PDF Loaded - pages: ${details.document.pages.count}");
+          return PdfView(
+            controller: _pdfController,
+            scrollDirection: Axis.vertical,
+            physics: const BouncingScrollPhysics(),
+            onDocumentLoaded: (doc) {
+              debugPrint("✅ PDF Loaded - pages: ${doc.pagesCount}");
             },
-            onDocumentLoadFailed: (details) {
-              debugPrint("❌ PDF Load Failed: ${details.error}");
+            onDocumentError: (error) {
+              debugPrint("❌ PDF Load Error: $error");
             },
           );
         },

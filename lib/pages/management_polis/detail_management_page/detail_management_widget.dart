@@ -503,19 +503,17 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
           ..._items.asMap().entries.map((entry) {
             final index = entry.key;
             final item = entry.value;
-            final activeIndex = _findActiveIndexBySource(_prosesSource, _items);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TimelineItem<dynamic>(
-                item: item,
-                activeIndex: _activeIndex,
-                getDateTime: (x) => _getDateTime!(x),
-                getStatusText: (x) => _getStatusText!(x),
-                activeTextColor: primaryLightColor,
-                normalTextColor: hintGrey,
-                activeDotColor: primaryColor,
-                normalDotColor: hintGrey, index: index,
-              ),
+            final isLast = index == _items.length - 1;
+            return TimelineItem<dynamic>(
+              isLast: isLast,
+              item: item,
+              activeIndex: _activeIndex,
+              getDateTime: (x) => _getDateTime!(x),
+              getStatusText: (x) => _getStatusText!(x),
+              activeTextColor: primaryLightColor,
+              normalTextColor: hintGrey,
+              activeDotColor: primaryColor,
+              normalDotColor: hintGrey, index: index,
             );
           }).toList(),
         ],

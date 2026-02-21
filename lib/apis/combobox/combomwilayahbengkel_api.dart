@@ -19,8 +19,8 @@ class ComboMWilayahBengkelAPI {
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 			return parsed
-				.map<ComboMWilayahBengkelModel>((json) => ComboMWilayahBengkelModel.fromJson(json))
-				.toList();
+					.map<ComboMWilayahBengkelModel>((json) => ComboMWilayahBengkelModel.fromJson(json))
+					.toList();
 		} else {
 			throw Exception("Failed to load data");
 		}

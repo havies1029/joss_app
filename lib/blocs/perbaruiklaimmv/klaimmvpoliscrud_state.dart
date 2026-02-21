@@ -12,6 +12,7 @@ class KlaimmvpoliscrudState extends Equatable {
 	final ComboMMvjnscoverModel? comboMMvjnscover;
   final bool isComplete;
   final bool isDirty;
+  final bool isValid;
 	const KlaimmvpoliscrudState(
 		{this.record,
 		this.isLoading = false,
@@ -23,6 +24,7 @@ class KlaimmvpoliscrudState extends Equatable {
 		this.comboMMvjnscover,
     this.isComplete = false,
     this.isDirty = false,
+    this.isValid = false,
 });
 
 	KlaimmvpoliscrudState copyWith({
@@ -36,6 +38,7 @@ class KlaimmvpoliscrudState extends Equatable {
 		ComboMMvjnscoverModel? comboMMvjnscover,
     bool? isComplete,
     bool? isDirty,
+    bool? isValid,
 	}){
 		return KlaimmvpoliscrudState(
 			record: record ?? this.record,
@@ -48,9 +51,10 @@ class KlaimmvpoliscrudState extends Equatable {
 			comboMMvjnscover: comboMMvjnscover?? this.comboMMvjnscover,
       isComplete: isComplete ?? this.isComplete,
       isDirty: isDirty ?? this.isDirty,
+      isValid: isValid ?? this.isValid,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record??'', isDirty];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record??'', isDirty, isValid];
 }

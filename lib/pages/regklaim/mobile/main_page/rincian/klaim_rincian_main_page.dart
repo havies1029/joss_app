@@ -62,10 +62,17 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     return MultiBlocListener(
       listeners: [
         BlocListener<MstatusrinciCariBloc, MstatusrinciCariState>(
-          listenWhen: (previous, current) =>
-          previous.selectedStatusId != current.selectedStatusId,
-          listener: (context, state) => _refreshData(),
-        ),
+            listener: (context, state) {
+              // Ketika selectedStatusId berubah, refresh data KlaimringkasCariBloc
+              context.read<GroupcobCariBloc>().add(
+                RefreshGroupcobCariEvent(
+                  statusId: state.selectedStatusId, searchText: state.searchText,
+                ),
+              );
+            }, listenWhen: (previous, current) {
+          return ((previous.selectedStatusId != current.selectedStatusId) ||
+              (previous.searchText != current.searchText));
+        }),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -21,9 +21,15 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 		on<Calmv1CrudTambahEvent>(onTambahCalmv1Crud);
 		on<Calmv1CrudHapusEvent>(onHapusCalmv1Crud);
 		on<Calmv1CrudLihatEvent>(onLihatCalmv1Crud);
+		on<ComboMMvgrupOjkChangedEvent>(onComboMMvgrupOjkChanged);
 		on<ComboMMvjnscoverChangedEvent>(onComboMMvjnscoverChanged);
 		on<ComboMWilayahChangedEvent>(onComboMWilayahChanged);
-		on<ComboMMvgrupOjkChangedEvent>(onComboMMvgrupOjkChanged);
+		on<ComboMMvpakaiChangedEvent>(onComboMMvpakaiChanged);
+		on<ComboRMatauangChangedEvent>(onComboRMatauangChanged);
+		on<FieldCoverBulanChangedEvent>(onFieldCoverBulanChanged);
+		on<FieldHargaChangedEvent>(onFieldHargaChanged);
+		on<FieldCurrIdChangedEvent>(onFieldCurrIdChanged);
+		on<FieldThnBuatChangedEvent>(onFieldThnBuatChanged);
 		on<Calmv1DraftEvent>(onDraftCalmv1Crud);
 		on<Calmv1ResetStatusEvent>((event, emit) {
 			emit(state.copyWith(
@@ -32,6 +38,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 				hasFailure: false,
 			));
 		});
+		on<ClaimmvPolisAutoSaveEvent>(onCalmvPolisAutoSave);
 	}
 
 	Future<void> onDraftCalmv1Crud(
@@ -50,25 +57,10 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			Calmv1CrudTambahEvent event,
 			Emitter<Calmv1CrudState> emit,
 			) async {
-		debugPrint(
-			"[${DateTime.now().toIso8601String()}] Calmv1Tambah START "
-					"oldId=${event.record.calmv1Id} hash=${event.record.hashCode}",
-		);
-
 		emit(state.copyWith(isSaving: true, isSaved: false, hasFailure: false));
-
-		debugPrint(
-			"[${DateTime.now().toIso8601String()}] Calmv1Tambah AFTER emit(isSaving=true) "
-					"state.isSaving=${state.isSaving} state.isSaved=${state.isSaved} state.fail=${state.hasFailure}",
-		);
 
 		try {
 			final returnData = await repository.calmv1CrudTambah(event.record);
-
-			debugPrint(
-				"[${DateTime.now().toIso8601String()}] Calmv1Tambah REPO DONE "
-						"success=${returnData.success} data=${returnData.data}",
-			);
 
 			final hasFailure = !returnData.success;
 
@@ -77,10 +69,6 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 				newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
 			}
 
-			debugPrint(
-				"[${DateTime.now().toIso8601String()}] Calmv1Tambah BEFORE FINAL emit "
-						"newId=${newRecord.calmv1Id} hasFailure=$hasFailure",
-			);
 
 			emit(state.copyWith(
 				isSaving: false,
@@ -167,25 +155,254 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 	}
 
 	Future<void> onComboMMvjnscoverChanged(
-			ComboMMvjnscoverChangedEvent event, Emitter<Calmv1CrudState> emit) async {
+			ComboMMvjnscoverChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(isDirty: false));
 
-		debugPrint("🔄 [Bloc] Combo Jenis Cover changed: ${event.comboMMvjnscover.mmvjnscoverId}");
-		emit(state.copyWith(comboMMvjnscover: event.comboMMvjnscover));
+		final ComboMMvjnscoverModel? combo = event.comboMMvjnscover;
+
+		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
+		updatedRecord = updatedRecord.copyWith(
+			mmvjnscoverId: combo?.mmvjnscoverId, // aman kalau null
+		);
+
+		emit(state.copyWith(
+			comboMMvjnscover: combo,
+			record: updatedRecord,
+			isDirty: true,
+			isValid: _validate(updatedRecord),
+		));
 	}
 
 	Future<void> onComboMWilayahChanged(
-			ComboMWilayahChangedEvent event, Emitter<Calmv1CrudState> emit) async {
+			ComboMWilayahChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(isDirty: false));
 
-		debugPrint("🔄 [Bloc] Combo Wilayah changed: ${event.comboMWilayah.mwilayahId}");
-		emit(state.copyWith(comboMWilayah: event.comboMWilayah));
+		final ComboMWilayahModel? combo = event.comboMWilayah;
+
+		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
+		updatedRecord = updatedRecord.copyWith(
+			mwilayahId: combo?.mwilayahId,
+		);
+
+		emit(state.copyWith(
+			comboMWilayah: combo,
+			record: updatedRecord,
+			isDirty: true,
+			isValid: _validate(updatedRecord),
+		));
 	}
 
 	Future<void> onComboMMvgrupOjkChanged(
-			ComboMMvgrupOjkChangedEvent event, Emitter<Calmv1CrudState> emit) async {
+			ComboMMvgrupOjkChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(isDirty: false));
 
-		debugPrint("🔄 [Bloc] Combo OJK changed: ${event.comboMMvgrupOjk.mmvgrupojkId}");
-		emit(state.copyWith(comboMMvgrupOjk: event.comboMMvgrupOjk));
+		final ComboMMvgrupOjkModel? combo = event.comboMMvgrupOjk;
+
+		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
+		updatedRecord = updatedRecord.copyWith(
+			mmvgrupojkId: combo?.mmvgrupojkId,
+		);
+
+		emit(state.copyWith(
+			comboMMvgrupOjk: combo,
+			record: updatedRecord,
+			isDirty: true,
+			isValid: _validate(updatedRecord),
+		));
 	}
 
+	Future<void> onComboMMvpakaiChanged(
+			ComboMMvpakaiChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		emit(state.copyWith(isDirty: false));
 
+		final ComboMMvpakaiModel? combo = event.comboMMvpakai;
+
+		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
+		updatedRecord = updatedRecord.copyWith(
+			mmvpakaiId: combo?.mmvpakaiId,
+		);
+
+		emit(state.copyWith(
+			comboMMvpakaiModel: combo,
+			record: updatedRecord,
+			isDirty: true,
+			isValid: _validate(updatedRecord),
+		));
+	}
+
+	Future<void> onComboRMatauangChanged(
+			ComboRMatauangChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+
+		emit(state.copyWith(isDirty: false));
+
+
+		ComboRMatauangModel comboRMatauang = event.comboRMatauang;
+
+
+		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
+
+		updatedRecord = updatedRecord.copyWith(
+			currId: comboRMatauang.rmatauangKode,
+		);
+
+		emit(state.copyWith(
+			comboRMatauangModel: comboRMatauang,
+			record: updatedRecord,
+			isDirty: true,
+			isValid: _validate(updatedRecord),
+		));
+	}
+
+	Future<void> onFieldCoverBulanChanged(
+			FieldCoverBulanChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		final record = state.record ?? Calmv1CrudModel.empty();
+
+		emit(state.copyWith(
+			record: record.copyWith(coverBulan: event.coverBulan),
+			isDirty: true,
+			isValid: _validate(record),
+		));
+	}
+
+	Future<void> onFieldHargaChanged(
+			FieldHargaChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		final record = state.record ?? Calmv1CrudModel.empty();
+
+		emit(state.copyWith(
+			record: record.copyWith(harga: event.harga),
+			isDirty: true,
+			isValid: _validate(record),
+		));
+	}
+
+	Future<void> onFieldCurrIdChanged(
+			FieldCurrIdChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		final record = state.record ?? Calmv1CrudModel.empty();
+
+		emit(state.copyWith(
+			record: record.copyWith(currId: event.currId),
+			isDirty: true,
+			isValid: _validate(record),
+		));
+	}
+
+	Future<void> onFieldThnBuatChanged(
+			FieldThnBuatChangedEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+		final record = state.record ?? Calmv1CrudModel.empty();
+
+		emit(state.copyWith(
+			record: record.copyWith(thnBuat: event.thnBuat),
+			isDirty: true,
+			isValid: _validate(record),
+		));
+	}
+
+	Future<void> onCalmvPolisAutoSave(
+			ClaimmvPolisAutoSaveEvent event,
+			Emitter<Calmv1CrudState> emit,
+			) async {
+
+		if (!state.isDirty) {
+			debugPrint("AUTO SAVE ⛔ skip karena state.isDirty = false");
+			return;
+		}
+
+		Calmv1CrudModel? record = state.record;
+		if (record == null) {
+			debugPrint("AUTO SAVE ⛔ skip karena record = null");
+			return;
+		}
+
+		debugPrint("AUTO SAVE ▶️ mulai save | id: ${record.calmv1Id}");
+
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		try {
+			/// ===== TAMBAH (INSERT) =====
+			if (record.calmv1Id.trim().isEmpty) {
+				debugPrint("AUTO SAVE ➕ mode TAMBAH");
+
+				final returnData = await repository.calmv1CrudTambah(record);
+
+				debugPrint("AUTO SAVE ➕ hasil tambah success: ${returnData.success}");
+				debugPrint("AUTO SAVE ➕ returned id: ${returnData.data}");
+
+				if (!returnData.success || returnData.data == null) {
+					debugPrint("AUTO SAVE ❌ tambah gagal");
+
+					emit(state.copyWith(
+						isSaving: false,
+						isSaved: false,
+						hasFailure: true,
+						isDirty: true,
+					));
+					return;
+				}
+
+				record = record.copyWith(calmv1Id: returnData.data.toString());
+				debugPrint("AUTO SAVE ➕ id baru dipasang: ${record.calmv1Id}");
+			}
+
+			/// ===== UBAH (UPDATE) =====
+			debugPrint("AUTO SAVE ✏️ mode UBAH id: ${record.calmv1Id}");
+			final ok = await repository.calmv1CrudUbah(record);
+
+			debugPrint("AUTO SAVE ✏️ hasil ubah success: $ok");
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: ok,
+				hasFailure: !ok,
+				record: record,
+				isDirty: ok ? false : true,
+			));
+
+			debugPrint("AUTO SAVE ✅ selesai | saved: $ok");
+		} catch (e) {
+			debugPrint("AUTO SAVE 💥 ERROR: $e");
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: true,
+				isDirty: true,
+			));
+		}
+	}
+
+	bool _validate(Calmv1CrudModel? record) {
+		if (record == null) return false;
+		// record.calmv1Id.isNotEmpty &&
+		return
+				record.coverBulan > 0 &&
+				record.currId.isNotEmpty &&
+				record.harga > 0 &&
+				record.thnBuat > 0 &&
+				record.mmvgrupojkId?.isNotEmpty == true &&
+				record.mmvjnscoverId?.isNotEmpty == true &&
+				record.mmvpakaiId?.isNotEmpty == true &&
+				record.mwilayahId?.isNotEmpty == true;
+	}
 }

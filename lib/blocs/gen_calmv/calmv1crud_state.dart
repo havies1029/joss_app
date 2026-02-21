@@ -11,6 +11,12 @@ class Calmv1CrudState extends Equatable {
 	final ComboMMvjnscoverModel? comboMMvjnscover;
 	final ComboMWilayahModel? comboMWilayah;
 	final ComboMMvgrupOjkModel? comboMMvgrupOjk;
+	final ComboMMvpakaiModel? comboMMvpakaiModel;
+	final ComboRMatauangModel? comboRMatauangModel;
+	final bool isComplete;
+	final bool isDirty;
+	final bool isValid;
+
 	const Calmv1CrudState(
 		{this.record,
 		this.isLoading = false,
@@ -21,6 +27,11 @@ class Calmv1CrudState extends Equatable {
 		this.comboMMvjnscover,
 		this.comboMWilayah,
 		this.comboMMvgrupOjk,
+		this.comboMMvpakaiModel,
+		this.comboRMatauangModel,
+		this.isComplete = false,
+		this.isDirty = false,
+		this.isValid = false,
 });
 
 	Calmv1CrudState copyWith({
@@ -33,6 +44,11 @@ class Calmv1CrudState extends Equatable {
 		ComboMMvjnscoverModel? comboMMvjnscover,
 		ComboMWilayahModel? comboMWilayah,
 		ComboMMvgrupOjkModel? comboMMvgrupOjk,
+		ComboMMvpakaiModel? comboMMvpakaiModel,
+		ComboRMatauangModel? comboRMatauangModel,
+		bool? isComplete,
+		bool? isDirty,
+		bool? isValid,
 	}){
 		return Calmv1CrudState(
 			record: record ?? this.record,
@@ -44,19 +60,24 @@ class Calmv1CrudState extends Equatable {
 			comboMMvjnscover: comboMMvjnscover?? this.comboMMvjnscover,
 			comboMWilayah: comboMWilayah?? this.comboMWilayah,
 			comboMMvgrupOjk: comboMMvgrupOjk?? this.comboMMvgrupOjk,
+			comboMMvpakaiModel: comboMMvpakaiModel?? this.comboMMvpakaiModel,
+			comboRMatauangModel: comboRMatauangModel?? this.comboRMatauangModel,
+			isComplete: isComplete ?? this.isComplete,
+			isDirty: isDirty ?? this.isDirty,
+			isValid: isValid ?? this.isValid,
 		);
 	}
 
 	@override
-	List<Object?> get props => [
-		record,
+	List<Object> get props => [
+		record??"",
 		isLoading,
 		isLoaded,
 		isSaving,
 		isSaved,
 		hasFailure,
-		comboMMvjnscover,
-		comboMWilayah,
-		comboMMvgrupOjk,
+		isComplete,
+		isDirty,
+		isValid
 	];
 }

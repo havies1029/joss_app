@@ -328,7 +328,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 // Transaction type
                 Text(
                   item.jenis_trs ?? "-",
-                  style: bodyTextStyle(context, fontSize: 20),
+                  style: bodyTextStyle(context, fontSize: 18).copyWith(color: primaryLightColor),
                 ),
                 const SizedBox(height: 4),
 
@@ -345,18 +345,18 @@ class _TransaksiPageState extends State<TransaksiPage> {
           ),
 
           // status
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            decoration: BoxDecoration(
-              color: _getStatusColor(item.status_nama),
-              borderRadius: BorderRadius.circular(20),
-            ),
+          SizedBox(
+            width: 90,
             child: Text(
               item.status_nama ?? "-",
-              style: bodyTextStyle(context, fontSize: 16),
+              textAlign: TextAlign.right,
+              style: bodyTextStyle(
+                context,
+                fontSize: 16,
+              ).copyWith(
+                color: _getStatusColor(item.status_nama),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

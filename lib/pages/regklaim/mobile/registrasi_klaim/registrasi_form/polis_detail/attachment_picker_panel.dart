@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:pdf_image_renderer/pdf_image_renderer.dart';
+import 'package:pdfx/pdfx.dart';
 
 import '../../../../../../models/regklaim/attachment_item.dart';
-
 
 class AttachmentPickerPanel extends StatelessWidget {
   final List<AttachmentItem> items;
@@ -27,7 +25,6 @@ class AttachmentPickerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -54,10 +51,7 @@ class AttachmentPickerPanel extends StatelessWidget {
             )
                 : ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               itemCount: items.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, i) {
@@ -93,7 +87,7 @@ class AttachmentPickerPanel extends StatelessWidget {
                   bg: const Color(0xFFF28C28),
                   fg: Colors.white,
                   enabled: true,
-                  onTap: onPickPhoto,
+                  onTap: onPickFile,
                 ),
               ),
             ],
@@ -120,6 +114,7 @@ class _ThumbCard extends StatefulWidget {
 }
 
 class _ThumbCardState extends State<_ThumbCard> {
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -150,6 +145,9 @@ class _ThumbCardState extends State<_ThumbCard> {
                 ),
               ),
             ),
+
+            // optional overlay status upload kecil
+            // Positioned(bottom: 10, right: 10, child: _StatusChip(item: widget.item)),
           ],
         ),
       ),
@@ -221,7 +219,7 @@ class _BigButton extends StatelessWidget {
     return SizedBox(
       height: 72,
       child: ElevatedButton.icon(
-        onPressed: enabled ? onTap : null,
+        onPressed: enabled ? onTap : null, // <- null = disabled native
         icon: Icon(icon, color: effectiveFg, size: 30),
         label: Text(
           label,
@@ -233,17 +231,16 @@ class _BigButton extends StatelessWidget {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: effectiveBg,
-          disabledBackgroundColor: effectiveBg,
+          disabledBackgroundColor: effectiveBg, // biar tetap sesuai opacity
           disabledForegroundColor: effectiveFg,
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
     );
   }
 }
+
 
 class _FilePlaceholder extends StatelessWidget {
   final String name;
@@ -259,7 +256,8 @@ class _FilePlaceholder extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.insert_drive_file_outlined, color: Colors.white70, size: 44),
+            const Icon(Icons.insert_drive_file_outlined,
+                color: Colors.white70, size: 44),
             const SizedBox(height: 10),
             Text(
               name,
@@ -287,28 +285,19 @@ class _PdfThumbImage extends StatelessWidget {
   });
 
   Future<Uint8List?> _renderPage1() async {
-    // ✅ versi 0.7.0: pakai PdfImageRendererPdf
-    final pdf = PdfImageRenderer(path: path);
+    final doc = await PdfDocument.openFile(path);
+    final page = await doc.getPage(1);
 
-    await pdf.open();                 // buka dokumen
-    await pdf.openPage(pageIndex: 0); // buka page 1 (index mulai 0)
+    final img = await page.render(
+      width: (width * 2).toDouble(),   // biar tajam
+      height: (height * 2).toDouble(),
+      format: PdfPageImageFormat.png,
+    );
 
-    try {
-      final bytes = await pdf.renderPage(
-        pageIndex: 0,
-        x: 0,
-        y: 0,
-        width: (width * 2).toInt(),
-        height: (height * 2).toInt(),
-        scale: 1,
-        background: const Color(0xFFFFFFFF),
-      );
+    await page.close();
+    await doc.close();
 
-      return bytes;
-    } finally {
-      await pdf.closePage(pageIndex: 0);
-      await pdf.close();
-    }
+    return img?.bytes;
   }
 
   @override

@@ -12,7 +12,6 @@ import '../../../../../../common/constants.dart';
 import '../../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../../repositories/regklaim/upload_repository.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'attachment_picker_panel.dart';
 

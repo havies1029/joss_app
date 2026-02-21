@@ -1,10 +1,8 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:joss_app/apis/payment/invoice_download_api.dart';
-import 'package:path_provider/path_provider.dart';
 
 class InvoiceDownloadRepository {
-  InvoiceDownloadApi api = InvoiceDownloadApi();
+  final InvoiceDownloadApi api = InvoiceDownloadApi();
 
   Future<String> downloadInvoice(String noInv) async {
     final response = await api.downloadInvoice(noInv);
@@ -12,14 +10,23 @@ class InvoiceDownloadRepository {
       throw Exception("Gagal download: ${response.statusCode}");
     }
 
-    final bytes = response.bodyBytes;
+    // BODY STRING : [{"response_code":"200",...,"inv":"JVBERi0x..."}]
+    final decoded = jsonDecode(response.body);
 
-    Directory dir = await getApplicationDocumentsDirectory();
-    String filePath = "${dir.path}/INVOICE_$noInv.jpg";
+    if (decoded is! List || decoded.isEmpty) {
+      throw Exception("Format response tidak valid (bukan list / kosong)");
+    }
 
-    File file = File(filePath);
-    await file.writeAsBytes(bytes);
+    final obj = Map<String, dynamic>.from(decoded.first);
 
-    return filePath;
+    if (obj['response_code']?.toString() != '200') {
+      throw Exception(obj['response_message']?.toString() ?? 'Gagal');
+    }
+
+    final inv = (obj['inv'] ?? '').toString();
+    if (inv.isEmpty) throw Exception("Field inv kosong");
+
+    // return base64 string
+    return inv;
   }
 }
