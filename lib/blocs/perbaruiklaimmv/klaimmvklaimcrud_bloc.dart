@@ -51,12 +51,24 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
-	Future<void> onLihatKlaimmvklaimcrud(
-		KlaimmvklaimcrudLihatEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-		KlaimmvklaimcrudModel? record = await repository.klaimmvklaimcrudLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
-	}
+  Future<void> onLihatKlaimmvklaimcrud(
+      KlaimmvklaimcrudLihatEvent event,
+      Emitter<KlaimmvklaimcrudState> emit
+      ) async {
+
+    emit(state.copyWith(isLoading: true, isLoaded: false));
+
+    KlaimmvklaimcrudModel? record =
+    await repository.klaimmvklaimcrudLihat(event.recordId);
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      record: record,
+      comboRMatauang: record?.comboRMatauang,
+      isComplete: _validate(record),
+    ));
+  }
 
 	Future<void> onComboRMatauangChanged(
 			ComboRMatauangChangedEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
@@ -75,6 +87,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       record: updatedRecord,
       isDirty: true,
       isValid: _validate(updatedRecord),
+      isComplete: _validate(updatedRecord),
     ));
 	}
 
@@ -88,6 +101,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         record: updatedRecord, 
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -103,6 +117,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         record: updatedRecord, 
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -118,6 +133,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         record: updatedRecord, 
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -132,6 +148,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         record: updatedRecord, 
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }

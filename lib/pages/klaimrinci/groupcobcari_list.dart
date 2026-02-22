@@ -1,3 +1,4 @@
+import 'package:joss_app/blocs/klaimbatal/klaimbatalcrud_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/mstatusrincicari_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +14,8 @@ class GroupcobCariPage extends StatefulWidget {
 
 class GroupcobCariPageState extends State<GroupcobCariPage> {
 	late GroupcobCariBloc groupcobCariBloc;
-  late MstatusrinciCariBloc mstatusrinciCariBloc;
-  String selectedStatusId = '';
+	late MstatusrinciCariBloc mstatusrinciCariBloc;
+	String selectedStatusId = '';
 	final TextEditingController _searchController = TextEditingController();
 	@override
 	void initState() {
@@ -27,16 +28,22 @@ class GroupcobCariPageState extends State<GroupcobCariPage> {
 	@override
 	Widget build(BuildContext context) {
 		groupcobCariBloc = BlocProvider.of<GroupcobCariBloc>(context);
-    mstatusrinciCariBloc = BlocProvider.of<MstatusrinciCariBloc>(context);
-    selectedStatusId = mstatusrinciCariBloc.state.selectedStatusId;
-		return GroupcobCariListWidget();
+		mstatusrinciCariBloc = BlocProvider.of<MstatusrinciCariBloc>(context);
+		selectedStatusId = mstatusrinciCariBloc.state.selectedStatusId;
+		return BlocListener<KlaimbatalcrudBloc, KlaimbatalcrudState>(
+				listener: (context, state) {
+					if (state.isSaved) {
+						refreshData();
+					}
+				},
+				child: GroupcobCariListWidget());
 	}
 	void refreshData() {
 		groupcobCariBloc.add(
 			RefreshGroupcobCariEvent(
-        statusId: selectedStatusId,
-        searchText: _searchController.text,
-      ),);
+				statusId: selectedStatusId,
+				searchText: _searchController.text,
+			),);
 	}
 
 }

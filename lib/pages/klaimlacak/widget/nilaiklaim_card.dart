@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/constants.dart';
 
 class NilaiKlaimCard extends StatelessWidget {
   final String curr;
@@ -16,7 +15,7 @@ class NilaiKlaimCard extends StatelessWidget {
     // format id_ID default: 2.000.000.000,00
     final f = NumberFormat.currency(
       locale: 'id_ID',
-      symbol: '',
+      symbol: '',        // kita taruh "curr" sendiri
       decimalDigits: 2,
     );
 
@@ -27,40 +26,48 @@ class NilaiKlaimCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final amountText = '${curr.trim()} ${_formatIdWithSpace(klaimAmount)}';
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
 
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
-            Color(0xFF8F7715),
-            pGrey,
+            Color(0xFF2C2C2C),
+            Color(0xFF3A3A3A),
           ],
-          stops: [0.0, 1.0],
         ),
+        border: Border.all(color: Colors.white24, width: 1),
         boxShadow: [
           BoxShadow(
             blurRadius: 14,
-            offset: Offset(0, 6),
-            color: Colors.black26,
+            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.25),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Nilai Klaim :',
-              style: bodyTextStyle(context, fontSize: 14)
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
           ),
+          const SizedBox(height: 6),
           Text(
             amountText,
-              style: bodyTextStyle(context, fontSize: 14).copyWith(color: pYellow)
-
+            style: const TextStyle(
+              color: Color(0xFFF2C94C), // kuning seperti contoh
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.2,
+            ),
           ),
         ],
       ),

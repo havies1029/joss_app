@@ -30,6 +30,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   @override
   Widget build(BuildContext context) {
     var klaimparklaimcrudBloc = BlocProvider.of<KlaimparklaimcrudBloc>(context);
+    final iconPath =
+        "assets/icons/${widget.cobGroupNama.toLowerCase().replaceAll(' ', '')}.svg";
     return BaseBackgroundSidePage(
       title: widget.cobGroupNama,
       child: Container(
@@ -43,9 +45,9 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                 const SizedBox(height: hPadding * 1.5),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                  child: const FormSectionHeader(
-                    iconPath: "assets/icons/properti.svg",
-                    title: "Polis Properti",
+                  child: FormSectionHeader(
+                    iconPath: iconPath,
+                    title: "Polis ${widget.cobGroupNama}",
                     subtitle:
                         "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                   ),
@@ -60,7 +62,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                         dok.isComplete,
                       ].where((x) => x).length;
 
-                      final progress = done / 5.0;
+                      final totalStep = 2.0;
+                      final progress = done / totalStep;
 
                       return Row(
                         children: [
@@ -71,16 +74,17 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                             borderRadius: cardBorderRadius,
                           )),
                           const SizedBox(width: 12),
-                          Text('${(progress * 100).round()}%'),
                         ],
                       );
                     },
                   ),
                 ),
+                const SizedBox(height: hPadding * 1.5),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        const SizedBox(height: hPadding * 1.5),
                         Klaimparaccordioncard(
                           title: 'Data Klaim',
                           isOpen: acc.openedIndex == 0,

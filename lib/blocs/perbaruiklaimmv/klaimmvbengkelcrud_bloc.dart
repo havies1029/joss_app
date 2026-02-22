@@ -52,12 +52,26 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
-	Future<void> onLihatKlaimmvbengkelcrud(
-		KlaimmvbengkelcrudLihatEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-		KlaimmvbengkelcrudModel? record = await repository.klaimmvbengkelcrudLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
-	}
+  Future<void> onLihatKlaimmvbengkelcrud(
+      KlaimmvbengkelcrudLihatEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit
+      ) async {
+
+    emit(state.copyWith(isLoading: true, isLoaded: false));
+
+    KlaimmvbengkelcrudModel? record =
+    await repository.klaimmvbengkelcrudLihat(event.recordId);
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      record: record,
+      comboMJnsbengkel: record?.comboMJnsbengkel,
+      comboMWilayahBengkel: record?.comboMWilayahBengkel,
+      comboMBengkel: record?.comboMBengkel,
+      isComplete: _validate(record),
+    ));
+  }
 
 	Future<void> onComboMJnsbengkelChanged(
 			ComboMJnsbengkelChangedEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
@@ -83,6 +97,7 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       record: updatedRecord,
       isDirty: true,
       isValid: _validate(updatedRecord),
+      isComplete: _validate(updatedRecord),
     ));
 	}
 
@@ -101,6 +116,7 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       record: updatedRecord,
       isDirty: true,
       isValid: _validate(updatedRecord),
+      isComplete: _validate(updatedRecord),
     ));
 	}
 
@@ -121,6 +137,7 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       isLoaded: true,
       isDirty: true,
       isValid: _validate(updatedRecord),
+      isComplete: _validate(updatedRecord),
     ));
 	}
 
@@ -152,6 +169,7 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
         record: updatedRecord, 
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     
   }

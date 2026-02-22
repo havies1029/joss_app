@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
 
 import 'klaim5cari_list_widget.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaim5cari_list_widget.dart';
 
 class Klaim5cariPage extends StatefulWidget {
   final String klaim1Id;
@@ -30,8 +29,7 @@ class Klaim5cariPageState extends State<Klaim5cariPage> {
   }
 
   void refreshData() {
-    klaim5cariBloc.add(
-        RefreshKlaim5cariEvent(klaim1Id: widget.klaim1Id));
+    klaim5cariBloc.add(RefreshKlaim5cariEvent(klaim1Id: widget.klaim1Id));
   }
 
   Widget buildList() {

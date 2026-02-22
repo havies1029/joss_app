@@ -1,4 +1,3 @@
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/blocs/klaimlacak/klaimnilaicrud_bloc.dart';
 import 'package:joss_app/pages/klaimlacak/klaimnilaicrud_form.dart';
 import 'package:joss_app/pages/klaimlacak/widget/klaim_progress_btn_masukan.dart';
@@ -47,54 +46,40 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
           final extra = showButton ? 1 : 0;
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 18),
             controller: _scrollController,
             itemCount: stateProgress.items.length + extra,
             itemBuilder: (_, index) {
 
               // ===== item tambahan terakhir: tombol =====
               if (showButton && index == stateProgress.items.length) {
-                return BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
-                    selector: (s) {
-                      final groupStatusId = stateProgress.klaimProgressInfo?.groupStatusId ?? '';
-                      final klaimProgressNilaiId = (stateProgress.klaimProgressInfo?.klaimNilaiId ?? '').trim();
-                      final klaimCrudNilaiId = s.klaimNilaiId.trim();
-                      return groupStatusId == "20" && klaimProgressNilaiId.isEmpty && klaimCrudNilaiId.isEmpty;
-                    },
-                    builder: (context, enabledByBloc) {
-                      return Align(
-                        alignment: Alignment.centerLeft,
-                        child: AppButton.iconLeft(
-                          width: 120,
-                          text: 'Masukan',
-                          icon: SvgPicture.asset(
-                            'assets/icons/masukan.svg', // sesuaikan path lo
-                            width: 16,
-                            height: 16,
-                            colorFilter: ColorFilter.mode(
-                              enabledByBloc ? Colors.white : const Color(0xFF6B4B10),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          height: 20,
-                          borderRadius: 4,
-                          backgroundColor: enabledByBloc ? const Color(0xFFECB43C) : const Color(0xFFF2D9A1),
-                          textColor: enabledByBloc ? primaryLightColor : const Color(0xFF6B4B10),
-                          iconTextSpacing: 4,
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                          borderSide: enabledByBloc ? BorderSide.none : const BorderSide(color: Color(0xFFB98A2A)),
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 14, left: 30),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
+                      selector: (s) {
+                        final groupStatusId = stateProgress.klaimProgressInfo?.groupStatusId ?? '';
+                        final klaimProgressNilaiId = (stateProgress.klaimProgressInfo?.klaimNilaiId ?? '').trim();
+                        final klaimCrudNilaiId = s.klaimNilaiId.trim();
+                        return groupStatusId == "20" && klaimProgressNilaiId.isEmpty && klaimCrudNilaiId.isEmpty;
+                      },
+                      builder: (context, enabledByBloc) {
+                        return KlaimProgressBtnMasukan(
+                          enabled: enabledByBloc,
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) {
-
+                                
                                 return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
                               }),
                             );
                           },
-                        ),
-                      );
-                    }
+                        );
+                      }
+                    ),
+                  ),
                 );
               }
 

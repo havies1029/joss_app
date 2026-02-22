@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/constants.dart';
 
 class MetodeGantiKlaimWidget extends StatelessWidget {
-  /// Value dari backend: 10001 (Indemnity) atau 10002 (Reinstatement)
-  /// Boleh kirim int atau String (mis "10001")
   final String metodeGantiKlaimId;
 
   const MetodeGantiKlaimWidget({
@@ -22,21 +21,21 @@ class MetodeGantiKlaimWidget extends StatelessWidget {
     final selectedIndemnity = id == 10001;
     final selectedReinstatement = id == 10002;
 
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1F1F1F),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withOpacity(0.10)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _SegBtnReadonly(label: 'Indemnity', selected: selectedIndemnity),
-          const SizedBox(width: 6),
-          _SegBtnReadonly(label: 'Reinstatement', selected: selectedReinstatement),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _SegBtnReadonly(
+          label: 'Indemnity',
+          selected: selectedIndemnity,
+          isLeft: true,
+        ),
+        SizedBox(width: 5),
+        _SegBtnReadonly(
+          label: 'Reinstatement',
+          selected: selectedReinstatement,
+          isLeft: false,
+        ),
+      ],
     );
   }
 }
@@ -44,32 +43,33 @@ class MetodeGantiKlaimWidget extends StatelessWidget {
 class _SegBtnReadonly extends StatelessWidget {
   final String label;
   final bool selected;
+  final bool isLeft;
 
   const _SegBtnReadonly({
     required this.label,
     required this.selected,
+    required this.isLeft,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = selected ? const Color(0xFFE53935) : const Color(0xFF2A2A2A);
-    final border = selected ? Colors.transparent : Colors.white.withOpacity(0.10);
-    final textColor = selected ? Colors.white : Colors.white.withOpacity(0.35);
+    final borderRadius = BorderRadius.horizontal(
+      left: isLeft ? const Radius.circular(10) : Radius.zero,
+      right: isLeft ? Radius.zero : const Radius.circular(10),
+    );
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: border),
+        color: selected ? const Color(0xFFF61A1A) : pGrey,
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+        border: Border.all(
+          color: selected ? const Color(0xFFF61A1A) : sGrey,
+        ),
       ),
       child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 13,
-          fontWeight: FontWeight.w800,
-        ),
+          label,
+          style: bodyTextStyle(context, fontSize: 14)
       ),
     );
   }

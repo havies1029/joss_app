@@ -1,5 +1,4 @@
 import 'package:joss_app/common/app_data.dart';
-import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/klaimlacak/klaim_progress_info_model.dart';
 import 'package:joss_app/models/klaimlacak/klaim_progress_jadwal_bayar_model.dart';
 import 'package:joss_app/models/klaimlacak/klaim_progress_nilai_klaim_model.dart';
@@ -35,10 +34,12 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
     final isPlaceholder = item.klaimprogressId.trim().isEmpty;
     final active = !isPlaceholder;
 
-    final baseText = primaryLightColor;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseText = isDark ? Colors.white : Colors.black;
 
-    final dotColor = active ? kategoriYellow : Color(0xFF4A4B4B);
-    final lineColor = Color(0xFF4A4B4B);
+    final dotColor = active ? KlaimProgressTileStyles.dotActive : baseText.withOpacity(0.22);
+    final lineColor = baseText.withOpacity(active ? 0.25 : 0.10);
 
     final headers = <String, String>{
       'Authorization': 'Bearer ${AppData.userToken}',
@@ -78,8 +79,8 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
                     dateText: dateText,
                     imageUrl: imageUrl,
                     headers: headers,
-                    cardBg: pGrey,
-                    border: sGrey,
+                    cardBg: KlaimProgressTileStyles.cardBg,
+                    border: KlaimProgressTileStyles.border(),
                     showNilaiKlaim: showNilaiKlaim,
                     infoNilaiKlaim: infoNilaiKlaim,
                     showJadwalBayar: showJadwalBayar,

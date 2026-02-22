@@ -58,7 +58,10 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 							key: _formKey,
 							child: Column(
 								children: [
-									if (widget.cobGroupId == "10003") buildFieldCobNama(),
+									if (widget.cobGroupId == "10003") ...[
+										buildFieldCobNama(),
+										const SizedBox(height: hPadding),
+									],
 									Row(
 										children: [
 											Flexible(child: buildFieldDol()),

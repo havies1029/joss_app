@@ -31,6 +31,190 @@ class KlaimparklaimcrudBloc extends Bloc<KlaimparklaimcrudEvents, Klaimparklaimc
 
 	}
 
+  Future<void> onLihatKlaimparklaimcrud(
+      KlaimparklaimcrudLihatEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    emit(state.copyWith(isLoading: true, isLoaded: false));
+
+    KlaimparklaimcrudModel? record =
+    await repository.klaimparklaimcrudLihat(event.recordId);
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      record: record,
+      comboMJenisrugi: record?.comboMJenisrugi,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onComboMJenisrugiChanged(
+      ComboMJenisrugiChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    emit(state.copyWith(isLoading: true, isLoaded: false));
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(
+          mjenisrugiId: event.comboMJenisrugi.mjenisrugiId);
+    }
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      comboMJenisrugi: event.comboMJenisrugi,
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldDolChanged(
+      FieldDolChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(dol: event.dol);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldKeteranganChanged(
+      FieldKeteranganChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(keterangan: event.keterangan);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldLaporJpsChanged(
+      FieldLaporJpsChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(laporJps: event.laporJps);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldLaporAsuransiChanged(
+      FieldLaporAsuransiChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(laporAsuransi: event.laporAsuransi);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldPenyebabChanged(
+      FieldPenyebabChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(penyebab: event.penyebab);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldPicEmailChanged(
+      FieldPicEmailChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(picEmail: event.picEmail);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldPicJabatanChanged(
+      FieldPicJabatanChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(picJabatan: event.picJabatan);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldPicNamaChanged(
+      FieldPicNamaChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(picNama: event.picNama);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
+  Future<void> onFieldPicTelpChanged(
+      FieldPicTelpChangedEvent event,
+      Emitter<KlaimparklaimcrudState> emit) async {
+
+    KlaimparklaimcrudModel? record = state.record;
+    if (record != null) {
+      record = record.copyWith(picTelp: event.picTelp);
+    }
+
+    emit(state.copyWith(
+      record: record,
+      isDirty: true,
+      isComplete: record != null,
+    ));
+  }
+
 	Future<void> onTambahKlaimparklaimcrud(
 		KlaimparklaimcrudTambahEvent event, Emitter<KlaimparklaimcrudState> emit) async {
 
@@ -59,148 +243,161 @@ class KlaimparklaimcrudBloc extends Bloc<KlaimparklaimcrudEvents, Klaimparklaimc
 		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
 	}
 
-	Future<void> onLihatKlaimparklaimcrud(
-		KlaimparklaimcrudLihatEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-		KlaimparklaimcrudModel? record = await repository.klaimparklaimcrudLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
-	}
-
-	Future<void> onComboMJenisrugiChanged(
-			ComboMJenisrugiChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-
-		ComboMJenisrugiModel comboMJenisrugi = event.comboMJenisrugi;
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(mjenisrugiId: comboMJenisrugi.mjenisrugiId);
-    }
-		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMJenisrugi: comboMJenisrugi,
-			record: record,
-      isDirty: true,));
-	}
-
-  Future<void> onFieldDolChanged(
-      FieldDolChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(dol: event.dol);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldKeteranganChanged(
-      FieldKeteranganChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(keterangan: event.keterangan);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldLaporAsuransiChanged(
-      FieldLaporAsuransiChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(laporAsuransi: event.laporAsuransi);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldLaporJpsChanged(
-      FieldLaporJpsChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(laporJps: event.laporJps);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldPenyebabChanged(
-      FieldPenyebabChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(penyebab: event.penyebab);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldPicEmailChanged(
-      FieldPicEmailChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(picEmail: event.picEmail);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldPicJabatanChanged(
-      FieldPicJabatanChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(picJabatan: event.picJabatan);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldPicNamaChanged(
-      FieldPicNamaChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(picNama: event.picNama);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
-
-  Future<void> onFieldPicTelpChanged(
-      FieldPicTelpChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-
-    KlaimparklaimcrudModel? record = state.record;
-    if (record != null) {
-      record = record.copyWith(picTelp: event.picTelp);
-    }
-    emit(state.copyWith(
-      record: record,
-      isDirty: true,
-    ));
-  }
+  // Future<void> onLihatKlaimparklaimcrud(
+  //     KlaimparklaimcrudLihatEvent event,
+  //     Emitter<KlaimparklaimcrudState> emit
+  //     ) async {
+  //
+  //   emit(state.copyWith(isLoading: true, isLoaded: false));
+  //
+  //   KlaimparklaimcrudModel? record =
+  //   await repository.klaimparklaimcrudLihat(event.recordId);
+  //
+  //   emit(state.copyWith(
+  //     isLoading: false,
+  //     isLoaded: true,
+  //     record: record,
+  //     comboMJenisrugi: record?.comboMJenisrugi,
+  //     isValid: _validate(record),
+  //   ));
+  // }
+  //
+	// Future<void> onComboMJenisrugiChanged(
+	// 		ComboMJenisrugiChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+	// 	emit(state.copyWith(isLoading: true, isLoaded: false));
+  //
+	// 	ComboMJenisrugiModel comboMJenisrugi = event.comboMJenisrugi;
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(mjenisrugiId: comboMJenisrugi.mjenisrugiId);
+  //   }
+	// 	emit(state.copyWith(
+	// 		isLoading: false,
+	// 		isLoaded: true,
+	// 		comboMJenisrugi: comboMJenisrugi,
+	// 		record: record,
+  //     isDirty: true,
+  //     isComplete: _validate(record),));
+	// }
+  //
+  // Future<void> onFieldDolChanged(
+  //     FieldDolChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(dol: event.dol);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldKeteranganChanged(
+  //     FieldKeteranganChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(keterangan: event.keterangan);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldLaporAsuransiChanged(
+  //     FieldLaporAsuransiChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(laporAsuransi: event.laporAsuransi);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldLaporJpsChanged(
+  //     FieldLaporJpsChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(laporJps: event.laporJps);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldPenyebabChanged(
+  //     FieldPenyebabChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(penyebab: event.penyebab);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldPicEmailChanged(
+  //     FieldPicEmailChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(picEmail: event.picEmail);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldPicJabatanChanged(
+  //     FieldPicJabatanChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(picJabatan: event.picJabatan);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldPicNamaChanged(
+  //     FieldPicNamaChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(picNama: event.picNama);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
+  //
+  // Future<void> onFieldPicTelpChanged(
+  //     FieldPicTelpChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+  //
+  //   KlaimparklaimcrudModel? record = state.record;
+  //   if (record != null) {
+  //     record = record.copyWith(picTelp: event.picTelp);
+  //   }
+  //   emit(state.copyWith(
+  //     record: record,
+  //     isDirty: true,
+  //   ));
+  // }
 
   Future<void> onAutoSave(
       KlaimparklaimcrudAutoSaveEvent event, Emitter<KlaimparklaimcrudState> emit) async {

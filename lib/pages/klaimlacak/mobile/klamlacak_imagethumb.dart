@@ -20,7 +20,7 @@ class KlaimLacakAuthedImageThumb extends StatelessWidget {
     final res = await http.get(Uri.parse(url), headers: headers);
     if (res.statusCode != 200) throw Exception("Image HTTP ${res.statusCode}");
     return res.bodyBytes;
-    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +50,6 @@ class KlaimLacakAuthedImageThumb extends StatelessWidget {
   }
 
   Widget _placeholder() => Center(
-        child: Icon(Icons.image_outlined, color: Colors.white.withOpacity(0.35), size: 22),
-      );
+    child: Icon(Icons.image_outlined, color: Colors.white.withOpacity(0.35), size: 22),
+  );
 }

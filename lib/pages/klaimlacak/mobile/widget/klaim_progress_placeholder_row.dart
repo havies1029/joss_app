@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/constants.dart';
 
 class KlaimProgressPlaceholderRow extends StatelessWidget {
   final String title;
@@ -17,14 +18,10 @@ class KlaimProgressPlaceholderRow extends StatelessWidget {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
-          title,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: baseText.withOpacity(0.45),
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-          ),
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: bodyTextStyle(context, fontSize: 14).copyWith(color: formGrey)
         ),
       ),
     );

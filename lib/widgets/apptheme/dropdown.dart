@@ -60,19 +60,19 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
     _debounceTimer?.cancel();
     super.dispose();
   }
-
-  // ✅ TAMBAHKAN INI
-  @override
-  void didUpdateWidget(covariant ReusableComboBox<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.initItem != widget.initItem) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          widget.comboKey?.currentState?.changeSelectedItem(widget.initItem);
-        }
-      });
-    }
-  }
+  //
+  // // ✅ TAMBAHKAN INI
+  // @override
+  // void didUpdateWidget(covariant ReusableComboBox<T> oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (oldWidget.initItem != widget.initItem) {
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       if (mounted) {
+  //         widget.comboKey?.currentState?.changeSelectedItem(widget.initItem);
+  //       }
+  //     });
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return DropdownSearch<T>(

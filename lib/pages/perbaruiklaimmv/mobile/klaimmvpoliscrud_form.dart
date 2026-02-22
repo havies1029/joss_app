@@ -81,9 +81,10 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 									buildFieldPolisNo(),
 									const SizedBox(height: hPadding),
 									buildFieldMmvjnscoverId(),
-									const SizedBox(height: hPadding),
-									if (isPolisJps)
+									if (isPolisJps) ...[
+										const SizedBox(height: hPadding),
 										buildFieldSppa1Id(),
+									],
 									const SizedBox(height: 15),
 									FormError(
 										errors: errors,
@@ -105,12 +106,9 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 						fieldPolisNoController.text = state.record!.polisNo;
 						fieldSppa1IdController.text = state.record!.sppa1Id ?? '';
 					}
-					// ✅ Tambahkan setState agar combo & isPolisJps di-render ulang
-					setState(() {
-						fieldComboMInsurer = state.comboMInsurer;
-						fieldComboMMvjnscover = state.comboMMvjnscover;
-						isPolisJps = state.record?.isPolisJps ?? false;
-					});
+					fieldComboMInsurer = state.comboMInsurer;
+					fieldComboMMvjnscover = state.comboMMvjnscover;
+					isPolisJps = state.record?.isPolisJps ?? false;
 				}
 			},
         buildWhen: (previous, current) {
@@ -267,39 +265,66 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	// 	);
 	// }
 
-	Widget buildFieldMmvjnscoverId() {
-		return ReusableComboBox<ComboMMvjnscoverModel>(
-			hintText: 'Coverage',
-			comboKey: comboMMvjnscoverKey,
-			initItem: fieldComboMMvjnscover,
-			isEnabled: isPolisJps ? false : true,
-			dataLoader: () {
-				return ComboMMvjnscoverRepository().getComboMMvjnscover();
-			},
-			enableSearch: false,
-			displayText: (item) => item.coverName,
-			compareItems: (item, selectedItem) =>
-			item.mmvjnscoverId == selectedItem.mmvjnscoverId,
-			onChangedCallback: (value) {
-				if (value != null) {
-					removeError(
-							error: "Jenis Cover tidak boleh kosong.");
-					klaimmvpoliscrudBloc.add(ComboMMvjnscoverChangedEvent(comboMMvjnscover: value));
-				}
-			},
-			onSaveCallback: (value) {
-				if (value != null) {
-					fieldComboMMvjnscover = value;
-				}
-			},
-			validatorCallback: (value) {
-				if (value == null) {
-					addError(
-							error: "Jenis Cover tidak boleh kosong.");
-				}
-			},
-		);
-	}
+	// Widget buildFieldMmvjnscoverId() {
+	// 	return ReusableComboBox<ComboMMvjnscoverModel>(
+	// 		hintText: 'Coverage',
+	// 		comboKey: comboMMvjnscoverKey,
+	// 		initItem: fieldComboMMvjnscover,
+	// 		isEnabled: isPolisJps ? false : true,
+	// 		dataLoader: () {
+	// 			return ComboMMvjnscoverRepository().getComboMMvjnscover();
+	// 		},
+	// 		enableSearch: false,
+	// 		displayText: (item) => item.coverName,
+	// 		compareItems: (item, selectedItem) =>
+	// 		item.mmvjnscoverId == selectedItem.mmvjnscoverId,
+	// 		onChangedCallback: (value) {
+	// 			if (value != null) {
+	// 				removeError(
+	// 						error: "Jenis Cover tidak boleh kosong.");
+	// 				klaimmvpoliscrudBloc.add(ComboMMvjnscoverChangedEvent(comboMMvjnscover: value));
+	// 			}
+	// 		},
+	// 		onSaveCallback: (value) {
+	// 			if (value != null) {
+	// 				fieldComboMMvjnscover = value;
+	// 			}
+	// 		},
+	// 		validatorCallback: (value) {
+	// 			if (value == null) {
+	// 				addError(
+	// 						error: "Jenis Cover tidak boleh kosong.");
+	// 			}
+	// 		},
+	// 	);
+	// }
+
+	Widget buildFieldMmvjnscoverId() => ReusableComboBox<ComboMMvjnscoverModel>(
+		hintText: "Jenis Cover",
+		initItem: fieldComboMMvjnscover,
+		dataLoader: () => ComboMMvjnscoverRepository().getComboMMvjnscover(),
+		displayText: (i) => i.coverName,
+		compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
+		validatorCallback: (value) {
+			if (value == null) {
+				addError(
+						error: "Jenis Cover tidak boleh kosong.");
+			}
+		},
+		onChangedCallback: (value) {
+			if (value != null) {
+				removeError(
+						error: "Jenis Cover tidak boleh kosong.");
+				fieldComboMMvjnscover = value;
+				klaimmvpoliscrudBloc.add(ComboMMvjnscoverChangedEvent(comboMMvjnscover: value));
+			}
+		},
+		onSaveCallback: (value) {
+			if (value != null) {
+				fieldComboMMvjnscover = value;
+			}
+		},
+	);
 
 	Widget buildFieldNoChasis(){
 		return appTextField(

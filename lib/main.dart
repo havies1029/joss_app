@@ -974,6 +974,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/klaimbatal/klaimbatalcrud_bloc.dart';
+import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
@@ -1411,6 +1413,7 @@ Future<void> main() async {
         // BlocProvider(create: (context) => Klaim5parListBloc()),
         // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),
         BlocProvider(create: (context) => KlaimparaccordionBloc()),
+        BlocProvider(create: (context) => KlaimbatalcrudBloc(repository: KlaimbatalcrudRepository())),
 
         // Aset
         BlocProvider(create: (_) => StatusAsetCariBloc()),

@@ -8,7 +8,8 @@ class Klaimmvaccordioncard extends StatelessWidget {
   final VoidCallback onTap;
   final Widget child;
 
-  const Klaimmvaccordioncard({super.key, 
+  const Klaimmvaccordioncard({
+    super.key,
     required this.title,
     required this.isOpen,
     required this.onTap,
@@ -33,20 +34,16 @@ class Klaimmvaccordioncard extends StatelessWidget {
             ),
             onTap: onTap,
           ),
-          if (isOpen)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: child,
             ),
-          // AnimatedCrossFade(
-          //   firstChild: const SizedBox.shrink(),
-          //   secondChild: Padding(
-          //     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          //     child: child,
-          //   ),
-          //   crossFadeState: isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-          //   duration: const Duration(milliseconds: 200),
-          // )
+            crossFadeState:
+                isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+          )
         ],
       ),
     );
