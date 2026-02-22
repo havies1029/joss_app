@@ -974,6 +974,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/dashboard/sumdash_bloc.dart';
+import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
@@ -1570,19 +1572,14 @@ Future<void> main() async {
         BlocProvider(create: (context) => MstatusringkasCariBloc()),
         BlocProvider(create: (context) => MstatusrinciCariBloc()),
         BlocProvider(create: (context) => GroupcobCariBloc()),
-        // BlocProvider(
-        //   create: (_) => AttachBloc(
-        //     pickerRepo: PickerRepositoryImpl(),
-        //     uploadRepo: UploadRepositoryImpl(Dio()),
-        //   ),
-        // ),
-
         // Log Notification
         BlocProvider(create: (context) => NotifeventcariBloc()),
 
         // Log Transaction
         BlocProvider(create: (context) => LogtrscariBloc()),
         BlocProvider(create: (context) => LogtrscaritopxBloc()),
+        //hero page premi
+        BlocProvider(create: (context) => SumdashBloc(repository: SumdashRepository())),
       ],
       child: MultiBlocListener(
         listeners: [

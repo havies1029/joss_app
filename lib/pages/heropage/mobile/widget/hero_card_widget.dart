@@ -1,18 +1,18 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
-import '../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../blocs/user_profile/user_profile_cubit.dart';
+import 'hero_header_widget.dart';
+import 'premi_polis_summary_widget.dart';
 
-class HeroCardWidget extends StatefulWidget {
+class HeroCardWidget extends StatelessWidget {
   final String userName;
   final Uint8List? imageBytes;
   final String? userImage;
+
   final String premiumAmount;
   final int polisCount;
+
   final VoidCallback? onDetailTap;
   final String userType;
 
@@ -28,33 +28,7 @@ class HeroCardWidget extends StatefulWidget {
   });
 
   @override
-  State<HeroCardWidget> createState() => _HeroCardWidgetState();
-}
-
-class _HeroCardWidgetState extends State<HeroCardWidget> {
-  bool _isPremiumVisible = false;
-  late final PageController _cardPageController;
-  String _getStarsText(String amount) => '-' * 6;
-  @override
-  void initState() {
-    super.initState();
-    _cardPageController = PageController(
-      viewportFraction: 1.0,
-      initialPage: 0,
-    );
-  }
-
-  @override
-  void dispose() {
-    _cardPageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final userType = widget.userType;
-    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
       decoration: BoxDecoration(
@@ -71,274 +45,25 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            _buildUserHeader(context),
+
+            HeroHeaderWidget(
+              userName: userName,
+              imageBytes: imageBytes,
+              userImage: userImage,
+              userType: userType,
+            ),
+
             const SizedBox(height: 16),
 
-            if (userType == 'C' && mjnsclientId == '10') _buildInfoCardPremi(context),
+            PremiPolisSummaryWidget(
+              userType: userType,
+              onDetailTap: onDetailTap,
+            ),
 
             const SizedBox(height: 12),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildUserHeader(BuildContext context) {
-    final hasBytes = widget.imageBytes != null && widget.imageBytes!.isNotEmpty;
-    final String? src = widget.userImage;
-
-    Widget buildFromString(String? s) {
-      if (s == null || s.isEmpty) {
-        return _avatarFallback();
-      }
-
-      if (s.startsWith('http')) {
-        return Image.network(
-          s,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _avatarFallback(),
-        );
-      }
-
-      return _avatarFallback();
-    }
-
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: hPadding + 6),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 46,
-            height: 46,
-            child: ClipOval(
-              child: hasBytes
-                  ? Image.memory(
-                widget.imageBytes!,
-                fit: BoxFit.cover,
-                gaplessPlayback: true,
-                filterQuality: FilterQuality.medium,
-                errorBuilder: (_, __, ___) => _avatarFallback(),
-              )
-                  : buildFromString(src),
-            ),
-          ),
-          const SizedBox(width: 16),
-
-          // Expanded(
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Text(
-          //         'Halo, ${widget.userName}',
-          //         style: headingStyle(context, fontSize: 22),
-          //       ),
-          //       // Text(
-          //       //   widget.userType == 'C'
-          //       //       ? 'Klien JPS'
-          //       //       : 'Nasabah Biasa',
-          //       //   style: bodyTextStyle(context),
-          //       // ),
-          //       Text(
-          //         _getGreeting(),
-          //         style: bodyTextStyle(context),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-
-          widget.userType != 'C' ?
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Halo, ${_getGreeting()}',
-                  style: headingStyle(context, fontSize: 22),
-                ),
-              ],
-            ),
-          ) : Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Halo, ${widget.userName}',
-                    style: headingStyle(context, fontSize: 22),
-                  ),
-                  Text(
-                    _getGreeting(),
-                    style: bodyTextStyle(context),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      )
-    );
-  }
-
-  Widget _avatarFallback() => Container(
-    color: pGrey,
-    child: const Icon(Icons.person, color: primaryLightColor, size: 25),
-  );
-
-  Widget _buildInfoCardPremi(BuildContext context) {
-    return IntrinsicHeight(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: pGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius * 1.6),
-          border: Border.all(color: sGrey),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: hPadding + 6,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Premi',
-                      style: bodyTextStyle(context, fontSize: 16),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // ===== Amount =====
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 400),
-                          transitionBuilder: (child, animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-                          },
-                          child: _isPremiumVisible
-                              ? Text(
-                            'Rp ${widget.premiumAmount}',
-                            key: const ValueKey('visible'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: headingStyle(context),
-                          )
-                              : Text(
-                            _getStarsText(widget.premiumAmount),
-                            key: const ValueKey('stars'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: headingStyle(context),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        // ===== Icon =====
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isPremiumVisible = !_isPremiumVisible;
-                              });
-                            },
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              transitionBuilder: (child, animation) {
-                                return ScaleTransition(
-                                  scale: CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeOutBack,
-                                  ),
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: Icon(
-                                _isPremiumVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off_outlined,
-                                key: ValueKey(_isPremiumVisible),
-                                color: primaryColor,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // GestureDetector(
-                    //   onTap: widget.onDetailTap,
-                    //   child: Row(
-                    //     mainAxisSize: MainAxisSize.min,
-                    //     children: [
-                    //       Text('Buka Detail', style: bodyTextStyle(context)),
-                    //       const SizedBox(width: 2),
-                    //       const Icon(
-                    //         Icons.keyboard_arrow_right,
-                    //         color: primaryColor,
-                    //         size: 11.33,
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Divider
-            Container(width: 1, color: sGrey),
-
-            // Polis
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Polis',
-                    textAlign: TextAlign.center,
-                    style: bodyTextStyle(context, fontSize: 16),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.polisCount.toString(),
-                    textAlign: TextAlign.center,
-                    style: headingStyle(context),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-
-    if (hour >= 4 && hour < 11) {
-      return 'Selamat Pagi!';
-    } else if (hour >= 11 && hour < 15) {
-      return 'Selamat Siang!';
-    } else if (hour >= 15 && hour < 18) {
-      return 'Selamat Sore!';
-    } else {
-      return 'Selamat Malam!';
-    }
   }
 }

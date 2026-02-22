@@ -65,9 +65,11 @@ class LoginApi {
             token: token.token,
             username: username,
             nama: info[2],
+            hp: info[4],
             email: info[5],
             userCabang: info[1],
-            userType: "C",);
+            userType: "C",
+            cstType: info[6],);
         return user;
       } on Exception {
         //debugPrint("Error : ${e.toString()}");
@@ -110,7 +112,9 @@ class LoginApi {
             username: info[1],
             nama: info[2],
             email: info[3],
-            userType: info[0],);
+            userType: info[0],
+            hp: info[4],
+            cstType: info[5],);
         return user;
       } else {
         debugPrint("User not found or invalid token");

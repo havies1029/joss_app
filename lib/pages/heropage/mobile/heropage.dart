@@ -1,17 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:joss_app/blocs/dashboard/sumdash_bloc.dart';
 import 'package:joss_app/pages/heropage/mobile/widget/detail_premi.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
-import '../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../blocs/user_profile/user_profile_state.dart';
-import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
-import '../../../blocs/reguser_profile/reguser_profile_state.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 
@@ -20,8 +16,22 @@ import 'widget/list_menu_widget.dart';
 import 'widget/carousel_menu_widget.dart';
 import 'widget/transaksi_list_widget.dart';
 
-class HeroPage extends StatelessWidget {
+class HeroPage extends StatefulWidget {
   const HeroPage({super.key});
+
+  @override
+  State<HeroPage> createState() => _HeroPageState();
+}
+
+class _HeroPageState extends State<HeroPage> {
+
+  @override
+void initState() {
+  super.initState();
+
+  // Panggil API sumdash saat HeroPage dibuka
+  context.read<SumdashBloc>().add(SumdashLihatEvent());
+}
 
   @override
   Widget build(BuildContext context) {
