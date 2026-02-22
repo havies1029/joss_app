@@ -105,31 +105,29 @@ class _RegotherSucessState extends State<RegotherSucess> {
                       backgroundColor: formGrey,
                       borderside: BorderSide(color: sGrey),
                       width: 245,onPressed: () {
-                      final cobOthers = context.read<Regother1CrudBloc>().state.selectedCOBId;
+                        final cobOthers = context.read<Regother1CrudBloc>().state.selectedCOBId;
 
-                      dynamic selectedItem;
-                      selectedItem = context.read<Regother1CrudBloc>().state.selectedItem;
-                      
-                      if (selectedItem == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Data polis tidak ditemukan")),
-                        );
-                        return;
-                      }
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DetailManagementPolisPage(
-                            data: selectedItem,
-                            cobId: cobOthers,
-                            statusId: "",
-                            jenisProses: widget.purpose,
+                        dynamic selectedItem;
+                        selectedItem = context.read<Regother1CrudBloc>().state.selectedItem;
+
+                        if (selectedItem == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Data polis tidak ditemukan")),
+                          );
+                          return;
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailManagementPolisPage(
+                              data: selectedItem,
+                              cobId: cobOthers,
+                              statusId: "",
+                              jenisProses: widget.purpose,
+                            ),
                           ),
-                        ),
-                      );
-
-                    },
-
+                        );
+                      },
                     ),
                   ],
                 ),

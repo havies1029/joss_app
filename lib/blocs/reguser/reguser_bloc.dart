@@ -22,10 +22,10 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<RegUserHapusEvent>(onHapusRegUser);
     on<RegUserLihatEvent>(onLihatRegUser);
     on<ValidasiPinHPEvent>(onValidasiPinHP);
-    on<SetIsEmailRegEvent>(_onSetIsEmail);
+    on<SetIsEmailEvent>(_onSetIsEmail);
   }
 
-  void _onSetIsEmail(SetIsEmailRegEvent event, Emitter<RegUserState> emit) {
+  void _onSetIsEmail(SetIsEmailEvent event, Emitter<RegUserState> emit) {
     emit(state.copyWith(isEmail: event.isEmail));
   }
 
@@ -51,8 +51,8 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         hasFailure: hasFailure));
 
     if (!hasFailure) {
-        authenticationBloc
-            .add(RequirePinHPVerification(hpno: event.record.telepon));
+      authenticationBloc
+          .add(RequirePinHPVerification(sentTo: event.pinSentTo, sentVia: event.pinSentVia));
     }
   }
 
@@ -104,22 +104,25 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       String username = info[8];
       Token token = Token.split(username, tokeninfo);
       User user = User(
-          id: 0,
-          token: token.token,
-          username: username,
-          nama: info[2],
-          email: info[5],
-          userCabang: info[1],
-          userType: "C",);
+        id: 0,
+        token: token.token,
+        username: username,
+        nama: info[2],
+        email: info[5],
+        userCabang: info[1],
+        userType: "C",);
 
       AppData.user = user;
       AppData.userToken = user.token!;
 
       UserRepository userRepository = UserRepository();
       userRepository.persistToken(userToken: user.token ?? "");
-      
+
       authenticationBloc.add(UserRoleChanged(user: user, authenticatedFrom: state.requestFrom));
 
+    }
+    else {
+      authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));
     }
   }
 }

@@ -38,7 +38,7 @@ class AuthenticationBloc
       emit(AuthenticationRequireRegisterClient(requiredFrom: event.requiredFrom));
     });
     on<RequirePinHPVerification>((event, emit) {
-      emit(AuthenticationRequirePinHPVerification(hpno: event.hpno));
+      emit(AuthenticationRequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia, requestedAt: DateTime.now()));
     });
     on<PhonePinVerified>((event, emit) {
       emit(AuthenticationPhonePinVerified());
@@ -52,32 +52,22 @@ class AuthenticationBloc
       emit(AuthenticationAuthenticated(
           user: event.user, authenticatedFrom: event.authenticatedFrom));
     });
-    on<ForceUnauthenticated>((event, emit) async {
-      emit(AuthenticationUnauthenticated());
-    });
-
-    on<ForceAuthenticated>((event, emit) async {
-      AppData.user = event.user;
-      AppData.userToken = event.user.token ?? AppData.userToken;
-
-      emit(AuthenticationAuthenticated(
-        user: event.user,
-        authenticatedFrom: event.authenticatedFrom,
-      ));
-    });
   }
 
   Future<void> _onAppStarted(
       AppStarted event, Emitter<AuthenticationState> emit) async {
+    debugPrint("_onAppStarted");
 
     emit(AuthenticationPreCheckHasToken());
     String token = await userRepository.getToken();
     emit(AuthenticationPostCheckHasToken());
 
+    debugPrint("hasToken ?");
     if (token.isNotEmpty) {
       var user = await userRepository.getUserByToken(token);
 
       if (user == null) {
+        debugPrint("Invalid token, proceed to unauthenticated");
         emit(AuthenticationUnauthenticated());
         return;
       }

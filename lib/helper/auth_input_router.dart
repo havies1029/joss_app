@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/login/emailverification_bloc.dart';
-import '../blocs/login/login_bloc.dart';
-import '../blocs/reguser/reguser_bloc.dart';
 import '../models/login/emailverification_model.dart';
-import '../models/reguser/reguser_model.dart';
 
 
 class AuthInputRouter {
   static void handleInput(BuildContext context, String input) {
     final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
     final phoneRegex = RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
-    debugPrint("AuthInputRouter");
+
     if (emailRegex.hasMatch(input)) {
-      // context.read<EmailVerificationBloc>().add(
-      //     SetIsEmailEvent(
-      //       isEmail:input,
-      //     ),
-      // );
-      context.read<EmailVerificationBloc>().add(
-        SetIsEmailEvent(isEmail: input),
-      );
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(
@@ -28,12 +17,8 @@ class AuthInputRouter {
             requestFrom: 'email',
           ),
         ),
-
       );
     } else if (phoneRegex.hasMatch(input)) {
-      context.read<EmailVerificationBloc>().add(
-        SetIsTeleponEvent(isTelepon: input),
-      );
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(

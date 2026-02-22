@@ -57,12 +57,12 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
                         ? ScrollbarTheme(
                       data: ScrollbarThemeData(
                         thumbVisibility:
-                        MaterialStateProperty.all(true),
+                        WidgetStateProperty.all(true),
                         trackVisibility:
-                        MaterialStateProperty.all(false),
-                        thickness: MaterialStateProperty.all(5),
+                        WidgetStateProperty.all(false),
+                        thickness: WidgetStateProperty.all(5),
                         radius: Radius.circular(cardBorderRadius),
-                        thumbColor: MaterialStateProperty.all(
+                        thumbColor: WidgetStateProperty.all(
                           scrollBar.withOpacity(0.25),
                         ),
                       ),

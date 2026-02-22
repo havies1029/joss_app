@@ -52,7 +52,7 @@ class Regpar3FormBloc extends Bloc<Regpar3FormEvents, Regpar3FormState> {
 
 		if (!hasFailure) {
 			// 🔥 ambil id baru dari server
-			final newId = returnData.data?.toString() ?? "";
+			final newId = returnData.data.toString() ?? "";
 
 			// 🔥 update record (model mutable)
 			final updatedRecord = event.record;

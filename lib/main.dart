@@ -1596,41 +1596,6 @@ Future<void> main() async {
               }
             },
           ),
-          BlocListener<EmailVerificationBloc, EmailVerificationState>(
-            listenWhen: (prev, curr) =>
-            prev.record != curr.record && curr.record != null && !curr.hasFailure,
-            listener: (context, state) {
-              // no-op (sesuai kode kamu)
-            },
-          ),
-          BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
-            listenWhen: (prev, curr) => curr.isLoaded && prev.record != curr.record,
-            listener: (context, state) {
-              // no-op (sesuai kode kamu)
-            },
-          ),
-          BlocListener<NetworkBloc, NetworkState>(
-            listener: (context, state) {
-              final messenger = ScaffoldMessenger.of(context);
-              messenger.clearSnackBars();
-
-              if (state is NetworkFailure) {
-                messenger.showSnackBar(
-                  errorSnackBar(
-                    "You're not Connected to Internet",
-                    icon: Icons.signal_wifi_off,
-                  ),
-                );
-              } else if (state is NetworkSuccess) {
-                messenger.showSnackBar(
-                  successSnackBar(
-                    "You're Connected to Internet",
-                    icon: Icons.wifi,
-                  ),
-                );
-              }
-            },
-          ),
           BlocListener<AuthenticationBloc, AuthenticationState>(
             listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
             listener: (context, state) {
@@ -1647,12 +1612,6 @@ Future<void> main() async {
                 context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
                 debugPrint('[Foto] LoadSecureImage() dipanggil');
               }
-            },
-          ),
-          BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-            listenWhen: (_, c) => c is ProfileDownloadFotoLoaded,
-            listener: (context, state) {
-              // no-op (sesuai kode kamu)
             },
           ),
         ],
@@ -1709,7 +1668,7 @@ class _AppState extends State<_App> {
           listenWhen: (_, curr) => curr is AuthenticationRequirePinHPVerification,
           listener: (_, state) {
             if (state is AuthenticationRequirePinHPVerification) {
-              _showPopup(PopupClientWidget(phoneNumber: state.hpno));
+              _showPopup(PopupClientWidget(sentTo: state.sentTo, sentVia: state.sentVia));
             }
           },
         ),
@@ -1718,6 +1677,28 @@ class _AppState extends State<_App> {
           listener: (_, state) {
             if (state is AuthenticationRequirePinEmailVerification) {
               _showPopup(PopupUserWidget(email: state.email));
+            }
+          },
+        ),
+        BlocListener<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
+          listener: (_, state) {
+            if (state is AuthenticationAuthenticated) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final nav = _navigatorKey.currentState;
+                if (nav == null) return;
+
+                if (state.authenticatedFrom != "calmv_page"){
+                  while (nav.canPop()) {
+                    nav.pop();
+                  }
+                }
+                else {
+                  if (nav.canPop()) {
+                    nav.pop();
+                  }
+                }
+              });
             }
           },
         ),
@@ -1750,9 +1731,6 @@ class _AppState extends State<_App> {
         home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
-              while (_navigatorKey.currentState?.canPop() ?? false) {
-                _navigatorKey.currentState?.pop();
-              }
 
               final user = state.user;
               final homeWidget =
@@ -1763,7 +1741,7 @@ class _AppState extends State<_App> {
                 return homeWidget;
               }
 
-              if ((user.userType ?? '').toUpperCase() == 'C') {
+              if ((user.userType).toUpperCase() == 'C') {
                 return BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
                   listenWhen: (prev, curr) =>
                   prev.record?.mrekan1Id != curr.record?.mrekan1Id &&
@@ -1773,10 +1751,10 @@ class _AppState extends State<_App> {
                     if (ChatInitService.I.isInitialized) return;
 
                     try {
-                      final userId = state.record!.mrekan1Id!.trim();
+                      final userId = state.record!.mrekan1Id.trim();
                       final displayName =
-                      (state.record?.rekanNama?.trim().isNotEmpty ?? false)
-                          ? state.record!.rekanNama!.trim()
+                      (state.record?.rekanNama.trim().isNotEmpty ?? false)
+                          ? state.record!.rekanNama.trim()
                           : "Guest";
 
                       await ChatInitService.I.ensureInit(

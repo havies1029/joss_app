@@ -491,7 +491,7 @@ class _DetailManagementPolisPage2State extends State<DetailManagementPolisPage2>
               activeDotColor: primaryColor,
               normalDotColor: hintGrey, index: index,
             );
-          }).toList(),
+          }),
         ],
       ),
     );

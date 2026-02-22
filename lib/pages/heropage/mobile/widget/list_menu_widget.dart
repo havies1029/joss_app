@@ -4,27 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../widgets/hitung_premi_demo.dart';
-import '../../../../widgets/image_picker_dummy_page.dart';
-import '../../../aset/aset_cari.dart';
-import '../../../calpar/mobile/calpar_main_page_remake.dart';
-import '../../../gen_calmv/mobile/calmv_main_page_remake.dart';
-import '../../../gen_calmv/mobile/calmv_main_page_remake2.dart';
-import '../../../gen_endors/endors1crud_form.dart';
 import '../../../gen_klaim/mobile/widget/list_klaim_widget/list_klaim_widget.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
-import '../../../management_polis/mobile/management_polis_filter.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
-import '../../../payment/dnsppamvcari_list.dart';
-import '../../../payment/mobile/payment_page/payment_method/payment_method_page.dart';
-import '../../../payment/mobile/payment_page/payment_process/payment_process.dart';
-// import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
-// import '../../../payment/mobile/rincian/rincian_page.dart';
-// import '../../../payment/mobile/ringkasan/payment_ringkasan_page.dart';
-import '../../../payment/mobile/riwayat/riwayat_page.dart';
-import '../../../payment/rincian/rinciansoa_page.dart';
-import '../../../payment/ringkasan/dnrekapcobcari_list.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
@@ -43,9 +25,12 @@ class ListMenuWidget extends StatelessWidget {
 
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
+        /*
+        micky - 2026-02-20
         if (state is AuthenticationRequireRegisterClient) {
           _openRegisterClientDialog(context, requestFrom: state.requiredFrom);
         }
+        */
       },
       child: Column(
         children: [
@@ -106,6 +91,7 @@ class ListMenuWidget extends StatelessWidget {
     );
   }
 
+/*
   void _openRegisterClientDialog(BuildContext context, {required String requestFrom}) {
     showGeneralDialog(
       context: context,
@@ -125,6 +111,7 @@ class ListMenuWidget extends StatelessWidget {
           ),
         );
       },
+      /*
       transitionBuilder: (_, anim, __, child) {
         return SlideTransition(
           position: Tween(
@@ -134,8 +121,10 @@ class ListMenuWidget extends StatelessWidget {
           child: child,
         );
       },
+      */
     );
   }
+  */
 
   Widget _buildDaftarKlienButton(BuildContext context) {
     return Material(
@@ -146,11 +135,22 @@ class ListMenuWidget extends StatelessWidget {
           topRight: Radius.circular(20),
         ),
         onTap: () {
+          // optional: haptic biar terasa "klik"
+          // HapticFeedback.lightImpact();
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RegisterClient(requestFrom: 'daftarclient_page'),
+            ),
+          );
+          /*
           context.read<AuthenticationBloc>().add(
             RequireRegisterClient(
               requiredFrom: 'daftarclient_page',
             ),
           );
+          */
         },
         child: Ink(
           width: double.infinity,
@@ -350,34 +350,33 @@ class ListMenuWidget extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
         break;
 
-      // case 'Bantuan':
-      //   if (ChatInitService.I.isInitialized) {
-      //     Navigator.pushNamed(context, 'chat');
-      //   } else {
-      //     ScaffoldMessenger.of(context).showSnackBar(
-      //       const SnackBar(content: Text('Chat belum siap, coba lagi')),
-      //     );
-      //   }
-      //   break;
-      //
+    // case 'Bantuan':
+    //   if (ChatInitService.I.isInitialized) {
+    //     Navigator.pushNamed(context, 'chat');
+    //   } else {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(content: Text('Chat belum siap, coba lagi')),
+    //     );
+    //   }
+    //   break;
+    //
       case 'Test Page':
-        // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-        // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CalmvMainPageRemake2(
-        )));
+      // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
+      // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
         break;
 
-      // case 'Test Page':
-      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppaCariPage(listcobId: '', currId: '',)));
-      //   break;
-      // //
-      // case 'Test Page':
-      //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppamvCariPage(sppa1Id: '',)));
-      //   break;
-      //
-      // case 'Test Page':
-      //   Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
-      //   break;
+    // case 'Test Page':
+    //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppaCariPage(listcobId: '', currId: '',)));
+    //   break;
+    // //
+    // case 'Test Page':
+    //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppamvCariPage(sppa1Id: '',)));
+    //   break;
+    //
+    // case 'Test Page':
+    //   Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
+    //   break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));
@@ -409,7 +408,7 @@ class MenuItem {
 }
 
 class SuccessPage extends StatefulWidget {
-  const SuccessPage({Key? key}) : super(key: key);
+  const SuccessPage({super.key});
 
   @override
   State<SuccessPage> createState() => _SuccessPageState();

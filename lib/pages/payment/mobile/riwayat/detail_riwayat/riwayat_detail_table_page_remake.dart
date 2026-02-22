@@ -167,7 +167,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                               : 'Unduh Invoice',
                           backgroundColor: selected.stsInvId == '10002'
                               ? primaryColor
-                              : GreenforPayment,
+                              : greenforPayment,
                           icon: SvgPicture.asset(
                             selected.stsInvId == '10002'
                                 ? 'assets/icons/unduh_invoice.svg'

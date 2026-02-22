@@ -29,7 +29,7 @@ class Regreaktif1Bloc extends Bloc<Regreaktif1Events, Regreaktif1State> {
 
 			Regreaktif1Model newRecord = event.record;
 
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				newRecord = event.record.copyWith(
 					sppa1Id: returnData.data.toString(),
 				);

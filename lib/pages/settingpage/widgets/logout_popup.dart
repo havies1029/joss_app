@@ -8,7 +8,7 @@ import '../../../common/constants.dart';
 import '../../qontak/mobile/chat_init_service.dart';
 
 class LogoutConfirmationPopup extends StatefulWidget {
-  const LogoutConfirmationPopup({Key? key}) : super(key: key);
+  const LogoutConfirmationPopup({super.key});
 
   @override
   State<LogoutConfirmationPopup> createState() =>

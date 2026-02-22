@@ -29,7 +29,7 @@ class Regrenew1FormBloc extends Bloc<Regrenew1FormEvents, Regrenew1FormState> {
 
 			Regrenew1FormModel newRecord = event.record;
 
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				newRecord = event.record.copyWith(
 					sppa1Id: returnData.data.toString(), // <-- simpan ID dari backend
 				);

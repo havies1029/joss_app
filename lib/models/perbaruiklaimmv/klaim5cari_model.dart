@@ -1,11 +1,10 @@
 import 'package:joss_app/common/app_data.dart';
-
 class Klaim5cariModel {
   String klaim1Id;
-	String jenisDocLain;
-	String klaim5Id;
-	String mjenisdocId;
-	String jenisNama;
+  String jenisDocLain;
+  String klaim5Id;
+  String mjenisdocId;
+  String jenisNama;
   String? fileUrl;
   String? fileName;
   String? mimeType;
@@ -17,9 +16,8 @@ class Klaim5cariModel {
   String uploadStatus; // idle|uploading|success|failed
   String? errorMessage;
 
-	Klaim5cariModel({required this.jenisDocLain, required this.klaim1Id, required this.klaim5Id, 
-		required this.mjenisdocId, 
-		required this.jenisNama,
+  Klaim5cariModel({required this.jenisDocLain, required this.klaim1Id, required this.klaim5Id, 		required this.mjenisdocId,
+    required this.jenisNama,
     this.fileUrl,
     this.fileName,
     this.mimeType,
@@ -31,18 +29,15 @@ class Klaim5cariModel {
     this.errorMessage,
   });
 
-	factory Klaim5cariModel.fromJson(Map<String, dynamic> data) {
-  
-
-		return Klaim5cariModel(
-			jenisDocLain: data['jenisDocLain']??'',
-			klaim1Id: data['klaim1Id']??'',
-			klaim5Id: data['klaim5Id']??'', 
-			mjenisdocId: data['mjenisdocId']??'',
-			jenisNama: data['jenisNama']??'',
+  factory Klaim5cariModel.fromJson(Map<String, dynamic> data) {
+    return Klaim5cariModel(
+      jenisDocLain: data['jenisDocLain']??'',
+      klaim1Id: data['klaim1Id']??'',
+      klaim5Id: data['klaim5Id']??'', 			mjenisdocId: data['mjenisdocId']??'',
+      jenisNama: data['jenisNama']??'',
       fileUrl: data['fileUrl'] == null
-        ? null
-        : '${AppData.apiDomain}${data['fileUrl'].toString()}',      
+          ? null
+          : '${AppData.apiDomain}${data['fileUrl'].toString()}',
       fileName: data['fileName']?.toString(),
       mimeType: data['mimeType']?.toString(),
       fileSizeBytes: data['fileSizeBytes'] is int
@@ -51,29 +46,27 @@ class Klaim5cariModel {
       uploadedAt: data['uploadedAt'] != null
           ? DateTime.tryParse('${data['uploadedAt']}')
           : null,
-		);
+    );
 
-	}
+  }
 
-	Map<String, dynamic> toJson() =>
-		{
-		'jenisDocLain': jenisDocLain,
-		'klaim1Id': klaim1Id,
-		'klaim5Id': klaim5Id,
-		'mjenisdocId': mjenisdocId,
-		'jenisNama': jenisNama,
-    'fileUrl': fileUrl,
-    'fileName': fileName,
-    'mimeType': mimeType,
-    'fileSizeBytes': fileSizeBytes,
-    'uploadedAt': uploadedAt?.toIso8601String(),
-    };
+  Map<String, dynamic> toJson() =>
+      {
+        'jenisDocLain': jenisDocLain,		'klaim1Id': klaim1Id,
+        'klaim5Id': klaim5Id,
+        'mjenisdocId': mjenisdocId,
+        'jenisNama': jenisNama,
+        'fileUrl': fileUrl,
+        'fileName': fileName,
+        'mimeType': mimeType,
+        'fileSizeBytes': fileSizeBytes,
+        'uploadedAt': uploadedAt?.toIso8601String(),
+      };
 
-    Klaim5cariModel copyWith({
+  Klaim5cariModel copyWith({
     String? jenisDocLain,
-    String? klaim1Id,
     String? klaim5Id,
-    String? mjenisdocId,
+    String? klaim1Id,
     String? jenisNama,
     String? localPath,
     String? fileName,
@@ -86,9 +79,9 @@ class Klaim5cariModel {
   }) {
     return Klaim5cariModel(
       jenisDocLain: jenisDocLain ?? this.jenisDocLain,
-      klaim1Id: klaim1Id ?? this.klaim1Id,
       klaim5Id: klaim5Id ?? this.klaim5Id,
-      mjenisdocId: mjenisdocId ?? this.mjenisdocId,
+      mjenisdocId: mjenisdocId ?? mjenisdocId,
+      klaim1Id: klaim1Id ?? this.klaim1Id,
       jenisNama: jenisNama ?? this.jenisNama,
       localPath: localPath ?? this.localPath,
       fileName: fileName ?? this.fileName,

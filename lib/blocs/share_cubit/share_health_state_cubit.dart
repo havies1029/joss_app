@@ -72,7 +72,7 @@ class ShareHealthStateCubit extends Cubit<Map<String, AsetHealthCariModel>> {
       return {
         'ID': e.asethealthId,
         'Nama': e.nama,
-        'Tanggal Lahir': e.dob?.toIso8601String().split('T').first,
+        'Tanggal Lahir': e.dob.toIso8601String().split('T').first,
         'Jenis Kelamin': e.jnskel,
         'Posisi': e.posisi,
         'No. Polis': e.polisNo,

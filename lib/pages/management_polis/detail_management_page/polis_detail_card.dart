@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_card_page/polis_detail_health.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_card_page/polis_detail_hull.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_card_page/polis_detail_mv.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_card_page/polis_detail_others.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_card_page/polis_detail_par.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_card_page/polis_detail_ringkasan.dart';
 
 class PolisDetailCard extends StatelessWidget {
   final Map<String, dynamic> dataMap;
@@ -39,33 +33,6 @@ class PolisDetailCard extends StatelessWidget {
     required this.borderRadius,
     required this.fontSize,
   });
-
-  void _navigateByCobId(BuildContext context) {
-    if (cobId.trim().isEmpty) return;
-
-    late final Widget page;
-    switch (cobId) {
-      case "10001":
-        page = PolisDetailRingkasan(dataMap: dataMap);
-        break;
-      case "10002":
-        page = PolisDetailPar(dataMap: dataMap);
-        break;
-      case "10003":
-        page = PolisDetailMv(dataMap: dataMap);
-        break;
-      case "10004":
-        page = PolisDetailHull(dataMap: dataMap);
-        break;
-      case "10005":
-        page = PolisDetailHealth(dataMap: dataMap);
-        break;
-      default:
-        page = PolisDetailOthers(dataMap: dataMap);
-    }
-
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-  }
 
   /// ====== CARD ROWS (harus sama dengan yang ditampilkan di page detail / header table) ======
   List<MapEntry<String, String>> _rowsForCard() {

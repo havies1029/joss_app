@@ -10,6 +10,7 @@ class StepBulletWithText extends StatelessWidget {
   final bool isDone;
 
   const StepBulletWithText({
+    super.key,
     required this.label,
     required this.icon,
     required this.isActive,
@@ -18,39 +19,33 @@ class StepBulletWithText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ukuran yang lebih proporsional untuk mobile
     const double bulletSize = 56;
     const double innerSize = 44;
     const double iconSize = 24;
 
-    // Determine colors based on state
     Color bulletColor;
     Color iconColor;
     Color textColor;
 
     if (isActive) {
-      // Current active step - orange
       bulletColor = primaryColor;
       iconColor = primaryLightColor;
       textColor = primaryLightColor;
     } else if (isDone) {
-      // Completed step - orange
       bulletColor = primaryColor;
       iconColor = primaryLightColor;
       textColor = primaryLightColor;
     } else {
-      // Future step - grey
       bulletColor = pGrey;
       iconColor = unselectedColor;
       textColor = unselectedColor;
     }
 
-    return Container(
-      width: 90, // 50% lebih pendek dari 180 -> 90
+    return SizedBox(
+      width: 90,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Bullet circle - centered in the 90px width
           Center(
             child: Container(
               width: bulletSize,
@@ -82,12 +77,9 @@ class StepBulletWithText extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 12),
-
-          // Label text - centered
-          Container(
-            width: 80, // Disesuaikan dengan container width yang lebih kecil
+          SizedBox(
+            width: 80,
             child: Text(
               label,
               textAlign: TextAlign.center,

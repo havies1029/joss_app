@@ -58,7 +58,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           listenWhen: (prev, curr) =>
           curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
           listener: (context, state) {
-            final nama = state.record?.rekanNama?.trim();
+            final nama = state.record?.rekanNama.trim();
             final mrekan1Id = state.record?.mrekan1Id;
             final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 

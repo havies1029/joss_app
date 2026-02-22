@@ -1,4 +1,4 @@
-library constants;
+library;
 
 import 'dart:async';
 
@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';
@@ -107,7 +106,7 @@ const Color sBlue = Color(0xFF0088FF);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
 const Color successGreen = Color(0xFF4BB34B);
-const Color GreenforPayment = Color(0xFF12C127);
+const Color greenforPayment = Color(0xFF12C127);
 const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);

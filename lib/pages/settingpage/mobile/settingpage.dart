@@ -32,7 +32,7 @@ import '../../../common/constants.dart';
 const List<String> scopes = <String>['email'];
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -202,9 +202,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                   prevRec?.telepon != currRec?.telepon;       // sesuaikan nama field
                             },
                             builder: (context, rekanState) {
-                              final namaRaw = rekanState.record?.rekanNama?.trim();
-                              final emailRaw = rekanState.record?.email?.trim(); // <-- ganti sesuai modelmu
-                              final telpRaw  = rekanState.record?.telepon?.trim();  // <-- ganti sesuai modelmu
+                              final namaRaw = rekanState.record?.rekanNama.trim();
+                              final emailRaw = rekanState.record?.email.trim();
+                              final telpRaw  = rekanState.record?.telepon.trim();
 
                               final nama = (namaRaw != null && namaRaw.isNotEmpty) ? namaRaw : 'Pengguna';
                               final email = (emailRaw != null && emailRaw.isNotEmpty) ? emailRaw : null;

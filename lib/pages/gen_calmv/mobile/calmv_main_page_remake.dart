@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:string_validator/string_validator.dart';
+import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1crud_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1list_bloc.dart';
 import '../../../blocs/gen_calmv/calmv2form_bloc.dart';
@@ -20,6 +21,7 @@ import '../../../models/combobox/combormatauang_model.dart';
 import '../../../models/gen_calmv/calmv1crud_model.dart';
 import '../../../models/gen_calmv/calmv2form_model.dart';
 import '../../../models/gen_calmv/calmv3form_model.dart';
+import '../../../models/user/user_model.dart';
 import '../../../repositories/combobox/combommvgrupojk_repository.dart';
 import '../../../repositories/combobox/combommvjnscover_repository.dart';
 import '../../../repositories/combobox/combommvpakai_repository.dart';
@@ -32,6 +34,7 @@ import '../../base/base_background_sidepage.dart';
 import '../../gen_regmv/mobile/regmv_main_page_remake.dart';
 import '../../gen_regmv/mobile/regmv/regmv_form4_remake.dart';
 import '../../gen_regmv/mobile/regmv_main_page.dart';
+import '../../register/mobile/client/register_client_page.dart';
 import 'calmv/calmv_form1_remake.dart';
 import 'calmv/calmv_form2_remake.dart';
 import 'calmv/calmv_form3_remake.dart';
@@ -896,9 +899,32 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Future<void> onLanjutkanPressed() async {
     if (context.read<Calmv1ListBloc>().state.isProcessing) return;
 
-    context.read<Calmv1ListBloc>().add(
-      CalMv2RegMvEvent(calmv1Id: calmv1Id!),
-    );
+    if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
+      User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
+      if (user.userType == "C"){
+        context.read<Calmv1ListBloc>().add(
+            CalMv2RegMvEvent(calmv1Id: calmv1Id!));
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Only Client user can perform this action.'),
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => RegisterClient(requestFrom: 'calmv_page')
+          ),
+        );
+        //micky
+        /*
+        context
+            .read<AuthenticationBloc>()
+            .add(RequireRegisterClient(requiredFrom: 'calmv1list_tile_widget'));
+        */
+      }
+    }
   }
 
   void openForm1() {

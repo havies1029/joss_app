@@ -12,14 +12,11 @@ class KlaimMainPage extends StatefulWidget {
 
   const KlaimMainPage({super.key, this.type = KlaimPageType.page});
 
-  const KlaimMainPage.page({Key? key})
-      : type = KlaimPageType.page,
-        super(key: key);
+  const KlaimMainPage.page({super.key})
+      : type = KlaimPageType.page;
 
-  const KlaimMainPage.menu({Key? key})
-      : type = KlaimPageType.menu,
-        super(key: key);
-
+  const KlaimMainPage.menu({super.key})
+      : type = KlaimPageType.menu;
   @override
   _KlaimMainPageState createState() => _KlaimMainPageState();
 }

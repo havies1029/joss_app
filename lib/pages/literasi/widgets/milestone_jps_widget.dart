@@ -90,7 +90,7 @@ class MilestoneJPSWidget extends StatelessWidget {
 
         const SizedBox(height: 24),
 
-        ...milestones.map((m) => _MilestoneTile(m)).toList(),
+        ...milestones.map((m) => _MilestoneTile(m)),
       ],
     );
   }

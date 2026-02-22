@@ -171,7 +171,7 @@ class _ListCardKlaimWidgetState extends State<ListCardKlaimWidget> {
         c.insuredName.text = item.insuredName ?? '';
         c.kejadianLokasi.text = item.kejadianLokasi ?? '';
         c.klaimAmount.text =
-            (item.klaimAmount == null || item.klaimAmount == 0)
+            (item.klaimAmount == 0)
                 ? ''
                 : NumberFormat.decimalPattern('id').format(item.klaimAmount);
         c.kejadianTgl = item.kejadianTgl ?? _today;

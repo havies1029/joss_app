@@ -57,7 +57,7 @@ class ArtikelListPage extends StatelessWidget {
                           ? "${artikel.lamaBaca} min"
                           : null,
                       tglTerbit:
-                      artikel.tglTerbit?.toString().split(' ').first ??
+                      artikel.tglTerbit.toString().split(' ').first ??
                           "",
                     ),
                   ),
@@ -85,7 +85,7 @@ class ArtikelListPage extends StatelessWidget {
                           ? "${artikel.lamaBaca} min"
                           : null,
                       tglTerbit:
-                      artikel.tglTerbit?.toString().split(' ').first ??
+                      artikel.tglTerbit.toString().split(' ').first ??
                           "",
                     ),
                   ),
@@ -113,7 +113,7 @@ class ArtikelListPage extends StatelessWidget {
                           ? "${artikel.lamaBaca} min"
                           : null,
                       tglTerbit:
-                      artikel.tglTerbit?.toString().split(' ').first ??
+                      artikel.tglTerbit.toString().split(' ').first ??
                           "",
                     ),
                   ),

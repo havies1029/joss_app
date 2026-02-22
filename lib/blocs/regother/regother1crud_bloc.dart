@@ -45,7 +45,7 @@ class Regother1CrudBloc extends Bloc<Regother1CrudEvents, Regother1CrudState> {
 		final returnData = await repository.regother1CrudTambah(event.record);
 		final hasFailure = !returnData.success;
 
-		final newId = (!hasFailure && returnData.data != null)
+		final newId = (!hasFailure)
 				? returnData.data.toString()
 				: "";
 

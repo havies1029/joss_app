@@ -40,14 +40,12 @@ class CalmvForm3SectionState extends State<CalmvForm3Section> {
   // DIPANGGIL OLEH PARENT
   void injectPayload(Calmv3FormModel? form3Record) {
     if (form3Record == null) return;
-
     setState(() {
-      diskonPremiCtrl.text = form3Record!.premiDiskon.toString();
-      netCtrl.text = form3Record!.premiNet.toString();
-      subtotalCtrl.text = form3Record!.premiSubtotal.toString();
+      diskonPremiCtrl.text = form3Record.premiDiskon.toString();
+      netCtrl.text = form3Record.premiNet.toString();
+      subtotalCtrl.text = form3Record.premiSubtotal.toString();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

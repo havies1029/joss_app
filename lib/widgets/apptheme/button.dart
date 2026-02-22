@@ -32,7 +32,7 @@ class AppButton extends StatefulWidget {
   final bool isOutlined;
 
   const AppButton({
-    Key? key,
+    super.key,
     this.text,
     this.icon,
     this.onPressed,
@@ -53,7 +53,7 @@ class AppButton extends StatefulWidget {
     this.isSquare = false,
     this.squareSize,
     this.isOutlined = false,
-  }) : super(key: key);
+  });
 
   // Factory constructor untuk button text saja
   factory AppButton.primary({

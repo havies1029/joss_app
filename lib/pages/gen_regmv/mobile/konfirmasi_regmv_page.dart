@@ -361,11 +361,11 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
           _buildDetailRow(
             "Tanggal Mulai:",
-            DateFormat('dd MMM yyyy').format(data.polisMulai!),
+            DateFormat('dd MMM yyyy').format(data.polisMulai),
           ),
           _buildDetailRow(
             "Tanggal Berakhir:",
-            DateFormat('dd MMM yyyy').format(data.polisAkhir!),
+            DateFormat('dd MMM yyyy').format(data.polisAkhir),
           ),
 
           // _buildDetailRow(

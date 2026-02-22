@@ -29,7 +29,7 @@ class Regendors1FormBloc extends Bloc<Regendors1FormEvents, Regendors1FormState>
 
 			Regendors1FormModel newRecord = event.record;
 
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				newRecord = event.record.copyWith(
 					sppa1Id: returnData.data.toString(),
 				);

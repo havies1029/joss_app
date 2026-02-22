@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../blocs/authentication/authentication_bloc.dart';
+import 'package:joss_app/common/app_data.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../blocs/login/login_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../common/app_data.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
@@ -21,8 +19,10 @@ class RegisterFormClientRemake extends StatefulWidget {
   State<RegisterFormClientRemake> createState() => _RegisterFormClientRemakeState();
 }
 
+
 class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 {
+  var lastLoginBy = "";
   final fieldNameController = TextEditingController();
   final fieldPasswordController = TextEditingController();
   final fieldTeleponController = TextEditingController();
@@ -31,18 +31,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   ComboMJnsclientModel? fieldComboJnsClient;
 
   bool _obscurePassword = true;
-  bool _obscurePassword2 = true;
 
   late EmailVerificationBloc emailVerificationBloc;
   late final RegUserModel? record;
-  String requestFrom = '';
-
-  @override
-  void initState() {
-    super.initState();
-    emailVerificationBloc = context.read<EmailVerificationBloc>();
-    requestFrom = emailVerificationBloc.state.record!.requestFrom!;
-  }
 
   @override
   void dispose(){
@@ -69,14 +60,28 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       ok = false;
     }
 
-    final telp = fieldTeleponController.text.trim();
-    if (telp.isEmpty) {
-      setErr('form1.telepon', kStringNullError);
-      ok = false;
-    } else {
-      if (!RegExp(r'^\d+$').hasMatch(telp)) {
-        setErr('form1.telepon', "Format tidak valid");
+    if (lastLoginBy == 'hp') {
+      final email = fieldEmailController.text.trim();
+      if (email.isEmpty) {
+        setErr('form1.email', kStringNullError);
         ok = false;
+      } else {
+        if (!emailValidatorRegExp.hasMatch(email)) {
+          setErr('form1.email', "Format tidak valid");
+          ok = false;
+        }
+      }
+    }
+    if (lastLoginBy == 'email') {
+      final telp = fieldTeleponController.text.trim();
+      if (telp.isEmpty) {
+        setErr('form1.telepon', kStringNullError);
+        ok = false;
+      } else {
+        if (!RegExp(r'^\d+$').hasMatch(telp)) {
+          setErr('form1.telepon', "Format tidak valid");
+          ok = false;
+        }
       }
     }
 
@@ -120,7 +125,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     controller: fieldPasswordController,
     keyboardType: TextInputType.visiblePassword,
     obscureText: _obscurePassword,
-
     errorText: err('form1.password'),
     validator: (_) => err('form1.password'),
     suffixIcon: IconButton(
@@ -149,12 +153,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     hint: "Masukkan konfirmasi password",
     controller: fieldKonfirmasiPasswordController,
     keyboardType: TextInputType.visiblePassword,
-    obscureText: _obscurePassword2,
+    obscureText: _obscurePassword,
     errorText: err('form1.konfirmasiPassword'),
     validator: (_) => err('form1.konfirmasiPassword'),
     suffixIcon: IconButton(
       icon: Icon(
-        _obscurePassword2
+        _obscurePassword
             ? Icons.visibility_off
             : Icons.visibility,
         color: sGrey,
@@ -162,7 +166,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       ),
       onPressed: () {
         setState(() {
-          _obscurePassword2 = !_obscurePassword2;
+          _obscurePassword = !_obscurePassword;
         });
       },
     ),
@@ -225,6 +229,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
   @override
   Widget build(BuildContext context) {
+    var email = AppData.user.email??"";
+    final isEmail = emailValidatorRegExp.hasMatch(email.trim());
+    lastLoginBy = isEmail ? "email" : "hp";
     return BlocConsumer<RegUserBloc, RegUserState>(
       listener: (context, state) {
         // gagal dari API
@@ -233,28 +240,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
           ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
           return;
         }
-
-        // sukses
-        if (state.isSaved) {
-          final email = state.record!.email;
-          final password = state.record!.password;
-
-          context.read<LoginBloc>().add(
-            LoginButtonPressed(
-              email: email,
-              password: password,
-              rememberMe: true,
-            ),
-          );
-
-
-
-          // kalau mau langsung balik halaman:
-          // Navigator.of(context, rootNavigator: true).pop();
-        }
       },
       builder: (context, state) {
-        final user = AppData.user;
         return SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -274,7 +261,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Image.asset(
-                          'assets/images/logo.png',
+                          'assets/icons/logo_jps_no_background.png',
                           height: isDesktop(context)
                               ? 56
                               : isTablet(context)
@@ -292,12 +279,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                           child: Padding(
                             padding: const EdgeInsets.only(left: 4),
                             child: TextButton.icon(
-                              onPressed: () => {
-
-                                context.read<AuthenticationBloc>().add(
-                                ForceAuthenticated(user: user, authenticatedFrom: "restore_state"),
-                                ),
-                              },
+                              onPressed: () => Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).pop(),
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 minimumSize: const Size(0, 0),
@@ -356,10 +341,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                 _buildNameField(),
                                 SizedBox(height: vPadding),
 
-                                if (requestFrom == 'email') ...[
+                                if (lastLoginBy == 'email') ...[
                                   _buildTeleponField(),
                                   SizedBox(height: vPadding),
-                                ] else if (requestFrom == 'hp') ...[
+                                ] else if (lastLoginBy == 'hp') ...[
                                   _buildEmailField(),
                                   SizedBox(height: vPadding),
                                 ],
@@ -377,6 +362,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                   text: "Submit",
                                   onPressed: onSubmit,
                                 ),
+
                                 const Spacer(),
                               ],
                             ),
@@ -398,33 +384,23 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     final ok = validateForm1();
     if (!ok) return;
 
-    final user = AppData.user;
-    if (user == null) {
-      debugPrint("User belum tersedia");
-      return;
-    }
+    final evState = context.read<EmailVerificationBloc>().state;
 
-    final verifiedInput = (user.email ?? "").trim(); // berisi email/telepon sesuai requestFrom
+    final bool fromEmail = lastLoginBy == 'email';
 
-    String email = "";
-    String telepon = "";
+    final String email = fromEmail
+        ? evState.email
+        : fieldEmailController.text.trim();
 
-    if (requestFrom == 'email') {
-      // AppData = email terverifikasi
-      email = verifiedInput;
-      telepon = _normalizePhone62(fieldTeleponController.text.trim());
-    } else if (requestFrom == 'hp') {
-      // AppData = telepon terverifikasi
-      telepon = _normalizePhone62(verifiedInput);
-      email = fieldEmailController.text.trim();
-    } else {
-      debugPrint("requestFrom tidak dikenali: $requestFrom");
-      return;
-    }
+    final String teleponRaw = fromEmail
+        ? fieldTeleponController.text.trim()
+        : evState.telepon;
+
+    final String teleponNormalized = _normalizePhone62(teleponRaw);
 
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
-      telepon: telepon,
+      telepon: teleponNormalized,
       password: fieldPasswordController.text,
       jnsClientId: fieldComboJnsClient!.mjnsclientId,
       email: email,
@@ -432,7 +408,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     );
 
     context.read<RegUserBloc>().add(
-      RegUserTambahEvent(record: record, requestFrom: widget.requestFrom),
+      RegUserTambahEvent(
+        record: record,
+        requestFrom: widget.requestFrom,
+        pinSentTo: fromEmail ? teleponNormalized : email,
+        pinSentVia: fromEmail ? "hp" : "email",
+      ),
     );
   }
 

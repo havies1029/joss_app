@@ -24,8 +24,8 @@ class ReusableComboBox<T> extends StatefulWidget {
   final IconData? prefixIcon;
   final String? errorText;
 
-  ReusableComboBox({
-    Key? key,
+  const ReusableComboBox({
+    super.key,
     required this.hintText,
     required this.dataLoader,
     required this.displayText,
@@ -45,7 +45,7 @@ class ReusableComboBox<T> extends StatefulWidget {
     this.dataLoaderWithFilter,
     this.serverSearchDebounce = const Duration(milliseconds: 350),
     this.serverSearchMinChars = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<ReusableComboBox<T>> createState() => _ReusableComboBoxState<T>();
@@ -75,7 +75,7 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
           hintText: 'Pilih ${widget.hintText}',
           hintStyle: bodyTextStyle(context).copyWith(color: hintGrey),
           prefixIcon:
-              widget.prefixIcon != null ? Icon(widget.prefixIcon, color: primaryColor) : null,
+          widget.prefixIcon != null ? Icon(widget.prefixIcon, color: primaryColor) : null,
           filled: true,
           fillColor: formGrey,
           border: OutlineInputBorder(
@@ -191,9 +191,9 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
               "assets/icons/dropdown.svg",
               width: 16,
             ),
-        ),
+          ),
 
-        isVisible: true,
+          isVisible: true,
         ),
       ),
       // DROPDOWN POPUP
@@ -220,27 +220,27 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
           );
         },
         searchFieldProps:
-            widget.enableSearch
-                ? TextFieldProps(
-                  style: inputTextStyle(context, color: hintGrey),
-                  cursorColor: primaryLightColor,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Cari ${widget.hintText}...',
-                    hintStyle: inputTextStyle(context, color: hintGrey),
-                    prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
-                    filled: true,
-                    fillColor: formGrey,
-                    border: InputBorder.none,
-                    prefixIconConstraints: const BoxConstraints(
-                      minWidth: 40,
-                      minHeight: 20,
-                    ),
-                  ),
-                )
-                : const TextFieldProps(
-                  decoration: InputDecoration(border: InputBorder.none),
-                ),
+        widget.enableSearch
+            ? TextFieldProps(
+          style: inputTextStyle(context, color: hintGrey),
+          cursorColor: primaryLightColor,
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: 'Cari ${widget.hintText}...',
+            hintStyle: inputTextStyle(context, color: hintGrey),
+            prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
+            filled: true,
+            fillColor: formGrey,
+            border: InputBorder.none,
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 20,
+            ),
+          ),
+        )
+            : const TextFieldProps(
+          decoration: InputDecoration(border: InputBorder.none),
+        ),
       ),
       compareFn: widget.compareItems,
       itemAsString: widget.displayText,
@@ -260,11 +260,11 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
   }
 
   Widget _defaultItemBuilderWithDivider(
-    BuildContext context,
-    T item,
-    bool isSelected,
-    bool isDisabled,
-  ) {
+      BuildContext context,
+      T item,
+      bool isSelected,
+      bool isDisabled,
+      ) {
     final items = _cachedItems ?? [];
     final isFirstItem = items.isNotEmpty && widget.compareItems(item, items.first);
     final isLastItem = items.isNotEmpty && widget.compareItems(item, items.last);
@@ -287,11 +287,11 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
   }
 
   Widget defaultItemBuilder(
-    BuildContext context,
-    T item,
-    bool isSelected,
-    bool isDisabled,
-  ) {
+      BuildContext context,
+      T item,
+      bool isSelected,
+      bool isDisabled,
+      ) {
     return Column(
       children: [
         Padding(

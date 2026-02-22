@@ -44,12 +44,13 @@ class RequirePinEmailVerification extends AuthenticationEvent {
 class FailedVerifyPinEmail extends AuthenticationEvent {}
 
 class RequirePinHPVerification extends AuthenticationEvent {
-  final String hpno;
+  final String sentTo; // email atau hpno
+  final String sentVia; // email atau sms
 
-  const RequirePinHPVerification({required this.hpno});
+  const RequirePinHPVerification({required this.sentTo, required this.sentVia});
 
   @override
-  List<Object> get props => [hpno];
+  List<Object> get props => [sentTo, sentVia];
 }
 
 class ForgotPasword extends AuthenticationEvent {
@@ -94,27 +95,6 @@ class UserRoleChanged extends AuthenticationEvent {
   final String authenticatedFrom;
 
   const UserRoleChanged({required this.user, required this.authenticatedFrom});
-  
-  @override
-  List<Object> get props => [user, authenticatedFrom];
-}
-
-
-class ForceUnauthenticated extends AuthenticationEvent {
-  final String reason;
-  const ForceUnauthenticated({required this.reason});
-
-  @override
-  List<Object> get props => [reason];
-}
-
-class ForceAuthenticated extends AuthenticationEvent {
-  final User user;
-  final String authenticatedFrom;
-  const ForceAuthenticated({
-    required this.user,
-    required this.authenticatedFrom,
-  });
 
   @override
   List<Object> get props => [user, authenticatedFrom];

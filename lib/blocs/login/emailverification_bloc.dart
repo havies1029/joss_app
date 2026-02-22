@@ -26,18 +26,8 @@ class EmailVerificationBloc
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
     on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
     on<FieldTeleponVerificationChangedEvent>(onFieldTeleponVerificationChangedEvent);
-    on<SetIsEmailEvent>(_onSetIsEmail);
-    on<SetIsTeleponEvent>(_onSetIsTelepon);
-  }
 
-  void _onSetIsEmail(SetIsEmailEvent event, Emitter<EmailVerificationState> emit) {
-    emit(state.copyWith(email: event.isEmail));
   }
-
-  void _onSetIsTelepon(SetIsTeleponEvent event, Emitter<EmailVerificationState> emit) {
-    emit(state.copyWith(telepon: event.isTelepon));
-  }
-
 
   Future<void> onFieldEmailVerificationChangedEvent(
       FieldEmailVerificationChangedEvent event,
@@ -73,13 +63,15 @@ class EmailVerificationBloc
       List<String> infoData = returnData.data.split(";");
 
       if ((infoData[0] == '1') || (infoData[0] == '3')) {
-        Token token = Token.split(event.record.email, infoData[1]);
+        // Token token = Token.split(event.record.email, infoData[1]);
+        Token token = Token.split(infoData[2], infoData[1]);
 
         UserRepository userRepository = UserRepository();
 
         User user = User(
           id: 0,
-          username: event.record.email,
+          // username: event.record.email,
+          username: infoData[2],
           email: event.record.email,
           token: token.token,
           userType: 'U',

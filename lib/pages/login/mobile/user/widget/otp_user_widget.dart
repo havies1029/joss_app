@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../../blocs/reguser_profile/reguser_profile_cubit.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/login/emailverification_model.dart';
-import '../../../../../repositories/user/user_repository.dart';
 import '../../../../base/base_background_firstpage.dart';
-import '../../../../home/home_tab_widget.dart';
 
 class PopupUserWidget extends StatefulWidget {
   final String email;
@@ -39,9 +37,11 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
+  // 📌 OTP
   final List<TextEditingController> _otpControllers = [];
   final List<FocusNode> _focusNodes = [];
 
+  // ⏱ Timer
   Timer? _timer;
   int _remainingTime = 59;
   bool _isResendAvailable = false;
@@ -134,9 +134,10 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     });
     _startTimer();
 
+    // Kirim event ke BLoC untuk request OTP baru
     context.read<EmailVerificationBloc>().add(
       ValidasiPinEmailEvent(
-        record: EmailVerificationModel(email: widget.email, pin: otp),
+          record: EmailVerificationModel(email: widget.email, pin: otp), requestAt: DateTime.now()
       ),
     );
 
@@ -189,7 +190,7 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
 
     context.read<EmailVerificationBloc>().add(
       ValidasiPinEmailEvent(
-        record: EmailVerificationModel(email: widget.email, pin: otp),
+        record: EmailVerificationModel(email: widget.email, pin: otp), requestAt: DateTime.now(),
       ),
     );
   }
@@ -213,8 +214,12 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     _shakeController.dispose();
     _timer?.cancel();
 
-    for (var c in _otpControllers) c.dispose();
-    for (var n in _focusNodes) n.dispose();
+    for (var c in _otpControllers) {
+      c.dispose();
+    }
+    for (var n in _focusNodes) {
+      n.dispose();
+    }
 
     super.dispose();
   }
@@ -227,168 +232,181 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     // final double topSpacing =
     // screenHeight < 700 ? screenHeight * 0.06 : screenHeight * 0.095;
 
-    return Scaffold(
-      backgroundColor: secondaryBlackColor,
-      body: SafeArea(
-        child: BaseBackgroundFirstPage(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                            child:
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 4),
-                                child: TextButton.icon(
-                                  onPressed: () {
-                                    for (var controller in _otpControllers) {
-                                      controller.clear();
-                                    }
-                                    _timer?.cancel();
-                                    Navigator.of(context, rootNavigator: false).pop();
-                                    context.read<AuthenticationBloc>().add(LoggedOut());
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(0, 0),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  icon: Icon(
-                                    Icons.arrow_back_ios_new,
-                                    color: primaryLightColor,
-                                    size: getResponsiveFont(context, 18),
-                                  ),
-                                  label: Text(
-                                      "Kembali",
-                                      style: bodyTextStyle(context).copyWith(color: primaryLightColor)
+    return BlocListener<EmailVerificationBloc, EmailVerificationState>(
+      listener: (context, state) {
+        if (state.verificationFailed) {
+          _shakeOtpFields();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kode OTP salah, silakan coba lagi'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: secondaryBlackColor,
+        body: SafeArea(
+          child: BaseBackgroundFirstPage(
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                              child:
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: TextButton.icon(
+                                    onPressed: () {
+                                      for (var controller in _otpControllers) {
+                                        controller.clear();
+                                      }
+                                      _timer?.cancel();
+                                      Navigator.of(context, rootNavigator: false).pop();
+                                      context.read<AuthenticationBloc>().add(LoggedOut());
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(0, 0),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    icon: Icon(
+                                      Icons.arrow_back_ios_new,
+                                      color: primaryLightColor,
+                                      size: getResponsiveFont(context, 18),
+                                    ),
+                                    label: Text(
+                                        "Kembali",
+                                        style: bodyTextStyle(context).copyWith(color: primaryLightColor)
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: cardBorderGradient,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: vPadding * 2, horizontal: hPadding * 1.5),
-                              margin: const EdgeInsets.all(1),
+                            Container(
                               decoration: BoxDecoration(
-                                color: secondaryBlackColor,
+                                gradient: cardBorderGradient,
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(20),
                                   topRight: Radius.circular(20),
                                 ),
                               ),
-                              child: Column(
-                                children: [
-                                  // SizedBox(height: screenHeight * 0.04),
-                                  // Icon
-                                  SvgPicture.asset(
-                                    "assets/icons/otp_icon.svg",
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: vPadding * 2, horizontal: hPadding * 1.5),
+                                margin: const EdgeInsets.all(1),
+                                decoration: BoxDecoration(
+                                  color: secondaryBlackColor,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
                                   ),
-                                  const SizedBox(height: 24),
-                                  Text(
-                                    'Verifikasi OTP',
-                                    style: headingStyle(context, fontSize: 25),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Column(
-                                    children: [
-                                      Text("Kami sudah mengirim kode OTP ke nomor/email", style: bodyTextStyle(context, fontSize: 20)),
-                                      Text(
-                                        widget.email, style: bodyTextStyle(context, fontSize: 20).copyWith(color: primaryColor)
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  // ⏱ Timer / Resend
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: _isResendAvailable
-                                        ? GestureDetector(
-                                      onTap: _resendOtp,
-                                      child: Text(
-                                        'Kirim ulang kode',
-                                        style: bodyTextStyle(context
-                                        ).copyWith(color: primaryColor),
-                                      ),
-                                    )
-                                        : Text(
-                                      _formatTime(_remainingTime),
-                                      style: bodyTextStyle(context
-                                      ).copyWith(color: pRed),
+                                ),
+                                child: Column(
+                                  children: [
+                                    // SizedBox(height: screenHeight * 0.04),
+                                    // Icon
+                                    SvgPicture.asset(
+                                      "assets/icons/otp_icon.svg",
                                     ),
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  // 🔢 OTP Fields
-                                  AnimatedBuilder(
-                                    animation: _shakeAnimation,
-                                    builder: (_, child) {
-                                      return Transform.translate(
-                                        offset: Offset(
-                                          math.sin(_shakeAnimation.value) * 8,
-                                          0,
+                                    const SizedBox(height: 24),
+                                    Text(
+                                      'Verifikasi OTP',
+                                      style: headingStyle(context, fontSize: 25),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Column(
+                                      children: [
+                                        Text("Kami sudah mengirim kode OTP ke hp/email", style: bodyTextStyle(context, fontSize: 20)),
+                                        Text(
+                                            widget.email, style: bodyTextStyle(context, fontSize: 20).copyWith(color: primaryColor)
                                         ),
-                                        child: child,
-                                      );
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                      children: List.generate(
-                                          6, (i) => _buildOtpField(i)),
+                                      ],
                                     ),
-                                  ),
 
-                                  const SizedBox(height: 18),
-                                  Text(
-                                    'Silakan masukkan kode di atas untuk melanjutkan.',
-                                    style: bodyTextStyle(context).copyWith(color: hintGrey),
-                                    textAlign: TextAlign.center,
-                                  ),
+                                    const SizedBox(height: 16),
 
-                                  const SizedBox(height: 18),
+                                    // ⏱ Timer / Resend
+                                    AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 300),
+                                      child: _isResendAvailable
+                                          ? GestureDetector(
+                                        onTap: _resendOtp,
+                                        child: Text(
+                                          'Kirim ulang kode',
+                                          style: bodyTextStyle(context
+                                          ).copyWith(color: primaryColor),
+                                        ),
+                                      )
+                                          : Text(
+                                        _formatTime(_remainingTime),
+                                        style: bodyTextStyle(context
+                                        ).copyWith(color: pRed),
+                                      ),
+                                    ),
 
-                                  AppButton.primary(
-                                    text: "Lanjut",
-                                    onPressed: () {
-                                      String otp = _otpControllers.map((c) => c.text).join();
-                                      if (otp.length == 6) {
-                                        _verifyOtp();
-                                      } else {
-                                        _shakeOtpFields();
-                                      }
-                                    },
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+
+                                    // 🔢 OTP Fields
+                                    AnimatedBuilder(
+                                      animation: _shakeAnimation,
+                                      builder: (_, child) {
+                                        return Transform.translate(
+                                          offset: Offset(
+                                            math.sin(_shakeAnimation.value) * 8,
+                                            0,
+                                          ),
+                                          child: child,
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                        children: List.generate(
+                                            6, (i) => _buildOtpField(i)),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 18),
+                                    Text(
+                                      'Silakan masukkan kode di atas untuk melanjutkan.',
+                                      style: bodyTextStyle(context).copyWith(color: hintGrey),
+                                      textAlign: TextAlign.center,
+                                    ),
+
+                                    const SizedBox(height: 18),
+
+                                    AppButton.primary(
+                                      text: "Lanjut",
+                                      onPressed: () {
+                                        String otp = _otpControllers.map((c) => c.text).join();
+                                        if (otp.length == 6) {
+                                          _verifyOtp();
+                                        } else {
+                                          _shakeOtpFields();
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

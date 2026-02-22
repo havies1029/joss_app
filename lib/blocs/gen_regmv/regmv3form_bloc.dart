@@ -64,7 +64,7 @@ class Regmv3FormBloc extends Bloc<Regmv3FormEvents, Regmv3FormState> {
 		final bool hasFailure = !returnData.success;
 
 		if (!hasFailure) {
-			final newId = returnData.data?.toString() ?? "";
+			final newId = returnData.data.toString() ?? "";
 
 			final updatedRecord = event.record;
 			updatedRecord.regmv3Id = newId;

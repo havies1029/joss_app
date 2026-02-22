@@ -5,7 +5,7 @@ import 'package:joss_app/models/authentication/change_password_model.dart';
 import 'package:joss_app/common/constants.dart';
 
 class UbahPasswordPage extends StatefulWidget {
-  const UbahPasswordPage({Key? key}) : super(key: key);
+  const UbahPasswordPage({super.key});
 
   @override
   State<UbahPasswordPage> createState() => _UbahPasswordPageState();

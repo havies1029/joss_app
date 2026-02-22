@@ -158,7 +158,7 @@ class RiwayatDetailTablePageState extends State<RiwayatDetailTablePage> {
                     alignment: Alignment.centerRight,
                     child: AppButton.iconLeft(
                       text: 'Unduh Invoice',
-                      backgroundColor: GreenforPayment,
+                      backgroundColor: greenforPayment,
                       icon: SvgPicture.asset(
                         'assets/icons/unduh_invoice',
                         width: 18,

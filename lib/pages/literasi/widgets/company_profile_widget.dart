@@ -121,7 +121,7 @@ class CompanyProfileCard extends StatelessWidget {
 }
 
 class ComproContactDialog extends StatefulWidget {
-  const ComproContactDialog({Key? key}) : super(key: key);
+  const ComproContactDialog({super.key});
 
   @override
   State<ComproContactDialog> createState() => _ComproContactDialogState();

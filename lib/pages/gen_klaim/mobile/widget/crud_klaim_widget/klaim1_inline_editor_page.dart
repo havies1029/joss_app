@@ -178,7 +178,7 @@ class Klaim1InlineEditorPage extends StatefulWidget {
 
 class _Klaim1InlineEditorPageState extends State<Klaim1InlineEditorPage> {
   final _scrollCtr = ScrollController();
-  bool _showAddForm = false;
+  final bool _showAddForm = false;
   bool _isSavingNew = false;
   final Map<String, bool> _isSavingById = {};
 

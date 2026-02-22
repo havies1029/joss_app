@@ -44,7 +44,7 @@ class HeroPage extends StatelessWidget {
                         builder: (context, authState) {
                           final userType =
                           authState is AuthenticationAuthenticated
-                              ? (authState.user.userType ?? '').toUpperCase()
+                              ? (authState.user.userType).toUpperCase()
                               : '';
 
                           if (userType == 'C') {
@@ -52,7 +52,7 @@ class HeroPage extends StatelessWidget {
                               buildWhen: (prev, curr) =>
                               prev.record?.rekanNama != curr.record?.rekanNama,
                               builder: (context, rekanState) {
-                                final nama = rekanState.record?.rekanNama?.trim();
+                                final nama = rekanState.record?.rekanNama.trim();
                                 final displayName =
                                 (nama != null && nama.isNotEmpty) ? nama : 'Client User';
 

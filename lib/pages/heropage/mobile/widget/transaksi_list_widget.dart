@@ -148,8 +148,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
 
                         // List item
                         ...items
-                            .map((item) => _buildLogItem(context, item))
-                            .toList(),
+                            .map((item) => _buildLogItem(context, item)),
 
                         Padding(
                           padding: const EdgeInsets.all(hPadding),

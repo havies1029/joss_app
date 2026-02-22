@@ -65,7 +65,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			final hasFailure = !returnData.success;
 
 			Calmv1CrudModel newRecord = event.record;
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				newRecord = event.record.copyWith(calmv1Id: returnData.data.toString());
 			}
 

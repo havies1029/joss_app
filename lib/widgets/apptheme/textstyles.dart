@@ -23,10 +23,10 @@ TextStyle inputTextStyle(BuildContext ctx, {Color? color}) => TextStyle(
     letterSpacing: 0);
 
 TextStyle bodyTextStyle(
-  BuildContext ctx, {
-  double fontSize = 18,
-  TextDecoration decoration = TextDecoration.none,
-}) =>
+    BuildContext ctx, {
+      double fontSize = 18,
+      TextDecoration decoration = TextDecoration.none,
+    }) =>
     TextStyle(
         fontSize: getResponsiveFont(ctx, fontSize),
         color: primaryLightColor,
@@ -43,13 +43,13 @@ class HoverableText extends StatefulWidget {
   final TextOverflow? overflow;
 
   const HoverableText({
-    Key? key,
+    super.key,
     required this.text,
     required this.styleBuilder,
     this.onTap,
     this.maxLines,
     this.overflow,
-  }) : super(key: key);
+  });
 
   @override
   State<HoverableText> createState() => _HoverableTextState();

@@ -18,10 +18,11 @@ class EmailVerificationTambahEvent extends EmailVerificationEvents {
 
 class ValidasiPinEmailEvent extends EmailVerificationEvents {
 	final EmailVerificationModel record;
-	const ValidasiPinEmailEvent({required this.record});
+	final DateTime requestAt;
+	const ValidasiPinEmailEvent({required this.record, required this.requestAt});
 
 	@override
-	List<Object> get props => [record];
+	List<Object> get props => [record, requestAt];
 }
 
 class FieldSimpanPasswordChangedEvent extends EmailVerificationEvents {
@@ -47,22 +48,3 @@ class FieldTeleponVerificationChangedEvent extends EmailVerificationEvents {
 	@override
 	List<Object> get props => [telepon];
 }
-
-class SetIsEmailEvent extends EmailVerificationEvents {
-	final String isEmail;
-
-	const SetIsEmailEvent({required this.isEmail});
-
-	@override
-	List<Object> get props => [isEmail];
-}
-
-class SetIsTeleponEvent extends EmailVerificationEvents {
-	final String isTelepon;
-
-	const SetIsTeleponEvent({required this.isTelepon});
-
-	@override
-	List<Object> get props => [isTelepon];
-}
-

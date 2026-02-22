@@ -287,7 +287,7 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
         final c = _RowCtrls();
         c.insuredName.text = item.insuredName ?? '';
         c.kejadianLokasi.text = item.kejadianLokasi ?? '';
-        c.klaimAmount.text = (item.klaimAmount == null || item.klaimAmount == 0)
+        c.klaimAmount.text = (item.klaimAmount == 0)
             ? ''
             : NumberFormat.decimalPattern('id').format(item.klaimAmount);
         c.kejadianTgl = item.kejadianTgl ?? _today;
