@@ -18,6 +18,7 @@ class User {
   bool hasDownline;
   Uint8List? foto;
   String userType;
+  String cstType;
 
   User({
     this.id,
@@ -35,6 +36,7 @@ class User {
     this.hasDownline = false,
     this.foto,
     this.userType = '',
+    this.cstType = '',
   });
 
   factory User.fromDatabaseJson(Map<String, dynamic> data) => User(
@@ -53,6 +55,7 @@ class User {
         foto: data['foto'] ?? '',
         token: data['token'],
         userType: data['userType'] ?? '',
+        cstType: data['cstType'] ?? '',
       );
 
   Map<String, dynamic> toDatabaseJson() => {
@@ -71,5 +74,6 @@ class User {
         "token": token,
         "foto": foto,
         "userType": userType,
+        "cstType": cstType,
       };
 }

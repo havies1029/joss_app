@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'dart:async';
 import 'dart:math' as math; // buat sin shake
 

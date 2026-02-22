@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/common/constants.dart';
 
 import '../../../../blocs/reguser/reguser_bloc.dart';
@@ -50,8 +51,11 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final userType = widget.userType;
-    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+    final String userType = widget.userType;
+    //micky - 2026-02-22
+    //ambil cstType dari Appdata
+    final String mjnsclientId = AppData.user.cstType;
+    //final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
@@ -122,28 +126,6 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
             ),
           ),
           const SizedBox(width: 16),
-
-          // Expanded(
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Text(
-          //         'Halo, ${widget.userName}',
-          //         style: headingStyle(context, fontSize: 22),
-          //       ),
-          //       // Text(
-          //       //   widget.userType == 'C'
-          //       //       ? 'Klien JPS'
-          //       //       : 'Nasabah Biasa',
-          //       //   style: bodyTextStyle(context),
-          //       // ),
-          //       Text(
-          //         _getGreeting(),
-          //         style: bodyTextStyle(context),
-          //       ),
-          //     ],
-          //   ),
-          // ),
 
           widget.userType != 'C' ?
           Expanded(

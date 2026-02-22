@@ -140,8 +140,8 @@ class HeroPage extends StatelessWidget {
         HeroCardWidget(
           userName: displayName,
           imageBytes: bytes,
-          premiumAmount: userType == 'C' ? '10.500.000.000' : '0',
-          polisCount: userType == 'C' ? 21 : 0,
+          premiumAmount: userType == 'C' ? '10.500.000.000' : '10',
+          polisCount: userType == 'C' ? 21 : 10,
           onDetailTap: () {
             Navigator.push(
               context,
