@@ -54,9 +54,7 @@ class CalmvForm2Section2State extends State<CalmvForm2Section2> {
   void _loadData() {
     final calmv1State = context.read<Calmv1CrudBloc>().state;
     calmv1Id = calmv1State.record?.calmv1Id;
-    debugPrint("calmv1Id ini isinya : ${calmv1Id}");
     if (calmv1Id?.isNotEmpty == true) {
-      calmv2Bloc.add(FieldCalmv1IdChangedEvent(calmv1Id: calmv1Id ?? ""));
       calmv2Bloc.add(Calmv2FormLihatEvent(recordId: calmv2Id!));
     }
   }

@@ -20,18 +20,8 @@ class Regmv7CariBloc extends Bloc<Regmv7CariEvents, Regmv7CariState> {
 			Emitter<Regmv7CariState> emit,
 			) async {
 
-		debugPrint("🔄 [onRefreshRegmv7Cari] CALLED");
-		debugPrint("👉 Event.regmv1Id = ${event.regmv1Id}");
-		debugPrint("📦 State sebelum update: regmv1Id = ${state.regmv1Id}");
-
 		emit(Regmv7CariState(regmv1Id: event.regmv1Id));
-
-		debugPrint("✅ State sesudah update: regmv1Id = ${state.regmv1Id}");
-		debugPrint("➡️ Trigger FetchRegmv7CariEvent");
-
 		add(FetchRegmv7CariEvent());
-
-		debugPrint("📨 FetchRegmv7CariEvent DIKIRIM");
 	}
 
 

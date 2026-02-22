@@ -6,20 +6,9 @@ import 'package:joss_app/models/gen_regmv/regmv7cari_model.dart';
 
 class Regmv7CariAPI{
 	Future<List<Regmv7CariModel>> getRegmv7CariAPI(String regmv1Id) async {
-
-		debugPrint("============================================");
-		debugPrint("📡 [API CALL] getRegmv7CariAPI START");
-		debugPrint("👉 regmv1Id = $regmv1Id");
-
 		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/regmv/regmv7cari/getlist";
-
 		Map<String, String> queryParams = {"regmv1Id": regmv1Id};
-
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
-
-		debugPrint("🌐 FINAL URI = $uri");
-		debugPrint("🔑 Authorization Token (short) = ${AppData.userToken.substring(0, 12)}...");
-
 		final http.Response response = await http.get(
 			uri,
 			headers: <String, String>{
@@ -28,13 +17,8 @@ class Regmv7CariAPI{
 				'Authorization': 'Bearer ${AppData.userToken}'
 			},
 		);
-
-		debugPrint("📨 Response Received");
-		debugPrint("🔢 Status Code = ${response.statusCode}");
-
-		// Only print preview of body (avoids flooding logs)
 		String previewBody = response.body.length > 300
-				? response.body.substring(0, 300) + "..."
+				? "${response.body.substring(0, 300)}..."
 				: response.body;
 
 		debugPrint("📄 Response Preview: $previewBody");

@@ -13,19 +13,7 @@ class RegmvUploadStnkApi {
       Uint8List imageBytes,
       String filename,
       ) async {
-    String url = _base + "api/regmv/regmv4form/uploadbinaryfotostnk";
-
-    debugPrint("");
-    debugPrint("🟦================ UPLOAD STNK START ================");
-    debugPrint("🌍 URL: $url");
-    debugPrint("📌 Header Auth: Bearer ${AppData.userToken.substring(0, 10)}...");
-
-    debugPrint("📄 Data Body:");
-    debugPrint("   ├─ regmv1Id : $regmv1Id");
-    debugPrint("   ├─ caption  : '$caption'");
-    debugPrint("   ├─ filename : $filename");
-    debugPrint("   └─ bytes    : ${imageBytes.lengthInBytes} bytes");
-
+    String url = "${_base}api/regmv/regmv4form/uploadbinaryfotostnk";
     try {
       _dio.options.headers = {
         'Authorization': 'Bearer ${AppData.userToken}',

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
+
+import 'package:joss_app/blocs/notiflog/logtrscaritopx_bloc.dart'; // ✅ ganti ke bloc baru
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/models/notiflog/logtrscari_model.dart';
 import 'package:joss_app/pages/heropage/mobile/widget/transaksi_page.dart';
+import 'package:intl/intl.dart';
 
 class TransaksiListWidget extends StatefulWidget {
   const TransaksiListWidget({super.key});
@@ -15,32 +17,18 @@ class TransaksiListWidget extends StatefulWidget {
 
 class _TransaksiListWidgetState extends State<TransaksiListWidget>
     with SingleTickerProviderStateMixin {
-  late TrslogCariBloc trslogCariBloc;
-  final TextEditingController _searchController = TextEditingController();
-  final ScrollController _scrollController = ScrollController(); // 🔹 untuk auto scroll
   bool _isExpanded = false;
-
-  // Buat key supaya bisa tahu posisi widget
   final _sectionKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    trslogCariBloc = BlocProvider.of<TrslogCariBloc>(context);
-    // Ambil data awal (tanpa search)
-    Future.delayed(const Duration(milliseconds: 500), () {
-      refreshData();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
     });
   }
 
-  void refreshData() {
-    trslogCariBloc.add(
-      RefreshTrslogCariEvent(searchText: _searchController.text),
-    );
-  }
-
   void _scrollToSection() {
-    // tunggu layout siap baru animasikan scroll
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ctx = _sectionKey.currentContext;
       if (ctx != null) {
@@ -65,7 +53,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔹 Header collapsible
+          // Header collapsible
           InkWell(
             borderRadius: BorderRadius.circular(8),
             onTap: () {
@@ -91,7 +79,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                 ),
                 AnimatedRotation(
                   duration: const Duration(milliseconds: 300),
-                  turns: _isExpanded ? 0.5 : 0, // 180° rotasi
+                  turns: _isExpanded ? 0.5 : 0,
                   curve: Curves.easeInOut,
                   child: const Icon(
                     Icons.keyboard_arrow_down,
@@ -103,9 +91,10 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
             ),
           ),
 
-          _isExpanded? const SizedBox(height: vPadding * 0.5) : const SizedBox.shrink(),
+          _isExpanded
+              ? const SizedBox(height: vPadding * 0.5)
+              : const SizedBox.shrink(),
 
-          // 🔹 Animasi expand/collapse pakai kombinasi AnimatedSize + Opacity
           AnimatedSize(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOutCubic,
@@ -114,9 +103,9 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
               opacity: _isExpanded ? 1.0 : 0.0,
               curve: Curves.easeInOut,
               child: _isExpanded
-                  ? BlocBuilder<TrslogCariBloc, TrslogCariState>(
+                  ? BlocBuilder<LogtrscaritopxBloc, LogtrscaritopxState>(
                 builder: (context, state) {
-                  if (state.status == ListStatus.initial) {
+                  if (state.status == ListStatus.initial && state.items.isEmpty) {
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(32),
@@ -135,37 +124,31 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                     );
                   }
 
-                  // Hanya tampilkan max 3 transaksi terbaru
+                  // tampilkan max 3 (top 3)
                   final items = state.items.take(3).toList();
 
                   return Container(
                     decoration: BoxDecoration(
                       color: pGrey,
-                      borderRadius:
-                      BorderRadius.circular(cardBorderRadius),
+                      borderRadius: BorderRadius.circular(cardBorderRadius),
                       border: Border.all(color: sGrey),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(hPadding),
                           child: Text(
                             "Transaksi Terbaru",
-                            style:
-                            bodyTextStyle(context, fontSize: 20),
+                            style: bodyTextStyle(context, fontSize: 20),
                           ),
                         ),
                         kDivider(color: sGrey),
 
-                        // List Item
+                        // List item
                         ...items
-                            .map(
-                              (item) =>
-                              _buildTransactionItem(context, item),
-                        )
+                            .map((item) => _buildLogItem(context, item))
                             .toList(),
 
                         Padding(
@@ -197,63 +180,66 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
     );
   }
 
-  Widget _buildTransactionItem(BuildContext context, dynamic item) {
-    final iconAsset = _getIconAsset(item.jenis_trs);
-
-    // Format tanggal
-    String dateTimeStr = "-";
-    if (item.trsTgl != null) {
-      try {
-        final tglDt =
-        (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
-        dateTimeStr = "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}";
-      } catch (_) {}
+  Widget _buildLogItem(BuildContext context, LogtrscariModel item) {
+    String formatTanggalWaktu(dynamic value) {
+      if (value == null) return "-";
+      DateTime dt;
+      if (value is DateTime) {
+        dt = value;
+      } else {
+        final s = value.toString().replaceFirst(' ', 'T');
+        dt = DateTime.tryParse(s) ?? DateTime.now();
+      }
+      return DateFormat("d MMM yyyy · HH:mm").format(dt);
     }
+
+    final dateStr = formatTanggalWaktu(item.tglDibuat);
 
     return Container(
       padding: const EdgeInsets.all(hPadding),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Icon dengan background
-          SvgPicture.asset(iconAsset, width: 40, height: 40),
+          // icon (boleh kamu mapping dari jenisLog kalau mau)
+          SvgPicture.asset("assets/icons/transaksi.svg", width: 34, height: 34),
           const SizedBox(width: 16),
 
-          // Content
+          // content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Transaction type
                 Text(
-                  item.jenis_trs ?? "-",
-                  style: bodyTextStyle(context, fontSize: 18).copyWith(color: primaryLightColor),
+                  item.jenisLog.isNotEmpty ? item.jenisLog : "-",
+                  style: bodyTextStyle(context, fontSize: 18)
+                      .copyWith(color: primaryLightColor),
                 ),
                 const SizedBox(height: 4),
-
-                // Date and time
                 Text(
-                  dateTimeStr,
-                  style: bodyTextStyle(
-                    context,
-                    fontSize: 16,
-                  ).copyWith(color: hintGrey),
+                  dateStr,
+                  style: bodyTextStyle(context, fontSize: 16)
+                      .copyWith(color: hintGrey),
                 ),
+                if (item.keterangan.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    item.keterangan,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: bodyTextStyle(context, fontSize: 14)
+                        .copyWith(color: hintGrey),
+                  ),
+                ],
               ],
             ),
           ),
-
-          // status
           SizedBox(
             width: 90,
             child: Text(
-              item.status_nama ?? "-",
+              item.status.isNotEmpty ? item.status : "-",
               textAlign: TextAlign.right,
-              style: bodyTextStyle(
-                context,
-                fontSize: 16,
-              ).copyWith(
-                color: _getStatusColor(item.status_nama),
+              style: bodyTextStyle(context, fontSize: 16).copyWith(
+                color: _getStatusColor(item.status),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -261,41 +247,6 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
         ],
       ),
     );
-  }
-
-  Widget _transactionIcon(String assetPath) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: transactionColor2, // background
-        border: Border.all(
-          color: transactionColor1, // border tipis
-          width: 1,
-        ),
-      ),
-      alignment: Alignment.center,
-      child: SvgPicture.asset(
-        assetPath,
-        width: 36,  // hampir nutup background (silakan adjust 28-32)
-        height: 36,
-        fit: BoxFit.contain,
-      ),
-    );
-  }
-
-  String _getIconAsset(String? jenisTrs) {
-    switch (jenisTrs?.toLowerCase()) {
-      case 'pembayaran premi':
-        return "assets/icons/pembayaran_premi.svg";
-      case 'klaim asuransi':
-        return "assets/icons/klaim_asuransi.svg";
-      case 'penutupan asuransi':
-        return "assets/icons/tagihan_pembayaran.svg";
-      default:
-        return "assets/icons/transaksi.svg";
-    }
   }
 
   String _monthIndo(int month) {

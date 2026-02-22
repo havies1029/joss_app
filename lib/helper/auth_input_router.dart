@@ -21,7 +21,6 @@ class AuthInputRouter {
       context.read<EmailVerificationBloc>().add(
         SetIsEmailEvent(isEmail: input),
       );
-      debugPrint("isEmail" + input);
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(
@@ -35,8 +34,6 @@ class AuthInputRouter {
       context.read<EmailVerificationBloc>().add(
         SetIsTeleponEvent(isTelepon: input),
       );
-      debugPrint("isTelepon" + input);
-
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(

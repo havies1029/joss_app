@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:joss_app/blocs/gen_trslog/trslogcari_bloc.dart';
-import 'package:joss_app/common/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
+
+import '../../../../blocs/notiflog/logtrscari_bloc.dart';
+import '../../../../models/notiflog/logtrscari_model.dart';
+
+enum LogFilter { semua, aktivitas, transaksi }
 
 class TransaksiPage extends StatefulWidget {
   const TransaksiPage({super.key});
@@ -14,50 +18,54 @@ class TransaksiPage extends StatefulWidget {
 }
 
 class _TransaksiPageState extends State<TransaksiPage> {
-  late TrslogCariBloc trslogCariBloc;
-  String? selectedFilter;
-  List<dynamic> allItems = [];
-  List<dynamic> filteredItems = [];
+  LogFilter _filter = LogFilter.semua;
+  final ScrollController _scrollController = ScrollController();
 
-  final List<String> filterOptions = [
-    "Pembayaran Premi",
-    "Klaim Asuransi",
-    "Penutupan Asuransi",
-  ];
+  String get _groupLogId {
+    switch (_filter) {
+      case LogFilter.semua:
+        return "";
+      case LogFilter.aktivitas:
+        return "10";
+      case LogFilter.transaksi:
+        return "20";
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    trslogCariBloc = BlocProvider.of<TrslogCariBloc>(context);
+    _scrollController.addListener(_onScroll);
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final bloc = context.read<LogtrscariBloc>();
+    final state = bloc.state;
+    if (state.hasReachedMax || state.isLoadingMore) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final current = _scrollController.position.pixels;
+    if (current >= (maxScroll - 200)) {
+      bloc.add(FetchLogtrscariEvent());
+    }
   }
 
   void _loadData() {
     Future.delayed(const Duration(milliseconds: 300), () {
-      trslogCariBloc.add(RefreshTrslogCariEvent(searchText: ''));
+      context.read<LogtrscariBloc>().add(
+        RefreshLogtrscariEvent(groupLogId: _groupLogId),
+      );
     });
-  }
-
-  void _applyFilter(String? filter) {
-    setState(() {
-      selectedFilter = filter;
-      if (filter == null) {
-        filteredItems = List.from(allItems);
-      } else {
-        filteredItems =
-            allItems
-                .where(
-                  (item) =>
-              item.jenis_trs?.toLowerCase() == filter.toLowerCase(),
-            )
-                .toList();
-      }
-    });
-  }
-
-  void _updateItemsFromBloc(List<dynamic> items) {
-    allItems = items;
-    _applyFilter(selectedFilter);
   }
 
   @override
@@ -67,64 +75,22 @@ class _TransaksiPageState extends State<TransaksiPage> {
       child: Container(
         color: secondaryBlackColor,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: vPadding),
+
+            // Filter chips
             Container(
               margin: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    ChoiceChip(
-                      label: Text(
-                        "Semua",
-                        style: bodyTextStyle(context, fontSize: 16),
-                      ),
-                      selected: selectedFilter == null,
-                      onSelected: (selected) {
-                        if (selected) _applyFilter(null);
-                      },
-                      selectedColor: primaryColor,
-                      backgroundColor: pGrey,
-                      showCheckmark: false,
-                      side: BorderSide.none,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(cardBorderRadius),
-                      ),
-                      labelPadding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                    ),
+                    _buildFilterChip("Semua", LogFilter.semua),
                     const SizedBox(width: 8),
-                    ...filterOptions.map(
-                          (filter) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(
-                            filter,
-                            style: bodyTextStyle(context, fontSize: 16),
-                          ),
-                          selected: selectedFilter == filter,
-                          onSelected: (selected) {
-                            if (selected) _applyFilter(filter);
-                          },
-                          selectedColor: primaryColor,
-                          backgroundColor: pGrey,
-                          showCheckmark: false,
-                          side: BorderSide.none,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              cardBorderRadius,
-                            ),
-                          ),
-                          labelPadding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildFilterChip("Aktivitas", LogFilter.aktivitas),
+                    const SizedBox(width: 8),
+                    _buildFilterChip("Transaksi", LogFilter.transaksi),
                   ],
                 ),
               ),
@@ -132,165 +98,145 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
             const SizedBox(height: vPadding),
 
-            // Transaction List
+            // List
             Expanded(
-              child: BlocListener<TrslogCariBloc, TrslogCariState>(
-                listener: (context, state) {
-                  if (state.status == ListStatus.success) {
-                    _updateItemsFromBloc(state.items);
+              child: BlocBuilder<LogtrscariBloc, LogtrscariState>(
+                builder: (context, state) {
+                  if (state.status == ListStatus.initial) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
                   }
-                },
-                child: BlocBuilder<TrslogCariBloc, TrslogCariState>(
-                  builder: (context, state) {
-                    if (state.status == ListStatus.initial) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
 
-                    if (state.status == ListStatus.failure) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.error_outline,
-                                size: 48,
-                                color: hintGrey,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                "Gagal memuat data",
-                                style: bodyTextStyle(context, fontSize: 18),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Periksa koneksi internet Anda",
-                                style: bodyTextStyle(
-                                  context,
-                                ).copyWith(color: hintGrey),
-                              ),
-                              const SizedBox(height: 16),
-                              AppButton.primary(
-                                text: "Coba Lagi",
-                                onPressed: _loadData,
-                                backgroundColor: pBlue,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    if (filteredItems.isEmpty) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                "assets/icons/transaksi.svg",
-                                width: 64,
-                                height: 64,
-                                color: hintGrey,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                selectedFilter == null
-                                    ? "Belum ada transaksi"
-                                    : "Tidak ada transaksi",
-                                style: bodyTextStyle(context, fontSize: 18),
-                                textAlign: TextAlign.center,
-                              ),
-                              if (selectedFilter != null)
-                                Text(
-                                  "untuk kategori \"$selectedFilter\"",
-                                  style: bodyTextStyle(
-                                    context,
-                                  ).copyWith(color: hintGrey),
-                                  textAlign: TextAlign.center,
-                                ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    return Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          _loadData();
-                        },
-                        child: ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: EdgeInsets.zero,
-                          itemCount: _groupedTransactions().length,
-                          itemBuilder: (context, groupIndex) {
-                            final group = _groupedTransactions()[groupIndex];
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Month Header (Outside card)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: hPadding * 1.5,
-                                    vertical: 12,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        group['month'],
-                                        style: bodyTextStyle(context, fontSize: 16),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        "${group['items'].length} Transaksi",
-                                        style: bodyTextStyle(context, fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Card with transactions
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: hPadding * 1.5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: pGrey,
-                                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                                    border: Border.all(color: sGrey),
-                                  ),
-                                  child: ListView.separated(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: group['items'].length,
-                                    separatorBuilder: (context, index) =>
-                                        kDivider(color: sGrey),
-                                    itemBuilder: (context, index) {
-                                      final item = group['items'][index];
-                                      return _buildTransactionItem(context, item);
-                                    },
-                                  ),
-                                ),
-
-                                const SizedBox(height: vPadding),
-                              ],
-                            );
-                          },
+                  if (state.status == ListStatus.failure) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.error_outline, size: 48, color: hintGrey),
+                            const SizedBox(height: 16),
+                            Text(
+                              "Gagal memuat data",
+                              style: bodyTextStyle(context, fontSize: 18),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Periksa koneksi internet Anda",
+                              style: bodyTextStyle(context).copyWith(color: hintGrey),
+                            ),
+                            const SizedBox(height: 16),
+                            AppButton.primary(
+                              text: "Coba Lagi",
+                              onPressed: _loadData,
+                              backgroundColor: pBlue,
+                            ),
+                          ],
                         ),
                       ),
                     );
-                  },
-                ),
+                  }
+
+                  final items = state.items; // <- sumber data tunggal dari bloc
+
+                  if (items.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              "assets/icons/transaksi.svg",
+                              width: 64,
+                              height: 64,
+                              color: hintGrey,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "Belum ada transaksi",
+                              style: bodyTextStyle(context, fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  // grouping sekali aja (jangan panggil berulang)
+                  final groups = _groupByBulan(items);
+
+                  return RefreshIndicator(
+                    onRefresh: () async => _loadData(),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemCount: groups.length,
+                      itemBuilder: (context, groupIndex) {
+                        final group = groups[groupIndex];
+                        final month = group['month'] as String;
+                        final groupItems = group['items'] as List<LogtrscariModel>;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Month Header
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: hPadding * 1.5,
+                                vertical: 12,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    month,
+                                    style: bodyTextStyle(context, fontSize: 16),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    "${groupItems.length} Transaksi",
+                                    style: bodyTextStyle(context, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Card
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                              decoration: BoxDecoration(
+                                color: pGrey,
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                border: Border.all(color: sGrey),
+                              ),
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: groupItems.length,
+                                separatorBuilder: (_, __) => kDivider(color: sGrey),
+                                itemBuilder: (context, index) {
+                                  final item = groupItems[index];
+                                  return _buildLogItem(context, item);
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(height: vPadding),
+                          ],
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ),
+
             const SizedBox(height: 16),
           ],
         ),
@@ -298,121 +244,180 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
-  Widget _buildTransactionItem(BuildContext context, dynamic item) {
-    final iconAsset = _getIconAsset(item.jenis_trs);
+  Widget _buildFilterChip(String label, LogFilter value) {
+    return ChoiceChip(
+      label: Text(label, style: bodyTextStyle(context, fontSize: 16)),
+      selected: _filter == value,
+      onSelected: (_) {
+        setState(() => _filter = value);
+        _loadData(); // reload dengan groupLogId baru
+      },
+      selectedColor: primaryColor,
+      backgroundColor: pGrey,
+      showCheckmark: false,
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+      ),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    );
+  }
 
-    // Format tanggal
-    String dateTimeStr = "-";
-    if (item.trsTgl != null) {
-      try {
-        final tglDt =
-        (item.trsTgl is String) ? DateTime.parse(item.trsTgl) : item.trsTgl;
-        dateTimeStr = "${tglDt.day} ${_monthIndo(tglDt.month)} ${tglDt.year}";
-      } catch (_) {}
+  Widget _buildLogItem(BuildContext context, LogtrscariModel item) {
+    String formatTanggalWaktu(dynamic value) {
+      if (value == null) return "-";
+
+      DateTime dt;
+      if (value is DateTime) {
+        dt = value;
+      } else {
+        final s = value.toString().replaceFirst(' ', 'T');
+        dt = DateTime.tryParse(s) ?? DateTime.now();
+      }
+
+      return DateFormat("d MMM yyyy · HH:mm").format(dt);
     }
+
+    final dateStr = formatTanggalWaktu(item.tglDibuat);
+
+    // icon (kamu bisa mapping berdasarkan jenisLog kalau mau)
+    final iconAsset = _getIconAsset(item.jenisLog);
 
     return Container(
       padding: const EdgeInsets.all(hPadding),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Icon dengan background
-          SvgPicture.asset(iconAsset, width: 40, height: 40),
+          SvgPicture.asset(iconAsset, width: 34, height: 34),
           const SizedBox(width: 16),
 
-          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Transaction type
                 Text(
-                  item.jenis_trs ?? "-",
-                  style: bodyTextStyle(context, fontSize: 18).copyWith(color: primaryLightColor),
+                  item.jenisLog.isNotEmpty ? item.jenisLog : "-",
+                  style: bodyTextStyle(context, fontSize: 18)
+                      .copyWith(color: primaryLightColor),
                 ),
                 const SizedBox(height: 4),
-
-                // Date and time
                 Text(
-                  dateTimeStr,
-                  style: bodyTextStyle(
-                    context,
-                    fontSize: 16,
-                  ).copyWith(color: hintGrey),
+                  dateStr,
+                  style: bodyTextStyle(context, fontSize: 16)
+                      .copyWith(color: hintGrey),
                 ),
+                // if (item.keterangan.isNotEmpty) ...[
+                //   const SizedBox(height: 4),
+                //   Text(
+                //     item.keterangan,
+                //     maxLines: 2,
+                //     overflow: TextOverflow.ellipsis,
+                //     style: bodyTextStyle(context, fontSize: 14)
+                //         .copyWith(color: hintGrey),
+                //   ),
+                // ],
               ],
             ),
           ),
 
-          // status
-          SizedBox(
-            width: 90,
-            child: Text(
-              item.status_nama ?? "-",
-              textAlign: TextAlign.right,
-              style: bodyTextStyle(
-                context,
-                fontSize: 16,
-              ).copyWith(
-                color: _getStatusColor(item.status_nama),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+          _buildRightSide(item),
         ],
       ),
     );
   }
 
-  String _getIconAsset(String? jenisTrs) {
-    switch (jenisTrs?.toLowerCase()) {
-      case 'pembayaran premi':
-        return "assets/icons/pembayaran_premi.svg";
-      case 'klaim asuransi':
-        return "assets/icons/klaim_asuransi.svg";
-      case 'penutupan asuransi':
-        return "assets/icons/tagihan_pembayaran.svg";
-      default:
-        return "assets/icons/transaksi.svg";
+  Widget _buildRightSide(LogtrscariModel item) {
+    final isTransaksi = item.groupLogId == "20"; // <- patokan transaksi
+
+    if (isTransaksi) {
+      final amountText = _formatAmountNoSpace(item.curr, item.amount1);
+      final remarkText = (item.remark1).isNotEmpty ? item.remark1 : "";
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            amountText,
+            textAlign: TextAlign.right,
+            style: bodyTextStyle(context, fontSize: 18).copyWith(
+              color: successGreen, // hijau seperti contoh
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            remarkText.isNotEmpty ? remarkText : "-",
+            textAlign: TextAlign.right,
+            style: bodyTextStyle(context, fontSize: 16).copyWith(
+              color: primaryLightColor, // putih
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      );
     }
+
+    // selain transaksi: tampilkan status seperti biasa
+    return SizedBox(
+      width: 90,
+      child: Text(
+        item.status.isNotEmpty ? item.status : "-",
+        textAlign: TextAlign.right,
+        style: bodyTextStyle(context, fontSize: 16).copyWith(
+          color: _getStatusColor(item.status),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 
-  String _monthIndo(int month) {
-    const bulan = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mei',
-      'Jun',
-      'Jul',
-      'Agu',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
-    ];
-    return bulan[month];
+  String _formatAmountNoSpace(String curr, double amount) {
+    final c = curr.isNotEmpty ? curr : "IDR";
+    final nf = NumberFormat("#,##0", "id_ID");
+    final amt = nf.format(amount);
+    return "$c$amt";
   }
 
-  String _monthIndoFull(int month) {
-    const bulan = [
-      '',
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
-    ];
-    return bulan[month];
+  List<Map<String, dynamic>> _groupByBulan(List<LogtrscariModel> items) {
+    final Map<String, List<LogtrscariModel>> grouped = {};
+
+    for (final item in items) {
+      final key = item.groupBulan.isNotEmpty ? item.groupBulan : "Tanpa Bulan";
+      (grouped[key] ??= []).add(item);
+    }
+
+    // Optional: sort item di tiap group by tglDibuat desc
+    for (final entry in grouped.entries) {
+      entry.value.sort((a, b) {
+        final ad = a.tglDibuat;
+        final bd = b.tglDibuat;
+        if (ad == null && bd == null) return 0;
+        if (ad == null) return 1;
+        if (bd == null) return -1;
+        return bd.compareTo(ad);
+      });
+    }
+
+    // Kalau groupBulan kamu sudah terformat dan ingin urutan terbaru, idealnya backend sudah urut.
+    // Kalau mau sort di sini juga, kita coba parse "MMMM yyyy" (id_ID) — tapi kalau formatnya beda, biarin urutan natural.
+    final keys = grouped.keys.toList();
+
+    return keys.map((k) => {'month': k, 'items': grouped[k]!}).toList();
+  }
+
+  String _getIconAsset(String? jenisLog) {
+    final v = (jenisLog ?? "").toLowerCase();
+    if (v.contains("pembayaran")) return "assets/icons/pembayaran_premi.svg";
+    if (v.contains("klaim")) return "assets/icons/klaim_asuransi.svg";
+    if (v.contains("penutupan")) return "assets/icons/tagihan_pembayaran.svg";
+    return "assets/icons/transaksi.svg";
+  }
+
+  String _formatNumber(double v) {
+    // simple format, bisa kamu sesuaikan
+    final nf = NumberFormat("#,##0.##", "id_ID");
+    return nf.format(v);
   }
 
   Color _getStatusColor(String? status) {
@@ -428,62 +433,5 @@ class _TransaksiPageState extends State<TransaksiPage> {
       default:
         return pGrey;
     }
-  }
-
-  List<Map<String, dynamic>> _groupedTransactions() {
-    Map<String, List<dynamic>> grouped = {};
-
-    for (var item in filteredItems) {
-      if (item.trsTgl != null) {
-        try {
-          final tglDt = (item.trsTgl is String)
-              ? DateTime.parse(item.trsTgl)
-              : item.trsTgl;
-          final monthYear = "${_monthIndoFull(tglDt.month)} ${tglDt.year}";
-
-          if (!grouped.containsKey(monthYear)) {
-            grouped[monthYear] = [];
-          }
-          grouped[monthYear]!.add(item);
-        } catch (_) {}
-      }
-    }
-
-    // Sort by date (newest first)
-    List<Map<String, dynamic>> result = [];
-    final sortedKeys = grouped.keys.toList()..sort((a, b) {
-      try {
-        final dateA = _parseMonthYear(a);
-        final dateB = _parseMonthYear(b);
-        return dateB.compareTo(dateA);
-      } catch (_) {
-        return 0;
-      }
-    });
-
-    for (var key in sortedKeys) {
-      result.add({
-        'month': key,
-        'items': grouped[key]!,
-      });
-    }
-
-    return result;
-  }
-
-  DateTime _parseMonthYear(String monthYear) {
-    final parts = monthYear.split(' ');
-    if (parts.length != 2) return DateTime.now();
-
-    final monthMap = {
-      'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4,
-      'Mei': 5, 'Juni': 6, 'Juli': 7, 'Agustus': 8,
-      'September': 9, 'Oktober': 10, 'November': 11, 'Desember': 12,
-    };
-
-    final month = monthMap[parts[0]] ?? 1;
-    final year = int.tryParse(parts[1]) ?? DateTime.now().year;
-
-    return DateTime(year, month);
   }
 }

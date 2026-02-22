@@ -1138,6 +1138,9 @@ import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
 import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_endors/endors2cari_bloc.dart';
+import 'blocs/notifevent/notifeventcari_bloc.dart';
+import 'blocs/notiflog/logtrscari_bloc.dart';
+import 'blocs/notiflog/logtrscaritopx_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
@@ -1573,6 +1576,13 @@ Future<void> main() async {
         //     uploadRepo: UploadRepositoryImpl(Dio()),
         //   ),
         // ),
+
+        // Log Notification
+        BlocProvider(create: (context) => NotifeventcariBloc()),
+
+        // Log Transaction
+        BlocProvider(create: (context) => LogtrscariBloc()),
+        BlocProvider(create: (context) => LogtrscaritopxBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

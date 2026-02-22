@@ -48,41 +48,30 @@ class _CalmvMainPageRemake2State extends State<CalmvMainPageRemake2> {
           listeners: [
             BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
               listener: (context, state) {
-                BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
-                  listener: (context, state) {
-                    if (state.isSaved && !state.hasFailure && state.record != null) {
-                      setState(() {
-                        calmv1Id = state.record!.calmv1Id;
-                      });
-                    }
-                  },
-                );
+                if (state.isSaved && !state.hasFailure && state.record != null) {
+                  setState(() {
+                    calmv1Id = state.record!.calmv1Id;
+                  });
+                }
               },
             ),
-            BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
+            BlocListener<Calmv2FormBloc, Calmv2FormState>(
               listener: (context, state) {
-                BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
-                  listener: (context, state) {
-                    if (state.isSaved && !state.hasFailure && state.record != null) {
-                      setState(() {
-                        calmv1Id = state.record!.calmv1Id;
-                      });
-                    }
-                  },
-                );
+                if (state.isSaved && !state.hasFailure && state.record != null) {
+                  setState(() {
+                    calmv1Id = state.record!.calmv1Id;
+                  });
+                  calmv2FormBloc.add(FieldCalmv1IdChangedEvent(calmv1Id: calmv1Id ?? ""));
+                }
               },
             ),
-            BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
+            BlocListener<Calmv2FormBloc, Calmv2FormState>(
               listener: (context, state) {
-                BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
-                  listener: (context, state) {
-                    if (state.isSaved && !state.hasFailure && state.record != null) {
-                      setState(() {
-                        calmv1Id = state.record!.calmv1Id;
-                      });
-                    }
-                  },
-                );
+                if (state.isSaved && !state.hasFailure && state.record != null) {
+                  setState(() {
+                    calmv1Id = state.record!.calmv1Id;
+                  });
+                }
               },
             ),
           ],
