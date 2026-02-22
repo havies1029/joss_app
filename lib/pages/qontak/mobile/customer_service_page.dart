@@ -327,8 +327,8 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
         context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
 
     if (mrekan1Id != null &&
-        mrekan1Id!.trim().isNotEmpty) {
-      return mrekan1Id!;
+        mrekan1Id.trim().isNotEmpty) {
+      return mrekan1Id;
     }
 
     final prefs = await SharedPreferences.getInstance();

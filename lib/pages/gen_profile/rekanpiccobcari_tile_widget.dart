@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:joss_app/widgets/my_colors.dart';
 import 'package:joss_app/widgets/my_text.dart';
 
-import '../../widgets/my_text.dart';
 
 class RekanPicCobCariTileWidget extends StatelessWidget {
   final String cobNama;

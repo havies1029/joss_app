@@ -13,10 +13,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_cob_list_page.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_success.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
-import '../../../../repositories/combobox/combomcobapp1_repository.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
-import '../../../management_polis/mobile/theme/polis_success.dart';
-import '../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 
 class Regother1CrudFormPage extends StatefulWidget {
   final String viewMode;

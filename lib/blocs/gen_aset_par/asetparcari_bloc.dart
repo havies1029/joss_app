@@ -312,7 +312,7 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			if (state.queryKey != keyAtRequest) return;
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
-			List<String> _first5IdsFrom(List<AsetParCariModel> list) {
+			List<String> first5IdsFrom(List<AsetParCariModel> list) {
 				return list
 						.take(5)
 						.map((e) => e.asetParId) // ganti kalau field id kamu beda

@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:equatable/equatable.dart';

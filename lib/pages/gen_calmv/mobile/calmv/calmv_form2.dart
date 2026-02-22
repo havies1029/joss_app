@@ -9,7 +9,6 @@ import 'package:joss_app/models/gen_calmv/calmv2form_model.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
 
-import '../../../../widgets/apptheme/numeric_to_one_decimal_formatter.dart';
 
 class CalmvForm2Section extends StatefulWidget {
   final String viewMode;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/gen_klaim/mobile/widget/crud_klaim_widget/klaim1_inline_editor_page.dart';
 import '../../../../common/constants.dart';
-import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../base/base_background_sidepage.dart';
 

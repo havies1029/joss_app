@@ -71,7 +71,7 @@ class _CalparFormMainState extends State<CalparFormMain> {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calpar1Id;
 
-              if (newId != null && newId.isNotEmpty) {
+              if (newId.isNotEmpty) {
                 setState(() {
                   calpar1Id = newId;
                 });

@@ -36,7 +36,7 @@ class Regklaim1CrudBloc extends Bloc<Regklaim1CrudEvents, Regklaim1CrudState> {
 
 		final hasFailure = !returnData.success;
 
-		final newId = (!hasFailure && returnData.data != null)
+		final newId = (!hasFailure)
 				? returnData.data.toString()
 				: "";
 

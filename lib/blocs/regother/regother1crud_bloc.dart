@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/regother/regother1crud_model.dart';

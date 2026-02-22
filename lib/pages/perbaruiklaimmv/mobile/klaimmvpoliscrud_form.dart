@@ -232,6 +232,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 					addError(
 							error: "Asuransi tidak boleh kosong.");
 				}
+				return null;
 			},
 		);
 	}
@@ -294,6 +295,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 					addError(
 							error: "Jenis Cover tidak boleh kosong.");
 				}
+				return null;
 			},
 		);
 	}

@@ -1626,7 +1626,6 @@ class _App extends StatefulWidget {
   final bool seenOnboarding;
 
   const _App({
-    super.key,
     required this.userRepository,
     required this.seenOnboarding,
   });
@@ -1743,7 +1742,7 @@ class _AppState extends State<_App> {
                   listenWhen: (prev, curr) =>
                   prev.record?.mrekan1Id != curr.record?.mrekan1Id &&
                       curr.record?.mrekan1Id != null &&
-                      curr.record!.mrekan1Id!.trim().isNotEmpty,
+                      curr.record!.mrekan1Id.trim().isNotEmpty,
                   listener: (context, state) async {
                     if (ChatInitService.I.isInitialized) return;
 

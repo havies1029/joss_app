@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
 import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';

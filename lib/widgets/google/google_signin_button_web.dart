@@ -3,7 +3,6 @@ import 'package:google_sign_in_web/web_only.dart';
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart'
     show GoogleSignInPlatform;
 import 'package:google_sign_in_web/google_sign_in_web.dart';
-import 'package:joss_app/common/constants.dart';
 
 void registerGoogleSigninButton() async {
   debugPrint(

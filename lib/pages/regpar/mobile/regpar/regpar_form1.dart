@@ -93,7 +93,7 @@ class RegparForm1SectionState extends State<RegparForm1Section> {
 
     // Numeric Controllers
     fieldTtgNamaController.text = record.ttgNama.toString();
-    fieldTtgAlamatController.text = record.ttgAlamat.toString();;
+    fieldTtgAlamatController.text = record.ttgAlamat.toString();
 
     setState(() {});
   }

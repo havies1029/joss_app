@@ -195,11 +195,11 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
         ),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: MaterialStateProperty.all(true),
-            trackVisibility: MaterialStateProperty.all(false),
-            thickness: MaterialStateProperty.all(5),
+            thumbVisibility: WidgetStateProperty.all(true),
+            trackVisibility: WidgetStateProperty.all(false),
+            thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(
+            thumbColor: WidgetStateProperty.all(
               scrollBar.withOpacity(0.1),
             ),
           ),
@@ -418,11 +418,11 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(cardBorderRadius / 2),
               ),
-              side: MaterialStateBorderSide.resolveWith(
+              side: WidgetStateBorderSide.resolveWith(
                     (states) => const BorderSide(color: sGrey, width: 1),
               ),
-              fillColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.selected)) {
+              fillColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
                   return primaryColor;
                 }
                 return Colors.transparent;

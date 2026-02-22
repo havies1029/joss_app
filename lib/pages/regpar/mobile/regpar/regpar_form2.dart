@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
-import 'package:string_validator/string_validator.dart';
 
 import '../../../../blocs/regpar/regpar2form_bloc.dart';
 import '../../../../models/combobox/combomkecamatan_model.dart';

@@ -88,7 +88,7 @@ class _RegotherSucessState extends State<RegotherSucess> {
                     ),
                     const SizedBox(height: vPadding),
                     Text(
-                      "${widget.display}",
+                      widget.display,
                       textAlign: TextAlign.center,
                       style: headingStyle(context),
                     ),

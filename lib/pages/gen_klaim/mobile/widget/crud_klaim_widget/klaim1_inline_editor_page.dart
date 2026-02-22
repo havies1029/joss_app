@@ -162,12 +162,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 // import 'package:joss_app/blocs/gen_klaim/klaim1list_bloc.dart';
 import 'package:joss_app/blocs/gen_klaim/klaim1crud_bloc.dart';
-import 'package:joss_app/pages/gen_klaim/mobile/widget/list_klaim_widget/timeline_card_widget.dart';
 
 import '../../../../../blocs/gen_klaim/klaim1list_bloc.dart';
 import '../../../../../widgets/apptheme/header_card.dart';
 import 'klaim1_add_form_card.dart';
-import 'klaim1_list_editor.dart';
 
 class Klaim1InlineEditorPage extends StatefulWidget {
   const Klaim1InlineEditorPage({super.key});

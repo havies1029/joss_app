@@ -6,17 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
-import 'package:string_validator/string_validator.dart';
 
-import '../../../../blocs/regpar/regpar3form_bloc.dart';
 import '../../../../blocs/regpar/regpar4form_bloc.dart';
-import '../../../../models/combobox/combomjnscoverpar_model.dart';
-import '../../../../models/combobox/combomwilayah_model.dart';
-import '../../../../models/combobox/combomzonagempa_model.dart';
 import '../../../../models/combobox/combormatauang_model.dart';
-import '../../../../models/regpar/regpar3form_model.dart';
 import '../../../../models/regpar/regpar4form_model.dart';
-import '../../../../repositories/combobox/combomjnscoverpar_repository.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
 
 class RegparForm4Section extends StatefulWidget {

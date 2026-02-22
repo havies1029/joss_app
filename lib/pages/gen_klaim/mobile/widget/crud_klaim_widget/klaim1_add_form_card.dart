@@ -349,19 +349,14 @@
 // lib/pages/gen_klaim/widgets/klaim1_add_form_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/gen_klaim/klaim1crud_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/combobox/combomstsclaim_model.dart';
-import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
-import 'package:joss_app/widgets/combobox/combomstsclaim_widget.dart';
 
 import '../../../../../common/thousand_separator_input_formatter.dart';
-import '../../../../../repositories/combobox/combomstsclaim_repository.dart';
 import '../../../../../repositories/combobox/combormatauang_repository.dart';
 
 class Klaim1AddFormCard extends StatefulWidget {

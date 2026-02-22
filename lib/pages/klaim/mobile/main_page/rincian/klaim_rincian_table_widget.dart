@@ -237,7 +237,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
       }) {
     final isSelected = selectedId == d.klaim1Id;
 
-    void _logSelectedRow(KlaimdetailCariModel d, int index) {
+    void logSelectedRow(KlaimdetailCariModel d, int index) {
       debugPrint("=========== ROW SELECTED ===========");
       debugPrint("Index         : $index");
       debugPrint("No Urut       : ${d.nourut}");
@@ -263,7 +263,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           child: CheckboxRadio(
             value: isSelected,
             onChanged: (checked) {
-              _logSelectedRow(d, index);
+              logSelectedRow(d, index);
               if (checked == true) {
                 groupcobCariBloc.add(SelectItemEvent(d.klaim1Id));
                 groupcobCariBloc.add(SelectKlaimRecordEvent(d));

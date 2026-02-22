@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/management_polis/mobile/form_button_page/endorse_form_page.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/detail_management_widget.dart';
 import '../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import '../blocs/gen_status_aset/statusasetcari_bloc.dart';
@@ -13,8 +12,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/renewal_form_page.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FabActionHelper {
   static String _cobId(BuildContext c) =>

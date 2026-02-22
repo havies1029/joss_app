@@ -45,7 +45,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
   ComboRKodeposModel? fieldComboRKodepos;
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
 
-  bool _isFirstLoad = true;
+  final bool _isFirstLoad = true;
 
   @override
   void initState() {

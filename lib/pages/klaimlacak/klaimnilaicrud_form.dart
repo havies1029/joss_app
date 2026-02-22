@@ -268,10 +268,10 @@ class _StarRating extends StatelessWidget {
   const _StarRating({
     required this.value,
     required this.onChanged,
-    this.max = 5,
     this.size = 44,
     required this.activeColor,
     required this.inactiveColor,
+    this.max = 5,
   });
 
   @override

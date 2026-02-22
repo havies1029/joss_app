@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/gen_aset_par/asetparcari_model.dart';
 

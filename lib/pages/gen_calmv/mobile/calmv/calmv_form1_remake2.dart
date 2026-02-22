@@ -96,7 +96,7 @@ class CalmvForm1Section2State extends State<CalmvForm1Section2> {
           fieldCoverBulanController.text = r.coverBulan.toString();
           fieldHargaController.text = r.harga.toString();
           fieldCurrIdController.text = r.currId ?? "";
-          selectedYear = r.thnBuat?.toString() ?? "";
+          selectedYear = r.thnBuat.toString() ?? "";
 
           fieldComboMMvgrupOjk = state.comboMMvgrupOjk;
           fieldComboMMvjnscover = state.comboMMvjnscover;

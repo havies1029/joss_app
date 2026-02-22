@@ -42,9 +42,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
     var klaimmvpoliscrudBloc = BlocProvider.of<KlaimmvpoliscrudBloc>(context);
     var klaimmvklaimcrudBloc = BlocProvider.of<KlaimmvklaimcrudBloc>(context);
     var klaimmvbengkelcrudBloc = BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
-    final _polisFormKey = GlobalKey<FormState>();
-    final _klaimFormKey = GlobalKey<FormState>();
-    final _bengkelFormKey = GlobalKey<FormState>();
+    final polisFormKey = GlobalKey<FormState>();
+    final klaimFormKey = GlobalKey<FormState>();
+    final bengkelFormKey = GlobalKey<FormState>();
 
     return BaseBackgroundSidePage(
       title: widget.cobGroupNama,
@@ -128,14 +128,14 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
                             context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 0));
                           },
-                          child: KlaimmvpoliscrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: _polisFormKey),
+                          child: KlaimmvpoliscrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: polisFormKey),
                         ),
                         Klaimmvaccordioncard(
                           title: 'Data Klaim',
                           isOpen: acc.openedIndex == 1,
                           onTap: () {
                             if (acc.openedIndex == 0) {
-                              final isFormPolisValid = _polisFormKey.currentState?.validate() ?? false;
+                              final isFormPolisValid = polisFormKey.currentState?.validate() ?? false;
                               if (!isFormPolisValid) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Data Polis belum valid")),
@@ -154,7 +154,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
                             context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 1));
                           },
-                          child: KlaimmvklaimcrudFormPage(recordId:  widget.klaim1Id, viewMode: "ubah", formKey: _klaimFormKey),
+                          child: KlaimmvklaimcrudFormPage(recordId:  widget.klaim1Id, viewMode: "ubah", formKey: klaimFormKey),
                         ),
                         Klaimmvaccordioncard(
                           title: 'Dokumen Klaim',
@@ -179,7 +179,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                           onTap: () => context
                               .read<KlaimmvaccordionBloc>()
                               .add(KlaimmvaccordionToggleEvent(index: 4)),
-                          child: KlaimmvbengkelcrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: _bengkelFormKey),
+                          child: KlaimmvbengkelcrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: bengkelFormKey),
                         ),
                         const SizedBox(height: 24),
                       ],

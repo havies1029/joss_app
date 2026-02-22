@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 
-import '../../../../common/thousand_separator_input_formatter.dart';
 
 class CalmvForm3Section extends StatefulWidget {
   final bool isExpanded;

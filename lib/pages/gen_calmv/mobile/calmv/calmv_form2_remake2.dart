@@ -91,7 +91,7 @@ class CalmvForm2Section2State extends State<CalmvForm2Section2> {
           fieldIsTbodController.text = r.isTbod.toString();
           fieldIsTerrorismController.text = r.isTerrorism.toString();
 
-          selectedPassengerCount = r.passangerCount?.toString() ?? "";
+          selectedPassengerCount = r.passangerCount.toString() ?? "";
 
           setState(() {});
         }

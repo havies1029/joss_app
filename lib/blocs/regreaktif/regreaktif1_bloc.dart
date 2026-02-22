@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/regreaktif/regreaktif1_model.dart';
 import 'package:joss_app/repositories/regreaktif/regreaktif1_repository.dart';
 

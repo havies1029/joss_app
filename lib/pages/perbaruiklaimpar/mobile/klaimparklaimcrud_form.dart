@@ -270,6 +270,7 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 									addError(
 											error: "Field ComboMJenisrugi tidak boleh kosong.");
 								}
+								return null;
 							},
 		);
 	}

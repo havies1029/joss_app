@@ -162,11 +162,11 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         ),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: MaterialStateProperty.all(true),
-            trackVisibility: MaterialStateProperty.all(false),
-            thickness: MaterialStateProperty.all(5),
+            thumbVisibility: WidgetStateProperty.all(true),
+            trackVisibility: WidgetStateProperty.all(false),
+            thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(
+            thumbColor: WidgetStateProperty.all(
               scrollBar.withOpacity(0.1),
             ),
           ),
@@ -319,7 +319,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
             child: center ? Center(child: child) : child,
           );
-        }).toList(),
+        }),
       ],
     );
   }

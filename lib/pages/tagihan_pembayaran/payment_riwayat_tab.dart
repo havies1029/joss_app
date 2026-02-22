@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../payment/mobile/riwayat/riwayat_page.dart';
 import '../payment/mobile/riwayat/riwayat_page_remake.dart';
 
 class PaymentRiwayatTab extends StatelessWidget {

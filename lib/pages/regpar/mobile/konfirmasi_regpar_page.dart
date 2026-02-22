@@ -5,10 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/regpar/regpar1crud_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/regpar/regpar1crud_model.dart';
-import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form1.dart';
-import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form2.dart';
-import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form3.dart';
-import 'package:joss_app/pages/regpar/mobile/regpar/regpar_form4.dart';
 import '../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../blocs/regpar/regpar1list_bloc.dart';
 import '../../../blocs/regpar/regpar2form_bloc.dart';
@@ -17,13 +13,10 @@ import '../../../blocs/regpar/regpar4form_bloc.dart';
 import '../../../models/regpar/regpar2form_model.dart';
 import '../../../models/regpar/regpar3form_model.dart';
 import '../../../models/regpar/regpar4form_model.dart';
-import '../../../widgets/apptheme/custom_progress_bar.dart';
-import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
 import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
-import '../../payment/paymentmethodcari_list.dart';
 import '../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 

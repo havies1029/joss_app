@@ -1,12 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiccrud_repository.dart';
 
-import '../../models/gen_profile/rekanpiccobcari_model.dart';
 
 part 'mrekanpiccrud_event.dart';
 part 'mrekanpiccrud_state.dart';

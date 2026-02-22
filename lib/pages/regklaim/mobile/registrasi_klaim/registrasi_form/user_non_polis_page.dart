@@ -219,10 +219,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     }
 
     final tglMulai = context.read<PolisTanggalBloc>().state.mulai;
-    if (tglMulai == null) {
-      setErr('form1.tglMulai', kStringNullError);
-      ok = false;
-    }
 
     return ok;
   }

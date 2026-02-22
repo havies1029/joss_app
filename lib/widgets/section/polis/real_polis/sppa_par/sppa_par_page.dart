@@ -15,7 +15,7 @@ class SppaParPage extends StatefulWidget {
 
 class _SppaParPageState extends State<SppaParPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _showPremiSection = true;
+  final bool _showPremiSection = true;
 
   @override
   Widget build(BuildContext context) {

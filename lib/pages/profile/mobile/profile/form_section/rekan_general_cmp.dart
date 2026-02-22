@@ -12,13 +12,10 @@ import 'package:joss_app/models/combobox/combombidang_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combombentukcst_repository.dart';
 import '../../../../../repositories/combobox/combombidang_repository.dart';
-import '../../../../../widgets/form_error.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanGeneralCmpCrudFormPage extends StatefulWidget {

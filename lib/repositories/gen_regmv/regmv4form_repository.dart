@@ -1,6 +1,4 @@
-import 'dart:typed_data';
 
-import 'package:joss_app/models/image/downloadfileinfo64.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/apis/gen_regmv/regmv4form_api.dart';
 

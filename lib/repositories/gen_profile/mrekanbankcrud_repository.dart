@@ -1,7 +1,6 @@
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/apis/gen_profile/mrekanbankcrud_api.dart';
 import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
-import 'package:flutter/cupertino.dart';
 
 class MRekanBankCrudRepository {
 

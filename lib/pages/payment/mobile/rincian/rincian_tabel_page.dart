@@ -186,11 +186,11 @@ class _RincianTablePageState extends State<RincianTablePage> {
             ),
             child: ScrollbarTheme(
               data: ScrollbarThemeData(
-                thumbVisibility: MaterialStateProperty.all(true),
-                trackVisibility: MaterialStateProperty.all(false),
-                thickness: MaterialStateProperty.all(5),
+                thumbVisibility: WidgetStateProperty.all(true),
+                trackVisibility: WidgetStateProperty.all(false),
+                thickness: WidgetStateProperty.all(5),
                 radius: Radius.circular(cardBorderRadius),
-                thumbColor: MaterialStateProperty.all(
+                thumbColor: WidgetStateProperty.all(
                   scrollBar.withOpacity(0.25),
                 ),
               ),
@@ -461,12 +461,12 @@ class _RincianTablePageState extends State<RincianTablePage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(cardBorderRadius / 2),
               ),
-              side: MaterialStateBorderSide.resolveWith(
+              side: WidgetStateBorderSide.resolveWith(
                     (states) => const BorderSide(color: sGrey),
               ),
-              fillColor: MaterialStateProperty.resolveWith(
+              fillColor: WidgetStateProperty.resolveWith(
                     (states) =>
-                states.contains(MaterialState.selected)
+                states.contains(WidgetState.selected)
                     ? primaryColor
                     : Colors.transparent,
               ),

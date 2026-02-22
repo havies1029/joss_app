@@ -458,8 +458,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     final statusId = context.read<StatusAsetCariBloc>().state.selectedStatusId;
     final searchText = _searchController.text;
 
-    if (cobId == null || cobId.trim().isEmpty ||
-        statusId == null || statusId.trim().isEmpty) {
+    if (cobId.trim().isEmpty || statusId.trim().isEmpty) {
       return;
     }
 

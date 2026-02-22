@@ -129,7 +129,7 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			if (state.queryKey != keyAtRequest) return;
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
-			List<String> _first5IdsFrom(List<AsetHealthCariModel> list) {
+			List<String> first5IdsFrom(List<AsetHealthCariModel> list) {
 				return list
 						.take(5)
 						.map((e) => e.asethealthId) // ganti kalau field id kamu beda

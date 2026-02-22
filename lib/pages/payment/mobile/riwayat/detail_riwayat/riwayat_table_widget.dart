@@ -132,7 +132,7 @@ class _RiwayatTableWidgetState extends State<RiwayatTableWidget> {
       children: [
         _headerCell("NO", center: true),
         _headerCell("NO POLIS"),
-        _headerCell("PERIODE\NPOLIS"),
+        _headerCell("PERIODENPOLIS"),
         _headerCell("PRREMI"),
       ],
     );

@@ -142,7 +142,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     ComboMJabatanModel? selected = _jabatan;
     try {
       final st = _comboKey.currentState;
-      if (selected == null) selected = st?.getSelectedItem;
+      selected ??= st?.getSelectedItem;
     } catch (_) {}
     final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
@@ -398,7 +398,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                               ),
                                               const SizedBox(height: 4),
 
-                                              if (_pendingCobList!.isEmpty)
+                                              if (_pendingCobList.isEmpty)
                                                 const Text(
                                                   'Pilih Daftar COB',
                                                   style: TextStyle(
@@ -412,7 +412,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                   spacing: 6,
                                                   runSpacing: 6,
                                                   children: _pendingCobList
-                                                      !.map(
+                                                      .map(
                                                         (e) => Container(
                                                       padding: const EdgeInsets.symmetric(
                                                           horizontal: 10, vertical: 6),
