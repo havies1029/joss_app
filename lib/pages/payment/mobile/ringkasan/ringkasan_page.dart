@@ -139,24 +139,22 @@ class RingkasanPageState extends State<RingkasanPage> {
                         return const Center(child: Text("Data kosong"));
                       }
 
-                      return Flexible(
-                        child: FractionallySizedBox(
-                          heightFactor: 0.85,
-                          alignment: Alignment.topCenter,
-                          child: RingkasanTablePage(
-                            items: state.items,
-                            selectedIds: state.selectedIds,
-                            onSelect: (id) {
-                              context
-                                  .read<DnrekapcobCariBloc>()
-                                  .add(ToggleSelectItemEvent(id));
-                            },
-                            onUnselect: (id) {
-                              context
-                                  .read<DnrekapcobCariBloc>()
-                                  .add(ToggleSelectItemEvent(id));
-                            },
-                          ),
+                      return FractionallySizedBox(
+                        heightFactor: 0.85,
+                        alignment: Alignment.topCenter,
+                        child: RingkasanTablePage(
+                          items: state.items,
+                          selectedIds: state.selectedIds,
+                          onSelect: (id) {
+                            context
+                                .read<DnrekapcobCariBloc>()
+                                .add(ToggleSelectItemEvent(id));
+                          },
+                          onUnselect: (id) {
+                            context
+                                .read<DnrekapcobCariBloc>()
+                                .add(ToggleSelectItemEvent(id));
+                          },
                         ),
                       );
                     },
