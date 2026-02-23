@@ -33,11 +33,16 @@ class Klaimparaccordioncard extends StatelessWidget {
             ),
             onTap: onTap,
           ),
-          if (isOpen)
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: child,
             ),
+            crossFadeState:
+            isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+          )
         ],
       ),
     );

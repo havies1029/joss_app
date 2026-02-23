@@ -111,12 +111,11 @@ const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
-
-const Color transactionColor1 = Color(0xFF3C3C3C);
-const Color transactionColor2 = Color(0xFF343434);
 const Color excelGreen = Color(0xFF27AE68);
 const Color pdfRed = Color(0xFFDA1618);
 
+const Color transactionColor1 = Color(0xFF3C3C3C);
+const Color transactionColor2 = Color(0xFF343434);
 // 🔥 Direct LinearGradients (Light → Dark, top → bottom)
 
 const LinearGradient yellowGradient = LinearGradient(

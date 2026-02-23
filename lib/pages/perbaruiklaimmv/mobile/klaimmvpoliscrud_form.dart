@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/plat_nomor_formatter.dart';
 import 'package:joss_app/repositories/combobox/combominsurer_repository.dart';
 import 'package:joss_app/repositories/combobox/combommvjnscover_repository.dart';
 import 'package:joss_app/widgets/form_error.dart';
@@ -350,6 +351,9 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 		return appTextField(
 			label: 'No Plat',
 			controller: fieldNoPlatController,
+			inputFormatters: [
+				PlatNomorFormatter(),
+			],
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: "No Plat tidak boleh kosong");

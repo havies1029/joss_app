@@ -66,6 +66,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
       isLoaded: true,
       record: record,
       comboRMatauang: record?.comboRMatauang,
+      isValid: _validate(record),
       isComplete: _validate(record),
     ));
   }

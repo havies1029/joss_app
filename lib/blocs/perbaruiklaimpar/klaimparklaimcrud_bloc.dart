@@ -11,13 +11,13 @@ part 'klaimparklaimcrud_event.dart';
 part 'klaimparklaimcrud_state.dart';
 
 class KlaimparklaimcrudBloc extends Bloc<KlaimparklaimcrudEvents, KlaimparklaimcrudState> {
-  final KlaimparklaimcrudRepository repository;
-  KlaimparklaimcrudBloc({required this.repository}) : super(const KlaimparklaimcrudState()) {
-    on<KlaimparklaimcrudUbahEvent>(onUbahKlaimparklaimcrud);
-    on<KlaimparklaimcrudTambahEvent>(onTambahKlaimparklaimcrud);
-    on<KlaimparklaimcrudHapusEvent>(onHapusKlaimparklaimcrud);
-    on<KlaimparklaimcrudLihatEvent>(onLihatKlaimparklaimcrud);
-    on<ComboMJenisrugiChangedEvent>(onComboMJenisrugiChanged);
+	final KlaimparklaimcrudRepository repository;
+	KlaimparklaimcrudBloc({required this.repository}) : super(const KlaimparklaimcrudState()) {
+		on<KlaimparklaimcrudUbahEvent>(onUbahKlaimparklaimcrud);
+		on<KlaimparklaimcrudTambahEvent>(onTambahKlaimparklaimcrud);
+		on<KlaimparklaimcrudHapusEvent>(onHapusKlaimparklaimcrud);
+		on<KlaimparklaimcrudLihatEvent>(onLihatKlaimparklaimcrud);
+		on<ComboMJenisrugiChangedEvent>(onComboMJenisrugiChanged);
     on<FieldDolChangedEvent>(onFieldDolChanged);
     on<FieldKeteranganChangedEvent>(onFieldKeteranganChanged);
     on<FieldLaporJpsChangedEvent>(onFieldLaporJpsChanged);
@@ -29,7 +29,7 @@ class KlaimparklaimcrudBloc extends Bloc<KlaimparklaimcrudEvents, Klaimparklaimc
     on<FieldPicTelpChangedEvent>(onFieldPicTelpChanged);
     on<KlaimparklaimcrudAutoSaveEvent>(onAutoSave);
 
-  }
+	}
 
   Future<void> onLihatKlaimparklaimcrud(
       KlaimparklaimcrudLihatEvent event,
@@ -215,33 +215,33 @@ class KlaimparklaimcrudBloc extends Bloc<KlaimparklaimcrudEvents, Klaimparklaimc
     ));
   }
 
-  Future<void> onTambahKlaimparklaimcrud(
-      KlaimparklaimcrudTambahEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+	Future<void> onTambahKlaimparklaimcrud(
+		KlaimparklaimcrudTambahEvent event, Emitter<KlaimparklaimcrudState> emit) async {
 
-    ReturnDataAPI returnData;
-    bool hasFailure = true;
-    emit(state.copyWith(isSaving: true, isSaved: false));
-    returnData = await repository.klaimparklaimcrudTambah(event.record);
-    hasFailure = !returnData.success;
-    emit(state.copyWith(
-        isSaving: false,
-        isSaved: true,
-        hasFailure: hasFailure));
-  }
+		ReturnDataAPI returnData;
+		bool hasFailure = true;
+		emit(state.copyWith(isSaving: true, isSaved: false));
+		returnData = await repository.klaimparklaimcrudTambah(event.record);
+		hasFailure = !returnData.success;
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: hasFailure));
+	}
 
-  Future<void> onUbahKlaimparklaimcrud(
-      KlaimparklaimcrudUbahEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-    emit(state.copyWith(isSaving: true, isSaved: false));
-    bool hasFailure = !await repository.klaimparklaimcrudUbah(event.record);
-    emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-  }
+	Future<void> onUbahKlaimparklaimcrud(
+		KlaimparklaimcrudUbahEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+		emit(state.copyWith(isSaving: true, isSaved: false));
+		bool hasFailure = !await repository.klaimparklaimcrudUbah(event.record);
+		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+	}
 
-  Future<void> onHapusKlaimparklaimcrud(
-      KlaimparklaimcrudHapusEvent event, Emitter<KlaimparklaimcrudState> emit) async {
-    emit(state.copyWith(isSaving: true, isSaved: false));
-    bool hasFailure = !await repository.klaimparklaimcrudHapus(event.recordId);
-    emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-  }
+	Future<void> onHapusKlaimparklaimcrud(
+		KlaimparklaimcrudHapusEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+		emit(state.copyWith(isSaving: true, isSaved: false));
+		bool hasFailure = !await repository.klaimparklaimcrudHapus(event.recordId);
+		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+	}
 
   // Future<void> onLihatKlaimparklaimcrud(
   //     KlaimparklaimcrudLihatEvent event,
@@ -262,25 +262,25 @@ class KlaimparklaimcrudBloc extends Bloc<KlaimparklaimcrudEvents, Klaimparklaimc
   //   ));
   // }
   //
-  // Future<void> onComboMJenisrugiChanged(
-  // 		ComboMJenisrugiChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
+	// Future<void> onComboMJenisrugiChanged(
+	// 		ComboMJenisrugiChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {
   //
-  // 	emit(state.copyWith(isLoading: true, isLoaded: false));
+	// 	emit(state.copyWith(isLoading: true, isLoaded: false));
   //
-  // 	ComboMJenisrugiModel comboMJenisrugi = event.comboMJenisrugi;
+	// 	ComboMJenisrugiModel comboMJenisrugi = event.comboMJenisrugi;
   //
   //   KlaimparklaimcrudModel? record = state.record;
   //   if (record != null) {
   //     record = record.copyWith(mjenisrugiId: comboMJenisrugi.mjenisrugiId);
   //   }
-  // 	emit(state.copyWith(
-  // 		isLoading: false,
-  // 		isLoaded: true,
-  // 		comboMJenisrugi: comboMJenisrugi,
-  // 		record: record,
+	// 	emit(state.copyWith(
+	// 		isLoading: false,
+	// 		isLoaded: true,
+	// 		comboMJenisrugi: comboMJenisrugi,
+	// 		record: record,
   //     isDirty: true,
   //     isComplete: _validate(record),));
-  // }
+	// }
   //
   // Future<void> onFieldDolChanged(
   //     FieldDolChangedEvent event, Emitter<KlaimparklaimcrudState> emit) async {

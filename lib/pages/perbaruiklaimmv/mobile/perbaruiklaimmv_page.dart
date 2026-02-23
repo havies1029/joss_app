@@ -8,10 +8,11 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/perbaruiklaimmv/klaim5cari_list.dart';
 import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
-import 'klaim5cari_list.dart';
+// import 'klaim5cari_list.dart';
 import 'klaimmvaccordioncard.dart';
 import 'klaimmvbengkelcrud_form.dart';
 import 'klaimmvklaimcrud_form.dart';
@@ -110,7 +111,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                               final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                               if (!klaimState.isValid) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Data Klaim belum valid")),
+                                  const SnackBar(content: Text("Data Polis belum valid")),
                                 );
                                 return;
                               }
@@ -128,7 +129,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                               final isFormPolisValid = _polisFormKey.currentState?.validate() ?? false;
                               if (!isFormPolisValid) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Data Polis belum valid")),
+                                  const SnackBar(content: Text("Data Klaim belum valid")),
                                 );
                                 return; // tahan pindah
                               }
@@ -138,7 +139,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Data Polis belum valid")),
                                 );
-                                return; // tahan pindah
+                                return; // tahan pindahv
                               }
                             }
 

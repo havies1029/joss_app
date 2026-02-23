@@ -88,13 +88,27 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _triggerByProses(
         jenisProses: widget.jenisProses,
+        prosesSource: _prosesSource,
+        prosesId: _prosesId,
       );
     });
   }
 
   void _triggerByProses({
     required String? jenisProses,
+    required String prosesSource,
+    required String prosesId,
   }) {
+    // 1) PRIORITAS: kalau prosesSource & prosesId dari dataMap ada, langsung pakai itu
+    final srcFromData = prosesSource.trim().toUpperCase();
+    final idFromData = prosesId.trim();
+
+    if (srcFromData.isNotEmpty && idFromData.isNotEmpty) {
+      _dispatchBySource(cleanSource: srcFromData, resolvedId: idFromData);
+      return;
+    }
+
+    // 2) FALLBACK: pakai jenisProses + cari id dari bloc record (logic lama kamu)
     final cleanSource = (jenisProses ?? "").trim().toUpperCase();
     String resolvedId = "";
 

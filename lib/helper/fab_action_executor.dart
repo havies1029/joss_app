@@ -8,7 +8,6 @@ import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import '../common/constants.dart';
 import '../pages/beli_polis/mobile/beli_polis_page.dart';
 import '../pages/management_polis/detail_management_page/detail_management_widget.dart';
-import '../pages/management_polis/detail_management_page/detail_management_widget_2.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 import '../pages/management_polis/mobile/form_button_page/endorse_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';
@@ -57,22 +56,42 @@ class FabActionExecutor {
     }
   }
 
+  bool? _readBool(Object item, String field) {
+    try {
+      final dyn = item as dynamic;
+      final raw = switch (field) {
+        'isReaktif' => dyn.isReaktif,
+        'isRenewal' => dyn.isRenewal,
+        _ => null,
+      };
+      return raw is bool ? raw : null;
+    } catch (_) {
+      if (item is Map) {
+        final raw = item[field];
+        return raw is bool ? raw : null;
+      }
+      return null;
+    }
+  }
+
   bool _guardTahapan({
     required BuildContext context,
     required ActionType actionType,
     required Object selectedItem,
   }) {
+    bool? flag;
+
     if (actionType == ActionType.aktifkanKembali) {
-      final flag = _boolFlag(selectedItem, 'isReaktif');
-      if (flag == false) {
+      flag = _readBool(selectedItem, 'isReaktif');
+      if (flag == true) {
         _snack(context, "Maaf polis ini sudah memiliki tahapan.");
         return false;
       }
     }
 
     if (actionType == ActionType.perpanjangan) {
-      final flag = _boolFlag(selectedItem, 'isRenewal');
-      if (flag == false) {
+      flag = _readBool(selectedItem, 'isRenewal');
+      if (flag == true) {
         _snack(context, "Maaf polis ini sudah memiliki tahapan.");
         return false;
       }
@@ -234,7 +253,7 @@ class FabActionExecutor {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => DetailManagementPolisPage2(
+        builder: (_) => DetailManagementPolisPage(
           data: item,
           cobId: cobId,
           statusId: "",

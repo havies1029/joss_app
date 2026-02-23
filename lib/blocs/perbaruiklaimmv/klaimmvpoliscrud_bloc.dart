@@ -72,6 +72,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
       record: record,
       comboMMvjnscover: record?.comboMMvjnscover,
       comboMInsurer: record?.comboMInsurer,
+      isValid: _validate(record),
       isComplete: _validate(record),
     ));
   }

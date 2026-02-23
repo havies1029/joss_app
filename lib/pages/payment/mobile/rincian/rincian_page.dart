@@ -136,8 +136,13 @@ class _RincianPageState extends State<RincianPage> {
                       Expanded(
                         child: ListPageFilterBarUIWidget(
                           searchController: _searchController,
-                          searchButton: buildSearchButton(),
+                          onSearch: (value) {
+                            dn2invBloc.add(
+                              GetRincianSOACustomerEvent(searchText: value),
+                            );
+                          },
                         ),
+
                       ),
 
                       const SizedBox(width: 8),
@@ -250,31 +255,32 @@ class _RincianPageState extends State<RincianPage> {
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return Material(
-          color: Colors.transparent,
-          child: Center(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: IntrinsicHeight(
             child: PopupWidget(
               title: "Pilih format file untuk diunduh",
               subtitle: "Tersedia Excel dan PDF",
               button1Text: "Excel",
               button2Text: "PDF",
               onExportSelected: (format) async {
-                // ambil semua detail dari semua header
-                final allDetails = state.rincianSOA.headers.expand((h) => h.details).toList();
+                final allDetails =
+                state.rincianSOA.headers.expand((h) => h.details).toList();
 
-                // filter yang dipilih (dn1Id)
                 final selectedDetails = allDetails
                     .where((d) => state.selectedIds.contains(d.dn1Id))
                     .toList();
 
                 if (selectedDetails.isEmpty) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(errorSnackBar("Tidak ada data yang dipilih"));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(errorSnackBar("Tidak ada data yang dipilih"));
                   return;
                 }
 
-                // mapping export (buat map sendiri)
-                final data = selectedDetails.map((d) => _detailToExportMap(d)).toList();
+                final data =
+                selectedDetails.map((d) => _detailToExportMap(d)).toList();
 
                 Navigator.pop(context);
                 await _exportDataRincian(context, format, data);

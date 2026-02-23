@@ -4,22 +4,20 @@ import java.io.FileInputStream
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // Flutter Gradle plugin harus selalu paling akhir
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.joss_app"
-//    compileSdk = flutter.compileSdkVersion
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
         applicationId = "com.example.joss_app"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 21
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
     }
 
     compileOptions {
@@ -31,7 +29,7 @@ android {
         jvmTarget = "17"
     }
 
-    // --- Aman: Load key.properties kalau ada ---
+    // ===== LOAD KEYSTORE =====
     val keystoreProps = Properties().apply {
         val f = rootProject.file("key.properties")
         if (f.exists()) {
@@ -40,7 +38,6 @@ android {
     }
 
     signingConfigs {
-        // DEBUG → tetap bisa pakai default keystore
         getByName("debug") {
             val sf = keystoreProps.getProperty("storeFile")
             if (sf != null) {
@@ -51,14 +48,18 @@ android {
             }
         }
 
-        // RELEASE → aman kalau file key.properties lengkap
         create("release") {
-            val sf = keystoreProps.getProperty("storeFileRelease") ?: keystoreProps.getProperty("storeFile")
+            val sf = keystoreProps.getProperty("storeFileRelease")
+                ?: keystoreProps.getProperty("storeFile")
+
             if (sf != null) {
                 storeFile = file(sf)
-                storePassword = keystoreProps.getProperty("storePasswordRelease") ?: keystoreProps.getProperty("storePassword")
-                keyAlias = keystoreProps.getProperty("keyAliasRelease") ?: keystoreProps.getProperty("keyAlias")
-                keyPassword = keystoreProps.getProperty("keyPasswordRelease") ?: keystoreProps.getProperty("keyPassword")
+                storePassword = keystoreProps.getProperty("storePasswordRelease")
+                    ?: keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAliasRelease")
+                    ?: keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPasswordRelease")
+                    ?: keystoreProps.getProperty("keyPassword")
             }
         }
     }

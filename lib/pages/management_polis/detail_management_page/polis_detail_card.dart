@@ -59,11 +59,8 @@ class PolisDetailCard extends StatelessWidget {
       return "$c $n";
     }
 
-    // NOTE:
-    // - PAR (10002): No Proses, No Polis, Tertanggung, Alamat, Periode, Nilai Pertanggungan, Premi
-    // - MV  (10003): Tertanggung, Periode, Merk, Nomor Polisi, Nilai Pertanggungan, Premi
     switch (cobId) {
-      case "10002": // PAR
+      case "10002":
         return [
           MapEntry("No Proses", s("prosesId")),
           MapEntry("No Polis", s("polisNo")),
@@ -74,7 +71,7 @@ class PolisDetailCard extends StatelessWidget {
           MapEntry("Premi", money("premi")),
         ];
 
-      case "10003": // MV
+      case "10003":
         return [
           MapEntry("Tertanggung", s("tertanggung")),
           MapEntry("Periode", periode()),
@@ -84,24 +81,21 @@ class PolisDetailCard extends StatelessWidget {
           MapEntry("Premi", money("premi")),
         ];
 
-      case "10004": // HULL (header table: Tertanggung, Detail Rangka Kapal, Nilai Tertanggung, Premi)
+      case "10004":
         return [
           MapEntry("Tertanggung", s("tertanggung")),
           MapEntry("Detail Rangka Kapal", s("namaKapal")),
           MapEntry("Nilai Tertanggung", money("tsi")),
-          MapEntry("Premi", money("premi")), // ✅ plus curr udah dari money()
+          MapEntry("Premi", money("premi")),
         ];
 
-      case "10005": // HEALTH (header table: Nama, Benefit)
+      case "10005":
         return [
           MapEntry("Nama", s("nama")),
-          MapEntry("Benefit", s("status")), // table benefit = status
+          MapEntry("Benefit", s("status")),
         ];
 
       default:
-      // OTHERS (header table: Object, Polis No, Sum Insured, Premi)
-      // Kalau kamu mau "Others" selalu pakai 4 field ini (bukan fallback entries),
-      // pakai return ini.
         return [
           MapEntry("Object", s("objectDesc")),
           MapEntry("Polis No", s("polisNo")),
@@ -109,21 +103,6 @@ class PolisDetailCard extends StatelessWidget {
           MapEntry("Premi", money("premi")),
         ];
 
-    // --- kalau kamu masih mau fallback entries untuk cobId lain beneran unknown,
-    // ganti "default" jadi:
-    //
-    // default:
-    //   final entries = dataMap.entries.where((e) {
-    //     if (e.key == "no") return false;
-    //     if (excludeKeys.contains(e.key)) return false;
-    //     final value = e.value?.toString().trim() ?? "";
-    //     if (value.isEmpty || value == "-" || value.toLowerCase() == "null") return false;
-    //     return true;
-    //   }).toList();
-    //
-    //   return entries
-    //     .map((e) => MapEntry(_beautifyKey(e.key), e.value?.toString() ?? "-"))
-    //     .toList();
     }
   }
 
@@ -160,7 +139,6 @@ class PolisDetailCard extends StatelessWidget {
               const SizedBox(height: 10),
             ],
 
-            /// NO (FIXED)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -183,7 +161,6 @@ class PolisDetailCard extends StatelessWidget {
 
             Divider(color: dividerColor, height: 20),
 
-            /// KEY VALUE LIST (sesuai mapping cobId)
             ...rows.map((row) => _kvRow(
               context: context,
               label: row.key,
@@ -254,11 +231,26 @@ class PolisDetailCard extends StatelessWidget {
 
   static String _formatDate(dynamic value) {
     if (value == null) return "-";
-    if (value is DateTime) return DateFormat("dd MMM yyyy").format(value);
 
-    // kalau server udah kasih string tanggal yang rapi, pakai apa adanya
+    if (value is DateTime) {
+      return DateFormat("dd MMM yyyy").format(value);
+    }
+
     final s = value.toString().trim();
-    return s.isEmpty ? "-" : s;
+    if (s.isEmpty || s.toLowerCase() == "null" || s == "-") return "-";
+
+    final dt = DateTime.tryParse(s);
+    if (dt != null) {
+      return DateFormat("dd MMM yyyy").format(dt.toLocal());
+    }
+
+    final firstPart = s.split(' ').first;
+    final dt2 = DateTime.tryParse(firstPart);
+    if (dt2 != null) {
+      return DateFormat("dd MMM yyyy").format(dt2.toLocal());
+    }
+
+    return s;
   }
 
   static String _beautifyKey(String key) {

@@ -502,7 +502,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
           context: context,
           data: d,
           child: Text(
-            "${d.polisMulai.toString().substring(0, 10)} → "
+            "${d.polisMulai.toString().substring(0, 10)} - "
                 "${d.polisAkhir.toString().substring(0, 10)}",
             maxLines: compact ? 2 : null,
             overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,

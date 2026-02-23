@@ -227,7 +227,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
   void onSaveForm() {
     // validasi rating: minimal pilih 1 bintang
     if (_nilaiSuka <= 0) {
-      addError(error: "Rating wajib dipilih");
+      addError(error: "Rating wajib dipilih"); 
     }
 
     if (_formKey.currentState!.validate()) {
@@ -271,7 +271,7 @@ class _StarRating extends StatelessWidget {
     required this.onChanged,
     this.size = 44,
     required this.activeColor,
-    required this.inactiveColor,
+    required this.inactiveColor, 
     required this.max,
   });
 

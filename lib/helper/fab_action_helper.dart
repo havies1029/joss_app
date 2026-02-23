@@ -6,7 +6,6 @@ import '../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import '../blocs/gen_status_aset/statusasetcari_bloc.dart';
 import '../pages/beli_polis/mobile/beli_polis_page.dart';
-import '../pages/management_polis/detail_management_page/detail_management_widget_2.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -406,7 +405,7 @@ class FabActionHelper {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => DetailManagementPolisPage2(
+        builder: (_) => DetailManagementPolisPage(
           data: item,
           cobId: cobId,
           statusId: "", // <- status tidak dipakai lagi untuk routing proses

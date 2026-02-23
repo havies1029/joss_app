@@ -64,6 +64,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     super.dispose();
   }
 
+  bool _toKlaimTriggered = false;
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -72,12 +74,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
           listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
           listener: (context, state) {
             if (!mounted) return;
-            if (!state.isSaved) return;
+            if (state.hasFailure) return;
 
-            if (!state.hasFailure) {
-              setState(() {
-                regklaim1Id = state.regklaim1Id;
-              });
+            if (_toKlaimTriggered) return;
+            _toKlaimTriggered = true;
+
+            final id = state.regklaim1Id;
+            regklaim1formBloc.add(RegklaimToKlaimEvent(regklaim1Id: id));
 
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -99,7 +102,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
             // debugPrint("AWAADSDDASAS");
             // debugPrint("regklaim1Id = ${regklaim1Id}");
-          },
         ),
       ],
       child: Padding(

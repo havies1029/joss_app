@@ -41,7 +41,7 @@ class Klaimmvaccordioncard extends StatelessWidget {
               child: child,
             ),
             crossFadeState:
-            isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 200),
           )
         ],

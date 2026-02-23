@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:flutter/material.dart'; // ⬅️ untuk snackbar
+import 'package:flutter/material.dart';
 
 class MobileDownloadHelper {
   static Future<void> download({
@@ -16,15 +16,10 @@ class MobileDownloadHelper {
   }) async {
     final messenger = ScaffoldMessenger.of(context);
 
-    final hasPermission = await Permission.manageExternalStorage.request().isGranted;
-    if (!hasPermission) {
-      // messenger.showSnackBar(
-      //   const SnackBar(content: Text('❌ Izin penyimpanan ditolak.')),
-      // );
-      return;
-    }
+    final hasPermission =
+    await Permission.manageExternalStorage.request().isGranted;
+    if (!hasPermission) return;
 
-    // ✅ Folder download yang terlihat di File Manager
     final directory = Directory('/storage/emulated/0/Download');
     if (!await directory.exists()) {
       await directory.create(recursive: true);
@@ -45,16 +40,23 @@ class MobileDownloadHelper {
         throw UnsupportedError("Format $format tidak didukung di mobile.");
       }
 
-      // messenger.showSnackBar(
-      //   SnackBar(content: Text('✅ Berhasil mengunduh ke folder Download:\n$fileName')),
-      // );
-
       await OpenFilex.open(file.path);
     } catch (e) {
-      // messenger.showSnackBar(
-      //   SnackBar(content: Text('❌ Gagal menyimpan file: $e')),
-      // );
+      // handle error
     }
+  }
+
+  static Future<File> generatePdfFile({
+    required String fileName,
+    required List<Map<String, dynamic>> data,
+  }) async {
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName');
+
+    final pdf = _generatePdf(data);
+    await file.writeAsBytes(await pdf.save());
+
+    return file;
   }
 
   static pw.Document _generatePdf(List<Map<String, dynamic>> data) {
@@ -65,7 +67,9 @@ class MobileDownloadHelper {
       pw.Page(
         build: (context) => pw.Table.fromTextArray(
           headers: headers,
-          data: data.map((row) => headers.map((h) => row[h].toString()).toList()).toList(),
+          data: data
+              .map((row) => headers.map((h) => row[h].toString()).toList())
+              .toList(),
         ),
       ),
     );

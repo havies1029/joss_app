@@ -4,6 +4,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
 import 'package:joss_app/pages/perbaruiklaimmv/klaimmvstatuscari_tile_widget.dart';
 import 'package:joss_app/models/perbaruiklaimmv/klaimmvstatuscari_model.dart';
+import 'package:joss_app/widgets/apptheme/radio_button.dart';
 
 class KlaimmvstatuscariListWidget extends StatefulWidget {
 	final String searchText;
@@ -36,61 +37,67 @@ class KlaimmvstatuscariListWidgetState extends State<KlaimmvstatuscariListWidget
 	Widget build(BuildContext context) {
 		klaimmvstatuscariBloc = BlocProvider.of<KlaimmvstatuscariBloc>(context);
 		return BlocConsumer<KlaimmvstatuscariBloc, KlaimmvstatuscariState>(
-			builder: (context, state) {
-		if (state.status == ListStatus.success) {
-			if (!state.hasReachedMax) {
-				klaimmvstatuscari.addAll(state.items);
-			}
+				builder: (context, state) {
+					if (state.status == ListStatus.success) {
+						if (!state.hasReachedMax) {
+							klaimmvstatuscari.addAll(state.items);
+						}
 
-			return state.items.isNotEmpty
-					? Column(
-				children: state.items.map((item) {
-					return RadioListTile<bool>(
-						value: true,
-						groupValue: item.isPilih,
-						onChanged: null, // ⛔ tidak aktif, cuma tampilan
-						title: Text(
-							item.statusNama ?? '',
-							style: const TextStyle(
-								color: Colors.white,
-								fontSize: 14,
+						return state.items.isNotEmpty
+								? Column(
+							children: state.items.map((item) {
+								return Padding(
+									padding: const EdgeInsets.symmetric(vertical: 12),
+									child: Row(
+										children: [
+											RadioButton(
+													isSelected: item.isPilih == true,
+													size: 18,
+													innerSize: 10,
+													borderWidth: 1,
+													selectedColor: Color(0xFF555555),
+													unselectedColor: sGrey,
+													onTap: null
+											),
+											const SizedBox(width: 16),
+											Expanded(
+												child: Text(
+														item.statusNama ?? '',
+														style: bodyTextStyle(context, fontSize: 16)
+												),
+											),
+										],
+									),
+								);
+							}).toList(),
+						)
+								: const Center(
+							child: Padding(
+								padding: EdgeInsets.only(top: 40),
+								child: Text(
+									'No Data Available',
+									style: TextStyle(
+										color: Colors.red,
+										fontSize: 12,
+										fontWeight: FontWeight.bold,
+									),
+								),
 							),
-						),
-						activeColor: Colors.white,
-						controlAffinity: ListTileControlAffinity.leading,
-						dense: true,
-						visualDensity:
-						const VisualDensity(horizontal: -2, vertical: -2),
-					);
-				}).toList(),
-			)
-					: const Center(
-				child: Padding(
-					padding: EdgeInsets.only(top: 40),
-					child: Text(
-						'No Data Available',
-						style: TextStyle(
-							color: Colors.red,
-							fontSize: 12,
-							fontWeight: FontWeight.bold,
-						),
-					),
-				),
-			);
-		} else {
-			return const Center(
-					child: Text(
-						'No Data Available!!',
-						style: TextStyle(
-							color: Colors.red,
-							fontSize: 12.0,
-							fontWeight: FontWeight.bold),
-					),
-				);
-			}
-			}, buildWhen: (previous, current) {
-				return (current.status == ListStatus.success);
-			}, listener: (context, state) {}
+						);
+					} else {
+						return const Center(
+							child: Text(
+								'No Data Available!!',
+								style: TextStyle(
+										color: Colors.red,
+										fontSize: 12.0,
+										fontWeight: FontWeight.bold),
+							),
+						);
+					}
+				}, buildWhen: (previous, current) {
+			return (current.status == ListStatus.success);
+		}, listener: (context, state) {}
 		);
 	}
 	void _onScroll() {

@@ -48,67 +48,67 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
           if (state.status == ListStatus.success) {
             return state.items.isNotEmpty
                 ? Column(
-              children: [
-                ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    controller: _scrollController,
-                    itemCount: state.items.length,
-                    itemBuilder: (_, index) => Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 3),
-                      padding: const EdgeInsets.all(0.2),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0)),
-                      child: Klaim5cariTileWidget(
-                        jenisDocLain: state.items[index].jenisDocLain,
-                        klaim5Id: state.items[index].klaim5Id,
-                        mjenisdocId: state.items[index].mjenisdocId,
-                        jenisNama: state.items[index].jenisNama,
-                        fileUrl: state.items[index].fileUrl,
-                        fileName: state.items[index].fileName,
-                        localPath: state.items[index].localPath,
-                        mime: state.items[index].mimeType,
-                        fileSizeBytes:
-                        state.items[index].fileSizeBytes,
-                        onPickFile: () =>
-                            _pickFile(state.items[index]),
-                        onPickPhoto: () =>
-                            _pickPhoto(state.items[index]),
-                        onDelete: () =>
-                            _deleteFile(state.items[index]),
-                        onPreview: () => _preview(state.items[index]),
+                    children: [
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          controller: _scrollController,
+                          itemCount: state.items.length,
+                          itemBuilder: (_, index) => Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 3),
+                                padding: const EdgeInsets.all(0.2),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15.0)),
+                                child: Klaim5cariTileWidget(
+                                  jenisDocLain: state.items[index].jenisDocLain,
+                                  klaim5Id: state.items[index].klaim5Id,
+                                  mjenisdocId: state.items[index].mjenisdocId,
+                                  jenisNama: state.items[index].jenisNama,
+                                  fileUrl: state.items[index].fileUrl,
+                                  fileName: state.items[index].fileName,
+                                  localPath: state.items[index].localPath,
+                                  mime: state.items[index].mimeType,
+                                  fileSizeBytes:
+                                      state.items[index].fileSizeBytes,
+                                  onPickFile: () =>
+                                      _pickFile(state.items[index]),
+                                  onPickPhoto: () =>
+                                      _pickPhoto(state.items[index]),
+                                  onDelete: () =>
+                                      _deleteFile(state.items[index]),
+                                  onPreview: () => _preview(state.items[index]),
+                                ),
+                              )),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4, 2, 4, 12),
+                        child: Klaim5TambahDokumenForm(
+                          onPickFileDokLain: (judul) async {
+                            await pickNewFileDokLain(widget.klaim1Id, judul);
+                            return true;
+                          },
+                          onPickPhoto: (judul) async {
+                            // TODO: panggil camera
+                            // final judul = _judulCtrl.text.trim();
+                            return true;
+                          },
+                        ),
                       ),
-                    )),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 2, 4, 12),
-                  child: Klaim5TambahDokumenForm(
-                    onPickFileDokLain: (judul) async {
-                      await pickNewFileDokLain(widget.klaim1Id, judul);
-                      return true;
-                    },
-                    onPickPhoto: (judul) async {
-                      // TODO: panggil camera
-                      // final judul = _judulCtrl.text.trim();
-                      return true;
-                    },
-                  ),
-                ),
-              ],
-            )
+                    ],
+                  )
                 : const Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 80.0),
-                child: Text(
-                  'No Data Available!!',
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 80.0),
+                      child: Text(
+                        'No Data Available!!',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
           } else {
             return const Center(
               child: Text(
@@ -201,7 +201,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
 
     if (isPdf && isLocal) {
       final controller =
-      PdfControllerPinch(document: PdfDocument.openFile(pathOrUrl));
+          PdfControllerPinch(document: PdfDocument.openFile(pathOrUrl));
       await showDialog(
         context: context,
         builder: (_) => Dialog(

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/helper/fab_action_helper.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
-import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
 
 class FabActionPolicy {
-  // === Inject dari tempat kamu (atau keep static) ===
   final List<ActionMenuItem> masterActions;
   final ActionMenuItem downloadPolisItem;
   final ActionMenuItem downloadParItem;
@@ -85,31 +83,39 @@ class FabActionPolicy {
     ActionType.lihatPolis,
   };
 
-  // ---- helper ambil field dari object atau map ----
-  String _getField(Object item, String key) {
+  // =========================
+  // PARSE FLAG
+  // =========================
+  bool _canReaktif(Object item) {
+    final raw = _readBool(item, "isReaktif");
+    return raw == false; // false => boleh (enabled)
+  }
+
+  bool _canRenewal(Object item) {
+    final raw = _readBool(item, "isRenewal");
+    return raw == false; // false => boleh (enabled)
+  }
+
+  bool? _readBool(Object item, String key) {
     try {
       final dyn = item as dynamic;
-      final v = (dyn?.toJson != null) ? null : null; // no-op, just to avoid analyzer noise
-      final val = (dyn as dynamic);
-      final got = (val as dynamic);
-      // akses dynamic: item.key
-      final res = (got as dynamic);
-      // kita coba via noSuchMethod catch:
-      // ignore: unnecessary_cast
-      final value = (item as dynamic);
-      // ignore: avoid_dynamic_calls
-      return ((value as dynamic).__lookup(key) ?? "").toString();
+      final raw = switch (key) {
+        "isReaktif" => dyn.isReaktif,
+        "isRenewal" => dyn.isRenewal,
+        _ => null,
+      };
+      return raw is bool ? raw : null;
     } catch (_) {
-      // fallback map
-      if (item is Map) return (item[key] ?? "").toString();
-      return "";
+      if (item is Map) {
+        final raw = item[key];
+        return raw is bool ? raw : null;
+      }
+      return null;
     }
   }
 
-  // Karena dart gak punya reflection aman, kita bikin getter manual list yang dipakai:
   String _prosesSource(Object item) {
     try {
-      // ignore: avoid_dynamic_calls
       return ((item as dynamic).prosesSource ?? "").toString();
     } catch (_) {
       if (item is Map) return (item["prosesSource"] ?? "").toString();
@@ -119,7 +125,6 @@ class FabActionPolicy {
 
   String _prosesId(Object item) {
     try {
-      // ignore: avoid_dynamic_calls
       return ((item as dynamic).prosesId ?? "").toString();
     } catch (_) {
       if (item is Map) return (item["prosesId"] ?? "").toString();
@@ -127,80 +132,52 @@ class FabActionPolicy {
     }
   }
 
-  bool? _parseBool(dynamic raw) {
-    if (raw == null) return null;
-
-    if (raw is bool) return raw;
-
-    if (raw is int) {
-      if (raw == 1) return true;
-      if (raw == 0) return false;
-    }
-
-    if (raw is String) {
-      final v = raw.trim().toLowerCase();
-      if (v == 'true' || v == '1') return true;
-      if (v == 'false' || v == '0') return false;
-    }
-
-    return null;
-  }
-
-  bool? _isReaktif(Object item) {
-    try {
-      return _parseBool((item as dynamic).isReaktif);
-    } catch (_) {
-      if (item is Map) {
-        return _parseBool(item["isReaktif"]);
-      }
-      return null;
-    }
-  }
-
-  bool? _isRenewal(Object item) {
-    try {
-      return _parseBool((item as dynamic).isRenewal);
-    } catch (_) {
-      if (item is Map) {
-        return _parseBool(item["isRenewal"]);
-      }
-      return null;
-    }
-  }
-
-  String _filePolisId(Object item) {
-    try {
-      // ignore: avoid_dynamic_calls
-      return ((item as dynamic).filePolisId ?? "").toString();
-    } catch (_) {
-      if (item is Map) return (item["filePolisId"] ?? "").toString();
-      return "";
-    }
-  }
-
-  String _filePolisParId(Object item) {
-    try {
-      // ignore: avoid_dynamic_calls
-      return ((item as dynamic).filePolisParId ?? "").toString();
-    } catch (_) {
-      if (item is Map) return (item["filePolisParId"] ?? "").toString();
-      return "";
-    }
-  }
-
-  String _filePolisEqId(Object item) {
-    try {
-      // ignore: avoid_dynamic_calls
-      return ((item as dynamic).filePolisEqId ?? "").toString();
-    } catch (_) {
-      if (item is Map) return (item["filePolisEqId"] ?? "").toString();
-      return "";
-    }
-  }
-
   bool _canLacak(Object item) =>
       _prosesSource(item).isNotEmpty && _prosesId(item).isNotEmpty;
 
+  // =========================
+  // DEBUG HELPERS (RENEWAL)
+  // =========================
+  void _dbg(String msg) => debugPrint(msg);
+
+  void _dbgRenewal({
+    required String cobId,
+    required String statusId,
+    required Object selectedItem,
+    required Set<ActionType> allowedByCob,
+    required Set<ActionType> allowedByStatus,
+    required Set<ActionType> allowedTypes,
+    required List<ActionMenuItem> base,
+    required bool? renewalFlag,
+  }) {
+    dynamic rawIsRenewal;
+    try {
+      rawIsRenewal = (selectedItem as dynamic).isRenewal;
+    } catch (_) {
+      if (selectedItem is Map) rawIsRenewal = (selectedItem as Map)["isRenewal"];
+    }
+
+    final hasRenewalInMaster =
+    masterActions.any((a) => a.type == ActionType.perpanjangan);
+
+    _dbg("========== FAB RENEWAL DEBUG ==========");
+    _dbg("cobId=$cobId | statusId=$statusId | selectedType=${selectedItem.runtimeType}");
+    _dbg("hasRenewalInMaster=$hasRenewalInMaster");
+    _dbg("allowedByCob has renewal=${allowedByCob.contains(ActionType.perpanjangan)}");
+    _dbg("allowedByStatus=$allowedByStatus");
+    _dbg("allowedByStatus has renewal=${allowedByStatus.contains(ActionType.perpanjangan)}");
+    _dbg("allowedTypes=$allowedTypes");
+    _dbg("allowedTypes has renewal=${allowedTypes.contains(ActionType.perpanjangan)}");
+    _dbg("rawIsRenewal=$rawIsRenewal | rawType=${rawIsRenewal.runtimeType}");
+    _dbg("parsed renewalFlag=$renewalFlag");
+    _dbg("base types=${base.map((e) => e.type).toList()}");
+    _dbg("base has renewal=${base.any((e) => e.type == ActionType.perpanjangan)}");
+    _dbg("======================================");
+  }
+
+  // =========================
+  // MAIN
+  // =========================
   List<ActionMenuItem> computeActions({
     required String cobId,
     required String statusId,
@@ -208,17 +185,23 @@ class FabActionPolicy {
   }) {
     final allowedByCob = cobAllowedMatrix[cobId] ?? othersCobAllowed;
 
+    // --- Case: belum pilih item ---
     if (selectedItem == null) {
-      return masterActions
+      final res = masterActions
           .where((a) => allowedByCob.contains(a.type))
           .map((a) => a.copyWith(isEnabled: alwaysEnabled.contains(a.type)))
           .toList();
+
+      _dbg("FAB DEBUG (selectedItem=null) cobId=$cobId | res=${res.map((e) => "${e.type}:${e.isEnabled}").toList()}");
+      return res;
     }
 
-    final reaktifFlag = _isReaktif(selectedItem);
-    final renewalFlag = _isRenewal(selectedItem);
+    // --- Case: sudah pilih item ---
+    final canReaktif = _canReaktif(selectedItem);
+    final canRenewal = _canRenewal(selectedItem);
 
-    final allowedByStatus = statusIdEnabledMatrix[statusId] ?? const <ActionType>{};
+    final allowedByStatus =
+        statusIdEnabledMatrix[statusId] ?? const <ActionType>{};
 
     final lacakAllowed =
         allowedByStatus.contains(ActionType.lacakPolis) && _canLacak(selectedItem);
@@ -233,24 +216,33 @@ class FabActionPolicy {
         .where((a) => allowedByCob.contains(a.type) && allowedTypes.contains(a.type))
         .map((a) {
       final enabled = switch (a.type) {
-        ActionType.aktifkanKembali => (reaktifFlag == true),
-        ActionType.perpanjangan => (renewalFlag == true),
+        ActionType.aktifkanKembali => canReaktif,
+        ActionType.perpanjangan => canRenewal,
         _ => true,
       };
       return a.copyWith(isEnabled: enabled);
     })
         .toList();
 
-    final downloadAllowedByStatus =
-    allowedByStatus.contains(ActionType.unduhPolis);
+    // === DEBUG khusus renewal (perpanjangan) ===
+    _dbgRenewal(
+      cobId: cobId,
+      statusId: statusId,
+      selectedItem: selectedItem,
+      allowedByCob: allowedByCob,
+      allowedByStatus: allowedByStatus,
+      allowedTypes: allowedTypes,
+      base: base,
+      renewalFlag: canRenewal,
+    );
 
-    // ✅ aturan download/lihat:
-    // - hanya COB 10002 yang punya Par/Eq
-    // - selain itu (termasuk cob aneh / 10006 / dst) pakai filePolisId biasa
+    // DOWNLOAD SECTION (biarkan seperti punyamu)
+    final downloadAllowedByStatus = allowedByStatus.contains(ActionType.unduhPolis);
+
     if (downloadAllowedByStatus) {
       if (cobId == "10002") {
         final parId = _filePolisParId(selectedItem);
-        final eqId  = _filePolisEqId(selectedItem);
+        final eqId = _filePolisEqId(selectedItem);
 
         if (allowedByCob.contains(ActionType.lihatPolisPar)) {
           base.add(downloadParItem.copyWith(isEnabled: parId.isNotEmpty));
@@ -267,6 +259,33 @@ class FabActionPolicy {
     }
 
     return base;
+  }
+
+  String _filePolisId(Object item) {
+    try {
+      return ((item as dynamic).filePolisId ?? "").toString();
+    } catch (_) {
+      if (item is Map) return (item["filePolisId"] ?? "").toString();
+      return "";
+    }
+  }
+
+  String _filePolisParId(Object item) {
+    try {
+      return ((item as dynamic).filePolisParId ?? "").toString();
+    } catch (_) {
+      if (item is Map) return (item["filePolisParId"] ?? "").toString();
+      return "";
+    }
+  }
+
+  String _filePolisEqId(Object item) {
+    try {
+      return ((item as dynamic).filePolisEqId ?? "").toString();
+    } catch (_) {
+      if (item is Map) return (item["filePolisEqId"] ?? "").toString();
+      return "";
+    }
   }
 
   bool isActionAllowed({

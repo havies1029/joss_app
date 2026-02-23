@@ -522,6 +522,7 @@ class SppamvCrudFormPageFormState extends State<SppamvCrudFormPage> {
 
 	Widget buildFieldMmvjnscoverId(){
 		return buildFieldComboMMvjnscover(
+			enabled: true,
 			comboKey: comboMMvjnscoverKey,
 			labelText: 'mmvjnscoverId',
 			initItem: fieldComboMMvjnscover,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/blocs/klaimbatal/klaimbatalcrud_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/mstatusrincicari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
@@ -62,17 +63,27 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     return MultiBlocListener(
       listeners: [
         BlocListener<MstatusrinciCariBloc, MstatusrinciCariState>(
-            listener: (context, state) {
-              // Ketika selectedStatusId berubah, refresh data KlaimringkasCariBloc
-              context.read<GroupcobCariBloc>().add(
-                RefreshGroupcobCariEvent(
-                  statusId: state.selectedStatusId, searchText: state.searchText,
-                ),
-              );
-            }, listenWhen: (previous, current) {
-          return ((previous.selectedStatusId != current.selectedStatusId) ||
-              (previous.searchText != current.searchText));
-        }),
+          listener: (context, state) {
+            context.read<GroupcobCariBloc>().add(
+              RefreshGroupcobCariEvent(
+                statusId: state.selectedStatusId,
+                searchText: state.searchText,
+              ),
+            );
+          },
+          listenWhen: (previous, current) {
+            return ((previous.selectedStatusId != current.selectedStatusId) ||
+                (previous.searchText != current.searchText));
+          },
+        ),
+
+        BlocListener<KlaimbatalcrudBloc, KlaimbatalcrudState>(
+          listener: (context, state) {
+            if (state.isSaved) {
+              _refreshData();
+            }
+          },
+        ),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

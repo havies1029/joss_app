@@ -161,15 +161,15 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                    "Apakah kamu yakin Klaim ini dibatalkan?",
-                    textAlign: TextAlign.center,
-                    style: headingStyle(context, fontSize: 18)
+                  "Apakah kamu yakin Klaim ini dibatalkan?",
+                  textAlign: TextAlign.center,
+                  style: headingStyle(context, fontSize: 18)
                 ),
                 const SizedBox(height: 8),
                 Text(
-                    "Setelah dibatalkan, proses klaim akan dihentikan.",
-                    textAlign: TextAlign.center,
-                    style: bodyTextStyle(context, fontSize: 14)
+                  "Setelah dibatalkan, proses klaim akan dihentikan.",
+                  textAlign: TextAlign.center,
+                  style: bodyTextStyle(context, fontSize: 14)
                 ),
                 const SizedBox(height: 12),
                 Row(

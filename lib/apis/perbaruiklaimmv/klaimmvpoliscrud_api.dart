@@ -93,6 +93,19 @@ class KlaimmvpoliscrudAPI {
 		AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 
 		try {
+			// ===============================
+			// DEBUG REQUEST
+			// ===============================
+			print("=== REQUEST ===");
+			print("URL      : $uri");
+			print("Method   : GET");
+			print("Headers  :");
+			print("  Content-Type : application/json");
+			print("  Accept       : application/json");
+			print("  Authorization: Bearer ${AppData.userToken}");
+			print("klaim1Id : $klaim1Id");
+			print("================");
+
 			final http.Response response = await http.get(
 				uri,
 				headers: <String, String>{
@@ -102,6 +115,14 @@ class KlaimmvpoliscrudAPI {
 				},
 			);
 
+			// ===============================
+			// DEBUG RESPONSE
+			// ===============================
+			print("=== RESPONSE ===");
+			print("Status Code : ${response.statusCode}");
+			print("Body        : ${response.body}");
+			print("================");
+
 			if (response.statusCode == 200) {
 				var returnData =
 				KlaimmvpoliscrudModel.fromJson(jsonDecode(response.body));
@@ -109,12 +130,17 @@ class KlaimmvpoliscrudAPI {
 			}
 
 			if (response.statusCode == 404) {
+				print("Data tidak ditemukan (404)");
 				return null;
 			}
 
 			throw HttpException(
 					'HTTP ${response.statusCode}: ${response.body}');
 		} catch (e, stackTrace) {
+			print("=== ERROR ===");
+			print(e);
+			print(stackTrace);
+			print("==============");
 
 			throw Exception("Failed to load data: $e");
 		}
