@@ -7,7 +7,6 @@ import 'package:joss_app/common/constants.dart';
 
 import '../../../../blocs/payment/historybayar2cari_bloc.dart';
 import '../../../../models/payment/historybayarcari_model.dart';
-import 'detail_riwayat/riwayat_detail_table_page.dart';
 import 'detail_riwayat/riwayat_detail_table_page_remake.dart';
 
 class RiwayatTablePageRemake extends StatefulWidget {

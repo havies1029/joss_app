@@ -5,6 +5,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../models/payment/invbayarvaform_model.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
@@ -33,6 +34,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   bool _isInvoicePayloadApplied = false;
   String? _payloadInvoiceId;
 
+  Timer? _pollingTimer;
+  bool _isPollingStarted = false;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +48,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
   @override
   void dispose() {
+    _stopInvoicePolling(); 
     fieldBatasBayarController.dispose();
     fieldVaNoController.dispose();
     fieldTotalBayarController.dispose();
@@ -95,6 +100,18 @@ class PaymentProcessFormState extends State<PaymentProcess> {
           listener: (context, state) {
             if (state.record != null) {
               _payloadInvoiceOnce(state.record!);
+
+              // START polling setelah record tampil
+              _startInvoicePolling();
+            }
+          },
+        ),
+        BlocListener<DnRekap2invBloc, DnRekap2invState>(
+          listenWhen: (prev, curr) =>
+          prev.isProcessed != curr.isProcessed && curr.isProcessed,
+          listener: (context, state) {
+            if (state.paymentStatus == "40") {
+              _stopInvoicePolling();
             }
           },
         ),
@@ -156,48 +173,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                             onPressed: _dismissDialog,
                             child: const Text(
                               'Close',
-                              style: TextStyle(fontSize: 13),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        height: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 30.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              context.read<DnRekap2invBloc>().add(
-                                CheckInvoiceStatusEvent(
-                                  invoiceId: widget.recordId,
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              'Cek Payment Manual',
-                              style: TextStyle(fontSize: 13),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        height: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 30.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              context.read<DnRekap2invBloc>().add(
-                                ForcePaymentViaVaEvent(
-                                  invoiceId: widget.recordId,
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              'Backend -> Payment Via VA',
                               style: TextStyle(fontSize: 13),
                             ),
                           ),
@@ -329,6 +304,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   }
 
   void _dismissDialog() {
+    _stopInvoicePolling();
     Navigator.pop(context);
   }
 
@@ -445,5 +421,30 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         ),
       ),
     );
+  }
+
+  void _startInvoicePolling() {
+    if (_isPollingStarted) return;
+    _isPollingStarted = true;
+
+    // optional: langsung cek sekali saat mulai
+    context.read<DnRekap2invBloc>().add(
+      CheckInvoiceStatusEvent(invoiceId: widget.recordId),
+    );
+
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (t) {
+      if (!mounted) return;
+
+      context.read<DnRekap2invBloc>().add(
+        CheckInvoiceStatusEvent(invoiceId: widget.recordId),
+      );
+    });
+  }
+
+  void _stopInvoicePolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+    _isPollingStarted = false;
   }
 }
