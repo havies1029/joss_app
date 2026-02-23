@@ -6,6 +6,7 @@ import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
 
 // import '../../klaimlacak/klaimprogresscari_main.dart';
+import '../../klaimbatal/mobile/klaimbatalcrud_form.dart';
 import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
 import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
 import '../../perbaruiklaimpar/mobile/perbaruiklaimpar_page.dart';
@@ -130,7 +131,21 @@ class FabActionKlaim extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => KlaimProgressCariMainPage(klaim1Id: klaim1Id),
+              builder: (_) => KlaimProgressCariMainPage(
+                klaim1Id: klaim1Id,
+              ),
+            ),
+          );
+          return;
+        }
+
+        if (type == ActionType.batalKlaim) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => KlaimbatalcrudFormPage(
+                klaim1Id: klaim1Id,
+              ),
             ),
           );
           return;

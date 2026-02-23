@@ -116,10 +116,10 @@ class _HeaderCell extends StatelessWidget {
   final TextAlign align;
 
   const _HeaderCell(
-    this.text, {
-    required this.flex,
-    this.align = TextAlign.left,
-  });
+      this.text, {
+        required this.flex,
+        this.align = TextAlign.left,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -156,12 +156,12 @@ class _BodyCell extends StatelessWidget {
   final int maxLines;
 
   const _BodyCell(
-    this.text, {
-    required this.flex,
-    this.align = TextAlign.left,
-    required this.color,
-    this.maxLines = 2,
-  });
+      this.text, {
+        required this.flex,
+        this.align = TextAlign.left,
+        required this.color,
+        this.maxLines = 2,
+      });
 
   @override
   Widget build(BuildContext context) {

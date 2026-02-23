@@ -114,7 +114,7 @@ class KlaimProgressActiveCard extends StatelessWidget {
 
                 if (showJadwalBayar && (jadwalBayarItems?.isNotEmpty ?? false)) ...[
                   const SizedBox(height: 12),
-                  JadwalBayarTable(items: jadwalBayarItems!),        
+                  JadwalBayarTable(items: jadwalBayarItems!),
 
                 ],
               ],

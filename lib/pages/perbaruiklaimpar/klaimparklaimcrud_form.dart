@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/repositories/combobox/combomjenisrugi_repository.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
@@ -11,7 +12,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 
 
 class KlaimparklaimcrudFormPage extends StatefulWidget {
-  final String cobGroupId;
+	final String cobGroupId;
 	final String viewMode;
 	final String recordId;
 
@@ -36,8 +37,8 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	var fieldPicJabatanController = TextEditingController();
 	var fieldPicNamaController = TextEditingController();
 	var fieldPicTelpController = TextEditingController();
-  var isPolisJps = false;
-  var fieldCobNamaController = TextEditingController();
+	var isPolisJps = false;
+	var fieldCobNamaController = TextEditingController();
 
 	@override
 	void initState() {
@@ -53,86 +54,89 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 		return BlocConsumer<KlaimparklaimcrudBloc, KlaimparklaimcrudState>(
 			builder: (context, state) {
 				return SingleChildScrollView(
-					child: Padding(
-						padding: const EdgeInsets.all(8.0),
-						child: Form(
+					child: Form(
 							key: _formKey,
 							child: Column(
 								children: [
-									const SizedBox(height: 10),
-                  if (widget.cobGroupId == "10003") buildFieldCobNama(),
-									buildFieldDol(),
-									buildFieldLaporJps(),
+									if (widget.cobGroupId == "10003") ...[
+										buildFieldCobNama(),
+										const SizedBox(height: hPadding),
+									],
+									Row(
+										children: [
+											Flexible(child: buildFieldDol()),
+											const SizedBox(width: 8),
+											Flexible(child: buildFieldLaporJps()),
+										],
+									),
+									const SizedBox(height: hPadding),
 									buildFieldLaporAsuransi(),
+									const SizedBox(height: hPadding),
 									buildFieldPicNama(),
+									const SizedBox(height: hPadding),
 									buildFieldPicJabatan(),
+									const SizedBox(height: hPadding),
 									buildFieldPicEmail(),
+									const SizedBox(height: hPadding),
 									buildFieldPicTelp(),
+									const SizedBox(height: hPadding),
 									buildFieldMjenisrugiId(),
+									const SizedBox(height: hPadding),
 									buildFieldPenyebab(),
+									const SizedBox(height: hPadding),
 									buildFieldKeterangan(),
 									const SizedBox(height: 25),
 									FormError(
 										errors: errors,
 										key: null,
-									),									
+									),
 								],
 							)),
-					),
 				);
-				},
-				listener: (context, state) {
-					if (state.isLoaded) {
-						if (state.record != null){
-							fieldDolController.text = state.record!.dol.toIso8601String();
-							fieldKeteranganController.text = state.record!.keterangan;
-							fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
-							fieldLaporJpsController.text = state.record!.laporJps.toIso8601String();
-							fieldPenyebabController.text = state.record!.penyebab;
-							fieldPicEmailController.text = state.record!.picEmail;
-							fieldPicJabatanController.text = state.record!.picJabatan;
-							fieldPicNamaController.text = state.record!.picNama;
-							fieldPicTelpController.text = state.record!.picTelp;
-              isPolisJps = state.record!.isPolisJps;
-              fieldCobNamaController.text = state.record!.cobNama;
-						}
-						fieldComboMJenisrugi = state.comboMJenisrugi;
+			},
+			listener: (context, state) {
+				if (state.isLoaded) {
+					if (state.record != null){
+						fieldDolController.text = state.record!.dol.toIso8601String();
+						fieldKeteranganController.text = state.record!.keterangan;
+						fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
+						fieldLaporJpsController.text = state.record!.laporJps.toIso8601String();
+						fieldPenyebabController.text = state.record!.penyebab;
+						fieldPicEmailController.text = state.record!.picEmail;
+						fieldPicJabatanController.text = state.record!.picJabatan;
+						fieldPicNamaController.text = state.record!.picNama;
+						fieldPicTelpController.text = state.record!.picTelp;
+						isPolisJps = state.record!.isPolisJps;
+						fieldCobNamaController.text = state.record!.cobNama;
 					}
-				},
-			);
-		}
+					fieldComboMJenisrugi = state.comboMJenisrugi;
+				}
+			},
+		);
+	}
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-		klaimparklaimcrudBloc.add(
-			KlaimparklaimcrudLihatEvent(recordId: widget.recordId));
+			klaimparklaimcrudBloc.add(
+					KlaimparklaimcrudLihatEvent(recordId: widget.recordId));
 		}
 	}
 
-  Widget buildFieldCobNama() {
-    return TextFormField(
-      enabled: false,
-      controller: fieldCobNamaController,
-      decoration: const InputDecoration(
-        labelText: "Nama COB",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-      )
-    );
-  }
+	Widget buildFieldCobNama() {
+		return appTextField(
+			label: 'Kategori Asuransi',
+			enabled: false,
+			controller: fieldCobNamaController,
+		);
+	}
 
 	Widget buildFieldDol(){
-		return DateTimeFormField(
-			mode: DateTimeFieldPickerMode.date,
-			dateFormat: DateFormat('dd/MM/yyyy'),
+		return AppDateField(
 			initialValue: DateTime.tryParse(fieldDolController.text),
-			decoration: const InputDecoration(
-				labelText: "Tanggal Kejadian (DOL)",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value != null) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 					fieldDolController.text = value.toIso8601String();
-          klaimparklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
+					klaimparklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
 				}
 
 			},
@@ -142,25 +146,23 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 					return "";
 				}
 				return null;
-			},
+			}, label: 'Tanggal Kejadian',
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
 		);
 	}
 
 	Widget buildFieldKeterangan(){
-		return TextFormField(
+		return appTextField(
+			label: 'Keterangan',
 			keyboardType: TextInputType.multiline,
-			minLines: 3,
 			maxLines: 10,
 			controller: fieldKeteranganController,
-			decoration: const InputDecoration(
-				labelText: "Keterangan",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
-        klaimparklaimcrudBloc.add(FieldKeteranganChangedEvent(keterangan: value));
+				klaimparklaimcrudBloc.add(FieldKeteranganChangedEvent(keterangan: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -173,19 +175,16 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	}
 
 	Widget buildFieldLaporAsuransi(){
-		return DateTimeFormField(
-			mode: DateTimeFieldPickerMode.date,
-			dateFormat: DateFormat('dd/MM/yyyy'),
+		return AppDateField(
+			label: 'Tanggal ke Asuransi',
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
 			initialValue: DateTime.tryParse(fieldLaporAsuransiController.text),
-			decoration: const InputDecoration(
-				labelText: "Lapor Asuransi",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value != null) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 					fieldLaporAsuransiController.text = value.toIso8601String();
-          klaimparklaimcrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
+					klaimparklaimcrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
 				}
 			},
 			validator: (value) {
@@ -199,19 +198,16 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	}
 
 	Widget buildFieldLaporJps(){
-		return DateTimeFormField(
-			mode: DateTimeFieldPickerMode.date,
-			dateFormat: DateFormat('dd/MM/yyyy'),
+		return AppDateField(
+			label: 'Tanggal ke JPS',
+			firstDate: DateTime(2000),
+			lastDate: DateTime(2100),
 			initialValue: DateTime.tryParse(fieldLaporJpsController.text),
-			decoration: const InputDecoration(
-				labelText: "Tgl Lapor JPS",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value != null) {
-				  removeError(error: kStringNullError);
-					fieldLaporJpsController.text = value.toIso8601String();                    
-          klaimparklaimcrudBloc.add(FieldLaporJpsChangedEvent(laporJps: value));       
+					removeError(error: kStringNullError);
+					fieldLaporJpsController.text = value.toIso8601String();
+					klaimparklaimcrudBloc.add(FieldLaporJpsChangedEvent(laporJps: value));
 				}
 			},
 			validator: (value) {
@@ -224,17 +220,48 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 		);
 	}
 
-	Widget buildFieldMjenisrugiId(){
-		return buildFieldComboMJenisrugi(
+	// Widget buildFieldMjenisrugiId(){
+	// 	return buildFieldComboMJenisrugi(
+	// 		comboKey: comboMJenisrugiKey,
+	// 		labelText: 'Jenis Kerugian',
+	// 		initItem: fieldComboMJenisrugi,
+	// 		onChangedCallback: (value) {
+	// 			if (value != null) {
+	// 				removeError(
+	// 						error: "Field ComboMJenisrugi tidak boleh kosong.");
+	// 				klaimparklaimcrudBloc.add(ComboMJenisrugiChangedEvent(comboMJenisrugi: value));
+	// 			}
+	// 		},
+	// 		onSaveCallback: (value) {
+	// 			if (value != null) {
+	// 				fieldComboMJenisrugi = value;
+	// 			}
+	// 		},
+	// 		validatorCallback: (value) {
+	// 			if (value == null) {
+	// 				addError(
+	// 						error: "Field ComboMJenisrugi tidak boleh kosong.");
+	// 			}
+	// 		},
+	// 	);
+	// }
+
+	Widget buildFieldMjenisrugiId() {
+		return ReusableComboBox<ComboMJenisrugiModel>(
 			comboKey: comboMJenisrugiKey,
-			labelText: 'Jenis Kerugian',
+			hintText: 'Jenis Kerugian',
 			initItem: fieldComboMJenisrugi,
-			onChangedCallback: (value) {
+			dataLoader: () =>
+					ComboMJenisrugiRepository().getComboMJenisrugi(),
+			displayText: (item) => item.rugiDesc,
+			compareItems: (a, b) =>
+			a.mjenisrugiId == b.mjenisrugiId,
+			onChangedCallback: (value){
 				if (value != null) {
 					removeError(
-						error: "Field ComboMJenisrugi tidak boleh kosong.");
-				  klaimparklaimcrudBloc.add(ComboMJenisrugiChangedEvent(comboMJenisrugi: value));
-				}        
+							error: "Field ComboMJenisrugi tidak boleh kosong.");
+					klaimparklaimcrudBloc.add(ComboMJenisrugiChangedEvent(comboMJenisrugi: value));
+				}
 			},
 			onSaveCallback: (value) {
 				if (value != null) {
@@ -244,27 +271,23 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			validatorCallback: (value) {
 				if (value == null) {
 					addError(
-						error: "Field ComboMJenisrugi tidak boleh kosong.");
+							error: "Field ComboMJenisrugi tidak boleh kosong.");
 				}
 			},
 		);
 	}
 
 	Widget buildFieldPenyebab(){
-		return TextFormField(
+		return appTextField(
+			label: 'Penyebab Kerugian',
 			keyboardType: TextInputType.multiline,
-			minLines: 2,
 			maxLines: 5,
 			controller: fieldPenyebabController,
-			decoration: const InputDecoration(
-				labelText: "Penyebab",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
-        klaimparklaimcrudBloc.add(FieldPenyebabChangedEvent(penyebab: value));
+				klaimparklaimcrudBloc.add(FieldPenyebabChangedEvent(penyebab: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -277,20 +300,14 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	}
 
 	Widget buildFieldPicEmail(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+		return appTextField(
+			label: 'Email',
 			controller: fieldPicEmailController,
-			decoration: const InputDecoration(
-				labelText: "Email PIC",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
-        klaimparklaimcrudBloc.add(FieldPicEmailChangedEvent(picEmail: value)); 
+				klaimparklaimcrudBloc.add(FieldPicEmailChangedEvent(picEmail: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -303,20 +320,14 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	}
 
 	Widget buildFieldPicJabatan(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+		return appTextField(
+			label: 'Jabatan',
 			controller: fieldPicJabatanController,
-			decoration: const InputDecoration(
-				labelText: "Jabatan PIC",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
-        klaimparklaimcrudBloc.add(FieldPicJabatanChangedEvent(picJabatan: value));
+				klaimparklaimcrudBloc.add(FieldPicJabatanChangedEvent(picJabatan: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -329,20 +340,14 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	}
 
 	Widget buildFieldPicNama(){
-		return TextFormField(
-			keyboardType: TextInputType.multiline,
-			minLines: 1,
-			maxLines: 3,
+		return appTextField(
+			label: 'PIC Tertanggung',
 			controller: fieldPicNamaController,
-			decoration: const InputDecoration(
-				labelText: "Nama PIC",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
-        klaimparklaimcrudBloc.add(FieldPicNamaChangedEvent(picNama: value));
+				klaimparklaimcrudBloc.add(FieldPicNamaChangedEvent(picNama: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {
@@ -355,17 +360,14 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 	}
 
 	Widget buildFieldPicTelp(){
-		return TextFormField(
+		return appTextField(
+			label: 'No Telp PIC',
 			controller: fieldPicTelpController,
-			decoration: const InputDecoration(
-				labelText: "Telp PIC",
-				floatingLabelBehavior: FloatingLabelBehavior.always,
-			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
-				  removeError(error: kStringNullError);
+					removeError(error: kStringNullError);
 				}
-        klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(picTelp: value));
+				klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(picTelp: value));
 			},
 			validator: (value) {
 				if (value == null || value.isEmpty) {

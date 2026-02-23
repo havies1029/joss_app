@@ -24,8 +24,8 @@ class ReusableComboBox<T> extends StatefulWidget {
   final IconData? prefixIcon;
   final String? errorText;
 
-  const ReusableComboBox({
-    super.key,
+  ReusableComboBox({
+    Key? key,
     required this.hintText,
     required this.dataLoader,
     required this.displayText,
@@ -45,7 +45,7 @@ class ReusableComboBox<T> extends StatefulWidget {
     this.dataLoaderWithFilter,
     this.serverSearchDebounce = const Duration(milliseconds: 350),
     this.serverSearchMinChars = 0,
-  });
+  }) : super(key: key);
 
   @override
   State<ReusableComboBox<T>> createState() => _ReusableComboBoxState<T>();
@@ -60,6 +60,19 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
     _debounceTimer?.cancel();
     super.dispose();
   }
+
+  // ✅ TAMBAHKAN INI
+  // @override
+  // void didUpdateWidget(covariant ReusableComboBox<T> oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (oldWidget.initItem != widget.initItem) {
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       if (mounted) {
+  //         widget.comboKey?.currentState?.changeSelectedItem(widget.initItem);
+  //       }
+  //     });
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return DropdownSearch<T>(

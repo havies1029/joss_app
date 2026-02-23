@@ -119,7 +119,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           });
         }
 
-        if (state.isSaved && state.hasFailure == false) {
+        if (state.isSaved ) {
           Navigator.push(
             context,
             MaterialPageRoute(

@@ -9,34 +9,34 @@ import 'package:joss_app/blocs/klaimlacak/klaimprogresscari_bloc.dart';
 
 class KlaimprogresscariListWidget extends StatefulWidget {
   final String klaim1Id;
-	const KlaimprogresscariListWidget({super.key, required this.klaim1Id});
+  const KlaimprogresscariListWidget({super.key, required this.klaim1Id});
 
-	@override
-	KlaimprogresscariListWidgetState createState() => KlaimprogresscariListWidgetState();
+  @override
+  KlaimprogresscariListWidgetState createState() => KlaimprogresscariListWidgetState();
 }
 
 class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget> {
-	late KlaimprogresscariBloc klaimprogresscariBloc;
-	final ScrollController _scrollController = ScrollController();
+  late KlaimprogresscariBloc klaimprogresscariBloc;
+  final ScrollController _scrollController = ScrollController();
 
-	@override
-	void initState() {
-		super.initState();
-		_scrollController.addListener(_onScroll);
-	}
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
-	@override
-	void dispose() {
-		_scrollController
-			..removeListener(_onScroll)
-			..dispose();
-		super.dispose();
-	}
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
 
-	@override
-	Widget build(BuildContext context) {
-		klaimprogresscariBloc = BlocProvider.of<KlaimprogresscariBloc>(context);
-		return BlocBuilder<KlaimprogresscariBloc, KlaimprogresscariState>(
+  @override
+  Widget build(BuildContext context) {
+    klaimprogresscariBloc = BlocProvider.of<KlaimprogresscariBloc>(context);
+    return BlocBuilder<KlaimprogresscariBloc, KlaimprogresscariState>(
       buildWhen: (prev, curr) => prev.status != curr.status || prev.items != curr.items,
       builder: (context, stateProgress) {
         if (stateProgress.status == ListStatus.success && stateProgress.items.isNotEmpty) {
@@ -46,34 +46,40 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
           final extra = showButton ? 1 : 0;
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 18),
             controller: _scrollController,
             itemCount: stateProgress.items.length + extra,
             itemBuilder: (_, index) {
 
               // ===== item tambahan terakhir: tombol =====
               if (showButton && index == stateProgress.items.length) {
-                return BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
-                    selector: (s) {
-                      final groupStatusId = stateProgress.klaimProgressInfo?.groupStatusId ?? '';
-                      final klaimProgressNilaiId = (stateProgress.klaimProgressInfo?.klaimNilaiId ?? '').trim();
-                      final klaimCrudNilaiId = s.klaimNilaiId.trim();
-                      return groupStatusId == "20" && klaimProgressNilaiId.isEmpty && klaimCrudNilaiId.isEmpty;
-                    },
-                    builder: (context, enabledByBloc) {
-                      return KlaimProgressBtnMasukan(
-                        enabled: enabledByBloc,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-
-                              return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
-                            }),
-                          );
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 14, left: 30),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
+                        selector: (s) {
+                          final groupStatusId = stateProgress.klaimProgressInfo?.groupStatusId ?? '';
+                          final klaimProgressNilaiId = (stateProgress.klaimProgressInfo?.klaimNilaiId ?? '').trim();
+                          final klaimCrudNilaiId = s.klaimNilaiId.trim();
+                          return groupStatusId == "20" && klaimProgressNilaiId.isEmpty && klaimCrudNilaiId.isEmpty;
                         },
-                      );
-                    }
+                        builder: (context, enabledByBloc) {
+                          return KlaimProgressBtnMasukan(
+                            enabled: enabledByBloc,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) {
+
+                                  return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
+                                }),
+                              );
+                            },
+                          );
+                        }
+                    ),
+                  ),
                 );
               }
 
@@ -93,7 +99,7 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
                 infoNilaiKlaim: curr.actioncode.trim().toLowerCase() == 'nilai_klaim' ? stateProgress.nilaiKlaim : null,
                 jadwalBayarItems: curr.actioncode.trim().toLowerCase() == 'table_payment' ? stateProgress.jadwalBayar : null,
                 klaimProgressInfo: curr.actioncode.trim().toLowerCase() == 'table_payment' ? stateProgress.klaimProgressInfo : null,
-            );
+              );
             },
           );
         }
@@ -110,13 +116,13 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
       },
     );
 
-	}
-	void _onScroll() {
-		if (!_scrollController.hasClients) return;
-		if (_scrollController.position.pixels ==
-				_scrollController.position.maxScrollExtent) {
-			klaimprogresscariBloc.add(FetchKlaimprogresscariEvent());
-		}
-	}
+  }
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      klaimprogresscariBloc.add(FetchKlaimprogresscariEvent());
+    }
+  }
 
 }

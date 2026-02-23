@@ -6,19 +6,10 @@ import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaim5cari_list.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvaccordioncard.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvbengkelcrud_form.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvklaimcrud_form.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvpoliscrud_form.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvstatuscari_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
-
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvbengkelcrud_form.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaimmvstatuscari_list.dart';
 
 import 'klaim5cari_list.dart';
 import 'klaimmvaccordioncard.dart';
@@ -37,6 +28,7 @@ class PerbaruiKlaimMvPage extends StatefulWidget {
 }
 
 class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
+
   @override
   Widget build(BuildContext context) {
     var klaimmvpoliscrudBloc = BlocProvider.of<KlaimmvpoliscrudBloc>(context);
@@ -50,22 +42,19 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
       title: widget.cobGroupNama,
       child: Container(
         color: secondaryBlackColor,
-          padding: const EdgeInsets.symmetric(
-          horizontal: 15, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 15, vertical: 10),
         child: BlocConsumer<KlaimmvaccordionBloc, KlaimmvaccordionState>(
           builder: (context, acc) {
             return Column(
               children: [
                 const SizedBox(height: hPadding * 1.5),
 
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                  child: const FormSectionHeader(
-                    iconPath: "assets/icons/kendaraan.svg",
-                    title: "Polis Kendaraan",
-                    subtitle:
-                        "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
-                  ),
+                FormSectionHeader(
+                  iconPath: "assets/icons/kendaraan.svg",
+                  title: "Polis Kendaraan",
+                  subtitle:
+                  "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                 ),
 
                 const SizedBox(height: hPadding * 1.5),
@@ -91,13 +80,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                               children: [
                                 Expanded(
                                     child: CustomProgressBar(
-                                  progress: progress,
-                                  barColor: primaryColor,
-                                  borderRadius: cardBorderRadius,
-                                )),
+                                      progress: progress,
+                                      barColor: primaryColor,
+                                      borderRadius: cardBorderRadius,
+                                    )),
                                 // Expanded(child: LinearProgressIndicator(value: progress)),
-                                const SizedBox(width: 12),
-                                Text('${(progress * 100).round()}%'),
+                                // const SizedBox(width: 12),
+                                // Text('${(progress * 100).round()}%'),
                               ],
                             );
                           },
@@ -107,6 +96,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                   ),
                 ),
 
+                const SizedBox(height: hPadding * 1.5),
+
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
@@ -115,14 +106,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                           title: 'Data Polis',
                           isOpen: acc.openedIndex == 0,
                           onTap: () {
-
                             if (acc.openedIndex == 1) {
                               final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                               if (!klaimState.isValid) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Data Klaim belum valid")),
                                 );
-                                return; // tahan pindah
+                                return;
                               }
                             }
 
@@ -159,9 +149,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                         Klaimmvaccordioncard(
                           title: 'Dokumen Klaim',
                           isOpen: acc.openedIndex == 2,
-                          onTap: () => context
-                              .read<KlaimmvaccordionBloc>()
-                              .add(KlaimmvaccordionToggleEvent(index: 2)),
+                          onTap: () => context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 2)),
                           child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
                         ),
                         Klaimmvaccordioncard(
@@ -171,7 +159,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                               .read<KlaimmvaccordionBloc>()
                               .add(KlaimmvaccordionToggleEvent(index: 3)),
                           child:
-                              KlaimmvstatuscariPage(klaim1Id: widget.klaim1Id),
+                          KlaimmvstatuscariPage(klaim1Id: widget.klaim1Id),
                         ),
                         Klaimmvaccordioncard(
                           title: 'Bengkel yang dipilih',
@@ -209,25 +197,25 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
             );
           }, listener: (BuildContext context, KlaimmvaccordionState state) async {
           if (state.previousIndex != null &&
-                  state.previousIndex != state.openedIndex) {
+              state.previousIndex != state.openedIndex) {
 
-                FocusManager.instance.primaryFocus?.unfocus();
-                await Future.delayed(const Duration(milliseconds: 50));
+            FocusManager.instance.primaryFocus?.unfocus();
+            await Future.delayed(const Duration(milliseconds: 50));
 
-                switch(state.previousIndex) {
-                  case 0:
-                    klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
-                    break;
-                  case 1:
-                    klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
-                    break;
-                  case 4:
-                    klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
-                    break;
-                }
+            switch(state.previousIndex) {
+              case 0:
+                klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent());
+                break;
+              case 1:
+                klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent());
+                break;
+              case 4:
+                klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent());
+                break;
+            }
 
-              }
-            },
+          }
+        },
         ),
       ),
     );

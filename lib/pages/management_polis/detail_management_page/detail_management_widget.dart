@@ -377,7 +377,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                           setState(() {
                             _loading = false;
                             _items = List.from(state.items);
-                            _emptyText = "Belum ada proses Perpanjang";
+                            _emptyText = "Belum ada proses Otherrs";
                             _getDateTime =
                                 (x) => (x as Regother3cariModel).tglStatus;
                             _getStatusText =

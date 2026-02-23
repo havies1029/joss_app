@@ -9,74 +9,87 @@ part 'klaimmvklaimcrud_event.dart';
 part 'klaimmvklaimcrud_state.dart';
 
 class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, KlaimmvklaimcrudState> {
-	final KlaimmvklaimcrudRepository repository;
-	KlaimmvklaimcrudBloc({required this.repository}) : super(const KlaimmvklaimcrudState()) {
-		on<KlaimmvklaimcrudUbahEvent>(onUbahKlaimmvklaimcrud);
-		on<KlaimmvklaimcrudTambahEvent>(onTambahKlaimmvklaimcrud);
-		on<KlaimmvklaimcrudHapusEvent>(onHapusKlaimmvklaimcrud);
-		on<KlaimmvklaimcrudLihatEvent>(onLihatKlaimmvklaimcrud);
-		on<ComboRMatauangChangedEvent>(onComboRMatauangChanged);
-		on<FieldCurrIdChangedEvent>(onFieldCurrIdChanged);
+  final KlaimmvklaimcrudRepository repository;
+  KlaimmvklaimcrudBloc({required this.repository}) : super(const KlaimmvklaimcrudState()) {
+    on<KlaimmvklaimcrudUbahEvent>(onUbahKlaimmvklaimcrud);
+    on<KlaimmvklaimcrudTambahEvent>(onTambahKlaimmvklaimcrud);
+    on<KlaimmvklaimcrudHapusEvent>(onHapusKlaimmvklaimcrud);
+    on<KlaimmvklaimcrudLihatEvent>(onLihatKlaimmvklaimcrud);
+    on<ComboRMatauangChangedEvent>(onComboRMatauangChanged);
+    on<FieldCurrIdChangedEvent>(onFieldCurrIdChanged);
     on<FieldDolChangedEvent>(onFieldDolChanged);
     on<FieldKlaimAmountChangedEvent>(onFieldKlaimAmountChanged);
     on<FieldKronologisChangedEvent>(onFieldKronologisChanged);
     on<KlaimmvklaimAutoSaveEvent>(onKlaimmvklaimAutoSave);
-	}
+  }
 
-	Future<void> onTambahKlaimmvklaimcrud(
-		KlaimmvklaimcrudTambahEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
+  Future<void> onTambahKlaimmvklaimcrud(
+      KlaimmvklaimcrudTambahEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
 
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.klaimmvklaimcrudTambah(event.record);
-		hasFailure = !returnData.success;
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
-	}
+    ReturnDataAPI returnData;
+    bool hasFailure = true;
+    emit(state.copyWith(isSaving: true, isSaved: false));
+    returnData = await repository.klaimmvklaimcrudTambah(event.record);
+    hasFailure = !returnData.success;
+    emit(state.copyWith(
+        isSaving: false,
+        isSaved: true,
+        hasFailure: hasFailure));
+  }
 
-	Future<void> onUbahKlaimmvklaimcrud(
-		KlaimmvklaimcrudUbahEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.klaimmvklaimcrudUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-	}
+  Future<void> onUbahKlaimmvklaimcrud(
+      KlaimmvklaimcrudUbahEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
+    emit(state.copyWith(isSaving: true, isSaved: false));
+    bool hasFailure = !await repository.klaimmvklaimcrudUbah(event.record);
+    emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+  }
 
-	Future<void> onHapusKlaimmvklaimcrud(
-		KlaimmvklaimcrudHapusEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.klaimmvklaimcrudHapus(event.recordId);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-	}
+  Future<void> onHapusKlaimmvklaimcrud(
+      KlaimmvklaimcrudHapusEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
+    emit(state.copyWith(isSaving: true, isSaved: false));
+    bool hasFailure = !await repository.klaimmvklaimcrudHapus(event.recordId);
+    emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+  }
 
-	Future<void> onLihatKlaimmvklaimcrud(
-		KlaimmvklaimcrudLihatEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-		KlaimmvklaimcrudModel? record = await repository.klaimmvklaimcrudLihat(event.recordId);
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
-	}
+  Future<void> onLihatKlaimmvklaimcrud(
+      KlaimmvklaimcrudLihatEvent event,
+      Emitter<KlaimmvklaimcrudState> emit
+      ) async {
 
-	Future<void> onComboRMatauangChanged(
-			ComboRMatauangChangedEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
+    emit(state.copyWith(isLoading: true, isLoaded: false));
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));
-		ComboRMatauangModel comboRMatauang = event.comboRMatauang;
+    KlaimmvklaimcrudModel? record =
+    await repository.klaimmvklaimcrudLihat(event.recordId);
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      record: record,
+      comboRMatauang: record?.comboRMatauang,
+      isComplete: _validate(record),
+    ));
+  }
+
+  Future<void> onComboRMatauangChanged(
+      ComboRMatauangChangedEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
+
+    emit(state.copyWith(isLoading: true, isLoaded: false));
+    ComboRMatauangModel comboRMatauang = event.comboRMatauang;
 
     KlaimmvklaimcrudModel updatedRecord = state.record!.copyWith(
       currId: comboRMatauang.rmatauangKode,
     );
 
-		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboRMatauang: comboRMatauang,
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      comboRMatauang: comboRMatauang,
       record: updatedRecord,
       isDirty: true,
       isValid: _validate(updatedRecord),
+      isComplete: _validate(updatedRecord),
     ));
-	}
+  }
 
   Future<void> onFieldCurrIdChanged(
       FieldCurrIdChangedEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
@@ -85,9 +98,10 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         currId: event.currId,
       );
       emit(state.copyWith(
-        record: updatedRecord, 
+        record: updatedRecord,
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -100,9 +114,10 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         dol: parsedDol,
       );
       emit(state.copyWith(
-        record: updatedRecord, 
+        record: updatedRecord,
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -115,9 +130,10 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         klaimAmount: parsedKlaimAmount,
       );
       emit(state.copyWith(
-        record: updatedRecord, 
+        record: updatedRecord,
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -129,9 +145,10 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
         kronologis: event.kronologis,
       );
       emit(state.copyWith(
-        record: updatedRecord, 
+        record: updatedRecord,
         isDirty: true,
         isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
       ));
     }
   }
@@ -149,10 +166,10 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
     if (record == null) return false;
 
     return
-        _isSameOrBeforeToday(record.dol) &&
-        record.klaimAmount > 0 &&
-        record.kronologis.trim().isNotEmpty &&
-        (record.currId?.isNotEmpty ?? false);
+      _isSameOrBeforeToday(record.dol) &&
+          record.klaimAmount > 0 &&
+          record.kronologis.trim().isNotEmpty &&
+          (record.currId?.isNotEmpty ?? false);
   }
 
 

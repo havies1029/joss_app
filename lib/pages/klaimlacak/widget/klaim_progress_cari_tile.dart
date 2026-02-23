@@ -53,7 +53,7 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
 
     final showNilaiKlaim = item.actioncode.trim().toLowerCase() == 'nilai_klaim';
 
-    final showJadwalBayar = item.actioncode.trim().toLowerCase() == 'table_payment';    
+    final showJadwalBayar = item.actioncode.trim().toLowerCase() == 'table_payment';
 
     return IntrinsicHeight(
       child: Row(
@@ -70,24 +70,24 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
           Expanded(
             child: isPlaceholder
                 ? KlaimProgressPlaceholderRow(
-                    title: title,
-                    baseText: baseText,
-                  )
+              title: title,
+              baseText: baseText,
+            )
                 : KlaimProgressActiveCard(
-                    progressNama: title,
-                    progressDesc: item.progressDesc,
-                    dateText: dateText,
-                    imageUrl: imageUrl,
-                    headers: headers,
-                    cardBg: KlaimProgressTileStyles.cardBg,
-                    border: KlaimProgressTileStyles.border(),
-                    showNilaiKlaim: showNilaiKlaim,
-                    infoNilaiKlaim: infoNilaiKlaim,
-                    showJadwalBayar: showJadwalBayar,
-                    jadwalBayarItems: jadwalBayarItems,
-                    showMetodeGantiKlaim: klaimProgressInfo != null,
-                    klaimProgressInfo: klaimProgressInfo,                    
-                  ),
+              progressNama: title,
+              progressDesc: item.progressDesc,
+              dateText: dateText,
+              imageUrl: imageUrl,
+              headers: headers,
+              cardBg: KlaimProgressTileStyles.cardBg,
+              border: KlaimProgressTileStyles.border(),
+              showNilaiKlaim: showNilaiKlaim,
+              infoNilaiKlaim: infoNilaiKlaim,
+              showJadwalBayar: showJadwalBayar,
+              jadwalBayarItems: jadwalBayarItems,
+              showMetodeGantiKlaim: klaimProgressInfo != null,
+              klaimProgressInfo: klaimProgressInfo,
+            ),
           ),
         ],
       ),

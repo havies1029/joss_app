@@ -1,6 +1,8 @@
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/pages/klaimlacak/klaimprogresscari_list.dart';
+// import 'package:joss_app/pages/klaimlacak/klaimprogresscari_list.dart';
 import 'package:flutter/material.dart';
+
+import 'klaimprogresscari_list.dart';
 
 class KlaimProgressCariMainPage extends StatelessWidget {
   final String klaim1Id;

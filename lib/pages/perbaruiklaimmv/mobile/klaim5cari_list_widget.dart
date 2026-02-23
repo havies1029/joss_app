@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
-// import 'package:joss_app/pages/perbaruiklaimmv/klaim5cari_tile_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
@@ -46,9 +45,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     klaim5cariBloc = BlocProvider.of<Klaim5cariBloc>(context);
     return BlocConsumer<Klaim5cariBloc, Klaim5cariState>(
         builder: (context, state) {
-
           if (state.status == ListStatus.success) {
-
             return state.items.isNotEmpty
                 ? Column(
               children: [
@@ -59,7 +56,8 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                     controller: _scrollController,
                     itemCount: state.items.length,
                     itemBuilder: (_, index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 3),
                       padding: const EdgeInsets.all(0.2),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15.0)),
@@ -72,10 +70,14 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                         fileName: state.items[index].fileName,
                         localPath: state.items[index].localPath,
                         mime: state.items[index].mimeType,
-                        fileSizeBytes: state.items[index].fileSizeBytes,
-                        onPickFile: () => _pickFile(state.items[index]),
-                        onPickPhoto: () => _pickPhoto(state.items[index]),
-                        onDelete: () => _deleteFile(state.items[index]),
+                        fileSizeBytes:
+                        state.items[index].fileSizeBytes,
+                        onPickFile: () =>
+                            _pickFile(state.items[index]),
+                        onPickPhoto: () =>
+                            _pickPhoto(state.items[index]),
+                        onDelete: () =>
+                            _deleteFile(state.items[index]),
                         onPreview: () => _preview(state.items[index]),
                       ),
                     )),
@@ -118,11 +120,14 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
               ),
             );
           }
-        }, buildWhen: (previous, current) {
-      return previous.status != current.status || previous.items != current.items;
-    }, listener: (context, state) {}
-    );
+        },
+        buildWhen: (previous, current) {
+          return previous.status != current.status ||
+              previous.items != current.items;
+        },
+        listener: (context, state) {});
   }
+
   void _onScroll() {
     if (!_scrollController.hasClients) return;
     if (_scrollController.position.pixels ==
@@ -138,8 +143,10 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     if (p.endsWith('.png')) return 'image/png';
     if (p.endsWith('.webp')) return 'image/webp';
     if (p.endsWith('.pdf')) return 'application/pdf';
-    if (p.endsWith('.doc') || p.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    if (p.endsWith('.xls') || p.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    if (p.endsWith('.doc') || p.endsWith('.docx'))
+      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    if (p.endsWith('.xls') || p.endsWith('.xlsx'))
+      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     if (p.endsWith('.txt')) return 'text/plain';
     return null;
   }
@@ -147,8 +154,12 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
   bool isImagePath(String? path) {
     if (path == null) return false;
     final p = path.toLowerCase();
-    return p.endsWith('.jpg') || p.endsWith('.jpeg') || p.endsWith('.png') || p.endsWith('.webp');
+    return p.endsWith('.jpg') ||
+        p.endsWith('.jpeg') ||
+        p.endsWith('.png') ||
+        p.endsWith('.webp');
   }
+
   bool isPdfPath(String? path) => (path ?? '').toLowerCase().endsWith('.pdf');
 
   Future<void> showPreviewDialog({
@@ -189,7 +200,8 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     }
 
     if (isPdf && isLocal) {
-      final controller = PdfControllerPinch(document: PdfDocument.openFile(pathOrUrl));
+      final controller =
+      PdfControllerPinch(document: PdfDocument.openFile(pathOrUrl));
       await showDialog(
         context: context,
         builder: (_) => Dialog(
@@ -223,11 +235,11 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
       // kalau hanya URL dan bukan image: idealnya download dulu atau buka di webview/browser
       // untuk simpel: tampilkan info saja
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preview file ini belum didukung dari URL.')),
+        const SnackBar(
+            content: Text('Preview file ini belum didukung dari URL.')),
       );
     }
   }
-
 
   Future<void> _pickFile(Klaim5cariModel it) async {
     final bloc = context.read<Klaim5cariBloc>();
@@ -235,10 +247,14 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
       allowMultiple: false,
       type: FileType.custom,
       allowedExtensions: [
-        'jpg', 'jpeg', 'png',
+        'jpg',
+        'jpeg',
+        'png',
         'pdf',
-        'doc', 'docx',
-        'xls', 'xlsx',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
         'txt'
       ],
     );
@@ -263,7 +279,8 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     );
 
     bloc.add(
-      Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
+      Klaim5UploadRequestedEvent(
+          mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
     );
   }
 
@@ -273,10 +290,14 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
       allowMultiple: false,
       type: FileType.custom,
       allowedExtensions: [
-        'jpg', 'jpeg', 'png',
+        'jpg',
+        'jpeg',
+        'png',
         'pdf',
-        'doc', 'docx',
-        'xls', 'xlsx',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
         'txt'
       ],
     );
@@ -302,10 +323,10 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     );
 
     bloc.add(
-      Klaim5UploadRequestedEvent(mjenisdocId: '', klaim5Id: '', jenisDocLain: jenisDocLain),
+      Klaim5UploadRequestedEvent(
+          mjenisdocId: '', klaim5Id: '', jenisDocLain: jenisDocLain),
     );
   }
-
 
   Future<void> _pickPhoto(Klaim5cariModel it) async {
     final picker = ImagePicker();
@@ -334,12 +355,12 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     );
 
     bloc.add(
-      Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
+      Klaim5UploadRequestedEvent(
+          mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
     );
   }
 
   Future<void> _deleteFile(Klaim5cariModel it) async {
-
     final bloc = context.read<Klaim5cariBloc>();
     final confirm = await showDialog<bool>(
       context: context,
@@ -364,10 +385,12 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     if (confirm != true) return;
 
     bloc.add(
-      Klaim5DeleteRequestedEvent(mjenisdocId: it.mjenisdocId, klaim1Id: it.klaim1Id, jenisDocLain: it.jenisDocLain),
+      Klaim5DeleteRequestedEvent(
+          mjenisdocId: it.mjenisdocId,
+          klaim1Id: it.klaim1Id,
+          jenisDocLain: it.jenisDocLain),
     );
   }
-
 
   Future<void> _preview(Klaim5cariModel it) async {
     // ignore: unnecessary_null_comparison
@@ -412,7 +435,4 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     // OTHER FILE (DOC/XLS/TXT)
     await OpenFilex.open(path);
   }
-
-
-
 }

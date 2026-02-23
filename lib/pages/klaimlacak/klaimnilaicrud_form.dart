@@ -74,6 +74,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                 child: Form(
+                  key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -108,7 +109,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
                                 setState(() => _nilaiSuka = v);
                                 // remove error rating kalau sebelumnya belum pilih
                                 removeError(error: kStringNullError);
-                              },
+                              }, max: 5,
                             ),
                             const SizedBox(height: 8),
                             Row(
@@ -226,7 +227,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
   void onSaveForm() {
     // validasi rating: minimal pilih 1 bintang
     if (_nilaiSuka <= 0) {
-      addError(error: "Rating wajib dipilih"); 
+      addError(error: "Rating wajib dipilih");
     }
 
     if (_formKey.currentState!.validate()) {
@@ -268,10 +269,10 @@ class _StarRating extends StatelessWidget {
   const _StarRating({
     required this.value,
     required this.onChanged,
-    this.max = 5,
     this.size = 44,
     required this.activeColor,
     required this.inactiveColor,
+    required this.max,
   });
 
   @override
