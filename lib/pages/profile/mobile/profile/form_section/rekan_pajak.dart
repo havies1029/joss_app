@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpajakcrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanpajakcrud_model.dart';
@@ -15,9 +14,6 @@ import 'package:joss_app/widgets/combobox/comborkodepos_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../../blocs/profile/profile_upload_foto_bloc.dart';
-import '../../../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../../../blocs/user_profile/user_profile_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../base/base_background_sidepage.dart';

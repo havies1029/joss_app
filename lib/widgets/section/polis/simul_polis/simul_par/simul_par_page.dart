@@ -26,7 +26,7 @@ class SimulParPage extends StatefulWidget {
 
 class _SimulParPageState extends State<SimulParPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _showPremiSection = false;
+  final bool _showPremiSection = false;
 
   @override
   void initState() {

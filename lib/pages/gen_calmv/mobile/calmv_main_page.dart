@@ -66,8 +66,8 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
           listener: (context, state) {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calmv1Id;
-              debugPrint("ini id apaan dh " + newId);
-              if (newId != null && newId.isNotEmpty) {
+              debugPrint("ini id apaan dh $newId");
+              if (newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calmv1 saved → result ID = $newId");
                 final regmv = state.record!.regmv1Id;
                 setState(() {
@@ -96,7 +96,7 @@ class _CalmvFormMainState extends State<CalmvFormMain> {
             if (state.isSaved && !state.hasFailure && state.record != null) {
               final newId = state.record!.calmv2Id;
 
-              if (newId != null && newId.isNotEmpty) {
+              if (newId.isNotEmpty) {
                 debugPrint("🔥 [LISTENER] calmv2 saved → result ID = $newId");
 
                 setState(() {

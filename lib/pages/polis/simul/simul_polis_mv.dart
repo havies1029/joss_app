@@ -7,6 +7,6 @@ class SimulPolisMvMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(child: SimulMvPage(), title: "Kendaraan");
+    return BaseBackgroundSidePage(title: "Kendaraan", child: SimulMvPage());
   }
 }

@@ -79,7 +79,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 			);
 
 			var newRecord = event.record;
-			if (returnData.success && returnData.data != null) {
+			if (returnData.success) {
 				final newId = returnData.data.toString();
 				if (newId.isNotEmpty) {
 					newRecord = event.record.copyWith(calmv2Id: newId);
@@ -339,7 +339,7 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 			if (record.calmv2Id.trim().isEmpty) {
 				final ReturnDataAPI returnData = await repository.calmv2FormTambah(record);
 
-				if (!returnData.success || returnData.data == null) {
+				if (!returnData.success) {
 					emit(state.copyWith(
 						isSaving: false,
 						isSaved: false,

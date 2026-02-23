@@ -6,7 +6,6 @@ import 'package:joss_app/widgets/floatingmenumaster_widget.dart';
 import 'package:joss_app/blocs/regother/regother1list_bloc.dart';
 import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
 import 'package:joss_app/pages/regother/regother1crud_form.dart';
-import 'package:joss_app/pages/regother/regother1list_list_widget.dart';
 
 class Regother1ListPage extends StatefulWidget {
 	const Regother1ListPage({super.key});

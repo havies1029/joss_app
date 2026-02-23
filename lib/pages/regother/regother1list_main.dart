@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/regother/regother1list_list.dart';
 import 'package:joss_app/pages/regother/regother1list_list_widget.dart';
 
 class Regother1ListMainPage extends StatelessWidget {

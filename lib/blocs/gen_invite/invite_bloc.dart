@@ -1,6 +1,5 @@
 // lib/blocs/gen_invite/invite_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/gen_invite/invite_model.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
 
 part 'invite_event.dart';

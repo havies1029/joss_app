@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/rekanpiccobcari_bloc.dart';
-import 'package:joss_app/models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../common/constants.dart';
 
 class RekanPicCobCariListWidget extends StatefulWidget {

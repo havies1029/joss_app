@@ -89,7 +89,7 @@ class RingkasanDetailTableList extends StatelessWidget {
       int index,
       DnsppaCariModel row,
       ) {
-    final DateFormat _dateFmt = DateFormat("dd/MM/yyyy");
+    final DateFormat dateFmt = DateFormat("dd/MM/yyyy");
 
     return TableRow(
       decoration: BoxDecoration(
@@ -100,7 +100,7 @@ class RingkasanDetailTableList extends StatelessWidget {
         _polisCell(context, row),
         _cell(
           context,
-          "${_dateFmt.format(row.polisMulai)} - ${_dateFmt.format(row.polisAkhir)}",
+          "${dateFmt.format(row.polisMulai)} - ${dateFmt.format(row.polisAkhir)}",
         ),
         _cell(context, row.currSimbol),
         _cell(context, formatNum(row.dnOs)),

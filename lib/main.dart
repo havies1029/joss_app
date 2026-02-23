@@ -974,6 +974,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
 import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
@@ -1090,6 +1091,7 @@ import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
+import 'blocs/dashboard/sumdash_bloc.dart';
 import 'blocs/gen_calmv/calmvaccordion_bloc.dart';
 import 'blocs/gen_dn1/dn1cari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
@@ -1400,7 +1402,7 @@ Future<void> main() async {
         // Trslog
         BlocProvider(create: (_) => TrslogCariBloc()),
 
-        //Klaimq
+        //Klaim
         BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
         BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
         // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),
@@ -1586,6 +1588,8 @@ Future<void> main() async {
         // Log Transaction
         BlocProvider(create: (context) => LogtrscariBloc()),
         BlocProvider(create: (context) => LogtrscaritopxBloc()),
+        //hero page premi
+        BlocProvider(create: (context) => SumdashBloc(repository: SumdashRepository())),
       ],
       child: MultiBlocListener(
         listeners: [

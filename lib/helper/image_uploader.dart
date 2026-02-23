@@ -1,11 +1,9 @@
 // lib/utils/image_uploader.dart
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/profile/profile_upload_foto_bloc.dart';
-import '../blocs/user_profile/user_profile_cubit.dart';
 
 class ImageUploader {
   static Future<void> pickAndUpload(BuildContext context) async {

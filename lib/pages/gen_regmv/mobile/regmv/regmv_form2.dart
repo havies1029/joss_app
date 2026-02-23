@@ -264,8 +264,8 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     fieldPllController.text = cleanNum(record.pll);
     fieldTplController.text = cleanNum(record.tpl);
 
-    fieldPolisMulaiController.text = record.polisMulai!.toIso8601String();
-    fieldPolisAkhirController.text = record.polisAkhir!.toIso8601String();
+    fieldPolisMulaiController.text = record.polisMulai.toIso8601String();
+    fieldPolisAkhirController.text = record.polisAkhir.toIso8601String();
 
     kejadianMulaiTgl = record.polisMulai;
     if (_isPayloadInjected) {

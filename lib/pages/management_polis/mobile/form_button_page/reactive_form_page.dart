@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/management_polis/mobile/theme/polis_success.dart';
-import 'package:joss_app/widgets/form_error.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
-import 'package:date_field/date_field.dart';
 
 import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
@@ -18,7 +14,6 @@ import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/regreaktif/regreaktif1_bloc.dart';
 import '../../../../models/regreaktif/regreaktif1_model.dart';
-import '../../detail_management_page/detail_management_widget.dart';
 
 
 

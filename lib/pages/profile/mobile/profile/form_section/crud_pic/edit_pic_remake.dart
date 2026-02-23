@@ -51,6 +51,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   late final MRekanPicCrudBloc crudBloc;
   late final RekanPicCobCariBloc cobBloc;
 
+  @override
   void initState() {
     super.initState();
     cobBloc = context.read<RekanPicCobCariBloc>();
@@ -386,7 +387,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     ComboMJabatanModel? selected = _jabatan;
     try {
       final st = _comboKey.currentState;
-      if (selected == null) selected = st?.getSelectedItem;
+      selected ??= st?.getSelectedItem;
     } catch (_) {}
     final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 

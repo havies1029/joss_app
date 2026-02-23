@@ -145,8 +145,7 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                 return Column(
                                   children: List.generate(state.items.length, (i) {
                                     final it = state.items[i];
-                                    if (it.mrekanpicId == null ||
-                                        it.mrekanpicId!.isEmpty) {
+                                    if (it.mrekanpicId.isEmpty) {
                                       debugPrint(
                                           '⛔ Skip card karena mrekanpicId kosong untuk ${it.picNama}');
                                       return const SizedBox.shrink();
@@ -162,11 +161,11 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                         email: it.picEmail ?? '-',
                                         telp: it.picHp ?? '-',
                                         jabatan: it.jabatanDesc ?? '-',
-                                        mrekanpicId: it.mrekanpicId!,
+                                        mrekanpicId: it.mrekanpicId,
                                         statusPic: it.statusPic,
                                         onEdit: () async {
                                           final jabatanModelFromList = ComboMJabatanModel(
-                                            mjabatanId: it.mjabatanId!.toString(),
+                                            mjabatanId: it.mjabatanId.toString(),
                                             jabatanDesc: it.jabatanDesc ?? '',
                                           );
 
@@ -179,7 +178,7 @@ class _MRekanPicListSimpleState extends State<MRekanPicListSimple> {
                                                   BlocProvider(create: (_) => RekanPicCobCariBloc()), // ✅ Tambah ini
                                                 ],
                                                 child: EditPicWidget(
-                                                  mrekanpicId: it.mrekanpicId!,
+                                                  mrekanpicId: it.mrekanpicId,
                                                   initNama: it.picNama,
                                                   initEmail: it.picEmail,
                                                   initHp: it.picHp,

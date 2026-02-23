@@ -16,13 +16,11 @@ class DaftarCobKlaimWidget extends StatefulWidget {
     this.type = DaftarCobKlaimType.page,
   });
 
-  const DaftarCobKlaimWidget.page({Key? key})
-      : type = DaftarCobKlaimType.page,
-        super(key: key);
+  const DaftarCobKlaimWidget.page({super.key})
+      : type = DaftarCobKlaimType.page;
 
-  const DaftarCobKlaimWidget.menu({Key? key})
-      : type = DaftarCobKlaimType.menu,
-        super(key: key);
+  const DaftarCobKlaimWidget.menu({super.key})
+      : type = DaftarCobKlaimType.menu;
 
   @override
   State<DaftarCobKlaimWidget> createState() => _DaftarCobKlaimWidgetState();

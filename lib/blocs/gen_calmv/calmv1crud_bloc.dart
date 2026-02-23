@@ -160,7 +160,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			) async {
 		emit(state.copyWith(isDirty: false));
 
-		final ComboMMvjnscoverModel? combo = event.comboMMvjnscover;
+		final ComboMMvjnscoverModel combo = event.comboMMvjnscover;
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
@@ -181,7 +181,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			) async {
 		emit(state.copyWith(isDirty: false));
 
-		final ComboMWilayahModel? combo = event.comboMWilayah;
+		final ComboMWilayahModel combo = event.comboMWilayah;
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
@@ -202,7 +202,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			) async {
 		emit(state.copyWith(isDirty: false));
 
-		final ComboMMvgrupOjkModel? combo = event.comboMMvgrupOjk;
+		final ComboMMvgrupOjkModel combo = event.comboMMvgrupOjk;
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
@@ -223,7 +223,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 			) async {
 		emit(state.copyWith(isDirty: false));
 
-		final ComboMMvpakaiModel? combo = event.comboMMvpakai;
+		final ComboMMvpakaiModel combo = event.comboMMvpakai;
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
@@ -349,7 +349,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 				debugPrint("AUTO SAVE ➕ hasil tambah success: ${returnData.success}");
 				debugPrint("AUTO SAVE ➕ returned id: ${returnData.data}");
 
-				if (!returnData.success || returnData.data == null) {
+				if (!returnData.success) {
 					debugPrint("AUTO SAVE ❌ tambah gagal");
 
 					emit(state.copyWith(

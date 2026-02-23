@@ -2,7 +2,6 @@ import 'package:joss_app/models/combobox/combocoblist_model.dart';
 import 'package:joss_app/widgets/combobox/combocoblist_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:joss_app/blocs/gen_aset_dashboard/asetdashboardcari_bloc.dart';
 import 'package:joss_app/pages/gen_aset_dashboard/asetdashboardcari_list_widget.dart';
 import 'package:dropdown_search/dropdown_search.dart';

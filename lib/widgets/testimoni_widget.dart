@@ -49,7 +49,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
       width: double.infinity,
       padding: widget.isPageMode ? EdgeInsets.all(15) : EdgeInsets.all(0),
       child: Center(
-        child: Container(
+        child: SizedBox(
           width: 360,
           child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
             builder: (context, state) {

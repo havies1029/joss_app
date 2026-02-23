@@ -73,22 +73,26 @@ class MRekanBankCrudAPI {
 		}
 		return returnData.success;
 	}
-	Future<MRekanBankCrudModel> mRekanBankCrudLihatAPI(String mrekanbankId) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/profile/mrekanbankcrud/read";
-		Map<String, String> queryParams = {'mrekanbankId': mrekanbankId};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		final http.Response response =
-			await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+
+	Future<MRekanBankCrudModel> mRekanBankCrudLihatAPI() async {
+		String lihatEndpoint =
+				"${AppData.prefixEndPoint}/api/profile/mrekanbankcrud/read";
+
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, {});
+
+		final http.Response response = await http.get(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}',
+			},
+		);
 
 		if (response.statusCode == 200) {
-			var returnData = MRekanBankCrudModel.fromJson(jsonDecode(response.body));
-			return returnData;
+			return MRekanBankCrudModel.fromJson(jsonDecode(response.body));
 		} else {
-			return throw Exception("Failed to load data");
+			throw Exception("Failed to load data");
 		}
 	}
 }

@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:joss_app/common/constants.dart';
 
 import 'hitung_premi_widget.dart';
 class HitungPremiVerticalDemo extends StatefulWidget {

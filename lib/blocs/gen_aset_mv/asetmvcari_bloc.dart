@@ -300,7 +300,7 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			if (state.queryKey != keyAtRequest) return;
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
-			List<int> _first5IdsFrom(List<AsetMvCariModel> list) {
+			List<int> first5IdsFrom(List<AsetMvCariModel> list) {
 				return list
 						.take(5)
 						.map((e) => e.nomor) // ganti kalau field id kamu beda

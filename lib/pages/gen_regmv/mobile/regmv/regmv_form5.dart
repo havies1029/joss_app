@@ -42,7 +42,7 @@ class RegmvForm5Section extends StatefulWidget {
 
 class RegmvForm5SectionState extends State<RegmvForm5Section> {
   final _regmvform5key = GlobalKey<FormState>();
-  bool _showError = false;
+  final bool _showError = false;
   Completer<bool>? _validationCompleter;
 
   List<Uint8List> _images = [];

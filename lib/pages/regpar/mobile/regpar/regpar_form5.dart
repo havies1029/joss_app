@@ -43,7 +43,7 @@ class RegparForm5Section extends StatefulWidget {
 
 class RegparForm5SectionState extends State<RegparForm5Section> {
   final _regparform5key = GlobalKey<FormState>();
-  bool _showError = false;
+  final bool _showError = false;
   Completer<bool>? _validationCompleter;
 
   List<Uint8List> _images = [];

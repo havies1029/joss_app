@@ -129,7 +129,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 	void loadData() {
 		if (widget.viewMode == "ubah") {
 			mRekanBankCrudBloc.add(
-					MRekanBankCrudLihatEvent(recordId: widget.recordId));
+					MRekanBankCrudLihatEvent());
 		}
 	}
 

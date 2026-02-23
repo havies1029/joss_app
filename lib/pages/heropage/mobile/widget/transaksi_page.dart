@@ -393,8 +393,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
         final ad = a.tglDibuat;
         final bd = b.tglDibuat;
         if (ad == null && bd == null) return 0;
-        if (ad == null) return 1;
-        if (bd == null) return -1;
         return bd.compareTo(ad);
       });
     }

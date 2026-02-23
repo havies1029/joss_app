@@ -9,7 +9,6 @@ import '../../blocs/login/emailverification_bloc.dart';
 import '../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../common/constants.dart';
 import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
-import '../../widgets/menus/navbar.dart' as web_nav;
 import '../../widgets/menus/top_nav.dart';
 import '../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../heropage/mobile/heropage.dart';

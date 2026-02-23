@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/calpar/calpar3form_bloc.dart';
 import 'package:joss_app/models/calpar/calpar3form_model.dart';
 import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:string_validator/string_validator.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../../models/combobox/combomjnscoverpar_model.dart';
 import '../../../../repositories/combobox/combomjnscoverpar_repository.dart';

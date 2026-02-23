@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/widgets/list_extension.dart';
 import 'package:joss_app/models/gen_endors/endors2cari_model.dart';
 import 'package:joss_app/repositories/gen_endors/endors2cari_repository.dart';
 

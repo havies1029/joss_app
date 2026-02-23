@@ -188,7 +188,7 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
     }
 
     if (mjns == '20') {
-      final lain = record.namaBengkelLain?.trim() ?? '';
+      final lain = record.namaBengkelLain.trim() ?? '';
       if (lain.isEmpty) return false;
     }
 

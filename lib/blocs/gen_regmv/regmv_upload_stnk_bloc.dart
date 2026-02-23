@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv_upload_stnk_repository.dart';
 import 'package:equatable/equatable.dart';
 

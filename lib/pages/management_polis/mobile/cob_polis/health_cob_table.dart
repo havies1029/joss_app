@@ -225,11 +225,11 @@ class _HealthCobTableState extends State<HealthCobTable> {
         ),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: MaterialStateProperty.all(true),
-            trackVisibility: MaterialStateProperty.all(false),
-            thickness: MaterialStateProperty.all(5),
+            thumbVisibility: WidgetStateProperty.all(true),
+            trackVisibility: WidgetStateProperty.all(false),
+            thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(scrollBar.withOpacity(0.1)),
+            thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
           ),
           child: Scrollbar(
             controller: hController,
@@ -322,7 +322,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
             child: center ? Center(child: child) : child,
           );
-        }).toList(),
+        }),
       ],
     );
   }

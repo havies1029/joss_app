@@ -203,49 +203,48 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   void _payloadform2(Calmv2FormModel record) {
-    if (fieldAwController.text.trim().isEmpty && record.aw != null) {
+    if (fieldAwController.text.trim().isEmpty) {
       fieldAwController.text = cleanNum(record.aw);
     }
 
-    if (fieldPadController.text.trim().isEmpty && record.pad != null) {
+    if (fieldPadController.text.trim().isEmpty) {
       fieldPadController.text = cleanNum(record.pad);
     }
 
-    if (fieldPapController.text.trim().isEmpty && record.pap != null) {
+    if (fieldPapController.text.trim().isEmpty) {
       fieldPapController.text = cleanNum(record.pap);
     }
 
-    if (fieldPllController.text.trim().isEmpty && record.pll != null) {
+    if (fieldPllController.text.trim().isEmpty) {
       fieldPllController.text = cleanNum(record.pll);
     }
 
-    if (fieldTplController.text.trim().isEmpty && record.tpl != null) {
+    if (fieldTplController.text.trim().isEmpty) {
       fieldTplController.text = cleanNum(record.tpl);
     }
 
-    if (fieldIsEqController.text.trim().isEmpty && record.isEq != null) {
+    if (fieldIsEqController.text.trim().isEmpty) {
       fieldIsEqController.text = record.isEq.toString();
     }
 
-    if (fieldIsFloodController.text.trim().isEmpty && record.isFlood != null) {
+    if (fieldIsFloodController.text.trim().isEmpty) {
       fieldIsFloodController.text = record.isFlood.toString();
     }
 
-    if (fieldIsSrccController.text.trim().isEmpty && record.isSrcc != null) {
+    if (fieldIsSrccController.text.trim().isEmpty) {
       fieldIsSrccController.text = record.isSrcc.toString();
     }
 
-    if (fieldIsTbodController.text.trim().isEmpty && record.isTbod != null) {
+    if (fieldIsTbodController.text.trim().isEmpty) {
       fieldIsTbodController.text = record.isTbod.toString();
     }
 
-    if (fieldIsTerrorismController.text.trim().isEmpty &&
-        record.isTerrorism != null) {
+    if (fieldIsTerrorismController.text.trim().isEmpty) {
       fieldIsTerrorismController.text = record.isTerrorism.toString();
     }
 
     setState(() {
-      if (selectedPassengerCount.isEmpty && record.passangerCount != null) {
+      if (selectedPassengerCount.isEmpty) {
         selectedPassengerCount = record.passangerCount.toString();
       }
     });

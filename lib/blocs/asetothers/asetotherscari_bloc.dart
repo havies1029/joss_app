@@ -131,7 +131,7 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			if (state.queryKey != keyAtRequest) return;
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
-			List<String> _first5IdsFrom(List<AsetothersCariModel> list) {
+			List<String> first5IdsFrom(List<AsetothersCariModel> list) {
 				return list
 						.take(5)
 						.map((e) => e.asetOthersId) // ganti kalau field id kamu beda

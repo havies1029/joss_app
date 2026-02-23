@@ -17,7 +17,6 @@ import 'package:joss_app/widgets/combobox/comborkonstruksiojk_widget.dart';
 import 'package:joss_app/models/combobox/comborokupasi_model.dart';
 import 'package:joss_app/widgets/combobox/comborokupasi_widget.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 

@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import '../../../blocs/notifevent/notifeventcari_bloc.dart';
 import '../../../common/constants.dart';
 import '../../../models/notifevent/notifeventcari_model.dart';
-import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_sidepage.dart';
 
 class NotificationPage extends StatefulWidget {

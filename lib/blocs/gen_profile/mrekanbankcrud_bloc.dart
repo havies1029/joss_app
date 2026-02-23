@@ -70,7 +70,7 @@ class MRekanBankCrudBloc extends Bloc<MRekanBankCrudEvents, MRekanBankCrudState>
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 
 		try {
-			final record = await repository.mRekanBankCrudLihat(event.recordId);
+			final record = await repository.mRekanBankCrudLihat();
 
 			if (record.mrekanbankId.isEmpty) {
 				emit(state.copyWith(isLoading: false, isLoaded: true, record: null));

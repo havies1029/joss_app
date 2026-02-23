@@ -60,11 +60,11 @@ class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
         decoration: _boxDecoration(),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: MaterialStateProperty.all(true),
-            trackVisibility: MaterialStateProperty.all(false),
-            thickness: MaterialStateProperty.all(5),
+            thumbVisibility: WidgetStateProperty.all(true),
+            trackVisibility: WidgetStateProperty.all(false),
+            thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(scrollBar.withOpacity(0.25)),
+            thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.25)),
           ),
           child: Scrollbar(
             controller: hController,
@@ -145,10 +145,10 @@ class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
     return const TableRow(
       decoration: BoxDecoration(color: formGrey),
       children: [
-        _HeaderCell("SPPA ID"),
-        _HeaderCell("PERIODE POLIS"),
-        _HeaderCell("NO POLIS"),
-        _HeaderCell("STATUS"),
+        _HeaderCell(text: "SPPA ID", center: false),
+        _HeaderCell(text: "PERIODE POLIS", center: false),
+        _HeaderCell(text: "NO POLIS", center: false),
+        _HeaderCell(text: "STATUS", center: false),
       ],
     );
   }
@@ -198,7 +198,7 @@ class _HeaderCell extends StatelessWidget {
   final String text;
   final bool center;
 
-  const _HeaderCell(this.text, {this.center = false});
+  const _HeaderCell({required this.text, required this.center});
 
   @override
   Widget build(BuildContext context) {

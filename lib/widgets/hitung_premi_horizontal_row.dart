@@ -49,16 +49,16 @@ class HitungPremiHorizontalRow extends StatelessWidget {
         ? baseValueStyle?.copyWith(fontWeight: FontWeight.w700)
         : baseValueStyle;
 
-    String _cleanNum(num value) {
+    String cleanNum(num value) {
       final f = NumberFormat("#,###", "en_US");
       return f.format(value);
     }
 
-    String _formatControllerNumber(TextEditingController c) {
+    String formatControllerNumber(TextEditingController c) {
       if (c.text.isEmpty) return '';
       final value = num.tryParse(c.text.replaceAll(',', ''));
       if (value == null) return c.text;
-      return _cleanNum(value);
+      return cleanNum(value);
     }
 
     String buildDisplayValue(HitungPremiRow row) {
@@ -66,7 +66,7 @@ class HitungPremiHorizontalRow extends StatelessWidget {
       final suffix = (row.valueSuffix ?? '').trim();
 
       final value = row.formatNumber
-          ? _formatControllerNumber(row.controller).trim()
+          ? formatControllerNumber(row.controller).trim()
           : row.controller.text.trim();
 
       final parts = <String>[];

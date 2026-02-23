@@ -88,7 +88,7 @@ class _PolisSuccessState extends State<PolisSuccess> {
                     ),
                     const SizedBox(height: vPadding),
                     Text(
-                      "${widget.display}",
+                      widget.display,
                       textAlign: TextAlign.center,
                       style: headingStyle(context),
                     ),

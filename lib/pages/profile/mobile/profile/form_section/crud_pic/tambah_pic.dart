@@ -52,7 +52,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   bool _savedOnce = false;     // 🔹 untuk ubah label simpan jadi "Tersimpan"
 
   bool _showErrors = false;
-  bool _showInviteWarning = false;
+  final bool _showInviteWarning = false;
 
   List<ComboMJabatanModel>? _jabatanCache;
 
@@ -146,9 +146,9 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
     final idJabatan = (mjnsclientId == '10')
         ? ''
-        : (_jabatan?.mjabatanId?.trim().isEmpty ?? true)
+        : (_jabatan?.mjabatanId.trim().isEmpty ?? true)
         ? '' // ✅ kirim string kosong kalau null / belum dipilih
-        : _jabatan!.mjabatanId!.trim();
+        : _jabatan!.mjabatanId.trim();
 
 
     // 🧩 Validasi jabatan (kecuali clientId == 10)
@@ -453,7 +453,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                               _pendingCobList = selectedCobs;
                                             });
                                             debugPrint(
-                                                "🟠 Pending COB disimpan sementara: ${_pendingCobList!.length} item");
+                                                "🟠 Pending COB disimpan sementara: ${_pendingCobList.length} item");
                                           }
                                         },
                                         child: Row(
@@ -492,8 +492,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                         fontSize: 13),
                                                   ),
                                                   const SizedBox(height: 4),
-                                                  if (_pendingCobList == null ||
-                                                      _pendingCobList!.isEmpty)
+                                                  if (_pendingCobList.isEmpty)
                                                     const Text(
                                                       'Pilih Daftar COB',
                                                       style: TextStyle(
@@ -507,7 +506,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                     Wrap(
                                                       spacing: 6,
                                                       runSpacing: 6,
-                                                      children: _pendingCobList!
+                                                      children: _pendingCobList
                                                           .map(
                                                             (e) => Container(
                                                           padding:

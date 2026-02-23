@@ -125,7 +125,7 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			if (state.queryKey != keyAtRequest) return;
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
-			List<String> _first5IdsFrom(List<AsethullCariModel> list) {
+			List<String> first5IdsFrom(List<AsethullCariModel> list) {
 				return list
 						.take(5)
 						.map((e) => e.asetHullId) // ganti kalau field id kamu beda

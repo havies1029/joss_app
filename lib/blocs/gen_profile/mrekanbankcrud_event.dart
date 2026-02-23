@@ -31,13 +31,7 @@ class MRekanBankCrudHapusEvent extends MRekanBankCrudEvents {
 	List<Object> get props => [recordId];
 }
 
-class MRekanBankCrudLihatEvent extends MRekanBankCrudEvents {
-	final String recordId;
-	const MRekanBankCrudLihatEvent({required this.recordId});
-
-	@override
-	List<Object> get props => [recordId];
-}
+class MRekanBankCrudLihatEvent extends MRekanBankCrudEvents {}
 
 class ComboMBankChangedEvent extends MRekanBankCrudEvents{
 	final ComboMBankModel comboMBank;

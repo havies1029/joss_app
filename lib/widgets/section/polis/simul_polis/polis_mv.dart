@@ -53,7 +53,7 @@ class PolisMVPageState extends State<PolisMVPage> {
             child: Column(
               children: [
                 Center(
-                  child: Container(
+                  child: SizedBox(
                     width: responsive.maxWidth,
                     child: Form(
                       key: _formKey,
@@ -486,7 +486,7 @@ class PolisMVPageState extends State<PolisMVPage> {
             color: Colors.white,
           ),
           child: DropdownButtonFormField<String>(
-            value: value,
+            // initialValue: value,
             hint: Text(
               hint,
               style: TextStyle(

@@ -10,11 +10,6 @@ import 'regpar1crud_bloc.dart';
 import 'regpar2form_bloc.dart';
 import 'regpar3form_bloc.dart';
 
-import 'package:joss_app/models/regpar/regpar1crud_model.dart';
-import 'package:joss_app/models/regpar/regpar2form_model.dart';
-import 'package:joss_app/models/regpar/regpar3form_model.dart';
-import 'package:joss_app/models/regpar/regpar6form_model.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 
 part 'regpar_flow_event.dart';
 part 'regpar_flow_state.dart';

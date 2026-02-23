@@ -155,6 +155,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 									addError(
 										error: "Field ComboMBengkel tidak boleh kosong.");
 								}
+								return null;
 							},
 		);
 	}
@@ -218,6 +219,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 									addError(
 										error: "Field ComboMJnsbengkel tidak boleh kosong.");
 								}
+								return null;
 							},
 		);
 	}
@@ -286,6 +288,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 									addError(
 										error: "Field ComboMWilayahBengkel tidak boleh kosong.");
 								}
+								return null;
 							},
 		);
 	}

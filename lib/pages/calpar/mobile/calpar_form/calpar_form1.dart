@@ -1,6 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
@@ -9,7 +8,6 @@ import 'package:joss_app/models/calpar/calpar1crud_model.dart';
 import 'package:joss_app/models/combobox/combomjnscoverpar_model.dart';
 import 'package:joss_app/models/combobox/comborkonstruksiojk_model.dart';
 import 'package:joss_app/models/combobox/comborokupasi_model.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 
 import '../../../../repositories/combobox/combomjnscoverpar_repository.dart';
 import '../../../../repositories/combobox/comborkonstruksiojk_repository.dart';
