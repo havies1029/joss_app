@@ -138,7 +138,7 @@ class notificationPage extends State<NotificationPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SvgPicture.asset(
-              "assets/icons/notification-1.svg",
+              "assets/icons/notifikasi-2.svg",
               height: 50,
             ),
             const SizedBox(height: 20),

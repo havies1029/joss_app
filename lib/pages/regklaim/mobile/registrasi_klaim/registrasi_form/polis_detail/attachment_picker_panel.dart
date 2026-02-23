@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../../../../../common/constants.dart';
 import '../../../../../../models/regklaim/attachment_item.dart';
 
 class AttachmentPickerPanel extends StatelessWidget {
@@ -66,28 +68,34 @@ class AttachmentPickerPanel extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          // ===== buttons =====
+          // ===== buttons ===== ardi
           Row(
             children: [
               Expanded(
-                child: _BigButton(
-                  label: "Ambil File",
-                  icon: Icons.insert_drive_file_outlined,
-                  bg: const Color(0xFF4A4A4A),
-                  fg: Colors.white,
-                  enabled: true,
-                  onTap: onPickFile,
+                child: AppButton.iconLeft(
+                  text: "Ambil File",
+                  icon: SvgPicture.asset(
+                    "assets/icons/gallery_img.svg",
+                    width: 18,
+                    height: 18,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: const Color(0xFF4A4A4A),
+                  onPressed: onPickFile,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _BigButton(
-                  label: "Ambil Foto",
-                  icon: Icons.photo_camera_outlined,
-                  bg: const Color(0xFFF28C28),
-                  fg: Colors.white,
-                  enabled: true,
-                  onTap: onPickFile,
+                child: AppButton.iconLeft(
+                  text: "Ambil Foto",
+                  icon: SvgPicture.asset(
+                    "assets/icons/photo_img.svg",
+                    width: 18,
+                    height: 18,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: const Color(0xFFF28C28),
+                  onPressed: onPickPhoto,
                 ),
               ),
             ],
@@ -114,133 +122,122 @@ class _ThumbCard extends StatefulWidget {
 }
 
 class _ThumbCardState extends State<_ThumbCard> {
+  static const double _w = 180; // lebih ramping
+  static const double _h = 130;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: ClipRRect(
+    return Container(
+      margin: const EdgeInsets.only(right: 2), // optional, boleh hapus
+      child: Material(
+        color: const Color(0xFF101010),
         borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          children: [
-            SizedBox(
-              width: 210,
-              height: 136,
-              child: _content(),
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: _w,
+            height: _h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.10)),
             ),
-            Positioned(
-              top: 10,
-              left: 10,
-              child: InkWell(
-                onTap: widget.onRemove,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.25)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  // content
+                  SizedBox(width: _w, height: _h, child: _content()),
+
+                  // overlay gradient tipis biar text/chip kebaca kalau background terang
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.18),
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.18),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 20),
-                ),
+
+                  // tombol remove (lebih kecil & rapih)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: widget.onRemove,
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.45),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withOpacity(0.15)),
+                        ),
+                        child: const Icon(Icons.close, color: Colors.white, size: 18),
+                      ),
+                    ),
+                  ),
+
+                  // kamu bisa taruh status chip kecil di kanan bawah kalau perlu
+                  // Positioned(bottom: 10, right: 10, child: _StatusChip(item: widget.item)),
+                ],
               ),
             ),
-
-            // optional overlay status upload kecil
-            // Positioned(bottom: 10, right: 10, child: _StatusChip(item: widget.item)),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _content() {
+    // LOGIC SAMA PERSIS seperti punyamu, cuma ganti width/height pdf thumb
     if (widget.item.isImage) {
       return Image.file(File(widget.item.path), fit: BoxFit.cover);
     }
 
     if (widget.item.isPdf) {
-      return Container(
-        color: const Color(0xFF101010),
-        child: Stack(
-          children: [
-            _PdfThumbImage(
-              path: widget.item.path,
-              width: 210,
-              height: 136,
-            ),
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.45),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white.withOpacity(0.15)),
-                ),
-                child: const Text(
-                  "PDF",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+      return Stack(
+        children: [
+          _PdfThumbImage(
+            path: widget.item.path,
+            width: _w,
+            height: _h,
+          ),
+          Positioned(
+            bottom: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.45),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white.withOpacity(0.15)),
+              ),
+              child: const Text(
+                "PDF",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
     return _FilePlaceholder(name: widget.item.name);
   }
 }
-
-class _BigButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color bg;
-  final Color fg;
-  final VoidCallback? onTap;
-  final bool enabled;
-
-  const _BigButton({
-    required this.label,
-    required this.icon,
-    required this.bg,
-    required this.fg,
-    required this.onTap,
-    required this.enabled,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final effectiveBg = enabled ? bg : bg.withOpacity(0.35);
-    final effectiveFg = enabled ? fg : fg.withOpacity(0.55);
-
-    return SizedBox(
-      height: 72,
-      child: ElevatedButton.icon(
-        onPressed: enabled ? onTap : null, // <- null = disabled native
-        icon: Icon(icon, color: effectiveFg, size: 30),
-        label: Text(
-          label,
-          style: TextStyle(
-            color: effectiveFg,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: effectiveBg,
-          disabledBackgroundColor: effectiveBg, // biar tetap sesuai opacity
-          disabledForegroundColor: effectiveFg,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        ),
-      ),
-    );
-  }
-}
-
 
 class _FilePlaceholder extends StatelessWidget {
   final String name;

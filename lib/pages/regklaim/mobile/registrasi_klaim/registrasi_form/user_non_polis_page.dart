@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,12 +8,16 @@ import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/
 import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_state.dart';
+import '../../../../../blocs/regklaim/attach_bloc.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
+import '../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
+import '../../../../../repositories/regklaim/picker_repository.dart';
+import '../../../../../repositories/regklaim/upload_repository.dart';
 import '../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
@@ -33,6 +38,8 @@ class UserNonPolisPage extends StatefulWidget {
 class _UserNonPolisPageState extends State<UserNonPolisPage> {
   String regklaim1Id = "";
   late Regklaim1CrudBloc regklaim1formBloc;
+  late final Dio _dio;
+  late final AttachBloc _attachBloc;
 
   final fieldInsuredNamaController = TextEditingController();
   ComboMInsuranceModel? fieldComboMInsurance;
@@ -47,6 +54,19 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     super.initState();
     regklaim1formBloc = context.read<Regklaim1CrudBloc>();
 
+    _dio = Dio(BaseOptions(
+      baseUrl: AppData.apiDomain,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': 'Bearer ${AppData.userToken}',
+      },
+    ));
+
+    _attachBloc = AttachBloc(
+      pickerRepo: PickerRepositoryImpl(),
+      uploadRepo: UploadRepositoryImpl(_dio),
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -56,6 +76,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
   @override
   void dispose() {
+    _attachBloc.close();
     fieldInsuredNamaController.dispose();
     fieldPolisAkhirController.dispose();
     fieldPolisMulaiController.dispose();
@@ -65,28 +86,38 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   bool _toKlaimTriggered = false;
-
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<Regklaim1CrudBloc, Regklaim1CrudState>(
-          listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
-          listener: (context, state) {
-            if (!mounted) return;
-            if (state.hasFailure) return;
+    return BlocProvider.value(
+      value: _attachBloc,
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<Regklaim1CrudBloc, Regklaim1CrudState>(
+            listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
+            listener: (context, state) {
+              if (!mounted) return;
+              if (state.hasFailure) return;
 
-            if (_toKlaimTriggered) return;
-            _toKlaimTriggered = true;
+              if (_toKlaimTriggered) return;
+              _toKlaimTriggered = true;
 
-            final id = state.regklaim1Id;
-            regklaim1formBloc.add(RegklaimToKlaimEvent(regklaim1Id: id));
+              final id = state.regklaim1Id;
+              final attachBloc = context.read<AttachBloc>();
+
+              for (final item in attachBloc.state.items) {
+                if (item.status == UploadStatus.queued) {
+                  attachBloc.add(UploadOne(localId: item.localId, regklaim1Id: id));
+                }
+              }
+
+              regklaim1formBloc.add(RegklaimToKlaimEvent(regklaim1Id: id));
 
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => PaymentSuccess(
                     displayButton: "Kembali",
-                    description: "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
+                    description:
+                    "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
                     display: "Klaim Kamu Berhasil Didaftarkan!",
                     onButtonPressed: () {
                       Navigator.pushAndRemoveUntil(
@@ -98,71 +129,67 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   ),
                 ),
               );
-            }
-
-            // debugPrint("AWAADSDDASAS");
-            // debugPrint("regklaim1Id = ${regklaim1Id}");
-        ),
-      ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: vPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: pGrey,
-                borderRadius: BorderRadius.circular(cardBorderRadius),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "Cari Data Polis",
-                    style: TextStyle(
-                      color: primaryLightColor,
-                      fontSize: getResponsiveFont(context, 18),
-                      fontWeight: FontWeight.w500,
+            },
+          ),
+        ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: vPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: pGrey,
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Cari Data Polis",
+                      style: TextStyle(
+                        color: primaryLightColor,
+                        fontSize: getResponsiveFont(context, 18),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: hPadding),
+                    const SizedBox(height: hPadding),
 
-                  buildFieldMinsuranceId(),
-                  const SizedBox(height: hPadding),
-                  buildFieldPolisNo(),
-                  const SizedBox(height: hPadding),
-                  Row(
-                    children: [
-                      Flexible(child: buildFieldPolisMulai()),
-                      const SizedBox(width: hPadding),
-                      Flexible(child: buildFieldPolisBerakhir()),
-                    ],
-                  ),
-                  const SizedBox(height: hPadding),
-                  buildFieldInsuredNama(),
-                  const SizedBox(height: hPadding),
-                  buildFieldLokasiResiko(),
-                  const SizedBox(height: hPadding),
+                    buildFieldMinsuranceId(),
+                    const SizedBox(height: hPadding),
+                    buildFieldPolisNo(),
+                    const SizedBox(height: hPadding),
+                    Row(
+                      children: [
+                        Flexible(child: buildFieldPolisMulai()),
+                        const SizedBox(width: hPadding),
+                        Flexible(child: buildFieldPolisBerakhir()),
+                      ],
+                    ),
+                    const SizedBox(height: hPadding),
+                    buildFieldInsuredNama(),
+                    const SizedBox(height: hPadding),
+                    buildFieldLokasiResiko(),
+                    const SizedBox(height: hPadding),
 
-                  UploadSectionWidget(),
-                ],
+                    UploadSectionWidget(),
+                  ],
+                ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            SizedBox(
-              width: double.infinity,
-              child: AppButton(
-                text: "Masukkan Data Polis",
-                onPressed: onPressCariPolis,
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: AppButton(
+                  text: "Masukkan Data Polis",
+                  onPressed: onPressCariPolis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -171,8 +198,21 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   void onPressCariPolis() {
     final polis = context.read<PolisTanggalBloc>().state;
 
+    // ✅ pakai instance langsung, bukan context.read
+    final attachState = _attachBloc.state;
+
     final ok = validateForm1();
     if (!ok) return;
+
+    if (attachState.items.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text("Lampiran wajib diisi minimal 1 file/foto")),
+        );
+      return;
+    }
+
 
     final record = Regklaim1CrudModel(
       insuredNama: fieldInsuredNamaController.text,
@@ -185,10 +225,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     );
 
     if (regklaim1Id.isNotEmpty) {
-      debugPrint("call Regklaim1CrudUbahEvent");
       regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
     } else {
-      debugPrint("call Regklaim1CrudTambahEvent");
       regklaim1formBloc.add(Regklaim1CrudTambahEvent(record: record));
     }
   }

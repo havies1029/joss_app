@@ -262,6 +262,19 @@ flutter:
     - assets/icons/centang2.svg
     - assets/icons/no-alarm.svg
     - assets/icons/notification-1.svg
+    - assets/icons/aktifitas_notifikasi.svg
+    - assets/icons/transaksi_notifikasi.svg
+    - assets/icons/notifikasi-2.svg
+    - assets/icons/AktifKembali.svg
+    - assets/icons/BatalKlaim.svg
+    - assets/icons/EndorseLog.svg
+    - assets/icons/KlaimBaru.svg
+    - assets/icons/LaporKlaim.svg
+    - assets/icons/PerbaruiKlaim.svg
+    - assets/icons/PerpanjanganLog.svg
+    - assets/icons/RegMV.svg
+    - assets/icons/RegOthers.svg
+    - assets/icons/RegPAR.svg
 
   fonts:
     - family: Delm-Regular

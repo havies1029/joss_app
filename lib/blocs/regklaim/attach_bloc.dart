@@ -27,24 +27,30 @@ class AttachBloc extends Bloc<AttachEvent, AttachState> {
     on<_ProgressChanged>(_onProgressChanged);
   }
 
+  static const int _maxItems = 10;
+
+  bool get _isMaxReached => state.items.length >= _maxItems;
+
+  void _emitMaxToast(Emitter<AttachState> emit) {
+    emit(state.copyWith(
+      toast: "Maksimal $_maxItems file.",
+    ));
+    emit(state.copyWith(clearToast: true));
+  }
+
   Future<void> _onPickCamera(
       PickImageFromCamera event,
       Emitter<AttachState> emit,
       ) async {
-    debugPrint("=== EVENT: PickImageFromCamera triggered ===");
-
-    final item = await pickerRepo.pickFromCamera();
-
-    if (item == null) {
-      debugPrint("PickImageFromCamera: item null (user cancel?)");
+    if (_isMaxReached) {
+      _emitMaxToast(emit);
       return;
     }
 
-    debugPrint("PickImageFromCamera: item picked -> ${item.name}");
+    final item = await pickerRepo.pickFromCamera();
+    if (item == null) return;
 
     emit(state.copyWith(items: [...state.items, item]));
-
-    debugPrint("PickImageFromCamera: total items now ${state.items.length + 1}");
   }
 
 
@@ -52,24 +58,23 @@ class AttachBloc extends Bloc<AttachEvent, AttachState> {
       PickFilesFromStorage event,
       Emitter<AttachState> emit,
       ) async {
-    debugPrint("=== EVENT: PickFilesFromStorage triggered ===");
-
-    final picked = await pickerRepo.pickFiles();
-
-    if (picked.isEmpty) {
-      debugPrint("PickFilesFromStorage: no files selected");
+    if (_isMaxReached) {
+      _emitMaxToast(emit);
       return;
     }
 
-    debugPrint("PickFilesFromStorage: ${picked.length} file(s) selected");
+    final picked = await pickerRepo.pickFiles();
+    if (picked.isEmpty) return;
 
-    for (final file in picked) {
-      debugPrint(" -> ${file.name}");
+    final remaining = _maxItems - state.items.length;
+    final accepted = picked.take(remaining).toList();
+
+    emit(state.copyWith(items: [...state.items, ...accepted]));
+
+    if (picked.length > accepted.length) {
+      emit(state.copyWith(toast: "Maksimal $_maxItems file. Sisanya tidak ditambahkan."));
+      emit(state.copyWith(clearToast: true));
     }
-
-    emit(state.copyWith(items: [...state.items, ...picked]));
-
-    debugPrint("PickFilesFromStorage: total items now ${state.items.length + picked.length}");
   }
 
   void _onRemove(

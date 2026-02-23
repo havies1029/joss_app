@@ -144,28 +144,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                   final items = state.items; // <- sumber data tunggal dari bloc
 
                   if (items.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              "assets/icons/transaksi.svg",
-                              width: 64,
-                              height: 64,
-                              color: hintGrey,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              "Belum ada transaksi",
-                              style: bodyTextStyle(context, fontSize: 18),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    return _centerContainer(context);
                   }
 
                   // grouping sekali aja (jangan panggil berulang)
@@ -288,7 +267,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SvgPicture.asset(iconAsset, width: 34, height: 34),
+          _logIcon(item.jenisLog),
           const SizedBox(width: 16),
 
           Expanded(
@@ -431,5 +410,86 @@ class _TransaksiPageState extends State<TransaksiPage> {
       default:
         return pGrey;
     }
+  }
+
+  ({String icon, String header, String desc}) _emptyStateByFilter() {
+    switch (_filter) {
+      case LogFilter.aktivitas:
+        return (
+        icon: "assets/icons/aktifitas_notifikasi.svg",
+        header: "Tidak Ada Aktivitas",
+        desc: "Saat ini Anda belum membuat Aktivitas apa pun",
+        );
+      case LogFilter.transaksi:
+        return (
+        icon: "assets/icons/transaksi_notifikasi.svg",
+        header: "Tidak ada Transaksi",
+        desc: "Saat ini Anda belum membuat Transaksi apa pun",
+        );
+      case LogFilter.semua:
+        return (
+        icon: "assets/icons/semua_notifikasi.svg",
+        header: "Tidak ada Riwayat Transaksi",
+        desc: "Saat ini Anda belum membuat Aktivitas Transaksi apa pun",
+        );
+    }
+  }
+
+  Widget _centerContainer(BuildContext context) {
+    final e = _emptyStateByFilter();
+
+    return Expanded(
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(e.icon, height: 50),
+            const SizedBox(height: 20),
+
+            Text(
+              e.header,
+              style: TextStyle(
+                fontSize: getResponsiveFont(context, 16),
+                color: hintGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                e.desc,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: getResponsiveFont(context, 14),
+                  color: hintGrey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _logIcon(String? jenisLog) {
+    final j = (jenisLog ?? "").toLowerCase().trim();
+
+    String asset = "assets/icons/transaksi.svg"; // default fallback
+
+    if (j.contains("klaim baru")) asset = "assets/icons/KlaimBaru.svg";
+    else if (j.contains("pembatalan")) asset = "assets/icons/BatalKlaim.svg";
+    else if (j.contains("update")) asset = "assets/icons/PerbaruiKlaim.svg";
+    else if (j.contains("lapor")) asset = "assets/icons/LaporKlaim.svg";
+    else if (j.contains("endorse")) asset = "assets/icons/EndorseLog.svg";
+    else if (j.contains("perpanjang polis")) asset = "assets/icons/perpanjangan.svg";
+    else if (j.contains("aktivasi kembali")) asset = "assets/icons/AktifKembali.svg";
+    else if (j.contains("beli polis")) asset = "assets/icons/RegOthers.svg";
+
+    return SvgPicture.asset(
+      asset,
+      width: 40,
+      height: 40,
+    );
   }
 }

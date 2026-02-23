@@ -200,7 +200,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // icon (boleh kamu mapping dari jenisLog kalau mau)
-          SvgPicture.asset("assets/icons/transaksi.svg", width: 34, height: 34),
+          _logIcon(item.jenisLog),
           const SizedBox(width: 16),
 
           // content
@@ -219,16 +219,16 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                   style: bodyTextStyle(context, fontSize: 16)
                       .copyWith(color: hintGrey),
                 ),
-                if (item.keterangan.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    item.keterangan,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: bodyTextStyle(context, fontSize: 14)
-                        .copyWith(color: hintGrey),
-                  ),
-                ],
+                // if (item.keterangan.isNotEmpty) ...[
+                //   const SizedBox(height: 4),
+                //   Text(
+                //     item.keterangan,
+                //     maxLines: 2,
+                //     overflow: TextOverflow.ellipsis,
+                //     style: bodyTextStyle(context, fontSize: 14)
+                //         .copyWith(color: hintGrey),
+                //   ),
+                // ],
               ],
             ),
           ),
@@ -270,5 +270,26 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
       default:
         return pGrey;
     }
+  }
+
+  Widget _logIcon(String? jenisLog) {
+    final j = (jenisLog ?? "").toLowerCase().trim();
+
+    String asset = "assets/icons/transaksi.svg"; // default fallback
+
+    if (j.contains("klaim baru")) asset = "assets/icons/KlaimBaru.svg";
+    else if (j.contains("pembatalan")) asset = "assets/icons/BatalKlaim.svg";
+    else if (j.contains("update")) asset = "assets/icons/PerbaruiKlaim.svg";
+    else if (j.contains("lapor")) asset = "assets/icons/LaporKlaim.svg";
+    else if (j.contains("endorse")) asset = "assets/icons/EndorseLog.svg";
+    else if (j.contains("perpanjang polis")) asset = "assets/icons/perpanjangan.svg";
+    else if (j.contains("aktivasi kembali")) asset = "assets/icons/AktifKembali.svg";
+    else if (j.contains("beli polis")) asset = "assets/icons/RegOthers.svg";
+
+    return SvgPicture.asset(
+      asset,
+      width: 40,
+      height: 40,
+    );
   }
 }
