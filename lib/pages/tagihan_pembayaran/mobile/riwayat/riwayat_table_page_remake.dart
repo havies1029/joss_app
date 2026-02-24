@@ -1,341 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-
-
-import '../../../../blocs/payment/historybayar2cari_bloc.dart';
-import '../../../../models/payment/historybayarcari_model.dart';
-import 'detail_riwayat/riwayat_detail_table_page_remake.dart';
+import 'package:joss_app/models/payment/historybayarcari_model.dart';
+import 'package:joss_app/pages/payment/mobile/riwayat/table_widgets/riwayat_table_compact.dart';
+import 'package:joss_app/pages/payment/mobile/riwayat/table_widgets/riwayat_table_normal.dart';
 
 class RiwayatTablePageRemake extends StatefulWidget {
   final String searchText;
   const RiwayatTablePageRemake({super.key, required this.searchText});
 
   @override
-  RiwayatTablePageRemakeState createState() => RiwayatTablePageRemakeState();
+  State<RiwayatTablePageRemake> createState() => _RiwayatTablePageRemakeState();
 }
 
-class RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
-  late HistorybayarCariBloc historybayarCariBloc;
-
-  final ScrollController _scrollController = ScrollController();
-
-  String formatNum(num value) =>
-      NumberFormat.decimalPattern().format(value);
-
-  String formatDate(DateTime date) =>
-      DateFormat('yyyy-MM-dd').format(date);
-
-  final ScrollController hController = ScrollController();
-
-  void _openDetail(String inv1Id) {
-    FocusScope.of(context).requestFocus(FocusNode());
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return BlocProvider.value(
-          value: context.read<Historybayar2CariBloc>(),
-          child: RiwayatDetailTablePageRemake(inv1Id: inv1Id),
-        );
-      },
-      useSafeArea: true,
-    );
-  }
-
-  Widget _rowTapWrapper(HistorybayarCariModel d, {required Widget child}) {
-    return InkWell(
-      onTap: () => {
-        context.read<HistorybayarCariBloc>()
-            .add(SelectHistorybayarCariEvent(selected: d)),
-        _openDetail(d.inv1Id)
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(0),
-        child: child,
-      ),
-    );
-  }
+class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
+  final ScrollController _vController = ScrollController();
+  final ScrollController _hController = ScrollController();
+  bool _fetchLock = false;
 
   @override
   void initState() {
     super.initState();
-    historybayarCariBloc = context.read<HistorybayarCariBloc>();
-    _scrollController.addListener(_onScroll);
+    _vController.addListener(_onScroll);
   }
+
+void _onScroll() {
+  if (!_vController.hasClients) return;
+
+  final bloc = context.read<HistorybayarCariBloc>();
+  final state = bloc.state;
+
+  if (state.hasReachedMax) return;
+
+  // kalau bloc masih loading, jangan trigger dan buka lock lagi
+  if (state.isLoading) {
+    _fetchLock = false;
+    return;
+  }
+
+  final nearBottom = _vController.position.extentAfter < 200;
+
+  // ✅ near bottom dan lock belum aktif
+  if (nearBottom && !_fetchLock) {
+    _fetchLock = true;
+    bloc.add(FetchHistorybayarCariEvent());
+  }
+
+  // ✅ kalau sudah menjauh dari bottom, reset lock supaya bisa fetch lagi nanti
+  if (!nearBottom) {
+    _fetchLock = false;
+  }
+}
 
   @override
   void dispose() {
-    hController.dispose();
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
+    _vController.dispose();
+    _hController.dispose();
     super.dispose();
+  }
+
+  void _onTapRow(HistorybayarCariModel item) {
+    context.read<HistorybayarCariBloc>().add(SelectHistorybayarCariEvent(selected: item));
+    // panggil open detail kamu di sini kalau mau
   }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 900;
+    final isNarrow = MediaQuery.of(context).size.width < 900;
 
-    return BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
-      buildWhen: (p, c) => c.status == ListStatus.success,
-      listener: (_, __) {},
+    return BlocBuilder<HistorybayarCariBloc, HistorybayarCariState>(
+      buildWhen: (p, c) =>
+          p.status != c.status ||
+          p.items != c.items ||
+          p.isLoaded != c.isLoaded, // ✅ supaya indikator muncul
       builder: (context, state) {
         if (state.status != ListStatus.success) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (state.items.isEmpty) {
-          return const Center(
-            child: Text(
-              "No Data Available!!",
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          );
+          return const Center(child: Text("No Data Available!!"));
         }
 
-        return SizedBox(child: isNarrow
-            ? _buildTableCompact(state.items)
-            : _buildTableNormal(state.items));
+        return SingleChildScrollView(
+          controller: _vController,
+          child: Column(
+            children: [
+              isNarrow
+                  ? RiwayatTableCompact(
+                      items: state.items,
+                      hController: _hController,
+                      onTap: _onTapRow,
+                    )
+                  : RiwayatTableNormal(
+                      items: state.items,
+                      onTap: _onTapRow,
+                    ),
+              const SizedBox(height: 16),
+              if (state.isLoading == true)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          ),
+        );
       },
     );
-  }
-
-  // ========= TABLE COMPACT (NARROW) =========
-
-  Widget _buildTableCompact(List<HistorybayarCariModel> items) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Container(
-        decoration: _boxDecoration(),
-        child: ScrollbarTheme(
-          data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(true),
-            trackVisibility: WidgetStateProperty.all(false),
-            thickness: WidgetStateProperty.all(5),
-            radius: const Radius.circular(cardBorderRadius),
-            thumbColor: WidgetStateProperty.all(
-              scrollBar.withOpacity(0.1),
-            ),
-          ),
-          child: Scrollbar(
-            controller: hController,
-            child: SingleChildScrollView(
-              controller: hController,
-              scrollDirection: Axis.horizontal,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width - (hPadding * 3),
-                ),
-                child: Table(
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  border: _tableBorder(),
-                  columnWidths: const {
-                    0: FixedColumnWidth(50),
-                    1: IntrinsicColumnWidth(),
-                    2: IntrinsicColumnWidth(),
-                    3: IntrinsicColumnWidth(),
-                    4: IntrinsicColumnWidth(),
-                    5: IntrinsicColumnWidth(),
-                  },
-                  children: [
-                    _headerRow(),
-                    ...items.asMap().entries.map(
-                          (e) => _row(e.value, e.key, compact: true),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ========= TABLE NORMAL =========
-
-  Widget _buildTableNormal(List<HistorybayarCariModel> items) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Container(
-        decoration: _boxDecoration(),
-        child: Table(
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          border: _tableBorder(),
-          columnWidths: const {
-            0: FlexColumnWidth(1),
-            1: FlexColumnWidth(3),
-            2: FlexColumnWidth(2),
-            3: FlexColumnWidth(2),
-            4: FlexColumnWidth(2),
-            5: FlexColumnWidth(3),
-          },
-          children: [
-            _headerRow(),
-
-            ...items.asMap().entries.map(
-                  (e) => _row(
-                e.value,
-                e.key,
-                compact: false,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ========= SHARED PARTS =========
-
-  BoxDecoration _boxDecoration() {
-    return BoxDecoration(
-      color: formGrey,
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      border: const Border(
-        top: BorderSide(color: sGrey, width: 1),
-        left: BorderSide(color: sGrey, width: 1),
-        right: BorderSide(color: sGrey, width: 1),
-        bottom: BorderSide(color: sGrey, width: 0.5),
-      ),
-    );
-  }
-
-  TableBorder _tableBorder() {
-    return const TableBorder(
-      horizontalInside: BorderSide(color: sGrey, width: 1),
-      verticalInside: BorderSide(color: sGrey, width: 1),
-    );
-  }
-
-  TableRow _headerRow() {
-    return TableRow(
-      decoration: const BoxDecoration(color: formGrey),
-      children: [
-        _headerCell("NO"),
-        _headerCell("NO PEMBAYARAN"),
-        _headerCell("TANGGAL\nDIBAYAR"),
-        _headerCell("JUMLAH\nPOLIS"),
-        _headerCell("STATUS"),
-        _headerCell("TOTAL PEMBAYARAN"),
-        // _headerCell("Aksi"),
-      ],
-    );
-  }
-  Widget _headerCell(String text) {
-    final bool isNo = text.trim().toUpperCase() == "NO";
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-      child: isNo
-          ? Center(
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 15,
-            color: primaryLightColor,
-          ),
-        ),
-      )
-          : Text(
-        text,
-        style: TextStyle(
-          fontSize: 15,
-          color: primaryLightColor,
-        ),
-      ),
-    );
-  }
-
-  TableRow _row(
-      HistorybayarCariModel d,
-      int index, {
-        required bool compact,
-      }) {
-    return TableRow(
-      decoration: BoxDecoration(
-        color: index.isEven ? pGrey : formGrey,
-      ),
-      children: [
-        _rowTapWrapper(
-          d,
-          child: _cell(
-            (index + 1).toString(),
-            center: true,
-          ),
-        ),
-
-        _rowTapWrapper(
-          d,
-          child: _cell(d.inv1Id),
-        ),
-
-        _rowTapWrapper(
-          d,
-          child: _cell(formatDate(d.invTgl)),
-        ),
-
-        _rowTapWrapper(
-          d,
-          child: _cell(d.jmlPolis.toString()),
-        ),
-
-        _rowTapWrapper(
-          d,
-          child: _cell(d.status.toString()),
-        ),
-
-        _rowTapWrapper(
-          d,
-          child: _cell(formatNum(d.totalBayar)),
-        ),
-      ],
-    );
-  }
-
-  Widget _cell(
-      String text, {
-        bool center = false,
-      }) {
-    return Padding(
-      padding: const EdgeInsets.all(6),
-      child: center
-          ? Center(
-        child: Text(
-          text,
-          style: TextStyle(
-            color: primaryLightColor,
-            fontSize: 15,
-          ),
-        ),
-      )
-          : Text(
-        text,
-        style: TextStyle(
-          color: primaryLightColor,
-          fontSize: 15,
-        ),
-      ),
-    );
-  }
-
-  // ========= SCROLL / DELETE HELPERS =========
-
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      historybayarCariBloc.add(FetchHistorybayarCariEvent());
-    }
   }
 }

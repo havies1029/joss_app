@@ -225,7 +225,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/widgets/list_extension.dart';
 import 'package:joss_app/models/gen_aset_par/asetparcari_model.dart';
 import 'package:joss_app/repositories/gen_aset_par/asetparcari_repository.dart';
 

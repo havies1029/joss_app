@@ -171,10 +171,6 @@ import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
-import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
-import '../../../blocs/reguser_profile/reguser_profile_state.dart';
-import '../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../../blocs/user_profile/user_profile_state.dart';
 
 class CustomerServicePage extends StatefulWidget {
   const CustomerServicePage({super.key});

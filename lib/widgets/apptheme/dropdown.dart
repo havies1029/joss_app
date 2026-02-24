@@ -24,8 +24,8 @@ class ReusableComboBox<T> extends StatefulWidget {
   final IconData? prefixIcon;
   final String? errorText;
 
-  ReusableComboBox({
-    Key? key,
+  const ReusableComboBox({
+    super.key,
     required this.hintText,
     required this.dataLoader,
     required this.displayText,
@@ -45,7 +45,7 @@ class ReusableComboBox<T> extends StatefulWidget {
     this.dataLoaderWithFilter,
     this.serverSearchDebounce = const Duration(milliseconds: 350),
     this.serverSearchMinChars = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<ReusableComboBox<T>> createState() => _ReusableComboBoxState<T>();

@@ -14,7 +14,6 @@ import '../../../../models/combobox/combormatauang_model.dart';
 import '../../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../../repositories/combobox/combommvjnscover_repository.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
-import '../../../../widgets/apptheme/numeric_to_one_decimal_formatter.dart';
 
 class RegmvForm2Section extends StatefulWidget {
   final String viewMode;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/payment/dnrekapcobcari_model.dart';
-import 'package:path/path.dart';
 
 class RingkasanTablePage extends StatefulWidget {
   final List<DnrekapcobCariModel> items;
@@ -195,11 +194,11 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
         ),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: MaterialStateProperty.all(true),
-            trackVisibility: MaterialStateProperty.all(false),
-            thickness: MaterialStateProperty.all(5),
+            thumbVisibility: WidgetStateProperty.all(true),
+            trackVisibility: WidgetStateProperty.all(false),
+            thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: MaterialStateProperty.all(
+            thumbColor: WidgetStateProperty.all(
               scrollBar.withOpacity(0.1),
             ),
           ),

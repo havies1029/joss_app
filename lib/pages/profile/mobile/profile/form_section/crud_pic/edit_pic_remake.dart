@@ -10,18 +10,14 @@ import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
 import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
-import 'package:joss_app/widgets/combobox/combomjabatan_widget.dart';
 
-import '../../../../../../apis/gen_profile/rekanpiccobcari_api.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
-import '../../../../../../blocs/user_profile/user_profile_cubit.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import '../../../../../gen_profile/common/rekanpiccobcari_list.dart';
-import '../../../../../gen_profile/rekanpiccobmultipage.dart';
 
 class EditPicWidget extends StatefulWidget {
   final String mrekanpicId;
