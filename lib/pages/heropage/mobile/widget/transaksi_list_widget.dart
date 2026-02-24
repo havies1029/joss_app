@@ -282,7 +282,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
     else if (j.contains("update")) asset = "assets/icons/PerbaruiKlaim.svg";
     else if (j.contains("lapor")) asset = "assets/icons/LaporKlaim.svg";
     else if (j.contains("endorse")) asset = "assets/icons/EndorseLog.svg";
-    else if (j.contains("perpanjang polis")) asset = "assets/icons/perpanjangan.svg";
+    else if (j.contains("perpanjang polis")) asset = "assets/icons/PerpanjanganLog.svg";
     else if (j.contains("aktivasi kembali")) asset = "assets/icons/AktifKembali.svg";
     else if (j.contains("beli polis")) asset = "assets/icons/RegOthers.svg";
 
