@@ -1,7 +1,6 @@
 //generate from : usp_flutter_crud_api
 
 import 'dart:convert';
-import 'dart:io';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';

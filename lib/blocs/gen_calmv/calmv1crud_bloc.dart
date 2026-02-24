@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
 import 'package:joss_app/models/combobox/combomwilayah_model.dart';
 import 'package:joss_app/models/combobox/combommvgrupojk_model.dart';
@@ -164,7 +163,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
-			mmvjnscoverId: combo?.mmvjnscoverId, // aman kalau null
+			mmvjnscoverId: combo.mmvjnscoverId, // aman kalau null
 		);
 
 		emit(state.copyWith(
@@ -185,7 +184,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
-			mwilayahId: combo?.mwilayahId,
+			mwilayahId: combo.mwilayahId,
 		);
 
 		emit(state.copyWith(
@@ -206,7 +205,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
-			mmvgrupojkId: combo?.mmvgrupojkId,
+			mmvgrupojkId: combo.mmvgrupojkId,
 		);
 
 		emit(state.copyWith(
@@ -227,7 +226,7 @@ class Calmv1CrudBloc extends Bloc<Calmv1CrudEvents, Calmv1CrudState> {
 
 		Calmv1CrudModel updatedRecord = state.record ?? Calmv1CrudModel.empty();
 		updatedRecord = updatedRecord.copyWith(
-			mmvpakaiId: combo?.mmvpakaiId,
+			mmvpakaiId: combo.mmvpakaiId,
 		);
 
 		emit(state.copyWith(

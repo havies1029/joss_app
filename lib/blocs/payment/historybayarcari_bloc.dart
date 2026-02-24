@@ -43,8 +43,8 @@ class HistorybayarCariBloc extends Bloc<HistorybayarCariEvents, HistorybayarCari
 			hal: 0,
 			statusId: event.statusId,
 			searchText: event.searchText,
-			// kalau mau reset selection saat refresh:
-			// selectedItem: null,
+      isLoading: false,
+      isLoaded: false,
 		));
 
 		add(FetchHistorybayarCariEvent());
@@ -53,6 +53,9 @@ class HistorybayarCariBloc extends Bloc<HistorybayarCariEvents, HistorybayarCari
 Future<void> onFetchHistorybayarCari(
 		FetchHistorybayarCariEvent event, Emitter<HistorybayarCariState> emit) async {
 	if (state.hasReachedMax) return;
+  if (state.isLoading) return; 
+
+  emit(state.copyWith(isLoading: true, isLoaded: false));
 
 	HistorybayarCariRepository repo = HistorybayarCariRepository();
 	if (state.status == ListStatus.initial) {
@@ -61,11 +64,15 @@ Future<void> onFetchHistorybayarCari(
 			items: items,
 			hasReachedMax: false,
 			status: ListStatus.success,
-			hal: 1));
+			hal: 1,
+	  isLoading: false,
+	  isLoaded: true,
+		));
 	}
+  
 	List<HistorybayarCariModel> items = await repo.getHistorybayarCari(state.statusId, state.searchText, state.hal);
 	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
+		return emit(state.copyWith(hasReachedMax: true, isLoading: false, isLoaded: true));
 	} else {
 		List<HistorybayarCariModel> historybayarCari = List.of(state.items)..addAll(items);
 
@@ -79,8 +86,11 @@ Future<void> onFetchHistorybayarCari(
 			items: result,
 			hasReachedMax: false,
 			status: ListStatus.success,
-			hal: state.hal + 1));
-		}
+			hal: state.hal + 1,
+	  isLoading: false,
+	  isLoaded: true,
+		));
 
 	}
+}
 }

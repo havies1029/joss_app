@@ -11,6 +11,8 @@ class HistorybayarCariState extends Equatable {
 	final HistorybayarCariModel? selectedItem;
 	final bool isDownloading;
 	final String downloadPath;
+  final bool isLoading;
+  final bool isLoaded;
 
 	const HistorybayarCariState(
 		{this.status = ListStatus.initial,
@@ -22,7 +24,9 @@ class HistorybayarCariState extends Equatable {
 		this.selectedItem,
 		this.isDownloading = false,
 		this.downloadPath = '',
-	});
+    this.isLoading = false,
+    this.isLoaded = false
+   });
 
 	const HistorybayarCariState.success(List<HistorybayarCariModel> items)
 			: this(status: ListStatus.success, items: items);
@@ -38,7 +42,9 @@ class HistorybayarCariState extends Equatable {
     String? searchText,
 		HistorybayarCariModel? selectedItem,
 		bool? isDownloading,
-		String? downloadPath
+		String? downloadPath,
+    bool? isLoading,
+    bool? isLoaded,
    }) {
 
 		return HistorybayarCariState(
@@ -50,7 +56,9 @@ class HistorybayarCariState extends Equatable {
       searchText: searchText ?? this.searchText,
 			selectedItem: selectedItem ?? this.selectedItem,
 			isDownloading: isDownloading ?? this.isDownloading,
-			downloadPath: downloadPath ?? this.downloadPath
+			downloadPath: downloadPath ?? this.downloadPath,
+      isLoading: isLoading ?? this.isLoading,
+      isLoaded: isLoaded ?? this.isLoaded,
 		);
 	}
 

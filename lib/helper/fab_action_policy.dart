@@ -154,7 +154,7 @@ class FabActionPolicy {
     try {
       rawIsRenewal = (selectedItem as dynamic).isRenewal;
     } catch (_) {
-      if (selectedItem is Map) rawIsRenewal = (selectedItem as Map)["isRenewal"];
+      if (selectedItem is Map) rawIsRenewal = (selectedItem)["isRenewal"];
     }
 
     final hasRenewalInMaster =
