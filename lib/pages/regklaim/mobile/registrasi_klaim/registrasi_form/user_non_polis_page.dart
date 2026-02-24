@@ -20,10 +20,10 @@ import '../../../../../models/user/user_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
 import '../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../repositories/regklaim/upload_repository.dart';
-import '../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
 import '../../../../register/mobile/client/register_client_page.dart';
+import '../../../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
 class UserNonPolisPage extends StatefulWidget {
   final String cobKlaimId;

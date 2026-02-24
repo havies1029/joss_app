@@ -13,8 +13,8 @@ import '../../../../../base/base_background_sidepage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import '../../../../../register/mobile/client/register_client_page.dart';
+import '../../../../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 import '../../../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class UserPolisDetail extends StatefulWidget {
