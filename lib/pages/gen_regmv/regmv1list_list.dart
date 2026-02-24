@@ -62,7 +62,7 @@ class Regmv1ListPageState extends State<Regmv1ListPage> {
 							ListPageFilterBarUIWidget(
 								searchController: _searchController,
 								searchButton: buildSearchButton()),
-							buildList()
+							// buildList()
 						],
 
 					),
@@ -91,13 +91,13 @@ class Regmv1ListPageState extends State<Regmv1ListPage> {
 			});
 	}
 
-	Widget buildList() {
-		return Expanded(
-			child: Column(
-				mainAxisAlignment: MainAxisAlignment.start,
-				children: <Widget>[Regmv1ListListWidget(searchText: _searchController.text)],
-		));
-	}
+	// Widget buildList() {
+	// 	return Expanded(
+	// 		child: Column(
+	// 			mainAxisAlignment: MainAxisAlignment.start,
+	// 			children: <Widget>[Regmv1ListListWidget(searchText: _searchController.text)],
+	// 	));
+	// }
 
 	void showDialogViewData(BuildContext context, String viewMode, String recordId) {
 		FocusScope.of(context).requestFocus(FocusNode());

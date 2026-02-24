@@ -1695,7 +1695,7 @@ class _AppState extends State<_App> {
                 final nav = _navigatorKey.currentState;
                 if (nav == null) return;
 
-                if (state.authenticatedFrom != "calmv_page"){
+                if (state.authenticatedFrom != "calmv_page" || state.authenticatedFrom != 'regisnonpolis_page' || state.authenticatedFrom != 'regispolis_page'){
                   while (nav.canPop()) {
                     nav.pop();
                   }

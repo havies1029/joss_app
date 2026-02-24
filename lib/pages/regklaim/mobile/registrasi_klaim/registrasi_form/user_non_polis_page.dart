@@ -3,6 +3,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/upload_section_widget.dart';
 
 import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
@@ -15,11 +16,14 @@ import '../../../../../common/constants.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
+import '../../../../../models/user/user_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
 import '../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../repositories/regklaim/upload_repository.dart';
 import '../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
+
+import '../../../../register/mobile/client/register_client_page.dart';
 
 class UserNonPolisPage extends StatefulWidget {
   final String cobKlaimId;
@@ -198,7 +202,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   void onPressCariPolis() {
     final polis = context.read<PolisTanggalBloc>().state;
 
-    // ✅ pakai instance langsung, bukan context.read
     final attachState = _attachBloc.state;
 
     final ok = validateForm1();
@@ -214,6 +217,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     }
 
 
+
+
     final record = Regklaim1CrudModel(
       insuredNama: fieldInsuredNamaController.text,
       lokasiObject: fieldLokasiObjectController.text,
@@ -224,10 +229,28 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       regklaim1Id: regklaim1Id,
     );
 
-    if (regklaim1Id.isNotEmpty) {
-      regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
-    } else {
-      regklaim1formBloc.add(Regklaim1CrudTambahEvent(record: record));
+    if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
+      User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
+      if (user.userType == "C"){
+        if (regklaim1Id.isNotEmpty) {
+          regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
+        } else {
+          regklaim1formBloc.add(Regklaim1CrudTambahEvent(record: record));
+        }
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Only Client user can perform this action.'),
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => RegisterClient(requestFrom: 'regisnonpolis_page')
+          ),
+        );
+      }
     }
   }
 

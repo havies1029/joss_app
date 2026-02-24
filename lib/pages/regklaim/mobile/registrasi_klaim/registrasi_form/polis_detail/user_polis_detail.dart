@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/sppa_detail_page.dart';
 
+import '../../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../../blocs/regklaim/sppaheader_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/regklaim/sppadetail_model.dart';
 import '../../../../../../models/regklaim/sppaheader_model.dart';
+import '../../../../../../models/user/user_model.dart';
 import '../../../../../../widgets/apptheme/header_card_polis.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
+import '../../../../../register/mobile/client/register_client_page.dart';
 import '../../../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class UserPolisDetail extends StatefulWidget {
@@ -166,9 +169,26 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                     child: AppButton(
                       text: "Lapor Klaim",
                       onPressed: () {
-                        regklaim1crudbloc.add(
-                            Regklaim1Tambah4PolisJpsEvent(
-                                sppa1Id: widget.sppa1Id));
+                        if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
+                          User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
+                          if (user.userType == "C"){
+                            regklaim1crudbloc.add(
+                                Regklaim1Tambah4PolisJpsEvent(
+                                    sppa1Id: widget.sppa1Id));
+                          }else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Only Client user can perform this action.'),
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegisterClient(requestFrom: 'regispolis_page')
+                              ),
+                            );
+                          }
+                        }
                       },
                     ),
                   ),
