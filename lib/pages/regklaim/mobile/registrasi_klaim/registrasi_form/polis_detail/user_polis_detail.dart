@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/sppa_detail_page.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
 import '../../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../../blocs/regklaim/sppaheader_bloc.dart';
@@ -11,7 +12,7 @@ import '../../../../../base/base_background_sidepage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
+// import '../../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import '../../../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class UserPolisDetail extends StatefulWidget {

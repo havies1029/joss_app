@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
-import 'package:joss_app/pages/payment/mobile/ringkasan/detail/ringkasan_detail_table_widget.dart';
+// import 'package:joss_app/pages/payment/mobile/ringkasan/detail/ringkasan_detail_table_widget.dart';
 
 import '../../../../../common/constants.dart';
 import '../../../../base/base_background_sidepage.dart';
+import 'ringkasan_detail_table_widget.dart';
 
 class RingkasanDetailPage extends StatefulWidget {
   final String listcobId;

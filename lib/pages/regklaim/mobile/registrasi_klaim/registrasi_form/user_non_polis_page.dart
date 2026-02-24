@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/upload_section_widget.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
 import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_event.dart';
@@ -13,7 +14,7 @@ import '../../../../../common/constants.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
-import '../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
+// import '../../../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
 class UserNonPolisPage extends StatefulWidget {

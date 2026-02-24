@@ -17,7 +17,15 @@ class FabActionKlaim extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
       builder: (context, state) {
-        final selected = state.selectedKlaimRecord;
+        // final selected = state.selectedKlaimRecord;
+
+        final selectedId = state.selectedId;
+        final selected = selectedId.isNotEmpty
+            ? state.items
+            .expand((group) => group.details)
+            .where((d) => d.klaim1Id == selectedId)
+            .firstOrNull
+            : null;
         final status = (selected?.statusDesc ?? '').toLowerCase().trim();
 
         final isBerjalan = status == "berjalan";

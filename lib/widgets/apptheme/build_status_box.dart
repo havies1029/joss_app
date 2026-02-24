@@ -32,10 +32,13 @@ class _StatusChipState extends State<StatusChip> {
   String _normalIconByStatusId(String id) {
     switch (id) {
       case "10001":
+      case "10":
         return "assets/icons/aktif.svg";
       case "10002":
+      case "20":
         return "assets/icons/diproses.svg";
       case "10003":
+      case "30":
         return "assets/icons/nonaktif.svg";
       case "10004":
         return "assets/icons/jatuhtempo.svg";
@@ -47,10 +50,13 @@ class _StatusChipState extends State<StatusChip> {
   String _activeIconByStatusId(String id) {
     switch (id) {
       case "10001":
+      case "10":
         return "assets/icons/aktif_hover.svg";
       case "10002":
+      case "20":
         return "assets/icons/diproses_hover.svg";
       case "10003":
+      case "30":
         return "assets/icons/nonaktif_hover.svg";
       case "10004":
         return "assets/icons/jatuhtempo_hover.svg";

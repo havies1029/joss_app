@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/klaimringkas/mstatusringkascari_model.dart';
@@ -37,8 +38,17 @@ Future<void> onFetchMstatusringkasCari(
 	}
 
   Future<void> onSelectedIdChanged(
-    SelectedIdChanged event, Emitter<MstatusringkasCariState> emit) async {
-      emit(state.copyWith(selectedStatusId: event.selectedId));
+      SelectedIdChanged event,
+      Emitter<MstatusringkasCariState> emit,
+      ) async {
+
+    debugPrint("===== STATUS CHANGED =====");
+    debugPrint("OLD: ${state.selectedStatusId}");
+    debugPrint("NEW: ${event.selectedId}");
+    debugPrint("==========================");
+
+    emit(state.copyWith(
+      selectedStatusId: event.selectedId,
+    ));
   }
-	
 }

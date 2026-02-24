@@ -343,7 +343,7 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Lapor Klaim':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimMainPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
         break;
 
       case 'Polis':
@@ -379,7 +379,7 @@ class ListMenuWidget extends StatelessWidget {
     //   break;
 
       case 'Klaim':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => ListKlaimWidget()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimMainPage()));
         break;
 
       case 'Tagihan Pembayaran':

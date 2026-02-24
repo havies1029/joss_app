@@ -4,13 +4,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/historybayar2cari_bloc.dart';
 import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
-import 'package:joss_app/pages/payment/mobile/riwayat/detail_riwayat/riwayat_table_widget_remake.dart';
+// import 'package:joss_app/pages/payment/mobile/riwayat/detail_riwayat/riwayat_table_widget_remake.dart';
 
 
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../models/payment/historybayarcari_model.dart';
+import 'riwayat_table_widget_remake.dart';
 
 class RiwayatDetailTablePageRemake extends StatefulWidget {
   final String inv1Id;

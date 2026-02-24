@@ -4,11 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/pay2cari_bloc.dart';
 import 'package:joss_app/blocs/payment/pay1crud_bloc.dart';
-import 'package:joss_app/pages/payment/mobile/riwayat/detail_riwayat/riwayat_table_widget.dart';
+// import 'package:joss_app/pages/payment/mobile/riwayat/detail_riwayat/riwayat_table_widget.dart';
 
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../models/payment/pay1crud_model.dart';
+import 'riwayat_table_widget.dart';
 
 class RiwayatDetailTablePage extends StatefulWidget {
   final String ar1Id;
