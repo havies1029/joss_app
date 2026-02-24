@@ -8,4 +8,3 @@ abstract class SumdashEvents extends Equatable {
 }
 
 class SumdashLihatEvent extends SumdashEvents {}
-

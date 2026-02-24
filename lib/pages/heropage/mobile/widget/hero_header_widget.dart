@@ -45,52 +45,52 @@ class HeroHeaderWidget extends StatelessWidget {
             child: ClipOval(
               child: hasBytes
                   ? Image.memory(
-                      imageBytes!,
-                      fit: BoxFit.cover,
-                      gaplessPlayback: true,
-                      filterQuality: FilterQuality.medium,
-                      errorBuilder: (_, __, ___) => _avatarFallback(),
-                    )
+                imageBytes!,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                filterQuality: FilterQuality.medium,
+                errorBuilder: (_, __, ___) => _avatarFallback(),
+              )
                   : buildFromString(src),
             ),
           ),
           const SizedBox(width: 16),
           userType != 'C'
               ? Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Halo, ${_getGreeting()}',
-                        style: headingStyle(context, fontSize: 22),
-                      ),
-                    ],
-                  ),
-                )
-              : Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Halo, $userName',
-                        style: headingStyle(context, fontSize: 22),
-                      ),
-                      Text(
-                        _getGreeting(),
-                        style: bodyTextStyle(context),
-                      ),
-                    ],
-                  ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Halo, ${_getGreeting()}',
+                  style: headingStyle(context, fontSize: 22),
                 ),
+              ],
+            ),
+          )
+              : Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Halo, $userName',
+                  style: headingStyle(context, fontSize: 22),
+                ),
+                Text(
+                  _getGreeting(),
+                  style: bodyTextStyle(context),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _avatarFallback() => Container(
-        color: pGrey,
-        child: const Icon(Icons.person, color: primaryLightColor, size: 25),
-      );
+    color: pGrey,
+    child: const Icon(Icons.person, color: primaryLightColor, size: 25),
+  );
 
   String _getGreeting() {
     final hour = DateTime.now().hour;

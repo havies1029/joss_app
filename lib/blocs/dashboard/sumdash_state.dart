@@ -7,11 +7,11 @@ class SumdashState extends Equatable {
 	final bool isLoaded;
 	final bool hasFailure;
 	const SumdashState(
-		{this.record,
-		this.isLoading = false,
-		this.isLoaded = false,
-		this.hasFailure = false,
-});
+			{this.record,
+				this.isLoading = false,
+				this.isLoaded = false,
+				this.hasFailure = false,
+			});
 
 	SumdashState copyWith({
 		SumdashModel? record,

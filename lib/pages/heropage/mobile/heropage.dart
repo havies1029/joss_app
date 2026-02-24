@@ -26,12 +26,12 @@ class HeroPage extends StatefulWidget {
 class _HeroPageState extends State<HeroPage> {
 
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  // Panggil API sumdash saat HeroPage dibuka
-  context.read<SumdashBloc>().add(SumdashLihatEvent());
-}
+    // Panggil API sumdash saat HeroPage dibuka
+    context.read<SumdashBloc>().add(SumdashLihatEvent());
+  }
 
   @override
   Widget build(BuildContext context) {

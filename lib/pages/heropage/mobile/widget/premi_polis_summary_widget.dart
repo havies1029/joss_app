@@ -56,11 +56,11 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
   }
 
   Widget _buildCard(
-    BuildContext context, {
-    required String premiumAmount,
-    required int polisCount,
-    required bool isLoading,
-  }) {
+      BuildContext context, {
+        required String premiumAmount,
+        required int polisCount,
+        required bool isLoading,
+      }) {
     return IntrinsicHeight(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -98,19 +98,19 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                               FadeTransition(opacity: animation, child: child),
                           child: _isPremiumVisible
                               ? Text(
-                                  isLoading ? '...' : premiumAmount,
-                                  key: const ValueKey('visible'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: headingStyle(context),
-                                )
+                            isLoading ? '...' : premiumAmount,
+                            key: const ValueKey('visible'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: headingStyle(context),
+                          )
                               : Text(
-                                  _getStarsText(),
-                                  key: const ValueKey('stars'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: headingStyle(context),
-                                ),
+                            _getStarsText(),
+                            key: const ValueKey('stars'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: headingStyle(context),
+                          ),
                         ),
                         const SizedBox(width: 4),
                         SizedBox(

@@ -15,7 +15,7 @@ class SumdashBloc extends Bloc<SumdashEvents, SumdashState> {
 	}
 
 	Future<void> onLihatSumdash(
-		SumdashLihatEvent event, Emitter<SumdashState> emit) async {
+			SumdashLihatEvent event, Emitter<SumdashState> emit) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		SumdashModel? record = await repository.sumdashLihat();
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));

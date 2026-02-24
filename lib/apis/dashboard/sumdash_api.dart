@@ -2,18 +2,18 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/dashboard/sumdash_model.dart';
 
 class SumdashAPI {
 
 	Future<SumdashModel?> sumdashLihatAPI() async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/dashboard/sumdash/read";
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/dashboard/sumdashcrud/read";
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint);
 		try{
 			final http.Response response =
-				await http.get(uri, headers: <String, String>{
+			await http.get(uri, headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
 				'Authorization': 'Bearer ${AppData.userToken}'
