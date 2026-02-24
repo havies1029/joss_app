@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../payment/mobile/riwayat/riwayat_page_remake.dart';
+
+import 'mobile/riwayat/riwayat_page_remake.dart';
+// import '../payment/mobile/riwayat/riwayat_page_remake.dart';
 
 class PaymentRiwayatTab extends StatelessWidget {
   const PaymentRiwayatTab({super.key});

@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_method/payment_method_page.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
+import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
+// import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../../blocs/gen_regmv/regmv1crud_bloc.dart';
 import '../../../blocs/gen_regmv/regmv1list_bloc.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
@@ -13,8 +16,8 @@ import '../../../models/gen_regmv/regmv1crud_model.dart';
 import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
 import '../../base/base_background_sidepage.dart';
-import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
-import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
+// import '../../payment/mobile/payment_page/payment_process/payment_process.dart';
+// import '../../payment/mobile/payment_page/payment_success/payment_success.dart';
 import '../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {

@@ -5,7 +5,9 @@ import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
 import 'package:joss_app/models/payment/dnsppacari_model.dart';
-import 'package:joss_app/pages/payment/mobile/ringkasan/detail/ringkasan_detail_table_list.dart';
+
+import 'ringkasan_detail_table_list.dart';
+// import 'package:joss_app/pages/payment/mobile/ringkasan/detail/ringkasan_detail_table_list.dart';
 
 class RingkasanDetailTableWidget extends StatefulWidget {
   const RingkasanDetailTableWidget({super.key});

@@ -30,7 +30,9 @@
 
 // pages/tagihan_pembayaran/payment_rincian_tab.dart
 import 'package:flutter/material.dart';
-import '../payment/mobile/rincian/rincian_page.dart';
+
+import 'mobile/rincian/rincian_page.dart';
+// import '../payment/mobile/rincian/rincian_page.dart';
 
 class PaymentRincianTab extends StatelessWidget {
   const PaymentRincianTab({super.key});
