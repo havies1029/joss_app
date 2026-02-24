@@ -7,11 +7,7 @@ import 'package:joss_app/repositories/combobox/combommvjnscover_repository.dart'
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'package:joss_app/models/combobox/combominsurer_model.dart';
-import 'package:joss_app/widgets/combobox/combominsurer_widget.dart';
 import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
-import 'package:joss_app/widgets/combobox/combommvjnscover_widget.dart';
-import 'package:intl/intl.dart';
-import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 
@@ -234,6 +230,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 					addError(
 							error: "Asuransi tidak boleh kosong.");
 				}
+				return null;
 			},
 		);
 	}
@@ -311,6 +308,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 				addError(
 						error: "Jenis Cover tidak boleh kosong.");
 			}
+			return null;
 		},
 		onChangedCallback: (value) {
 			if (value != null) {

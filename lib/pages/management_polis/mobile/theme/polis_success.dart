@@ -11,7 +11,6 @@ import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
 import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
 import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
-import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
 import '../../detail_management_page/detail_management_widget.dart';

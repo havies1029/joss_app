@@ -5,13 +5,6 @@ import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
-import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
-import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
-import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
-import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
-import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
-import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
 import '../../../management_polis/detail_management_page/detail_management_widget.dart';

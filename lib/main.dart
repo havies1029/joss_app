@@ -968,7 +968,6 @@
 //     );
 //   }
 // }
-import 'package:dio/dio.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -1034,8 +1033,6 @@ import 'package:joss_app/repositories/calpar/calpar4form_repository.dart';
 import 'package:joss_app/repositories/gen_endors/endors1crud_repository.dart';
 import 'package:joss_app/repositories/regendors/regendors1form_repository.dart';
 
-import 'package:joss_app/repositories/gen_klaim/klaim1crud_repository.dart';
-import 'package:joss_app/repositories/gen_klaim/klaim2crud_repository.dart';
 
 import 'package:joss_app/repositories/gen_regmv/regmv1crud_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv2form_repository.dart';
@@ -1056,7 +1053,6 @@ import 'package:joss_app/repositories/gen_sppamv/sppamvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_sppapar/sppaparcrud_repository.dart';
 
 import 'package:joss_app/repositories/payment/paymentdn_repository.dart';
-import 'package:joss_app/repositories/payment/paymentmethodcari_repository.dart';
 import 'package:joss_app/repositories/payment/invbayarvaform_repository.dart';
 import 'package:joss_app/repositories/payment/pay1crud_repository.dart';
 
@@ -1064,8 +1060,6 @@ import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 import 'package:joss_app/repositories/regother/regother1crud_repository.dart';
 import 'package:joss_app/repositories/regother/regother2form_repository.dart';
 
-import 'package:joss_app/repositories/regklaim/picker_repository.dart';
-import 'package:joss_app/repositories/regklaim/upload_repository.dart';
 import 'package:joss_app/repositories/regklaim/regklaim1crud_repository.dart';
 import 'package:joss_app/repositories/regklaim/sppaheader_repository.dart';
 
@@ -1074,7 +1068,6 @@ import 'package:joss_app/repositories/regreaktif/regreaktif1_repository.dart';
 
 import 'package:joss_app/repositories/simulmv/simulmvcrud_repository.dart';
 import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
-import 'package:joss_app/repositories/simulpar/simulparlist_repository.dart';
 
 import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
@@ -1158,10 +1151,6 @@ import 'blocs/regendors/regendorscari_bloc.dart';
 import 'blocs/regendors/regendors1form_bloc.dart';
 import 'blocs/regendors/regendors2cari_bloc.dart';
 
-import 'blocs/gen_klaim/klaim1crud_bloc.dart';
-import 'blocs/gen_klaim/klaim1list_bloc.dart';
-import 'blocs/gen_klaim/klaim2crud_bloc.dart';
-import 'blocs/klaim/klaim2list_bloc.dart';
 
 import 'blocs/gen_regmv/polis_tanggal_bloc.dart';
 import 'blocs/gen_regmv/regmv1crud_bloc.dart';
@@ -1238,7 +1227,6 @@ import 'blocs/regother/regother1list_bloc.dart';
 import 'blocs/regother/regother2form_bloc.dart';
 import 'blocs/regother/regother3cari_bloc.dart';
 
-import 'blocs/regklaim/attach_bloc.dart';
 import 'blocs/regklaim/cobklaimcari_bloc.dart';
 import 'blocs/regklaim/polissourcecari_bloc.dart';
 import 'blocs/regklaim/regklaim1crud_bloc.dart';
@@ -1636,7 +1624,6 @@ class _App extends StatefulWidget {
   final bool seenOnboarding;
 
   const _App({
-    super.key,
     required this.userRepository,
     required this.seenOnboarding,
   });
@@ -1753,7 +1740,7 @@ class _AppState extends State<_App> {
                   listenWhen: (prev, curr) =>
                   prev.record?.mrekan1Id != curr.record?.mrekan1Id &&
                       curr.record?.mrekan1Id != null &&
-                      curr.record!.mrekan1Id!.trim().isNotEmpty,
+                      curr.record!.mrekan1Id.trim().isNotEmpty,
                   listener: (context, state) async {
                     if (ChatInitService.I.isInitialized) return;
 

@@ -5,9 +5,6 @@ import 'package:joss_app/repositories/combobox/combomjenisrugi_repository.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
-import 'package:joss_app/widgets/combobox/combomjenisrugi_widget.dart';
-import 'package:intl/intl.dart';
-import 'package:date_field/date_field.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 

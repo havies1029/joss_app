@@ -1,23 +1,12 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
-import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
-import 'package:joss_app/pages/qontak/mobile/customer_service_page.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../blocs/user_profile/user_profile_state.dart';
-import '../../../blocs/reguser_profile/reguser_profile_cubit.dart';
-import '../../../blocs/reguser_profile/reguser_profile_state.dart';
-import '../../../blocs/user_profile/user_profile_cubit.dart';
-import '../../gen_cob_app/cobcari_main.dart';
-import '../../gen_dn1/dn1cari_list.dart';
-import '../../login/change_pswd_main.dart';
-import '../../profile/mobile/profile/form_section/crud_pic/list_pic.dart';
 import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
@@ -577,7 +566,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: primaryLightColor,
+              activeThumbColor: primaryLightColor,
               activeTrackColor: pBlue,
               inactiveThumbColor: primaryLightColor,
               inactiveTrackColor: pGrey,
