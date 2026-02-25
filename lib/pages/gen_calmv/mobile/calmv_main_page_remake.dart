@@ -77,10 +77,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   //form1
 
   //form2
-  final fieldPadController = TextEditingController();
-  final fieldPapController = TextEditingController();
-  final fieldPllController = TextEditingController();
-  final fieldTplController = TextEditingController();
+  final fieldPadController = TextEditingController(text: "0");
+  final fieldPapController = TextEditingController(text: "0");
+  final fieldPllController = TextEditingController(text: "0");
+  final fieldTplController = TextEditingController(text: "0");
   final fieldIsEqController = TextEditingController();
   final fieldIsFloodController = TextEditingController();
   final fieldIsSrccController = TextEditingController();

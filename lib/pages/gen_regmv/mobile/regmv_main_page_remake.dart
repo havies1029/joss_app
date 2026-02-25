@@ -1388,7 +1388,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   if (hasForm6Record) ...[
                     AppButton.iconRight(
-                      text: "Lanjutkanx",
+                      text: "Lanjutkan",
                       icon: Icon(Icons.arrow_forward),
                       onPressed: () {
                         Navigator.push(
@@ -1796,6 +1796,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     _onUploadPressedForm4();
     _onUploadPressedForm5();
     _onUploadPressedForm7();
+    
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
