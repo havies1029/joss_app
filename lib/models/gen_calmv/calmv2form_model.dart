@@ -1,5 +1,4 @@
 class Calmv2FormModel {
-	double aw;
 	String calmv2Id;
 	String calmv1Id;
 	bool isEq;
@@ -7,6 +6,7 @@ class Calmv2FormModel {
 	bool isSrcc;
 	bool isTbod;
 	bool isTerrorism;
+  bool isAw;
 	double pad;
 	double pap;
 	int passangerCount;
@@ -14,13 +14,13 @@ class Calmv2FormModel {
 	double tpl;
 
 	Calmv2FormModel({
-		required this.aw,
 		required this.calmv2Id,
 		required this.isEq,
 		required this.isFlood,
 		required this.isSrcc,
 		required this.isTbod,
 		required this.isTerrorism,
+		required this.isAw,
 		required this.pad,
 		required this.pap,
 		required this.passangerCount,
@@ -31,7 +31,6 @@ class Calmv2FormModel {
 
 	/// ✅ copyWith: clone + ganti field tertentu
 	Calmv2FormModel copyWith({
-		double? aw,
 		String? calmv2Id,
 		String? calmv1Id,
 		bool? isEq,
@@ -44,9 +43,9 @@ class Calmv2FormModel {
 		int? passangerCount,
 		double? pll,
 		double? tpl,
+		bool? isAw,
 	}) {
 		return Calmv2FormModel(
-			aw: aw ?? this.aw,
 			calmv2Id: calmv2Id ?? this.calmv2Id,
 			calmv1Id: calmv1Id ?? this.calmv1Id,
 			isEq: isEq ?? this.isEq,
@@ -54,6 +53,7 @@ class Calmv2FormModel {
 			isSrcc: isSrcc ?? this.isSrcc,
 			isTbod: isTbod ?? this.isTbod,
 			isTerrorism: isTerrorism ?? this.isTerrorism,
+			isAw: isAw ?? this.isAw,
 			pad: pad ?? this.pad,
 			pap: pap ?? this.pap,
 			passangerCount: passangerCount ?? this.passangerCount,
@@ -63,8 +63,7 @@ class Calmv2FormModel {
 	}
 
 	factory Calmv2FormModel.fromJson(Map<String, dynamic> data) {
-		return Calmv2FormModel(
-			aw: double.tryParse(data['aw'].toString()) ?? 0,
+    return Calmv2FormModel(
 			calmv2Id: data['calmv2Id'] ?? '',
 			calmv1Id: data['calmv1Id'] ?? '',
 			isEq: data['isEq'] ?? false,
@@ -72,6 +71,7 @@ class Calmv2FormModel {
 			isSrcc: data['isSrcc'] ?? false,
 			isTbod: data['isTbod'] ?? false,
 			isTerrorism: data['isTerrorism'] ?? false,
+			isAw: data['isAw'] ?? false,
 			pad: double.tryParse(data['pad'].toString()) ?? 0,
 			pap: double.tryParse(data['pap'].toString()) ?? 0,
 			passangerCount: int.tryParse(data['passangerCount'].toString()) ?? 0,
@@ -81,7 +81,6 @@ class Calmv2FormModel {
 	}
 
 	Map<String, dynamic> toJson() => {
-		'aw': aw.toString(),
 		'calmv2Id': calmv2Id,
 		'calmv1Id': calmv1Id,
 		'isEq': isEq,
@@ -89,6 +88,7 @@ class Calmv2FormModel {
 		'isSrcc': isSrcc,
 		'isTbod': isTbod,
 		'isTerrorism': isTerrorism,
+		'isAw': isAw,
 		'pad': pad.toString(),
 		'pap': pap.toString(),
 		'passangerCount': passangerCount.toString(),
@@ -97,7 +97,6 @@ class Calmv2FormModel {
 	};
 	factory Calmv2FormModel.empty() {
 		return Calmv2FormModel(
-			aw: 0,
 			calmv2Id: '',
 			calmv1Id: '',
 			isEq: false,
@@ -105,6 +104,7 @@ class Calmv2FormModel {
 			isSrcc: false,
 			isTbod: false,
 			isTerrorism: false,
+			isAw: false,
 			pad: 0,
 			pap: 0,
 			passangerCount: 0,

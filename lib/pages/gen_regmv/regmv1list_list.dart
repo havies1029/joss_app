@@ -5,7 +5,6 @@ import 'package:joss_app/widgets/floatingmenumaster_widget.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1list_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:joss_app/pages/gen_regmv/regmv1crud_form.dart';
-import 'package:joss_app/pages/gen_regmv/regmv1list_list_widget.dart';
 
 class Regmv1ListPage extends StatefulWidget {
 	const Regmv1ListPage({super.key});

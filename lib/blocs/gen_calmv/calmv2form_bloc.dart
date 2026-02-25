@@ -23,7 +23,6 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 				hasFailure: false,
 			));
 		});
-		on<FieldAwChangedEvent>(onFieldAwChanged);
 		on<FieldPadChangedEvent>(onFieldPadChanged);
 		on<FieldPapChangedEvent>(onFieldPapChanged);
 		on<FieldPllChangedEvent>(onFieldPllChanged);
@@ -171,18 +170,6 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
 		Calmv2FormModel record = await repository.calmv2FormLihat(event.recordId);
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
-	}
-
-	Future<void> onFieldAwChanged(
-			FieldAwChangedEvent event,
-			Emitter<Calmv2FormState> emit,
-			) async {
-		Calmv2FormModel? record = state.record ?? Calmv2FormModel.empty();
-		emit(state.copyWith(
-			record: record.copyWith(aw: event.aw),
-			isDirty: true,
-			isValid: _validate(record),
-		));
 	}
 
 	Future<void> onFieldPadChanged(
@@ -384,7 +371,6 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 
 		final isValid =
 				record.calmv1Id.isNotEmpty &&
-						record.aw > 0 &&
 						record.pad > 0 &&
 						record.pap > 0 &&
 						record.pll > 0 &&
@@ -394,7 +380,6 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 
 		debugPrint("=== CALMV2 VALIDATION DEBUG ===");
 		debugPrint("calmv1Id : ${record.calmv1Id}");
-		debugPrint("aw       : ${record.aw}");
 		debugPrint("pad      : ${record.pad}");
 		debugPrint("pap      : ${record.pap}");
 		debugPrint("pll      : ${record.pll}");

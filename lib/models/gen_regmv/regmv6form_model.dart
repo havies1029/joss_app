@@ -14,7 +14,7 @@ class Regmv6FormModel {
 	double rateEq; // gempa bumi
 	double rateTerrorism; // terorisme dan sabotase
 	double ratePad;
-	double rateAw; // komprehensif
+	double rateAw; // bengkel resmi
 	double ratePap;
 	double biayaPolis;
 	double tsi;

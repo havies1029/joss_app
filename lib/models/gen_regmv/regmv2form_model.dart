@@ -2,7 +2,7 @@ import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
 
 class Regmv2FormModel {
-	double aw;
+	bool isAw;
 	bool isEq;
 	bool isFlood;
 	bool isSrcc;
@@ -23,7 +23,7 @@ class Regmv2FormModel {
 	ComboMMvjnscoverModel? comboMMvjnscover;
 
 	Regmv2FormModel({
-		required this.aw,
+		required this.isAw,
 		required this.isEq,
 		required this.isFlood,
 		required this.isSrcc,
@@ -56,7 +56,7 @@ class Regmv2FormModel {
 		}
 
 		return Regmv2FormModel(
-			aw: double.tryParse(data['aw'].toString()) ?? 0,
+			isAw: data['isAw'] ?? false,
 			isEq: data['isEq'] ?? false,
 			isFlood: data['isFlood'] ?? false,
 			isSrcc: data['isSrcc'] ?? false,
@@ -81,7 +81,7 @@ class Regmv2FormModel {
 	}
 
 	Map<String, dynamic> toJson() => {
-		'aw': aw.toString(),
+		'isAw': isAw,
 		'isEq': isEq,
 		'isFlood': isFlood,
 		'isSrcc': isSrcc,
@@ -103,7 +103,7 @@ class Regmv2FormModel {
 	};
 
 	Regmv2FormModel copyWith({
-		double? aw,
+		bool? isAw,
 		bool? isEq,
 		bool? isFlood,
 		bool? isSrcc,
@@ -124,7 +124,7 @@ class Regmv2FormModel {
 		ComboMMvjnscoverModel? comboMMvjnscover,
 	}) {
 		return Regmv2FormModel(
-			aw: aw ?? this.aw,
+			isAw: isAw ?? this.isAw,
 			isEq: isEq ?? this.isEq,
 			isFlood: isFlood ?? this.isFlood,
 			isSrcc: isSrcc ?? this.isSrcc,

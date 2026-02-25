@@ -77,7 +77,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   //form1
 
   //form2
-  final fieldAwController = TextEditingController();
   final fieldPadController = TextEditingController();
   final fieldPapController = TextEditingController();
   final fieldPllController = TextEditingController();
@@ -87,6 +86,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   final fieldIsSrccController = TextEditingController();
   final fieldIsTbodController = TextEditingController();
   final fieldIsTerrorismController = TextEditingController();
+  final fieldIsAwController = TextEditingController();
   String selectedPassengerCount = "";
   //form2
 
@@ -107,10 +107,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     // default passenger count = 1
     selectedPassengerCount = selectedPassengerCount.trim().isEmpty ? "1" : selectedPassengerCount;
 
-    // default AW = 0.01
-    if (fieldAwController.text.trim().isEmpty) {
-      fieldAwController.text = "0.01";
-    }
   }
 
   @override
@@ -122,7 +118,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     //form1
 
     //form2
-    fieldAwController.dispose();
     fieldPadController.dispose();
     fieldPapController.dispose();
     fieldPllController.dispose();
@@ -132,6 +127,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     fieldIsSrccController.dispose();
     fieldIsTbodController.dispose();
     fieldIsTerrorismController.dispose();
+    fieldIsAwController.dispose();
     //form2
 
     //form3
@@ -197,9 +193,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   void _payloadform2(Calmv2FormModel record) {
-    if (fieldAwController.text.trim().isEmpty) {
-      fieldAwController.text = cleanNum(record.aw);
-    }
 
     if (fieldPadController.text.trim().isEmpty) {
       fieldPadController.text = cleanNum(record.pad);
@@ -235,6 +228,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
     if (fieldIsTerrorismController.text.trim().isEmpty) {
       fieldIsTerrorismController.text = record.isTerrorism.toString();
+    }
+
+    if (fieldIsAwController.text.trim().isEmpty) {
+      fieldIsAwController.text = record.isAw.toString();
     }
 
     setState(() {
@@ -355,7 +352,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
                 title: "Kendaraan",
-                subtitle: "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
+                subtitle: "Isi detail x kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
             ),
 
@@ -447,9 +444,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
                         Row(
                           children: [
-                            Flexible(child: _buildFieldPassengerCountCombo()),
+                            Expanded(child: _buildFieldPassengerCountCombo()),
                             const SizedBox(width: 8),
-                            Flexible(child: _buildFieldAW()),
+                            const Expanded(child: SizedBox.shrink()),
                           ],
                         ),
                         const SizedBox(height: hPadding),
@@ -475,7 +472,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                         Row(
                           children: [
                             Flexible(child: _buildFieldIsTbod()),
-                            const Flexible(child: SizedBox.shrink()),
+                            const SizedBox(width: 8),
+                            Flexible(child: _buildFieldIsAw()),
                           ],
                         ),
 
@@ -710,12 +708,12 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     final record = Calmv2FormModel(
       calmv2Id: calmv2Id ?? "",
       calmv1Id: calmv1Id ?? "",
-      aw: double.tryParse(fieldAwController.text.replaceAll(",", "")) ?? 0,
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
       isSrcc: toBoolean(fieldIsSrccController.text),
       isTbod: toBoolean(fieldIsTbodController.text),
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
+      isAw: toBoolean(fieldIsAwController.text),
       pad: double.tryParse(fieldPadController.text.replaceAll(",", "")) ?? 0,
       pap: double.tryParse(fieldPapController.text.replaceAll(",", "")) ?? 0,
       passangerCount: int.tryParse(selectedPassengerCount) ?? 0,
@@ -807,25 +805,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     bool ok = true;
     clearErrsByPrefix('form2.');
 
-    // AW (required, 0..100) - default 0.01 dari initState
-    final awRaw = fieldAwController.text.trim();
-    if (awRaw.isEmpty) {
-      setErr('form2.aw', kStringNullError);
-      ok = false;
-    } else {
-      final x = double.tryParse(awRaw);
-      if (x == null) {
-        setErr('form2.aw', "Format tidak valid");
-        ok = false;
-      } else if (x < 0) {
-        setErr('form2.aw', "Tidak boleh minus");
-        ok = false;
-      } else if (x > 100) {
-        setErr('form2.aw', "Max 100%");
-        ok = false;
-      }
-    }
-
     // Passenger Count (required) - default 1 dari initState
     if (selectedPassengerCount.trim().isEmpty) {
       setErr('form2.passengerCount', kStringNullError);
@@ -910,12 +889,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               builder: (context) => RegisterClient(requestFrom: 'calmv_page')
           ),
         );
-        //micky
-        /*
-        context
-            .read<AuthenticationBloc>()
-            .add(RequireRegisterClient(requiredFrom: 'calmv1list_tile_widget'));
-        */
       }
     }
   }
@@ -1067,43 +1040,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   );
 //form1 field
 
-
-
-//form2 field
-  Widget _buildFieldAW() => appTextField(
-    label: "Bengkel Resmi",
-    controller: fieldAwController,
-    keyboardType: TextInputType.numberWithOptions(decimal: true),
-    suffix: Text("%", style: bodyTextStyle(context)),
-    autovalidateMode: AutovalidateMode.onUserInteraction,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-      TextInputFormatter.withFunction((oldValue, newValue) {
-        // Prevent input if value would exceed 100
-        if (newValue.text.isEmpty) return newValue;
-
-        final value = double.tryParse(newValue.text);
-        if (value == null) return newValue;
-
-        if (value > 100) {
-          return oldValue; // Block input if exceeds 100
-        }
-
-        return newValue;
-      }),
-    ],
-
-    errorText: err('form2.aw'),
-    validator: (_) => err('form2.aw'),
-    onChanged: (v) {
-      final x = double.tryParse(v.trim());
-      if (x != null && x >= 0 && x <= 100) {
-        clearErr('form2.aw');
-      }
-    },
-  );
-
-
   Widget _buildFieldPAD() => appTextField(
     label: "Kecelakaan Diri Pengemudi",
     controller: fieldPadController,
@@ -1246,6 +1182,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     rightLabel: "Pencurian Barang oleh Supir",
     initialValue: toBoolean(fieldIsTbodController.text),
     callback: (v) => fieldIsTbodController.text = v.toString(),
+    leftLabel: "",
+  );
+
+  Widget _buildFieldIsAw() => CheckboxWidget(
+    rightLabel: "Bengkel Resmi",
+    initialValue: toBoolean(fieldIsAwController.text),
+    callback: (v) => fieldIsAwController.text = v.toString(),
     leftLabel: "",
   );
 

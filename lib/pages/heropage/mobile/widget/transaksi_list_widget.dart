@@ -277,8 +277,9 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
 
     String asset = "assets/icons/transaksi.svg"; // default fallback
 
-    if (j.contains("klaim baru")) asset = "assets/icons/KlaimBaru.svg";
-    else if (j.contains("pembatalan")) asset = "assets/icons/BatalKlaim.svg";
+    if (j.contains("klaim baru")) {
+      asset = "assets/icons/KlaimBaru.svg";
+    } else if (j.contains("pembatalan")) asset = "assets/icons/BatalKlaim.svg";
     else if (j.contains("update")) asset = "assets/icons/PerbaruiKlaim.svg";
     else if (j.contains("lapor")) asset = "assets/icons/LaporKlaim.svg";
     else if (j.contains("endorse")) asset = "assets/icons/EndorseLog.svg";

@@ -132,7 +132,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   //form2
   final fieldPolisAkhirController = TextEditingController();
   final fieldPolisMulaiController = TextEditingController();
-  final fieldAwController = TextEditingController();
+  final fieldIsAwController = TextEditingController();
   final fieldCoverLamaController = TextEditingController();
   final fieldIsEqController = TextEditingController();
   final fieldIsFloodController = TextEditingController();
@@ -206,6 +206,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldRateTerrorismController = TextEditingController();
   final fieldRatePadController = TextEditingController();
   final fieldRatePapController = TextEditingController();
+  final fieldRateAwController = TextEditingController();
   final fieldBiayaPolisController = TextEditingController();
   final fieldSumInsuredController = TextEditingController();
   final fieldRateTotalController = TextEditingController();
@@ -243,7 +244,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     //form2
     fieldPolisAkhirController.dispose();
     fieldPolisMulaiController.dispose();
-    fieldAwController.dispose();
+    fieldIsAwController.dispose();
     fieldCoverLamaController.dispose();
     fieldIsEqController.dispose();
     fieldIsFloodController.dispose();
@@ -284,6 +285,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldBiayaPolisController.dispose();
     fieldSumInsuredController.dispose();
     fieldRateTotalController.dispose();
+    fieldRateAwController.dispose();
     //form6
 
     super.dispose();
@@ -365,8 +367,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   void _payloadform2(Regmv2FormModel record) {
-    if (fieldAwController.text.trim().isEmpty) {
-      fieldAwController.text = record.aw.toString();
+    if (fieldIsAwController.text.trim().isEmpty) {
+      fieldIsAwController.text = record.isAw.toString();
     }
 
     if (fieldIsEqController.text.trim().isEmpty) {
@@ -513,6 +515,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldRateTerrorismController.text = record.rateTerrorism.toString();
     fieldRatePadController.text = record.ratePad.toString();
     fieldRatePapController.text = record.ratePap.toString();
+    fieldRateAwController.text = record.rateAw.toString();
     fieldRateTotalController.text = record.rateTotal.toString();
   }
 
@@ -1070,7 +1073,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         Row(
                           children: [
                             Flexible(child: _buildFieldIsTbod()),
-                            const Flexible(child: SizedBox.shrink()),
+                            const SizedBox(width: 8),
+                            Flexible(child: _buildFieldIsAw()),
                           ],
                         ),
                         const SizedBox(height: hPadding),
@@ -1097,7 +1101,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           children: [
                             Flexible(child: _buildFieldPassengerCountCombo()),
                             const SizedBox(width: 8),
-                            Flexible(child: _buildFieldAW()),
+                            const Flexible(child: SizedBox.shrink()),
                           ],
                         ),
                         const SizedBox(height: 15),
@@ -1289,6 +1293,13 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                             HitungPremiRow(
                               label: "Gempa Bumi:",
                               controller: fieldRateEqController,
+                              layoutType: HitungPremiLayoutType.horizontal,
+                              // showValueBorder: true,
+                              valueSuffix: "%",
+                            ),
+                            HitungPremiRow(
+                              label: "Bengkel Resmi:",
+                              controller: fieldRateAwController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
                               valueSuffix: "%",
@@ -1675,7 +1686,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     debugPrint("==========================");
 
     final record = Regmv2FormModel(
-      aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
+      isAw: toBoolean(fieldIsAwController.text),
       currId: fieldComboRMatauang?.rmatauangKode,
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
@@ -1891,25 +1902,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     if (fieldComboMMvjnscover == null) {
       setErr('form2.jenisCover', kStringNullError);
       ok = false;
-    }
-
-    // AW (required, 0..100)
-    final awRaw = fieldAwController.text.trim();
-    if (awRaw.isEmpty) {
-      setErr('form2.aw', kStringNullError);
-      ok = false;
-    } else {
-      final x = double.tryParse(awRaw);
-      if (x == null) {
-        setErr('form2.aw', "Format tidak valid");
-        ok = false;
-      } else if (x < 0) {
-        setErr('form2.aw', "Tidak boleh minus");
-        ok = false;
-      } else if (x > 100) {
-        setErr('form2.aw', "Max 100%");
-        ok = false;
-      }
     }
 
     // Jumlah Penumpang (required)
@@ -2327,6 +2319,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     leftLabel: "",
   );
 
+  Widget _buildFieldIsAw() => CheckboxWidget(
+    rightLabel: "Bengkel Resmi",
+    initialValue: toBoolean(fieldIsAwController.text),
+    callback: (v) => fieldIsAwController.text = v.toString(),
+    leftLabel: "",
+  );
 
   Widget _buildFieldPLL() => appTextField(
     label: "Tanggung Jawab Penumpang",
@@ -2414,30 +2412,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       onSaveCallback: (value) => selectedPassengerCount = value ?? "",
     );
   }
-
-  Widget _buildFieldAW() => appTextField(
-    label: "Bengkel Resmi",
-    controller: fieldAwController,
-    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-    suffix: Text("%", style: bodyTextStyle(context)),
-    autovalidateMode: AutovalidateMode.onUserInteraction,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-      TextInputFormatter.withFunction((oldValue, newValue) {
-        if (newValue.text.isEmpty) return newValue;
-        final value = double.tryParse(newValue.text);
-        if (value == null) return newValue;
-        if (value > 100) return oldValue;
-        return newValue;
-      }),
-    ],
-    errorText: err('form2.aw'),
-    validator: (_) => err('form2.aw'),
-    onChanged: (v) {
-      final x = double.tryParse(v.trim());
-      if (x != null && x >= 0 && x <= 100) clearErr('form2.aw');
-    },
-  );
 
   //form2
 

@@ -51,13 +51,6 @@ class Calmv2ResetStatusEvent extends Calmv2FormEvents {
 	const Calmv2ResetStatusEvent();
 }
 
-class FieldAwChangedEvent extends Calmv2FormEvents {
-	final double aw;
-	const FieldAwChangedEvent({required this.aw});
-	@override
-	List<Object> get props => [aw];
-}
-
 class FieldPadChangedEvent extends Calmv2FormEvents {
 	final double pad;
 	const FieldPadChangedEvent({required this.pad});

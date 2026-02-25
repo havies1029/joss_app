@@ -250,7 +250,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
     debugPrint("🔥 Injecting payload into Form1...");
 
     // Text Controllers
-    fieldAwController.text = record.aw.toString();
+    fieldAwController.text = record.isAw.toString();
 
     fieldIsEqController.text = record.isEq.toString();
     fieldIsFloodController.text = record.isFlood.toString();
@@ -288,7 +288,7 @@ class RegmvForm2SectionState extends State<RegmvForm2Section> {
 
   Future<void> saveForm2() async {
     final record = Regmv2FormModel(
-      aw: double.tryParse(fieldAwController.text.replaceAll(',', '')) ?? 0,
+      isAw: false,
       currId: fieldComboRMatauang?.rmatauangKode,
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
