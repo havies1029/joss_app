@@ -13,6 +13,7 @@ class KlaimmvpoliscrudState extends Equatable {
   final bool isComplete;
   final bool isDirty;
   final bool isValid;
+  final String saveFrom;
 	const KlaimmvpoliscrudState(
 		{this.record,
 		this.isLoading = false,
@@ -25,6 +26,7 @@ class KlaimmvpoliscrudState extends Equatable {
     this.isComplete = false,
     this.isDirty = false,
     this.isValid = false,
+    this.saveFrom = "",
 });
 
 	KlaimmvpoliscrudState copyWith({
@@ -39,6 +41,7 @@ class KlaimmvpoliscrudState extends Equatable {
     bool? isComplete,
     bool? isDirty,
     bool? isValid,
+    String? saveFrom,
 	}){
 		return KlaimmvpoliscrudState(
 			record: record ?? this.record,
@@ -52,9 +55,10 @@ class KlaimmvpoliscrudState extends Equatable {
       isComplete: isComplete ?? this.isComplete,
       isDirty: isDirty ?? this.isDirty,
       isValid: isValid ?? this.isValid,
+      saveFrom: saveFrom ?? this.saveFrom,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record??'', isDirty, isValid];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record??'', isDirty, isValid, saveFrom];
 }

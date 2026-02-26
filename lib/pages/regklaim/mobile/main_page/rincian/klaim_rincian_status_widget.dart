@@ -35,15 +35,7 @@ class _KlaimRincianStatusWidgetState extends State<KlaimRincianStatusWidget> {
       },
       listener: (context, state) {},
       builder: (context, state) {
-        if (state.selectedStatusId.isEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            context.read<MstatusrinciCariBloc>().add(
-              SelectedIdChanged(state.items.first.mgroupstatusclaimId),
-            );
-          });
-        }
-
+        
         if (state.status == ListStatus.success) {
           return state.items.isNotEmpty
               ? SizedBox(

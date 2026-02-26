@@ -1,146 +1,3 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:joss_app/common/constants.dart';
-// import 'package:joss_app/pages/base/base_background_sidepage.dart';
-// import 'package:joss_app/pages/klaim/mobile/klaim_rasio_tab.dart';
-// import 'package:joss_app/pages/klaim/mobile/klaim_rincian_tab.dart';
-// import 'package:joss_app/pages/klaim/mobile/klaim_ringkasan_tab.dart';
-// import 'package:joss_app/pages/regklaim/mobile/floating_action_klaim.dart';
-// import 'package:joss_app/widgets/apptheme/header_card.dart';
-//
-// class KlaimMainPage extends StatefulWidget {
-//   const KlaimMainPage({super.key});
-//
-//   @override
-//   _KlaimMainPageState createState() => _KlaimMainPageState();
-// }
-//
-// class _KlaimMainPageState extends State<KlaimMainPage>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _animationController;
-//
-//   final _formKey = GlobalKey<FormState>();
-//
-//   int selectedTab = 0;
-//
-//   final List<Map<String, dynamic>> tabItems = [
-//     {'label': 'Ringkasan', 'page': const KlaimRingkasanTab()},
-//     {
-//       'label': 'Rincian',
-//       'page': const KlaimRincianTab(),
-//     },
-//     {'label': 'Rasio', 'page': const KlaimRasioTab()},
-//
-//   ];
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _animationController = AnimationController(
-//       duration: defaultDuration,
-//       vsync: this,
-//     );
-//   }
-//
-//   @override
-//   void dispose() {
-//     _animationController.dispose();
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: secondaryBlackColor,
-//       body: SafeArea(
-//         child: Stack(
-//           children: [
-//             BaseBackgroundSidePage(
-//               title: 'Klaim',
-//               child: Form(
-//                 key: _formKey,
-//                 child: Column(
-//                   children: [
-//                     const HeaderCard(
-//                       iconPath: "assets/icons/menu_lapor_klaim.svg",
-//                       title: "Klaim",
-//                       subtitle:
-//                       "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
-//                     ),
-//                     // BaseAssetWidget(),
-//                     SafeArea(
-//                       child: Container(
-//                         decoration: const BoxDecoration(
-//                           color: secondaryBlackColor,
-//                         ),
-//                         child: Row(
-//                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                           children: List.generate(tabItems.length, (i) {
-//                             final isActive = i == selectedTab;
-//                             return Expanded(
-//                               child: GestureDetector(
-//                                 onTap: () => setState(() => selectedTab = i),
-//                                 child: Container(
-//                                   height: 54,
-//                                   alignment: Alignment.center,
-//                                   decoration: BoxDecoration(
-//                                     border: Border(
-//                                       bottom: BorderSide(
-//                                         color:
-//                                         isActive ? primaryColor : unselectedColor,
-//                                         width: 1.5,
-//                                       ),
-//                                     ),
-//                                     borderRadius:
-//                                     i == 0
-//                                         ? const BorderRadius.only(
-//                                       topLeft: Radius.circular(20),
-//                                     )
-//                                         : i == tabItems.length - 1
-//                                         ? const BorderRadius.only(
-//                                       topRight: Radius.circular(20),
-//                                     )
-//                                         : null,
-//                                   ),
-//                                   child: Text(
-//                                     tabItems[i]['label'],
-//                                     style: bodyTextStyle(context).copyWith(
-//                                       color: isActive ? primaryColor : unselectedColor,
-//                                     ),
-//                                     textAlign: TextAlign.center,
-//                                   ),
-//                                 ),
-//                               ),
-//                             );
-//                           }),
-//                         ),
-//                       ),
-//                     ),
-//                     // Body content
-//                     // Expanded(
-//                     //   child: IndexedStack(
-//                     //     index: selectedTab,
-//                     //     children: tabItems.map((e) => e['page'] as Widget).toList(),
-//                     //   ),
-//                     // ),
-//                     Expanded(
-//                       child: tabItems[selectedTab]['page'] as Widget,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//       // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-//       // floatingActionButton: FabActionKlaim(
-//       //   selectedTab: selectedTab,
-//       // ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
@@ -155,12 +12,13 @@ class KlaimMainPage extends StatefulWidget {
   const KlaimMainPage({super.key});
 
   @override
-  _KlaimMainPageState createState() => _KlaimMainPageState();
+  KlaimMainPageState createState() => KlaimMainPageState();
 }
 
-class _KlaimMainPageState extends State<KlaimMainPage>
+class KlaimMainPageState extends State<KlaimMainPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  late final List<Widget> _pages;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -183,6 +41,7 @@ class _KlaimMainPageState extends State<KlaimMainPage>
       duration: defaultDuration,
       vsync: this,
     );
+    _pages = tabItems.map((e) => e['page'] as Widget).toList(growable: false);
   }
 
   @override
@@ -208,9 +67,8 @@ class _KlaimMainPageState extends State<KlaimMainPage>
                       iconPath: "assets/icons/menu_lapor_klaim.svg",
                       title: "Klaim",
                       subtitle:
-                      "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+                      "Pilih kategori asuransi x untuk keamanan Anda dan keluarga, Yuk!",
                     ),
-                    // BaseAssetWidget(),
                     SafeArea(
                       child: Container(
                         decoration: const BoxDecoration(
@@ -259,15 +117,11 @@ class _KlaimMainPageState extends State<KlaimMainPage>
                         ),
                       ),
                     ),
-                    // Body content
-                    // Expanded(
-                    //   child: IndexedStack(
-                    //     index: selectedTab,
-                    //     children: tabItems.map((e) => e['page'] as Widget).toList(),
-                    //   ),
-                    // ),
                     Expanded(
-                      child: tabItems[selectedTab]['page'] as Widget,
+                      child: IndexedStack(
+                        index: selectedTab,
+                        children: _pages,
+                      ),
                     ),
                   ],
                 ),

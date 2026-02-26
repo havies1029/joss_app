@@ -210,6 +210,7 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
         isSaved: true,
         hasFailure: hasFailure,
         isDirty: false,
+        saveFrom: event.saveFrom,
       ));
     }
   }
@@ -247,12 +248,19 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
   bool _validate(KlaimmvpoliscrudModel? record) {
     if (record == null) return false;
 
-    return record.insuredNama.isNotEmpty &&
-        record.noChasis.isNotEmpty &&
-        record.noPlat.isNotEmpty &&
-        record.polisNo.isNotEmpty &&
-        record.minsurerId?.isNotEmpty == true &&
-        record.mmvjnscoverId?.isNotEmpty == true;
+    if (record.isPolisJps) {
+      return 
+          record.noChasis.isNotEmpty &&
+          record.noPlat.isNotEmpty;
+    }
+    else{
+      return record.insuredNama.isNotEmpty &&
+          record.noChasis.isNotEmpty &&
+          record.noPlat.isNotEmpty &&
+          record.polisNo.isNotEmpty &&
+          record.minsurerId?.isNotEmpty == true &&
+          record.mmvjnscoverId?.isNotEmpty == true;
+    }
   }
 
 }

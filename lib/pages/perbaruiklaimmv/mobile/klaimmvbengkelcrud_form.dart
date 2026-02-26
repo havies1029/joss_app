@@ -138,25 +138,25 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 			compareItems: (a, b) => a.mbengkelId == b.mbengkelId,
 			enableSearch: true,
 			showClearButton: false,
-				onChangedCallback: (value) {
-								if (value != null) {
-									removeError(
-										error: "Field ComboMBengkel tidak boleh kosong.");
-									klaimmvbengkelcrudBloc.add(ComboMBengkelChangedEvent(comboMBengkel: value));
-								}
-							},
-							onSaveCallback: (value) {
-								if (value != null) {
-									fieldComboMBengkel = value;
-								}
-							},
-							validatorCallback: (value) {
-								if (value == null) {
-									addError(
-										error: "Field ComboMBengkel tidak boleh kosong.");
-								}
-								return null;
-							},
+      onChangedCallback: (value) {
+        if (value != null) {
+          removeError(
+            error: "Field Nama Bengkel tidak boleh kosong.");
+          klaimmvbengkelcrudBloc.add(ComboMBengkelChangedEvent(comboMBengkel: value));
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          fieldComboMBengkel = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          addError(
+            error: "Field Nama Bengkel tidak boleh kosong.");
+        }
+        return null;
+      },
 		);
 	}
 
@@ -201,7 +201,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 				onChangedCallback: (value) {
 								if (value != null) {
 									removeError(
-										error: "Field ComboMJnsbengkel tidak boleh kosong.");
+										error: "Field Jenis Bengkel tidak boleh kosong.");
 
 					        // reset UI dropdown bengkel
 					        comboMBengkelKey.currentState?.clear();
@@ -217,7 +217,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 							validatorCallback: (value) {
 								if (value == null) {
 									addError(
-										error: "Field ComboMJnsbengkel tidak boleh kosong.");
+										error: "Field Jenis Bengkel tidak boleh kosong.");
 								}
 								return null;
 							},
@@ -271,7 +271,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 				onChangedCallback: (value) {
 								if (value != null) {
 									removeError(
-										error: "Field ComboMWilayahBengkel tidak boleh kosong.");
+										error: "Field Wilayah Bengkel tidak boleh kosong.");
 
 					        // reset UI dropdown bengkel
 					        comboMBengkelKey.currentState?.clear();
@@ -286,7 +286,7 @@ class KlaimmvbengkelcrudFormPageFormState extends State<KlaimmvbengkelcrudFormPa
 							validatorCallback: (value) {
 								if (value == null) {
 									addError(
-										error: "Field ComboMWilayahBengkel tidak boleh kosong.");
+										error: "Field Wilayah Bengkel tidak boleh kosong.");
 								}
 								return null;
 							},

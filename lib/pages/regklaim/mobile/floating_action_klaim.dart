@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
 import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
@@ -15,27 +17,33 @@ class FabActionKlaim extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("Selected Tab: $selectedTab");
     return BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
       builder: (context, state) {
-        // final selected = state.selectedKlaimRecord;
+        debugPrint("Selected ID: ${state.selectedId}");
+        bool isBerjalan = false;
+        bool isLacak = false;
+        String selectedId = "";
+        KlaimdetailCariModel? selected;
+        if (selectedTab == 1) {
+          selectedId = state.selectedId;
+          selected = selectedId.isNotEmpty
+              ? state.items
+              .expand((group) => group.details)
+              .where((d) => d.klaim1Id == selectedId)
+              .firstOrNull
+              : null;
+          final status = (selected?.statusDesc ?? '').toLowerCase().trim();
 
-        final selectedId = state.selectedId;
-        final selected = selectedId.isNotEmpty
-            ? state.items
-            .expand((group) => group.details)
-            .where((d) => d.klaim1Id == selectedId)
-            .firstOrNull
-            : null;
-        final status = (selected?.statusDesc ?? '').toLowerCase().trim();
-
-        final isBerjalan = status == "berjalan";
-        final isSelesaiOrBatal = status == "selesai" || status == "batal";
-
+          isBerjalan = status == "berjalan";
+          isLacak = true;
+        }
+       
         final actions = [
           ActionMenuItem(
             type: ActionType.klaimBaru,
             label: "Klaim Baru",
-            iconAsset: "assets/icons/plus icon.svg",
+            iconAsset: "assets/icons/Plus Icon.svg",
             gradientColors: const [Color(0xFF2ECC71), Color(0xFF2F9F22)],
             borderColor: const Color(0xFF99FF98),
             isEnabled: true,
@@ -54,7 +62,7 @@ class FabActionKlaim extends StatelessWidget {
             iconAsset: "assets/icons/lacak_polis.svg",
             gradientColors: const [Color(0xFF48E0FF), Color(0xFF02B1D5)],
             borderColor: const Color(0xFF78E8FF),
-            isEnabled: isBerjalan || isSelesaiOrBatal,
+            isEnabled: isLacak,
           ),
           ActionMenuItem(
             type: ActionType.batalKlaim,
@@ -80,20 +88,20 @@ class FabActionKlaim extends StatelessWidget {
               }
               return;
             }
-
+        
             switch (type) {
               case ActionType.perbaruiKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                selected.cobId == "10002"
+                selected!.cobId == "10002"
                     ? PerbaruiKlaimMvPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama)
                     : PerbaruiKlaimParPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama, cobGroupId: selected.cobId),
                 ));
               case ActionType.lacakKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                    KlaimProgressCariMainPage(klaim1Id: selected.klaim1Id)));
+                    KlaimProgressCariMainPage(klaim1Id: selected!.klaim1Id)));
               case ActionType.batalKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                    KlaimbatalcrudFormPage(klaim1Id: selected.klaim1Id)));
+                    KlaimbatalcrudFormPage(klaim1Id: selected!.klaim1Id)));
               case ActionType.klaimBaru:
                 Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
               default:

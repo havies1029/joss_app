@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/widgets/list_extension.dart';
 import 'package:joss_app/models/klaimrinci/mstatusrincicari_model.dart';
 import 'package:joss_app/repositories/klaimrinci/mstatusrincicari_repository.dart';
 
@@ -30,30 +29,16 @@ Future<void> onFetchMstatusrinciCari(
 	MstatusrinciCariRepository repo = MstatusrinciCariRepository();
 	if (state.status == ListStatus.initial) {
 		List<MstatusrinciCariModel> items = await repo.getMstatusrinciCari();
+
+    final String defaultId = items.first.mgroupstatusclaimId;
+
 		return emit(state.copyWith(
 			items: items,
 			hasReachedMax: false,
 			status: ListStatus.success,
+      selectedStatusId: defaultId,
 			));
-	}
-	List<MstatusrinciCariModel> items = await repo.getMstatusrinciCari();
-	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
-	} else {
-		List<MstatusrinciCariModel> mstatusrinciCari = List.of(state.items)..addAll(items);
-
-		final result = mstatusrinciCari
-			.whereWithIndex((e, index) =>
-				mstatusrinciCari.indexWhere((e2) => e2.mgroupstatusclaimId == e.mgroupstatusclaimId) ==
-				index)
-			.toList();
-
-		return emit(state.copyWith(
-			items: result,
-			hasReachedMax: false,
-			status: ListStatus.success,
-			));
-		}
+	  }	
 	}
 
   Future<void> onSelectedIdChanged(

@@ -10,7 +10,7 @@ class MstatusringkasCariState extends Equatable {
 		{this.status = ListStatus.initial,
 		this.items = const <MstatusringkasCariModel>[],
 		this.hasReachedMax = false,
-    this.selectedStatusId = ''
+    this.selectedStatusId = '10'
 		});
 
 	const MstatusringkasCariState.success(List<MstatusringkasCariModel> items)

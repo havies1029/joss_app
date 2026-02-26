@@ -85,7 +85,6 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 										const SizedBox(height: 15),
 										FormError(
 											errors: errors,
-											key: null,
 										),
 									],
 								))
@@ -101,7 +100,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 						fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
 						fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
 						fieldPolisNoController.text = state.record!.polisNo;
-						fieldSppa1IdController.text = state.record!.sppa1Id ?? '';
+						fieldSppa1IdController.text = state.record!.sppa1Id;
 					}
 					fieldComboMInsurer = state.comboMInsurer;
 					fieldComboMMvjnscover = state.comboMMvjnscover;
@@ -214,6 +213,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			compareItems: (item, selectedItem) =>
 			item.minsurerId == selectedItem.minsurerId,
 			onChangedCallback: (value) {
+        if (isPolisJps) return null;
 				if (value != null) {
 					removeError(
 							error: "Asuransi tidak boleh kosong.");
@@ -226,6 +226,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 				}
 			},
 			validatorCallback: (value) {
+        if (isPolisJps) return null;
 				if (value == null) {
 					addError(
 							error: "Asuransi tidak boleh kosong.");
@@ -297,13 +298,16 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	// 	);
 	// }
 
-	Widget buildFieldMmvjnscoverId() => ReusableComboBox<ComboMMvjnscoverModel>(
+	Widget buildFieldMmvjnscoverId() => 
+    ReusableComboBox<ComboMMvjnscoverModel>(
 		hintText: "Jenis Cover",
+    isEnabled: isPolisJps ? false : true,
 		initItem: fieldComboMMvjnscover,
 		dataLoader: () => ComboMMvjnscoverRepository().getComboMMvjnscover(),
 		displayText: (i) => i.coverName,
 		compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
 		validatorCallback: (value) {
+      if (isPolisJps) return null;
 			if (value == null) {
 				addError(
 						error: "Jenis Cover tidak boleh kosong.");
@@ -311,6 +315,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			return null;
 		},
 		onChangedCallback: (value) {
+      if (isPolisJps) return null;
 			if (value != null) {
 				removeError(
 						error: "Jenis Cover tidak boleh kosong.");
@@ -422,12 +427,14 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			enabled: isPolisJps ? false : true,
 			controller: fieldPolisNoController,
 			onChanged: (value) {
+        if (isPolisJps) return;
 				if (value.isNotEmpty) {
 					removeError(error: "Polis No tidak boleh kosong");
 				}
 				klaimmvpoliscrudBloc.add(FieldPolisNoChangedEvent(polisNo: value));
 			},
 			validator: (value) {
+        if (isPolisJps) return null;
 				if (value == null || value.isEmpty) {
 					addError(error: "Polis No tidak boleh kosong");
 					return "";

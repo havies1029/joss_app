@@ -74,4 +74,10 @@ class FieldKronologisChangedEvent extends KlaimmvklaimcrudEvents{
   @override	List<Object> get props => [kronologis];
 }
 
-class KlaimmvklaimAutoSaveEvent extends KlaimmvklaimcrudEvents {}
+class KlaimmvklaimAutoSaveEvent extends KlaimmvklaimcrudEvents {
+  final String saveFrom;
+  const KlaimmvklaimAutoSaveEvent({required this.saveFrom});
+
+  @override
+  List<Object> get props => [saveFrom];
+}

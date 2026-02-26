@@ -14,6 +14,7 @@ class KlaimmvbengkelcrudState extends Equatable {
   final bool isComplete;
   final bool isDirty;
   final bool isValid;
+  final String saveFrom;
 
 	const KlaimmvbengkelcrudState(
 		{this.record,
@@ -28,6 +29,7 @@ class KlaimmvbengkelcrudState extends Equatable {
     this.isComplete = false,
     this.isDirty = false,
     this.isValid = false,
+    this.saveFrom = "",
 });
 
 	KlaimmvbengkelcrudState copyWith({
@@ -43,6 +45,7 @@ class KlaimmvbengkelcrudState extends Equatable {
     bool? isComplete,
     bool? isDirty,
     bool? isValid,
+    String? saveFrom,
 	}){
 		return KlaimmvbengkelcrudState(
 			record: record ?? this.record,
@@ -57,11 +60,12 @@ class KlaimmvbengkelcrudState extends Equatable {
       isComplete: isComplete ?? this.isComplete,
       isDirty: isDirty ?? this.isDirty,
       isValid: isValid ?? this.isValid,
+      saveFrom: saveFrom ?? this.saveFrom,
 		);
 	}
 
   static const _sentinel = Object();
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record ?? '', isDirty, isValid];
+	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, isComplete, record ?? '', isDirty, isValid, saveFrom];
 }

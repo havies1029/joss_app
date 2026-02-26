@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/sppa_detail_page.dart';
 
 import '../../../../../../blocs/authentication/authentication_bloc.dart';
@@ -15,7 +16,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../register/mobile/client/register_client_page.dart';
 import '../../../../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
-import '../../../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
 class UserPolisDetail extends StatefulWidget {
   final String cobKlaimId;
@@ -90,7 +90,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                     onButtonPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
-                          builder: (_) => const TagihanPembayaranPage(initialTab: 2,),
+                          builder: (_) => const KlaimMainPage(),
                         ),
                             (route) => route.isFirst,
                       );

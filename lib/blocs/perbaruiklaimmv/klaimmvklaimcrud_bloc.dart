@@ -159,7 +159,8 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
     if (state.record != null && state.isDirty) {
       emit(state.copyWith(isSaving: true, isSaved: false));
       bool hasFailure = !await repository.klaimmvklaimcrudUbah(state.record!);
-      emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure, isDirty: false));
+      emit(state.copyWith(isSaving: false, isSaved: true, 
+      hasFailure: hasFailure, isDirty: false, saveFrom: event.saveFrom));
     }
   }
 

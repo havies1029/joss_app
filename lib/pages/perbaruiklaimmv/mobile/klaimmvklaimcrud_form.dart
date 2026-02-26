@@ -9,6 +9,7 @@ import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:joss_app/widgets/form_error.dart';
 
 
 class KlaimmvklaimcrudFormPage extends StatefulWidget {
@@ -53,13 +54,14 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 									buildFieldDol(),
 									const SizedBox(height: hPadding),
 									buildFieldKronologis(),
-									// const SizedBox(height: hPadding),
-									// buildFieldCurrId(),
 									const SizedBox(height: hPadding),
 									buildFieldKlaimAmount(),
 									const SizedBox(height: hPadding),
 									buildFieldKlaimBayar(),
-									const SizedBox(height: 15),
+									const SizedBox(height: 25),
+									FormError(
+										errors: errors,
+									),							
 								],
 							)),
 				);
@@ -113,8 +115,16 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 			onChanged: (value) {
 				if (value != null) {
           klaimmvklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
+          removeError(error: "Date Of Accident tidak boleh kosong");
 				}
 			},
+      validator: (value) {
+        if (value == null) {
+          addError(error: "Date Of Accident tidak boleh kosong");
+          return "";
+        }
+        return null;
+      },
 		);
 	}
 
@@ -153,9 +163,18 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 				klaimmvklaimcrudBloc.add(
 					FieldKlaimAmountChangedEvent(klaimAmount: amount),
 				);
+        if (amount > 0) {
+          removeError(error: "Nilai Tagihan harus lebih besar dari 0");
+        } else {
+          addError(error: "Nilai Tagihan harus lebih besar dari 0");
+        }
 			},
 			validator: (v) {
-				if (v == null || v.trim().isEmpty) return kStringNullError;
+				final amount = parseAmount(v ?? "");
+        if (amount <= 0) {
+          addError(error: "Nilai Tagihan harus lebih besar dari 0");
+          return "";
+        }
 				return null;
 			},
 		);
@@ -179,18 +198,41 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 			controller: fieldKronologisController,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
+          removeError(error: "Kronologis Kejadian tidak boleh kosong");
 				  klaimmvklaimcrudBloc.add(FieldKronologisChangedEvent(kronologis: value));
 				}
 			},
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          addError(error: "Kronologis Kejadian tidak boleh kosong");
+          return "";
+        }
+        return null;
+      },
 		);
 	}
 
-double parseAmount(String s) {
-  final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), '');
-  if (cleaned.isEmpty) return 0;
-  return double.tryParse(cleaned) ?? 0;
-}
+  double parseAmount(String s) {
+    final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), '');
+    if (cleaned.isEmpty) return 0;
+    return double.tryParse(cleaned) ?? 0;
+  }
 
+void addError({required String error}) {
+		if (!errors.contains(error)){
+			setState(() {
+				errors.add(error);
+			});
+		}
+	}
+
+	void removeError({required String error}) {
+		if (errors.contains(error)){
+			setState(() {
+				errors.remove(error);
+			});
+		}
+	}
 
 }
 
@@ -278,4 +320,5 @@ class AppCurrencyAmountField extends StatelessWidget {
 			],
 		);
 	}
+
 }

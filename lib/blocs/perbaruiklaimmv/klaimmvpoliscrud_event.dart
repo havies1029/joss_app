@@ -102,4 +102,10 @@ class FieldPolisAkhirChangedEvent extends KlaimmvpoliscrudEvents{
   @override	List<Object> get props => [polisAkhir];
 }
 
-class KlaimmvPolisAutoSaveEvent extends KlaimmvpoliscrudEvents {} 
+class KlaimmvPolisAutoSaveEvent extends KlaimmvpoliscrudEvents {
+  final String saveFrom;
+  const KlaimmvPolisAutoSaveEvent({required this.saveFrom});
+
+  @override
+  List<Object> get props => [saveFrom];
+} 

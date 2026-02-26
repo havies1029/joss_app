@@ -28,6 +28,7 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
   @override
   void initState() {
     super.initState();
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       refreshData();
@@ -42,27 +43,12 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<MstatusringkasCariBloc, MstatusringkasCariState>(
-          listenWhen: (previous, current) =>
-          previous.selectedStatusId != current.selectedStatusId,
-          listener: (context, state) {
-            context.read<KlaimringkasCariBloc>().add(
-              RefreshKlaimringkasCariEvent(
-                selectedStatusId: state.selectedStatusId,
-              ),
-            );
-          },
-        ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(context),
+        Expanded(child: _buildBody(context)),
       ],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildHeader(context),
-          Expanded(child: _buildBody(context)),
-        ],
-      ),
     );
   }
 

@@ -60,10 +60,11 @@ class ComboMBengkelChangedEvent extends KlaimmvbengkelcrudEvents{
 }
 
 class KlaimmvbengkelAutoSaveEvent extends KlaimmvbengkelcrudEvents {
-  const KlaimmvbengkelAutoSaveEvent();
+  final String saveFrom;
+  const KlaimmvbengkelAutoSaveEvent({required this.saveFrom});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [saveFrom];
 }
 
 class FieldNamaBengkelLainChangedEvent extends KlaimmvbengkelcrudEvents{

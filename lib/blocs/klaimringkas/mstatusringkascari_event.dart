@@ -7,11 +7,10 @@ abstract class MstatusringkasCariEvents extends Equatable {
 	List<Object> get props => [];
 }
 
-class FetchMstatusringkasCariEvent extends MstatusringkasCariEvents {}
-
-class RefreshMstatusringkasCariEvent extends MstatusringkasCariEvents {}
-
 class SelectedIdChanged extends MstatusringkasCariEvents {
   final String selectedId;
   const SelectedIdChanged(this.selectedId);
+
+  @override
+  List<Object> get props => [selectedId];
 }
