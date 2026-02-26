@@ -28,7 +28,7 @@ class KlaimmvbengkelcrudState extends Equatable {
 		this.comboMBengkel,
     this.isComplete = false,
     this.isDirty = false,
-    this.isValid = false,
+    this.isValid = true,
     this.saveFrom = "",
 });
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
+import 'package:joss_app/pages/login/mobile/client/forgot_password_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
@@ -72,30 +73,32 @@ class _LoginFormClientState extends State<LoginFormClient>
     super.dispose();
   }
 
+  //micky
+
   Widget _buildEmailField(double hPadding) {
     return appTextField(
-      label: "Email",
-      hint: "Masukkan email",
+      label: "Email atau No. Handphone",
+      hint: "Masukkan email atau nomor HP kamu",
       controller: _usernameController,
       focusNode: _emailFocusNode,
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return kEmailNullError;
+          return "Mohon isi email atau nomor handphone";
         }
-        if (!emailValidatorRegExp.hasMatch(value)) {
-          return kInvalidEmailError;
+
+        // validasi email atau hp
+        final isEmail = emailValidatorRegExp.hasMatch(value.trim());
+        final isPhone = phoneValidatorRegExp.hasMatch(value.trim());
+
+        if (!isEmail && !isPhone) {
+          return "Masukkan format email atau nomor HP yang valid";
         }
+
         return null;
       },
       onTap: () {
         _animationController.forward(from: 0);
-      },
-
-      onChanged: (value) {
-        context.read<EmailVerificationBloc>().add(
-          FieldEmailVerificationChangedEvent(email: value),
-        );
       },
     );
   }
@@ -336,7 +339,20 @@ class _LoginFormClientState extends State<LoginFormClient>
                                           },
                                           child: HoverableText(
                                             text: 'Lupa Kata Sandi',
-                                            onTap: () {},
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (_) => ForgotPasswordPage(
+                                                    initialEmail: _usernameController.text.trim(),
+                                                    onSubmit: (email) {
+                                                        // panggil bloc / api versi kamu sendiri
+                                                        // contoh: context.read<ForgotPasswordBloc>().add(...)
+                                                        return Future.value(true);
+                                                      },
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                             styleBuilder:
                                                 (isHovering) =>
                                                 inputTextStyle(

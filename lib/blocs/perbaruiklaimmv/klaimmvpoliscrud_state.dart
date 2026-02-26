@@ -25,7 +25,7 @@ class KlaimmvpoliscrudState extends Equatable {
 		this.comboMMvjnscover,
     this.isComplete = false,
     this.isDirty = false,
-    this.isValid = false,
+    this.isValid = true,
     this.saveFrom = "",
 });
 

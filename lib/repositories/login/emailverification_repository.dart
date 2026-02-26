@@ -13,5 +13,4 @@ class EmailVerificationRepository {
 	Future<ReturnDataAPI> validasiPinEmail(EmailVerificationModel record) async {
 		return await api.validasiPinEmailAPI(record);
 	}
-
 }

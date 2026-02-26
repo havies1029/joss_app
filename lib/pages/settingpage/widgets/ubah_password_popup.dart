@@ -313,16 +313,7 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
                       ),
 
                       const SizedBox(height: 10),
-
-                      // BUTTON LUPA KATA SANDI
-                      AppButton.primary(
-                        text: "Lupa Kata Sandi?",
-                        onPressed: () {
-                          // TODO: Implement forgot password logic
-                        },
-                        width: double.infinity,
-                        backgroundColor: pGrey,
-                      ),
+                     
                     ],
                   ),
                 ),

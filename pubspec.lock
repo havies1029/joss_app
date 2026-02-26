@@ -996,10 +996,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_image_renderer
-      sha256: b5420b7f3e0671deedd68fdd9fe6a63c696fa90170de8d4c57c061aa83f08131
+      sha256: "0ec76118b14663f17f9b6a8c29ec59cb1b82e466a3c16fbb2ed9f1b613fc41b7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.0"
+    version: "1.0.1"
   pdf_widget_wrapper:
     dependency: transitive
     description:

@@ -973,9 +973,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
 import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
 import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
+import 'package:joss_app/repositories/login/forgot_password_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvpoliscrud_repository.dart';
@@ -1578,6 +1580,8 @@ Future<void> main() async {
         BlocProvider(create: (context) => LogtrscaritopxBloc()),
         //hero page premi
         BlocProvider(create: (context) => SumdashBloc(repository: SumdashRepository())),
+        //forgot password
+         BlocProvider(create: (context) => ForgotPasswordBloc(repository: ForgotPasswordRepository())),
       ],
       child: MultiBlocListener(
         listeners: [

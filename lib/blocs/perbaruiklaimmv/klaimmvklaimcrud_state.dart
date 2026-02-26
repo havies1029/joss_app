@@ -23,7 +23,7 @@ class KlaimmvklaimcrudState extends Equatable {
 		this.comboRMatauang,
     this.isComplete = false,
     this.isDirty = false,
-    this.isValid = false,
+    this.isValid = true,
     this.saveFrom = "",
 });
 
