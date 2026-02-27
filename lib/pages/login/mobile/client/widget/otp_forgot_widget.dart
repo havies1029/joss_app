@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/blocs/login/emailverification_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/models/login/emailverification_model.dart';
 import 'package:joss_app/models/login/forgot_password_model.dart';
 import 'package:joss_app/pages/login/mobile/client/kata_sandi_baru_page.dart';
 import 'dart:async';
@@ -124,7 +126,6 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
 
 
   void _resendOtp() {
-    String otp = _otpControllers.map((c) => c.text).join();
 
     setState(() {
       _remainingTime = 59;
@@ -143,13 +144,8 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     );
 
     ForgotPasswordModel? record = context.read<ForgotPasswordBloc>().state.record;
-    record?.pin = otp;
-
-    context.read<ForgotPasswordBloc>().add(
-      ForgotPswdValidasiPinEmailEvent(
-          record: record!,
-          requestAt: DateTime.now()
-      ),
+    context.read<EmailVerificationBloc>().add(
+      ResendOtpEvent(record: EmailVerificationModel(email: widget.sentTo, requestId: record?.requestId ?? '')),
     );
   }
 
@@ -231,33 +227,54 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
+    return MultiBlocListener(
+      listeners: [
 
-    return BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
-      listenWhen: (prev, curr) =>
-          prev.isSent != curr.isSent ||
-          prev.verificationPinSuccess != curr.verificationPinSuccess,
-      listener: (context, state) {
-        // OTP VALID (sukses)
-        if (state.isSent && state.verificationPinSuccess) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => KataSandiBaruPage(
-                email: widget.sentTo,
-                requestId: state.record?.requestId ?? '', // kalau dipakai
-              ),
-            ),
-          );
-          return;
-        }
+        /// LISTENER VALIDASI OTP
+        BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
+          listenWhen: (prev, curr) =>
+              prev.isSent != curr.isSent ||
+              prev.verificationPinSuccess != curr.verificationPinSuccess,
+          listener: (context, state) {
+            if (state.isSent && state.verificationPinSuccess) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => KataSandiBaruPage(
+                    email: widget.sentTo,
+                    requestId: state.record?.requestId ?? '',
+                  ),
+                ),
+              );
+              return;
+            }
 
-        // OTP TIDAK VALID (gagal)
-        if (state.isSent && !state.verificationPinSuccess) {
-          _shakeOtpFields();
-          ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar("Kode OTP salah / sudah kadaluarsa."),
-          );
-        }
-      },
+            if (state.isSent && !state.verificationPinSuccess) {
+              _shakeOtpFields();
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar("Kode OTP salah / sudah kadaluarsa."),
+              );
+            }
+          },
+        ),
+
+        /// 🔥 LISTENER RESEND OTP
+        BlocListener<EmailVerificationBloc, EmailVerificationState>(
+          listenWhen: (prev, curr) =>
+              prev.isResendOtpSuccess != curr.isResendOtpSuccess ||
+              prev.hasFailure != curr.hasFailure,
+          listener: (context, state) {
+            if (state.isResendOtpSuccess) {
+              _handleResendSuccess();
+            }
+
+            if (state.hasFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar("Gagal mengirim ulang OTP."),
+              );
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: primaryBlackColor,
         body: SafeArea(
@@ -517,6 +534,30 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
           _scaleController.forward();
         },
       ),
+    );
+  }
+
+  void _handleResendSuccess() {
+    // 🔥 Kosongkan OTP
+    for (var controller in _otpControllers) {
+      controller.clear();
+    }
+
+    // Fokus ke field pertama
+    if (_focusNodes.isNotEmpty) {
+      _focusNodes.first.requestFocus();
+    }
+
+    // Reset timer
+    setState(() {
+      _remainingTime = 59;
+      _isResendAvailable = false;
+    });
+
+    _startTimer();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      successSnackBar("Kode OTP berhasil dikirim ulang."),
     );
   }
 

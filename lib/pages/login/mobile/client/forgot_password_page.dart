@@ -49,7 +49,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     if (success) {
 
-      final record = ForgotPasswordModel(email: email); // sesuaikan ctor model kamu
+      final record = ForgotPasswordModel(email: email); 
       context.read<ForgotPasswordBloc>().add(
         ForgotPswdRequestPinEvent(record: record),
       );

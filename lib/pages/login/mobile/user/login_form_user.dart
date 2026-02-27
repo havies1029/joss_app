@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
@@ -322,18 +323,18 @@ class _LoginFormUserState extends State<LoginFormUser>
                                     ),
                                     SizedBox(height: 10),
                                     // Tombol Google
-                                    // kIsWeb
-                                    //     ? const CachedGoogleSigninButton()
-                                    //     : AppButton.iconLeft(
-                                    //   text: 'Masuk Dengan Google',
-                                    //   icon: SvgPicture.asset(
-                                    //     'assets/icons/google-icon.svg',
-                                    //     width: 20,
-                                    //     height: 20,
-                                    //   ),
-                                    //   onPressed: () => _handleGmailRegisterForMobile(context),
-                                    //   backgroundColor: pGrey,
-                                    // ),
+                                    kIsWeb
+                                        ? const CachedGoogleSigninButton()
+                                        : AppButton.iconLeft(
+                                      text: 'Masuk Dengan Google',
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/google-icon.svg',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      onPressed: () => _handleGmailRegisterForMobile(context),
+                                      backgroundColor: pGrey,
+                                    ),
 
                                     SizedBox(height: vPadding,),
                                     footerLoginText(context),

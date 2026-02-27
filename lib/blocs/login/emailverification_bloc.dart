@@ -26,6 +26,7 @@ class EmailVerificationBloc
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
     on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
     on<FieldTeleponVerificationChangedEvent>(onFieldTeleponVerificationChangedEvent);
+    on<ResendOtpEvent>(onResendOtp);     
 
   }
 
@@ -165,5 +166,32 @@ class EmailVerificationBloc
 
     debugPrint(
         "onFieldSimpanPasswordChangedEvent state: ${state.isSimpanPassword}");
+  }
+
+  Future<void> onResendOtp(ResendOtpEvent event, Emitter<EmailVerificationState> emit) async {
+    ReturnDataAPI returnData;
+    bool hasFailure = true;
+    emit(state.copyWith(isResendOtpSuccess: false, hasFailure: false));
+    returnData = await repository.resendOtp(event.record);
+    hasFailure = !returnData.success;
+
+    if (hasFailure) {
+      List<String> errors = [];
+      errors.add(returnData.data);
+      emit(state.copyWith(
+        isResendOtpSuccess: false,
+        hasFailure: hasFailure,
+        errors: errors,
+      ));
+      return;
+    }
+
+    EmailVerificationModel updatedRecord = state.record?.copyWith(requestId: returnData.data) ?? event.record.copyWith(requestId: returnData.data); 
+
+    emit(state.copyWith(
+      record: updatedRecord,
+      hasFailure: hasFailure,
+      isResendOtpSuccess: !hasFailure,
+    ));
   }
 }
