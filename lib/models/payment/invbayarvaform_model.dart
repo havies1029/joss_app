@@ -8,12 +8,14 @@ class InvbayarvaFormModel {
 	String vaNo;
 	double totalBayar;
   String curr;
+  String paymentStatus;
   List<InstruksiBayarModel> instruksi;
 
 	InvbayarvaFormModel({
     required this.bankNama, required this.batasBayar, required this.iconId, 
 		required this.iconUrl, required this.vaNo, 
-		required this.totalBayar, required this.curr, required this.instruksi,});
+		required this.totalBayar, required this.curr, required this.paymentStatus, required this.instruksi,});
+
 	factory InvbayarvaFormModel.fromJson(Map<String, dynamic> data) {
 		return InvbayarvaFormModel(
       bankNama: data['bankNama']??'',
@@ -23,12 +25,51 @@ class InvbayarvaFormModel {
 			vaNo: data['vaNo']??'',
 			totalBayar: (data['totalBayar'] ?? 0).toDouble(),
       curr: data['curr']??'',
+      paymentStatus: data['paymentStatus']??'',
       instruksi: (data['instruksi'] as List<dynamic>?)
           ?.map((e) => InstruksiBayarModel.fromJson(e))
           .toList() ?? [],
 		);
 
 	}
+
+  factory InvbayarvaFormModel.empty() {
+    return InvbayarvaFormModel(
+      bankNama: '',
+      batasBayar: DateTime.now(),
+      iconId: '',
+      iconUrl: '',
+      vaNo: '',
+      totalBayar: 0.0,
+      curr: '',
+      paymentStatus: '',
+      instruksi: [],
+    );
+  }
+
+  InvbayarvaFormModel copyWith({
+    String? bankNama,
+    DateTime? batasBayar,
+    String? iconId,
+    String? iconUrl,
+    String? vaNo,
+    double? totalBayar,
+    String? curr,
+    String? paymentStatus,
+    List<InstruksiBayarModel>? instruksi,
+  }) {
+    return InvbayarvaFormModel(
+      bankNama: bankNama ?? this.bankNama,
+      batasBayar: batasBayar ?? this.batasBayar,
+      iconId: iconId ?? this.iconId,
+      iconUrl: iconUrl ?? this.iconUrl,
+      vaNo: vaNo ?? this.vaNo,
+      totalBayar: totalBayar ?? this.totalBayar,
+      curr: curr ?? this.curr,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      instruksi: instruksi ?? this.instruksi,
+    );
+  }
 
 	Map<String, dynamic> toJson() =>
 		{
@@ -39,6 +80,7 @@ class InvbayarvaFormModel {
       'vaNo': vaNo,
       'totalBayar': totalBayar,
       'curr': curr,
+      'paymentStatus': paymentStatus,
       'instruksi': instruksi.map((e) => e.toJson()).toList(),
     };
 

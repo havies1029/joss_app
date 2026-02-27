@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-// import 'package:joss_app/pages/payment/mobile/payment_page/payment_success/payment_success.dart';
-// import 'package:joss_app/pages/payment/mobile/rincian/rincian_grand_total_widget.dart';
-// import 'package:joss_app/pages/payment/mobile/rincian/rincian_tabel_page.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../blocs/payment/dnrekapcobcari_bloc.dart';
 import '../../../../common/constants.dart';
@@ -16,8 +13,6 @@ import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import '../bayar_button.dart';
-// import 'package:joss_app/pages/payment/mobile/payment_page/payment_method/payment_method_page.dart';
-// import 'package:joss_app/pages/payment/mobile/payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_success/payment_success.dart';
@@ -87,6 +82,10 @@ class _RincianPageState extends State<RincianPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<DnRekap2invBloc, DnRekap2invState>(
+      listenWhen: (previous, current) {
+        return previous.isProcessed != current.isProcessed ||
+            previous.paymentStatus != current.paymentStatus;
+      },
       listener: (BuildContext context, DnRekap2invState state) {
         if (state.isProcessed){
           if (state.paymentStatus == "20"){

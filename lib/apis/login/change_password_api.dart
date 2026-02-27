@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/authentication/change_password_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:joss_app/models/authentication/reset_password_model.dart';
 
 class ChangePasswordApi {
   Future<bool> changePasswordApi(ChangePasswordModel pswd) async {

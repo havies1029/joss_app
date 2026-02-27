@@ -44,6 +44,15 @@ class CheckInvoiceStatusEvent extends DnRekap2invEvent {
   List<Object> get props => [invoiceId];
 }
 
+class SetRecordInvoiceStatusEvent extends DnRekap2invEvent {
+  final InvoiceStatusModel invoiceStatusRecord;
+
+  const SetRecordInvoiceStatusEvent({required this.invoiceStatusRecord});
+
+  @override
+  List<Object> get props => [invoiceStatusRecord];
+}
+
 class Invoice2PaymentViaVAEvent extends DnRekap2invEvent {
   final String invoiceId;
   final String methodId;

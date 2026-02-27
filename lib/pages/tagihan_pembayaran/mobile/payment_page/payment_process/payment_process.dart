@@ -1,3 +1,4 @@
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,9 +6,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
-import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
-import '../../../../../models/payment/invbayarvaform_model.dart';
+
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
 
@@ -15,40 +14,51 @@ class PaymentProcess extends StatefulWidget {
   final String viewMode;
   final String recordId;
 
-  const PaymentProcess(
-      {super.key, required this.viewMode, required this.recordId});
+  const PaymentProcess({
+    super.key,
+    required this.viewMode,
+    required this.recordId,
+  });
 
   @override
   PaymentProcessFormState createState() => PaymentProcessFormState();
 }
 
 class PaymentProcessFormState extends State<PaymentProcess> {
-  late InvbayarvaFormBloc invbayarvaFormBloc;
+  late final InvbayarvaFormBloc invbayarvaFormBloc;
+
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+
   final fieldBatasBayarController =
       TextEditingController(text: DateTime.now().toIso8601String());
   final fieldVaNoController = TextEditingController();
   final fieldTotalBayarController = TextEditingController();
   final fieldCurrController = TextEditingController();
-  bool _isInvoicePayloadApplied = false;
-  String? _payloadInvoiceId;
-
-  Timer? _pollingTimer;
-  bool _isPollingStarted = false;
 
   @override
   void initState() {
     super.initState();
     invbayarvaFormBloc = context.read<InvbayarvaFormBloc>();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      loadData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (widget.viewMode == "ubah") {
+        invbayarvaFormBloc.add(
+          InvbayarvaPollingStarted(
+            invoiceId: widget.recordId,
+            interval: const Duration(seconds: 3),
+          ),
+        );
+      }
     });
   }
 
   @override
   void dispose() {
-    _stopInvoicePolling(); 
+    invbayarvaFormBloc.add(const InvbayarvaPollingStopped());
+
     fieldBatasBayarController.dispose();
     fieldVaNoController.dispose();
     fieldTotalBayarController.dispose();
@@ -56,38 +66,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     super.dispose();
   }
 
-  void _payloadInvoiceOnce(InvbayarvaFormModel record) {
-    final invoiceId = widget.recordId;
-
-    if (_payloadInvoiceId != invoiceId) {
-      _payloadInvoiceId = invoiceId;
-      _isInvoicePayloadApplied = false;
-    }
-
-    if (_isInvoicePayloadApplied) return;
-
-    if (fieldBatasBayarController.text.trim().isEmpty) {
-      fieldBatasBayarController.text = record.batasBayar.toIso8601String();
-    }
-    if (fieldVaNoController.text.trim().isEmpty) {
-      fieldVaNoController.text = record.vaNo;
-    }
-    if (fieldCurrController.text.trim().isEmpty) {
-      fieldCurrController.text = record.curr;
-    }
-    if (fieldTotalBayarController.text.trim().isEmpty) {
-      fieldTotalBayarController.text =
-          NumberFormat("#,###").format(record.totalBayar);
-    }
-
-    _isInvoicePayloadApplied = true;
-  }
-
-  void loadData() {
-    if (widget.viewMode == "ubah") {
-      invbayarvaFormBloc
-          .add(InvbayarvaFormLihatEvent(invoiceId: widget.recordId));
-    }
+  void _dismissDialog() {
+    context.read<InvbayarvaFormBloc>().add(const InvbayarvaPollingStopped());
+    Navigator.pop(context);
   }
 
   @override
@@ -96,36 +77,29 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       listeners: [
         BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
           listenWhen: (prev, curr) =>
-          prev.record != curr.record && curr.record != null,
+              prev.record != curr.record && curr.record != null,
           listener: (context, state) {
-            if (state.record != null) {
-              _payloadInvoiceOnce(state.record!);
+            final r = state.record!;
 
-              // START polling setelah record tampil
-              _startInvoicePolling();
-            }
+            fieldVaNoController.text = (r.vaNo).toString();
+            fieldCurrController.text = (r.curr).toString();
+            final formatter = NumberFormat('#,###', 'id_ID');
+            fieldTotalBayarController.text = formatter.format(r.totalBayar);            
+            fieldBatasBayarController.text = (r.batasBayar).toString();
           },
-        ),
-        BlocListener<DnRekap2invBloc, DnRekap2invState>(
-          listenWhen: (prev, curr) =>
-          prev.isProcessed != curr.isProcessed && curr.isProcessed,
-          listener: (context, state) {
-            if (state.paymentStatus == "40") {
-              _stopInvoicePolling();
-            }
-          },
-        ),
+        ),        
       ],
       child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
         buildWhen: (prev, curr) =>
-        prev.record != curr.record ||
-            prev.isLoaded != curr.isLoaded ||
-            prev.isLoading != curr.isLoading,
+            prev.record != curr.record ||
+            prev.isPollingVa != curr.isPollingVa ||
+            prev.isPollingStatus != curr.isPollingStatus,
         builder: (context, state) {
+          final bankTitle = (state.record?.bankNama ?? '').trim();
+          final title = bankTitle.isNotEmpty ? bankTitle : "Pembayaran";
+
           return BaseBackgroundSidePage(
-            title: state.record?.bankNama.isNotEmpty == true
-                ? state.record!.bankNama
-                : "Pembayaran",
+            title: title,
             child: Container(
               color: secondaryBlackColor,
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -135,6 +109,8 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                   child: Column(
                     children: [
                       const SizedBox(height: 10),
+
+                      // Logo bank
                       Container(
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
@@ -152,8 +128,12 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                           size: 120,
                         ),
                       ),
+
                       const SizedBox(height: 12),
-                      buildWaitingStatus(),
+
+                      // Status dinamis
+                      _buildPaymentStatus(state),
+
                       const SizedBox(height: 6),
                       buildFieldTotalBayar(),
                       const SizedBox(height: 8),
@@ -191,6 +171,96 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     );
   }
 
+  // ================== STATUS WIDGET ==================
+
+  Widget _buildPaymentStatus(InvbayarvaFormState state) {
+    final r = state.record;
+
+    final va = (r?.vaNo ?? '').toString().trim();
+    final status = (r?.paymentStatus ?? '').toString().trim().toUpperCase();
+
+    if (r == null) {
+      return _badge(
+        icon: Icons.hourglass_bottom,
+        text: "Memuat data pembayaran...",
+        color: primaryColor,
+      );
+    }
+
+    // Menunggu VA
+    if (va.isEmpty && state.isPollingVa) {
+      return _badge(
+        icon: Icons.hourglass_bottom,
+        text: "Menunggu Nomor Virtual Account...",
+        color: primaryColor,
+      );
+    }
+
+    // VA sudah ada, menunggu pembayaran
+    if (va.isNotEmpty && state.isPollingStatus && status != "PAID") {
+      return _badge(
+        icon: Icons.hourglass_bottom,
+        text: "Menunggu Pembayaran",
+        color: primaryColor,
+      );
+    }
+
+    // Paid
+    if (status == "PAID") {
+      return _badge(
+        icon: Icons.check_circle,
+        text: "Pembayaran Berhasil",
+        color: Colors.green,
+      );
+    }
+
+    // Expired
+    if (status == "EXPIRED") {
+      return _badge(
+        icon: Icons.error,
+        text: "Pembayaran Kadaluarsa",
+        color: Colors.red,
+      );
+    }
+
+    // Default
+    return _badge(
+      icon: Icons.hourglass_bottom,
+      text: "Menunggu Pembayaran",
+      color: primaryColor,
+    );
+  }
+
+  Widget _badge({
+    required IconData icon,
+    required String text,
+    required Color color,
+  }) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: pGrey,
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          border: Border.all(color: sGrey),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(width: 4),
+            Text(
+              text,
+              style: TextStyle(fontSize: 14, color: color),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================== FIELD WIDGETS ==================
+
   Widget buildFieldBatasBayar() {
     final batasBayar = DateTime.tryParse(fieldBatasBayarController.text);
 
@@ -203,31 +273,23 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
         decoration: BoxDecoration(
           color: pGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius), // <— di sini
-          border: Border.all(
-            color: sGrey,
-          ),
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          border: Border.all(color: sGrey),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Pembayaran Berakhir pada:",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: hintGrey,
-              ),
+              style: TextStyle(fontSize: 16, color: hintGrey),
             ),
             const SizedBox(height: 4),
             Text(
               batasBayarText,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: primaryLightColor,
-              ),
+              style: const TextStyle(fontSize: 14, color: primaryLightColor),
             ),
           ],
         ),
@@ -285,15 +347,10 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                     if (!context.mounted) return;
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      successSnackBar(
-                          "Nomor Virtual Account Berhasil Disalin!"),
+                      successSnackBar("Nomor Virtual Account Berhasil Disalin!"),
                     );
                   },
-                  child: Icon(
-                    Icons.copy,
-                    color: Colors.white,
-                    size: 14,
-                  ),
+                  child: const Icon(Icons.copy, color: Colors.white, size: 14),
                 ),
               ],
             ),
@@ -301,11 +358,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         ],
       ),
     );
-  }
-
-  void _dismissDialog() {
-    _stopInvoicePolling();
-    Navigator.pop(context);
   }
 
   Widget buildFieldTotalBayar() {
@@ -316,12 +368,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
+          const Text(
             "Total Pembayaran:",
-            style: TextStyle(
-              fontSize: 16,
-              color: hintGrey,
-            ),
+            style: TextStyle(fontSize: 16, color: hintGrey),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
@@ -347,16 +396,15 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   Widget buildInstruksiPembayaran(InvbayarvaFormState state) {
     final instruksi = state.record?.instruksi ?? [];
 
-    if (instruksi.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (instruksi.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          color: pGrey,
-          border: Border.all(color: sGrey),
-          borderRadius: BorderRadius.circular(10)),
+        color: pGrey,
+        border: Border.all(color: sGrey),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -370,81 +418,16 @@ class PaymentProcessFormState extends State<PaymentProcess> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "${item.urutan}. ",
-                    style: bodyTextStyle(context),
-                  ),
+                  Text("${item.urutan}. ", style: bodyTextStyle(context)),
                   Expanded(
-                    child: Text(
-                      item.tahapDesc,
-                      style: bodyTextStyle(context),
-                    ),
+                    child: Text(item.tahapDesc, style: bodyTextStyle(context)),
                   ),
                 ],
               ),
             ),
           ),
-          // const SizedBox(height: hPadding),
         ],
       ),
     );
-  }
-
-  Widget buildWaitingStatus() {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: pGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: Border.all(
-            color: sGrey,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.hourglass_bottom,
-              color: primaryColor,
-              size: 16,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              "Menunggu Pembayaran",
-              style: TextStyle(
-                fontSize: 14,
-                color: primaryColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _startInvoicePolling() {
-    if (_isPollingStarted) return;
-    _isPollingStarted = true;
-
-    // optional: langsung cek sekali saat mulai
-    context.read<DnRekap2invBloc>().add(
-      CheckInvoiceStatusEvent(invoiceId: widget.recordId),
-    );
-
-    _pollingTimer?.cancel();
-    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (t) {
-      if (!mounted) return;
-
-      context.read<DnRekap2invBloc>().add(
-        CheckInvoiceStatusEvent(invoiceId: widget.recordId),
-      );
-    });
-  }
-
-  void _stopInvoicePolling() {
-    _pollingTimer?.cancel();
-    _pollingTimer = null;
-    _isPollingStarted = false;
   }
 }

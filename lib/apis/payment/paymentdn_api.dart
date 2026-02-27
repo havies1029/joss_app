@@ -27,7 +27,7 @@ class PaymentDnAPI{
 		}
 	}
 
-	Future<List<InvoiceStatusModel>> cekPaymentStatusAPI(String inv1Id) async {
+	Future<InvoiceStatusModel> cekPaymentStatusAPI(String inv1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/cekstatus";
 		Map<String, String> queryParams = {'inv1_id': inv1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
@@ -39,17 +39,15 @@ class PaymentDnAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
+			final Map<String, dynamic> jsonData = json.decode(response.body);
 
-			return jsonData
-					.map((e) => InvoiceStatusModel.fromJson(e))
-					.toList();
+			return InvoiceStatusModel.fromJson(jsonData);
 		} else {
-			return throw Exception("Failed to load data");
+			throw Exception("Failed to load data");
 		}
 	}
 
-	Future<List<InvoiceStatusModel>> dnToInvByListCobAPI(String listcob) async {
+	Future<InvoiceStatusModel> dnToInvByListCobAPI(String listcob) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/dntoinvbylistcob";
 		Map<String, String> queryParams = {'listcob': listcob, 'modulId': 'dnToInvByListCobAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
@@ -61,17 +59,16 @@ class PaymentDnAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
+      final Map<String, dynamic> jsonData =
+          json.decode(response.body) as Map<String, dynamic>;
 
-			return jsonData
-					.map((e) => InvoiceStatusModel.fromJson(e))
-					.toList();
-		} else {
-			return throw Exception("Failed to load data");
-		}
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
 	}
 
-	Future<List<InvoiceStatusModel>> dnToInvByListDnAPI(String listdn) async {
+	Future<InvoiceStatusModel> dnToInvByListDnAPI(String listdn) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/dntoinvbylistdn";
 		Map<String, String> queryParams = {'listdn': listdn, 'modulId': 'dnToInvByListDnAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
@@ -83,17 +80,16 @@ class PaymentDnAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
+      final Map<String, dynamic> jsonData =
+          json.decode(response.body) as Map<String, dynamic>;
 
-			return jsonData
-					.map((e) => InvoiceStatusModel.fromJson(e))
-					.toList();
-		} else {
-			return throw Exception("Failed to load data");
-		}
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
 	}
 
-	Future<List<InvoiceStatusModel>> invoice2PaymentViaVaAPI(String invoiceId, String methodId) async {
+	Future<InvoiceStatusModel> invoice2PaymentViaVaAPI(String invoiceId, String methodId) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/invtobayarviava";
 		Map<String, String> queryParams = {'invoiceId': invoiceId, 'methodId': methodId, 'modulId': 'invoice2PaymentAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
@@ -105,14 +101,13 @@ class PaymentDnAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
+      final Map<String, dynamic> jsonData =
+          json.decode(response.body) as Map<String, dynamic>;
 
-			return jsonData
-					.map((e) => InvoiceStatusModel.fromJson(e))
-					.toList();
-		} else {
-			return throw Exception("Failed to load data");
-		}
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
 	}
 
 	Future<RincianSOAModel> getRincianSOACustomer(String searchText) async {
@@ -150,11 +145,11 @@ class PaymentDnAPI{
 		if (response.statusCode == 200) {
 			return true;
 		} else {
-			return throw Exception("Failed to process data");
+			throw Exception("Failed to process data");
 		}
 	}
 
-	Future<List<InvoiceStatusModel>> regMv2InvAPI(String regmv1Id) async {
+	Future<InvoiceStatusModel> regMv2InvAPI(String regmv1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/regmvtosppa";
 		Map<String, String> queryParams = {'regmv1Id': regmv1Id, 'modulId': 'RegMv2InvAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
@@ -166,17 +161,16 @@ class PaymentDnAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
+      final Map<String, dynamic> jsonData =
+          json.decode(response.body) as Map<String, dynamic>;
 
-			return jsonData
-					.map((e) => InvoiceStatusModel.fromJson(e))
-					.toList();
-		} else {
-			return throw Exception("Failed to load data");
-		}
+      return InvoiceStatusModel.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to load data");
+    }
 	}
 
-	Future<List<InvoiceStatusModel>> regPar2InvAPI(String regpar1Id) async {
+	Future<InvoiceStatusModel> regPar2InvAPI(String regpar1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/regpartosppa";
 		Map<String, String> queryParams = {'regpar1Id': regpar1Id, 'modulId': 'RegPar2InvAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
@@ -188,13 +182,12 @@ class PaymentDnAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final List<dynamic> jsonData = json.decode(response.body);
+			final Map<String, dynamic> jsonData =
+          json.decode(response.body) as Map<String, dynamic>;
 
-			return jsonData
-					.map((e) => InvoiceStatusModel.fromJson(e))
-					.toList();
+			return InvoiceStatusModel.fromJson(jsonData);
 		} else {
-			return throw Exception("Failed to load data");
+			throw Exception("Failed to load data");
 		}
 	}
 

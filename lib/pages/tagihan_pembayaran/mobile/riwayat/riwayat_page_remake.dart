@@ -69,6 +69,10 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           },
         ),
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
+          listenWhen: (previous, current) {
+            return previous.isProcessed != current.isProcessed ||
+                previous.paymentStatus != current.paymentStatus;
+          },
           listener: (context, state) {
             if (!state.isProcessed) return;
 
@@ -78,6 +82,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               );
               onViewPaymentMethods(state.curr, state.totalBayar);
             } else if (state.paymentStatus == "30") {
+            
               ScaffoldMessenger.of(context).showSnackBar(
                 infoSnackBar('Silakan lakukan pembayaran.'),
               );
@@ -90,6 +95,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 ),
               );
+              
             } else if (state.paymentStatus == "40") {
               ScaffoldMessenger.of(context).showSnackBar(
                 successSnackBar('Proses pembayaran berhasil.'),

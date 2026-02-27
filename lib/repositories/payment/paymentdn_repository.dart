@@ -12,19 +12,19 @@ class PaymentDnRepository {
     return await api.getPaymentMethods();
   }
 
-  Future<List<InvoiceStatusModel>> fetchInvoiceStatus(String inv1Id) async {
+  Future<InvoiceStatusModel> fetchInvoiceStatus(String inv1Id) async {
     return await api.cekPaymentStatusAPI(inv1Id);
   }
 
-  Future<List<InvoiceStatusModel>> fetchDnToInvByListCob(String listcob) async {
+  Future<InvoiceStatusModel> fetchDnToInvByListCob(String listcob) async {
     return await api.dnToInvByListCobAPI(listcob);
   }
 
-  Future<List<InvoiceStatusModel>> fetchDnToInvByListDn(String listdn) async {
+  Future<InvoiceStatusModel> fetchDnToInvByListDn(String listdn) async {
     return await api.dnToInvByListDnAPI(listdn);
   }
 
-  Future<List<InvoiceStatusModel>> processInvoiceToPaymentViaVa(String invoiceId, String methodId) async {
+  Future<InvoiceStatusModel> processInvoiceToPaymentViaVa(String invoiceId, String methodId) async {
     return await api.invoice2PaymentViaVaAPI(invoiceId, methodId);
   }
 
@@ -36,11 +36,11 @@ class PaymentDnRepository {
     return await api.forcePaymentViaVaAPI(invoiceId);
   }
 
-  Future<List<InvoiceStatusModel>> regMv2Inv(String regmv1Id) async {
+  Future<InvoiceStatusModel> regMv2Inv(String regmv1Id) async {
     return await api.regMv2InvAPI(regmv1Id);
   }
 
-  Future<List<InvoiceStatusModel>> regPar2Inv(String regpar1Id) async {
+  Future<InvoiceStatusModel> regPar2Inv(String regpar1Id) async {
     return await api.regPar2InvAPI(regpar1Id);
   }
 

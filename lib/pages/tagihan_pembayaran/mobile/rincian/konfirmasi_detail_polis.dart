@@ -62,13 +62,6 @@ class RincianKonfirmasiDetailPage extends StatelessWidget {
                 onPressed: () {
                   final dnBloc = context.read<DnRekap2invBloc>();
                   final curr = _resolveCurrFromRincian(dnBloc.state, selectedDnIds);
-                  //
-                  // if (curr == "__MIXED__") {
-                  //   ScaffoldMessenger.of(context).showSnackBar(
-                  //     errorSnackBar("Currency berbeda-beda, tidak bisa digabung"),
-                  //   );
-                  //   return;
-                  // }
 
                   context.read<DnRekap2invBloc>().add(
                     DnToInvByListDnProcessEvent(
