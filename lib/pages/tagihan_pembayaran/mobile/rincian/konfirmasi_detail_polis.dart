@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:joss_app/pages/payment/mobile/rincian/rincian_tabel_page.dart';
-
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../base/base_background_sidepage.dart';
 import 'rincian_tabel_page.dart';
+
+//micky 2026-02-27
 
 class RincianKonfirmasiDetailPage extends StatelessWidget {
   final List<String> selectedDnIds;
