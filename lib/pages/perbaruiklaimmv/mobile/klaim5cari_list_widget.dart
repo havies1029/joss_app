@@ -74,8 +74,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                                       state.items[index].fileSizeBytes,
                                   onPickFile: () =>
                                       _pickFile(state.items[index]),
-                                  onPickPhoto: () =>
-                                      _pickPhoto(state.items[index]),
+                                  onPickPhoto: () => _showPickImageSourceSheet(state.items[index]),
                                   onDelete: () =>
                                       _deleteFile(state.items[index]),
                                   onPreview: () => _preview(state.items[index]),
@@ -89,8 +88,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                             return true;
                           },
                           onPickPhoto: (judul) async {
-                            // TODO: panggil camera
-                            // final judul = _judulCtrl.text.trim();
+                            await _showPickImageSourceSheetDokLain(widget.klaim1Id, judul);
                             return true;
                           },
                         ),
@@ -436,5 +434,152 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
 
     // OTHER FILE (DOC/XLS/TXT)
     await OpenFilex.open(path);
+  }
+
+  Future<void> _showPickImageSourceSheet(Klaim5cariModel it) async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 42,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+            const SizedBox(height: 14),
+            ListTile(
+              leading: const Icon(Icons.photo_camera, color: Colors.white),
+              title: const Text("Kamera", style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.white),
+              title: const Text("Galeri", style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+    await _pickImageSource(it, source);
+  }
+
+  Future<void> _pickImageSource(Klaim5cariModel it, ImageSource source) async {
+    final picker = ImagePicker();
+    final bloc = context.read<Klaim5cariBloc>();
+
+    final photo = await picker.pickImage(
+      source: source,
+      imageQuality: 85,
+    );
+    if (photo == null) return;
+
+    final path = photo.path;
+
+    // mime kadang null -> fallback
+    final mime = lookupMimeType(path) ?? guessMime(path) ?? 'image/jpeg';
+
+    bloc.add(
+      Klaim5LocalFileSetEvent(
+        klaim1Id: it.klaim1Id,
+        mjenisdocId: it.mjenisdocId,
+        klaim5Id: it.klaim5Id,
+        localPath: path,
+        fileName: path.split('/').last,
+        mimeType: mime,
+        fileSizeBytes: await photo.length(),
+      ),
+    );
+
+    bloc.add(
+      Klaim5UploadRequestedEvent(
+        mjenisdocId: it.mjenisdocId,
+        klaim5Id: it.klaim5Id,
+        jenisDocLain: '',
+      ),
+    );
+  }
+
+  Future<void> _showPickImageSourceSheetDokLain(String klaim1Id, String jenisDocLain) async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 42,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+            const SizedBox(height: 14),
+            ListTile(
+              leading: const Icon(Icons.photo_camera, color: Colors.white),
+              title: const Text("Kamera", style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.white),
+              title: const Text("Galeri", style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final picker = ImagePicker();
+    final bloc = context.read<Klaim5cariBloc>();
+
+    final photo = await picker.pickImage(source: source, imageQuality: 85);
+    if (photo == null) return;
+
+    final path = photo.path;
+    final mime = lookupMimeType(path) ?? guessMime(path) ?? 'image/jpeg';
+
+    bloc.add(
+      Klaim5LocalFileSetEvent(
+        klaim1Id: klaim1Id,
+        mjenisdocId: '',
+        klaim5Id: '',
+        localPath: path,
+        fileName: path.split('/').last,
+        mimeType: mime,
+        fileSizeBytes: await photo.length(),
+        jenisDocLain: jenisDocLain,
+      ),
+    );
+
+    bloc.add(
+      Klaim5UploadRequestedEvent(
+        mjenisdocId: '',
+        klaim5Id: '',
+        jenisDocLain: jenisDocLain,
+      ),
+    );
   }
 }
