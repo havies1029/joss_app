@@ -86,6 +86,7 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                           borderSide: enabledByBloc ? BorderSide.none : const BorderSide(color: Color(0xFFB98A2A)),
                           onPressed: () {
+                            if (enabledByBloc) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) {
@@ -93,6 +94,7 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
                                 return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
                               }),
                             );
+                            }
                           },
                         ),
                       );
