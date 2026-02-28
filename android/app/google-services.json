@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "771608260840",
+    "project_id": "joss-app-6afc8",
+    "storage_bucket": "joss-app-6afc8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771608260840:android:c7ab59231909d1d232595d",
+        "android_client_info": {
+          "package_name": "id.co.jayaproteksindo.joss_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771608260840-du8rkdo99t5f8630hvspvspituji7mr4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "id.co.jayaproteksindo.joss_app",
+            "certificate_hash": "458608362630527b654f3e1835bdc44f7bbe6354"
+          }
+        },
+        {
+          "client_id": "771608260840-1oieolascqum91j5p70fb7e8776bl3ud.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc4LqrfKYrKrAUJSMvD9-Kn6EabdJy7uk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771608260840-1oieolascqum91j5p70fb7e8776bl3ud.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
