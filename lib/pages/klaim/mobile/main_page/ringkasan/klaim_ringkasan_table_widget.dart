@@ -15,7 +15,7 @@ class KlaimRingkasanTableWidget extends StatefulWidget {
 
 class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
   late KlaimringkasCariBloc klaimringkasCariBloc;
-  final ScrollController hController = ScrollController();
+  //final ScrollController hController = ScrollController();
 
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
@@ -23,7 +23,7 @@ class KlaimRingkasanTableWidgetState extends State<KlaimRingkasanTableWidget> {
 
   @override
   void dispose() {
-    hController.dispose();
+    //hController.dispose();
     super.dispose();
   }
 

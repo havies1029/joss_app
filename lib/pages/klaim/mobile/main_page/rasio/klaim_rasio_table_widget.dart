@@ -17,7 +17,7 @@ class KlaimRasioTableWidget extends StatefulWidget {
 
 class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
   late KlaimrasiocobCariBloc klaimrasiocobCariBloc;
-  final ScrollController hController = ScrollController();
+  //final ScrollController hController = ScrollController();
 
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
@@ -25,7 +25,7 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
 
   @override
   void dispose() {
-    hController.dispose();
+    //hController.dispose();
     super.dispose();
   }
 
@@ -57,7 +57,7 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
                         ? ScrollbarTheme(
                       data: ScrollbarThemeData(
                         thumbVisibility:
-                        WidgetStateProperty.all(true),
+                        WidgetStateProperty.all(false),
                         trackVisibility:
                         WidgetStateProperty.all(false),
                         thickness: WidgetStateProperty.all(5),
@@ -67,9 +67,10 @@ class KlaimRasioTableWidgetState extends State<KlaimRasioTableWidget> {
                         ),
                       ),
                       child: Scrollbar(
-                        controller: hController,
+                        //controller: hController,
+                        //thumbVisibility: true,
                         child: SingleChildScrollView(
-                          controller: hController,
+                          //controller: hController,
                           scrollDirection: Axis.horizontal,
                           child: Column(
                             children: [

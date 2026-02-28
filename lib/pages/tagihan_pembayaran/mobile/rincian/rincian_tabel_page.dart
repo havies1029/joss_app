@@ -30,7 +30,7 @@ class RincianTablePage extends StatefulWidget {
 }
 
 class _RincianTablePageState extends State<RincianTablePage> {
-  final ScrollController hController = ScrollController();
+  //final ScrollController hController = ScrollController();
 
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
@@ -48,7 +48,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
   @override
   void dispose() {
-    hController.dispose();
+    //hController.dispose();
     super.dispose();
   }
 
@@ -186,7 +186,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
             ),
             child: ScrollbarTheme(
               data: ScrollbarThemeData(
-                thumbVisibility: WidgetStateProperty.all(true),
+                thumbVisibility: WidgetStateProperty.all(false),
                 trackVisibility: WidgetStateProperty.all(false),
                 thickness: WidgetStateProperty.all(5),
                 radius: Radius.circular(cardBorderRadius),
@@ -195,9 +195,10 @@ class _RincianTablePageState extends State<RincianTablePage> {
                 ),
               ),
               child: Scrollbar(
-                controller: hController,
+                //controller: hController,
+                //thumbVisibility: true,
                 child: SingleChildScrollView(
-                  controller: hController,
+                  //controller: hController,
                   scrollDirection: Axis.horizontal,
                   child: Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,

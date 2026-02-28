@@ -6,6 +6,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   file_saver
   file_selector_windows
+  firebase_auth
+  firebase_core
   flutter_inappwebview_windows
   pdfx
   permission_handler_windows

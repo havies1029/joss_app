@@ -17,12 +17,12 @@ class SppaDetailTableWidget extends StatefulWidget {
 }
 
 class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
-  final ScrollController hController = ScrollController();
+  //final ScrollController hController = ScrollController();
   final DateFormat _dateFmt = DateFormat('dd MMM yyyy');
 
   @override
   void dispose() {
-    hController.dispose();
+    //hController.dispose();
     super.dispose();
   }
 
@@ -60,16 +60,16 @@ class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
         decoration: _boxDecoration(),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(true),
+            thumbVisibility: WidgetStateProperty.all(false),
             trackVisibility: WidgetStateProperty.all(false),
             thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
             thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.25)),
           ),
           child: Scrollbar(
-            controller: hController,
+            //controller: hController,
             child: SingleChildScrollView(
-              controller: hController,
+              //controller: hController,
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
                 constraints: BoxConstraints(

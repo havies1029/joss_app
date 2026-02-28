@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
+import 'package:joss_app/helper/hscroll_always_thumb_helper.dart';
 import 'package:joss_app/models/klaimrinci/groupcobcari_model.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
@@ -139,7 +140,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           ),
           child: ScrollbarTheme(
             data: ScrollbarThemeData(
-              thumbVisibility: WidgetStateProperty.all(true),
+              thumbVisibility: WidgetStateProperty.all(false),
               trackVisibility: WidgetStateProperty.all(false),
               thickness: WidgetStateProperty.all(5),
               radius: const Radius.circular(cardBorderRadius),
@@ -147,57 +148,52 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
                 scrollBar.withOpacity(0.1),
               ),
             ),
-            child: Scrollbar(
-              controller: hController,
-              child: SingleChildScrollView(
-                  controller: hController,
-                  scrollDirection: Axis.horizontal,
-                  child: Table(
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    border: const TableBorder(
-                      horizontalInside: BorderSide(color: sGrey, width: 1),
-                      verticalInside: BorderSide(color: sGrey, width: 1),
-                    ),
-                    columnWidths: isLainnya
-                        ? const {
-                      0: FixedColumnWidth(50),
-                      1: FixedColumnWidth(50),
-                      2: FixedColumnWidth(100),
-                      3: FixedColumnWidth(120),
-                      4: FixedColumnWidth(120), // COB
-                      5: FixedColumnWidth(80), // TANGGAL
-                      6: FixedColumnWidth(100), // ESTIMASI
-                    }
-                        : const {
-                      0: FixedColumnWidth(50),
-                      1: FixedColumnWidth(50),
-                      2: FixedColumnWidth(100),
-                      3: FixedColumnWidth(120),
-                      4: FixedColumnWidth(80), // TANGGAL
-                      5: FixedColumnWidth(100), // ESTIMASI
-                    },
-                    children: [
-                      _tableHeader(context, [
-                        "",
-                        "NO",
-                        "NO KLAIM",
-                        "NO POLIS",
-                        if (isLainnya) "COB",
-                        "TANGGAL\nKEJADIAN",
-                        "NILAI",
-                      ]),
-                      ...details.asMap().entries.map(
-                            (e) => _detailRow(
-                          e.value,
-                          e.key,
-                          selectedId,
-                          compact: compact,
-                          isLainnya: isLainnya,
-                        ),
+            child: HScrollAlwaysThumb(
+                child: Table(
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: const TableBorder(
+                    horizontalInside: BorderSide(color: sGrey, width: 1),
+                    verticalInside: BorderSide(color: sGrey, width: 1),
+                  ),
+                  columnWidths: isLainnya
+                      ? const {
+                    0: FixedColumnWidth(50),
+                    1: FixedColumnWidth(50),
+                    2: FixedColumnWidth(100),
+                    3: FixedColumnWidth(120),
+                    4: FixedColumnWidth(120), // COB
+                    5: FixedColumnWidth(80), // TANGGAL
+                    6: FixedColumnWidth(100), // ESTIMASI
+                  }
+                      : const {
+                    0: FixedColumnWidth(50),
+                    1: FixedColumnWidth(50),
+                    2: FixedColumnWidth(100),
+                    3: FixedColumnWidth(120),
+                    4: FixedColumnWidth(80), // TANGGAL
+                    5: FixedColumnWidth(100), // ESTIMASI
+                  },
+                  children: [
+                    _tableHeader(context, [
+                      "",
+                      "NO",
+                      "NO KLAIM",
+                      "NO POLIS",
+                      if (isLainnya) "COB",
+                      "TANGGAL\nKEJADIAN",
+                      "NILAI",
+                    ]),
+                    ...details.asMap().entries.map(
+                          (e) => _detailRow(
+                        e.value,
+                        e.key,
+                        selectedId,
+                        compact: compact,
+                        isLainnya: isLainnya,
                       ),
-                    ],
-                  )),
-            ),
+                    ),
+                  ],
+                )),
           ),
         ),
       ),

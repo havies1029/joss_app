@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,21 +12,7 @@ import '../../../../common/constants.dart';
 
 import '../../../../helper/auth_input_router.dart';
 import '../../../../models/login/emailverification_model.dart';
-import 'package:joss_app/widgets/google/google_signin_button_stub.dart'
-if (dart.library.js_interop) 'package:joss_app/widgets/google/google_signin_button_web.dart';
 
-const List<String> scopes = <String>[
-  'email',
-];
-
-class CachedGoogleSigninButton extends StatelessWidget {
-  const CachedGoogleSigninButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return googleSigninButton();
-  }
-}
 
 class LoginFormUser extends StatefulWidget {
   const LoginFormUser({super.key});
@@ -37,7 +23,11 @@ class LoginFormUser extends StatefulWidget {
 
 class _LoginFormUserState extends State<LoginFormUser>
     with SingleTickerProviderStateMixin {
-  late final Widget _cachedGoogleButton;
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>['email'], // default sudah email
+  );
+
   // Controller untuk input field
   final TextEditingController _emailOrPhoneController = TextEditingController();
 
@@ -56,21 +46,7 @@ class _LoginFormUserState extends State<LoginFormUser>
     _animationController = AnimationController(
       vsync: this,
       duration: defaultDuration,
-    );
-    googleSignIn.onCurrentUserChanged
-        .listen((GoogleSignInAccount? account) async {
-      if (account != null && context.mounted) {
-        context.read<EmailVerificationBloc>().add(
-          EmailVerificationTambahEvent(
-            record: EmailVerificationModel(
-              email: account.email,
-              requestFrom: 'google',
-            ),
-          ),
-        );
-      }
-    });
-    // googleSignIn.signInSilently();
+    );    
   }
 
   @override
@@ -322,10 +298,10 @@ class _LoginFormUserState extends State<LoginFormUser>
                                       ],
                                     ),
                                     SizedBox(height: 10),
+
+                                    
                                     // Tombol Google
-                                    kIsWeb
-                                        ? const CachedGoogleSigninButton()
-                                        : AppButton.iconLeft(
+                                    AppButton.iconLeft(
                                       text: 'Masuk Dengan Google',
                                       icon: SvgPicture.asset(
                                         'assets/icons/google-icon.svg',
@@ -359,40 +335,52 @@ class _LoginFormUserState extends State<LoginFormUser>
     );
   }
 
-  void _handleGmailRegisterForMobile(BuildContext context) async {
+  Future<void> _handleGmailRegisterForMobile(BuildContext context) async {
     try {
-      GoogleSignInAccount? user;
-
-      if (kIsWeb) {
-        user = await googleSignIn.signIn();
-      } else {
-        user = await googleSignIn.signInSilently();
-        user ??= await googleSignIn.signIn();
+      // 1) Pilih akun Google (interactive)
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        // user cancel
+        return;
       }
 
-      // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
+      // 2) Ambil auth token dari Google
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-      if (user != null && context.mounted) {
-        // 🔒 Simpan email & display name ke AuthLocalCubi
+      // 3) Buat credential untuk Firebase
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-        // ⛳ Kirim ke EmailVerificationBloc
-        context.read<EmailVerificationBloc>().add(
-          EmailVerificationTambahEvent(
-            record: EmailVerificationModel(
-              email: user.email,
-              requestFrom: 'google',
-            ),
+      // 4) Login ke FirebaseAuth
+      final userCred =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      final user = userCred.user;
+      if (user == null) {
+        throw Exception('Firebase user is null setelah signInWithCredential');
+      }
+
+      // 5) Kirim ke BLoC / flow kamu (contoh kamu: EmailVerificationBloc)
+      if (!context.mounted) return;
+
+      context.read<EmailVerificationBloc>().add(
+        EmailVerificationTambahEvent(
+          record: EmailVerificationModel(
+            email: user.email ?? googleUser.email,
+            requestFrom: 'google',
           ),
-        );
-      }
+        ),
+      );
 
     } catch (e) {
       debugPrint('[GMAIL] ERROR: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Google gagal: $e')),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login Google gagal: $e')),
+      );
     }
   }
 }

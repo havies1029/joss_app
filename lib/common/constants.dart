@@ -31,11 +31,6 @@ DateTime? parseDate(dynamic value) {
 const List<String> scopes = <String>[
   'email',
 ];
-GoogleSignIn googleSignIn = GoogleSignIn(
-  scopes: scopes,
-  clientId: kIsWeb ? '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com' : null,
-  serverClientId: kIsWeb ? null : '217496566954-tiqmna993j1a943i9d86chpas0ipktle.apps.googleusercontent.com',
-);
 
 /// Device/Platform Utils
 bool get pIsMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);

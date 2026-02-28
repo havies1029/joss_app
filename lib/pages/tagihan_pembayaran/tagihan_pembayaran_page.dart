@@ -124,15 +124,16 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
                       ),
                     ),
                     // Body content
-                    // Expanded(
-                    //   child: IndexedStack(
-                    //     index: selectedTab,
-                    //     children: tabItems.map((e) => e['page'] as Widget).toList(),
-                    //   ),
-                    // ),
                     Expanded(
-                      child: tabItems[selectedTab]['page'] as Widget,
+                      child: IndexedStack(
+                        index: selectedTab,
+                        children: tabItems.map((e) => e['page'] as Widget).toList(),
+                      ),
                     ),
+                    //micky - 2026-02-28 pakai indexed stack biar state tiap tab tetap terjaga, kalau pakai ternary atau switch case tiap switch akan rebuild ulang widgetnya, jadi statenya hilang. Kalau pakai indexed stack, semua widget tetap hidup, cuma yang ditampilkan sesuai indexnya. Jadi state tiap tab tetap terjaga walaupun pindah-pindah tab
+                    // Expanded(
+                    //   child: tabItems[selectedTab]['page'] as Widget,
+                    // ),
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/helper/hscroll_always_thumb_helper.dart';
 import 'package:joss_app/models/payment/historybayarcari_model.dart';
 import 'riwayat_table_header.dart';
 import 'riwayat_table_row.dart';
@@ -6,13 +7,11 @@ import 'riwayat_table_style.dart';
 
 class RiwayatTableCompact extends StatelessWidget {
   final List<HistorybayarCariModel> items;
-  final ScrollController hController;
   final ValueChanged<HistorybayarCariModel> onTap;
 
   const RiwayatTableCompact({
     super.key,
     required this.items,
-    required this.hController,
     required this.onTap,
   });
 
@@ -31,11 +30,11 @@ class RiwayatTableCompact extends StatelessWidget {
       child: Container(
         decoration: RiwayatTableStyle.boxDecoration(),
         child: Scrollbar(
-          controller: hController,
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            controller: hController,
-            scrollDirection: Axis.horizontal,
+          //controller: hController,
+          //thumbVisibility: true,
+          child: HScrollAlwaysThumb(
+            //controller: hController,
+            //scrollDirection: Axis.horizontal,
             child: SizedBox( // ✅ width dibuat FIXED (bounded)
               width: tableWidth,
               child: Column(

@@ -84,9 +84,11 @@ class _LogoutConfirmationPopupState extends State<LogoutConfirmationPopup>
     Navigator.of(context).pop();
 
     // 3) Baru sign out + dispatch logout
+    /*
     try {
       await googleSignIn.signOut();
     } catch (_) {}
+    */
 
     // Optional cleanup sebelum logout event (kalau kamu mau aktifkan)
     // context.read<UserProfileCubit>().clearProfile();

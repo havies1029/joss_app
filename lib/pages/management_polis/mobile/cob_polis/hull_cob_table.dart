@@ -245,7 +245,7 @@ class _HullCobTableState extends State<HullCobTable> {
         ),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(true),
+            thumbVisibility: WidgetStateProperty.all(false),
             trackVisibility: WidgetStateProperty.all(false),
             thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),

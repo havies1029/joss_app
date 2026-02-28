@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/helper/hscroll_always_thumb_helper.dart';
 import 'package:joss_app/models/payment/dnrekapcobcari_model.dart';
 
 class RingkasanTablePage extends StatefulWidget {
@@ -25,11 +26,11 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
     return NumberFormat.decimalPattern().format(value);
   }
 
-  final ScrollController hController = ScrollController();
+  //final ScrollController hController = ScrollController();
 
   @override
   void dispose() {
-    hController.dispose();
+    //hController.dispose();
     super.dispose();
   }
 
@@ -194,7 +195,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
         ),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(true),
+            thumbVisibility: WidgetStateProperty.all(false),
             trackVisibility: WidgetStateProperty.all(false),
             thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
@@ -202,44 +203,41 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
               scrollBar.withOpacity(0.1),
             ),
           ),
-          child: Scrollbar(
-            controller: hController,
-            child: SingleChildScrollView(
-              controller: hController,
-              scrollDirection: Axis.horizontal,
-              child: Table(
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                border: const TableBorder(
-                  horizontalInside: BorderSide(color: sGrey),
-                  verticalInside: BorderSide(color: sGrey),
-                ),
-                columnWidths: const {
-                  // 0: FixedColumnWidth(50),
-                  0: FixedColumnWidth(50),
-                  1: FixedColumnWidth(110), // dibuat lebih lega
-                  2: FixedColumnWidth(90),
-                  3: FixedColumnWidth(55),
-                  4: FixedColumnWidth(150),
-                  5: FixedColumnWidth(120),
-                },
-                children: [
-                  _tableHeader(context, [
-                    // "",
-                    "NO",
-                    "KATEGORI",
-                    "JUMLAH\nPOLIS",
-                    "CURR",
-                    "TOTAL NILAI\nPERTANGGUNGAN",
-                    "TOTAL PREMI",
-                  ]),
-                  _detailRowWithCheckbox(
-                    context,
-                    bodyItems,
-                    index,
-                    compact: true,
-                  ),
-                ],
+          child: HScrollAlwaysThumb(
+            //controller: hController,
+            //thumbVisibility: true,
+            child: Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              border: const TableBorder(
+                horizontalInside: BorderSide(color: sGrey),
+                verticalInside: BorderSide(color: sGrey),
               ),
+              columnWidths: const {
+                // 0: FixedColumnWidth(50),
+                0: FixedColumnWidth(50),
+                1: FixedColumnWidth(110), // dibuat lebih lega
+                2: FixedColumnWidth(90),
+                3: FixedColumnWidth(55),
+                4: FixedColumnWidth(150),
+                5: FixedColumnWidth(120),
+              },
+              children: [
+                _tableHeader(context, [
+                  // "",
+                  "NO",
+                  "KATEGORI",
+                  "JUMLAH\nPOLIS",
+                  "CURR",
+                  "TOTAL NILAI\nPERTANGGUNGAN",
+                  "TOTAL PREMI",
+                ]),
+                _detailRowWithCheckbox(
+                  context,
+                  bodyItems,
+                  index,
+                  compact: true,
+                ),
+              ],
             ),
           ),
         ),

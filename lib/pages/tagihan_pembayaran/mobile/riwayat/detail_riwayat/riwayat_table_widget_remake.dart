@@ -17,11 +17,11 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
   late Historybayar2CariBloc historybayar2cariBloc;
 
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
-  final ScrollController hController = ScrollController();
+  //final ScrollController hController = ScrollController();
 
   @override
   void dispose() {
-    hController.dispose();
+    //hController.dispose();
     super.dispose();
   }
 
@@ -74,7 +74,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
           builder: (context, constraints) {
             return ScrollbarTheme(
               data: ScrollbarThemeData(
-                thumbVisibility: WidgetStateProperty.all(true),
+                thumbVisibility: WidgetStateProperty.all(false),
                 trackVisibility: WidgetStateProperty.all(false),
                 thickness: WidgetStateProperty.all(5),
                 radius: const Radius.circular(cardBorderRadius),
@@ -83,9 +83,9 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                 ),
               ),
               child: Scrollbar(
-                controller: hController,
+                //controller: hController,
                 child: SingleChildScrollView(
-                  controller: hController,
+                  //controller: hController,
                   scrollDirection: Axis.horizontal,
                   child: ConstrainedBox(
                     // bikin "nempel" kalau muat

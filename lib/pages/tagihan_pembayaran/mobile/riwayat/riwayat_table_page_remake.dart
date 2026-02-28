@@ -89,7 +89,7 @@ void _onScroll() {
               isNarrow
                   ? RiwayatTableCompact(
                       items: state.items,
-                      hController: _hController,
+                      //hController: _hController,
                       onTap: _onTapRow,
                     )
                   : RiwayatTableNormal(
