@@ -251,7 +251,7 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
             if (state.isSent && !state.verificationPinSuccess) {
               _shakeOtpFields();
               ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar("Kode OTP salah / sudah kadaluarsa."),
+                errorSnackBar(state.errorMessage.isNotEmpty ? state.errorMessage : "Kode OTP salah. Silakan coba lagi."),
               );
             }
           },

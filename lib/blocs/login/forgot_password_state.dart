@@ -8,6 +8,7 @@ class ForgotPasswordState extends Equatable {
   final bool verificationEmailSuccess;
   final bool verificationPinSuccess;
   final bool resetPasswordSuccess;
+  final String errorMessage;
 
   const ForgotPasswordState({
     this.record,
@@ -17,6 +18,7 @@ class ForgotPasswordState extends Equatable {
     this.verificationEmailSuccess = false,
     this.verificationPinSuccess = false,
     this.resetPasswordSuccess = false,
+    this.errorMessage = "",
   });
 
   ForgotPasswordState copyWith({
@@ -27,6 +29,7 @@ class ForgotPasswordState extends Equatable {
     bool? verificationEmailSuccess,
     bool? verificationPinSuccess,
     bool? resetPasswordSuccess,
+    String? errorMessage,
   }) {
     return ForgotPasswordState(
       record: record ?? this.record,
@@ -36,6 +39,7 @@ class ForgotPasswordState extends Equatable {
       verificationEmailSuccess: verificationEmailSuccess ?? this.verificationEmailSuccess,
       verificationPinSuccess: verificationPinSuccess ?? this.verificationPinSuccess,
       resetPasswordSuccess: resetPasswordSuccess ?? this.resetPasswordSuccess,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -48,5 +52,6 @@ class ForgotPasswordState extends Equatable {
     verificationPinSuccess,
     resetPasswordSuccess,
     record,
+    errorMessage,
   ];
 }

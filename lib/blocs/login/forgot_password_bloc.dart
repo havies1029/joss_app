@@ -46,9 +46,9 @@ class ForgotPasswordBloc
     bool hasFailure = true;
     emit(state.copyWith(isSending: true, isSent: false, verificationPinSuccess: false));
 
-    returnData = await repository.emailVerificationForgotPswd(event.record);
+    returnData = await repository.validasiPinForgotPassword(event.record);
 
-    debugPrint("onValidasiPinEmail returnData: ${returnData.data}");
+    //debugPrint("onValidasiPinEmail returnData: ${returnData.data}");
 
     hasFailure = !returnData.success;
     emit(state.copyWith(
@@ -56,6 +56,7 @@ class ForgotPasswordBloc
       isSent: true,
       hasFailure: hasFailure,
       verificationPinSuccess: !hasFailure,
+      errorMessage: hasFailure ? returnData.data : "",
     ));
   }
 
