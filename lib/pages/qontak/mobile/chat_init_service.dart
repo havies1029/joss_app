@@ -79,6 +79,11 @@ class ChatInitService {
         displayName: displayName,
         error: e.toString(),
       );
+      debugPrint(
+        'ChatInitResult => success=${result.success}, '
+        'userId=${result.userId}, displayName=${result.displayName}, '
+        'error=${result.error}',
+      );
       debugPrint("❌ Chat init gagal: $e\n$st");
       _pending?.complete(result);
       return result;

@@ -36,7 +36,7 @@ class Klaimparaccordioncard extends StatelessWidget {
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
             secondChild: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               child: child,
             ),
             crossFadeState:

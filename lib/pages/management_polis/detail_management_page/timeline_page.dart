@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/common/constants.dart';
 
 class TimelineItem<T> extends StatelessWidget {
   final T item;
@@ -15,6 +16,7 @@ class TimelineItem<T> extends StatelessWidget {
   final Color activeDotColor;
   final Color normalDotColor;
   final bool isLast;
+  final bool isLastActive;
   final bool hideLineWhenActive;
   final double lineHeight;
   final double dotSize;
@@ -26,6 +28,7 @@ class TimelineItem<T> extends StatelessWidget {
     required this.item,
     required this.index,
     required this.isLast,
+    required this.isLastActive,
     required this.activeIndex,
     required this.getDateTime,
     required this.getStatusText,
@@ -50,7 +53,7 @@ class TimelineItem<T> extends StatelessWidget {
     final isActive = index == activeIndex;
 
     final textColor = isActive ? activeTextColor : normalTextColor;
-    final dotColor = isActive ? activeDotColor : normalDotColor;
+    final dotColor = isLastActive ? pGreen : (isActive ? activeDotColor : normalDotColor);
 
     final showLine = !isLast;
 

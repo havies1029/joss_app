@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/home/draggable_chat_button.dart';
 import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
+import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
 import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
@@ -47,7 +49,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
         BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
           listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
           listener: (context, state) {
-            final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
+            //final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
             // if (bytes.isNotEmpty) {
             //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
             // }
@@ -57,9 +59,9 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           listenWhen: (prev, curr) =>
           curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
           listener: (context, state) {
-            final nama = state.record?.rekanNama.trim();
+            //final nama = state.record?.rekanNama.trim();
             final mrekan1Id = state.record?.mrekan1Id;
-            final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
+            //final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
 
             // if (nama != null && nama.isNotEmpty) {
             //   context.read<UserProfileCubit>().setProfile(
@@ -80,7 +82,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
           listenWhen: (prev, curr) =>
           prev.record != curr.record && curr.record != null && !curr.hasFailure,
           listener: (context, state) {
-            final record = state.record!;
+            //final record = state.record!;
             // if (record.email.isNotEmpty) {
             //   context.read<RegUserProfileCubit>().setProfile(
             //     email: record.email,
@@ -99,17 +101,17 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
               index: selectedIndex,
               children: pages,
             ),
-            // DraggableChatButton(
-            //   onTap: () {
-            //     if (ChatInitService.I.isInitialized) {
-            //       Navigator.pushNamed(context, 'chat');
-            //     } else {
-            //       ScaffoldMessenger.of(context).showSnackBar(
-            //         const SnackBar(content: Text('Chat belum siap, coba lagi')),
-            //       );
-            //     }
-            //   },
-            // ),
+            DraggableChatButton(
+              onTap: () {
+                if (ChatInitService.I.isInitialized) {
+                  Navigator.pushNamed(context, 'chat');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Chat belum siap, coba lagi')),
+                  );
+                }
+              },
+            ),
           ],
         ),
 

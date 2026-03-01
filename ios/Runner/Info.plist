@@ -45,5 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Joss App membutuhkan akses kamera untuk mengambil foto dan mengirimkannya lewat chat.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Joss App membutuhkan akses mikrofon untuk merekam voice note dan mengirimkannya lewat chat.</string>
 </dict>
 </plist>

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
-import 'klaim_progress_tile_styles.dart';
 
 class KlaimProgressTimeline extends StatelessWidget {
   final bool isLast;
@@ -18,7 +17,6 @@ class KlaimProgressTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lastActiveColor = KlaimProgressTileStyles.lastActiveColor;
 
     return SizedBox(
       width: 22,

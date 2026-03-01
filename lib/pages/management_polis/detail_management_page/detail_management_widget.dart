@@ -388,7 +388,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                           setState(() {
                             _loading = false;
                             _items = List.from(state.items);
-                            _emptyText = "Belum ada proses Otherrs";
+                            _emptyText = "Belum ada proses Others";
                             _getDateTime =
                                 (x) => (x as Regother3cariModel).tglStatus;
                             _getStatusText =
@@ -515,8 +515,14 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
             final index = entry.key;
             final item = entry.value;
             final isLast = index == _items.length - 1;
+            final currActive = item.tglStatus != null;
+            final nextIsPlaceholder = (index < _items.length - 1)
+              ? _items[index + 1].tglStatus == null
+              : true;
+            final isLastActive = currActive && nextIsPlaceholder;
             return TimelineItem<dynamic>(
               isLast: isLast,
+              isLastActive: isLastActive,
               item: item,
               activeIndex: _activeIndex,
               getDateTime: (x) => _getDateTime!(x),
