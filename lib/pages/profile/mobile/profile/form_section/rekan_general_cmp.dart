@@ -130,16 +130,21 @@ class MRekanGeneralCmpCrudFormPageFormState
                                         CircleAvatar(
                                           radius: 50,
                                           backgroundColor: secondaryBlackColor,
-                                          backgroundImage: (imageBytes != null &&
-                                              imageBytes.isNotEmpty)
+                                          backgroundImage: (imageBytes != null && imageBytes.isNotEmpty)
                                               ? MemoryImage(imageBytes)
                                               : null,
-                                          child: (imageBytes == null ||
-                                              imageBytes.isEmpty)
-                                              ? const Icon(
-                                            Icons.business,
-                                            color: Colors.white,
-                                            size: 48,
+                                          child: (imageBytes == null || imageBytes.isEmpty)
+                                              ? Container(
+                                            alignment: Alignment.center,
+                                            child: SvgPicture.asset(
+                                              "assets/icons/placeholder_icon.svg",
+                                              width: 40,
+                                              height: 40,
+                                              colorFilter: const ColorFilter.mode(
+                                                Colors.white,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
                                           )
                                               : null,
                                         ),

@@ -28,6 +28,11 @@ class _CobCariPageState extends State<CobCariPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ambil selected id dari bloc (satu sumber kebenaran)
+    final selectedId = context.select<Regother1CrudBloc, String>(
+          (b) => b.state.selectedCOBId,
+    );
+
     return BaseBackgroundSidePage(
       title: "Kategori Asuransi",
       child: Container(
@@ -55,7 +60,6 @@ class _CobCariPageState extends State<CobCariPage> {
             }
 
             final rawItems = snapshot.data ?? [];
-
             final items = rawItems
                 .where((e) => e.mCobApp1Id != "10002" && e.mCobApp1Id != "10003")
                 .toList();
@@ -69,6 +73,13 @@ class _CobCariPageState extends State<CobCariPage> {
               );
             }
 
+            // kalau sudah pernah pilih sebelumnya, pastikan model lokal ikut kebaca
+            if (selectedCobModel == null && selectedId.isNotEmpty) {
+              final found =
+              items.where((e) => e.mCobApp1Id == selectedId).toList();
+              if (found.isNotEmpty) selectedCobModel = found.first;
+            }
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -76,12 +87,16 @@ class _CobCariPageState extends State<CobCariPage> {
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     itemCount: items.length,
-                    itemBuilder: (_, i) => _buildCobItem(items[i]),
+                    itemBuilder: (_, i) => _buildCobItem(
+                      context,
+                      items[i],
+                      selectedId,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
                 AppButton.primary(
-                  text: "Tambah",
+                  text: "Lanjut",
                   onPressed: selectedCobModel == null
                       ? null
                       : () => Navigator.pop(context, selectedCobModel),
@@ -95,14 +110,15 @@ class _CobCariPageState extends State<CobCariPage> {
     );
   }
 
-  Widget _buildCobItem(ComboMCobApp1Model item) {
-    final isSelected = selectedCobId == item.mCobApp1Id;
+  Widget _buildCobItem(
+      BuildContext context,
+      ComboMCobApp1Model item,
+      String selectedId,
+      ) {
+    final isSelected = selectedId == item.mCobApp1Id;
 
     void pick() {
-      setState(() {
-        selectedCobId = item.mCobApp1Id;
-        selectedCobModel = item;
-      });
+      selectedCobModel = item;
 
       context.read<Regother1CrudBloc>().add(SelectButton(item.mCobApp1Id));
     }
@@ -129,5 +145,4 @@ class _CobCariPageState extends State<CobCariPage> {
       ),
     );
   }
-
 }

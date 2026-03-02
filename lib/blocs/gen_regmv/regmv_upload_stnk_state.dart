@@ -1,43 +1,38 @@
 part of 'regmv_upload_stnk_bloc.dart';
 
-abstract class RegmvUploadStnkState extends Equatable {
-  const RegmvUploadStnkState();
+
+class Regmv4UploadFotoObjectState extends Equatable {
+  final List<Regmv4UploadModel> items;
+  final String? toast;
+  final bool isClearing;
+  final bool uploadAllDone;
+  final bool isUploadingAll;
+
+  const Regmv4UploadFotoObjectState({
+    this.items = const [],
+    this.toast,
+    this.isClearing = false,
+    this.uploadAllDone = false,
+    this.isUploadingAll = false,
+  });
+
+  Regmv4UploadFotoObjectState copyWith({
+    List<Regmv4UploadModel>? items,
+    String? toast,
+    bool clearToast = false,
+    bool? isClearing,
+    bool? uploadAllDone,
+    bool? isUploadingAll,
+  }) {
+    return Regmv4UploadFotoObjectState(
+      items: items ?? this.items,
+      toast: clearToast ? null : (toast ?? this.toast),
+      isClearing: isClearing ?? this.isClearing,
+      uploadAllDone: uploadAllDone ?? false, // auto reset
+      isUploadingAll: isUploadingAll ?? this.isUploadingAll,
+    );
+  }
 
   @override
-  List<Object?> get props => [];
-}
-
-class UploadStnkInitial extends RegmvUploadStnkState {}
-
-class UploadStnkPreview extends RegmvUploadStnkState {
-  final Uint8List imageBytes;
-  final String fileName;
-  const UploadStnkPreview(this.imageBytes, this.fileName);
-
-  @override
-  List<Object?> get props => [imageBytes, fileName];
-}
-
-class UploadStnkListPreview extends RegmvUploadStnkState {
-  final List<Uint8List> images;
-  final List<String> fileNames;
-
-  const UploadStnkListPreview(this.images, this.fileNames);
-
-  @override
-  List<Object?> get props => [images, fileNames];
-}
-
-
-class UploadStnkLoading extends RegmvUploadStnkState {}
-
-class UploadStnkSuccess extends RegmvUploadStnkState {}
-
-class UploadStnkFailure extends RegmvUploadStnkState {
-  final String error;
-
-  const UploadStnkFailure(this.error);
-
-  @override
-  List<Object?> get props => [error];
+  List<Object?> get props => [items, toast, isClearing, uploadAllDone, isUploadingAll];
 }

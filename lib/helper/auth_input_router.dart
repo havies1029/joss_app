@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/login/emailverification_bloc.dart';
 import '../models/login/emailverification_model.dart';
+import 'package:email_validator/email_validator.dart';
 
+import 'indo_phone_result.dart';
 
 class AuthInputRouter {
-  static void handleInput(BuildContext context, String input) {
-    final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
-    final phoneRegex = RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
+  static void handleInput(BuildContext context, String inputRaw) {
+    final input = inputRaw.trim();
 
-    if (emailRegex.hasMatch(input)) {
+    // 1) Email: pakai library
+    final isEmail = EmailValidator.validate(input);
+
+    if (isEmail) {
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(
@@ -18,61 +22,30 @@ class AuthInputRouter {
           ),
         ),
       );
-    } else if (phoneRegex.hasMatch(input)) {
+      return;
+    }
+
+    final phoneRes = IndoPhoneHelper.normalize(input);
+    if (phoneRes.isValid) {
+      final phone62 = phoneRes.phone62!;
+
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(
-            email: input,
+            email: phone62,
             requestFrom: 'hp',
           ),
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Format tidak valid, masukkan email atau nomor HP"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      return;
     }
+
+    // 3) Invalid
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(phoneRes.error ?? "Format tidak valid, masukkan email atau nomor HP"),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 }
-//
-//
-// class AuthInputRouter {
-//   static void handleFromBlocState(BuildContext context) {
-//     final state = context.read<EmailVerificationBloc>().state;
-//
-//     final input = (state.email.isNotEmpty) ? state.email : state.telepon;
-//
-//     final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
-//     final phoneRegex = RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
-//
-//     if (emailRegex.hasMatch(input)) {
-//       context.read<EmailVerificationBloc>().add(
-//         EmailVerificationTambahEvent(
-//           record: EmailVerificationModel(
-//             email: input,
-//             requestFrom: 'email',
-//           ),
-//         ),
-//       );
-//     } else if (phoneRegex.hasMatch(input)) {
-//       context.read<EmailVerificationBloc>().add(
-//         EmailVerificationTambahEvent(
-//           record: EmailVerificationModel(
-//             email: input,
-//             requestFrom: 'hp',
-//           ),
-//         ),
-//       );
-//     } else {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text("Format tidak valid, masukkan email atau nomor HP"),
-//           backgroundColor: Colors.red,
-//         ),
-//       );
-//     }
-//   }
-// }

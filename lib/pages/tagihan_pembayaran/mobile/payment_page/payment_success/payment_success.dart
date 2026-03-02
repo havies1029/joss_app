@@ -91,38 +91,40 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                 ),
               ),
 
-              // Konten utama
               Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/logo_berhasil.svg",
-                      width: 120,
-                      height: 120,
-                    ),
-                    const SizedBox(height: vPadding),
-                    Text(
-                      widget.display,
-                      textAlign: TextAlign.center,
-                      style: headingStyle(context),
-                    ),
-                    const SizedBox(height: hPadding),
-                    Text(
-                      widget.description,
-                      textAlign: TextAlign.center,
-                      style: bodyTextStyle(context, fontSize: 20)
-                          .copyWith(color: hintGrey),
-                    ),
-                    const SizedBox(height: vPadding),
-                    AppButton.primary(
-                      text: widget.displayButton,
-                      backgroundColor: formGrey,
-                      borderside: BorderSide(color: sGrey),
-                      width: 245,
-                      onPressed: onPressed,
-                    ),
-                  ],
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/logo_berhasil.svg",
+                        width: 120,
+                        height: 120,
+                      ),
+                      const SizedBox(height: vPadding),
+                      Text(
+                        widget.display,
+                        textAlign: TextAlign.center,
+                        style: headingStyle(context),
+                      ),
+                      const SizedBox(height: hPadding),
+                      Text(
+                        widget.description,
+                        textAlign: TextAlign.center,
+                        style: bodyTextStyle(context, fontSize: 20)
+                            .copyWith(color: hintGrey),
+                      ),
+                      const SizedBox(height: vPadding),
+                      AppButton.primary(
+                        text: widget.displayButton,
+                        backgroundColor: formGrey,
+                        borderside: BorderSide(color: sGrey),
+                        width: 245,
+                        onPressed: onPressed,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

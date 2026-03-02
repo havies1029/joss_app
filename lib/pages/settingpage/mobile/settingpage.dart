@@ -13,6 +13,7 @@ import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_idv.dart';
 import '../../profile/mobile/profile/form_section/rekan_pic.dart';
 import '../widgets/logout_popup.dart';
+import '../widgets/syarat_ketentuan_page.dart';
 import '../widgets/ubah_password_popup.dart';
 
 import '../../base/base_background_firstpage.dart';
@@ -32,15 +33,43 @@ class _SettingsPageState extends State<SettingsPage> {
   bool darkMode = true;
 
   Widget _buildAvatar(Uint8List? bytes, String initials) {
-    if (bytes != null && bytes.isNotEmpty) {
-      return CircleAvatar(radius: 23, backgroundImage: MemoryImage(bytes));
-    }
+    final hasPhoto = bytes != null && bytes.isNotEmpty;
+
     return CircleAvatar(
       radius: 23,
-      backgroundColor: primaryColor,
-      child: Text(initials, style: headingStyle(context, fontSize: 20)),
+      backgroundColor: formGrey,
+      child: ClipOval(
+        child: hasPhoto
+            ? Image.memory(
+          bytes!,
+          fit: BoxFit.cover,
+          width: 46,
+          height: 46,
+          gaplessPlayback: true,
+          filterQuality: FilterQuality.medium,
+          errorBuilder: (_, __, ___) => _placeholderAvatar(),
+        )
+            : _placeholderAvatar(),
+      ),
     );
   }
+
+  Widget _placeholderAvatar() {
+    return Container(
+      color: formGrey,
+      alignment: Alignment.center,
+      child: SvgPicture.asset(
+        "assets/icons/placeholder_icon.svg",
+        width: 26,
+        height: 26,
+        colorFilter: const ColorFilter.mode(
+          primaryLightColor,
+          BlendMode.srcIn,
+        ),
+      ),
+    );
+  }
+
 
   String _initialsFromName(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -282,7 +311,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 children: [
                                   _buildMenuItem(
                                     svgAsset: 'assets/icons/ubah_pass.svg',
-                                    title: 'Ubah Password',
+                                    title: 'Ubah Kata Sandi',
                                     onTap: () {
                                       Navigator.push(
                                         context,
@@ -387,15 +416,19 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     // ================== SYARAT & KETENTUAN ==================
                     _buildSectionTitle(context, 'Syarat dan Ketentuan'),
-                     _buildCardContainer(
+                    _buildCardContainer(
                       children: [
                         _buildMenuItem(
                           svgAsset: 'assets/icons/sk.svg',
                           title: 'Syarat dan Ketentuan',
-                          onTap:
-                              () => successSnackBar(
-                                'Syarat dan Ketentuan diklik',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SyaratKetentuanPage(),
                               ),
+                            );
+                          },
                         ),
                         sDivider,
                         _buildMenuItem(
@@ -403,8 +436,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           title: 'Kebijakan dan Privasi',
                           onTap:
                               () => successSnackBar(
-                                'Kebijakan dan Privasi diklik',
-                              ),
+                            'Kebijakan dan Privasi diklik',
+                          ),
                         ),
                       ],
                     ),
@@ -566,7 +599,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeThumbColor: primaryLightColor,
+              activeColor: primaryLightColor,
               activeTrackColor: pBlue,
               inactiveThumbColor: primaryLightColor,
               inactiveTrackColor: pGrey,

@@ -9,6 +9,9 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
+import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv4_unified_preview_page.dart';
+import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv5_unified_preview_page.dart';
+import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv7_unified_preview_page.dart';
 import 'package:string_validator/string_validator.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
@@ -91,19 +94,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Regmv2FormBloc? regmv2formbloc;
   Regmv3FormBloc? regmv3formbloc;
 
-  Regmv4FormBloc? regmv4formBloc;
-  bool _form4HasError = false;
-  String? _form4ErrorText;
-
-  Regmv5FormBloc? regmv5formBloc;
-  bool _form5HasError = false;
-  String? _form5ErrorText;
-
-  Regmv6FormBloc? regmv6formbloc;
-
-  Regmv7FormBloc? regmv7formBloc;
-  bool _form7HasError = false;
-  String? _form7ErrorText;
+  bool _showVal4 = false;
+  bool _showVal5 = false;
+  bool _showVal7 = false;
 
   Regmv1CrudModel? form1Record;
   Regmv2FormModel? form2Record;
@@ -177,20 +170,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   String selectedYearform3 = "";
   //form3
 
-  //form4
-  List<Uint8List> _imagesRegmv4 = [];
-  List<String> _fileNamesRegmv4 = [];
-  List<Regmv4CariModel> _serverPhotosRegmv4 = [];
-  final Set<String> _deletingServerIdsRegmv4 = {};
-  //form4
-
-  //form5
-  List<Uint8List> _imagesRegmv5 = [];
-  List<String> _fileNamesRegmv5 = [];
-  List<Regmv5CariModel> _serverPhotosRegmv5 = [];
-  final Set<String> _deletingServerIdsRegmv5 = {};
-  //form5
-
   //form6
   final fieldDiskonPersenController = TextEditingController();
   final fieldPremiAddController = TextEditingController();
@@ -211,13 +190,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldSumInsuredController = TextEditingController();
   final fieldRateTotalController = TextEditingController();
   //form6
-
-  //form7
-  List<Uint8List> _imagesRegmv7 = [];
-  List<String> _fileNamesRegmv7 = [];
-  List<Regmv7CariModel> _serverPhotosRegmv7 = [];
-  final Set<String> _deletingServerIdsRegmv7 = {};
-  //form7
 
   @override
   void initState() {
@@ -721,236 +693,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               }
             },
           ),
-
-          // server list update
-          BlocListener<Regmv4CariBloc, Regmv4CariState>(
-            listener: (context, state) {
-              debugPrint("👂 Regmv4CariBloc listener CALLED");
-              debugPrint("state.status: ${state.status}");
-              debugPrint("state.items length: ${state.items.length}");
-
-              if (state.status == ListStatus.success) {
-                debugPrint("✅ Regmv4CariBloc SUCCESS");
-                setState(() => _serverPhotosRegmv4 = List.from(state.items));
-              }
-            },
-          ),
-
-          // upload flow
-          BlocListener<RegmvUploadStnkBloc, RegmvUploadStnkState>(
-            listener: (context, state) {
-              if (state is UploadStnkListPreview) {
-                debugPrint("fileNames length: ${state.fileNames.length}");
-
-                setState(() {
-                  _imagesRegmv4 = List.from(state.images);
-                  _fileNamesRegmv4 = List.from(state.fileNames);
-                });
-              }
-
-              if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm4 CALLED (general)");
-                refreshForm4(recordId: regmv1Id);
-              }
-
-              if (state is UploadStnkSuccess) {
-                debugPrint("✅ UploadStnkSuccess");
-
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  debugPrint("🔄 refreshForm4 CALLED (success)");
-                  refreshForm4(recordId: regmv1Id);
-                }
-              }
-
-              if (state is UploadStnkFailure) {
-                debugPrint("❌ UploadStnkFailure: ${state.error}");
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-          ),
-
-          // delete server (state hanya flag)
-          BlocListener<Regmv4FormBloc, Regmv4FormState>(
-            listener: (context, state) {
-              debugPrint("👂 Regmv4FormBloc listener CALLED");
-              debugPrint("isSaved: ${state.isSaved}");
-              debugPrint("hasFailure: ${state.hasFailure}");
-
-              if (state.isSaved) {
-                debugPrint("✅ Delete SUCCESS");
-                _deletingServerIdsRegmv4.clear();
-
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  debugPrint("🔄 refreshForm4 CALLED (delete success)");
-                  refreshForm4(recordId: regmv1Id);
-                }
-              }
-
-              if (state.hasFailure) {
-                debugPrint("❌ Delete FAILURE");
-                _deletingServerIdsRegmv4.clear();
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  debugPrint("🔄 refreshForm4 CALLED (delete failure)");
-                  refreshForm4(recordId: regmv1Id);
-                }
-              }
-            },
-          ),
-
-          // server list update
-          BlocListener<Regmv5CariBloc, Regmv5CariState>(
-            listener: (context, state) {
-              if (state.status == ListStatus.success) {
-                setState(() => _serverPhotosRegmv5 = List.from(state.items));
-              }
-            },
-          ),
-
-          // upload flow
-          BlocListener<RegmvUploadFotoMobilBloc, RegmvUploadFotoMobilState>(
-            listener: (context, state) {
-              if (state is UploadFotoMobilListPreview) {
-                setState(() {
-                  _imagesRegmv5 = List.from(state.images);
-                  _fileNamesRegmv5 = List.from(state.fileNames);
-                });
-              }
-
-              if (state is UploadFotoMobilSuccess) {
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  refreshForm5(recordId: regmv1Id);
-                }
-              }
-
-              if (state is UploadFotoMobilFailure) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-          ),
-
-          // delete server (state hanya flag)
-          BlocListener<Regmv5FormBloc, Regmv5FormState>(
-            listener: (context, state) {
-              if (state.isSaved) {
-                _deletingServerIdsRegmv5.clear();
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  refreshForm5(recordId: regmv1Id);
-                }
-              }
-
-              if (state.hasFailure) {
-                _deletingServerIdsRegmv5.clear();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  refreshForm5(recordId: regmv1Id);
-                }
-              }
-            },
-          ),
-
-          BlocListener<Regmv6FormBloc, Regmv6FormState>(
-            listener: (context, state) {
-              if (state.record != null) {
-                _payloadform6(state.record!);
-                openForm7(recordId: regmv1Id);
-
-                if (state.isSaved) {
-                  setState(() {
-                    regmv6Id = state.record!.regmv6Id;
-                  });
-
-                  if (state.record!.regmv6Id.isNotEmpty) {
-                    openForm7(recordId: regmv1Id);
-                  }
-                }
-              }
-            },
-          ),
-
-          // server list update
-          BlocListener<Regmv7CariBloc, Regmv7CariState>(
-            listener: (context, state) {
-              if (state.status == ListStatus.success) {
-                setState(() => _serverPhotosRegmv7 = List.from(state.items));
-              }
-            },
-          ),
-
-          // upload flow
-          BlocListener<RegmvUploadFotoAccBloc, RegmvUploadFotoAccState>(
-            listener: (context, state) {
-              if (state is UploadFotoAccListPreview) {
-                setState(() {
-                  _imagesRegmv7 = List.from(state.images);
-                  _fileNamesRegmv7 = List.from(state.fileNames);
-                });
-              }
-
-              if (state is UploadFotoAccSuccess) {
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  refreshForm7(recordId: regmv1Id);
-                }
-              }
-
-              if (state is UploadFotoAccFailure) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-          ),
-
-          // delete server (state hanya flag)
-          BlocListener<Regmv7FormBloc, Regmv7FormState>(
-            listener: (context, state) {
-              if (state.isSaved) {
-                _deletingServerIdsRegmv7.clear();
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  refreshForm7(recordId: regmv1Id);
-                }
-              }
-
-              if (state.hasFailure) {
-                _deletingServerIdsRegmv7.clear();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                if (regmv1Id != null && regmv1Id!.isNotEmpty) {
-                  refreshForm7(recordId: regmv1Id);
-                }
-              }
-            },
-          ),
         ],
         child: _buildForm(),
       ),
@@ -974,7 +716,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
                 title: "Kendaraan",
-                subtitle: "Isi detail kendaraan a, pilih pertanggungan, dan hitung premi secara otomatis.",
+                subtitle: "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
             ),
 
@@ -1182,8 +924,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        _buildBodyForm4(),
-                        const SizedBox(height: 15),
+                        BlocBuilder<RegmvUploadStnkBloc, Regmv4UploadFotoObjectState>(
+                          buildWhen: (p, c) => p.items.length != c.items.length,
+                          builder: (context, state) {
+                            if (_showVal4 && state.items.isNotEmpty) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) setState(() => _showVal4 = false);
+                              });
+                            }
+
+                            return Regmv4StoragePickerSectionWidget(
+                              showRequiredError: _showVal4 && state.items.isEmpty,
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -1202,8 +956,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        _buildBodyForm5(),
-                        const SizedBox(height: 15),
+                        BlocBuilder<RegmvUploadFotoMobilBloc, Regmv5UploadFotoObjectState>(
+                          buildWhen: (p, c) => p.items.length != c.items.length,
+                          builder: (context, state) {
+                            if (_showVal5 && state.items.isNotEmpty) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) setState(() => _showVal5 = false);
+                              });
+                            }
+
+                            return Regmv5StoragePickerSectionWidget(
+                              showRequiredError: _showVal5 && state.items.isEmpty,
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -1222,8 +988,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        _buildBodyForm7(),
-                        const SizedBox(height: 15),
+                        BlocBuilder<RegmvUploadFotoAccBloc, Regmv7UploadFotoObjectState>(
+                          buildWhen: (p, c) => p.items.length != c.items.length,
+                          builder: (context, state) {
+                            if (_showVal7 && state.items.isNotEmpty) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) setState(() => _showVal7 = false);
+                              });
+                            }
+
+                            return Regmv7StoragePickerSectionWidget(
+                              showRequiredError: _showVal7 && state.items.isEmpty,
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -1256,7 +1034,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         HitungPremiWidget(
                           rows: [
                             HitungPremiRow(
-                              label: "Komprehensif::",
+                              label: "Komprehensif:",
                               controller: fieldRateDasarController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,
@@ -1762,41 +1540,51 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       return;
     }
 
-    final isUploading4 = context.read<RegmvUploadStnkBloc>().state is UploadStnkLoading;
-    final isUploading5 = context.read<RegmvUploadFotoMobilBloc>().state is UploadFotoMobilLoading;
-    final isUploading7 = context.read<RegmvUploadFotoAccBloc>().state is UploadFotoAccLoading;
-    final ok4 = !isUploading4 &&
-        (_imagesRegmv4.isNotEmpty || _serverPhotosRegmv4.isNotEmpty);
 
-    final ok5 = !isUploading5 &&
-        (_imagesRegmv5.isNotEmpty || _serverPhotosRegmv5.isNotEmpty);
+    final stnkState = context.read<RegmvUploadStnkBloc>().state;
+    final mobilState = context.read<RegmvUploadFotoMobilBloc>().state;
+    final accState = context.read<RegmvUploadFotoAccBloc>().state;
 
-    final ok7 = !isUploading7 &&
-        (_imagesRegmv7.isNotEmpty || _serverPhotosRegmv7.isNotEmpty);
-
-    setState(() {
-      _form4HasError = !ok4;
-      _form4ErrorText = !ok4 ? 'Bagian ini wajib diisi' : null;
-
-      _form5HasError = !ok5;
-      _form5ErrorText = !ok5 ? 'Bagian ini wajib diisi' : null;
-
-      _form7HasError = !ok7;
-      _form7ErrorText = !ok7 ? 'Bagian ini wajib diisi' : null;
-    });
+    final ok4 = stnkState.items.isNotEmpty;
+    final ok5 = mobilState.items.isNotEmpty;
+    final ok7 = accState.items.isNotEmpty;
 
     if (!ok4 || !ok5 || !ok7) {
+      setState(() {
+        _showVal4 = !ok4;
+        _showVal5 = !ok5;
+        _showVal7 = !ok7;
+      });
+
       if (!ok4) {
         openForm4(recordId: regmv1Id);
-      } else if (!ok5) openForm5(recordId: regmv1Id);
-      else if(!ok7) openForm6(recordId: regmv1Id);
+      } else if (!ok5) {
+        openForm5(recordId: regmv1Id);
+      } else if (!ok7) {
+        openForm6(recordId: regmv1Id);
+      }
+
       return;
     }
 
-    _onUploadPressedForm4();
-    _onUploadPressedForm5();
-    _onUploadPressedForm7();
-    
+    final localIds4 = stnkState.items.map((e) => e.localId).toList();
+    final localIds5 = mobilState.items.map((e) => e.localId).toList();
+    final localIds7 = accState.items.map((e) => e.localId).toList();
+
+    context.read<RegmvUploadStnkBloc>().add(Regmv4StorageUploadMany(
+      regmv1Id: regmv1Id!,
+      localIds: localIds4,
+    ));
+
+    context.read<RegmvUploadFotoMobilBloc>().add(Regmv5StorageUploadMany(
+      regmv1Id: regmv1Id!,
+      localIds: localIds5,
+    ));
+
+    context.read<RegmvUploadFotoAccBloc>().add(Regmv7StorageUploadMany(
+      regmv1Id: regmv1Id!,
+      localIds: localIds7,
+    ));
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -2652,701 +2440,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   );
   //form3
 
-  //form4
-  Widget _buildBodyForm4() {
-    final uploadState = context.watch<RegmvUploadStnkBloc>().state;
-
-    final bool hasPreview =
-        uploadState is UploadStnkListPreview && uploadState.images.isNotEmpty;
-    final bool hasServer = _serverPhotosRegmv4.isNotEmpty;
-
-    final bool showIntro = !hasPreview && !hasServer;
-    final bool isUploading = uploadState is UploadStnkLoading;
-
-    final borderColor = _form4HasError ? Colors.red : sGrey;
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: hPadding,
-        right: hPadding,
-        bottom: hPadding,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: hPadding),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: Border.all(color: borderColor, width: _form4HasError ? 1.5 : 1),
-          color: formGrey,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (showIntro) _buildIntroForm4(),
-            if (!showIntro) _buildGalleryForm4(uploadState: uploadState),
-            const SizedBox(height: hPadding),
-
-            _buildPickButtonsForm4(
-              disabled: isUploading,
-              previewCount: _imagesRegmv4.length,
-            ),
-
-            if (_form4HasError && _form4ErrorText != null) ...[
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    _form4ErrorText!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-
-            if (isUploading) ...[
-              const SizedBox(height: 12),
-              const CircularProgressIndicator(),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntroForm4() {
-    return Column(
-      children: [
-        Icon(Icons.upload, size: 40, color: primaryLightColor),
-        const SizedBox(height: 14),
-        Text(
-          "Unggah Foto STNK",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: primaryLightColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Pastikan foto STNK jelas, terang, dan tidak buram.",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: cardGrey),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildGalleryForm4({required RegmvUploadStnkState uploadState}) {
-    final hasPreview =
-        uploadState is UploadStnkListPreview && uploadState.images.isNotEmpty;
-
-    if (hasPreview) {
-      final images = uploadState.images;
-
-      return SizedBox(
-        height: 200,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: images.length,
-          itemBuilder: (context, index) {
-            return _photoTileForm4(
-              child: Image.memory(images[index], fit: BoxFit.cover),
-              onDelete: () => _deletePreviewForm4(index),
-            );
-          },
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _serverPhotosRegmv4.length,
-        itemBuilder: (context, index) {
-          final item = _serverPhotosRegmv4[index];
-          final url =
-              "${AppData.apiDomain}api/regmv/regmv4cari/stnk/getfoto/${item.regmv4Id}";
-
-          final isDeleting = _deletingServerIdsRegmv4.contains(item.regmv4Id);
-
-          return _photoTileForm4(
-            child: Image.network(
-              url,
-              headers: {"Authorization": "Bearer ${AppData.userToken}"},
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, progress) =>
-              progress == null ? child : const Center(child: CircularProgressIndicator()),
-              errorBuilder: (context, err, st) =>
-              const Icon(Icons.broken_image, color: Colors.red, size: 48),
-            ),
-            onDelete: isDeleting ? null : () => _deleteServerPhotoForm4(item),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _photoTileForm4({required Widget child, VoidCallback? onDelete}) {
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: child,
-          ),
-        ),
-        if (onDelete != null)
-          Positioned(
-            top: 20,
-            right: 20,
-            child: GestureDetector(
-              onTap: onDelete,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 18),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildPickButtonsForm4({required bool disabled, required int previewCount}) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Pilih File',
-            icon: SvgPicture.asset(
-              'assets/icons/gallery_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            backgroundColor: sGrey,
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm4
-                : _pickFromGalleryForm4,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Ambil Foto',
-            icon: SvgPicture.asset(
-              'assets/icons/photo_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm4
-                : _pickFromCameraForm4,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUploadButtonForm4({required bool disabled}) {
-    final canUpload = !disabled &&
-        widget.regmv1Id != null &&
-        widget.regmv1Id!.isNotEmpty &&
-        _imagesRegmv4.isNotEmpty;
-
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canUpload ? _onUploadPressedForm4 : null,
-        child: const Text("Upload"),
-      ),
-    );
-  }
-
-  void _maxReachedForm4() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Maksimal 10 foto."),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _deletePreviewForm4(int index) {
-    _imagesRegmv4.removeAt(index);
-    _fileNamesRegmv4.removeAt(index);
-
-    context.read<RegmvUploadStnkBloc>().add(
-      UploadStnkSelectedList(List.from(_imagesRegmv4), List.from(_fileNamesRegmv4)),
-    );
-  }
-
-  void _deleteServerPhotoForm4(Regmv4CariModel item) {
-    final id = item.regmv4Id;
-
-    // mark deleting
-    _deletingServerIdsRegmv4.add(id);
-
-    // optimistic remove
-    setState(() {
-      _serverPhotosRegmv4.removeWhere((x) => x.regmv4Id == id);
-    });
-
-    // hit api hapus
-    context.read<Regmv4FormBloc>().add(
-      Regmv4FormHapusEvent(recordId: id),
-    );
-  }
-
-  Future<void> _pickFromGalleryForm4() async {
-    if (_imagesRegmv4.length >= 10) {
-      _maxReachedForm4();
-      return;
-    }
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: true,
-    );
-
-    if (result == null) return;
-
-    for (final file in result.files) {
-      if (_imagesRegmv4.length >= 10) break;
-      if (file.bytes == null) continue;
-      _imagesRegmv4.add(file.bytes!);
-      _fileNamesRegmv4.add(file.name);
-    }
-
-    if (_imagesRegmv4.isNotEmpty) {
-      setState(() {
-        _form4HasError = false;
-        _form4ErrorText = null;
-      });
-    }
-
-    context.read<RegmvUploadStnkBloc>().add(
-      UploadStnkSelectedList(
-        List.from(_imagesRegmv4),
-        List.from(_fileNamesRegmv4),
-      ),
-    );
-  }
-
-  Future<void> _pickFromCameraForm4() async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kamera tidak tersedia di web")),
-      );
-      return;
-    }
-
-    if (_imagesRegmv4.length >= 10) {
-      _maxReachedForm4();
-      return;
-    }
-
-    final picked = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (picked == null) return;
-
-    final bytes = await picked.readAsBytes();
-    _imagesRegmv4.add(bytes);
-    _fileNamesRegmv4.add(picked.name);
-
-    context.read<RegmvUploadStnkBloc>().add(
-      UploadStnkSelectedList(List.from(_imagesRegmv4), List.from(_fileNamesRegmv4)),
-    );
-  }
-
-  void _onUploadPressedForm4() {
-    debugPrint("🔥 _onUploadPressedForm4 CALLED");
-
-    final id = widget.regmv1Id;
-    debugPrint("regmv1Id: $id");
-
-    if (id == null || id.isEmpty) {
-      debugPrint("❌ regmv1Id null atau empty, return");
-      return;
-    }
-
-    debugPrint("_imagesRegmv4 length: ${_imagesRegmv4.length}");
-    debugPrint("_fileNamesRegmv4 length: ${_fileNamesRegmv4.length}");
-
-    context.read<RegmvUploadStnkBloc>().add(
-      UploadStnkBatchSubmit(
-        regmv1Id: id,
-        images: List.from(_imagesRegmv4),
-        names: List.from(_fileNamesRegmv4),
-      ),
-    );
-
-    debugPrint("✅ UploadStnkBatchSubmit event SENT");
-  }
-
-  //form4
-
-  //form5
-  Widget _buildBodyForm5() {
-    final uploadState = context.watch<RegmvUploadFotoMobilBloc>().state;
-
-    final bool hasPreview =
-        uploadState is UploadFotoMobilListPreview && uploadState.images.isNotEmpty;
-    final bool hasServer = _serverPhotosRegmv5.isNotEmpty;
-
-    final bool showIntro = !hasPreview && !hasServer;
-    final bool isUploading = uploadState is UploadFotoMobilLoading;
-
-    final borderColor = _form5HasError ? Colors.red : sGrey;
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: hPadding,
-        right: hPadding,
-        bottom: hPadding,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: hPadding),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: Border.all(color: borderColor, width: _form5HasError ? 1.5 : 1),
-          color: formGrey,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (showIntro) _buildIntroForm5(),
-            if (!showIntro) _buildGalleryForm5(uploadState: uploadState),
-            const SizedBox(height: hPadding),
-
-            _buildPickButtonsForm5(
-              disabled: isUploading,
-              previewCount: _imagesRegmv5.length,
-            ),
-
-            if (_form5HasError && _form5ErrorText != null) ...[
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    _form5ErrorText!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-
-            if (isUploading) ...[
-              const SizedBox(height: 12),
-              const CircularProgressIndicator(),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntroForm5() {
-    return Column(
-      children: [
-        Icon(Icons.upload, size: 40, color: primaryLightColor),
-        const SizedBox(height: 14),
-        Text(
-          "Unggah Foto Mobil",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: primaryLightColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Pastikan foto FotoMobil jelas, terang, dan tidak buram.",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: cardGrey),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildGalleryForm5({required RegmvUploadFotoMobilState uploadState}) {
-    final hasPreview =
-        uploadState is UploadFotoMobilListPreview && uploadState.images.isNotEmpty;
-
-    if (hasPreview) {
-      final images = uploadState.images;
-
-      return SizedBox(
-        height: 200,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: images.length,
-          itemBuilder: (context, index) {
-            return _photoTileForm5(
-              child: Image.memory(images[index], fit: BoxFit.cover),
-              onDelete: () => _deletePreviewForm5(index),
-            );
-          },
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _serverPhotosRegmv5.length,
-        itemBuilder: (context, index) {
-          final item = _serverPhotosRegmv5[index];
-          final url =
-              "${AppData.apiDomain}api/regmv/regmv5cari/mobil/getfoto/${item.regmv5Id}";
-
-          final isDeleting = _deletingServerIdsRegmv5.contains(item.regmv5Id);
-
-          return _photoTileForm5(
-            child: Image.network(
-              url,
-              headers: {"Authorization": "Bearer ${AppData.userToken}"},
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, progress) =>
-              progress == null ? child : const Center(child: CircularProgressIndicator()),
-              errorBuilder: (context, err, st) =>
-              const Icon(Icons.broken_image, color: Colors.red, size: 48),
-            ),
-            onDelete: isDeleting ? null : () => _deleteServerPhotoForm5(item),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _photoTileForm5({required Widget child, VoidCallback? onDelete}) {
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: child,
-          ),
-        ),
-        if (onDelete != null)
-          Positioned(
-            top: 20,
-            right: 20,
-            child: GestureDetector(
-              onTap: onDelete,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 18),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildPickButtonsForm5({required bool disabled, required int previewCount}) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Pilih File',
-            icon: SvgPicture.asset(
-              'assets/icons/gallery_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            backgroundColor: sGrey,
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm5
-                : _pickFromGalleryForm5,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Ambil Foto',
-            icon: SvgPicture.asset(
-              'assets/icons/photo_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm5
-                : _pickFromCameraForm5,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUploadButtonForm5({required bool disabled}) {
-    final canUpload = !disabled &&
-        widget.regmv1Id != null &&
-        widget.regmv1Id!.isNotEmpty &&
-        _imagesRegmv5.isNotEmpty;
-
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canUpload ? _onUploadPressedForm5 : null,
-        child: const Text("Upload"),
-      ),
-    );
-  }
-
-  void _maxReachedForm5() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Maksimal 10 foto."),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _deletePreviewForm5(int index) {
-    _imagesRegmv5.removeAt(index);
-    _fileNamesRegmv5.removeAt(index);
-
-    context.read<RegmvUploadFotoMobilBloc>().add(
-      UploadFotoMobilSelectedList(List.from(_imagesRegmv5), List.from(_fileNamesRegmv5)),
-    );
-  }
-
-  void _deleteServerPhotoForm5(Regmv5CariModel item) {
-    final id = item.regmv5Id;
-
-    // mark deleting
-    _deletingServerIdsRegmv5.add(id);
-
-    // optimistic remove
-    setState(() {
-      _serverPhotosRegmv5.removeWhere((x) => x.regmv5Id == id);
-    });
-
-    // hit api hapus
-    context.read<Regmv5FormBloc>().add(
-      Regmv5FormHapusEvent(recordId: id),
-    );
-  }
-
-  Future<void> _pickFromGalleryForm5() async {
-    if (_imagesRegmv5.length >= 10) {
-      _maxReachedForm5();
-      return;
-    }
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: true,
-    );
-
-    if (result == null) return;
-
-    for (final file in result.files) {
-      if (_imagesRegmv5.length >= 10) break;
-      if (file.bytes == null) continue;
-      _imagesRegmv5.add(file.bytes!);
-      _fileNamesRegmv5.add(file.name);
-    }
-
-    if (_imagesRegmv5.isNotEmpty) {
-      setState(() {
-        _form5HasError = false;
-        _form5ErrorText = null;
-      });
-    }
-
-    context.read<RegmvUploadFotoMobilBloc>().add(
-      UploadFotoMobilSelectedList(
-        List.from(_imagesRegmv5),
-        List.from(_fileNamesRegmv5),
-      ),
-    );
-  }
-
-  Future<void> _pickFromCameraForm5() async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kamera tidak tersedia di web")),
-      );
-      return;
-    }
-
-    if (_imagesRegmv5.length >= 10) {
-      _maxReachedForm5();
-      return;
-    }
-
-    final picked = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (picked == null) return;
-
-    final bytes = await picked.readAsBytes();
-    _imagesRegmv5.add(bytes);
-    _fileNamesRegmv5.add(picked.name);
-
-    context.read<RegmvUploadFotoMobilBloc>().add(
-      UploadFotoMobilSelectedList(List.from(_imagesRegmv5), List.from(_fileNamesRegmv5)),
-    );
-  }
-
-  void _onUploadPressedForm5() {
-    final id = widget.regmv1Id;
-    if (id == null || id.isEmpty) return;
-
-    context.read<RegmvUploadFotoMobilBloc>().add(
-      UploadFotoMobilBatchSubmit(
-        regmv1Id: id,
-        images: List.from(_imagesRegmv5),
-        names: List.from(_fileNamesRegmv5),
-      ),
-    );
-  }
-  //form5
-
   //form6
   Widget buildFieldDiskonPersen() => appTextField(
     label: "diskonPersen",
@@ -3453,349 +2546,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     },
   );
   //form6
-
-
-  //form7
-  Widget _buildBodyForm7() {
-    final uploadState = context.watch<RegmvUploadFotoAccBloc>().state;
-
-    final bool hasPreview =
-        uploadState is UploadFotoAccListPreview && uploadState.images.isNotEmpty;
-    final bool hasServer = _serverPhotosRegmv7.isNotEmpty;
-
-    final bool showIntro = !hasPreview && !hasServer;
-    final bool isUploading = uploadState is UploadFotoAccLoading;
-
-    final borderColor = _form7HasError ? Colors.red : sGrey;
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: hPadding,
-        right: hPadding,
-        bottom: hPadding,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: hPadding),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: Border.all(color: borderColor, width: _form7HasError ? 1.5 : 1),
-          color: formGrey,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (showIntro) _buildIntroForm7(),
-            if (!showIntro) _buildGalleryForm7(uploadState: uploadState),
-            const SizedBox(height: hPadding),
-
-            _buildPickButtonsForm7(
-              disabled: isUploading,
-              previewCount: _imagesRegmv7.length,
-            ),
-
-            if (_form7HasError && _form7ErrorText != null) ...[
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    _form7ErrorText!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-
-            if (isUploading) ...[
-              const SizedBox(height: 12),
-              const CircularProgressIndicator(),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntroForm7() {
-    return Column(
-      children: [
-        Icon(Icons.upload, size: 40, color: primaryLightColor),
-        const SizedBox(height: 14),
-        Text(
-          "Unggah Foto FotoAcc",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: primaryLightColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Pastikan foto FotoAcc jelas, terang, dan tidak buram.",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: cardGrey),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildGalleryForm7({required RegmvUploadFotoAccState uploadState}) {
-    final hasPreview =
-        uploadState is UploadFotoAccListPreview && uploadState.images.isNotEmpty;
-
-    if (hasPreview) {
-      final images = uploadState.images;
-
-      return SizedBox(
-        height: 200,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: images.length,
-          itemBuilder: (context, index) {
-            return _photoTileForm7(
-              child: Image.memory(images[index], fit: BoxFit.cover),
-              onDelete: () => _deletePreviewForm7(index),
-            );
-          },
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _serverPhotosRegmv7.length,
-        itemBuilder: (context, index) {
-          final item = _serverPhotosRegmv7[index];
-          final url =
-              "${AppData.apiDomain}api/regmv/regmv7cari/FotoAcc/getfoto/${item.regmv7Id}";
-
-          final isDeleting = _deletingServerIdsRegmv7.contains(item.regmv7Id);
-
-          return _photoTileForm7(
-            child: Image.network(
-              url,
-              headers: {"Authorization": "Bearer ${AppData.userToken}"},
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, progress) =>
-              progress == null ? child : const Center(child: CircularProgressIndicator()),
-              errorBuilder: (context, err, st) =>
-              const Icon(Icons.broken_image, color: Colors.red, size: 48),
-            ),
-            onDelete: isDeleting ? null : () => _deleteServerPhotoForm7(item),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _photoTileForm7({required Widget child, VoidCallback? onDelete}) {
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: child,
-          ),
-        ),
-        if (onDelete != null)
-          Positioned(
-            top: 20,
-            right: 20,
-            child: GestureDetector(
-              onTap: onDelete,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 18),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildPickButtonsForm7({required bool disabled, required int previewCount}) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Pilih File',
-            icon: SvgPicture.asset(
-              'assets/icons/gallery_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            backgroundColor: sGrey,
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm7
-                : _pickFromGalleryForm7,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Ambil Foto',
-            icon: SvgPicture.asset(
-              'assets/icons/photo_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm7
-                : _pickFromCameraForm7,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUploadButtonForm7({required bool disabled}) {
-    final canUpload = !disabled &&
-        widget.regmv1Id != null &&
-        widget.regmv1Id!.isNotEmpty &&
-        _imagesRegmv7.isNotEmpty;
-
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canUpload ? _onUploadPressedForm7 : null,
-        child: const Text("Upload"),
-      ),
-    );
-  }
-
-  void _maxReachedForm7() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Maksimal 10 foto."),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _deletePreviewForm7(int index) {
-    _imagesRegmv7.removeAt(index);
-    _fileNamesRegmv7.removeAt(index);
-
-    context.read<RegmvUploadFotoAccBloc>().add(
-      UploadFotoAccSelectedList(List.from(_imagesRegmv7), List.from(_fileNamesRegmv7)),
-    );
-  }
-
-  void _deleteServerPhotoForm7(Regmv7CariModel item) {
-    final id = item.regmv7Id;
-
-    // mark deleting
-    _deletingServerIdsRegmv7.add(id);
-
-    // optimistic remove
-    setState(() {
-      _serverPhotosRegmv7.removeWhere((x) => x.regmv7Id == id);
-    });
-
-    // hit api hapus
-    context.read<Regmv7FormBloc>().add(
-      Regmv7FormHapusEvent(recordId: id),
-    );
-  }
-
-  Future<void> _pickFromGalleryForm7() async {
-    if (_imagesRegmv7.length >= 10) {
-      _maxReachedForm7();
-      return;
-    }
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: true,
-    );
-
-    if (result == null) return;
-
-    for (final file in result.files) {
-      if (_imagesRegmv7.length >= 10) break;
-      if (file.bytes == null) continue;
-      _imagesRegmv7.add(file.bytes!);
-      _fileNamesRegmv7.add(file.name);
-    }
-
-    if (_imagesRegmv7.isNotEmpty) {
-      setState(() {
-        _form7HasError = false;
-        _form7ErrorText = null;
-      });
-    }
-
-    context.read<RegmvUploadFotoAccBloc>().add(
-      UploadFotoAccSelectedList(
-        List.from(_imagesRegmv7),
-        List.from(_fileNamesRegmv7),
-      ),
-    );
-  }
-
-  Future<void> _pickFromCameraForm7() async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kamera tidak tersedia di web")),
-      );
-      return;
-    }
-
-    if (_imagesRegmv7.length >= 10) {
-      _maxReachedForm7();
-      return;
-    }
-
-    final picked = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (picked == null) return;
-
-    final bytes = await picked.readAsBytes();
-    _imagesRegmv7.add(bytes);
-    _fileNamesRegmv7.add(picked.name);
-
-    context.read<RegmvUploadFotoAccBloc>().add(
-      UploadFotoAccSelectedList(List.from(_imagesRegmv7), List.from(_fileNamesRegmv7)),
-    );
-  }
-
-  void _onUploadPressedForm7() {
-    final id = widget.regmv1Id;
-    if (id == null || id.isEmpty) return;
-
-    context.read<RegmvUploadFotoAccBloc>().add(
-      UploadFotoAccBatchSubmit(
-        regmv1Id: id,
-        images: List.from(_imagesRegmv7),
-        names: List.from(_fileNamesRegmv7),
-      ),
-    );
-  }
-//form7
-
 
 
   final Map<String, String?> fieldErrors = {};

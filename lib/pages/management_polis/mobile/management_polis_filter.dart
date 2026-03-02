@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_aset_health/asethealthcari_bloc.dart';
 import 'package:joss_app/blocs/gen_aset_mv/asetmvcari_bloc.dart';
@@ -18,6 +19,7 @@ import '../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
 import '../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../blocs/loading_flow/loading_flow_bloc.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../helper/expert_helper.dart';
 import '../../../helper/mobile_expert_helper.dart';
 import '../../../widgets/EmptyStateWidget.dart';
@@ -29,6 +31,7 @@ import 'cob_polis/kargo_cob_table.dart';
 import 'cob_polis/kendaraan_cob_table.dart';
 import 'cob_polis/property_cob_table.dart';
 import 'cob_polis/ringkasan_cob_table.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ManagementPolisFilter extends StatefulWidget {
   const ManagementPolisFilter({super.key});
@@ -158,7 +161,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
   Widget _buildBodyByCob(BuildContext context, CobManPolState state) {
     if (state.status == ListStatus.initial) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: LoadingIndicator());
     }
     if (state.status == ListStatus.failure) {
       return const Center(child: Text('Failed to fetch data'));
@@ -196,7 +199,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     required Widget child,
   }) {
     if (status == ListStatus.initial || status == ListStatus.loadingMore) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: LoadingIndicator());
     }
     if (status == ListStatus.failure) {
       return const Center(child: Text('Failed to fetch data'));
@@ -534,19 +537,21 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
     if (cobId == "10002") {
       final st = context.read<AsetParCariBloc>().state;
-      return st.items
-          .where((x) => st.selectedIds.contains(x.asetParId))
-          .map((d) => {
+
+      final dataSource = st.selectedIds.isNotEmpty
+          ? st.items.where((x) => st.selectedIds.contains(x.asetParId))
+          : st.items;
+
+      return dataSource.map((d) => {
         "No": d.nomor,
         "Tertanggung": d.tertanggung,
         "Alamat": d.alamat,
-        "Periode Mulai": "${d.periodeMulai}",
-        "Periode Akhir": "${d.periodeAkhir}",
+        "Periode Mulai": d.periodeMulai,
+        "Periode Akhir": d.periodeAkhir,
         "Nilai Pertanggungan": d.sumInsured,
         "Premi": d.premi,
         "Status": d.status,
-      })
-          .toList();
+      }).toList();
     }
 
     if (cobId == "10003") {
@@ -651,7 +656,8 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     final rows = _exportRows();
 
     if (rows.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
       return;
     }
 
@@ -746,91 +752,52 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     }
   }
 
-  void _onShare(BuildContext context) {
+  Future<void> _onShare(BuildContext context) async {
     final rows = _exportRows();
 
     if (rows.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
       return;
     }
 
-    final cobLabel = _exportLabel();
+    try {
+      final cleanedRows = _stripTimeFromDateValues(rows);
 
-    String fmt(dynamic v) {
-      if (v == null) return "-";
-
-      if (v is DateTime) return DateFormat('dd/MM/yyyy').format(v);
-
-      if (v is String) {
-        final d = DateTime.tryParse(v);
-        if (d != null) return DateFormat('dd/MM/yyyy').format(d);
+      // WEB → tetap export biasa
+      if (kIsWeb) {
+        await ExportHelper.export(
+          "pdf",
+          cleanedRows,
+          _exportCategory(),
+        );
+        return;
       }
 
-      if (v is num) return NumberFormat.decimalPattern().format(v);
+      // MOBILE → generate PDF dulu
+      final fileName =
+          "Aset_${_exportLabel()}_${DateTime.now().millisecondsSinceEpoch}.pdf";
 
-      return v.toString();
+      final file = await MobileDownloadHelper.generatePdfFile(
+        fileName: fileName,
+        data: cleanedRows,
+      );
+
+      if (!context.mounted) return;
+
+      // buka native share sheet
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: "Rincian ${_exportLabel()}",
+        text: rows.length == 1
+            ? "Berikut terlampir rincian ${_exportLabel()}."
+            : "Berikut terlampir ${rows.length} data ${_exportLabel()} terpilih.",
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(errorSnackBar("Gagal membagikan file: $e"));
+      }
     }
-
-    final detailText = rows
-        .map((m) => "• ${m.entries.map((e) => "${e.key}: ${fmt(e.value)}").join(" | ")}")
-        .join("\n");
-
-    final message = '''
-📄 Rincian Terpilih ($cobLabel)
-
-Jumlah Data: ${rows.length}
-
-Detail:
-$detailText
-''';
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: secondaryBlackColor,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.share, color: primaryColor),
-                  const SizedBox(width: 10),
-                  Text("Bagikan Rincian ($cobLabel)", style: bodyTextStyle(context)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text("Total data terpilih: ${rows.length}", style: bodyTextStyle(context, fontSize: 14)),
-              const SizedBox(height: 20),
-              AppButton.iconLeft(
-                text: "Salin Rincian",
-                icon: const Icon(Icons.copy),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: message));
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    successSnackBar("Rincian berhasil disalin"),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Batal"),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
@@ -10,6 +11,7 @@ class StatusChip extends StatefulWidget {
   final VoidCallback onTap;
   final double height;
   final double iconSize;
+  final bool showIcon;
 
   const StatusChip({
     super.key,
@@ -20,6 +22,7 @@ class StatusChip extends StatefulWidget {
     required this.onTap,
     this.height = 34,
     this.iconSize = 16,
+    this.showIcon = true,
   });
 
   @override
@@ -67,8 +70,6 @@ class _StatusChipState extends State<StatusChip> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isJatuhTempo = widget.statusId == "10004";
-
     final String iconPath = widget.isSelected
         ? _activeIconByStatusId(widget.statusId)
         : _normalIconByStatusId(widget.statusId);
@@ -87,57 +88,31 @@ class _StatusChipState extends State<StatusChip> {
         scale: _isPressed ? 0.98 : 1.0,
         duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: widget.height,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: widget.isSelected ? primaryColor : pGrey,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
-                    iconPath,
-                    width: widget.iconSize,
-                    height: widget.iconSize,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    textLabel,
-                    style: bodyTextStyle(context, fontSize: 13.2),
-                  ),
-                ],
-              ),
-            ),
-
-            if (isJatuhTempo)
-              Align(
-                alignment: Alignment.centerRight,
-                child: Transform.translate(
-                  offset: const Offset(6, -10),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: pYellow,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(6),
-                        topRight: Radius.circular(6),
-                        bottomRight: Radius.circular(6),
-                      ),
-                    ),
-                    child: Text(
-                      'H-60 hr',
-                      style: bodyTextStyle(context, fontSize: 9.65),
-                    ),
-                  ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: widget.height,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: widget.isSelected ? primaryColor : pGrey,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.showIcon) ...[
+                SvgPicture.asset(
+                  iconPath,
+                  width: widget.iconSize,
+                  height: widget.iconSize,
                 ),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                textLabel,
+                style: bodyTextStyle(context, fontSize: 13.2),
               ),
-          ],
+            ],
+          ),
         ),
       ),
     );

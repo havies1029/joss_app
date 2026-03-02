@@ -28,6 +28,7 @@ import '../../../repositories/combobox/combomwilayah_repository.dart';
 import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
+import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../gen_regmv/mobile/regmv_main_page_remake.dart';
@@ -352,7 +353,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
                 title: "Kendaraan",
-                subtitle: "Isi detail x kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
+                subtitle: "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
             ),
 
@@ -484,7 +485,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
                   const SizedBox(height: hPadding),
 
-                   buildButtonHitungPremi(),
+                  buildButtonHitungPremi(),
 
                   const SizedBox(height: hPadding),
 
@@ -878,17 +879,27 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
             CalMv2RegMvEvent(calmv1Id: calmv1Id!));
       }
       else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Only Client user can perform this action.'),
+        showDialog(
+          context: context,
+          barrierDismissible: true, // klik luar = close
+          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+          builder: (context) => RegisterClientPopUp(
+            header: 'Data Klien Belum Terdaftar!',
+            description:
+            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            buttonText: 'Daftar Klien',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RegisterClient(requestFrom: 'calmv_page')
+                ),
+              );
+            },
           ),
         );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => RegisterClient(requestFrom: 'calmv_page')
-          ),
-        );
+
+
       }
     }
   }
@@ -906,9 +917,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   void openForm3() {
-     setState(() {
-       expanded = [false, false, true];
-     });
+    setState(() {
+      expanded = [false, false, true];
+    });
   }
 
   //form1 field

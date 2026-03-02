@@ -12,8 +12,12 @@ import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_cob_list_page.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_success.dart';
+import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
+import '../../../../models/user/user_model.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
+import '../../../../widgets/apptheme/register_client_pop_up.dart';
+import '../../../register/mobile/client/register_client_page.dart';
 
 class Regother1CrudFormPage extends StatefulWidget {
   final String viewMode;
@@ -274,47 +278,73 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   }
 
   void _showPengajuanDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: formGrey,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.white,
-                  size: 40,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  "Pengajuan diproses tim internal.",
-                  textAlign: TextAlign.center,
-                  style: headingStyle(context, fontSize: 17.49),
-                ),
-                const SizedBox(height: 12),
+    if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
+      User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
+      if (user.userType == "C"){
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) {
+            return Dialog(
+              backgroundColor: formGrey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Pengajuan diproses tim internal.",
+                      textAlign: TextAlign.center,
+                      style: headingStyle(context, fontSize: 17.49),
+                    ),
+                    const SizedBox(height: 12),
 
-                AppButton.primary(
-                  text: 'Ajukan Sekarang',
-                  backgroundColor: const Color(0xFF0ED7FF),
-                  onPressed: () {
-                    Navigator.pop(context); // tutup dialog
-                    _executeSave();
-                  },
+                    AppButton.primary(
+                      text: 'Ajukan Sekarang',
+                      backgroundColor: const Color(0xFF0ED7FF),
+                      onPressed: () {
+                        Navigator.pop(context); // tutup dialog
+                        _executeSave();
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            );
+          },
+        );
+      }
+      else {
+        showDialog(
+          context: context,
+          barrierDismissible: true, // klik luar = close
+          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+          builder: (context) => RegisterClientPopUp(
+            header: 'Data Klien Belum Terdaftar!',
+            description:
+            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            buttonText: 'Daftar Klien',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RegisterClient(requestFrom: 'calmv_page')
+                ),
+              );
+            },
           ),
         );
-      },
-    );
+      }
+    }
   }
 
   void _executeSave() {

@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
 import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv4picker_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv5picker_repository.dart';
+import 'package:joss_app/repositories/gen_regmv/regmv7picker_repository.dart';
 import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/login/forgot_password_repository.dart';
@@ -20,6 +23,7 @@ import 'package:joss_app/repositories/regpar/regpar3form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar4form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar5form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar6form_repository.dart';
+import 'package:joss_app/repositories/regpar/regpar6picker_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_download_fotoobject_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_screen.dart';
@@ -524,9 +528,27 @@ Future<void> main() async {
         BlocProvider(create: (_) => Regmv4CariBloc()),
         BlocProvider(create: (_) => Regmv5CariBloc()),
         BlocProvider(create: (_) => Regmv7CariBloc()),
-        BlocProvider(create: (_) => RegmvUploadStnkBloc(repository: RegmvUploadStnkRepository())),
-        BlocProvider(create: (_) => RegmvUploadFotoMobilBloc(repository: RegmvUploadFotoMobilRepository())),
-        BlocProvider(create: (_) => RegmvUploadFotoAccBloc(repository: RegmvUploadFotoAccRepository())),
+        BlocProvider<RegmvUploadStnkBloc>(
+          create: (context) => RegmvUploadStnkBloc(
+            repository: RegmvUploadStnkRepository(),
+            pickerRepository: Regmv4PickerRepositoryImpl(),
+            regmv4formBloc: context.read<Regmv4FormBloc>(),
+          ),
+        ),
+        BlocProvider<RegmvUploadFotoMobilBloc>(
+          create: (context) => RegmvUploadFotoMobilBloc(
+            repository: RegmvUploadFotoMobilRepository(),
+            pickerRepository: Regmv5PickerRepositoryImpl(),
+            regmv5formBloc: context.read<Regmv5FormBloc>(),
+          ),
+        ),
+        BlocProvider<RegmvUploadFotoAccBloc>(
+          create: (context) => RegmvUploadFotoAccBloc(
+            repository: RegmvUploadFotoAccRepository(),
+            pickerRepository: Regmv7PickerRepositoryImpl(),
+            regmv7formBloc: context.read<Regmv7FormBloc>(),
+          ),
+        ),
         BlocProvider(create: (_) => RegmvDownloadFotoStnkBloc(repository: RegmvDownloadStnkRepository())),
         BlocProvider(create: (_) => RegmvDownloadFotoMobilBloc(repository: RegmvDownloadFotoMobilRepository())),
         BlocProvider(create: (_) => RegmvDownloadFotoAccBloc(repository: RegmvDownloadFotoAccRepository())),
@@ -548,7 +570,13 @@ Future<void> main() async {
         BlocProvider(create: (_) => Regpar5FormBloc(repository: Regpar5FormRepository())),
         BlocProvider(create: (_) => Regpar6CariBloc()),
         BlocProvider(create: (_) => Regpar6FormBloc(repository: Regpar6FormRepository())),
-        BlocProvider(create: (_) => RegparUploadFotoObjectBloc(repository: RegparUploadFotoObjectRepository())),
+        BlocProvider<RegparUploadFotoObjectBloc>(
+          create: (context) => RegparUploadFotoObjectBloc(
+            repository: RegparUploadFotoObjectRepository(),
+            regpar6pickerRepository: Regpar6PickerRepositoryImpl(),
+            regpar6formBloc: context.read<Regpar6FormBloc>(),
+          ),
+        ),
         BlocProvider(create: (_) => RegparDownloadFotoObjectBloc(repository: RegparDownloadFotoObjectRepository())),
         BlocProvider<RegparFlowBloc>(
           create: (context) => RegparFlowBloc(

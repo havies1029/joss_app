@@ -139,11 +139,17 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ListPageFilterBarUIWidget(
+              //   searchController: _searchController,
+              //   searchButton: buildSearchButton(),
+              // ),
               ListPageFilterBarUIWidget(
                 searchController: _searchController,
-                searchButton: buildSearchButton(),
+                onSearch: (value) {
+                  refreshData();
+                },
               ),
-              const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
               // ✅ Filter bar di parent
               _buildFilterBarParent(),

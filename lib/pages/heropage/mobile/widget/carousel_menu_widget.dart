@@ -16,13 +16,19 @@ class CarouselMenuWidget extends StatefulWidget {
 class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   late final PageController _pageController;
   int _currentIndex = 1;
+  int _currentRealIndex = 0;
+  static const int _kFakeCount = 100000;
+  late final int _initialPage;
+  bool _didSyncInitialIndex = false;
 
   @override
   void initState() {
     super.initState();
+    _initialPage = _kFakeCount ~/ 2;
+
     _pageController = PageController(
       viewportFraction: 0.82,
-      initialPage: _currentIndex,
+      initialPage: _initialPage,
       keepPage: true,
     );
 
@@ -46,6 +52,7 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
           _buildHeader(context),
           const SizedBox(height: 8),
           _buildCarouselFromBloc(context),
+
         ],
       ),
     );
@@ -55,7 +62,7 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
       child: Text(
-        'Yuk, mulai klaim sekarang!',
+        'Yuk mulai Asuransi Sekarang!',
         style: headingStyle(context).copyWith(fontSize: 20),
       ),
     );
@@ -89,8 +96,28 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
         if (state.status == ListStatus.success && state.items.isNotEmpty) {
           final images = state.items;
-          final loopedImages = [images.last, ...images, images.first];
-          return _buildCarousel(loopedImages);
+          if (!_didSyncInitialIndex) {
+            _didSyncInitialIndex = true;
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+
+              final page = _pageController.hasClients
+                  ? (_pageController.page?.round() ?? _pageController.initialPage)
+                  : _pageController.initialPage;
+
+              setState(() {
+                _currentRealIndex = page % images.length;
+              });
+            });
+          }
+          return Column(
+            children: [
+              _buildInfiniteCarousel(images),
+              const SizedBox(height: 8),
+              _buildIndicator(images.length),
+            ],
+          );
         }
 
         return const Center(
@@ -181,4 +208,68 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
     );
   }
 
+  Widget _buildIndicator(int itemCount) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(itemCount, (index) {
+        final isActive = index == _currentRealIndex;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive ? primaryLightColor : aGrey,
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildInfiniteCarousel(List images) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = width * 0.38;
+
+        return SizedBox(
+          height: height,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: _kFakeCount,
+            physics: const BouncingScrollPhysics(),
+            onPageChanged: (pageIndex) {
+              final real = pageIndex % images.length;
+              setState(() {
+                _currentRealIndex = real;
+              });
+            },
+            itemBuilder: (context, pageIndex) {
+              final realIndex = pageIndex % images.length;
+              final item = images[realIndex];
+
+              return AnimatedBuilder(
+                animation: _pageController,
+                builder: (context, child) {
+                  double scale = 1.0;
+                  if (_pageController.position.haveDimensions) {
+                    final diff = _pageController.page! - pageIndex;
+                    scale = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);
+                  }
+                  return Center(
+                    child: Transform.scale(scale: scale, child: child),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: _buildCachedImage(item.galleryUrl),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 }

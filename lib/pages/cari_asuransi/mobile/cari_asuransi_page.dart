@@ -34,7 +34,6 @@ class CariAsuransiWidget extends StatelessWidget {
     return BaseBackgroundSidePage(
       title: "Cari Asuransi",
       child: Container(
-        color: secondaryBlackColor,
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: hPadding),
           child: _buildContent(context),
@@ -71,7 +70,6 @@ class CariAsuransiWidget extends StatelessWidget {
 
   Widget _buildContent(BuildContext context) {
     return Container(
-      color: secondaryBlackColor,
       constraints: BoxConstraints(
         minHeight: MediaQuery.of(context).size.height,
       ),
@@ -82,7 +80,7 @@ class CariAsuransiWidget extends StatelessWidget {
             iconPath: "assets/icons/menu_cari_asuransi.svg",
             title: "Cari Asuransi",
             subtitle:
-            "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+            "Pilih jenis asuransi dan hitung premi langsung di sini.",
           ),
           Container(
             color: primaryBlackColor,
@@ -109,7 +107,7 @@ class CariAsuransiWidget extends StatelessWidget {
                     ? TextAlign.center
                     : TextAlign.left,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: hPadding),
               kDivider(),
             ],
           ),

@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:string_validator/string_validator.dart';
+import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/calpar/calpar1crud_bloc.dart';
 import '../../../blocs/calpar/calpar1list_bloc.dart';
 import '../../../blocs/calpar/calpar2form_bloc.dart';
@@ -24,6 +25,7 @@ import '../../../models/combobox/combomwilayah_model.dart';
 import '../../../models/combobox/comborkonstruksiojk_model.dart';
 import '../../../models/combobox/combormatauang_model.dart';
 import '../../../models/combobox/comborokupasi_model.dart';
+import '../../../models/user/user_model.dart';
 import '../../../repositories/combobox/combomjnscoverpar_repository.dart';
 import '../../../repositories/combobox/combomkabzonagempa_repository.dart';
 import '../../../repositories/combobox/combomwilayah_repository.dart';
@@ -32,8 +34,10 @@ import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../repositories/combobox/comborokupasi_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
+import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../register/mobile/client/register_client_page.dart';
 import '../../regpar/mobile/regpar_main_page_remake.dart';
 
 
@@ -867,11 +871,45 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   Future<void> onLanjutkanPressed() async {
-    if (context.read<Calpar1ListBloc>().state.isProcessing) return;
+    if (context
+        .read<Calpar1ListBloc>()
+        .state
+        .isProcessing) return;
 
-    context.read<Calpar1ListBloc>().add(
-      CalPar2RegParEvent(calpar1Id: calpar1Id!),
-    );
+
+    if (context
+        .read<AuthenticationBloc>()
+        .state is AuthenticationAuthenticated) {
+      User user = (context
+          .read<AuthenticationBloc>()
+          .state as AuthenticationAuthenticated).user;
+      if (user.userType == "C") {
+        context.read<Calpar1ListBloc>().add(
+          CalPar2RegParEvent(calpar1Id: calpar1Id!),
+        );
+      }
+      else {
+        showDialog(
+          context: context,
+          barrierDismissible: true, // klik luar = close
+          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+          builder: (context) => RegisterClientPopUp(
+            header: 'Data Klien Belum Terdaftar!',
+            description:
+            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            buttonText: 'Daftar Klien',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RegisterClient(requestFrom: 'calpar_page')
+                ),
+              );
+            },
+          ),
+        );
+      }
+    }
   }
 
   void draftForm1ToBloc(BuildContext context) {
@@ -995,7 +1033,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       if (angka == null) {
         setErr('form1.coverBulan', "Format tidak valid");
         ok = false;
-      } else if (angka <= 0) {
+      } else if (angka < 0) {
         setErr('form1.coverBulan', "Harus lebih dari 0");
         ok = false;
       }
@@ -1024,33 +1062,58 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     clearErrsByPrefix('form2.');
     bool ok = true;
 
-    bool requiredPositiveNum(TextEditingController c, String key) {
+    double parseOrZeroAutoFill(TextEditingController c) {
       final raw = c.text.trim();
       if (raw.isEmpty) {
-        setErr(key, kStringNullError);
-        return false;
+        c.text = '0';
+        return 0;
       }
       final clean = raw.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka <= 0) {
+      return double.tryParse(clean) ?? double.nan; // nan untuk tandain invalid
+    }
+
+    bool optionalPositiveNumAutoZero(TextEditingController c, String key) {
+      final angka = parseOrZeroAutoFill(c);
+
+      if (angka.isNaN) {
         setErr(key, kString0);
         return false;
       }
+
+      if (angka < 0) {
+        setErr(key, kString0);
+        return false;
+      }
+
       return true;
     }
 
-    // Mata Uang (combo)
     if (fieldComboRMatauang == null) {
       setErr('form2.mataUang', kStringNullError);
       ok = false;
     }
 
-    // SI fields yang dipakai di UI
-    ok = requiredPositiveNum(fieldSiMachineryController, 'form2.siMachinery') && ok;
-    ok = requiredPositiveNum(fieldSiBuildingController, 'form2.siBuilding') && ok;
-    ok = requiredPositiveNum(fieldSiContentController, 'form2.siContent') && ok;
-    ok = requiredPositiveNum(fieldSiStockController, 'form2.siStock') && ok;
-    ok = requiredPositiveNum(fieldSiOtherController, 'form2.siOther') && ok;
+    ok = optionalPositiveNumAutoZero(fieldSiMachineryController, 'form2.siMachinery') && ok;
+    ok = optionalPositiveNumAutoZero(fieldSiBuildingController, 'form2.siBuilding') && ok;
+    ok = optionalPositiveNumAutoZero(fieldSiContentController, 'form2.siContent') && ok;
+    ok = optionalPositiveNumAutoZero(fieldSiStockController, 'form2.siStock') && ok;
+    ok = optionalPositiveNumAutoZero(fieldSiOtherController, 'form2.siOther') && ok;
+
+    if (ok) {
+      final vMachinery = parseOrZeroAutoFill(fieldSiMachineryController);
+      final vBuilding  = parseOrZeroAutoFill(fieldSiBuildingController);
+      final vContent   = parseOrZeroAutoFill(fieldSiContentController);
+      final vStock     = parseOrZeroAutoFill(fieldSiStockController);
+      final vOther     = parseOrZeroAutoFill(fieldSiOtherController);
+
+      final anyGreaterThanZero =
+          vMachinery > 0 || vBuilding > 0 || vContent > 0 || vStock > 0 || vOther > 0;
+
+      if (!anyGreaterThanZero) {
+        setErr('form2.siMachinery', 'Minimal salah satu nilai harus lebih dari 0');
+        ok = false;
+      }
+    }
 
     if (!ok) {
       setState(() => expanded[1] = true);

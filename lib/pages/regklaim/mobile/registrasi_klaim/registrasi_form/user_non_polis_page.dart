@@ -22,6 +22,7 @@ import '../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../repositories/regklaim/upload_repository.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
+import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../../register/mobile/client/register_client_page.dart';
 import '../../../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
@@ -76,6 +77,25 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       final today = DateTime(now.year, now.month, now.day);
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
     });
+  }
+
+  List<ComboMInsuranceModel> _filterInsurance(
+      List<ComboMInsuranceModel> data,
+      ) {
+    // 10001 → hanya tampil 14
+    if (widget.cobKlaimId == '10001') {
+      return data.where((e) => e.minsuranceId == '14').toList();
+    }
+
+    // 10002 → hanya tampil 02
+    if (widget.cobKlaimId == '10002') {
+      return data.where((e) => e.minsuranceId == '02').toList();
+    }
+
+    // selain itu → buang 14 & 02
+    return data
+        .where((e) => e.minsuranceId != '14' && e.minsuranceId != '02')
+        .toList();
   }
 
   @override
@@ -244,10 +264,23 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
             content: Text('Only Client user can perform this action.'),
           ),
         );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => RegisterClient(requestFrom: 'regisnonpolis_page')
+        showDialog(
+          context: context,
+          barrierDismissible: true, // klik luar = close
+          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+          builder: (context) => RegisterClientPopUp(
+            header: 'Data Klien Belum Terdaftar!',
+            description:
+            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            buttonText: 'Daftar Klien',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RegisterClient(requestFrom: 'regisnonpolis_page')
+                ),
+              );
+            },
           ),
         );
       }
@@ -287,9 +320,12 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   Widget buildFieldMinsuranceId() => ReusableComboBox<ComboMInsuranceModel>(
-    hintText: "Kategory Asuransi",
+    hintText: "Kategori Asuransi",
     initItem: fieldComboMInsurance,
-    dataLoader: () => ComboMInsuranceRepository().getComboMInsurance(""),
+    dataLoader: () async {
+      final data = await ComboMInsuranceRepository().getComboMInsurance("");
+      return _filterInsurance(data);
+    },
     displayText: (item) => item.insuranceName,
     compareItems: (a, b) => a.minsuranceId == b.minsuranceId,
     validatorCallback: (_) => err('form1.kategoryInsurance'),

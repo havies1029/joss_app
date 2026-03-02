@@ -258,10 +258,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
     }
 
     final dateStr = formatTanggalWaktu(item.tglDibuat);
-
-    // icon (kamu bisa mapping berdasarkan jenisLog kalau mau)
-    final iconAsset = _getIconAsset(item.jenisLog);
-
     return Container(
       padding: const EdgeInsets.all(hPadding),
       child: Row(
@@ -450,7 +446,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
               e.header,
               style: TextStyle(
                 fontSize: getResponsiveFont(context, 16),
-                color: hintGrey,
+                color: primaryLightColor,
               ),
             ),
             const SizedBox(height: 6),
@@ -486,7 +482,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
     else if (j.contains("perpanjang polis")) asset = "assets/icons/PerpanjanganLog.svg";
     else if (j.contains("aktivasi kembali")) asset = "assets/icons/AktifKembali.svg";
     else if (j.contains("beli polis")) asset = "assets/icons/RegOthers.svg";
-
     return SvgPicture.asset(
       asset,
       width: 40,

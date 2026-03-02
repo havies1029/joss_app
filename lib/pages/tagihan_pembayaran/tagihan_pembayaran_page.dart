@@ -71,7 +71,7 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
                       iconPath: "assets/icons/menu_tagihan_pembayaran.svg",
                       title: "Tagihan Pembayaran",
                       subtitle:
-                      "Pilih kategori asuransi untuk keamanan Anda dan keluarga, Yuk!",
+                      "Lihat dan kelola tagihan pembayaran Anda di sini.",
                     ),
                     // BaseAssetWidget(),
                     SafeArea(

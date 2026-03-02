@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/gen_aset_ringkasan/asetringkasancari_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../models/gen_aset_ringkasan/asetringkasancari_model.dart';
 
@@ -23,17 +24,40 @@ class RingkasanCobTable extends StatefulWidget {
 
 class _RingkasanCobTableState extends State<RingkasanCobTable> {
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+
   late final ScrollController hController;
+  late final ScrollController vController;
 
   @override
   void initState() {
     super.initState();
     hController = ScrollController();
+    vController = ScrollController();
+    vController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final bloc = context.read<AsetRingkasanCariBloc>();
+    final s = bloc.state;
+
+    if (!vController.hasClients) return;
+
+    final max = vController.position.maxScrollExtent;
+    final cur = vController.position.pixels;
+    const threshold = 100.0;
+
+    if (max - cur <= threshold) {
+      if (!s.hasReachedMax && !s.isFetching) {
+        bloc.add(FetchAsetRingkasanCariEvent());
+      }
+    }
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.removeListener(_onScroll);
+    vController.dispose();
     super.dispose();
   }
 
@@ -49,6 +73,7 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
     }
 
     return SingleChildScrollView(
+      controller: vController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

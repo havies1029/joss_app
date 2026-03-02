@@ -227,11 +227,14 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text(
-                          "Pastikan semua data sudah sesuai sebelum melanjutkan.",
-                          style: bodyTextStyle(context).copyWith(color: primaryLightColor),
+                        Expanded(
+                          child: Text(
+                            "Pastikan semua data sudah sesuai sebelum melanjutkan.",
+                            style: bodyTextStyle(context).copyWith(
+                              color: primaryLightColor,
+                            ),
+                          ),
                         ),
                       ],
                     ),

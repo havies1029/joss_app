@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +12,7 @@ import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../common/constants.dart';
 
 import '../../../../helper/auth_input_router.dart';
+import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/login/emailverification_model.dart';
 
 
@@ -62,18 +64,20 @@ class _LoginFormUserState extends State<LoginFormUser>
       label: "Email atau No. Handphone",
       hint: "Masukkan email atau nomor HP kamu",
       controller: _emailOrPhoneController,
-      keyboardType: TextInputType.emailAddress, // biar bisa input campuran
+      keyboardType: TextInputType.text,
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        final input = (value ?? '').trim();
+        if (input.isEmpty) {
           return "Mohon isi email atau nomor handphone";
         }
 
-        // validasi email atau hp
-        final isEmail = emailValidatorRegExp.hasMatch(value.trim());
-        final isPhone = phoneValidatorRegExp.hasMatch(value.trim());
+        final isEmail = EmailValidator.validate(input);
 
-        if (!isEmail && !isPhone) {
-          return "Masukkan format email atau nomor HP yang valid";
+        if (!isEmail) {
+          final phoneRes = IndoPhoneHelper.normalize(input);
+          if (!phoneRes.isValid) {
+            return phoneRes.error ?? "Masukkan format nomor HP yang valid";
+          }
         }
 
         return null;

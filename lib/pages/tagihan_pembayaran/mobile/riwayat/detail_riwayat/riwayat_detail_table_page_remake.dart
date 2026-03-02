@@ -111,55 +111,6 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
 
                       const SizedBox(height: hPadding),
 
-                      // Row(
-                      //   children: [
-                      //     Expanded(
-                      //       child: Align(
-                      //         alignment: Alignment.centerLeft,
-                      //         child: AppButton.iconLeft(
-                      //           text: 'Unduh Polis',
-                      //           backgroundColor: primaryColor,
-                      //           icon: SvgPicture.asset(
-                      //             'assets/icons/invoice.svg',
-                      //             width: 18,
-                      //             height: 18,
-                      //           ),
-                      //           onPressed: () {
-                      //             ScaffoldMessenger.of(context).showSnackBar(
-                      //               const SnackBar(
-                      //                 content: Text('Fitur unduh invoice belum tersedia'),
-                      //                 duration: Duration(seconds: 2),
-                      //               ),
-                      //             );
-                      //           },
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     const SizedBox(width: 10),
-                      //     Expanded(
-                      //       child: Align(
-                      //         alignment: Alignment.centerRight,
-                      //         child: AppButton.iconLeft(
-                      //           text: 'Unduh Invoice',
-                      //           backgroundColor: GreenforPayment,
-                      //           icon: SvgPicture.asset(
-                      //             'assets/icons/unduh_invoice.svg',
-                      //             width: 18,
-                      //             height: 18,
-                      //           ),
-                      //           onPressed: () {
-                      //             ScaffoldMessenger.of(context).showSnackBar(
-                      //               const SnackBar(
-                      //                 content: Text('Fitur unduh invoice belum tersedia'),
-                      //                 duration: Duration(seconds: 2),
-                      //               ),
-                      //             );
-                      //           },
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                       Align(
                         alignment: Alignment.centerRight,
                         child: AppButton.iconLeft(

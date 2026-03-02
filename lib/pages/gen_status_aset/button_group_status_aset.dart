@@ -4,8 +4,7 @@ import 'package:joss_app/blocs/gen_status_aset/statusasetcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
 import '../../widgets/apptheme/build_status_box.dart';
-
-// pastiin StatusType & StatusChip ke-import
+import '../../common/loading_indicator.dart';
 
 class ButtonGroupStatusAsetWidget extends StatefulWidget {
   const ButtonGroupStatusAsetWidget({super.key});
@@ -21,7 +20,6 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
     context.read<StatusAsetCariBloc>().add(RefreshStatusAsetCariEvent());
   }
 
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StatusAsetCariBloc, StatusAsetCariState>(
@@ -31,7 +29,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
             height: 44,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: LoadingIndicator(),
             ),
           );
         }
@@ -83,8 +81,6 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
 
                 final id = status.mstatusasetId;
                 final isSelected = state.selectedStatusId == id;
-
-                final type = StatusType.fromId(id);
 
                 return Padding(
                   padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),

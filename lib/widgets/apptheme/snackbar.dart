@@ -14,10 +14,11 @@ SnackBar appSnackBar({
 }) {
   return SnackBar(
     content: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (icon != null) ...[
           Padding(
-            padding: const EdgeInsets.only(right: 12.0),
+            padding: const EdgeInsets.only(right: 10),
             child: Icon(icon, color: iconColor ?? primaryLightColor),
           ),
         ],
@@ -25,8 +26,9 @@ SnackBar appSnackBar({
           child: Text(
             message,
             style: TextStyle(
-              color: textColor ?? primaryLightColor,
-              fontWeight: FontWeight.w500,
+                color: textColor ?? primaryLightColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 18
             ),
           ),
         ),
@@ -59,5 +61,5 @@ SnackBar successSnackBar(String message, {IconData? icon}) => appSnackBar(
 SnackBar infoSnackBar(String message, {IconData? icon}) => appSnackBar(
   message: message,
   icon: icon ?? Icons.info_outline,
-  backgroundColor: pGrey,
+  backgroundColor: pBlue,
 );

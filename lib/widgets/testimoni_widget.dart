@@ -47,46 +47,50 @@ class TestimonialSectionState extends State<TestimonialSection> {
     return Container(
       color: secondaryBlackColor,
       width: double.infinity,
-      padding: widget.isPageMode ? EdgeInsets.all(15) : EdgeInsets.all(0),
-      child: Center(
-        child: SizedBox(
-          width: 360,
-          child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
-            builder: (context, state) {
-              if (state.status == ListStatus.initial) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state.status == ListStatus.failure) {
-                return const Center(child: Text('Failed to load testimonials'));
-              } else if (state.items.isEmpty) {
-                return const Center(child: Text('No testimonials available'));
-              }
+      // padding: widget.isPageMode ? EdgeInsets.all(15) : EdgeInsets.all(0),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical: hPadding),
+          child: SizedBox(
+            width: 360,
+            child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
+              builder: (context, state) {
+                if (state.status == ListStatus.initial) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state.status == ListStatus.failure) {
+                  return Center(child: _emptyReviewWidget(context));
+                } else if (state.items.isEmpty) {
+                  return Center(child: _emptyReviewWidget(context));
+                }
 
-              final items = state.items;
+                final items = state.items;
 
-              return widget.isPageMode
-                  ? SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return widget.isPageMode
+                    ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(context),
+                      const SizedBox(height: 16),
+                      _buildGridView(context, items),
+                      if (_displayedItems < items.length)
+                        _buildLoadMoreButton(items.length),
+                    ],
+                  ),
+                )
+                    : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildHeader(context),
                     const SizedBox(height: 16),
-                    _buildGridView(context, items),
-                    if (_displayedItems < items.length)
-                      _buildLoadMoreButton(items.length),
+                    _buildCarouselView(context, items),
+                    SizedBox(height: isMobile(context) ? 10.0 : 15.0),
+                    _buildNavigationControls(context, items),
                   ],
-                ),
-              )
-                  : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 16),
-                  _buildCarouselView(context, items),
-                  SizedBox(height: isMobile(context) ? 10.0 : 15.0),
-                  _buildNavigationControls(context, items),
-                ],
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -326,7 +330,7 @@ class TestimonialSectionState extends State<TestimonialSection> {
 
     final int itemsPerPage = mobile ? 1 : (tablet ? 2 : 3);
     final totalPages = (items.length / itemsPerPage).ceil();
-
+    if (totalPages <= 1) return const SizedBox.shrink();
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -394,6 +398,40 @@ class TestimonialSectionState extends State<TestimonialSection> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _emptyReviewWidget(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SvgPicture.asset(
+          'assets/icons/empty_review_page.svg',
+          height: 50,
+        ),
+        const SizedBox(height: 20),
+
+        Text(
+          'Tidak ada Review tersedia',
+          style: TextStyle(
+            fontSize: getResponsiveFont(context, 16),
+            color: primaryLightColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            'Saat ini belum tersedia Review apa pun',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: getResponsiveFont(context, 14),
+              color: hintGrey,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

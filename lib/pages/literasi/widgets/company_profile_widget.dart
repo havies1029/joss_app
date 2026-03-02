@@ -16,7 +16,7 @@ class CompanyProfileCard extends StatelessWidget {
       create: (_) => ReqComproBloc(repository: ReqComproRepository()),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final double offsetY = kIsWeb ? -30 : -50;
+          final double offsetY = kIsWeb ? -30 : -40;
           final double bgWidth =
           constraints.maxWidth > 420 ? 392 : constraints.maxWidth * 1;
           final double cardWidth =

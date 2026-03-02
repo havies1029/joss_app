@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../blocs/payment/dnrekapcobcari_bloc.dart';
 import '../../../../common/constants.dart';
@@ -362,121 +364,77 @@ class _RincianPageState extends State<RincianPage> {
   }
 
 
-  ///Share data
-  void _onShare(BuildContext context) {
+  Future<void> _onShare(BuildContext context) async {
     final state = dn2invBloc.state;
 
-    if (state.selectedIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+    final allDetails =
+    state.rincianSOA.headers.expand((h) => h.details).toList();
+
+    if (allDetails.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
       return;
     }
 
-    final allDetails = state.rincianSOA.headers.expand((h) => h.details).toList();
-    final selectedDetails = allDetails.where((d) => state.selectedIds.contains(d.dn1Id)).toList();
+    if (state.selectedIds.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+      return;
+    }
+
+    // kalau select all → ambil semua
+    final bool isSelectAll =
+        state.selectedIds.length == allDetails.length;
+
+    final selectedDetails = isSelectAll
+        ? allDetails
+        : allDetails
+        .where((d) => state.selectedIds.contains(d.dn1Id))
+        .toList();
 
     if (selectedDetails.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar("Tidak ada data yang dipilih"));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(errorSnackBar("Tidak ada data yang dipilih"));
       return;
     }
 
-    // total premi per currency (lebih aman kalau multi-currency)
-    final Map<String, num> totalByCurr = {};
-    for (final d in selectedDetails) {
-      totalByCurr[d.currSimbol] = (totalByCurr[d.currSimbol] ?? 0) + (d.dnOs as num);
+    try {
+      final exportData =
+      selectedDetails.map((e) => e.toExportMap()).toList();
+
+      if (kIsWeb) {
+        await ExportHelper.export(
+          "pdf",
+          exportData,
+          CategoryType.ringkasan,
+        );
+        return;
+      }
+
+      final fileName =
+          "Rincian_Polis_${DateTime
+          .now()
+          .millisecondsSinceEpoch}.pdf";
+
+      final file = await MobileDownloadHelper.generatePdfFile(
+        fileName: fileName,
+        data: exportData,
+      );
+
+      if (!context.mounted) return;
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: 'Rincian Polis Terpilih',
+        text: isSelectAll
+            ? 'Berikut terlampir seluruh rincian polis.'
+            : 'Berikut terlampir rincian polis terpilih.',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(errorSnackBar("Gagal membagikan file: $e"));
+      }
     }
-
-    final totalPolis = selectedDetails.length;
-
-    final totalsText = totalByCurr.entries
-        .map((e) => "• ${e.key} ${NumberFormat.decimalPattern().format(e.value)}")
-        .join("\n");
-
-    final detailLines = selectedDetails.take(20).map((d) {
-      final periode =
-          "${d.polisMulai.toString().substring(0, 10)} → ${d.polisAkhir.toString().substring(0, 10)}";
-      final premi = "${d.currSimbol} ${NumberFormat.decimalPattern().format(d.dnOs)}";
-      return "• ${d.noPolis} | $periode | $premi";
-    }).join("\n");
-
-    final more = selectedDetails.length > 20 ? "\n…dan ${selectedDetails.length - 20} polis lainnya" : "";
-
-    final message = '''
-📄 Rincian Polis Terpilih
-
-Jumlah Polis: $totalPolis
-
-Total Premi:
-$totalsText
-
-Detail Polis:
-$detailLines$more
-''';
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.share, color: primaryColor, size: 24),
-                const SizedBox(width: 12),
-                const Text(
-                  "Bagikan Rincian",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Text(message, style: const TextStyle(fontSize: 14, height: 1.5)),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.copy),
-                label: const Text("Salin Rincian"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: message));
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    successSnackBar("Rincian berhasil disalin", icon: Icons.copy),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                child: const Text("Batal"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
-
 }

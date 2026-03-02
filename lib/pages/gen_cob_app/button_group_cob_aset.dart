@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_cob_app/cobmanpol_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-
+import 'package:joss_app/common/loading_indicator.dart';
 class ButtonGroupCobAsetWidget extends StatefulWidget {
   const ButtonGroupCobAsetWidget({super.key});
 
@@ -20,7 +20,6 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
   @override
   Widget build(BuildContext context) {
     final textStyle = headingStyle(context, fontSize: 14);
-    final Color chipBg = pGrey;
     final Color chipSelected = primaryColor;
     final double radius = cardBorderRadius;
 
@@ -31,7 +30,7 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
             height: 44,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: LoadingIndicator(),
             ),
           );
         }

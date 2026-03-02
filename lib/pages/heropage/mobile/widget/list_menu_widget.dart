@@ -22,6 +22,24 @@ class ListMenuWidget extends StatelessWidget {
     final menuItems = _getMenuItems();
     final itemWidth = getItemWidth(context);
 
+    final textStyle = bodyTextStyle(context).copyWith(
+      height: 1.2,
+    );
+
+    bool willWrapToSecondLine(String text) {
+      final tp = TextPainter(
+        text: TextSpan(text: text, style: textStyle),
+        maxLines: 1, // cek apakah muat dalam 1 baris
+        textDirection: TextDirection.ltr,
+        ellipsis: '…',
+      )..layout(maxWidth: itemWidth - 8); // kasih sedikit buffer padding
+
+      return tp.didExceedMaxLines; // kalau exceed => butuh baris kedua
+    }
+
+    final needsExtraHeight = menuItems.any((m) => willWrapToSecondLine(m.title));
+    final double menuHeight = needsExtraHeight ? 140 : 120;
+
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         /*
@@ -45,7 +63,7 @@ class ListMenuWidget extends StatelessWidget {
               ),
             ),
             child: SizedBox(
-              height: 120,
+              height: menuHeight,
               child: Stack(
                 children: [
                   ListView.builder(
@@ -64,9 +82,12 @@ class ListMenuWidget extends StatelessWidget {
                     top: 0,
                     bottom: 0,
                     width: 40,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: blackFadeGradientHorizontal,
+                    child: IgnorePointer(
+                      ignoring: true,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: blackFadeGradientHorizontal,
+                        ),
                       ),
                     ),
                   ),
@@ -75,9 +96,12 @@ class ListMenuWidget extends StatelessWidget {
                     top: 0,
                     bottom: 0,
                     width: 48,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: blackFadeGradientHorizontalReversed,
+                    child: IgnorePointer(
+                      ignoring: true,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: blackFadeGradientHorizontalReversed,
+                        ),
                       ),
                     ),
                   ),
@@ -222,86 +246,107 @@ class ListMenuWidget extends StatelessWidget {
     final isClient = userType == 'C';
     final isAlwaysActive =
         item.title == "Cari Asuransi" || item.title == "Lapor Klaim" || item.title == "Bantuan";
-
     final isActive = isClient || isAlwaysActive;
 
     return GestureDetector(
-      onTap: () {
-        handleMenuTap(context, item.title);
-      },
-
+      onTap: isActive ? () => handleMenuTap(context, item.title) : null,
+      behavior: HitTestBehavior.opaque,
       child: Opacity(
-        opacity: isActive ? 1.0 : 0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 68,
-              height: 68,
-              margin: const EdgeInsets.only(top: 15),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 68,
-                    height: 68,
-                    decoration: BoxDecoration(
-                      color: pGrey,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: sGrey,
-                      ),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        item.iconPath,
-                        width: 38,
-                        height: 38,
-                      ),
-                    ),
-                  ),
+        opacity: isActive ? 1.0 : 0.35,
+        child: LayoutBuilder(
+          builder: (context, c) {
+            final titleStyle = bodyTextStyle(context).copyWith(
+              height: 1.2,
+              color: isActive ? primaryLightColor : hintGrey,
+            );
 
-                  if (item.isPopular)
-                    Positioned(
-                      top: -10,
-                      left: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+            final fontSize = titleStyle.fontSize ?? 14;
+            final lineHeight = fontSize * (titleStyle.height ?? 1.2);
+
+            // target slot: 2 baris + padding kecil
+            final desiredTitleHeight = (lineHeight * 2) + 6;
+
+            // hitung tinggi fixed di atas & bawah
+            const iconSize = 68.0;
+            const topMargin = 15.0;     // margin top icon container
+            const gapAfterIcon = 8.0;   // SizedBox(height: 8)
+            final bottomGap = hPadding.toDouble();
+
+            final fixedHeights = iconSize + topMargin + gapAfterIcon + bottomGap;
+
+            // sisa ruang untuk title + ruang bawah
+            final remaining = (c.maxHeight - fixedHeights).clamp(0.0, double.infinity);
+
+            // title tidak boleh lebih tinggi dari remaining
+            final titleHeight = desiredTitleHeight.clamp(0.0, remaining);
+
+            // sisa setelah title jadi "ruang bawah" saja
+            final bottomFill = (remaining - titleHeight).clamp(0.0, double.infinity);
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: 68,
+                  height: 68,
+                  margin: const EdgeInsets.only(top: 15),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 68,
+                        height: 68,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(cardBorderRadius),
-                          gradient: primaryBadgeGradient,
+                          color: pGrey,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: sGrey),
                         ),
-                        child: Text(
-                          'Populer!',
-                          style: bodyTextStyle(
-                            context,
-                          ).copyWith(fontSize: 11, fontWeight: FontWeight.w600),
+                        child: Center(
+                          child: SvgPicture.asset(item.iconPath, width: 38, height: 38),
                         ),
                       ),
-                    ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Expanded(
-              child: Text(
-                item.title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: bodyTextStyle(context).copyWith(
-                  height: 1,
-                  color: isActive ? primaryLightColor : hintGrey,
+                      if (item.isPopular)
+                        Positioned(
+                          top: -10,
+                          left: 20,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              gradient: primaryBadgeGradient,
+                            ),
+                            child: Text(
+                              'Populer!',
+                              style: bodyTextStyle(context).copyWith(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: hPadding),
-          ],
+                const SizedBox(height: 8),
+
+                SizedBox(
+                  height: titleHeight,
+                  child: Text(
+                    item.title,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: titleStyle,
+                  ),
+                ),
+
+                SizedBox(height: hPadding),
+
+                SizedBox(height: bottomFill),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -324,17 +369,6 @@ class ListMenuWidget extends StatelessWidget {
     ];
   }
 
-  // List<MenuItem> _getMenuItems() {
-  //   return [
-  //     MenuItem(title: 'Cari Asuransi', iconPath: 'assets/icons/menu_cari_asuransi.svg', isPopular: true,),
-  //     MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
-  //     MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-  //     MenuItem(title: 'Beli Polis', iconPath: 'assets/icons/menu_beli_polis.svg',),
-  //     MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
-  //     MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
-  //   ];
-  // }
-
   void handleMenuTap(BuildContext context, String title) async {
     switch (title) {
       case 'Cari Asuransi':
@@ -349,33 +383,9 @@ class ListMenuWidget extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => ManagementPolisPage()));
         break;
 
-    // case 'Bantuan':
-    //   if (ChatInitService.I.isInitialized) {
-    //     Navigator.pushNamed(context, 'chat');
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(content: Text('Chat belum siap, coba lagi')),
-    //     );
-    //   }
-    //   break;
-    //
       case 'Test Page':
-      // Navigator.push(context, MaterialPageRoute(builder: (_) => DnrekapcobCariPage()));
-      // Navigator.push(context, MaterialPageRoute(builder: (_) => ImagePickerDummyPage(  )));
         Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
         break;
-
-    // case 'Test Page':
-    //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppaCariPage(listcobId: '', currId: '',)));
-    //   break;
-    // //
-    // case 'Test Page':
-    //   Navigator.push(context, MaterialPageRoute(builder: (_) => DnsppamvCariPage(sppa1Id: '',)));
-    //   break;
-    //
-    // case 'Test Page':
-    //   Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodsCariListPage()));
-    //   break;
 
       case 'Klaim':
         Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimMainPage()));

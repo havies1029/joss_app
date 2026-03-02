@@ -124,7 +124,7 @@ class _LoginFormClientState extends State<LoginFormClient>
         if (value == null || value.isEmpty) {
           return kPassNullError;
         }
-        if (value.length < 6) {
+        if (value.length < 8) {
           return kShortPassError;
         }
         return null;

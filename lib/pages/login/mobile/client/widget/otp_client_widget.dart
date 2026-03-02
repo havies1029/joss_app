@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -110,22 +111,12 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       } else {
         setState(() => _isResendAvailable = true);
         timer.cancel();
-
-        // 🔥 Auto redirect ke HomeTabWidget
-        // Future.delayed(const Duration(seconds: 1), () {
-        //   Navigator.of(context).pushReplacement(
-        //     MaterialPageRoute(
-        //       builder: (_) => HomeTabWidget(userRepository: UserRepository()),
-        //     ),
-        //   );
-        // });
       }
     });
   }
 
-
   void _resendOtp() {
-    String otp = _otpControllers.map((c) => c.text).join();
+    final otp = _otpControllers.map((c) => c.text).join();
 
     setState(() {
       _remainingTime = 59;
@@ -148,25 +139,29 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
     context.read<RegUserBloc>().add(
       ValidasiPinHPEvent(
-          record: record!,
-          sentTo: widget.sentTo,
-          sentVia: widget.sentVia
+        record: record!,
+        sentTo: widget.sentTo,
+        sentVia: widget.sentVia,
       ),
     );
   }
 
   void _onOtpChanged(String value, int index) {
+    // ✅ logika kamu tetap: maju fokus kalau ada isi
     if (value.isNotEmpty && index < 5) {
       _focusNodes[index + 1].requestFocus();
     }
 
+    // ✅ auto verify kalau semua terisi
     if (_otpControllers.every((c) => c.text.isNotEmpty)) {
       _verifyOtp();
     }
   }
-  void _verifyOtp() async {
-    String otp = _otpControllers.map((c) => c.text).join();
 
+  void _verifyOtp() async {
+    final otp = _otpControllers.map((c) => c.text).join();
+
+    // ✅ validasi kamu tetap
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -180,23 +175,16 @@ class PopupClientWidgetState extends State<PopupClientWidget>
     RegUserModel? record = context.read<RegUserBloc>().state.record;
     record?.kodePin = otp;
 
-    // Kirim event validasi OTP ke RegUserBloc
     context.read<RegUserBloc>().add(
       ValidasiPinHPEvent(
-          record: record!,
-          sentTo: widget.sentTo,
-          sentVia: widget.sentVia
+        record: record!,
+        sentTo: widget.sentTo,
+        sentVia: widget.sentVia,
       ),
     );
 
-    // // 🚀 Trigger AuthenticationAuthenticated langsung
-    // final userRepo = context.read<UserRepository>();
-    // final user = await userRepo.getUserByToken(await userRepo.getToken());
-    // context.read<AuthenticationBloc>().add(LoggedIn(user: user));
-
     Navigator.of(context, rootNavigator: true).pop();
   }
-
 
   void _shakeOtpFields() {
     HapticFeedback.heavyImpact();
@@ -204,8 +192,8 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   }
 
   String _formatTime(int seconds) {
-    int m = seconds ~/ 60;
-    int s = seconds % 60;
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
     return '$m:${s.toString().padLeft(2, '0')}';
   }
 
@@ -217,10 +205,10 @@ class PopupClientWidgetState extends State<PopupClientWidget>
     _shakeController.dispose();
     _timer?.cancel();
 
-    for (var c in _otpControllers) {
+    for (final c in _otpControllers) {
       c.dispose();
     }
-    for (var n in _focusNodes) {
+    for (final n in _focusNodes) {
       n.dispose();
     }
 
@@ -229,13 +217,9 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    final double topSpacing =
-    screenHeight < 700 ? screenHeight * 0.06 : screenHeight * 0.095;
-
     return Scaffold(
-      backgroundColor: primaryBlackColor,
+      // ✅ ikut DNA patokan: secondaryBlackColor
+      backgroundColor: secondaryBlackColor,
       body: SafeArea(
         child: BaseBackgroundFirstPage(
           child: Column(
@@ -249,25 +233,31 @@ class PopupClientWidgetState extends State<PopupClientWidget>
                       child: Column(
                         children: [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                            child:
-                            Align(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 10,
+                            ),
+                            child: Align(
                               alignment: Alignment.centerLeft,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 4),
                                 child: TextButton.icon(
                                   onPressed: () {
-                                    for (var controller in _otpControllers) {
+                                    for (final controller in _otpControllers) {
                                       controller.clear();
                                     }
                                     _timer?.cancel();
-                                    Navigator.of(context, rootNavigator: false).pop();
-                                    context.read<AuthenticationBloc>().add(LoggedOut());
+                                    Navigator.of(context, rootNavigator: false)
+                                        .pop();
+                                    context
+                                        .read<AuthenticationBloc>()
+                                        .add(LoggedOut());
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(0, 0),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   icon: Icon(
                                     Icons.arrow_back_ios_new,
@@ -275,182 +265,156 @@ class PopupClientWidgetState extends State<PopupClientWidget>
                                     size: getResponsiveFont(context, 18),
                                   ),
                                   label: Text(
-                                      "Kembali",
-                                      style: bodyTextStyle(context).copyWith(color: primaryLightColor)
+                                    "Kembali",
+                                    style: bodyTextStyle(context).copyWith(
+                                      color: primaryLightColor,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
 
+                          // ✅ Card DNA patokan (gradient border)
                           Container(
-                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: primaryBlackColor,
-                              borderRadius: BorderRadius.circular(20),
-                              border: const Border(
-                                top: BorderSide(
-                                  color: primaryColor,
-                                  width: 4.0,
-                                ),
+                              gradient: cardBorderGradient,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
                               ),
                             ),
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                SizedBox(height: screenHeight * 0.04),
-
-                                ScaleTransition(
-                                  scale: _scaleAnimation,
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: primaryColor.withOpacity(0.3),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(Icons.lock_outline,
-                                        size: 40, color: Colors.white),
-                                  ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: vPadding * 2,
+                                horizontal: hPadding * 1.5,
+                              ),
+                              margin: const EdgeInsets.all(1),
+                              decoration: BoxDecoration(
+                                color: secondaryBlackColor,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
                                 ),
-
-                                const SizedBox(height: 24),
-                                const Text(
-                                  'Verifikasi OTP',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                              ),
+                              child: Column(
+                                children: [
+                                  // ✅ icon SVG seperti patokan
+                                  SvgPicture.asset(
+                                    "assets/icons/otp_icon.svg",
                                   ),
-                                ),
-                                const SizedBox(height: 16),
+                                  const SizedBox(height: 24),
 
-                                RichText(
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                      height: 1.5,
-                                    ),
+                                  Text(
+                                    'Verifikasi OTP',
+                                    style: headingStyle(context, fontSize: 25),
+                                  ),
+                                  const SizedBox(height: 6),
+
+                                  Column(
                                     children: [
-                                      const TextSpan(
-                                          text:
-                                          'Kami sudah mengirim kode OTP ke\n'),
-                                      TextSpan(
-                                        text: widget.sentTo,
-                                        style: const TextStyle(
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.w600,
+                                      Text(
+                                        "Kami sudah mengirim kode OTP ke ${widget.sentVia}",
+                                        style: bodyTextStyle(
+                                          context,
+                                          fontSize: 20,
                                         ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      Text(
+                                        widget.sentTo,
+                                        style: bodyTextStyle(
+                                          context,
+                                          fontSize: 20,
+                                        ).copyWith(color: primaryColor),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
-                                ),
 
-                                const SizedBox(height: 40),
+                                  const SizedBox(height: 16),
 
-                                // 🔢 OTP Fields with shake (pakai sin)
-                                AnimatedBuilder(
-                                  animation: _shakeAnimation,
-                                  builder: (_, child) {
-                                    return Transform.translate(
-                                      offset: Offset(
-                                        math.sin(_shakeAnimation.value) * 8,
-                                        0,
+                                  // ⏱ Timer / resend (UI ikut DNA patokan)
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: _isResendAvailable
+                                        ? GestureDetector(
+                                      onTap: _resendOtp,
+                                      child: Text(
+                                        'Kirim ulang kode',
+                                        style: bodyTextStyle(context)
+                                            .copyWith(
+                                          color: primaryColor,
+                                        ),
                                       ),
-                                      child: child,
-                                    );
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(
-                                        6, (i) => _buildOtpField(i)),
-                                  ),
-                                ),
-
-                                const SizedBox(height: 24),
-
-                                // ⏱ Timer / Resend
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 300),
-                                  child: _isResendAvailable
-                                      ? GestureDetector(
-                                    onTap: _resendOtp,
-                                    child: const Text(
-                                      'Kirim ulang kode',
-                                      style: TextStyle(
-                                        color: primaryColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  )
-                                      : Text(
-                                    _formatTime(_remainingTime),
-                                    style: const TextStyle(
-                                      color: pRed, // pakai constant
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                    )
+                                        : Text(
+                                      _formatTime(_remainingTime),
+                                      style: bodyTextStyle(context)
+                                          .copyWith(color: pRed),
                                     ),
                                   ),
-                                ),
 
+                                  const SizedBox(height: 16),
 
-                                const SizedBox(height: 32),
-                                const Text(
-                                  'Silakan masukkan kode di atas untuk melanjutkan.',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white60),
-                                  textAlign: TextAlign.center,
-                                ),
-
-                                const SizedBox(height: 40),
-
-                                // 🚀 Continue button
-                                ScaleTransition(
-                                  scale: _scaleAnimation,
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    height: 56,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        String otp = _otpControllers
-                                            .map((c) => c.text)
-                                            .join();
-                                        if (otp.length == 6) {
-                                          _verifyOtp();
-                                        } else {
-                                          _shakeOtpFields();
-                                        }
+                                  // 🔢 OTP fields + shake (UI ikut DNA patokan)
+                                  TextSelectionTheme(
+                                    data: TextSelectionThemeData(
+                                      cursorColor: primaryColor,
+                                      selectionColor:
+                                      primaryColor.withOpacity(0.25),
+                                      selectionHandleColor: primaryColor,
+                                    ),
+                                    child: AnimatedBuilder(
+                                      animation: _shakeAnimation,
+                                      builder: (_, child) {
+                                        return Transform.translate(
+                                          offset: Offset(
+                                            math.sin(_shakeAnimation.value) * 8,
+                                            0,
+                                          ),
+                                          child: child,
+                                        );
                                       },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: primaryColor,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(16)),
-                                      ),
-                                      child: const Text(
-                                        'Lanjut',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                        children: List.generate(
+                                          6,
+                                              (i) => _buildOtpField(i),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+
+                                  const SizedBox(height: 18),
+
+                                  Text(
+                                    'Silakan masukkan kode di atas untuk melanjutkan.',
+                                    style: bodyTextStyle(context).copyWith(
+                                      color: hintGrey,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+
+                                  const SizedBox(height: 18),
+
+                                  // ✅ Button ikut DNA patokan: AppButton.primary
+                                  AppButton.primary(
+                                    text: "Lanjut",
+                                    onPressed: () {
+                                      final otp = _otpControllers
+                                          .map((c) => c.text)
+                                          .join();
+                                      if (otp.length == 6) {
+                                        _verifyOtp();
+                                      } else {
+                                        _shakeOtpFields();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -467,27 +431,44 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   }
 
   Widget _buildOtpField(int i) {
-    return Container(
+    final hasFocus = _focusNodes[i].hasFocus;
+
+    // ✅ UI ikut DNA patokan: AnimatedContainer + border width 2
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOut,
       width: 48,
       height: 48,
       decoration: BoxDecoration(
         color: pGrey,
         borderRadius: BorderRadius.circular(checkboxBorderRadius),
         border: Border.all(
-          color: _focusNodes[i].hasFocus ? primaryColor : sGrey,
+          color: hasFocus ? primaryColor : sGrey,
+          width: 2,
         ),
       ),
       child: TextField(
         controller: _otpControllers[i],
         focusNode: _focusNodes[i],
         textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        cursorColor: primaryColor,
+        cursorWidth: 2,
+        cursorHeight: 24,
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         keyboardType: TextInputType.number,
         maxLength: 1,
-        decoration: const InputDecoration(counterText: '', border: InputBorder.none),
+        decoration: const InputDecoration(
+          counterText: '',
+          border: InputBorder.none,
+        ),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         onChanged: (v) => _onOtpChanged(v, i),
+
+        // ✅ tetap pertahankan behavior kamu (scale reset/forward) biar "sebisa mungkin" nggak berubah
         onTap: () {
           _scaleController.reset();
           _scaleController.forward();
@@ -495,5 +476,4 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       ),
     );
   }
-
 }

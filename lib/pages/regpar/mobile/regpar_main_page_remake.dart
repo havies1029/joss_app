@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/regpar/regpar_upload_foto_object_bloc.dart';
+import 'package:joss_app/pages/regpar/mobile/preview/regpar6_unified_preview_page.dart';
 import 'package:string_validator/string_validator.dart';
 
 
@@ -90,10 +91,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Regpar4FormBloc? regpar4formbloc;
   Regpar5FormBloc? regpar5formbloc;
 
-
-  Regpar6FormBloc? regpar6formBloc;
-  bool _form6HasError = false;
-  String? _form6ErrorText;
+  bool _showVal6 = false;
 
   Regpar1CrudModel? form1Record;
   Regpar2FormModel? form2Record;
@@ -247,13 +245,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldSumInsuredController = TextEditingController();
   final fieldBiayaPolisController = TextEditingController();
   //form5
-
-  //form6
-  List<Uint8List> _imagesRegpar6 = [];
-  List<String> _fileNamesRegpar6 = [];
-  List<Regpar6CariModel> _serverPhotosRegpar6 = [];
-  final Set<String> _deletingServerIdsRegpar6 = {};
-  //form6
 
   @override
   void initState() {
@@ -760,87 +751,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               }
             },
           ),
-
-
-          BlocListener<Regpar6CariBloc, Regpar6CariState>(
-            listener: (context, state) {
-
-              if (state.status == ListStatus.success) {
-                debugPrint("✅ Regpar4CariBloc SUCCESS");
-                setState(() => _serverPhotosRegpar6 = List.from(state.items));
-              }
-            },
-          ),
-
-          BlocListener<RegparUploadFotoObjectBloc, RegparUploadFotoObjectState>(
-            listener: (context, state) {
-
-              if (state is UploadFotoObjectListPreview) {
-                debugPrint("fileNames length: ${state.fileNames.length}");
-
-                setState(() {
-                  _imagesRegpar6 = List.from(state.images);
-                  _fileNamesRegpar6 = List.from(state.fileNames);
-                });
-              }
-
-              if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                debugPrint("🔄 refreshForm6 CALLED (general)");
-                refreshForm6(recordId: regpar1Id);
-              }
-
-              if (state is UploadFotoObjectSuccess) {
-                debugPrint("✅ UploadFotoObjectSuccess");
-
-                if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                  debugPrint("🔄 refreshForm4 CALLED (success)");
-                  refreshForm6(recordId: regpar1Id);
-                }
-              }
-
-              if (state is UploadFotoObjectFailure) {
-                debugPrint("❌ UploadFotoObjectFailure: ${state.error}");
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-          ),
-
-          BlocListener<Regpar6FormBloc, Regpar6FormState>(
-            listener: (context, state) {
-
-              if (state.isSaved) {
-                _deletingServerIdsRegpar6.clear();
-
-                if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                  refreshForm6(recordId: regpar1Id);
-                }
-              }
-
-              if (state.hasFailure) {
-                debugPrint("❌ Delete FAILURE");
-
-                _deletingServerIdsRegpar6.clear();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Gagal menghapus foto. Mengambil ulang data..."),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-
-                if (regpar1Id != null && regpar1Id!.isNotEmpty) {
-                  debugPrint("🔄 refreshForm6 CALLED (delete failure)");
-                  refreshForm6(recordId: regpar1Id);
-                }
-              }
-            },
-          ),
-
         ],
         child: _buildForm(),
       ),
@@ -897,9 +807,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        buildFieldTtgAlamat(),
-                        const SizedBox(height: hPadding),
                         buildFieldTtgNama(),
+                        const SizedBox(height: hPadding),
+                        buildFieldTtgAlamat(),
                         const SizedBox(height: 15),
                       ],
                     ),
@@ -1049,7 +959,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
                   Form6Page(
                     context: context,
-                    title: "Upload Foto Objek",
+                    title: "Upload Foto Bangunan",
                     isExpanded: expanded[4],
                     onToggle: (v) => setState(() => expanded[4] = v),
                     onRefresh: () {
@@ -1059,7 +969,20 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        _buildBodyForm6(),
+                        BlocBuilder<RegparUploadFotoObjectBloc, RegParUploadFotoObjectState>(
+                          buildWhen: (p, c) => p.items.length != c.items.length,
+                          builder: (context, state) {
+                            if (_showVal6 && state.items.isNotEmpty) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) setState(() => _showVal6 = false);
+                              });
+                            }
+
+                            return Regpar6StoragePickerSectionWidget(
+                              showRequiredError: _showVal6 && state.items.isEmpty,
+                            );
+                          },
+                        ),
                         const SizedBox(height: 15),
                       ],
                     ),
@@ -1511,7 +1434,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     ),
   );
 
-  Future<void>  onHitungPremi() async {
+  Future<void> onHitungPremi() async {
     final okForm1 = validateForm1();
     if (!okForm1) {
       openForm1(recordId: regpar1Id);
@@ -1536,21 +1459,24 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       return;
     }
 
-    final isUploading6 = context.read<RegparUploadFotoObjectBloc>().state is UploadFotoObjectLoading;
-    final ok6 = !isUploading6 &&
-        (_imagesRegpar6.isNotEmpty || _serverPhotosRegpar6.isNotEmpty);
+    final form6State = context.read<RegparUploadFotoObjectBloc>().state;
 
-    setState(() {
-      _form6HasError = !ok6;
-      _form6ErrorText = !ok6 ? 'Bagian ini wajib diisi' : null;
-    });
+    final ok6 = form6State.items.isNotEmpty;
 
     if (!ok6) {
-      if (!ok6) openForm5(recordId: regpar1Id);
+      setState(() => _showVal6 = true);
+      openForm5(recordId: regpar1Id);
       return;
     }
 
-    _onUploadPressedForm6();
+    final localIds6 = form6State.items.map((e) => e.localId).toList();
+
+    context.read<RegparUploadFotoObjectBloc>().add(
+      RegparStorageUploadMany(
+        regpar1Id: regpar1Id!,
+        localIds: localIds6,
+      ),
+    );
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -2318,345 +2244,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   );
 
   //form5
-
-  //form6
-  Widget _buildBodyForm6() {
-    final uploadState = context.watch<RegparUploadFotoObjectBloc>().state;
-
-    final bool hasPreview =
-        uploadState is UploadFotoObjectListPreview && uploadState.images.isNotEmpty;
-    final bool hasServer = _serverPhotosRegpar6.isNotEmpty;
-
-    final bool showIntro = !hasPreview && !hasServer;
-    final bool isUploading = uploadState is UploadFotoObjectLoading;
-
-    final borderColor = _form6HasError ? Colors.red : sGrey;
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: hPadding,
-        right: hPadding,
-        bottom: hPadding,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: hPadding),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: Border.all(color: borderColor, width: _form6HasError ? 1.5 : 1),
-          color: formGrey,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (showIntro) _buildIntroForm6(),
-            if (!showIntro) _buildGalleryForm6(uploadState: uploadState),
-            const SizedBox(height: hPadding),
-
-            _buildPickButtonsForm6(
-              disabled: isUploading,
-              previewCount: _imagesRegpar6.length,
-            ),
-
-            if (_form6HasError && _form6ErrorText != null) ...[
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    _form6ErrorText!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-
-            if (isUploading) ...[
-              const SizedBox(height: 12),
-              const CircularProgressIndicator(),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntroForm6() {
-    return Column(
-      children: [
-        Icon(Icons.upload, size: 40, color: primaryLightColor),
-        const SizedBox(height: 14),
-        Text(
-          "Unggah Foto Object",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: primaryLightColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Pastikan foto jelas, terang, dan tidak buram.",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: cardGrey),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildGalleryForm6({required RegparUploadFotoObjectState uploadState}) {
-    final hasPreview =
-        uploadState is UploadFotoObjectListPreview && uploadState.images.isNotEmpty;
-
-    if (hasPreview) {
-      final images = uploadState.images;
-
-      return SizedBox(
-        height: 200,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: images.length,
-          itemBuilder: (context, index) {
-            return _photoTileForm6(
-              child: Image.memory(images[index], fit: BoxFit.cover),
-              onDelete: () => _deletePreviewForm6(index),
-            );
-          },
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _serverPhotosRegpar6.length,
-        itemBuilder: (context, index) {
-          final item = _serverPhotosRegpar6[index];
-
-          // 🔥 URL sesuai yang bos minta
-          final url =
-              "${AppData.apiDomain}api/regpar/regpar6cari/fotoobject/getfoto/${item.regpar6Id}";
-
-          final isDeleting = _deletingServerIdsRegpar6.contains(item.regpar6Id);
-
-          return _photoTileForm6(
-            child: Image.network(
-              url,
-              headers: {"Authorization": "Bearer ${AppData.userToken}"},
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, progress) =>
-              progress == null ? child : const Center(child: CircularProgressIndicator()),
-              errorBuilder: (context, err, st) =>
-              const Icon(Icons.broken_image, color: Colors.red, size: 48),
-            ),
-            onDelete: isDeleting ? null : () => _deleteServerPhotoForm6(item),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _photoTileForm6({required Widget child, VoidCallback? onDelete}) {
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: child,
-          ),
-        ),
-        if (onDelete != null)
-          Positioned(
-            top: 20,
-            right: 20,
-            child: GestureDetector(
-              onTap: onDelete,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 18),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-  Widget _buildPickButtonsForm6({required bool disabled, required int previewCount}) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Pilih File',
-            icon: SvgPicture.asset(
-              'assets/icons/gallery_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            backgroundColor: sGrey,
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm6
-                : _pickFromGalleryForm6,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AppButton.iconLeft(
-            text: 'Ambil Foto',
-            icon: SvgPicture.asset(
-              'assets/icons/photo_img.svg',
-              width: 18,
-              height: 18,
-              color: Colors.white,
-            ),
-            onPressed: disabled
-                ? null
-                : previewCount >= 10
-                ? _maxReachedForm6
-                : _pickFromCameraForm6,
-          ),
-        ),
-      ],
-    );
-  }
-  void _onUploadPressedForm6() {
-
-    final id = regpar1Id;
-
-    if (id == null || id.isEmpty) {
-      debugPrint("❌ regpar1Id null atau empty, return");
-      return;
-    }
-
-
-    context.read<RegparUploadFotoObjectBloc>().add(
-      UploadFotoObjectBatchSubmit(
-        regpar1Id: id,
-        images: List.from(_imagesRegpar6),
-        names: List.from(_fileNamesRegpar6),
-      ),
-    );
-
-    debugPrint("✅ UploadFotoObjectBatchSubmit event SENT");
-  }
-
-  void _maxReachedForm6() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Maksimal 10 foto."),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _deletePreviewForm6(int index) {
-    _imagesRegpar6.removeAt(index);
-    _fileNamesRegpar6.removeAt(index);
-
-    context.read<RegparUploadFotoObjectBloc>().add(
-      UploadFotoObjectSelectedList(
-        List.from(_imagesRegpar6),
-        List.from(_fileNamesRegpar6),
-      ),
-    );
-  }
-
-  Future<void> _pickFromGalleryForm6() async {
-    if (_imagesRegpar6.length >= 10) {
-      _maxReachedForm6();
-      return;
-    }
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: true,
-    );
-
-    if (result == null) return;
-
-    for (final file in result.files) {
-      if (_imagesRegpar6.length >= 10) break;
-      if (file.bytes == null) continue;
-      _imagesRegpar6.add(file.bytes!);
-      _fileNamesRegpar6.add(file.name);
-    }
-
-    if (_imagesRegpar6.isNotEmpty) {
-      setState(() {
-        _form6HasError = false;
-        _form6ErrorText = null;
-      });
-    }
-
-    context.read<RegparUploadFotoObjectBloc>().add(
-      UploadFotoObjectSelectedList(
-        List.from(_imagesRegpar6),
-        List.from(_fileNamesRegpar6),
-      ),
-    );
-  }
-
-  Future<void> _pickFromCameraForm6() async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kamera tidak tersedia di web")),
-      );
-      return;
-    }
-
-    if (_imagesRegpar6.length >= 10) {
-      _maxReachedForm6();
-      return;
-    }
-
-    final picked = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (picked == null) return;
-
-    final bytes = await picked.readAsBytes();
-    _imagesRegpar6.add(bytes);
-    _fileNamesRegpar6.add(picked.name);
-
-    context.read<RegparUploadFotoObjectBloc>().add(
-      UploadFotoObjectSelectedList(
-        List.from(_imagesRegpar6),
-        List.from(_fileNamesRegpar6),
-      ),
-    );
-  }
-  void _deleteServerPhotoForm6(Regpar6CariModel item) {
-    final id = item.regpar6Id;
-
-    _deletingServerIdsRegpar6.add(id);
-
-    setState(() {
-      _serverPhotosRegpar6.removeWhere((x) => x.regpar6Id == id);
-    });
-
-    context.read<Regpar6FormBloc>().add(
-      Regpar6FormHapusEvent(recordId: id),
-    );
-  }
-
-  //form6
-
-
 
   void _clearIfNonNegativeNumber(String key, String v) {
     final clean = v.replaceAll(",", "").trim();

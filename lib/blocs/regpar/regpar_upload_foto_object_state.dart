@@ -1,42 +1,38 @@
 part of 'regpar_upload_foto_object_bloc.dart';
 
-abstract class RegparUploadFotoObjectState extends Equatable {
-  const RegparUploadFotoObjectState();
+
+class RegParUploadFotoObjectState extends Equatable {
+  final List<Regpar6UploadModel> items;
+  final String? toast;
+  final bool isClearing;
+  final bool uploadAllDone;
+  final bool isUploadingAll;
+
+  const RegParUploadFotoObjectState({
+    this.items = const [],
+    this.toast,
+    this.isClearing = false,
+    this.uploadAllDone = false,
+    this.isUploadingAll = false,
+  });
+
+  RegParUploadFotoObjectState copyWith({
+    List<Regpar6UploadModel>? items,
+    String? toast,
+    bool clearToast = false,
+    bool? isClearing,
+    bool? uploadAllDone,
+    bool? isUploadingAll,
+  }) {
+    return RegParUploadFotoObjectState(
+      items: items ?? this.items,
+      toast: clearToast ? null : (toast ?? this.toast),
+      isClearing: isClearing ?? this.isClearing,
+      uploadAllDone: uploadAllDone ?? false, // auto reset
+      isUploadingAll: isUploadingAll ?? this.isUploadingAll,
+    );
+  }
 
   @override
-  List<Object?> get props => [];
-}
-
-class UploadFotoObjectInitial extends RegparUploadFotoObjectState {}
-
-class UploadFotoObjectPreview extends RegparUploadFotoObjectState {
-  final Uint8List imageBytes;
-  final String fileName;
-  const UploadFotoObjectPreview(this.imageBytes, this.fileName);
-
-  @override
-  List<Object?> get props => [imageBytes, fileName];
-}
-
-class UploadFotoObjectListPreview extends RegparUploadFotoObjectState {
-  final List<Uint8List> images;
-  final List<String> fileNames;
-
-  const UploadFotoObjectListPreview(this.images, this.fileNames);
-
-  @override
-  List<Object?> get props => [images, fileNames];
-}
-
-class UploadFotoObjectLoading extends RegparUploadFotoObjectState {}
-
-class UploadFotoObjectSuccess extends RegparUploadFotoObjectState {}
-
-class UploadFotoObjectFailure extends RegparUploadFotoObjectState {
-  final String error;
-
-  const UploadFotoObjectFailure(this.error);
-
-  @override
-  List<Object?> get props => [error];
+  List<Object?> get props => [items, toast, isClearing, uploadAllDone, isUploadingAll];
 }

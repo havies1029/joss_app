@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
@@ -31,6 +32,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   ComboMJnsclientModel? fieldComboJnsClient;
 
   bool _obscurePassword = true;
+  bool _obscureConfirm = true;
 
   late EmailVerificationBloc emailVerificationBloc;
   late final RegUserModel? record;
@@ -43,6 +45,19 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     fieldEmailController.dispose();
     fieldKonfirmasiPasswordController.dispose();
     super.dispose();
+  }
+
+  String? _validatePasswordRules(String pass) {
+    final p = pass.trim();
+
+    if (p.isEmpty) return kStringNullError;
+    if (p.length < 8) return 'Kata Sandi minimal 8 karakter';
+    if (!RegExp(r'[A-Z]').hasMatch(p)) return 'Tambahkan minimal 1 huruf besar';
+    if (!RegExp(r'\d').hasMatch(p)) return 'Tambahkan minimal 1 angka';
+    if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-\\/\[\]=+]').hasMatch(p)) {
+      return 'Tambahkan minimal 1 simbol';
+    }
+    return null;
   }
 
   bool validateForm1() {
@@ -86,8 +101,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     }
 
     final pass = fieldPasswordController.text;
-    if (pass.trim().isEmpty) {
-      setErr('form1.password', kStringNullError);
+    final passErr = _validatePasswordRules(pass);
+    if (passErr != null) {
+      setErr('form1.password', passErr);
       ok = false;
     }
 
@@ -97,7 +113,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       ok = false;
     } else {
       if (pass.trim().isNotEmpty && pass != konf) {
-        setErr('form1.konfirmasiPassword', "Konfirmasi password tidak sama");
+        setErr('form1.konfirmasiPassword', "Konfirmasi Kata sandi tidak sama");
         ok = false;
       }
     }
@@ -120,8 +136,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   );
 
   Widget _buildPasswordField() => appTextField(
-    label: "Password",
-    hint: "Masukkan password",
+    label: "Kata Sandi",
+    hint: "Masukkan Kata Sandi",
     controller: fieldPasswordController,
     keyboardType: TextInputType.visiblePassword,
     obscureText: _obscurePassword,
@@ -142,23 +158,21 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       },
     ),
     onChanged: (v) {
-      if (v.trim().isNotEmpty) {
-        clearErr('form1.password');
-      }
+      clearErr('form1.password');
     },
   );
 
   Widget _buildKonfirmasiPasswordField() => appTextField(
-    label: "Konfirmasi Password",
-    hint: "Masukkan konfirmasi password",
+    label: "Konfirmasi Kata Sandi",
+    hint: "Masukkan konfirmasi Kata Sandi",
     controller: fieldKonfirmasiPasswordController,
     keyboardType: TextInputType.visiblePassword,
-    obscureText: _obscurePassword,
+    obscureText: _obscureConfirm,
     errorText: err('form1.konfirmasiPassword'),
     validator: (_) => err('form1.konfirmasiPassword'),
     suffixIcon: IconButton(
       icon: Icon(
-        _obscurePassword
+        _obscureConfirm
             ? Icons.visibility_off
             : Icons.visibility,
         color: sGrey,
@@ -166,7 +180,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       ),
       onPressed: () {
         setState(() {
-          _obscurePassword = !_obscurePassword;
+          _obscureConfirm = !_obscureConfirm;
         });
       },
     ),
@@ -178,12 +192,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   );
 
   Widget _buildTeleponField() => appTextField(
-    label: "Nomor Telepon",
+    label: "No. HP",
     hint: "Masukkan nomor telepon",
     controller: fieldTeleponController,
     keyboardType: TextInputType.phone,
     prefix: Text(
-      "62 | ",
+      "+62 | ",
       style: inputTextStyle(context, color: primaryLightColor),
     ),
     errorText: err('form1.telepon'),
@@ -261,7 +275,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Image.asset(
-                          'assets/icons/logo_jps_no_background.png',
+                          'assets/images/logo.png',
                           height: isDesktop(context)
                               ? 56
                               : isTablet(context)
@@ -352,6 +366,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                 _buildPasswordField(),
                                 SizedBox(height: vPadding),
 
+                                _PasswordRequirementRow(controller: fieldPasswordController),
+
+                                SizedBox(height: vPadding),
+
+
                                 _buildKonfirmasiPasswordField(),
                                 SizedBox(height: vPadding),
 
@@ -396,7 +415,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
         ? fieldTeleponController.text.trim()
         : evState.telepon;
 
-    final String teleponNormalized = _normalizePhone62(teleponRaw);
+    final phoneRes = IndoPhoneHelper.normalize(teleponRaw);
+    final String teleponNormalized = phoneRes.phone62 ?? '';
 
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
@@ -417,22 +437,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     );
   }
 
-  String _normalizePhone62(String input) {
-    var t = input.trim();
-
-    t = t.replaceAll(RegExp(r'[\s\-]'), '');
-
-    if (t.startsWith('+62')) t = t.substring(1);
-
-    if (t.startsWith('0')) t = '62${t.substring(1)}';
-
-    if (t.startsWith('62')) return t;
-
-    return '62$t';
-  }
-
-
-
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
 
@@ -448,5 +452,59 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
     });
   }
+}
 
+class _PasswordRequirementRow extends StatelessWidget {
+  final TextEditingController controller;
+  const _PasswordRequirementRow({required this.controller});
+
+  bool _min8(String p) => p.length >= 8;
+  bool _upper(String p) => p.contains(RegExp(r'[A-Z]'));
+  bool _digit(String p) => p.contains(RegExp(r'\d'));
+  bool _symbol(String p) =>
+      p.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-\\/\[\]=+]'));
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle style(bool active) => TextStyle(
+      fontSize: 13.7,
+      color: active ? primaryColor : hintGrey,
+      fontWeight: FontWeight.w500,
+    );
+    Widget item(bool checked, String text) => IntrinsicWidth(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            checked ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+            size: 15,
+            color: checked ? primaryColor : hintGrey,
+          ),
+          const SizedBox(width: 4),
+          Text(text, style: style(checked)),
+        ],
+      ),
+    );
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final p = value.text;
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Wrap(
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 14,
+            runSpacing: 8,
+            children: [
+              item(_min8(p), "Minimal 8 Karakter"),
+              item(_upper(p), "Ada Huruf Besar"),
+              item(_digit(p), "Ada Angka"),
+              item(_symbol(p), "Ada Simbol"),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

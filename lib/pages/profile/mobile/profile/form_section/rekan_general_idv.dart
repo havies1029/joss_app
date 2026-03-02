@@ -132,10 +132,17 @@ class MRekanGeneralIdvCrudFormPageFormState
                                               ? MemoryImage(imageBytes)
                                               : null,
                                           child: (imageBytes == null || imageBytes.isEmpty)
-                                              ? const Icon(
-                                            Icons.person,
-                                            color: Colors.white,
-                                            size: 48,
+                                              ? Container(
+                                            alignment: Alignment.center,
+                                            child: SvgPicture.asset(
+                                              "assets/icons/placeholder_icon.svg",
+                                              width: 40,
+                                              height: 40,
+                                              colorFilter: const ColorFilter.mode(
+                                                Colors.white,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
                                           )
                                               : null,
                                         ),

@@ -81,9 +81,11 @@ const Color secondaryBlackColor = Color(0xFF181818);
 
 const Color cardGrey = Color(0xFF8C8C8C);
 const Color formGrey = Color(0xFF333333);
+const Color dGrey = Color(0xFFA2A2A2);
 const Color pGrey = Color(0xFF292929);
 const Color sGrey = Color(0xFF4E4E4E);
 const Color hintGrey = Color(0xFFBCBCBC);
+const Color aGrey = Color(0xFF383838);
 const Color unselectedColor = Color(0xFF666666);
 const Color scrollBar = Color(0xFFD9D9D9);
 const Color greyKlaim = Color(0xFFA8A8A8);

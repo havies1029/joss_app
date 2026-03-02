@@ -28,8 +28,6 @@ class _HeroPageState extends State<HeroPage> {
   @override
   void initState() {
     super.initState();
-
-    // Panggil API sumdash saat HeroPage dibuka
     context.read<SumdashBloc>().add(SumdashLihatEvent());
   }
 
@@ -171,38 +169,39 @@ class _HeroPageState extends State<HeroPage> {
         ListMenuWidget(userType: userType),
         const SizedBox(height: vPadding - 3),
         const CarouselMenuWidget(),
-        const SizedBox(height: vPadding - 3),
 
-        if (userType == 'C')
-          const TransaksiListWidget()
-        else
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: screenHeight * 0.05,
+        (userType == 'C')
+            ? Column(
+          children: [
+            SizedBox(height: vPadding - 3),
+            const TransaksiListWidget(),
+          ],
+        )
+            : Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: vPadding - 3),
+            Container(
+              padding: const EdgeInsets.all(hPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Berizin dan Diawasi Oleh:',
+                    style: bodyTextStyle(context, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Image.asset(
+                    'assets/images/ojk.png',
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                ],
               ),
-              Container(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Berizin dan Diawasi Oleh:',
-                      style: bodyTextStyle(context, fontSize: 14),
-                    ),
-                    const SizedBox(height: 8),
-                    Image.asset(
-                      'assets/images/ojk.png',
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
+        ),
       ],
     );
   }
