@@ -67,7 +67,7 @@ class KlaimMainPageState extends State<KlaimMainPage>
                       iconPath: "assets/icons/menu_lapor_klaim.svg",
                       title: "Klaim",
                       subtitle:
-                      "Pilih kategori asuransi x untuk keamanan Anda dan keluarga, Yuk!",
+                      "Masukkan klaim Anda sesuai dengan kategori asuransi yang tersedia.",
                     ),
                     SafeArea(
                       child: Container(

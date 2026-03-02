@@ -9,7 +9,7 @@ class KlaimRingkasanStatusWidget extends StatelessWidget {
 
   // ✅ hardcode 3 status (sesuaikan id dengan backend kamu)
   static const _statuses = <Map<String, String>>[
-    {"id": "10", "label": "Berjalanx"},
+    {"id": "10", "label": "Berjalan"},
     {"id": "20", "label": "Selesai"},
     {"id": "30", "label": "Batal"},
   ];
@@ -20,40 +20,45 @@ class KlaimRingkasanStatusWidget extends StatelessWidget {
       (b) => b.state.selectedStatusId,
     );
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: _statuses.map((s) {
-          final id = s["id"]!;
-          final label = s["label"]!;
-          final isSelected = id == selectedId;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: _statuses.map((s) {
+                final id = s["id"]!;
+                final label = s["label"]!;
+                final isSelected = id == selectedId;
 
-          return Row(
-            children: [
-              StatusChip(
-                statusId: id,
-                height: 30,
-                label: label,
-                isSelected: isSelected,
-                onTap: () {
-                  // set selected status
-                  context.read<MstatusringkasCariBloc>().add(
-                        SelectedIdChanged(id),
-                      );
+                return Row(
+                  children: [
+                    StatusChip(
+                      statusId: id,
+                      height: 30,
+                      label: label,
+                      isSelected: isSelected,
+                      onTap: () {
+                        context.read<MstatusringkasCariBloc>().add(
+                          SelectedIdChanged(id),
+                        );
 
-                  // ✅ opsional: langsung refresh data list klaim sesuai status
-                  context.read<KlaimringkasCariBloc>().add(
-                        RefreshKlaimringkasCariEvent(selectedStatusId: id),
-                      );
-                },
-              ),
-              const SizedBox(width: 8),
-            ],
-          );
-        }).toList(),
-      ),
+                        context.read<KlaimringkasCariBloc>().add(
+                          RefreshKlaimringkasCariEvent(selectedStatusId: id),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
     );
   }
 }

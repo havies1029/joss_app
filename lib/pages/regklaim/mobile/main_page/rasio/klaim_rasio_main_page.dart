@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/models/klaimrasio/klaimrasiodetailcari_model.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../../blocs/klaimrasio/klaimrasiocobcari_bloc.dart';
 import '../../../../../common/constants.dart';
@@ -109,10 +110,11 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return Material(
-          color: Colors.transparent,
-          child: Center(
-            child: PopupWidget(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: IntrinsicHeight(
+            child:  PopupWidget(
               title: "Pilih format file untuk diunduh",
               subtitle: "Tersedia Excel dan PDF",
               button1Text: "Excel",
@@ -125,7 +127,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
                 if (allDetails.isEmpty) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar("Tidak ada data yang dipilih"));
+                      infoSnackBar("Tidak ada data untuk diekspor"));
                   return;
                 }
 
@@ -210,17 +212,19 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
     }
   }
 
-  void _onShare(BuildContext context) {
+  Future<void> _onShare(BuildContext context) async {
     final state = klaimrasiocobCariBloc.state;
 
-    if (state.status != ListStatus.success || state.klaimRasio.cobs.isEmpty) {
+    if (state.status != ListStatus.success ||
+        state.klaimRasio.cobs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         infoSnackBar("Tidak ada data untuk dibagikan"),
       );
       return;
     }
 
-    final allDetails = state.klaimRasio.cobs.expand((h) => h.details).toList();
+    final allDetails =
+    state.klaimRasio.cobs.expand((h) => h.details).toList();
 
     if (allDetails.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -229,111 +233,42 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
       return;
     }
 
-    final Map<String, num> totalPremiByCurr = {};
-    final Map<String, num> totalKlaimByCurr = {};
+    final data =
+    allDetails.map((d) => _detailToExportMap(d)).toList();
 
-    for (final d in allDetails) {
-      totalPremiByCurr[d.curr] =
-          (totalPremiByCurr[d.curr] ?? 0) + d.premiAmount;
-      totalKlaimByCurr[d.curr] =
-          (totalKlaimByCurr[d.curr] ?? 0) + d.klaimAmount;
+    try {
+      if (kIsWeb) {
+        await ExportHelper.export(
+          "pdf",
+          data,
+          CategoryType.klaimrasio,
+        );
+        return;
+      }
+
+      final fileName =
+          "KlaimRasio_${DateTime.now().millisecondsSinceEpoch}.pdf";
+
+      final file = await MobileDownloadHelper.generatePdfFile(
+        fileName: fileName,
+        data: data,
+      );
+
+      if (!context.mounted) return;
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: "Laporan Klaim Rasio",
+        text: allDetails.length == 1
+            ? "Berikut terlampir laporan klaim rasio."
+            : "Berikut terlampir ${allDetails.length} data klaim rasio.",
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar("Gagal membagikan file: $e"),
+        );
+      }
     }
-
-    final totalPolis = allDetails.length;
-
-    String fmt(num v) => NumberFormat.decimalPattern().format(v);
-
-    final totalText = totalPremiByCurr.keys.map((curr) {
-      final premi = fmt(totalPremiByCurr[curr]!);
-      final klaim = fmt(totalKlaimByCurr[curr]!);
-      return "• $curr → Premi: $premi | Klaim: $klaim";
-    }).join("\n");
-
-    final detailText = allDetails.take(20).map((d) {
-      final periode =
-          "${d.periodeMulai.toString().substring(0, 10)} → ${d.periodeAkhir.toString().substring(0, 10)}";
-      return "• ${d.polisNo}\n  $periode\n  Premi: ${d.curr} ${fmt(d.premiAmount)} | "
-          "Klaim: ${d.curr} ${fmt(d.klaimAmount)} | "
-          "Rasio: ${fmt(d.rasio)}%";
-    }).join("\n\n");
-
-    final more = allDetails.length > 20
-        ? "\n\n…dan ${allDetails.length - 20} polis lainnya"
-        : "";
-
-    final message = '''
-📊 Laporan Klaim Rasio
-
-Jumlah Polis: $totalPolis
-
-Total:
-$totalText
-
-Detail Polis:
-$detailText$more
-''';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        child: Container(
-          color: secondaryBlackColor,
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER
-              Row(
-                children: [
-                  Icon(Icons.share, color: primaryColor),
-                  const SizedBox(width: 10),
-                  Text(
-                    "Bagikan Laporan Klaim Rasio",
-                    style: bodyTextStyle(context),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              Text(
-                "Total polis terpilih: $totalPolis",
-                style: bodyTextStyle(context, fontSize: 14),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ACTION
-              AppButton.iconLeft(
-                text: "Salin Laporan",
-                icon: const Icon(Icons.copy),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: message));
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    successSnackBar("Laporan berhasil disalin"),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 8),
-
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Batal"),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

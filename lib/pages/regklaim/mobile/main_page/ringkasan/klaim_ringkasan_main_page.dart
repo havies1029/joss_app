@@ -11,6 +11,7 @@ import 'package:joss_app/helper/mobile_expert_helper.dart';
 import 'package:joss_app/widgets/EmptyStateWidget.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'klaim_ringkasan_status_widget.dart';
 import 'klaim_ringkasan_table_widget.dart';
@@ -221,83 +222,45 @@ class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
     }
   }
 
-  void _onShare(BuildContext context) {
+  Future<void> _onShare(BuildContext context) async {
     final rows = _exportRows();
+
     if (rows.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
+          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
       return;
     }
 
-    String fmt(dynamic v) {
-      if (v == null) return "-";
-      if (v is num) return NumberFormat.decimalPattern().format(v);
-      return v.toString();
+    try {
+      if (kIsWeb) {
+        await ExportHelper.export(
+          "pdf",
+          rows,
+          CategoryType.ringkasan,
+        );
+        return;
+      }
+
+      final fileName =
+          "Ringkasan_Klaim_${DateTime.now().millisecondsSinceEpoch}.pdf";
+
+      final file = await MobileDownloadHelper.generatePdfFile(
+        fileName: fileName,
+        data: rows,
+      );
+
+      if (!context.mounted) return;
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: 'Ringkasan Klaim',
+        text: 'Berikut terlampir ringkasan klaim.',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(errorSnackBar("Gagal membagikan file: $e"));
+      }
     }
-
-    final detailText = rows.map((m) {
-      final parts =
-      m.entries.map((e) => "${e.key}: ${fmt(e.value)}").join(" | ");
-      return "• $parts";
-    }).join("\n");
-
-    final message = '''
-📄 Ringkasan Klaim
-
-Jumlah Data: ${rows.length}
-
-Detail:
-$detailText
-''';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.share, color: primaryColor),
-                  const SizedBox(width: 10),
-                  Text("Bagikan Ringkasan Klaim",
-                      style: bodyTextStyle(context)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text("Total data terpilih: ${rows.length}",
-                  style: bodyTextStyle(context, fontSize: 14)),
-              const SizedBox(height: 20),
-              AppButton.iconLeft(
-                text: "Salin Rincian",
-                icon: const Icon(Icons.copy),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: message));
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    successSnackBar("Rincian berhasil disalin"),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Batal"),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

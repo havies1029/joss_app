@@ -10,9 +10,11 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
+import 'package:joss_app/widgets/EmptyStateWidget.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'klaim_rincian_status_widget.dart';
 import 'klaim_rincian_table_widget.dart';
@@ -146,10 +148,10 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     );
   }
 
-  // ==============================
-  // CONTENT
-  // ==============================
   Widget _buildContent(BuildContext context) {
+    final statusId = context.select<MstatusrinciCariBloc, String>(
+          (b) => b.state.selectedStatusId,
+    );
     return Expanded(
       child: BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
         buildWhen: (previous, current) => current.status != previous.status,
@@ -168,29 +170,39 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
             );
           }
 
+          if (state.items.isEmpty) {
+            return EmptyStateWidget(statusId: statusId);
+          }
+
           return const KlaimRincianTableWidget();
         },
       ),
     );
   }
 
-  // ==============================
-  // EXPORT & SHARE (dari kode gagal, fungsi tetap sama)
-  // ==============================
-  List<KlaimdetailCariModel> _getSelectedDetails() {
+  List<KlaimdetailCariModel> _getExportDetails() {
     final state = groupcobCariBloc.state;
+
     if (state.status != ListStatus.success) return [];
-    return state.items
-        .expand((cob) => cob.details)
-        .where((d) => state.selectedIds.contains(d.klaim1Id))
-        .toList();
+
+    final allDetails =
+    state.items.expand((cob) => cob.details).toList();
+
+    if (state.selectedIds.isNotEmpty) {
+      return allDetails
+          .where((d) => state.selectedIds.contains(d.klaim1Id))
+          .toList();
+    }
+
+    return allDetails;
   }
 
   void _showExportDialog(BuildContext context) {
-    final selected = _getSelectedDetails();
-    if (selected.isEmpty) {
+    final details = _getExportDetails();
+
+    if (details.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Pilih data klaim terlebih dahulu"));
+          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
       return;
     }
 
@@ -202,28 +214,23 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Dialog(
-          backgroundColor: Colors.transparent,
-          child: PopupWidget(
-            title: "Pilih format file untuk diunduh",
-            subtitle: "Tersedia Excel dan PDF",
-            button1Text: "Excel",
-            button2Text: "PDF",
-            onExportSelected: (format) async {
-              Navigator.pop(context);
-              final data = selected.map(_detailToExportMap).toList();
-              await _exportData(context, format, data);
-            },
-          ),
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+            child: IntrinsicHeight(
+              child: PopupWidget(
+                title: "Pilih format file untuk diunduh",
+                subtitle: "Tersedia Excel dan PDF",
+                button1Text: "Excel",
+                button2Text: "PDF",
+                onExportSelected: (format) async {
+                  Navigator.pop(context);
+                  final data = details.map(_detailToExportMap).toList();
+                  await _exportData(context, format, data);
+                },
+              ),
+            )
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child) =>
-          FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(
-              scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-              child: child,
-            ),
-          ),
     );
   }
 
@@ -275,72 +282,49 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     }
   }
 
-  void _onShare(BuildContext context) {
-    final selected = _getSelectedDetails();
-    if (selected.isEmpty) {
+  Future<void> _onShare(BuildContext context) async {
+    final details = _getExportDetails();
+
+    if (details.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Pilih data klaim terlebih dahulu"));
+          .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
       return;
     }
 
-    String fmt(num v) => NumberFormat.decimalPattern().format(v);
+    final data = details.map(_detailToExportMap).toList();
 
-    final message = selected.take(20).map((d) {
-      return '''
-• ${d.noPolis}
-  Klaim: ${d.klaim1Id}
-  Tgl: ${DateFormat('yyyy-MM-dd').format(d.tglKejadian)}
-  Nilai: ${d.curr} ${fmt(d.klaimAmount)}
-  Status: ${d.statusDesc}
-''';
-    }).join("\n");
+    try {
+      if (kIsWeb) {
+        await ExportHelper.export(
+          "pdf",
+          data,
+          CategoryType.klaimrincian,
+        );
+        return;
+      }
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.share, color: primaryColor),
-                  const SizedBox(width: 10),
-                  Text("Bagikan Klaim Terpilih", style: bodyTextStyle(context)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text("Total klaim terpilih: ${selected.length}",
-                  style: bodyTextStyle(context, fontSize: 14)),
-              const SizedBox(height: 20),
-              AppButton.iconLeft(
-                text: "Salin Rincian",
-                icon: const Icon(Icons.copy),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: message));
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      successSnackBar("Rincian berhasil disalin"));
-                },
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Batal"),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+      final fileName =
+          "KlaimRincian_${DateTime.now().millisecondsSinceEpoch}.pdf";
+
+      final file = await MobileDownloadHelper.generatePdfFile(
+        fileName: fileName,
+        data: data,
+      );
+
+      if (!context.mounted) return;
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: "Rincian Klaim",
+        text: details.length == 1
+            ? "Berikut terlampir rincian klaim."
+            : "Berikut terlampir ${details.length} rincian klaim terpilih.",
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(errorSnackBar("Gagal membagikan file: $e"));
+      }
+    }
   }
 }

@@ -35,33 +35,33 @@ class _KlaimRincianStatusWidgetState extends State<KlaimRincianStatusWidget> {
       },
       listener: (context, state) {},
       builder: (context, state) {
-        
+
         if (state.status == ListStatus.success) {
           return state.items.isNotEmpty
-              ? SizedBox(
-            height: 44,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.zero,
-              itemCount: state.items.length,
-              itemBuilder: (_, index) {
-                final item = state.items[index];
+              ? SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: state.items.map((item) {
                 final id = item.mgroupstatusclaimId;
                 final isSelected = (id == state.selectedStatusId);
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 5, vertical: 3),
-                  child: StatusChip(
-                    statusId: id,
-                    label: item.groupNama,
-                    isSelected: isSelected,
-                    onTap: () {
-                      mstatusrinciCariBloc.add(SelectedIdChanged(id));
-                    },
-                  ),
+                return Row(
+                  children: [
+                    StatusChip(
+                      statusId: id,
+                      height: 30,
+                      label: item.groupNama,
+                      isSelected: isSelected,
+                      onTap: () {
+                        context.read<MstatusrinciCariBloc>()
+                            .add(SelectedIdChanged(id));
+                      },
+                    ), SizedBox(width: 8)
+                  ],
                 );
-              },
+              }).toList(),
             ),
           )
               : const SizedBox.shrink();
