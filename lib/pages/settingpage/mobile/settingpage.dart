@@ -39,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return CircleAvatar(
       radius: 23,
-      backgroundColor: formGrey,
+      backgroundColor: Colors.transparent,
       child: ClipOval(
         child: hasPhoto
             ? Image.memory(
@@ -58,20 +58,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _placeholderAvatar() {
     return Container(
-      color: formGrey,
       alignment: Alignment.center,
       child: SvgPicture.asset(
         "assets/icons/placeholder_icon.svg",
         width: 26,
         height: 26,
-        colorFilter: const ColorFilter.mode(
-          primaryLightColor,
-          BlendMode.srcIn,
-        ),
+
       ),
     );
   }
-
 
   String _initialsFromName(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -178,6 +173,136 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+
+  Future<bool?> showLogoutConfirmDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Keluar Sekarang?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Kamu bisa login lagi kapan pun kok.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(dialogContext, false),
+                            child: Text(
+                              "Batal",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(dialogContext, true),
+                            child: Text(
+                              "Iya, Keluar",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> handleLogout(BuildContext context) async {
+    final shouldLogout = await showLogoutConfirmDialog(context);
+    if (!context.mounted) return;
+
+    if (shouldLogout == true) {
+      context.read<AuthenticationBloc>().add(LoggedOut());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
@@ -274,14 +399,11 @@ class _SettingsPageState extends State<SettingsPage> {
                               ? (authState.user.email?.trim() ?? 'Guest User')
                               : 'Guest User';
 
-                          debugPrint(
-                              "⚙️ [ProfileCard] userType kosong/tidak dikenal → pakai auth email: $fallbackEmail");
-
                           return _buildProfileCard(
                             context: context,
                             nama: fallbackEmail,
                             foto: null,
-                            subtitle: "Nasabah Biasa",
+                            subtitle: "Nasabah",
                           );
                         }
 
@@ -300,9 +422,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, authState) {
                         final userType =
-                            authState is AuthenticationAuthenticated
-                                ? authState.user.userType
-                                : '';
+                        authState is AuthenticationAuthenticated
+                            ? authState.user.userType
+                            : '';
 
                         if (userType == 'C') {
                           return Column(
@@ -332,7 +454,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 children: [
                                   _buildMenuItem(
                                     svgAsset:
-                                        'assets/icons/informasi_klien.svg',
+                                    'assets/icons/informasi_klien.svg',
                                     title: 'Informasi Klien',
                                     onTap: () async {
                                       if (mjnsclientId == '10') {
@@ -368,7 +490,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         MaterialPageRoute(
                                           builder:
                                               (_) =>
-                                                  const MRekanContactCrudFormPage(),
+                                          const MRekanContactCrudFormPage(),
                                         ),
                                       );
                                     },
@@ -383,10 +505,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                         MaterialPageRoute(
                                           builder:
                                               (_) =>
-                                                  const MRekanBankCrudFormPage(
-                                                    viewMode: 'tambah',
-                                                    recordId: '',
-                                                  ),
+                                          const MRekanBankCrudFormPage(
+                                            viewMode: 'tambah',
+                                            recordId: '',
+                                          ),
                                         ),
                                       );
                                     },
@@ -466,17 +588,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           svgAsset: 'assets/icons/bantuan.svg',
                           title: 'Bantuan',
                           onTap: () async {
-                            DraggableChatButton(
-                              onTap: () {
-                                if (ChatInitService.I.isInitialized) {
-                                  Navigator.pushNamed(context, 'chat');
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Chat belum siap, coba lagi')),
-                                  );
-                                }
-                              },
-                            );
+                            Navigator.pushNamed(context, 'chat');
                           },
                         ),
                       ],
@@ -494,13 +606,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           titleColor: pDarkRed,
                           showForwardsvgAsset: false,
                           svgAssetColor: pRed,
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder:
-                                  (context) => const LogoutConfirmationPopup(),
-                            );
+                          onTap: () async {
+                            await handleLogout(context);
                           },
                         ),
                       ],
@@ -562,9 +669,9 @@ class _SettingsPageState extends State<SettingsPage> {
               width: 20,
               height: 20,
               colorFilter:
-                  svgAssetColor != null
-                      ? ColorFilter.mode(svgAssetColor, BlendMode.srcIn)
-                      : null,
+              svgAssetColor != null
+                  ? ColorFilter.mode(svgAssetColor, BlendMode.srcIn)
+                  : null,
             ),
             const SizedBox(width: 10),
             Expanded(

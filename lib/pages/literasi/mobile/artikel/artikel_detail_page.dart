@@ -19,19 +19,29 @@ class ArtikelDetailPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        leading: Material(
-          color: pGrey,
-          borderRadius: BorderRadius.circular(6.67),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(6.67),
-            onTap: () => Navigator.pop(context),
-            child: SizedBox(
-              width: 40,
-              height: 40,
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/arrow_back.svg',
-                  colorFilter: ColorFilter.mode(primaryColor, BlendMode.srcIn),
+        titleSpacing: 0,
+        title: Padding(
+          padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5,vertical: vPadding),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Material(
+              color: pGrey,
+              borderRadius: BorderRadius.circular(6.67),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(6.67),
+                onTap: () => Navigator.pop(context),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/arrow_back.svg',
+                      colorFilter: ColorFilter.mode(
+                        primaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -39,7 +49,7 @@ class ArtikelDetailPage extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5), // 👈 ini aja
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -47,7 +57,7 @@ class ArtikelDetailPage extends StatelessWidget {
               selectedArticle.judulArtikel ?? '-',
               style: bodyTextStyle(context, fontSize: 22),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: vPadding),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -78,7 +88,7 @@ class ArtikelDetailPage extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: vPadding),
 
             if (selectedArticle.gambarArtikel != null &&
                 selectedArticle.gambarArtikel!.isNotEmpty)
@@ -91,6 +101,7 @@ class ArtikelDetailPage extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
+
             if (selectedArticle.gambarArtikel != null &&
                 selectedArticle.gambarArtikel!.isNotEmpty)
               const SizedBox(height: 18),
@@ -99,24 +110,23 @@ class ArtikelDetailPage extends StatelessWidget {
               builder: (context, contentState) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      contentState.items.map<Widget>((section) {
-                        if ((section.paragraf ?? '').trim().isEmpty) {
-                          return const SizedBox.shrink();
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(
-                            section.paragraf ?? '',
-                            style: bodyTextStyle(context),
-                            textAlign: TextAlign.justify,
-                          ),
-                        );
-                      }).toList(),
+                  children: contentState.items.map<Widget>((section) {
+                    if ((section.paragraf ?? '').trim().isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        section.paragraf ?? '',
+                        style: bodyTextStyle(context),
+                        textAlign: TextAlign.justify,
+                      ),
+                    );
+                  }).toList(),
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: vPadding),
           ],
         ),
       ),

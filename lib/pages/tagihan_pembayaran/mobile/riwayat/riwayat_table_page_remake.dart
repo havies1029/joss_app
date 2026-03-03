@@ -6,6 +6,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/payment/historybayarcari_model.dart';
 
 import '../../../../blocs/payment/historybayar2cari_bloc.dart';
+import '../../../../common/loading_indicator.dart';
 import 'detail_riwayat/riwayat_detail_table_page_remake.dart';
 
 class RiwayatTablePageRemake extends StatefulWidget {
@@ -47,7 +48,6 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
 
     if (state.hasReachedMax) return;
 
-    // kalau bloc masih loading, jangan trigger, dan buka lock lagi
     if (state.isLoading) {
       _fetchLock = false;
       return;
@@ -89,9 +89,6 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
     _openDetail(item.inv1Id);
   }
 
-  // =========================
-  // STYLE: SAMA PERSIS DENGAN VERSI FULL TABLE KAMU
-  // =========================
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: formGrey,
@@ -198,9 +195,6 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
     );
   }
 
-  // =========================
-  // TABLE BUILDERS: COMPACT & NORMAL (SAMA STRUKTUR VERSI FULL TABLE)
-  // =========================
   Widget _buildTableCompact(List<HistorybayarCariModel> items) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -283,9 +277,6 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
     );
   }
 
-  // =========================
-  // BUILD
-  // =========================
   @override
   Widget build(BuildContext context) {
     final bool isNarrow = MediaQuery.of(context).size.width < 900;
@@ -298,7 +289,7 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
           p.isLoading != c.isLoading,
       builder: (context, state) {
         if (state.status != ListStatus.success) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: LoadingIndicator());
         }
 
         if (state.items.isEmpty) {
@@ -317,7 +308,7 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
               if (state.isLoading)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16),
-                  child: CircularProgressIndicator(),
+                  child: LoadingIndicator(),
                 ),
             ],
           ),

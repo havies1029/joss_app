@@ -39,7 +39,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
   ComboRKodeposModel? fieldComboRKodepos;
   final comboRKodeposKey = GlobalKey<DropdownSearchState<ComboRKodeposModel>>();
 
-  final bool _isFirstLoad = true;
+  late bool _isFirstLoad = true;
 
   @override
   void initState() {
@@ -80,12 +80,17 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                     listenWhen: (prev, curr) =>
                     curr.isLoaded == true || curr.isSaved == true,
                     listener: (context, state) {
-                      if (state.isLoaded && state.record != null) {
-                      // if (state.isLoaded && state.record != null && _isFirstLoad) {
+                      if (state.isLoaded && state.record != null && _isFirstLoad) {
                         final contact = state.record!;
 
-                        // _isFirstLoad = false;
-                        _injectPayload(contact);
+                        // =========================
+                        // 1) TEXTFIELD: isi hanya kalau kosong
+                        // =========================
+
+                        if (fieldAlamat1Controller.text.trim().isEmpty) {
+                          final alamat = (contact.alamat1).trim();
+                          if (alamat.isNotEmpty) fieldAlamat1Controller.text = alamat;
+                        }
 
                         final contactEmail = contact.email.trim();
                         final contactTelp  = contact.telp.trim();
@@ -94,9 +99,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                         final rekanEmail = (rekan?.email ?? '').trim();
                         final rekanTelp  = (rekan?.telepon ?? '').trim();
 
-
-                        if (fieldEmailController.text.isEmpty) {
-
+                        if (fieldEmailController.text.trim().isEmpty) {
                           if (contactEmail.isNotEmpty) {
                             fieldEmailController.text = contactEmail;
                           } else if (rekanEmail.isNotEmpty) {
@@ -104,14 +107,31 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                           }
                         }
 
-                        if (fieldTelpController.text.isEmpty) {
-
+                        if (fieldTelpController.text.trim().isEmpty) {
                           if (contactTelp.isNotEmpty) {
                             fieldTelpController.text = contactTelp;
                           } else if (rekanTelp.isNotEmpty) {
                             fieldTelpController.text = rekanTelp;
                           }
                         }
+
+                        // =========================
+                        // 2) DROPDOWN: isi hanya kalau belum dipilih user
+                        // =========================
+
+                        if (fieldComboMPropinsi == null) {
+                          fieldComboMPropinsi = contact.comboMPropinsi;
+                        }
+
+                        if (fieldComboMKota == null) {
+                          fieldComboMKota = contact.comboMKota;
+                        }
+
+                        if (fieldComboRKodepos == null) {
+                          fieldComboRKodepos = contact.comboRKodepos;
+                        }
+
+                        _isFirstLoad = false;
                       }
 
                       if (state.isSaved && !state.hasFailure) {
@@ -180,7 +200,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
           ),
 
           const SizedBox(height: vPadding),
-          AppButton.primary(text: "Submit", onPressed: onSaveForm),
+          AppButton.primary(text: " Simpan Perubahan", onPressed: onSaveForm),
         ],
       ),
     );

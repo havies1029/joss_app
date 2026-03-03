@@ -66,7 +66,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               );
               onViewPaymentMethods(state.curr, state.totalBayar);
             } else if (state.paymentStatus == "30") {
-            
+
               ScaffoldMessenger.of(context).showSnackBar(
                 infoSnackBar('Silakan lakukan pembayaran.'),
               );
@@ -79,7 +79,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 ),
               );
-              
+
             } else if (state.paymentStatus == "40") {
               ScaffoldMessenger.of(context).showSnackBar(
                 successSnackBar('Proses pembayaran berhasil.'),
@@ -114,17 +114,12 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ListPageFilterBarUIWidget(
-              //   searchController: _searchController,
-              //   searchButton: buildSearchButton(),
-              // ),
               ListPageFilterBarUIWidget(
                 searchController: _searchController,
                 onSearch: (value) {
                   refreshData();
-                },
-              ),
-            const SizedBox(height: 10),
+                },              ),
+              const SizedBox(height: 10),
 
               // ✅ Filter bar di parent
               _buildFilterBarParent(),
@@ -192,7 +187,6 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
         return STATUS_SELESAI;
     }
   }
-
   Widget _buildFilterBarParent() {
     void apply(RiwayatFilter f) {
       if (_filter == f) return;

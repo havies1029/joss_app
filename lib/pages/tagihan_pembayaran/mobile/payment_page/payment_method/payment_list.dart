@@ -8,7 +8,9 @@ import 'package:joss_app/common/constants.dart';
 
 class PaymentList extends StatelessWidget {
   final String categoryName;
+
   final List items;
+
   final bool isExpanded;
   final VoidCallback onTapHeader;
   final String iconPath;
@@ -25,7 +27,13 @@ class PaymentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedId =
-        context.select((PaymentMethodCariBloc b) => b.state.selectedMethodId);
+    context.select((PaymentMethodCariBloc b) => b.state.selectedMethodId);
+
+    final sortedItems = [...items]..sort((a, b) {
+      final sa = (a.sortOrder ?? 0) as int;
+      final sb = (b.sortOrder ?? 0) as int;
+      return sa.compareTo(sb);
+    });
 
     return Column(
       children: [
@@ -61,7 +69,7 @@ class PaymentList extends StatelessWidget {
         if (isExpanded) ...[
           Divider(height: 1, thickness: 1, color: sGrey),
           Column(
-            children: items.map<Widget>((item) {
+            children: sortedItems.map<Widget>((item) {
               final bool isSelected = item.methodId == selectedId;
 
               return InkWell(
@@ -79,36 +87,33 @@ class PaymentList extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          // BANK LOGO
                           buildBankLogo(
                             item.iconId,
                             item.iconUrl,
                             size: 36,
                           ),
-
                           const SizedBox(width: 12),
-
-                          // TITLE
                           Expanded(
                             child: Text(
                               item.title,
                               style: bodyTextStyle(context),
                             ),
                           ),
-
-                          // CHECK ICON
                           if (isSelected)
                             SvgPicture.asset(
                               'assets/icons/checklist2.svg',
                               width: 18,
                               height: 18,
-                              color: primaryColor,
+                              colorFilter: const ColorFilter.mode(
+                                primaryColor,
+                                BlendMode.srcIn,
+                              ),
                             ),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Divider(height: 1, thickness: 1, color: sGrey),
                     ),
                   ],

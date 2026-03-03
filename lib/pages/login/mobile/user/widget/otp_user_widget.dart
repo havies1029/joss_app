@@ -1,15 +1,19 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:math' as math; // buat sin shake
+import 'package:pinput/pinput.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/login/forgot_password_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../helper/indo_phone_result.dart';
 import '../../../../../models/login/emailverification_model.dart';
+import '../../../../../models/login/forgot_password_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
 class PopupUserWidget extends StatefulWidget {
@@ -37,9 +41,10 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  // 📌 OTP
-  final List<TextEditingController> _otpControllers = [];
-  final List<FocusNode> _focusNodes = [];
+  // 📌 OTP (Pinput)
+  final TextEditingController _pinController = TextEditingController();
+  final FocusNode _pinFocusNode = FocusNode();
+  bool _otpError = false;
 
   // ⏱ Timer
   Timer? _timer;
@@ -50,21 +55,12 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   void initState() {
     super.initState();
 
-    for (int i = 0; i < 6; i++) {
-      _otpControllers.add(TextEditingController());
-      _focusNodes.add(FocusNode());
-    }
-
-    // biar border fokus ke-refresh halus tanpa setState jittery
-    for (final n in _focusNodes) {
-      n.addListener(() {
-        if (mounted) setState(() {});
-      });
-    }
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _focusNodes[0].requestFocus();
+      _pinFocusNode.requestFocus();
+    });
+
+    _pinFocusNode.addListener(() {
+      if (mounted) setState(() {});
     });
 
     _slideController = AnimationController(
@@ -108,58 +104,49 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     _startTimer();
   }
 
-  // ===== Helper label/value (tanpa sentuh bloc) =====
-  bool _looksLikeEmail(String input) => input.contains('@');
+  bool _isEmail(String input) => EmailValidator.validate(input);
 
-  bool _looksLikePhone(String input) {
-    final digits = input.replaceAll(RegExp(r'\D'), '');
-    return digits.length >= 9; // cukup aman buat hp lokal
+  bool _isPhone(String input) => IndoPhoneHelper.normalize(input).isValid;
+
+  String _buildRequestFrom(String input) {
+    if (_isEmail(input)) return "email";
+    if (_isPhone(input)) return "hp";
+    return "unknown";
+  }
+
+  String _formatPhoneVisual(String phone62) {
+    if (!phone62.startsWith('62')) return phone62;
+    return '+62 ${phone62.substring(2)}';
   }
 
   String _buildOtpLabel(String input) {
-    if (_looksLikeEmail(input)) return 'email';
-    if (_looksLikePhone(input)) return 'No. HP';
+    if (_isEmail(input)) return 'email';
+    if (_isPhone(input)) return 'No. HP';
     return 'hp/email';
   }
 
   String _buildOtpValue(String input) {
-    if (_looksLikePhone(input)) {
-      final digits = input.replaceAll(RegExp(r'\D'), '');
-      // kalau sudah 62xxxxx, tampilkan +62 xxxxx
-      if (digits.startsWith('62')) return '+62 ${digits.substring(2)}';
-      // kalau 0xxxx -> tampilkan apa adanya
-      return input;
-    }
-    return input;
-  }
+    if (_isEmail(input)) return input;
 
-  void _resetOtpAndFocusFirst() {
-    for (final c in _otpControllers) {
-      c.clear();
+    final phoneRes = IndoPhoneHelper.normalize(input);
+    if (phoneRes.isValid) {
+      return _formatPhoneVisual(phoneRes.phone62!);
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      FocusScope.of(context).requestFocus(_focusNodes[0]);
-    });
-    setState(() {});
+
+    return input;
   }
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 100));
-    if (!mounted) return;
     _fadeController.forward();
     await Future.delayed(const Duration(milliseconds: 200));
-    if (!mounted) return;
     _slideController.forward();
     await Future.delayed(const Duration(milliseconds: 300));
-    if (!mounted) return;
     _scaleController.forward();
   }
 
   void _startTimer() {
-    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) return;
       if (_remainingTime > 0) {
         setState(() => _remainingTime--);
       } else {
@@ -194,49 +181,13 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
         record: EmailVerificationModel(
           email: widget.email,
           requestId: emailVerificationRecord?.requestId ?? '',
-          requestFrom: "email",
+          requestFrom: _buildRequestFrom(widget.email),
         ),
       ),
     );
   }
 
-  void _onOtpChanged(String value, int index) {
-    // PASTE handling: user paste 123456
-    if (value.length > 1) {
-      final chars = value.replaceAll(RegExp(r'\D'), '').split('');
-      for (int i = 0; i < 6; i++) {
-        _otpControllers[i].text = i < chars.length ? chars[i] : '';
-      }
-      final last = math.min(chars.length, 6) - 1;
-      if (last >= 0) {
-        _focusNodes[last].requestFocus();
-      } else {
-        _focusNodes[0].requestFocus();
-      }
-
-      // auto verify kalau penuh
-      if (_otpControllers.every((c) => c.text.isNotEmpty)) _verifyOtp();
-      setState(() {}); // paste only
-      return;
-    }
-
-    // Normal typing
-    if (value.isNotEmpty) {
-      if (index < 5) {
-        _focusNodes[index + 1].requestFocus();
-      } else {
-        FocusScope.of(context).unfocus();
-      }
-    }
-
-    if (_otpControllers.every((c) => c.text.isNotEmpty)) {
-      _verifyOtp();
-    }
-  }
-
-  void _verifyOtp() {
-    final otp = _otpControllers.map((c) => c.text).join();
-
+  void _verifyOtpFromPin(String otp) {
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -247,7 +198,6 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
       return;
     }
 
-    // bloc tetap sama: jangan diubah
     context.read<EmailVerificationBloc>().add(
       ValidasiPinEmailEvent(
         record: EmailVerificationModel(email: widget.email, pin: otp),
@@ -262,8 +212,8 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   }
 
   String _formatTime(int seconds) {
-    final m = seconds ~/ 60;
-    final s = seconds % 60;
+    int m = seconds ~/ 60;
+    int s = seconds % 60;
     return '$m:${s.toString().padLeft(2, '0')}';
   }
 
@@ -275,29 +225,59 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     _shakeController.dispose();
     _timer?.cancel();
 
-    for (final c in _otpControllers) {
-      c.dispose();
-    }
-    for (final n in _focusNodes) {
-      n.dispose();
-    }
+    _pinController.dispose();
+    _pinFocusNode.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // === PIN THEMES (DESAIN TETAP) ===
+    final basePinTheme = PinTheme(
+      width: 48,
+      height: 48,
+      textStyle: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+      decoration: BoxDecoration(
+        color: pGrey,
+        borderRadius: BorderRadius.circular(checkboxBorderRadius),
+        border: Border.all(
+          color: _pinFocusNode.hasFocus ? primaryColor : sGrey,
+          width: 2,
+        ),
+      ),
+    );
+
+    final focusedPinTheme = basePinTheme.copyDecorationWith(
+      border: Border.all(color: primaryColor, width: 2),
+    );
+
+    final errorPinTheme = basePinTheme.copyDecorationWith(
+      border: Border.all(color: pRed, width: 2),
+    );
+
     return BlocListener<EmailVerificationBloc, EmailVerificationState>(
       listener: (context, state) {
         if (state.verificationFailed) {
           _shakeOtpFields();
+
+          setState(() => _otpError = true);
+
+          _pinController.clear();
+          _pinFocusNode.requestFocus();
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Kode OTP salah, silakan coba lagi'),
               backgroundColor: Colors.red,
             ),
           );
-          _resetOtpAndFocusFirst();
         }
       },
       child: Scaffold(
@@ -323,11 +303,10 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                   padding: const EdgeInsets.only(left: 4),
                                   child: TextButton.icon(
                                     onPressed: () {
-                                      for (final c in _otpControllers) {
-                                        c.clear();
-                                      }
+                                      _pinController.clear();
                                       _timer?.cancel();
-                                      Navigator.of(context, rootNavigator: false)
+                                      Navigator.of(context,
+                                          rootNavigator: false)
                                           .pop();
                                       context
                                           .read<AuthenticationBloc>()
@@ -346,8 +325,8 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                     ),
                                     label: Text(
                                       "Kembali",
-                                      style: bodyTextStyle(context)
-                                          .copyWith(color: primaryLightColor),
+                                      style: bodyTextStyle(context).copyWith(
+                                          color: primaryLightColor),
                                     ),
                                   ),
                                 ),
@@ -367,50 +346,54 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                   horizontal: hPadding * 1.5,
                                 ),
                                 margin: const EdgeInsets.all(1),
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: secondaryBlackColor,
-                                  borderRadius: const BorderRadius.only(
+                                  borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(20),
                                     topRight: Radius.circular(20),
                                   ),
                                 ),
                                 child: Column(
                                   children: [
-                                    SvgPicture.asset("assets/icons/otp_icon.svg"),
+                                    SvgPicture.asset(
+                                      "assets/icons/otp_icon.svg",
+                                    ),
                                     const SizedBox(height: 24),
                                     Text(
                                       'Verifikasi OTP',
-                                      style: headingStyle(context, fontSize: 25),
+                                      style: headingStyle(context,
+                                          fontSize: 25),
                                     ),
                                     const SizedBox(height: 6),
-
                                     Column(
                                       children: [
                                         Text(
                                           "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(widget.email)}",
-                                          style: bodyTextStyle(context, fontSize: 20),
+                                          style: bodyTextStyle(context,
+                                              fontSize: 20),
                                           textAlign: TextAlign.center,
                                         ),
                                         Text(
                                           _buildOtpValue(widget.email),
-                                          style: bodyTextStyle(context, fontSize: 20)
+                                          style: bodyTextStyle(context,
+                                              fontSize: 20)
                                               .copyWith(color: primaryColor),
                                           textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
-
                                     const SizedBox(height: 16),
-
                                     AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 300),
+                                      duration:
+                                      const Duration(milliseconds: 300),
                                       child: _isResendAvailable
                                           ? GestureDetector(
                                         onTap: _resendOtp,
                                         child: Text(
                                           'Kirim ulang kode',
                                           style: bodyTextStyle(context)
-                                              .copyWith(color: primaryColor),
+                                              .copyWith(
+                                              color: primaryColor),
                                         ),
                                       )
                                           : Text(
@@ -419,34 +402,77 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                             .copyWith(color: pRed),
                                       ),
                                     ),
-
                                     const SizedBox(height: 16),
 
-                                    TextSelectionTheme(
-                                      data: TextSelectionThemeData(
-                                        cursorColor: primaryColor,
-                                        selectionColor:
-                                        primaryColor.withOpacity(0.25),
-                                        selectionHandleColor: primaryColor,
-                                      ),
-                                      child: AnimatedBuilder(
-                                        animation: _shakeAnimation,
-                                        builder: (_, child) {
-                                          return Transform.translate(
-                                            offset: Offset(
-                                              math.sin(_shakeAnimation.value) * 8,
-                                              0,
+                                    // 🔢 OTP Field (Pinput) + Shake (tetap)
+                                    AnimatedBuilder(
+                                      animation: _shakeAnimation,
+                                      builder: (_, child) {
+                                        return Transform.translate(
+                                          offset: Offset(
+                                            math.sin(_shakeAnimation.value) *
+                                                8,
+                                            0,
+                                          ),
+                                          child: child,
+                                        );
+                                      },
+                                      child: TextSelectionTheme(
+                                        data: TextSelectionThemeData(
+                                          cursorColor: primaryColor,
+                                          selectionColor: primaryColor
+                                              .withOpacity(0.25),
+                                          selectionHandleColor: primaryColor,
+                                        ),
+                                        child: Pinput(
+                                          length: 6,
+                                          controller: _pinController,
+                                          focusNode: _pinFocusNode,
+
+                                          keyboardType:
+                                          TextInputType.number,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly
+                                          ],
+                                          autofillHints: const <String>[],
+
+                                          defaultPinTheme: basePinTheme,
+                                          focusedPinTheme: focusedPinTheme,
+                                          errorPinTheme: errorPinTheme,
+                                          forceErrorState: _otpError,
+
+                                          showCursor: true,
+                                          cursor: Align(
+                                            alignment: Alignment.center,
+                                            child: Container(
+                                              width: 2,
+                                              height: 24,
+                                              color: primaryColor,
                                             ),
-                                            child: child,
-                                          );
-                                        },
-                                        child: Row(
+                                          ),
+
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
-                                          children: List.generate(
-                                            6,
-                                                (i) => _buildOtpField(i),
-                                          ),
+
+                                          onTap: () => HapticFeedback
+                                              .selectionClick(),
+
+                                          onChanged: (v) {
+                                            // reset error state saat user mulai input lagi
+                                            if (_otpError) {
+                                              setState(() => _otpError = false);
+                                            }
+                                          },
+
+                                          // auto verify saat 6 digit
+                                          onCompleted: (pin) {
+                                            if (_otpError) {
+                                              setState(
+                                                      () => _otpError = false);
+                                            }
+                                            _verifyOtpFromPin(pin);
+                                          },
                                         ),
                                       ),
                                     ),
@@ -458,18 +484,18 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                           .copyWith(color: hintGrey),
                                       textAlign: TextAlign.center,
                                     ),
-
                                     const SizedBox(height: 18),
 
                                     AppButton.primary(
                                       text: "Lanjut",
                                       onPressed: () {
-                                        final otp =
-                                        _otpControllers.map((c) => c.text).join();
+                                        final otp = _pinController.text;
                                         if (otp.length == 6) {
-                                          _verifyOtp();
+                                          _verifyOtpFromPin(otp);
                                         } else {
                                           _shakeOtpFields();
+                                          setState(() => _otpError = true);
+                                          _pinFocusNode.requestFocus();
                                         }
                                       },
                                     ),
@@ -486,75 +512,6 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOtpField(int i) {
-    final hasFocus = _focusNodes[i].hasFocus;
-
-    return Focus(
-      onKeyEvent: (node, event) {
-        if (event is! KeyDownEvent) return KeyEventResult.ignored;
-
-        final isBackspace = event.logicalKey == LogicalKeyboardKey.backspace;
-        if (!isBackspace) return KeyEventResult.ignored;
-
-        // 1) kalau field ada isi: clear field ini, stay
-        if (_otpControllers[i].text.isNotEmpty) {
-          _otpControllers[i].clear();
-          return KeyEventResult.handled;
-        }
-
-        // 2) kalau kosong: pindah kiri + clear kiri
-        if (i > 0) {
-          _otpControllers[i - 1].clear();
-          _focusNodes[i - 1].requestFocus();
-          return KeyEventResult.handled;
-        }
-
-        return KeyEventResult.handled;
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        curve: Curves.easeOut,
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: pGrey,
-          borderRadius: BorderRadius.circular(checkboxBorderRadius),
-          border: Border.all(
-            color: hasFocus ? primaryColor : sGrey,
-            width: 2,
-          ),
-        ),
-        child: TextField(
-          controller: _otpControllers[i],
-          focusNode: _focusNodes[i],
-          textAlign: TextAlign.center,
-          cursorColor: primaryColor,
-          cursorWidth: 2,
-          cursorHeight: 24,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          keyboardType: TextInputType.number,
-          textInputAction: i == 5 ? TextInputAction.done : TextInputAction.next,
-          maxLength: 1,
-          decoration: const InputDecoration(
-            counterText: '',
-            border: InputBorder.none,
-          ),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: (v) => _onOtpChanged(v, i),
-          onTap: () {
-            HapticFeedback.selectionClick();
-            _scaleController.reset();
-            _scaleController.forward();
-          },
         ),
       ),
     );

@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:pdfx/pdfx.dart';
-
-import '../../../../common/loading_indicator.dart';
 
 class InvoicePreviewFromBase64Page extends StatefulWidget {
   final String base64Pdf; // idealnya ini INV base64, bukan JSON

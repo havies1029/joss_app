@@ -1,15 +1,19 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/blocs/login/emailverification_bloc.dart';
-import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
-import 'package:joss_app/models/login/emailverification_model.dart';
-import 'package:joss_app/models/login/forgot_password_model.dart';
-import 'package:joss_app/pages/login/mobile/client/kata_sandi_baru_page.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:pinput/pinput.dart';
+import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/models/login/forgot_password_model.dart';
+import 'package:joss_app/pages/login/mobile/client/kata_sandi_baru_page.dart';
 
+import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../helper/indo_phone_result.dart';
+import '../../../../../models/login/emailverification_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
 class OtpForgotWidget extends StatefulWidget {
@@ -26,6 +30,7 @@ class OtpForgotWidget extends StatefulWidget {
 
 class OtpForgotWidgetState extends State<OtpForgotWidget>
     with TickerProviderStateMixin {
+  // 🎬 Animations (DNA patokan)
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -36,22 +41,27 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  final List<TextEditingController> _otpControllers = [];
-  final List<FocusNode> _focusNodes = [];
+  // 📌 OTP
+  final TextEditingController _pinController = TextEditingController();
+  final FocusNode _pinFocusNode = FocusNode();
+  bool _otpError = false;
 
   // ⏱ Timer
   Timer? _timer;
-  int _remainingTime = 59;
+  int _remainingTime = 6;
   bool _isResendAvailable = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _pinFocusNode.requestFocus();
+    });
 
-    for (int i = 0; i < 6; i++) {
-      _otpControllers.add(TextEditingController());
-      _focusNodes.add(FocusNode());
-    }
+    _pinFocusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
 
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -94,6 +104,36 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     _startTimer();
   }
 
+  bool _isEmail(String input) => EmailValidator.validate(input);
+  bool _isPhone(String input) => IndoPhoneHelper.normalize(input).isValid;
+
+  String _buildRequestFrom(String input) {
+    if (_isEmail(input)) return "email";
+    if (_isPhone(input)) return "hp";
+    return "unknown";
+  }
+
+  String _formatPhoneVisual(String phone62) {
+    if (!phone62.startsWith('62')) return phone62;
+    return '+62 ${phone62.substring(2)}';
+  }
+
+  String _buildOtpLabel(String input) {
+    if (_isEmail(input)) return 'email';
+    if (_isPhone(input)) return 'No. HP';
+    return 'hp/email';
+  }
+
+  String _buildOtpValue(String input) {
+    if (_isEmail(input)) return input;
+
+    final phoneRes = IndoPhoneHelper.normalize(input);
+    if (phoneRes.isValid) {
+      return _formatPhoneVisual(phoneRes.phone62!);
+    }
+    return input;
+  }
+
   Future<void> _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 100));
     if (!mounted) return;
@@ -107,6 +147,7 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     if (!mounted) return;
     _scaleController.forward();
   }
+
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -114,7 +155,6 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
         timer.cancel();
         return;
       }
-
       if (_remainingTime > 0) {
         setState(() => _remainingTime--);
       } else {
@@ -124,11 +164,29 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     });
   }
 
+  String _formatTime(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '$m:${s.toString().padLeft(2, '0')}';
+  }
+
+  void _resetOtpAndFocusFirst() {
+    setState(() => _otpError = false);
+    _pinController.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _pinFocusNode.requestFocus();
+    });
+  }
+
+  void _shakeOtpFields() {
+    HapticFeedback.heavyImpact();
+    _shakeController.forward(from: 0);
+  }
 
   void _resendOtp() {
-
     setState(() {
-      _remainingTime = 59;
+      _remainingTime = 6;
       _isResendAvailable = false;
     });
     _startTimer();
@@ -143,23 +201,21 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
       ),
     );
 
-    ForgotPasswordModel? record = context.read<ForgotPasswordBloc>().state.record;
+    // ✅ LOGIC TETAP OTP FORGOT:
+    final record = context.read<ForgotPasswordBloc>().state.record;
     context.read<EmailVerificationBloc>().add(
-      ResendOtpEvent(record: EmailVerificationModel(email: widget.sentTo, requestId: record?.requestId ?? '')),
+      ResendOtpEvent(
+        record: EmailVerificationModel(
+          email: widget.sentTo,
+          requestId: record?.requestId ?? '',
+          requestFrom: _buildRequestFrom(widget.sentTo),
+        ),
+      ),
     );
   }
 
-  void _onOtpChanged(String value, int index) {
-    if (value.isNotEmpty && index < 5) {
-      _focusNodes[index + 1].requestFocus();
-    }
-
-    if (_otpControllers.every((c) => c.text.isNotEmpty)) {
-      _verifyOtp();
-    }
-  }
-  void _verifyOtp() async {
-    String otp = _otpControllers.map((c) => c.text).join();
+  void _verifyOtp({String? otpOverride}) {
+    final otp = (otpOverride ?? _pinController.text).trim();
 
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -171,10 +227,7 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
       return;
     }
 
-    ForgotPasswordModel? record = context.read<ForgotPasswordBloc>().state.record;
-    record?.pin = otp;
-
-    // Kirim event validasi OTP ke ForgotPasswordBloc
+    final record = context.read<ForgotPasswordBloc>().state.record;
     if (record == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -184,25 +237,29 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
       );
       return;
     }
+
+    record.pin = otp;
+
     context.read<ForgotPasswordBloc>().add(
       ForgotPswdValidasiPinEmailEvent(
-          record: record,
-          requestAt: DateTime.now() 
+        record: record,
+        requestAt: DateTime.now(),
       ),
     );
-
   }
 
+  void _handleResendSuccess() {
+    _resetOtpAndFocusFirst();
 
-  void _shakeOtpFields() {
-    HapticFeedback.heavyImpact();
-    _shakeController.forward(from: 0);
-  }
+    setState(() {
+      _remainingTime = 6;
+      _isResendAvailable = false;
+    });
+    _startTimer();
 
-  String _formatTime(int seconds) {
-    int m = seconds ~/ 60;
-    int s = seconds % 60;
-    return '$m:${s.toString().padLeft(2, '0')}';
+    ScaffoldMessenger.of(context).showSnackBar(
+      successSnackBar("Kode OTP berhasil dikirim ulang."),
+    );
   }
 
   @override
@@ -213,27 +270,18 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     _shakeController.dispose();
     _timer?.cancel();
 
-    for (var c in _otpControllers) {
-      c.dispose();
-    }
-    for (var n in _focusNodes) {
-      n.dispose();
-    }
-
+    _pinController.dispose();
+    _pinFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return MultiBlocListener(
       listeners: [
-
-        /// LISTENER VALIDASI OTP
         BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
           listenWhen: (prev, curr) =>
-              prev.isSent != curr.isSent ||
+          prev.isSent != curr.isSent ||
               prev.verificationPinSuccess != curr.verificationPinSuccess,
           listener: (context, state) {
             if (state.isSent && state.verificationPinSuccess) {
@@ -250,23 +298,26 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
 
             if (state.isSent && !state.verificationPinSuccess) {
               _shakeOtpFields();
+              setState(() => _otpError = true);
+
               ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(state.errorMessage.isNotEmpty ? state.errorMessage : "Kode OTP salah. Silakan coba lagi."),
+                errorSnackBar("Kode OTP salah / sudah kadaluarsa."),
               );
+
+              _resetOtpAndFocusFirst();
             }
           },
         ),
 
-        /// 🔥 LISTENER RESEND OTP
+        /// LISTENER RESEND OTP (LOGIC TETAP)
         BlocListener<EmailVerificationBloc, EmailVerificationState>(
           listenWhen: (prev, curr) =>
-              prev.isResendOtpSuccess != curr.isResendOtpSuccess ||
+          prev.isResendOtpSuccess != curr.isResendOtpSuccess ||
               prev.hasFailure != curr.hasFailure,
           listener: (context, state) {
             if (state.isResendOtpSuccess) {
               _handleResendSuccess();
             }
-
             if (state.hasFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Gagal mengirim ulang OTP."),
@@ -276,7 +327,7 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
         ),
       ],
       child: Scaffold(
-        backgroundColor: primaryBlackColor,
+        backgroundColor: secondaryBlackColor,
         body: SafeArea(
           child: BaseBackgroundFirstPage(
             child: Column(
@@ -290,24 +341,25 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                         child: Column(
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                              child:
-                              Align(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 4),
                                   child: TextButton.icon(
                                     onPressed: () {
-                                      for (var controller in _otpControllers) {
-                                        controller.clear();
-                                      }
+                                      _resetOtpAndFocusFirst();
                                       _timer?.cancel();
-                                      Navigator.of(context, rootNavigator: false).pop();
+                                      Navigator.of(context,
+                                          rootNavigator: false)
+                                          .pop();
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(0, 0),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                     ),
                                     icon: Icon(
                                       Icons.arrow_back_ios_new,
@@ -315,182 +367,211 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                       size: getResponsiveFont(context, 18),
                                     ),
                                     label: Text(
-                                        "Kembali",
-                                        style: bodyTextStyle(context).copyWith(color: primaryLightColor)
+                                      "Kembali",
+                                      style: bodyTextStyle(context)
+                                          .copyWith(color: primaryLightColor),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-      
+
+                            // ✅ Card DNA patokan (gradient border)
                             Container(
-                              width: double.infinity,
                               decoration: BoxDecoration(
-                                color: primaryBlackColor,
-                                borderRadius: BorderRadius.circular(20),
-                                border: const Border(
-                                  top: BorderSide(
-                                    color: primaryColor,
-                                    width: 4.0,
-                                  ),
+                                gradient: cardBorderGradient,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
                                 ),
                               ),
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: screenHeight * 0.04),
-      
-                                  ScaleTransition(
-                                    scale: _scaleAnimation,
-                                    child: Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        color: primaryColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: primaryColor.withOpacity(0.3),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: const Icon(Icons.lock_outline,
-                                          size: 40, color: Colors.white),
-                                    ),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: vPadding * 2,
+                                  horizontal: hPadding * 1.5,
+                                ),
+                                margin: const EdgeInsets.all(1),
+                                decoration: BoxDecoration(
+                                  color: secondaryBlackColor,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
                                   ),
-      
-                                  const SizedBox(height: 24),
-                                  const Text(
-                                    'Verifikasi OTP',
-                                    style: TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                ),
+                                child: Column(
+                                  children: [
+                                    // ✅ icon DNA patokan
+                                    SvgPicture.asset(
+                                      "assets/icons/otp_icon.svg",
                                     ),
-                                  ),
-                                  const SizedBox(height: 16),
-      
-                                  RichText(
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white70,
-                                        height: 1.5,
-                                      ),
+                                    const SizedBox(height: 24),
+                                    Text(
+                                      'Verifikasi OTP',
+                                      style: headingStyle(context, fontSize: 25),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Column(
                                       children: [
-                                        const TextSpan(
-                                            text:
-                                            'Kami sudah mengirim kode OTP ke\n'),
-                                        TextSpan(
-                                          text: widget.sentTo,
-                                          style: const TextStyle(
-                                            color: primaryColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                        Text(
+                                          "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(widget.sentTo)}",
+                                          style:
+                                          bodyTextStyle(context, fontSize: 20),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Text(
+                                          _buildOtpValue(widget.sentTo),
+                                          style: bodyTextStyle(context, fontSize: 20)
+                                              .copyWith(color: primaryColor),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
-                                  ),
-      
-                                  const SizedBox(height: 40),
-      
-                                  // 🔢 OTP Fields with shake (pakai sin)
-                                  AnimatedBuilder(
-                                    animation: _shakeAnimation,
-                                    builder: (_, child) {
-                                      return Transform.translate(
-                                        offset: Offset(
-                                          math.sin(_shakeAnimation.value) * 8,
-                                          0,
+                                    const SizedBox(height: 16),
+
+                                    // ⏱ Timer / resend (DNA)
+                                    AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 300),
+                                      child: _isResendAvailable
+                                          ? GestureDetector(
+                                        onTap: _resendOtp,
+                                        child: Text(
+                                          'Kirim ulang kode',
+                                          style: bodyTextStyle(context)
+                                              .copyWith(color: primaryColor),
                                         ),
-                                        child: child,
-                                      );
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                      children: List.generate(
-                                          6, (i) => _buildOtpField(i)),
-                                    ),
-                                  ),
-      
-                                  const SizedBox(height: 24),
-      
-                                  // ⏱ Timer / Resend
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: _isResendAvailable
-                                        ? GestureDetector(
-                                      onTap: _resendOtp,
-                                      child: const Text(
-                                        'Kirim ulang kode',
-                                        style: TextStyle(
-                                          color: primaryColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                                    )
-                                        : Text(
-                                      _formatTime(_remainingTime),
-                                      style: const TextStyle(
-                                        color: pRed, // pakai constant
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                                      )
+                                          : Text(
+                                        _formatTime(_remainingTime),
+                                        style: bodyTextStyle(context)
+                                            .copyWith(color: pRed),
                                       ),
                                     ),
-                                  ),
-      
-      
-                                  const SizedBox(height: 32),
-                                  const Text(
-                                    'Silakan masukkan kode di atas untuk melanjutkan.',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.white60),
-                                    textAlign: TextAlign.center,
-                                  ),
-      
-                                  const SizedBox(height: 40),
-      
-                                  // 🚀 Continue button
-                                  ScaleTransition(
-                                    scale: _scaleAnimation,
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      height: 56,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          String otp = _otpControllers
-                                              .map((c) => c.text)
-                                              .join();
-                                          if (otp.length == 6) {
-                                            _verifyOtp();
-                                          } else {
-                                            _shakeOtpFields();
-                                          }
+
+                                    const SizedBox(height: 16),
+
+                                    // 🔢 OTP fields + shake (DNA)
+                                    TextSelectionTheme(
+                                      data: TextSelectionThemeData(
+                                        cursorColor: primaryColor,
+                                        selectionColor:
+                                        primaryColor.withOpacity(0.25),
+                                        selectionHandleColor: primaryColor,
+                                      ),
+                                      child: AnimatedBuilder(
+                                        animation: _shakeAnimation,
+                                        builder: (_, child) {
+                                          return Transform.translate(
+                                            offset: Offset(
+                                              math.sin(_shakeAnimation.value) * 8,
+                                              0,
+                                            ),
+                                            child: child,
+                                          );
                                         },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: primaryColor,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(16)),
-                                        ),
-                                        child: const Text(
-                                          'Lanjut',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
+                                        child: Pinput(
+                                          length: 6,
+                                          controller: _pinController,
+                                          focusNode: _pinFocusNode,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          autofillHints: const <String>[],
+
+                                          // theme (DNA: sama ukuran & border)
+                                          defaultPinTheme: PinTheme(
+                                            width: 48,
+                                            height: 48,
+                                            textStyle: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: pGrey,
+                                              borderRadius: BorderRadius.circular(checkboxBorderRadius),
+                                              border: Border.all(
+                                                color: _pinFocusNode.hasFocus ? primaryColor : sGrey,
+                                                width: 2,
+                                              ),
+                                            ),
                                           ),
+                                          focusedPinTheme: PinTheme(
+                                            width: 48,
+                                            height: 48,
+                                            textStyle: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: pGrey,
+                                              borderRadius: BorderRadius.circular(checkboxBorderRadius),
+                                              border: Border.all(color: primaryColor, width: 2),
+                                            ),
+                                          ),
+                                          errorPinTheme: PinTheme(
+                                            width: 48,
+                                            height: 48,
+                                            textStyle: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: pGrey,
+                                              borderRadius: BorderRadius.circular(checkboxBorderRadius),
+                                              border: Border.all(color: pRed, width: 2),
+                                            ),
+                                          ),
+                                          forceErrorState: _otpError,
+
+                                          showCursor: true,
+                                          cursor: Align(
+                                            alignment: Alignment.center,
+                                            child: Container(width: 2, height: 24, color: primaryColor),
+                                          ),
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                                          onTap: () => HapticFeedback.selectionClick(),
+
+                                          onChanged: (v) {
+                                            if (_otpError) setState(() => _otpError = false);
+                                          },
+
+                                          // auto verify saat 6 digit
+                                          onCompleted: (pin) {
+                                            if (_otpError) setState(() => _otpError = false);
+                                            _verifyOtp(otpOverride: pin);
+                                          },
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+
+                                    const SizedBox(height: 18),
+                                    Text(
+                                      'Silakan masukkan kode di atas untuk melanjutkan.',
+                                      style: bodyTextStyle(context)
+                                          .copyWith(color: hintGrey),
+                                      textAlign: TextAlign.center,
+                                    ),
+
+                                    const SizedBox(height: 18),
+
+                                    // ✅ tombol DNA patokan
+                                    AppButton.primary(
+                                      text: "Lanjut",
+                                      onPressed: () {
+                                        final otp = _pinController.text.trim();
+                                        if (otp.length == 6) {
+                                          _verifyOtp();
+                                        } else {
+                                          _shakeOtpFields();
+                                          setState(() => _otpError = true);
+                                          _pinFocusNode.requestFocus();
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -506,59 +587,4 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
       ),
     );
   }
-
-  Widget _buildOtpField(int i) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: pGrey,
-        borderRadius: BorderRadius.circular(checkboxBorderRadius),
-        border: Border.all(
-          color: _focusNodes[i].hasFocus ? primaryColor : sGrey,
-        ),
-      ),
-      child: TextField(
-        controller: _otpControllers[i],
-        focusNode: _focusNodes[i],
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-        keyboardType: TextInputType.number,
-        maxLength: 1,
-        decoration: const InputDecoration(counterText: '', border: InputBorder.none),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: (v) => _onOtpChanged(v, i),
-        onTap: () {
-          _scaleController.reset();
-          _scaleController.forward();
-        },
-      ),
-    );
-  }
-
-  void _handleResendSuccess() {
-    // 🔥 Kosongkan OTP
-    for (var controller in _otpControllers) {
-      controller.clear();
-    }
-
-    // Fokus ke field pertama
-    if (_focusNodes.isNotEmpty) {
-      _focusNodes.first.requestFocus();
-    }
-
-    // Reset timer
-    setState(() {
-      _remainingTime = 59;
-      _isResendAvailable = false;
-    });
-
-    _startTimer();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      successSnackBar("Kode OTP berhasil dikirim ulang."),
-    );
-  }
-
 }

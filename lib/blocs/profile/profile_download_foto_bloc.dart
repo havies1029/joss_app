@@ -13,6 +13,16 @@ class ProfileDownloadFotoBloc
   ProfileDownloadFotoBloc({required this.repository})
       : super(ProfileDownloadFotoInitial()) {
     on<LoadSecureImage>(_onLoadSecureImage);
+
+    // NEW: untuk optimistic preview
+    on<SetLocalPreviewImage>(_onSetLocalPreviewImage);
+  }
+
+  void _onSetLocalPreviewImage(
+      SetLocalPreviewImage event,
+      Emitter<ProfileDownloadFotoState> emit,
+      ) {
+    emit(ProfileDownloadFotoLoaded(event.imageBytes));
   }
 
   Future<void> _onLoadSecureImage(

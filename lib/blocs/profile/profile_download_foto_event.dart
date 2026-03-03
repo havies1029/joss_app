@@ -5,3 +5,8 @@ abstract class ProfileDownloadFotoEvent {}
 class LoadSecureImage extends ProfileDownloadFotoEvent {
   LoadSecureImage();
 }
+
+class SetLocalPreviewImage extends ProfileDownloadFotoEvent {
+  final Uint8List imageBytes;
+  SetLocalPreviewImage(this.imageBytes);
+}

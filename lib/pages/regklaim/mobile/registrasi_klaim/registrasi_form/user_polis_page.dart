@@ -52,7 +52,7 @@ class _UserPolisPageState extends State<UserPolisPage> {
           children: [
             // Title
             Text(
-              "Cari Data Polis",
+              "Masukkan Data Polis",
               style: TextStyle(
                 color: primaryLightColor,
                 fontSize: getResponsiveFont(context, 18),

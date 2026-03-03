@@ -87,7 +87,7 @@ class _TentangCardWidgetState extends State<TentangCardWidget> {
               children: [
                 ...List.generate(
                   4,
-                  (i) => const Icon(Icons.star, color: Colors.amber, size: 15),
+                      (i) => const Icon(Icons.star, color: Colors.amber, size: 15),
                 ),
                 const Icon(Icons.star_half, color: Colors.amber, size: 15),
                 const SizedBox(width: 5),
@@ -126,9 +126,9 @@ class _TentangCardWidgetState extends State<TentangCardWidget> {
                       firstChild: _buildTrimmedText(),
                       secondChild: _buildFullText(),
                       crossFadeState:
-                          expanded
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
+                      expanded
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
                     ),
                     const SizedBox(height: 5),
                     Align(
@@ -146,6 +146,7 @@ class _TentangCardWidgetState extends State<TentangCardWidget> {
                         iconTextSpacing: 6,
                       ),
                     ),
+                    const SizedBox(height: 5),
                   ],
                 ),
               ),

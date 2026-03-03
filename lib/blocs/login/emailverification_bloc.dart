@@ -200,10 +200,10 @@ class EmailVerificationBloc
       return;
     }
 
-    EmailVerificationModel updatedRecord = state.record?.copyWith(requestId: returnData.data) ?? event.record.copyWith(requestId: returnData.data); 
+    EmailVerificationModel updatedRecord = state.record?.copyWith(requestId: returnData.data) ?? event.record.copyWith(requestId: returnData.data);
 
     emit(state.copyWith(
-      record: updatedRecord,
+      // record: updatedRecord,
       hasFailure: hasFailure,
       isResendOtpSuccess: !hasFailure,
     ));

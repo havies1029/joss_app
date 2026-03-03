@@ -27,12 +27,6 @@ class PaymentMethodPage extends StatefulWidget {
 
 class _PaymentMethodPageState extends State<PaymentMethodPage> {
   int? _expandedIndex;
-  final categoryIcons = [
-    'assets/icons/va.svg',
-    'assets/icons/ewallet.svg',
-    'assets/icons/cc.svg',
-  ];
-
   late final ScrollController _scrollCtrl;
 
   @override
@@ -46,6 +40,19 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   void dispose() {
     _scrollCtrl.dispose();
     super.dispose();
+  }
+
+  String _categoryIconBySortOrder(int? sortOrder) {
+    switch (sortOrder) {
+      case 10:
+        return 'assets/icons/va.svg';
+      case 20:
+        return 'assets/icons/ewallet.svg';
+      case 30:
+        return 'assets/icons/cc.svg';
+      default:
+        return 'assets/icons/va.svg'; // fallback
+    }
   }
 
   Future<bool?> showExitConfirmDialog(BuildContext context) {
@@ -223,6 +230,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                       );
                     }
 
+                    final categories = [...state.categories]
+                      ..sort((a, b) =>
+                          (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
+
                     return ScrollbarTheme(
                       data: ScrollbarThemeData(
                         thumbVisibility: WidgetStateProperty.all(false),
@@ -275,20 +286,21 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                 ),
                                 child: ListView.separated(
                                   shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
+                                  physics:
+                                  const NeverScrollableScrollPhysics(),
                                   padding: EdgeInsets.zero,
-                                  itemCount: state.categories.length,
+                                  itemCount: categories.length,
                                   separatorBuilder: (_, __) => Divider(
                                     height: 1,
                                     color: sGrey.withOpacity(0.5),
                                   ),
                                   itemBuilder: (context, index) {
-                                    final cat = state.categories[index];
+                                    final cat = categories[index];
 
-                                    final icon = categoryIcons.isEmpty
-                                        ? 'assets/icons/va.svg'
-                                        : categoryIcons[
-                                    index % categoryIcons.length];
+                                    // ✅ icon kategori dari SortOrder
+                                    final icon = _categoryIconBySortOrder(
+                                      cat.sortOrder,
+                                    );
 
                                     return PaymentList(
                                       iconPath: icon,
@@ -296,6 +308,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                       items: cat.items,
                                       isExpanded: _expandedIndex == index,
                                       onTapHeader: () {
+                                        // reset selection saat pindah kategori
                                         if (_expandedIndex != index) {
                                           context
                                               .read<PaymentMethodCariBloc>()

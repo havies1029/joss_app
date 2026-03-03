@@ -68,35 +68,40 @@ class MRekanGeneralIdvCrudFormPageFormState
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: BlocConsumer<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
-                      listener: (context, state) {
-                        if (state.isLoaded && state.record != null && _isFirstLoad) {
-                          _injectPayload(state.record!);
+                    listener: (context, state) {
+                      if (state.isLoaded && state.record != null && _isFirstLoad) {
+                        final rec = state.record!;
 
-                          final formName = (state.record?.rekanNama ?? '').trim();
+                        if (fieldRekanNamaController.text.trim().isEmpty) {
+                          final formName = (rec.rekanNama).trim();
                           final fallbackName =
                           (context.read<MRekan1CrudBloc>().state.record?.rekanNama ?? '').trim();
 
-                          if (fieldRekanNamaController.text.trim().isEmpty) {
-                            if (formName.isNotEmpty) {
-                              fieldRekanNamaController.text = formName;
-                            } else if (fallbackName.isNotEmpty) {
-                              fieldRekanNamaController.text = fallbackName;
-                            }
+                          if (formName.isNotEmpty) {
+                            fieldRekanNamaController.text = formName;
+                          } else if (fallbackName.isNotEmpty) {
+                            fieldRekanNamaController.text = fallbackName;
                           }
-
-                          _isFirstLoad = false;
                         }
 
-                        if (state.isSaved && !state.hasFailure) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan!"),
-                          );
-
-                          // kalau kamu mau reload manual / buka lagi setelah save
-                          _isFirstLoad = true;
+                        if (fieldComboMPekerjaan == null) {
+                          fieldComboMPekerjaan = rec.comboMPekerjaan;
                         }
-                      },
-                      builder: (context, state) {
+
+                        if (fieldComboMJnskel == null) {
+                          fieldComboMJnskel = rec.comboMJnskel;
+                        }
+
+                        _isFirstLoad = false;
+                      }
+
+                      if (state.isSaved && !state.hasFailure) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          successSnackBar("Data berhasil disimpan!"),
+                        );
+                      }
+                    },
+                    builder: (context, state) {
                       return Form(
                         key: _formKey,
                         child: Column(
@@ -104,14 +109,7 @@ class MRekanGeneralIdvCrudFormPageFormState
                           children: [
                             // 🧿 Avatar section
                             BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-                              buildWhen: (prev, curr) {
-                                if (prev is ProfileDownloadFotoLoaded &&
-                                    curr is ProfileDownloadFotoLoaded) {
-                                  return prev.imageBytes.lengthInBytes !=
-                                      curr.imageBytes.lengthInBytes;
-                                }
-                                return prev.runtimeType != curr.runtimeType;
-                              },
+                              buildWhen: (prev, curr) => prev.runtimeType != curr.runtimeType || curr is ProfileDownloadFotoLoaded,
                               builder: (context, state) {
                                 final Uint8List? imageBytes =
                                 state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
@@ -216,7 +214,7 @@ class MRekanGeneralIdvCrudFormPageFormState
                             ),
 
                             const SizedBox(height: vPadding),
-                            AppButton.primary(text: "Submit", onPressed: onSaveForm),
+                            AppButton.primary(text: " Simpan Perubahan", onPressed: onSaveForm),
                           ],
                         ),
                       );
@@ -311,72 +309,72 @@ class MRekanGeneralIdvCrudFormPageFormState
               const SizedBox(height: 10),
               Row(
                 children:
-                    jenisKelaminList.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      ComboMJnskelModel item = entry.value;
-                      bool isSelected =
-                          fieldComboMJnskel?.mjnskelId == item.mjnskelId;
+                jenisKelaminList.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  ComboMJnskelModel item = entry.value;
+                  bool isSelected =
+                      fieldComboMJnskel?.mjnskelId == item.mjnskelId;
 
-                      return Expanded(
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                fieldComboMJnskel = item;
-                                mRekanGeneralIdvCrudBloc.add(
-                                  ComboMJnskelChangedEvent(comboMJnskel: item),
-                                );
-                                setState(() {});
-                              },
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
+                  return Expanded(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            fieldComboMJnskel = item;
+                            mRekanGeneralIdvCrudBloc.add(
+                              ComboMJnskelChangedEvent(comboMJnskel: item),
+                            );
+                            setState(() {});
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color:
+                                    isSelected
+                                        ? primaryColor
+                                        : hintGrey,
+                                    width: 1,
+                                  ),
+                                  color: Colors.transparent,
+                                ),
+                                child:
+                                isSelected
+                                    ? Center(
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color:
-                                            isSelected
-                                                ? primaryColor
-                                                : hintGrey,
-                                        width: 1,
-                                      ),
-                                      color: Colors.transparent,
+                                      color: primaryColor,
                                     ),
-                                    child:
-                                        isSelected
-                                            ? Center(
-                                              child: Container(
-                                                width: 8,
-                                                height: 8,
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: primaryColor,
-                                                ),
-                                              ),
-                                            )
-                                            : null,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    item.jenisDesc,
-                                    style:
-                                        isSelected
-                                            ? inputTextStyle(context)
-                                            : bodyTextStyle(context),
-                                  ),
-                                ],
+                                )
+                                    : null,
                               ),
-                            ),
-                            // Spacer between options (except for last item)
-                            if (index < jenisKelaminList.length - 1)
-                              const SizedBox(width: 24),
-                          ],
+                              const SizedBox(width: 8),
+                              Text(
+                                item.jenisDesc,
+                                style:
+                                isSelected
+                                    ? inputTextStyle(context)
+                                    : bodyTextStyle(context),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    }).toList(),
+                        // Spacer between options (except for last item)
+                        if (index < jenisKelaminList.length - 1)
+                          const SizedBox(width: 24),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
               FormField<ComboMJnskelModel>(
                 validator: (value) {
@@ -388,12 +386,12 @@ class MRekanGeneralIdvCrudFormPageFormState
                 builder: (state) {
                   return state.hasError
                       ? Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          state.errorText!,
-                          style: TextStyle(color: pRed, fontSize: 12),
-                        ),
-                      )
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      state.errorText!,
+                      style: TextStyle(color: pRed, fontSize: 12),
+                    ),
+                  )
                       : const SizedBox.shrink();
                 },
               ),

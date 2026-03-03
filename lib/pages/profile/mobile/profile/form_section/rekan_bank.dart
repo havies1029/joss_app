@@ -95,7 +95,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan!"),
                           );
-                          _isFirstLoad = true;
                         }
                       },
 
@@ -149,7 +148,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
           const SizedBox(height: vPadding),
 
           AppButton.primary(
-            text: "Submit",
+            text: " Simpan Perubahan",
             onPressed: onSaveForm,
           )
         ],

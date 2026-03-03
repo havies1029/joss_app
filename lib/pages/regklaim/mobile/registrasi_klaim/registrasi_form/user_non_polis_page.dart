@@ -53,6 +53,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   final fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
   final fieldPolisNoController = TextEditingController();
   final fieldLokasiObjectController = TextEditingController();
+  bool _toKlaimTriggered = false;
 
   @override
   void initState() {
@@ -79,25 +80,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     });
   }
 
-  List<ComboMInsuranceModel> _filterInsurance(
-      List<ComboMInsuranceModel> data,
-      ) {
-    // 10001 → hanya tampil 14
-    if (widget.cobKlaimId == '10001') {
-      return data.where((e) => e.minsuranceId == '14').toList();
-    }
-
-    // 10002 → hanya tampil 02
-    if (widget.cobKlaimId == '10002') {
-      return data.where((e) => e.minsuranceId == '02').toList();
-    }
-
-    // selain itu → buang 14 & 02
-    return data
-        .where((e) => e.minsuranceId != '14' && e.minsuranceId != '02')
-        .toList();
-  }
-
   @override
   void dispose() {
     _attachBloc.close();
@@ -109,7 +91,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     super.dispose();
   }
 
-  bool _toKlaimTriggered = false;
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -174,7 +155,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Cari Data Polis",
+                      "Simpan",
                       style: TextStyle(
                         color: primaryLightColor,
                         fontSize: getResponsiveFont(context, 18),
@@ -235,9 +216,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         );
       return;
     }
-
-
-
 
     final record = Regklaim1CrudModel(
       insuredNama: fieldInsuredNamaController.text,
@@ -317,6 +295,25 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     final tglMulai = context.read<PolisTanggalBloc>().state.mulai;
 
     return ok;
+  }
+
+  List<ComboMInsuranceModel> _filterInsurance(
+      List<ComboMInsuranceModel> data,
+      ) {
+    // 10001 → hanya tampil 14
+    if (widget.cobKlaimId == '10001') {
+      return data.where((e) => e.minsuranceId == '14').toList();
+    }
+
+    // 10002 → hanya tampil 02
+    if (widget.cobKlaimId == '10002') {
+      return data.where((e) => e.minsuranceId == '02').toList();
+    }
+
+    // selain itu → buang 14 & 02
+    return data
+        .where((e) => e.minsuranceId != '14' && e.minsuranceId != '02')
+        .toList();
   }
 
   Widget buildFieldMinsuranceId() => ReusableComboBox<ComboMInsuranceModel>(

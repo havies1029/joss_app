@@ -182,7 +182,7 @@ class MRekanPajakCrudFormPageFormState extends State<MRekanPajakCrudFormPage> {
 
                                                   const SizedBox(height: 16),
                                                   AppButton.primary(
-                                                    text: "Submit",
+                                                    text: " Simpan Perubahan",
                                                     onPressed: onSaveForm,
                                                     width: MediaQuery.of(context).size.width * 0.3,
                                                   ),
