@@ -174,7 +174,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Cari Data Polis",
+                      "Masukan Data Polis",
                       style: TextStyle(
                         color: primaryLightColor,
                         fontSize: getResponsiveFont(context, 18),
@@ -208,7 +208,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               SizedBox(
                 width: double.infinity,
                 child: AppButton(
-                  text: "Masukkan Data Polis",
+                  text: "Simpan",
                   onPressed: onPressCariPolis,
                 ),
               ),

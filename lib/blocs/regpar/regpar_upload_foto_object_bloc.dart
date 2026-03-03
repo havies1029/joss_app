@@ -1,7 +1,5 @@
-import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/blocs/regpar/regpar6form_bloc.dart';
 import 'package:equatable/equatable.dart';
 

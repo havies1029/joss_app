@@ -7,7 +7,6 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
-import '../../blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
 import '../../models/gen_regmv/regmv4upload_model.dart';
 import '../../repositories/gen_regmv/regmv4picker_repository.dart';
 import '../../repositories/gen_regmv/regmv_upload_stnk_repository.dart';

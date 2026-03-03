@@ -66,7 +66,7 @@ class InvbayarvaFormBloc
 
       emit(state.copyWith(record: record));
 
-      final va = (record.vaNo ?? "").trim();
+      final va = (record.vaNo).trim();
 
       if (va.isNotEmpty) {
         // Stop VA timer
