@@ -874,7 +874,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     if (context
         .read<Calpar1ListBloc>()
         .state
-        .isProcessing) return;
+        .isProcessing) {
+      return;
+    }
 
 
     if (context

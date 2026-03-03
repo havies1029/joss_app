@@ -1,6 +1,7 @@
 
 class AsetothersCariModel {
 	String asetOthersId;
+  String sppa2Id;
 	String curr;
 	int nomor;
 	String objectDesc;
@@ -15,7 +16,7 @@ class AsetothersCariModel {
 	bool isReaktif;
 	bool isRenewal;
 
-	AsetothersCariModel({required this.asetOthersId, required this.curr,
+	AsetothersCariModel({required this.asetOthersId, required this.sppa2Id, required this.curr,
 		required this.nomor, required this.objectDesc,
 		required this.polisNo, required this.premi,
 		required this.status, required this.sumInsured, required this.filePolisId,
@@ -25,6 +26,7 @@ class AsetothersCariModel {
 	factory AsetothersCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetothersCariModel(
 			asetOthersId: data['asetOthersId']??'',
+			sppa2Id: data['sppa2Id']??'',
 			curr: data['curr']??'',
 			nomor: int.tryParse(data['nomor'].toString())??0,
 			objectDesc: data['objectDesc']??'',
@@ -43,6 +45,7 @@ class AsetothersCariModel {
 
 	Map<String, dynamic> toJson() =>
 			{'asetOthersId': asetOthersId,
+        'sppa2Id': sppa2Id,
 				'curr': curr,
 				'nomor': nomor.toString(),
 				'objectDesc': objectDesc,

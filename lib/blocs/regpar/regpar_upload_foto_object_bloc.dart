@@ -1,7 +1,5 @@
-import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/blocs/regpar/regpar6form_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -158,7 +156,7 @@ class RegparUploadFotoObjectBloc
       );
 
       if (returnData.success == true) {
-        final serverId = returnData.data?.toString();
+        final serverId = returnData.data.toString();
         _updateItem(emit, localId, (x) => x.copyWith(
           status: UploadStatus.success,
           progress: 1,
@@ -250,7 +248,7 @@ class RegparUploadFotoObjectBloc
 
       final success = returnData.success == true;
       if (success) {
-        final serverId = returnData.data?.toString(); // ✅ tangkap serverId
+        final serverId = returnData.data.toString(); // ✅ tangkap serverId
 
         _updateItem(emit, localId, (x) => x.copyWith(
           status: UploadStatus.success,

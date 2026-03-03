@@ -1,6 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_aset_health/asethealthcari_bloc.dart';
 import 'package:joss_app/blocs/gen_aset_mv/asetmvcari_bloc.dart';

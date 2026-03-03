@@ -42,6 +42,9 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onDnToInvByListCobProcess(
       DnToInvByListCobProcessEvent event, Emitter<DnRekap2invState> emit) async {
+    
+    if (state.isProcessing) return;
+
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false, curr: event.curr ?? state.curr));
 
     try {
@@ -69,6 +72,9 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       DnToInvByListDnProcessEvent event,
       Emitter<DnRekap2invState> emit,
       ) async {
+
+      if (state.isProcessing) return;
+
     emit(state.copyWith(
       isProcessing: true,
       isProcessed: false,
@@ -101,6 +107,8 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onCheckInvoiceStatus(
       CheckInvoiceStatusEvent event, Emitter<DnRekap2invState> emit) async {
+    if (state.isProcessing) return;
+
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {
@@ -141,6 +149,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
 
   Future<void> onInvoice2PaymentViaVA(
       Invoice2PaymentViaVAEvent event, Emitter<DnRekap2invState> emit) async {
+    if (state.isProcessing) return;
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {
@@ -166,6 +175,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   Future<void> onGetRincianSOACustomer(
       GetRincianSOACustomerEvent event, Emitter<DnRekap2invState> emit) async {
     debugPrint("onGetRincianSOACustomer called");
+    if (state.isProcessing) return;
     emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
 
     try {

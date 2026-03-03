@@ -50,7 +50,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         invbayarvaFormBloc.add(
           InvbayarvaPollingStarted(
             invoiceId: widget.recordId,
-            interval: const Duration(seconds: 3),
+            interval: const Duration(seconds: 4),
           ),
         );
       }

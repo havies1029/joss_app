@@ -1,6 +1,7 @@
 
 class AsetParCariModel {
 	String asetParId;
+  String sppa2Id;
 	String tertanggung;
 	String alamat;
 	DateTime periodeMulai;
@@ -20,6 +21,7 @@ class AsetParCariModel {
 	bool isRenewal;
 
 	AsetParCariModel({required this.asetParId,
+    required this.sppa2Id,
 		required this.tertanggung,
 		required this.alamat,
 		required this.periodeMulai,
@@ -35,6 +37,7 @@ class AsetParCariModel {
 	factory AsetParCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetParCariModel(
 				asetParId: data['asetParId']??'',
+        sppa2Id: data['sppa2Id']??'',
 				tertanggung: data['tertanggung']??'',
 				periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
 				periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
@@ -59,6 +62,7 @@ class AsetParCariModel {
 	Map<String, dynamic> toJson() =>
 			{
 				'asetParId': asetParId,
+        'sppa2Id': sppa2Id,
 				'tertanggung': tertanggung,
 				'periodeMulai': periodeMulai.toIso8601String(),
 				'periodeAkhir': periodeAkhir.toIso8601String(),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -78,7 +77,7 @@ class RegmvUploadFotoAccApi {
       } else {
         return ReturnDataAPI(success: false, data: "", rowcount: 0);
       }
-    } on DioException catch (e) {
+    } on DioException {
 
       rethrow;
     } catch (e) {

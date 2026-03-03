@@ -8,8 +8,9 @@ import 'package:joss_app/models/regendors/regendors1form_model.dart';
 
 class Regendors1FormFormPage extends StatefulWidget {
 	final String sppa1Id;
+	final String sppa2Id;
 
-	const Regendors1FormFormPage({super.key, required this.sppa1Id});
+	const Regendors1FormFormPage({super.key, required this.sppa1Id, required this.sppa2Id});
 
 	@override
 	Regendors1FormFormPageFormState createState() => Regendors1FormFormPageFormState();
@@ -135,6 +136,7 @@ class Regendors1FormFormPageFormState extends State<Regendors1FormFormPage> {
 			Regendors1FormModel record = Regendors1FormModel(
 				notePerubahan: fieldNotePerubahanController.text,
 				sppa1Id: widget.sppa1Id,
+        sppa2Id: widget.sppa2Id,
 			);
 			regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));
 			_dismissDialog();

@@ -1,7 +1,6 @@
 import 'package:joss_app/models/authentication/reset_password_model.dart';
 import 'package:joss_app/models/login/forgot_password_model.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/repositories/login/forgot_password_repository.dart';

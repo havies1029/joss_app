@@ -98,7 +98,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       child: MultiBlocListener(
         listeners: [
           BlocListener<Regklaim1CrudBloc, Regklaim1CrudState>(
-            listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
+            listenWhen: (prev, curr) => curr.isSaved,
             listener: (context, state) {
               if (!mounted) return;
               if (state.hasFailure) return;
@@ -155,7 +155,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Simpan",
+                      "Masukan Data Polis",
                       style: TextStyle(
                         color: primaryLightColor,
                         fontSize: getResponsiveFont(context, 18),
@@ -189,7 +189,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               SizedBox(
                 width: double.infinity,
                 child: AppButton(
-                  text: "Masukkan Data Polis",
+                  text: "Simpan",
                   onPressed: onPressCariPolis,
                 ),
               ),

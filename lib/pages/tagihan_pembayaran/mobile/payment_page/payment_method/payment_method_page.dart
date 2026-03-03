@@ -208,15 +208,14 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
         await _handleExit(context);
       },
       child: BaseBackgroundSidePage(
-        onBack: () async {
-          await _handleExit(context);
-        },
+        onBack: () async => _handleExit(context),
         title: "Metode Pembayaran",
         child: Container(
           color: secondaryBlackColor,
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           child: Column(
             children: [
+              // ======= CONTENT (SCROLL AREA) =======
               Expanded(
                 child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
                   builder: (context, state) {
@@ -231,8 +230,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                     }
 
                     final categories = [...state.categories]
-                      ..sort((a, b) =>
-                          (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
+                      ..sort(
+                            (a, b) =>
+                            (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0),
+                      );
 
                     return ScrollbarTheme(
                       data: ScrollbarThemeData(
@@ -255,8 +256,9 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   color: pGrey,
-                                  borderRadius:
-                                  BorderRadius.circular(cardBorderRadius),
+                                  borderRadius: BorderRadius.circular(
+                                    cardBorderRadius,
+                                  ),
                                   border: Border.all(color: sGrey),
                                 ),
                                 padding:
@@ -280,8 +282,9 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                               Container(
                                 decoration: BoxDecoration(
                                   color: pGrey,
-                                  borderRadius:
-                                  BorderRadius.circular(cardBorderRadius),
+                                  borderRadius: BorderRadius.circular(
+                                    cardBorderRadius,
+                                  ),
                                   border: Border.all(color: sGrey),
                                 ),
                                 child: ListView.separated(
@@ -297,7 +300,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                   itemBuilder: (context, index) {
                                     final cat = categories[index];
 
-                                    // ✅ icon kategori dari SortOrder
                                     final icon = _categoryIconBySortOrder(
                                       cat.sortOrder,
                                     );
@@ -308,7 +310,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                       items: cat.items,
                                       isExpanded: _expandedIndex == index,
                                       onTapHeader: () {
-                                        // reset selection saat pindah kategori
                                         if (_expandedIndex != index) {
                                           context
                                               .read<PaymentMethodCariBloc>()
@@ -341,12 +342,18 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                     return const SizedBox.shrink();
                   }
 
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: AppButton.primary(
-                      text: "Lanjutkan",
-                      onPressed: _onLanjutkanPressed,
-                    ),
+                  return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+                    builder: (context, dnState) {
+                      final busy = dnState.isProcessing;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: AppButton.primary(
+                          text: busy ? "Memproses..." : "Lanjutkan",
+                          onPressed: busy ? null : _onLanjutkanPressed,
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -358,6 +365,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   }
 
   void _onLanjutkanPressed() {
+    FocusManager.instance.primaryFocus?.unfocus();
     final methodState = context.read<PaymentMethodCariBloc>().state;
     final selectedId = methodState.selectedMethodId;
     if (selectedId == null) return;
@@ -365,16 +373,11 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     final dnState = context.read<DnRekap2invBloc>().state;
 
     context.read<DnRekap2invBloc>().add(
-          Invoice2PaymentViaVAEvent(
-            invoiceId: dnState.invoiceId,
-            methodId: selectedId,
-          ),
-        );
-
-    /*
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
-    */
+      Invoice2PaymentViaVAEvent(
+        invoiceId: dnState.invoiceId,
+        methodId: selectedId,
+      ),
+    );
   }
 }
+

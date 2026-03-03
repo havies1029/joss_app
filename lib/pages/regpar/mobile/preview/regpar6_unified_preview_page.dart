@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/regpar/mobile/preview/regpar6_preview_page.dart';
 import 'package:joss_app/pages/regpar/mobile/preview/regpar6_storage_picker_panel.dart';
 
-import '../../../../blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import '../../../../blocs/regpar/regpar_upload_foto_object_bloc.dart';
 
 
