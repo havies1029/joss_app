@@ -18,17 +18,19 @@ import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 class EndorseFormPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
-  final String polisId;
+  final String sppaId;
   final String cobId;
   final String? pageTitle;
+  final String sppa2Id;
 
   const EndorseFormPage({
     super.key,
     required this.viewMode,
     required this.recordId,
-    required this.polisId,
+    required this.sppaId,
     required this.cobId,
     this.pageTitle,
+    required this.sppa2Id,
   });
 
 
@@ -70,9 +72,9 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
       loadData();
 
 
-      fieldSppa1IdController.text = widget.polisId;
+      fieldSppa1IdController.text = widget.sppaId;
 
-      debugPrint("✅ [Endorse] Polis ID dari BLoC: ${widget.polisId}");
+      debugPrint("✅ [Endorse] SPPA ID dari BLoC: ${widget.sppaId}");
     });
   }
 
@@ -395,8 +397,9 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
     _dismissDialog();
     final record = Regendors1FormModel(
       notePerubahan: fieldNotePerubahanController.text,
-      sppa1Id: widget.polisId,
+      sppa1Id: widget.sppaId,
       regendors1Id: "",
+      sppa2Id: widget.sppa2Id,
     );
     regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));
   }

@@ -277,7 +277,7 @@ class FabActionHelper {
     }
   }
 
-  static String _polisIdFromItem(String cobId, dynamic item) {
+  static String _sppa1IdFromItem(String cobId, dynamic item) {
     return switch (cobId) {
       "10002" => item.asetParId,
       "10003" => item.asetMvId,
@@ -290,8 +290,8 @@ class FabActionHelper {
 
   static void _openEndorse(
       BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final polisId = _polisIdFromItem(cobId, item);
-    if (polisId.isEmpty) return;
+    final sppa1Id = _sppa1IdFromItem(cobId, item);
+    if (sppa1Id.isEmpty) return;
 
     Navigator.push(
       c,
@@ -299,8 +299,9 @@ class FabActionHelper {
         builder: (_) => EndorseFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: polisId,
+          sppaId: sppa1Id,
           cobId: cobId,
+          sppa2Id: item.sppa2Id ?? "",
         ),
       ),
     ).then((_) => done?.call());
@@ -308,8 +309,8 @@ class FabActionHelper {
 
   static void _openRenewal(
       BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final polisId = _polisIdFromItem(cobId, item);
-    if (polisId.isEmpty) return;
+    final sppa1Id = _sppa1IdFromItem(cobId, item);
+    if (sppa1Id.isEmpty) return;
 
     Navigator.push(
       c,
@@ -317,7 +318,7 @@ class FabActionHelper {
         builder: (_) => RenewalFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: polisId,
+          polisId: sppa1Id,
           cobId: cobId,
         ),
       ),
@@ -326,8 +327,8 @@ class FabActionHelper {
 
   static void _openReactive(
       BuildContext c, String cobId, dynamic item, VoidCallback? done) {
-    final polisId = _polisIdFromItem(cobId, item);
-    if (polisId.isEmpty) return;
+    final sppa1Id = _sppa1IdFromItem(cobId, item);
+    if (sppa1Id.isEmpty) return;
 
     Navigator.push(
       c,
@@ -335,7 +336,7 @@ class FabActionHelper {
         builder: (_) => ReaktifFormPage(
           viewMode: "tambah",
           recordId: "",
-          polisId: polisId,
+          polisId: sppa1Id,
           cobId: cobId,
         ),
       ),

@@ -1,6 +1,7 @@
 
 class AsetMvCariModel {
 	String asetMvId;
+  String sppa2Id;
 	String tertanggung;
 	DateTime periodeMulai;
 	DateTime periodeAkhir;
@@ -22,7 +23,9 @@ class AsetMvCariModel {
 	bool isReaktif;
 	bool isRenewal;
 
-	AsetMvCariModel({required this.asetMvId, required this.tertanggung,
+	AsetMvCariModel({required this.asetMvId, 
+    required this.sppa2Id,
+    required this.tertanggung,
 		required this.periodeMulai, required this.periodeAkhir,
 		required this.curr,
 		required this.jenisMv, required this.merk,
@@ -36,6 +39,7 @@ class AsetMvCariModel {
 	factory AsetMvCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetMvCariModel(
 				asetMvId: data['asetMvId']??'',
+        sppa2Id: data['sppa2Id']??'',
 				tertanggung: data['tertanggung']??'',
 				periodeMulai: DateTime.tryParse(data['periodeMulai']??'') ?? DateTime(1970),
 				periodeAkhir: DateTime.tryParse(data['periodeAkhir']??'') ?? DateTime(1970),
@@ -62,6 +66,7 @@ class AsetMvCariModel {
 
 	Map<String, dynamic> toJson() =>
 			{'asetMvId': asetMvId,
+        'sppa2Id': sppa2Id,
 				'tertanggung': tertanggung,
 				'periodeMulai': periodeMulai.toIso8601String(),
 				'periodeAkhir': periodeAkhir.toIso8601String(),
