@@ -40,89 +40,82 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
             horizontal: 15, vertical: 10),
         child: BlocConsumer<KlaimparaccordionBloc, KlaimparaccordionState>(
           builder: (context, acc) {
-            return Column(
-              children: [
-                const SizedBox(height: hPadding * 1.5),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                  child: FormSectionHeader(
-                    iconPath: iconPath,
-                    title: "Polis ${widget.cobGroupNama}",
-                    subtitle:
-                        "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
-                  ),
-                ),
-                const SizedBox(height: hPadding * 1.5),
-                BlocBuilder<KlaimparklaimcrudBloc, KlaimparklaimcrudState>(
-                  builder: (_, klaim) =>
-                      BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
-                    builder: (_, dok) {
-                      final done = [
-                        klaim.isComplete,
-                        dok.isComplete,
-                      ].where((x) => x).length;
-
-                      final totalStep = 2.0;
-                      final progress = done / totalStep;
-
-                      return Row(
-                        children: [
-                          Expanded(
-                              child: CustomProgressBar(
-                            progress: progress,
-                            barColor: primaryColor,
-                            borderRadius: cardBorderRadius,
-                          )),
-                          const SizedBox(width: 12),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: hPadding * 1.5),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: hPadding * 1.5),
-                        Klaimparaccordioncard(
-                          title: 'Data Klaim',
-                          isOpen: acc.openedIndex == 0,
-                          onTap: () => context
-                              .read<KlaimparaccordionBloc>()
-                              .add(KlaimparaccordionToggleEvent(index: 0)),
-                          child: KlaimparklaimcrudFormPage(
-                              recordId: widget.klaim1Id,
-                              viewMode: "ubah",
-                              cobGroupId: widget.cobGroupId),
-                        ),
-                        Klaimparaccordioncard(
-                          title: 'Dokumen Klaim',
-                          isOpen: acc.openedIndex == 1,
-                          onTap: () => context
-                              .read<KlaimparaccordionBloc>()
-                              .add(KlaimparaccordionToggleEvent(index: 1)),
-                          child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: hPadding * 1.5),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: FormSectionHeader(
+                      iconPath: iconPath,
+                      title: "Polis ${widget.cobGroupNama}",
+                      subtitle:
+                          "Sebelum lanjut x, pastikan data kamu sudah lengkap, ya!",
                     ),
                   ),
-                ),
-                AppButton.primary(
-                  onPressed: () {
-                    switch (acc.openedIndex) {
-                      case 0:
-                        klaimparklaimcrudBloc
-                            .add(KlaimparklaimcrudAutoSaveEvent());
-                        break;
-                    }
-                  },
-                  text: 'Perbarui',
-                  backgroundColor: pBlue,
-                  textStyle: headingStyle(context, fontSize: 18),
-                ),
-              ],
+                  const SizedBox(height: hPadding * 1.5),
+                  BlocBuilder<KlaimparklaimcrudBloc, KlaimparklaimcrudState>(
+                    builder: (_, klaim) =>
+                        BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
+                      builder: (_, dok) {
+                        final done = [
+                          klaim.isComplete,
+                          dok.isComplete,
+                        ].where((x) => x).length;
+              
+                        final totalStep = 2.0;
+                        final progress = done / totalStep;
+              
+                        return Row(
+                          children: [
+                            Expanded(
+                                child: CustomProgressBar(
+                              progress: progress,
+                              barColor: primaryColor,
+                              borderRadius: cardBorderRadius,
+                            )),
+                            const SizedBox(width: 12),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: hPadding * 1.5),
+                  Klaimparaccordioncard(
+                    title: 'Data Klaim',
+                    isOpen: acc.openedIndex == 0,
+                    onTap: () => context
+                        .read<KlaimparaccordionBloc>()
+                        .add(KlaimparaccordionToggleEvent(index: 0)),
+                    child: KlaimparklaimcrudFormPage(
+                        recordId: widget.klaim1Id,
+                        viewMode: "ubah",
+                        cobGroupId: widget.cobGroupId),
+                  ),
+                  Klaimparaccordioncard(
+                    title: 'Dokumen Klaim',
+                    isOpen: acc.openedIndex == 1,
+                    onTap: () => context
+                        .read<KlaimparaccordionBloc>()
+                        .add(KlaimparaccordionToggleEvent(index: 1)),
+                    child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
+                  ),
+                  const SizedBox(height: 24),
+                  AppButton.primary(
+                    onPressed: () {
+                      switch (acc.openedIndex) {
+                        case 0:
+                          klaimparklaimcrudBloc
+                              .add(KlaimparklaimcrudAutoSaveEvent());
+                          break;
+                      }
+                    },
+                    text: 'Perbarui',
+                    backgroundColor: pBlue,
+                    textStyle: headingStyle(context, fontSize: 18),
+                  ),
+                ],
+              ),
             );
           },
           listener: (BuildContext context, KlaimparaccordionState state) async {

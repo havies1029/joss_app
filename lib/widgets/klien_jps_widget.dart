@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/common/loading_indicator.dart';
 import '../blocs/gallery/gallerymembercari_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 

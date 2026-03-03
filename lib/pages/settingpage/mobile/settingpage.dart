@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: ClipOval(
         child: hasPhoto
             ? Image.memory(
-          bytes!,
+          bytes,
           fit: BoxFit.cover,
           width: 46,
           height: 46,
@@ -599,7 +599,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: primaryLightColor,
+              activeThumbColor: primaryLightColor,
               activeTrackColor: pBlue,
               inactiveThumbColor: primaryLightColor,
               inactiveTrackColor: pGrey,

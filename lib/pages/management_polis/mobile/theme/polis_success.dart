@@ -1,7 +1,6 @@
   import 'package:flutter/material.dart';
   import 'package:flutter_svg/flutter_svg.dart';
   import 'package:flutter_bloc/flutter_bloc.dart';
-  import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
   import 'package:joss_app/common/constants.dart';
   import 'package:joss_app/pages/base/base_background_firstpage.dart';
 

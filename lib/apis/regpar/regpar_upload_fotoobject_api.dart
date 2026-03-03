@@ -82,7 +82,7 @@ class RegparUploadFotoObjectApi {
       } else {
         return ReturnDataAPI(success: false, data: "", rowcount: 0);
       }
-    } on DioException catch (e) {
+    } on DioException {
       rethrow;
     } catch (e) {
       debugPrint("Error uploading photo: $e");

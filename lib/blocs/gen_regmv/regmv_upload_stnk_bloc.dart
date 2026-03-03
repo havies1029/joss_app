@@ -372,7 +372,7 @@ class RegmvUploadStnkBloc
       );
 
       if (returnData.success == true) {
-        final serverId = returnData.data?.toString();
+        final serverId = returnData.data.toString();
         _updateItem(emit, localId, (x) => x.copyWith(
           status: UploadStatus.success,
           progress: 1.0,

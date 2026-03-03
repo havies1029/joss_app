@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
-import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 class SyaratKetentuanPage extends StatefulWidget {
   const SyaratKetentuanPage({super.key});

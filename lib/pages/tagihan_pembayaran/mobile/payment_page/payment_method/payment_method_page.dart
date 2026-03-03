@@ -176,12 +176,19 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   return const SizedBox.shrink();
                 }
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: AppButton.primary(
-                    text: "Lanjutkan",
-                    onPressed: _onLanjutkanPressed,
-                  ),
+                return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+                  builder: (context, dnState) {
+
+                    final busy = dnState.isProcessing;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: AppButton.primary(
+                        text: busy ? "Memproses..." : "Lanjutkan",
+                        onPressed: busy ? null : _onLanjutkanPressed,
+                      ),
+                    );
+                  }
                 );
               },
             ),
@@ -192,6 +199,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   }
 
   void _onLanjutkanPressed() {
+    FocusManager.instance.primaryFocus?.unfocus();
     final methodState = context.read<PaymentMethodCariBloc>().state;
     final selectedId = methodState.selectedMethodId;
     if (selectedId == null) return;
@@ -204,11 +212,5 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             methodId: selectedId,
           ),
         );
-
-    /*
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
-    */
   }
 }

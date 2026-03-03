@@ -117,7 +117,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       child: MultiBlocListener(
         listeners: [
           BlocListener<Regklaim1CrudBloc, Regklaim1CrudState>(
-            listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
+            listenWhen: (prev, curr) => curr.isSaved,
             listener: (context, state) {
               if (!mounted) return;
               if (state.hasFailure) return;

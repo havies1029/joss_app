@@ -78,7 +78,7 @@ class RegmvUploadFotoAccApi {
       } else {
         return ReturnDataAPI(success: false, data: "", rowcount: 0);
       }
-    } on DioException catch (e) {
+    } on DioException {
 
       rethrow;
     } catch (e) {
