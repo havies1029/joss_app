@@ -6,8 +6,10 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../models/login/emailverification_model.dart';
 import '../../../../../models/reguser/reguser_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
@@ -137,22 +139,25 @@ class PopupClientWidgetState extends State<PopupClientWidget>
     RegUserModel? record = context.read<RegUserBloc>().state.record;
     record?.kodePin = otp;
 
-    context.read<RegUserBloc>().add(
-      ValidasiPinHPEvent(
-        record: record!,
-        sentTo: widget.sentTo,
-        sentVia: widget.sentVia,
+    final emailVerificationRecord =
+        context.read<EmailVerificationBloc>().state.record;
+
+    context.read<EmailVerificationBloc>().add(
+      ResendOtpEvent(
+        record: EmailVerificationModel(
+          email: widget.sentTo,
+          requestId: emailVerificationRecord?.requestId ?? '',
+          requestFrom: "email",
+        ),
       ),
     );
   }
 
   void _onOtpChanged(String value, int index) {
-    // ✅ logika kamu tetap: maju fokus kalau ada isi
     if (value.isNotEmpty && index < 5) {
       _focusNodes[index + 1].requestFocus();
     }
 
-    // ✅ auto verify kalau semua terisi
     if (_otpControllers.every((c) => c.text.isNotEmpty)) {
       _verifyOtp();
     }

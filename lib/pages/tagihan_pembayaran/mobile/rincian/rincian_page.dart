@@ -68,14 +68,6 @@ class _RincianPageState extends State<RincianPage> {
         builder: (_) => PaymentMethodPage(
           curr: curr,
           totalBayar: totalBayar,
-          onBack: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const TagihanPembayaranPage(initialTab: 2),
-              ),
-                  (route) => route.isFirst,
-            );
-          },
         ),
       ),
     );

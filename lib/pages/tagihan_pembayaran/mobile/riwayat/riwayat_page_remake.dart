@@ -52,22 +52,6 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<HistorybayarCariBloc, HistorybayarCariState>(
-          listenWhen: (prev, curr) =>
-              prev.downloadPath != curr.downloadPath &&
-              curr.downloadPath.isNotEmpty &&
-              !curr.isDownloading,
-          listener: (context, state) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => InvoicePreviewFromBase64Page(
-                  base64Pdf: state.downloadPath,
-                ),
-              ),
-            );
-          },
-        ),
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
           listenWhen: (previous, current) {
             return previous.isProcessed != current.isProcessed ||
@@ -116,15 +100,6 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 errorSnackBar('Proses pembayaran gagal. Silakan coba lagi.'),
               );
             }
-          },
-        ),
-        BlocListener<HistorybayarCariBloc, HistorybayarCariState>(
-          listener: (context, state) {
-            debugPrint(
-              '[HistorybayarCariBloc Listener AKTIF] '
-              'isDownloading=${state.isDownloading} '
-              'downloadPath=${state.downloadPath}',
-            );
           },
         ),
       ],
@@ -202,14 +177,6 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
         builder: (_) => PaymentMethodPage(
           curr: curr,
           totalBayar: totalBayar,
-          onBack: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const TagihanPembayaranPage(initialTab: 2),
-              ),
-              (route) => route.isFirst,
-            );
-          },
         ),
       ),
     );
@@ -233,41 +200,54 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
       refreshData();
     }
 
-    Widget chip(String text, bool selected, VoidCallback onTap) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFF2994A) : const Color(0xFF2B2B2B),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: selected
-                  ? const Color(0xFFF2994A)
-                  : Colors.white.withOpacity(0.10),
+    final textStyle = headingStyle(context, fontSize: 14);
+    final Color chipSelected = primaryColor;
+    final double radius = cardBorderRadius;
+
+    Widget chip(String text, RiwayatFilter value) {
+      final selected = _filter == value;
+
+      return Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: ChoiceChip(
+          backgroundColor: pGrey,
+          label: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 180),
+            child: Text(
+              text,
+              style: textStyle.copyWith(
+                color: selected ? Colors.white : primaryLightColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
             ),
           ),
-          child: Text(
-            text,
-            style: TextStyle(
-              color: selected ? Colors.black : primaryLightColor,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+          selected: selected,
+          selectedColor: chipSelected,
+          showCheckmark: false,
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radius),
           ),
+          labelPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 5,
+          ),
+          onSelected: (_) => apply(value),
         ),
       );
     }
 
-    return Row(
-      children: [
-        chip("Semua", _filter == RiwayatFilter.semua, () => apply(RiwayatFilter.semua)),
-        const SizedBox(width: 10),
-        chip("Menunggu Pembayaran", _filter == RiwayatFilter.menunggu, () => apply(RiwayatFilter.menunggu)),
-        const SizedBox(width: 10),
-        chip("Selesai", _filter == RiwayatFilter.selesai, () => apply(RiwayatFilter.selesai)),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          chip("Semua", RiwayatFilter.semua),
+          chip("Menunggu Pembayaran", RiwayatFilter.menunggu),
+          chip("Selesai", RiwayatFilter.selesai),
+        ],
+      ),
     );
   }
 }

@@ -11,6 +11,7 @@ import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../models/payment/historybayarcari_model.dart';
+import '../invoice_preview_page.dart';
 import 'riwayat_table_widget_remake.dart';
 
 class RiwayatDetailTablePageRemake extends StatefulWidget {
@@ -69,6 +70,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                       alignment: Alignment.centerRight,
                       child: IconButton(
                         icon: const Icon(Icons.close),
+                        color: primaryLightColor,
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
@@ -84,66 +86,98 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                 horizontal: hPadding * 1.5,
                 vertical: hPadding,
               ),
-              child: BlocBuilder<HistorybayarCariBloc, HistorybayarCariState>(
-                buildWhen: (p, c) => p.selectedItem != c.selectedItem,
+              child: BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
+                buildWhen: (p, c) =>
+                p.selectedItem != c.selectedItem ||
+                    p.isDownloading != c.isDownloading, // <-- penting: supaya loading ke-render
+                listenWhen: (prev, curr) =>
+                prev.downloadPath != curr.downloadPath &&
+                    curr.downloadPath.isNotEmpty &&
+                    !curr.isDownloading,
+                listener: (context, state) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InvoicePreviewFromBase64Page(
+                        base64Pdf: state.downloadPath,
+                      ),
+                    ),
+                  );
+                },
                 builder: (context, state) {
                   final selected = state.selectedItem;
                   if (selected == null) return const LoadingIndicator();
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  return Stack(
                     children: [
-                      _buildPay1SummaryFromModel(selected),
+                      // konten utama dialog
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildPay1SummaryFromModel(selected),
 
-                      const SizedBox(height: hPadding),
-                      const Divider(height: 1),
-                      const SizedBox(height: hPadding),
+                          const SizedBox(height: hPadding),
+                          const Divider(height: 1),
+                          const SizedBox(height: hPadding),
 
-                      SingleChildScrollView(
-                        child: RiwayatTableWidgetRemake(),
-                      ),
-
-                      const SizedBox(height: hPadding),
-                      const Divider(height: 1),
-                      const SizedBox(height: hPadding),
-
-                      _buildTotalBayar(selected),
-
-                      const SizedBox(height: hPadding),
-
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: AppButton.iconLeft(
-                          text: selected.stsInvId == '10002'
-                              ? 'Lanjut Pembayaran'
-                              : 'Unduh Invoice',
-                          backgroundColor: selected.stsInvId == '10002'
-                              ? primaryColor
-                              : greenforPayment,
-                          icon: SvgPicture.asset(
-                            selected.stsInvId == '10002'
-                                ? 'assets/icons/unduh_invoice.svg'
-                                : 'assets/icons/invoice.svg',
-                            width: 18,
-                            height: 18,
+                          SingleChildScrollView(
+                            child: RiwayatTableWidgetRemake(),
                           ),
-                          onPressed: () {
-                            if (selected.stsInvId == '10002') {
-                              // lanjut pembayaran
-                              context.read<DnRekap2invBloc>().add(
-                                CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
-                              );
-                            } else {
-                              // unduh invoice
-                              context.read<HistorybayarCariBloc>().add(
-                                DownloadInvoiceEvent(
-                                  noInv: selected.inv1Id,
-                                ),
-                              );
-                            }
-                          },
-                        ),
+
+                          const SizedBox(height: hPadding),
+                          const Divider(height: 1),
+                          const SizedBox(height: hPadding),
+
+                          _buildTotalBayar(selected),
+
+                          const SizedBox(height: hPadding),
+
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: AppButton.iconLeft(
+                              text: selected.stsInvId == '10002'
+                                  ? 'Lanjut Pembayaran'
+                                  : 'Unduh Invoice',
+                              backgroundColor: selected.stsInvId == '10002'
+                                  ? primaryColor
+                                  : greenforPayment,
+                              icon: SvgPicture.asset(
+                                selected.stsInvId == '10002'
+                                    ? 'assets/icons/unduh_invoice.svg'
+                                    : 'assets/icons/invoice.svg',
+                                width: 18,
+                                height: 18,
+                              ),
+                              onPressed: () {
+                                if (selected.stsInvId == '10002') {
+                                  context.read<DnRekap2invBloc>().add(
+                                    CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                                  );
+                                } else {
+                                  // klik -> event -> bloc set isDownloading=true -> loading langsung muncul
+                                  context.read<HistorybayarCariBloc>().add(
+                                    DownloadInvoiceEvent(noInv: selected.inv1Id),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
+
+                      // overlay loading
+                      if (state.isDownloading) ...[
+                        Positioned.fill(
+                          child: AbsorbPointer(
+                            absorbing: true,
+                            child: Container(
+                              color: Colors.black45,
+                              alignment: Alignment.center,
+                              child: const LoadingIndicator(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   );
                 },

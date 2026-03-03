@@ -50,18 +50,24 @@ class EmailVerificationBloc
     ));
   }
 
-
-  Future<void> onTambahEmailVerification(EmailVerificationTambahEvent event,
-      Emitter<EmailVerificationState> emit) async {
+  Future<void> onTambahEmailVerification(
+      EmailVerificationTambahEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
     ReturnDataAPI returnData;
     bool hasFailure = true;
+
     emit(state.copyWith(isLoading: true, isLoaded: false, hasFailure: false));
+
     returnData = await repository.emailVerificationTambah(event.record);
     hasFailure = !returnData.success;
+
     List<String> errors = [];
 
+    EmailVerificationModel? record = hasFailure ? null : event.record;
+
     if (!hasFailure) {
-      List<String> infoData = returnData.data.split(";");
+      final infoData = returnData.data.split(";");
 
       if ((infoData[0] == '1') || (infoData[0] == '3')) {
         // Token token = Token.split(event.record.email, infoData[1]);
@@ -85,19 +91,27 @@ class EmailVerificationBloc
           userRepository.persistToken(userToken: token.token!);
         }
 
-        authenticationBloc.add(UserAuthenticated(user: user, authenticatedFrom: "email_verification"));
+        authenticationBloc.add(
+          UserAuthenticated(user: user, authenticatedFrom: "email_verification"),
+        );
       } else if (infoData[0] == '2') {
-        event.record.requestId = infoData[1];
-        authenticationBloc
-            .add(RequirePinEmailVerification(email: event.record.email));
+        record = event.record.copyWith(requestId: infoData.length > 1 ? infoData[1] : '');
+
+        authenticationBloc.add(
+          RequirePinEmailVerification(email: event.record.email),
+        );
       }
     } else if (returnData.data.isNotEmpty) {
-      List<String> infoData = returnData.data.split(";");
+      final infoData = returnData.data.split(";");
       if (infoData[0] == '9') {
         errors.add(infoData[1]);
 
-        authenticationBloc.add(RequireLoginClient(
-            requiredFrom: "bloc_email_verification", errorMsg: infoData[1]));
+        authenticationBloc.add(
+          RequireLoginClient(
+            requiredFrom: "bloc_email_verification",
+            errorMsg: infoData[1],
+          ),
+        );
       }
     }
 
@@ -105,7 +119,7 @@ class EmailVerificationBloc
       isLoading: false,
       isLoaded: true,
       hasFailure: hasFailure,
-      record: event.record,
+      record: record,
       errors: errors,
     ));
   }

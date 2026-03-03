@@ -27,49 +27,50 @@ class HomeTabWidget extends StatefulWidget {
 
 class _HomeTabWidgetState extends State<HomeTabWidget> {
   int selectedIndex = 0;
-  late final List<Widget> pages;
 
-  @override
-  void initState() {
-    super.initState();
-    pages = [
-      const HeroPage(),
-      const CariAsuransiWidget.menu(),
-      const DaftarCobKlaimMenu(),
-      const LiterasiPage(),
-      const SettingsPage(),
-    ];
+  // track tab yang sudah pernah dibuka (biar baru dibuild saat pertama kali)
+  final Set<int> _visited = {0};
+
+  // jumlah tab
+  static const int _tabCount = 5;
+
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return const HeroPage();
+      case 1:
+        return const CariAsuransiWidget.menu();
+      case 2:
+        return const DaftarCobKlaimMenu();
+      case 3:
+        return const LiterasiPage();
+      case 4:
+        return const SettingsPage();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  void _onTapTab(int idx) {
+    setState(() {
+      selectedIndex = idx;
+      _visited.add(idx); // <- baru dibuat ketika user klik tab ini
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        // Listener Foto Profil
         BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
           listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
-          listener: (context, state) {
-            //final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
-            // if (bytes.isNotEmpty) {
-            //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
-            // }
-          },
+          listener: (context, state) {},
         ),
         BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
           listenWhen: (prev, curr) =>
           curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
           listener: (context, state) {
-            //final nama = state.record?.rekanNama.trim();
             final mrekan1Id = state.record?.mrekan1Id;
-            //final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
-
-            // if (nama != null && nama.isNotEmpty) {
-            //   context.read<UserProfileCubit>().setProfile(
-            //     nama: nama,
-            //     mjnsclientId: mjnsclientId, // 👈 simpan juga
-            //   );
-            // }
-
             if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
               context.read<MRekanContactCrudBloc>().add(
                 MRekanContactCrudLihatEvent(),
@@ -77,29 +78,27 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
             }
           },
         ),
-
         BlocListener<EmailVerificationBloc, EmailVerificationState>(
           listenWhen: (prev, curr) =>
-          prev.record != curr.record && curr.record != null && !curr.hasFailure,
-          listener: (context, state) {
-            //final record = state.record!;
-            // if (record.email.isNotEmpty) {
-            //   context.read<RegUserProfileCubit>().setProfile(
-            //     email: record.email,
-            //   );
-            // }
-          },
+          prev.record != curr.record &&
+              curr.record != null &&
+              !curr.hasFailure,
+          listener: (context, state) {},
         ),
-
       ],
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
+        appBar:
+        MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
         body: Stack(
           children: [
             IndexedStack(
               index: selectedIndex,
-              children: pages,
+              children: List.generate(_tabCount, (idx) {
+                // tab yang belum pernah dibuka: jangan build page-nya
+                if (!_visited.contains(idx)) return const SizedBox.shrink();
+                return _buildPage(idx);
+              }),
             ),
             DraggableChatButton(
               onTap: () {
@@ -114,14 +113,13 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
             ),
           ],
         ),
-
         bottomNavigationBar: Material(
           color: primaryBlackColor,
           child: SafeArea(
             top: false,
             child: bottom_nav.MobileBottomNavigationBar(
               currentIndex: selectedIndex,
-              onTap: (idx) => setState(() => selectedIndex = idx),
+              onTap: _onTapTab, // <- pakai handler ini
             ),
           ),
         ),

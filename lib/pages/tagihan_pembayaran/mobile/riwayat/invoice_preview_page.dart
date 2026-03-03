@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../../../common/loading_indicator.dart';
+
 class InvoicePreviewFromBase64Page extends StatefulWidget {
   final String base64Pdf; // idealnya ini INV base64, bukan JSON
 
@@ -74,7 +76,7 @@ class _InvoicePreviewFromBase64PageState extends State<InvoicePreviewFromBase64P
     return Scaffold(
       appBar: AppBar(title: const Text('Invoice Preview')),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingIndicator())
           : (_error != null
           ? Center(child: Text(_error!))
           : PdfViewPinch(controller: _controller!)),

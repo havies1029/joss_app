@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/payment/historybayar2cari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../models/payment/historybayar2cari_model.dart';
@@ -52,7 +53,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
       buildWhen: (p, c) => p.status != c.status || p.items != c.items,
       builder: (context, state) {
         if (state.status != ListStatus.success) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: LoadingIndicator());
         }
 
         final items = state.items.isNotEmpty ? state.items : _dummyItems();

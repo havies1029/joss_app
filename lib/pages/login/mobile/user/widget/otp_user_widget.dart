@@ -7,6 +7,7 @@ import 'dart:math' as math;
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
+import '../../../../../blocs/login/forgot_password_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/login/emailverification_model.dart';
 import '../../../../base/base_background_firstpage.dart';
@@ -169,25 +170,33 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   }
 
   void _resendOtp() {
-    // bloc tetap sama: jangan diubah
-    final otp = _otpControllers.map((c) => c.text).join();
-
     setState(() {
       _remainingTime = 59;
       _isResendAvailable = false;
     });
     _startTimer();
 
-    context.read<EmailVerificationBloc>().add(
-      ValidasiPinEmailEvent(
-        record: EmailVerificationModel(email: widget.email, pin: otp),
-        requestAt: DateTime.now(),
+    HapticFeedback.lightImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Kode OTP telah dikirim ulang'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
 
-    HapticFeedback.lightImpact();
-    ScaffoldMessenger.of(context).showSnackBar(
-      successSnackBar('Kode OTP telah dikirim ulang ke email'),
+    final emailVerificationRecord =
+        context.read<EmailVerificationBloc>().state.record;
+
+    context.read<EmailVerificationBloc>().add(
+      ResendOtpEvent(
+        record: EmailVerificationModel(
+          email: widget.email,
+          requestId: emailVerificationRecord?.requestId ?? '',
+          requestFrom: "email",
+        ),
+      ),
     );
   }
 
