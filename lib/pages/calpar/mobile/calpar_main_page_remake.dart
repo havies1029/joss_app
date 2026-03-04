@@ -40,7 +40,7 @@ import '../../base/base_background_sidepage.dart';
 import '../../register/mobile/client/register_client_page.dart';
 import '../../regpar/mobile/regpar_main_page_remake.dart';
 
-
+enum CalparFormSection { form1, form2, form3, form4 }
 
 class CalparMainPageRemake extends StatefulWidget {
 
@@ -54,7 +54,10 @@ class CalparMainPageRemake extends StatefulWidget {
 
 
 class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
-  List<bool> expanded = [true, false, false, false];
+  List<bool> expanded = List.filled(CalparFormSection.values.length, false);
+
+  int getOpenedIndex() => expanded.indexWhere((e) => e);
+  int sectionIndex(CalparFormSection s) => CalparFormSection.values.indexOf(s);
 
   String? calpar1Id;
   String? calpar2Id;
@@ -126,11 +129,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     return f.format(value);
   }
 
-  double getProgressValue() {
-    final openedCount = expanded.where((v) => v).length;
-    return openedCount / 4;
-  }
-
   String getKonstruksiSubtitle(String kelasNama) {
     switch (kelasNama) {
       case "Kelas Konstruksi 1":
@@ -195,6 +193,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   void initState() {
     super.initState();
     fieldCoverBulanController.text = "12";
+
+    expanded = List.filled(CalparFormSection.values.length, false);
+    expanded[sectionIndex(CalparFormSection.form1)] = true;
   }
 
   @override
@@ -385,7 +386,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
-      title: "Kendaraan",
+      title: "Properti",
       blocListeners: [
         BlocListener<Calpar1ListBloc, Calpar1ListState>(
           listenWhen: (prev, curr) {
@@ -747,8 +748,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(CalparFormSection.form1, onRefresh: onRefresh);
             },
 
           ),
@@ -782,10 +782,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-            onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
-            },
+          onTap: () {
+            tryOpenSection(CalparFormSection.form2, onRefresh: onRefresh);
+          },
           ),
           if (isExpanded)
             Padding(
@@ -818,8 +817,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(CalparFormSection.form3, onRefresh: onRefresh);
             },
           ),
           if (isExpanded)
@@ -854,7 +852,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                 width: 16,
               ),
             ),
-            onTap: () => onToggle(!isExpanded),
+            onTap: () {
+              tryOpenSection(CalparFormSection.form4);
+            },
           ),
           if (isExpanded)
             Padding(
@@ -995,29 +995,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     context.read<CalparFlowBloc>().add(CalparFlowStartEvent());
   }
 
-  void openForm1() {
-    setState(() {
-      expanded = [true, false, false, false];
-    });
-  }
-
-  void openForm2() {
-    setState(() {
-      expanded = [false, true, false, false];
-    });
-  }
-
-  void openForm3() {
-    setState(() {
-      expanded = [false, false, true, false];
-    });
-  }
-
-  void openForm4() {
-    setState(() {
-      expanded = [false, false, false, true];
-    });
-  }
+  void openForm1() => openSection(CalparFormSection.form1);
+  void openForm2() => openSection(CalparFormSection.form2);
+  void openForm3() => openSection(CalparFormSection.form3);
+  void openForm4() => openSection(CalparFormSection.form4);
 
   bool validateForm1() {
     clearErrsByPrefix('form1.');
@@ -1680,4 +1661,81 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
     });
   }
+
+  bool validateOpenedForm() {
+    final opened = getOpenedIndex();
+    if (opened < 0) return true;
+    if (opened >= CalparFormSection.values.length) return true;
+
+    final section = CalparFormSection.values[opened];
+
+    switch (section) {
+      case CalparFormSection.form1: return validateForm1();
+      case CalparFormSection.form2: return validateForm2();
+      case CalparFormSection.form3: return validateForm3();
+      case CalparFormSection.form4: return true; // hasil saja
+    }
+  }
+
+  void openSection(CalparFormSection section, {VoidCallback? onRefresh}) {
+    final idx = sectionIndex(section);
+
+    setState(() {
+      expanded = List<bool>.filled(expanded.length, false);
+      expanded[idx] = true;
+    });
+
+    onRefresh?.call();
+  }
+
+  void tryOpenSection(CalparFormSection section, {VoidCallback? onRefresh}) {
+    final targetIdx = sectionIndex(section);
+    final opened = getOpenedIndex();
+
+    if (opened == targetIdx) return;
+
+    final ok = validateOpenedForm();
+    if (!ok) return;
+
+    openSection(section, onRefresh: onRefresh);
+  }
+
+  double getProgressValue() {
+    final done = [
+      isForm1Complete(),
+      isForm2Complete(),
+      isForm3Complete(),
+      isForm4Complete(),
+    ].where((x) => x).length;
+
+    return done / CalparFormSection.values.length;
+  }
+
+  bool isForm1Complete() =>
+    fieldCoverBulanController.text.trim().isNotEmpty &&
+    fieldComboRKonstruksiojk != null &&
+    fieldComboROkupasi != null;
+
+  bool isForm2Complete() {
+    if (fieldComboRMatauang == null) return false;
+
+    double n(TextEditingController c) =>
+        double.tryParse(c.text.replaceAll(',', '').trim()) ?? 0;
+
+    final vMachinery = n(fieldSiMachineryController);
+    final vBuilding  = n(fieldSiBuildingController);
+    final vContent   = n(fieldSiContentController);
+    final vStock     = n(fieldSiStockController);
+    final vOther     = n(fieldSiOtherController);
+
+    return (vMachinery > 0 || vBuilding > 0 || vContent > 0 || vStock > 0 || vOther > 0);
+  }
+
+  bool isForm3Complete() =>
+      fieldComboMJnscoverPar != null &&
+      fieldComboMWilayah != null &&
+      fieldComboMKabZonaGempa != null;
+
+  bool isForm4Complete() => (calpar4Id?.isNotEmpty == true);
+
 }

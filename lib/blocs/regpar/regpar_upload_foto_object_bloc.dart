@@ -27,6 +27,9 @@ class RegparUploadFotoObjectBloc
     on<RegparStorageUploadMany>(_onUploadMany);
     on<RegparUploadFotoObjectUploadOne>(_onUploadOne);
     on<RegparStorageRemoveAttachment>(_onRemove);
+    on<RegparUploadReset>((event, emit) {
+      emit(state.copyWith(items: [])); // atau state.initial()
+    });
   }
 
 

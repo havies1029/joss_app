@@ -104,3 +104,5 @@ class RegparStorageRemoveAttachment extends RegparUploadFotoObjectEvent {
   @override
   List<Object?> get props => [localId];
 }
+
+class RegparUploadReset extends RegparUploadFotoObjectEvent {}

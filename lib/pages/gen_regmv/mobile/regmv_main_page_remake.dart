@@ -55,6 +55,16 @@ import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regmv_page.dart';
 
+enum RegmvFormSection {
+  form1,
+  form2,
+  form3,
+  form4,
+  form5,
+  form7,
+  form6,
+}
+
 class RegmvFormMainRemake extends StatefulWidget {
   final String? regmv1Id;
   final String? calmv1Id;
@@ -70,14 +80,15 @@ class RegmvFormMainRemake extends StatefulWidget {
 }
 
 class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
-  List<bool> expanded = [false, false, false, false, false, false, false];
+  List<bool> expanded = List.filled(RegmvFormSection.values.length, false);
+
+  int getOpenedIndex() => expanded.indexWhere((e) => e);
 
   String? regmv1Id;
   String? regmv2Id;
   String? regmv3Id;
   String? regmv4Id;
   String? regmv5Id;
-  String? regmv6Id;
   String? regmv7Id;
 
   Regmv1CrudBloc? regmv1crudbloc;
@@ -99,11 +110,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   String cleanNum(num value) {
     final f = NumberFormat("#,###", "en_US");
     return f.format(value);
-  }
-
-  double getProgressValue() {
-    final openedCount = expanded.where((v) => v).length;
-    return openedCount / 7;
   }
 
   //form1
@@ -184,13 +190,17 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   @override
   void initState() {
     super.initState();
+
     final regmv1 = context.read<Regmv1CrudBloc>().state.record?.regmv1Id ?? "";
     regmv1Id = widget.regmv1Id ?? regmv1;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      resetUploadStates(); // ✅ ini yang bikin foto lama hilang
+
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
     });
   }
@@ -680,6 +690,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               }
               if (state.isLoaded && !state.hasFailure && state.record != null) {
                 _payloadform3(state.record!);
+              }
+            },
+          ),
+          BlocListener<Regmv6FormBloc, Regmv6FormState>(
+            listener: (context, state) {
+              if (state.isCalculated && !state.hasFailure && state.record != null) {
+                _payloadform6(state.record!);
+                openSection(RegmvFormSection.form6);
               }
             },
           ),
@@ -1203,8 +1221,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegmvFormSection.form1, onRefresh: onRefresh);
             },
 
           ),
@@ -1239,8 +1256,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegmvFormSection.form2, onRefresh: onRefresh); // untuk Form2
             },
 
           ),
@@ -1275,8 +1291,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegmvFormSection.form3, onRefresh: onRefresh); // untuk Form3
             },
 
           ),
@@ -1310,10 +1325,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-            onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
-            },
+          onTap: () {
+            tryOpenSection(RegmvFormSection.form4, onRefresh: onRefresh); // untuk Form4
+          },
           ),
           if (isExpanded)
             Padding(
@@ -1345,10 +1359,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-            onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
-            },
+          onTap: () {
+            tryOpenSection(RegmvFormSection.form5, onRefresh: onRefresh); // untuk Form5
+          },
           ),
           if (isExpanded)
             Padding(
@@ -1380,10 +1393,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-            onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
-            },
+          onTap: () {
+            tryOpenSection(RegmvFormSection.form6, onRefresh: onRefresh); // untuk Form6
+          },
 
           ),
           if (isExpanded)
@@ -1416,10 +1428,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-            onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
-            },
+          onTap: () {
+            tryOpenSection(RegmvFormSection.form7, onRefresh: onRefresh); // untuk Form7
+          },
           ),
           if (isExpanded)
             Padding(
@@ -1435,8 +1446,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final record = Regmv1CrudModel(
       calmv1Id: widget.calmv1Id ?? "",
       regmv1Id: regmv1Id ?? "",
-      ttgNama: fieldTtgNamaController.text ?? "",
-      ttgAlamat: fieldTtgAlamatController.text ?? "",
+      ttgNama: fieldTtgNamaController.text,
+      ttgAlamat: fieldTtgAlamatController.text,
     );
 
     context.read<Regmv1CrudBloc>().add(
@@ -1551,7 +1562,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       } else if (!ok5) {
         openForm5(recordId: regmv1Id);
       } else if (!ok7) {
-        openForm6(recordId: regmv1Id);
+        openForm7(recordId: regmv1Id);
       }
 
       return;
@@ -1584,52 +1595,38 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   void openForm1({required String? recordId}) {
-    setState(() {
-      expanded = [true, false, false, false, false, false, false];
-    });
+    openSection(RegmvFormSection.form1);
     refreshForm1(recordId: recordId);
   }
 
   void openForm2({required String? recordId}) {
-    setState(() {
-      expanded = [false, true, false, false, false, false, false];
-    });
+    openSection(RegmvFormSection.form2);
     refreshForm2(recordId: recordId);
   }
 
   void openForm3({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, true, false, false, false, false];
-    });
+    openSection(RegmvFormSection.form3);
     refreshForm3(recordId: recordId);
   }
 
   void openForm4({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, true, false, false, false];
-    });
+    openSection(RegmvFormSection.form4);
     refreshForm4(recordId: recordId);
   }
 
   void openForm5({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, false, true, false, false];
-    });
+    openSection(RegmvFormSection.form5);
     refreshForm5(recordId: recordId);
   }
 
   void openForm6({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, false, false, true, false];
-    });
-    refreshForm7(recordId: recordId);
+    openSection(RegmvFormSection.form6);
+    refreshForm6(recordId: recordId);
   }
 
   void openForm7({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, false, false, false, true];
-    });
-    // refreshForm6(recordId: recordId);
+    openSection(RegmvFormSection.form7);
+    refreshForm7(recordId: recordId);
   }
 
   bool validateForm1() {
@@ -2552,5 +2549,127 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     setState(() {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
     });
+  }
+
+  double getProgressValue() {
+    final done = [
+      isForm1Complete(),
+      isForm2Complete(),
+      isForm3Complete(),
+      isForm4Complete(),
+      isForm5Complete(),
+      isForm7Complete(),
+      isForm6Complete(), // form premi (record sudah ada)
+    ].where((x) => x).length;
+
+    return done / 7;
+  }
+
+  bool isForm1Complete() {
+    return fieldCalmv1IdController.text.trim().isNotEmpty &&
+        fieldTtgNamaController.text.trim().isNotEmpty &&
+        fieldTtgAlamatController.text.trim().isNotEmpty;
+  }
+
+  bool isForm2Complete() {
+    // samakan dengan validateForm2 yang kamu mau:
+    // minimal mata uang, jenis cover, passengerCount, dan (tpl/pad/pap/pll >= 0) + minimal salah satu >0 (kalau itu aturanmu)
+    if (fieldComboRMatauang == null) return false;
+    if (fieldComboMMvjnscover == null) return false;
+    if (selectedPassengerCount.trim().isEmpty) return false;
+
+    double n(TextEditingController c) =>
+        double.tryParse(c.text.replaceAll(',', '').trim()) ?? 0;
+
+    final tpl = n(fieldTplController);
+    final pad = n(fieldPadController);
+    final pap = n(fieldPapController);
+    final pll = n(fieldPllController);
+
+    // pilih salah satu rule:
+    return (tpl > 0) || (pad > 0) || (pap > 0) || (pll > 0);
+  }
+
+  bool isForm3Complete() {
+    final harga = double.tryParse(fieldHargaController.text.replaceAll(',', '').trim()) ?? 0;
+
+    return selectedYearform3.trim().isNotEmpty &&
+        harga > 0 &&
+        fieldComboMWilayah != null &&
+        fieldPlatNoController.text.replaceAll(' ', '').trim().length >= 3 &&
+        fieldRangkaNoController.text.trim().length >= 5 &&
+        fieldMesinNoController.text.trim().length >= 5 &&
+        fieldComboMMvmerk != null &&
+        fieldComboMMvtipe != null &&
+        fieldComboMMvmodel != null &&
+        fieldComboMMvpakai != null &&
+        fieldComboMWarna != null &&
+        fieldAksesorisController.text.trim().isNotEmpty;
+  }
+
+  bool isForm4Complete() => context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
+  bool isForm5Complete() => context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
+  bool isForm7Complete() => context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
+
+  // form6 = premi sudah terhitung
+  bool isForm6Complete() => context.read<Regmv6FormBloc>().state.record != null;
+
+  bool validateOpenedForm() {
+    final opened = getOpenedIndex();
+
+    // ✅ Tidak ada section yang sedang terbuka (awal halaman)
+    if (opened < 0) return true;
+
+    // ✅ Guard tambahan kalau suatu saat index out of range
+    if (opened >= RegmvFormSection.values.length) return true;
+
+    final section = RegmvFormSection.values[opened];
+
+    switch (section) {
+      case RegmvFormSection.form1: return validateForm1();
+      case RegmvFormSection.form2: return validateForm2();
+      case RegmvFormSection.form3: return validateForm3();
+      case RegmvFormSection.form4: return context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
+      case RegmvFormSection.form5: return context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
+      case RegmvFormSection.form7: return context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
+      case RegmvFormSection.form6: return true;
+    }
+  }
+
+  void openSection(RegmvFormSection section, {VoidCallback? onRefresh}) {
+    final idx = sectionIndex(section);
+
+    setState(() {
+      expanded = List<bool>.filled(expanded.length, false);
+      expanded[idx] = true;
+    });
+
+    onRefresh?.call();
+  }
+
+  void tryOpenSection(RegmvFormSection section, {VoidCallback? onRefresh}) {
+    final targetIdx = sectionIndex(section);
+    final opened = getOpenedIndex();
+
+    if (opened == targetIdx) return;
+
+    final ok = validateOpenedForm();
+    if (!ok) return;
+
+    openSection(section, onRefresh: onRefresh);
+  }
+
+  int sectionIndex(RegmvFormSection s) => RegmvFormSection.values.indexOf(s);
+
+  void resetUploadStates() {
+    // reset flag error required
+    _showVal4 = false;
+    _showVal5 = false;
+    _showVal7 = false;
+
+    // clear state items di masing2 bloc (butuh event "Clear/Reset" di bloc)
+    context.read<RegmvUploadStnkBloc>().add(Regmv4UploadFotoObjectResetPreview());
+    context.read<RegmvUploadFotoMobilBloc>().add(Regmv5UploadFotoObjectResetPreview());
+    context.read<RegmvUploadFotoAccBloc>().add(Regmv7UploadFotoObjectResetPreview());
   }
 }

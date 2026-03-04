@@ -18,8 +18,6 @@ import '../../../models/gen_regmv/regmv3form_model.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 
-//micky 2026-02-27
-
 class KonfirmasiRegMvPage extends StatefulWidget {
   final String viewMode;
   final String? recordId;
@@ -39,7 +37,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   Regmv2FormModel? regmv2Record;
   Regmv3FormModel? regmv3Record;
   late Regmv1ListBloc regmv1ListBloc;
-  final TextEditingController _searchController = TextEditingController();
+  //final TextEditingController _searchController = TextEditingController();
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -55,18 +53,21 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   @override
   void initState() {
     super.initState();
-    regmv1ListBloc = context.read<Regmv1ListBloc>();
-    // 🔥 Trigger load Form 1 saat halaman dibuka
-    if (widget.viewMode == "ubah" && widget.recordId != null) {
-      context.read<Regmv1CrudBloc>()
-          .add(Regmv1CrudLihatEvent(recordId: widget.recordId!));
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.viewMode == "ubah" && widget.recordId?.isNotEmpty == true) {
+        context.read<Regmv1CrudBloc>()
+            .add(Regmv1CrudLihatEvent(recordId: widget.recordId!));
+      }
+    });
   }
 
+/*
   void refreshData() {
     regmv1ListBloc.add(
         RefreshRegmv1ListEvent(searchText: _searchController.text, hal: 0));
   }
+  */
 
   void onViewPaymentMethods(String curr, double totalBayar) {
     Navigator.push(
@@ -102,7 +103,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 );
                 onViewPaymentMethods(state.curr, state.totalBayar);
               } else if (state.paymentStatus == "30") {
-                refreshData();
+                //refreshData();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Silakan lakukan pembayaran.')),
                 );
@@ -124,7 +125,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   MaterialPageRoute(builder: (context) => PaymentSuccess(display: "Pembayaran berhasil!", description: "Selamat! Perlindungan kendaraan Anda resmi dimulai.", displayButton: "Kembali",)),
                 );
               } else if (state.paymentStatus == "91") {
-                refreshData();
+                //refreshData();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Proses pembayaran gagal. Silakan coba lagi.'),

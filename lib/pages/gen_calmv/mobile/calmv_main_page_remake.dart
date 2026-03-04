@@ -47,24 +47,17 @@ class CalmvMainPageRemake extends StatefulWidget {
 
 class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   List<bool> expanded = [true, false, false];
-
+  //untuk detect form mana yang terakhir dibuka
+  int? lastOpenedIndex;
+  int? currentOpenedIndex;
+  int getOpenedIndex() => expanded.indexWhere((e) => e);
   String? calmv1Id;
   String? calmv2Id;
   String? calmv3Id;
 
   Calmv2FormModel? form2Record;
   Calmv3FormModel? form3Record;
-
-  String cleanNum(num value) {
-    final f = NumberFormat("#,###", "en_US");
-    return f.format(value);
-  }
-
-  double getProgressValue() {
-    final openedCount = expanded.where((v) => v).length; // 0..3
-    return openedCount / 3; // 0.0, 0.333..., 0.666..., 1.0
-  }
-
+ 
   //form1
   final fieldCoverBulanController = TextEditingController();
   final fieldHargaController = TextEditingController();
@@ -100,6 +93,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   final fieldPremiSubtotalController = TextEditingController();
   final fieldCalmv1IdController = TextEditingController();
   //form3
+
+  String cleanNum(num value) {
+    final f = NumberFormat("#,###", "en_US");
+    return f.format(value);
+  }
 
   @override
   void initState() {
@@ -374,10 +372,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Form1Page(
+                    idx: 0,
                     context: context,
                     title: "Data Kendaraan",
                     isExpanded: expanded[0],
-                    onToggle: (v) => setState(() => expanded[0] = v),
+                    //onToggle: (v) => setState(() => expanded[0] = v),
                     onRefresh: () {
                       if (calmv1Id != null && calmv1Id!.isNotEmpty) {
                         refreshForm1(recordId: calmv1Id);
@@ -414,10 +413,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   const SizedBox(height: hPadding),
 
                   Form2Page(
+                    idx: 1,
                     context: context,
                     title: "Pertanggungan",
                     isExpanded: expanded[1],
-                    onToggle: (v) => setState(() => expanded[1] = v),
+                    //onToggle: (v) => setState(() => expanded[1] = v),
                     onRefresh: () {
                       if (calmv2Id != null && calmv2Id!.isNotEmpty) {
                         refreshForm2(recordId: calmv2Id);
@@ -490,10 +490,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   const SizedBox(height: hPadding),
 
                   Form3Page(
+                    idx: 2,
                     context: context,
                     title: "Perhitungan Premi",
                     isExpanded: expanded[2],
-                    onToggle: (v) => setState(() => expanded[2] = v),
+                    //onToggle: (v) => setState(() => expanded[2] = v),
                     child: (calmv3Id?.isNotEmpty == true)
                         ? Column(
                       children: [
@@ -582,9 +583,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   Widget Form1Page({
+    required int idx,
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
+    //required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 1",
@@ -602,8 +604,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(idx, onRefresh: onRefresh);
             },
 
           ),
@@ -618,9 +619,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   Widget Form2Page({
+    required int idx,
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
+    //required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 2",
@@ -638,8 +640,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(idx, onRefresh: onRefresh);
             },
           ),
           if (isExpanded)
@@ -653,9 +654,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   Widget Form3Page({
+    required int idx,
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
+    //required ValueChanged<bool> onToggle,
     required Widget child,
     String title = "Form 3",
   }) {
@@ -674,7 +676,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                 width: 16,
               ),
             ),
-            onTap: () => onToggle(!isExpanded),
+            onTap: () {
+              tryOpenSection(idx);
+            },
           ),
           if (isExpanded)
             Padding(
@@ -795,7 +799,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     }
 
     if (!ok) {
-      setState(() => expanded[0] = true);
+      openForm1Force(); // ini akan reset expanded jadi single-open
     }
 
     return ok;
@@ -904,23 +908,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     }
   }
 
-  void openForm1() {
-    setState(() {
-      expanded = [true, false, false];
-    });
-  }
+  void openForm1() => tryOpenSection(0);
+  void openForm2() => tryOpenSection(1);
+  void openForm3() => openForm3Force();
 
-  void openForm2() {
-    setState(() {
-      expanded = [false, true, false];
-    });
-  }
-
-  void openForm3() {
-    setState(() {
-      expanded = [false, false, true];
-    });
-  }
+  void openForm1Force() => openSection(0);
+  void openForm2Force() => openSection(1);
+  void openForm3Force() => openSection(2);
 
   //form1 field
   Widget _buildComboMMvgrupOjk() => ReusableComboBox<ComboMMvgrupOjkModel>(
@@ -1292,5 +1286,101 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
     });
   }
+
+  void openSection(int idx, {VoidCallback? onRefresh}) {
+    final prev = expanded.indexWhere((e) => e);
+    setState(() {
+      lastOpenedIndex = (prev == -1) ? null : prev;
+      currentOpenedIndex = idx;
+
+      // single-open
+      expanded = List<bool>.filled(expanded.length, false);
+      expanded[idx] = true;
+    });
+
+    onRefresh?.call();
+  }
+
+  bool validateOpenedForm() {
+    final opened = getOpenedIndex();
+    switch (opened) {
+      case 0:
+        final ok = validateForm1();
+        //if (!ok) openForm1Force();
+        return ok;
+      case 1:
+        final ok = validateForm2();
+        //if (!ok) openForm2Force();
+        return ok;
+      case 2:
+        // kalau form3 tidak perlu divalidasi, return true
+        return true;
+      default:
+        return true;
+    }
+  }
+
+  void tryOpenSection(int targetIdx, {VoidCallback? onRefresh}) {
+    final opened = getOpenedIndex();
+
+    if (opened == targetIdx) return;
+    // kalau klik header form yang sedang terbuka -> toggle close/open (optional)
+    // if (opened == targetIdx) {
+    //   setState(() {
+    //     final next = !expanded[targetIdx];
+    //     expanded[targetIdx] = next;
+    //     currentOpenedIndex = next ? targetIdx : null;
+    //     if (!next) lastOpenedIndex = targetIdx;
+    //   });
+    //   return;
+    // }
+
+    // pindah form: validasi form yang sedang terbuka dulu
+    final ok = validateOpenedForm();
+    if (!ok) return; // stop: tidak boleh pindah
+
+    // pindah
+    openSection(targetIdx, onRefresh: onRefresh);
+  }
+
+  bool isForm1Complete() {
+    final hargaRaw = fieldHargaController.text.replaceAll(",", "").trim();
+    final harga = double.tryParse(hargaRaw) ?? 0;
+
+    return fieldComboMMvgrupOjk != null &&
+        fieldComboMMvjnscover != null &&
+        fieldComboUang != null &&
+        selectedYearform1.trim().isNotEmpty &&
+        fieldComboMMvpakai != null &&
+        fieldComboMWilayah != null &&
+        harga > 0;
+  }
+
+  bool isForm2Complete() {
+    if (selectedPassengerCount.trim().isEmpty) return false;
+
+    double parseNum(TextEditingController c) =>
+        double.tryParse(c.text.replaceAll(",", "").trim()) ?? 0;
+
+    final tpl = parseNum(fieldTplController);
+    final pad = parseNum(fieldPadController);
+    final pap = parseNum(fieldPapController);
+    final pll = parseNum(fieldPllController);
+
+    return (tpl > 0) || (pad > 0) || (pap > 0) || (pll > 0);
+  }
+
+  double getProgressValue() {
+    final f1 = isForm1Complete();
+    final f2 = isForm2Complete();
+
+    int completed = 0;
+    if (f1) completed = 1;
+    if (f1 && f2) completed = 2;
+    if (calmv3Id?.isNotEmpty == true) completed = 3;
+
+    return completed / 3;
+  }
+
 }
 
