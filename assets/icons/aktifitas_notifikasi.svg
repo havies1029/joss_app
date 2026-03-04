@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" version="1.1" id="svg1641" width="682.66669" height="682.66669" viewBox="0 0 682.66669 682.66669">
+  <defs id="defs1645">
+    <clipPath clipPathUnits="userSpaceOnUse" id="clipPath1655">
+      <path d="M 0,512 H 512 V 0 H 0 Z" id="path1653"/>
+    </clipPath>
+  </defs>
+  <mask id="custom"><rect id="bg" x="0" y="0" width="100%" height="100%" fill="white"/><g transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)"><path transform="matrix(1,0,0,1,256,71)" d="m 0,0 v 0 c -11.046,0 -20,8.954 -20,20 0,11.046 8.954,20 20,20 C 11.046,40 20,31.046 20,20 20,8.954 11.046,0 0,0" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" id="path1667"/></g></mask><g mask="url(#custom)"><g id="g1647" transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)">
+    <g id="g1649">
+      <g id="g1651" clip-path="url(#clipPath1655)">
+        <g id="g1657" transform="translate(140,489.0513)">
+          <path d="m 0,0 c 5.971,1.992 12.359,3.07 19,3.07 h 194 c 33.137,0 60,-26.862 60,-60 v -227.121" style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path1659"/>
+        </g>
+        <g id="g1661" transform="translate(413,80.1221)">
+          <path d="m 0,0 c 0,-33.138 -26.863,-60 -60,-60 h -194 c -33.137,0 -60,26.862 -60,60 v 325.878" style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path1663"/>
+        </g>
+        <g id="g1665" transform="translate(256,71)">
+          <path d="m 0,0 v 0 c -11.046,0 -20,8.954 -20,20 0,11.046 8.954,20 20,20 C 11.046,40 20,31.046 20,20 20,8.954 11.046,0 0,0" style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="path1667"/>
+        </g>
+        <g id="g1669" transform="translate(236,421)">
+          <path d="M 0,0 H 40" style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path1671"/>
+        </g>
+        <g id="g1673" transform="translate(20,492)">
+          <path d="M 0,0 472,-472" style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path1675"/>
+        </g>
+      </g>
+    </g>
+  </g></g>
+</svg>

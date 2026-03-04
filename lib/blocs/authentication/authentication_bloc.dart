@@ -35,10 +35,10 @@ class AuthenticationBloc
     });
     on<UserAuthenticated>(_onUserAuthenticated);
     on<RequireRegisterClient>((event, emit) {
-      emit(AuthenticationRequireRegisterClient());
+      emit(AuthenticationRequireRegisterClient(requiredFrom: event.requiredFrom));
     });
     on<RequirePinHPVerification>((event, emit) {
-      emit(AuthenticationRequirePinHPVerification(hpno: event.hpno));
+      emit(AuthenticationRequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia, requestedAt: DateTime.now()));
     });
     on<PhonePinVerified>((event, emit) {
       emit(AuthenticationPhonePinVerified());
@@ -46,6 +46,11 @@ class AuthenticationBloc
     on<GoogleUserAuthenticated>((event, emit) {
       debugPrint("_onLoggedIn dari Form Login Google");
       emit(AuthenticationGoogleUserAuthenticated(user: event.user));
+    });
+    on<UserRoleChanged>((event, emit) {
+      emit(AuthenticationUserRoleChanged());
+      emit(AuthenticationAuthenticated(
+          user: event.user, authenticatedFrom: event.authenticatedFrom));
     });
   }
 
@@ -59,7 +64,13 @@ class AuthenticationBloc
 
     debugPrint("hasToken ?");
     if (token.isNotEmpty) {
-      final user = await userRepository.getUserByToken(token);
+      var user = await userRepository.getUserByToken(token);
+
+      if (user == null) {
+        debugPrint("Invalid token, proceed to unauthenticated");
+        emit(AuthenticationUnauthenticated());
+        return;
+      }
 
       AppData.user = user;
       AppData.userToken = token;
@@ -109,6 +120,6 @@ class AuthenticationBloc
     //emit(AuthenticationUserAuthenticated(user: event.user));
 
     emit(AuthenticationAuthenticated(
-        user: event.user, authenticatedFrom: "login_user"));
+        user: event.user, authenticatedFrom: event.authenticatedFrom));
   }
 }

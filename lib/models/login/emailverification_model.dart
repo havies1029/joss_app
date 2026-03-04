@@ -22,4 +22,18 @@ class EmailVerificationModel {
         'requestId': requestId,
         'requestFrom': requestFrom,
       };
+
+  EmailVerificationModel copyWith({
+    String? email,
+    String? pin,
+    String? requestId,
+    String? requestFrom,
+  }) {
+    return EmailVerificationModel(
+      email: email ?? this.email,
+      pin: pin ?? this.pin,
+      requestId: requestId ?? this.requestId,
+      requestFrom: requestFrom ?? this.requestFrom,
+    );
+  }
 }

@@ -20,4 +20,5 @@ class ChangePasswordApi {
       return false;
     }
   }
+  
 }

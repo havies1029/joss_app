@@ -4,7 +4,8 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.7.2
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.22.0"
 
 dependencies:
   flutter:
@@ -12,31 +13,45 @@ dependencies:
 
   auto_size_text: ^3.0.0
   accordion: ^2.6.0  
+  cached_network_image: ^3.4.1
   connectivity_plus: ^6.0.2  
   collection: ^1.18.0
+  confetti: ^0.7.0
   const_date_time: ^1.1.0
   cupertino_icons: ^1.0.8  
   date_field: ^6.0.0
+  dio: ^5.4.0
+  docx_template: ^0.4.0
   dropdown_search: ^6.0.1  
   equatable: ^2.0.3
-  flex_color_scheme: ^8.0.2
+  flex_color_scheme: 8.4.0
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.1.4  
   file_picker: ^8.0.0+1
-  flutter_animate: ^3.0.0     
+  flutter_animate: ^3.0.0
+  file_saver: ^0.2.2
   flutter_bloc: ^9.1.1
+  flutter_launcher_icons: ^0.14.4
   flutter_slidable: ^3.1.2
   flutter_staggered_animations: ^1.1.1 
   flutter_svg: ^2.0.17   
-  foundation: ^0.0.5
-  google_sign_in: ^6.3.0    
-  google_sign_in_web: ^0.12.4+4
+  fl_chart: ^0.66.0
+  flutter_speed_dial: ^7.0.0
+  excel: ^2.0.6
+  pdf: ^3.10.6
+  printing: ^5.12.0
+  open_filex: ^4.6.0
   google_fonts: ^6.1.0   
   grouped_list: ^6.0.0
+  google_sign_in: ^6.2.2
+#  google_sign_in: ^6.3.0
   http: ^1.2.1
   image: any
   image_picker: ^1.0.7
   intl: ^0.19.0
   js: ^0.6.7
   jwt_decoder: ^2.0.1
+  mobile_chat_flutter: ^1.0.4
   mime: ^2.0.0
   meta: ^1.10.0  
   path: ^1.9.0
@@ -46,19 +61,131 @@ dependencies:
   string_validator: ^1.0.2  
   timelines_plus: ^1.0.3
   uuid: ^4.5.1
-
+  hydrated_bloc: ^10.1.1
+  carousel_slider: 4.2.0
+  shimmer: ^3.0.0
+#  pdf_image_renderer: ^1.0.1
+  lottie: ^3.1.2
+  flutter_chat_types: ^3.6.2
+  pdfx: ^2.8.0
+  email_validator: ^3.0.0
+  url_launcher: ^6.3.0
+  share_plus: ^10.0.0
+  pinput: ^5.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo_launcher.png"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/images/logo_launcher.png"
+
 flutter:
   uses-material-design: true
-  assets:  
+  assets:
+    - assets/bank_logo/
     - assets/images/
-    - assets/images/month/
     - assets/icons/
+    - assets/images/month/
+    - assets/icons/ubah_pass.svg
+    - assets/icons/informasi_klien.svg
+    - assets/icons/location.svg
+    - assets/icons/bank.svg
+    - assets/icons/pic.svg
+    - assets/icons/sk.svg
+    - assets/icons/shield.svg
+    - assets/icons/address.svg
+    - assets/icons/arrow_down.svg
+    - assets/icons/arrow_left.svg
+    - assets/icons/arrow_right.svg
+    - assets/icons/arrow_up.svg
+    - assets/icons/arsitek.svg
+    - assets/icons/Back ICon.svg
+    - assets/icons/badge.svg
+    - assets/icons/bantuan.svg
+    - assets/icons/Bell.svg
+    - assets/icons/beranda.svg
+    - assets/icons/Bill Icon.svg
+    - assets/icons/Call.svg
+    - assets/icons/Camera Icon.svg
+    - assets/icons/Cart Icon.svg
+    - assets/icons/Cash.svg
+    - assets/icons/Chat bubble Icon.svg
+    - assets/icons/Check mark rounde.svg
+    - assets/icons/close.svg
+    - assets/icons/Conversation.svg
+    - assets/icons/Discover.svg
+    - assets/icons/download.svg
+    - assets/icons/employee_shield.svg
+    - assets/icons/Error.svg
+    - assets/icons/facebook.svg
+    - assets/icons/Flash Icon.svg
+    - assets/icons/Game Icon.svg
+    - assets/icons/gender.svg
+    - assets/icons/Gift Icon.svg
+    - assets/icons/google-icon.svg
+    - assets/icons/handshake.svg
+    - assets/icons/Heart Icon.svg
+    - assets/icons/Heart Icon_2.svg
+    - assets/icons/instagram.svg
+    - assets/icons/jps_logo.svg
+    - assets/icons/klaim_asuransi.svg
+    - assets/icons/konsultan.svg
+    - assets/icons/linkedin.svg
+    - assets/icons/literasi.svg
+    - assets/icons/Location point.svg
+    - assets/icons/Lock.svg
+    - assets/icons/logout.svg
+    - assets/icons/logo_jps_no_background.png
+    - assets/icons/Mail.svg
+    - assets/icons/notification.svg
+    - assets/icons/Parcel.svg
+    - assets/icons/pembayaran_premi.svg
+    - assets/icons/pengacara.svg
+    - assets/icons/penilaian.svg
+    - assets/icons/Phone.svg
+    - assets/icons/Plus Icon.svg
+    - assets/icons/premium.svg
+    - assets/icons/Question mark.svg
+    - assets/icons/quote.svg
+    - assets/icons/receipt.svg
+    - assets/icons/remove.svg
+    - assets/icons/Search Icon.svg
+    - assets/icons/setting.svg
+    - assets/icons/Settings.svg
+    - assets/icons/settings-2.svg
+    - assets/icons/Shop Icon.svg
+    - assets/icons/Star Icon.svg
+    - assets/icons/Success.svg
+    - assets/icons/tagihan_pembayaran.svg
+    - assets/icons/thumbsup_solid.svg
+    - assets/icons/tiktok.svg
+    - assets/icons/transaksi.svg
+    - assets/icons/Trash.svg
+    - assets/icons/twitter.svg
+    - assets/icons/User.svg
+    - assets/icons/User Icon.svg
+    - assets/icons/verified.svg
+    - assets/icons/website.svg
+    - assets/icons/group_icon.svg
+    - assets/icons/claim-icon-property.svg
+    - assets/icons/claim-icon-car.svg
+    - assets/icons/home_icon.svg
+    - assets/icons/delete_icon_polis.svg
+    - assets/icons/edit_icon_polis.svg
+    - assets/icons/tambah_polis_icon_polis.svg
+    - assets/icons/unduh_data_polis.svg
+    - assets/icons/share_data_polis.svg
+    - assets/icons/others_icon_polis.svg
+    - assets/icons/select_icon_polis.svg
+    - assets/icons/checklist.svg
+    - assets/icons/checklist2.svg
+    # images
     - assets/images/jps-image.png
     - assets/images/vector-1.png
     - assets/images/vector-2.png
@@ -77,19 +204,114 @@ flutter:
     - assets/images/vector-13.png
     - assets/images/vector-14.png
     - assets/images/vector-15.png
+    - assets/images/background_gradient.png
+    - assets/images/start-1.svg
+    - assets/images/start-2.svg
+    - assets/images/start-3.svg
+    - assets/images/logo_launcher.png
+    - assets/icons/instagram.svg
+    - assets/icons/tiktok.svg
+    - assets/icons/linkedin.svg
+    - assets/icons/facebook.svg
+    - assets/icons/shield2.svg
+    - assets/icons/correct.svg
+    - assets/icons/clock.svg
+    - assets/icons/exit.svg
+    - assets/icons/calender.svg
+    - assets/icons/find_insurance_icon.svg
+    - assets/icons/group_icon.svg
+    - assets/icons/claim-icon-property.svg
+    - assets/icons/claim-icon-car.svg
+    - assets/icons/home_icon.svg
+    - assets/icons/delete_icon_polis.svg
+    - assets/icons/edit_icon_polis.svg
+    - assets/icons/tambah_polis_icon_polis.svg
+    - assets/icons/unduh_data_polis.svg
+    - assets/icons/share_data_polis.svg
+    - assets/icons/others_icon_polis.svg
+    - assets/icons/btn_endorse.svg
+    - assets/icons/btn_delete.svg
+    - assets/icons/btn_lacak.svg
+    - assets/icons/save_btn_pic.svg
+    - assets/icons/send_btn_pic.svg
+    - assets/icons/logo_bantuan.svg
+    - assets/icons/logo_bantuan.jpg
+    - assets/icons/refresh_cob_icon.svg
+    - assets/icons/list_cob_icon.svg
+    - assets/icons/cs.svg
+    - assets/icons/aktif_hover.svg
+    - assets/icons/diproses_hover.svg
+    - assets/icons/jatuhtempo_hover.svg
+    - assets/icons/nonaktif_hover.svg
+    - assets/icons/aktifkan_kembali.svg
+    - assets/icons/aktif.svg
+    - assets/icons/diproses.svg
+    - assets/icons/nonaktif.svg
+    - assets/icons/jatuhtempo.svg
+    - assets/icons/lacak_polis.svg
+    - assets/icons/unduh_polis.svg
+    - assets/icons/perpanjangan.svg
+    - assets/icons/no_data.svg
+    - assets/icons/icons_telephone.svg
+    - assets/icons/dipilih.svg
+    - assets/icons/tidak_dipilih.svg
+    - assets/icons/endorse1.svg
+    - assets/icons/lacak_polis1.svg
+    - assets/icons/perpanjangan1.svg
+    - assets/icons/unduh_polis1.svg
+    - assets/icons/aktifkan1.svg
+    - assets/icons/beli_polis1.svg
+    - assets/icons/logo_berhasil.svg
+    - assets/icons/unduh_invoice.svg
+    - assets/icons/photo_img.svg
+    - assets/icons/gallery_img.svg
+    - assets/icons/bi_exclamation-circle.svg
+    - assets/icons/infinity_loader_orange.json
+    - assets/icons/lainnya.svg
+    - assets/icons/centang2.svg
+    - assets/icons/no-alarm.svg
+    - assets/icons/notification-1.svg
+    - assets/icons/aktifitas_notifikasi.svg
+    - assets/icons/transaksi_notifikasi.svg
+    - assets/icons/notifikasi-2.svg
+    - assets/icons/AktifKembali.svg
+    - assets/icons/BatalKlaim.svg
+    - assets/icons/EndorseLog.svg
+    - assets/icons/KlaimBaru.svg
+    - assets/icons/LaporKlaim.svg
+    - assets/icons/PerbaruiKlaim.svg
+    - assets/icons/PerpanjanganLog.svg
+    - assets/icons/RegMV.svg
+    - assets/icons/RegOthers.svg
+    - assets/ifcons/RegPAR.svg
+    - assets/icons/upload_simbol.svg
+    - assets/icons/daftar_client.svg
+    - assets/icons/empty_review_page.svg
+    - assets/icons/website_logo.svg
+    - assets/icons/placeholder_icon.svg
+    - assets/images/logo_va/
+    - assets/images/logo_va/logo_BNC.png
+
   fonts:
-    - family: HeeboBold
+    - family: Delm-Regular
       fonts:
-        - asset: assets/fonts/Heebo-Bold.ttf
-    - family: HeeboMedium
+        - asset: assets/fonts/Delm-Regular.ttf
+          weight: 400
+    - family: Delm
       fonts:
-        - asset: assets/fonts/Heebo-Medium.ttf
-    - family: Roboto-Bold
-      fonts:
-        - asset: assets/fonts/Roboto-Bold.ttf
-    - family: Roboto-Medium
-      fonts:
-        - asset: assets/fonts/Roboto-Medium.ttf
-    - family: Roboto-Regular
-      fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf  
+        - asset: assets/fonts/Delm-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Delm-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Delm-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Delm-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Delm-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Delm-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Delm-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Delm-Black.ttf
+          weight: 900

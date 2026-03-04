@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:joss_app/apis/profile/profile_api.dart';
+import 'package:joss_app/apis/profile/userfoto_api.dart';
+import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/user/user_model.dart';
 import 'package:joss_app/models/authentication/auth_model.dart';
 import 'package:joss_app/apis/login/login_api.dart';
@@ -33,10 +37,26 @@ class UserRepository {
     return token ?? "";
   }
 
-  Future<User> getUserByToken(String token) async {
+  Future<bool> updateUser(User user) async {
+    //debugPrint("user_repository : updateUser #10");
+
+    bool isValid = await updateUserProfile(user);
+
+    AppData.user = user;
+    AppData.userToken = user.token!;
+
+    return isValid;
+  }
+
+  Future<void> uploadFotoProfile(File fileFoto) async {
+    UserFotoApi api = UserFotoApi();
+    await api.uploadImage2API(fileFoto.path);    
+  }
+
+  Future<User?> getUserByToken(String token) async {
     debugPrint("getUserByToken : $token");
     LoginApi loginApi = LoginApi();
-    User user = await loginApi.getUserByTokenAPI(token);
+    User? user = await loginApi.getUserByTokenAPI(token);
     return user;
   }
 }

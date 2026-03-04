@@ -1,40 +1,127 @@
 import 'package:flutter/material.dart';
-import 'package:joss_app/pages/testpage/testpage0.dart';
-import 'package:joss_app/pages/testpage/testpage1.dart';
-import 'package:joss_app/pages/testpage/testpage2.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/pages/home/draggable_chat_button.dart';
+import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
+import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 
-class HomeTabWidget extends StatelessWidget {
+import '../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
+import '../../blocs/login/emailverification_bloc.dart';
+import '../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../common/constants.dart';
+import '../../widgets/menus/bottom_nav.dart' as bottom_nav;
+import '../../widgets/menus/top_nav.dart';
+import '../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../heropage/mobile/heropage.dart';
+import '../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
+import '../settingpage/mobile/settingpage.dart';
+
+class HomeTabWidget extends StatefulWidget {
   final UserRepository userRepository;
   const HomeTabWidget({super.key, required this.userRepository});
 
   @override
+  State<HomeTabWidget> createState() => _HomeTabWidgetState();
+}
+
+class _HomeTabWidgetState extends State<HomeTabWidget> {
+  int selectedIndex = 0;
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      const HeroPage(),
+      const CariAsuransiWidget.menu(),
+      const DaftarCobKlaimMenu(),
+      const LiterasiPage(),
+      const SettingsPage(),
+    ];
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
+    return MultiBlocListener(
+      listeners: [
+        // Listener Foto Profil
+        BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+          listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
+          listener: (context, state) {
+            //final bytes = (state as ProfileDownloadFotoLoaded).imageBytes;
+            // if (bytes.isNotEmpty) {
+            //   context.read<UserProfileCubit>().setProfile(fotoBytes: bytes);
+            // }
+          },
+        ),
+        BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
+          listenWhen: (prev, curr) =>
+          curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
+          listener: (context, state) {
+            //final nama = state.record?.rekanNama.trim();
+            final mrekan1Id = state.record?.mrekan1Id;
+            //final mjnsclientId = state.record?.mjnsclientId; // 👈 ambil di sini
+
+            // if (nama != null && nama.isNotEmpty) {
+            //   context.read<UserProfileCubit>().setProfile(
+            //     nama: nama,
+            //     mjnsclientId: mjnsclientId, // 👈 simpan juga
+            //   );
+            // }
+
+            if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
+              context.read<MRekanContactCrudBloc>().add(
+                MRekanContactCrudLihatEvent(),
+              );
+            }
+          },
+        ),
+
+        BlocListener<EmailVerificationBloc, EmailVerificationState>(
+          listenWhen: (prev, curr) =>
+          prev.record != curr.record && curr.record != null && !curr.hasFailure,
+          listener: (context, state) {
+            //final record = state.record!;
+            // if (record.email.isNotEmpty) {
+            //   context.read<RegUserProfileCubit>().setProfile(
+            //     email: record.email,
+            //   );
+            // }
+          },
+        ),
+
+      ],
       child: Scaffold(
-        appBar: AppBar(title: const Text('JPS Insurance Broker')),
-        body: const TabBarView(
+        extendBodyBehindAppBar: true,
+        appBar: MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
+        body: Stack(
           children: [
-            ReportTab(),
-            HomeTab(),
-            SettingsTab(),
+            IndexedStack(
+              index: selectedIndex,
+              children: pages,
+            ),
+            DraggableChatButton(
+              onTap: () {
+                if (ChatInitService.I.isInitialized) {
+                  Navigator.pushNamed(context, 'chat');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Chat belum siap, coba lagi')),
+                  );
+                }
+              },
+            ),
           ],
         ),
+
         bottomNavigationBar: Material(
-          // beri latar agar indikator & label terlihat
-          color: Theme.of(context).colorScheme.surface,
-          child: const SafeArea(
-            top: false, // fokus ke area bawah saja
-            child: TabBar(
-              // isScrollable: true, // aktifkan jika label panjang/lebih dari 3–4 tab
-              tabs: [
-                Tab(icon: Icon(Icons.pie_chart), text: 'Report'),
-                Tab(icon: Icon(Icons.home), text: 'Home'),
-                Tab(icon: Icon(Icons.settings), text: 'Settings'),
-              ],
-              // opsional: gaya indikator/label
-              // indicatorSize: TabBarIndicatorSize.tab,
+          color: primaryBlackColor,
+          child: SafeArea(
+            top: false,
+            child: bottom_nav.MobileBottomNavigationBar(
+              currentIndex: selectedIndex,
+              onTap: (idx) => setState(() => selectedIndex = idx),
             ),
           ),
         ),
@@ -43,4 +130,8 @@ class HomeTabWidget extends StatelessWidget {
   }
 }
 
-
+class NavBarItem {
+  final String iconPath;
+  final String label;
+  const NavBarItem({required this.iconPath, required this.label});
+}

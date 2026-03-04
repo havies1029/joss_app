@@ -82,7 +82,7 @@ class _IconButtonTile extends StatelessWidget {
       child: Ink(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: cs.surfaceVariant.withOpacity(0.5),
+          color: cs.surfaceContainerHighest.withOpacity(0.5),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

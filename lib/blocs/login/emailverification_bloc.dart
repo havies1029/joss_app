@@ -24,31 +24,64 @@ class EmailVerificationBloc
     on<EmailVerificationTambahEvent>(onTambahEmailVerification);
     on<ValidasiPinEmailEvent>(onValidasiPinEmail);
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
+    on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
+    on<FieldTeleponVerificationChangedEvent>(onFieldTeleponVerificationChangedEvent);
+    on<ResendOtpEvent>(onResendOtp);     
+
   }
 
-  Future<void> onTambahEmailVerification(EmailVerificationTambahEvent event,
-      Emitter<EmailVerificationState> emit) async {
+  Future<void> onFieldEmailVerificationChangedEvent(
+      FieldEmailVerificationChangedEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
+    emit(state.copyWith(
+      email: event.email.trim(),
+      telepon: '',
+    ));
+  }
+
+  Future<void> onFieldTeleponVerificationChangedEvent(
+      FieldTeleponVerificationChangedEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
+    emit(state.copyWith(
+      telepon: event.telepon.trim(),
+      email: '',
+    ));
+  }
+
+  Future<void> onTambahEmailVerification(
+      EmailVerificationTambahEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
     ReturnDataAPI returnData;
     bool hasFailure = true;
+
     emit(state.copyWith(isLoading: true, isLoaded: false, hasFailure: false));
+
     returnData = await repository.emailVerificationTambah(event.record);
     hasFailure = !returnData.success;
+
     List<String> errors = [];
 
+    EmailVerificationModel? record = hasFailure ? null : event.record;
+
     if (!hasFailure) {
-      List<String> infoData = returnData.data.split(";");
+      final infoData = returnData.data.split(";");
 
       if ((infoData[0] == '1') || (infoData[0] == '3')) {
-        Token token = Token.split(event.record.email, infoData[1]);
+        // Token token = Token.split(event.record.email, infoData[1]);
+        Token token = Token.split(infoData[2], infoData[1]);
 
         UserRepository userRepository = UserRepository();
 
         User user = User(
           id: 0,
-          username: event.record.email,
+          // username: event.record.email,
+          username: infoData[2],
           email: event.record.email,
           token: token.token,
-          custType: 'U',
+          userType: 'U',
         );
 
         AppData.user = user;
@@ -58,28 +91,35 @@ class EmailVerificationBloc
           userRepository.persistToken(userToken: token.token!);
         }
 
-        authenticationBloc.add(UserAuthenticated(user: user));
+        authenticationBloc.add(
+          UserAuthenticated(user: user, authenticatedFrom: "email_verification"),
+        );
       } else if (infoData[0] == '2') {
-        event.record.requestId = infoData[1];
-        authenticationBloc
-            .add(RequirePinEmailVerification(email: event.record.email));
+        record = event.record.copyWith(requestId: infoData.length > 1 ? infoData[1] : '');
+
+        authenticationBloc.add(
+          RequirePinEmailVerification(email: event.record.email),
+        );
       }
     } else if (returnData.data.isNotEmpty) {
-      List<String> infoData = returnData.data.split(";");
+      final infoData = returnData.data.split(";");
       if (infoData[0] == '9') {
         errors.add(infoData[1]);
 
-        authenticationBloc.add(RequireLoginClient(
-            requiredFrom: "bloc_email_verification", errorMsg: infoData[1]));
+        authenticationBloc.add(
+          RequireLoginClient(
+            requiredFrom: "bloc_email_verification",
+            errorMsg: infoData[1],
+          ),
+        );
       }
     }
 
-    debugPrint("onTambahEmailVerification returnData: ${returnData.data}");
     emit(state.copyWith(
       isLoading: false,
       isLoaded: true,
       hasFailure: hasFailure,
-      record: event.record,
+      record: record,
       errors: errors,
     ));
   }
@@ -103,7 +143,7 @@ class EmailVerificationBloc
     ));
 
     if (!hasFailure && returnData.data.isNotEmpty) {
-      
+
       List<String> info = returnData.data.split(";");
       Token token = Token.split(info[0], info[1]);
 
@@ -123,7 +163,7 @@ class EmailVerificationBloc
         userRepository.persistToken(userToken: token.token!);
       }
 
-      authenticationBloc.add(UserAuthenticated(user: user));
+      authenticationBloc.add(UserAuthenticated(user: user, authenticatedFrom: "email_verification"));
     } else {
       List<String> errors = [];
       errors.add(returnData.data);
@@ -140,5 +180,32 @@ class EmailVerificationBloc
 
     debugPrint(
         "onFieldSimpanPasswordChangedEvent state: ${state.isSimpanPassword}");
+  }
+
+  Future<void> onResendOtp(ResendOtpEvent event, Emitter<EmailVerificationState> emit) async {
+    ReturnDataAPI returnData;
+    bool hasFailure = true;
+    emit(state.copyWith(isResendOtpSuccess: false, hasFailure: false));
+    returnData = await repository.resendOtp(event.record);
+    hasFailure = !returnData.success;
+
+    if (hasFailure) {
+      List<String> errors = [];
+      errors.add(returnData.data);
+      emit(state.copyWith(
+        isResendOtpSuccess: false,
+        hasFailure: hasFailure,
+        errors: errors,
+      ));
+      return;
+    }
+
+    EmailVerificationModel updatedRecord = state.record?.copyWith(requestId: returnData.data) ?? event.record.copyWith(requestId: returnData.data);
+
+    emit(state.copyWith(
+      // record: updatedRecord,
+      hasFailure: hasFailure,
+      isResendOtpSuccess: !hasFailure,
+    ));
   }
 }

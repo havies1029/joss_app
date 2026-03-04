@@ -1,0 +1,450 @@
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter_svg/svg.dart';
+
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import 'package:joss_app/models/gen_profile/mrekangeneralidvcrud_model.dart';
+import 'package:joss_app/models/combobox/combompekerjaan_model.dart';
+import 'package:joss_app/models/combobox/combomjnskel_model.dart';
+
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../../../../helper/image_uploader.dart';
+import '../../../../../repositories/combobox/combomjnskel_repository.dart';
+import '../../../../../repositories/combobox/combompekerjaan_repository.dart';
+import '../../../../base/base_background_sidepage.dart';
+
+class MRekanGeneralIdvCrudFormPage extends StatefulWidget {
+  const MRekanGeneralIdvCrudFormPage({super.key});
+
+  @override
+  MRekanGeneralIdvCrudFormPageFormState createState() =>
+      MRekanGeneralIdvCrudFormPageFormState();
+}
+
+class MRekanGeneralIdvCrudFormPageFormState
+    extends State<MRekanGeneralIdvCrudFormPage> {
+  late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  final _formKey = GlobalKey<FormState>();
+
+  final fieldRekanNamaController = TextEditingController();
+
+  final List<String> errors = [];
+  ComboMPekerjaanModel? fieldComboMPekerjaan;
+  final comboMPekerjaanKey = GlobalKey<DropdownSearchState<ComboMPekerjaanModel>>();
+
+  ComboMJnskelModel? fieldComboMJnskel;
+  final comboMJnsKelKey = GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
+  bool _isFirstLoad = true;
+  @override
+  void initState() {
+    super.initState();
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      loadData();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseBackgroundSidePage(
+      title: 'Informasi Klien',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            width: double.infinity,
+            height: constraints.maxHeight,
+            color: secondaryBlackColor,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  child: BlocConsumer<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+                    listener: (context, state) {
+                      if (state.isLoaded && state.record != null && _isFirstLoad) {
+                        final rec = state.record!;
+
+                        if (fieldRekanNamaController.text.trim().isEmpty) {
+                          final formName = (rec.rekanNama).trim();
+                          final fallbackName =
+                          (context.read<MRekan1CrudBloc>().state.record?.rekanNama ?? '').trim();
+
+                          if (formName.isNotEmpty) {
+                            fieldRekanNamaController.text = formName;
+                          } else if (fallbackName.isNotEmpty) {
+                            fieldRekanNamaController.text = fallbackName;
+                          }
+                        }
+
+                        if (fieldComboMPekerjaan == null) {
+                          fieldComboMPekerjaan = rec.comboMPekerjaan;
+                        }
+
+                        if (fieldComboMJnskel == null) {
+                          fieldComboMJnskel = rec.comboMJnskel;
+                        }
+
+                        _isFirstLoad = false;
+                      }
+
+                      if (state.isSaved && !state.hasFailure) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          successSnackBar("Data berhasil disimpan!"),
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      return Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // 🧿 Avatar section
+                            BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                              buildWhen: (prev, curr) => prev.runtimeType != curr.runtimeType || curr is ProfileDownloadFotoLoaded,
+                              builder: (context, state) {
+                                final Uint8List? imageBytes =
+                                state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
+
+                                return Center(
+                                  child: InkResponse(
+                                    onTap: () => ImageUploader.pickAndUpload(context),
+                                    containedInkWell: true,
+                                    customBorder: const CircleBorder(),
+                                    child: Stack(
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 50,
+                                          backgroundColor: secondaryBlackColor,
+                                          backgroundImage:
+                                          (imageBytes != null && imageBytes.isNotEmpty)
+                                              ? MemoryImage(imageBytes)
+                                              : null,
+                                          child: (imageBytes == null || imageBytes.isEmpty)
+                                              ? Container(
+                                            alignment: Alignment.center,
+                                            child: SvgPicture.asset(
+                                              "assets/icons/placeholder_icon.svg",
+                                              width: 40,
+                                              height: 40,
+                                              colorFilter: const ColorFilter.mode(
+                                                Colors.white,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                          )
+                                              : null,
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: sGrey),
+                                              color: secondaryBlackColor,
+                                            ),
+                                            child: CircleAvatar(
+                                              radius: 16,
+                                              backgroundColor: secondaryBlackColor,
+                                              child: SvgPicture.asset(
+                                                "assets/icons/camera.svg",
+                                                width: 24,
+                                                colorFilter: const ColorFilter.mode(
+                                                  Colors.white,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 20),
+                            // Heading
+                            Text(
+                              "Informasi Klien",
+                              style: headingStyle(context, fontSize: getResponsiveFont(context, 22))
+                                  .copyWith(color: Colors.white),
+                            ),
+                            Text(
+                              "Lengkapi identitas dasar Anda dengan benar.",
+                              style: bodyTextStyle(
+                                context,
+                                fontSize: getResponsiveFont(context, 16),
+                              ).copyWith(color: hintGrey),
+                            ),
+                            const SizedBox(height: vPadding),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 15,
+                              ),
+                              decoration: BoxDecoration(
+                                color: pGrey,
+                                border: Border.all(color: sGrey),
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              child: Column(
+                                children: [
+                                  buildFieldRekanNama(),
+                                  const SizedBox(height: vPadding),
+                                  buildFieldJenisKlien(),
+                                  const SizedBox(height: vPadding),
+                                  buildFieldPekerjaan(),
+                                  const SizedBox(height: vPadding),
+                                  buildFieldJenisKelamin(),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: vPadding),
+                            AppButton.primary(text: " Simpan Perubahan", onPressed: onSaveForm),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _injectPayload(MRekanGeneralIdvCrudModel record) {
+    fieldRekanNamaController.text = record.rekanNama ?? "";
+    fieldComboMPekerjaan = record.comboMPekerjaan;
+    fieldComboMJnskel    = record.comboMJnskel;
+
+    setState(() {});
+  }
+
+
+  void loadData() {
+    mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+
+    // final name =
+    //     context.read<MRekan1CrudBloc>().state.record?.rekanNama;
+    //
+    // if (fieldRekanNamaController.text.isEmpty && (name?.isNotEmpty ?? false)) {
+    //   fieldRekanNamaController.text = name!;
+    // }
+  }
+
+  Widget buildFieldPekerjaan() {
+    return ReusableComboBox<ComboMPekerjaanModel>(
+      hintText: "Pekerjaan",
+      comboKey: comboMPekerjaanKey,
+      initItem: fieldComboMPekerjaan,
+      dataLoader: () => ComboMPekerjaanRepository().getComboMPekerjaan(),
+      displayText: (item) => item.kerjaNama,
+      compareItems: (a, b) => a.mpekerjaanId == b.mpekerjaanId,
+      onChangedCallback: (value) {
+        if (value != null) {
+          removeError(error: "Field ComboMPekerjaan tidak boleh kosong.");
+          mRekanGeneralIdvCrudBloc.add(
+            ComboMPekerjaanChangedEvent(comboMPekerjaan: value),
+          );
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          fieldComboMPekerjaan = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          return kStringNullError;
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget buildFieldJenisKelamin() {
+    return FutureBuilder<List<ComboMJnskelModel>>(
+      future: ComboMJnskelRepository().getComboMJnskel(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Text('Tidak ada data jenis kelamin');
+        }
+
+        List<ComboMJnskelModel> jenisKelaminList = snapshot.data!;
+
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Jenis Kelamin',
+                style: bodyTextStyle(context, fontSize: 20),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children:
+                jenisKelaminList.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  ComboMJnskelModel item = entry.value;
+                  bool isSelected =
+                      fieldComboMJnskel?.mjnskelId == item.mjnskelId;
+
+                  return Expanded(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            fieldComboMJnskel = item;
+                            mRekanGeneralIdvCrudBloc.add(
+                              ComboMJnskelChangedEvent(comboMJnskel: item),
+                            );
+                            setState(() {});
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color:
+                                    isSelected
+                                        ? primaryColor
+                                        : hintGrey,
+                                    width: 1,
+                                  ),
+                                  color: Colors.transparent,
+                                ),
+                                child:
+                                isSelected
+                                    ? Center(
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: primaryColor,
+                                    ),
+                                  ),
+                                )
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                item.jenisDesc,
+                                style:
+                                isSelected
+                                    ? inputTextStyle(context)
+                                    : bodyTextStyle(context),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Spacer between options (except for last item)
+                        if (index < jenisKelaminList.length - 1)
+                          const SizedBox(width: 24),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+              FormField<ComboMJnskelModel>(
+                validator: (value) {
+                  if (fieldComboMJnskel == null) {
+                    return kStringNullError;
+                  }
+                  return null;
+                },
+                builder: (state) {
+                  return state.hasError
+                      ? Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      state.errorText!,
+                      style: TextStyle(color: pRed, fontSize: 12),
+                    ),
+                  )
+                      : const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildFieldRekanNama() {
+    return appTextField(
+      label: "Nama",
+      controller: fieldRekanNamaController,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return kStringNullError;
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget buildFieldJenisKlien() {
+    return appTextField(
+      label: "Individu",
+      controller: TextEditingController(),
+      enabled: false,
+    );
+  }
+
+  void onSaveForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      MRekanGeneralIdvCrudModel record = MRekanGeneralIdvCrudModel(
+        mjnskelId: fieldComboMJnskel?.mjnskelId,
+        mpekerjaanId: fieldComboMPekerjaan?.mpekerjaanId,
+        mrekan1Id: '',
+        rekanNama: fieldRekanNamaController.text,
+      );
+      record.mrekan1Id = mRekanGeneralIdvCrudBloc.state.record!.mrekan1Id;
+      mRekanGeneralIdvCrudBloc.add(
+        MRekanGeneralIdvCrudUbahEvent(record: record),
+      );
+    }
+  }
+
+  void removeError({required String error}) {
+    if (errors.contains(error)) {
+      setState(() {
+        errors.remove(error);
+      });
+    }
+  }
+}
