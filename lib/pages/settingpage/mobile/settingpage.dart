@@ -7,14 +7,11 @@ import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../home/draggable_chat_button.dart';
 import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_idv.dart';
 import '../../profile/mobile/profile/form_section/rekan_pic.dart';
-import '../../qontak/mobile/chat_init_service.dart';
-import '../widgets/logout_popup.dart';
 import '../widgets/syarat_ketentuan_page.dart';
 import '../widgets/ubah_password_popup.dart';
 
@@ -712,7 +709,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: primaryLightColor,
+              activeThumbColor: primaryLightColor,
               activeTrackColor: pBlue,
               inactiveThumbColor: primaryLightColor,
               inactiveTrackColor: pGrey,

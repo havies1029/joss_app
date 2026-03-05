@@ -283,7 +283,7 @@ flutter:
     - assets/icons/PerpanjanganLog.svg
     - assets/icons/RegMV.svg
     - assets/icons/RegOthers.svg
-    - assets/ifcons/RegPAR.svg
+    - assets/icons/RegPAR.svg
     - assets/icons/upload_simbol.svg
     - assets/icons/daftar_client.svg
     - assets/icons/empty_review_page.svg

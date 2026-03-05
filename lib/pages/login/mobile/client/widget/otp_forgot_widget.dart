@@ -7,7 +7,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:pinput/pinput.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
-import 'package:joss_app/models/login/forgot_password_model.dart';
 import 'package:joss_app/pages/login/mobile/client/kata_sandi_baru_page.dart';
 
 import '../../../../../blocs/login/emailverification_bloc.dart';

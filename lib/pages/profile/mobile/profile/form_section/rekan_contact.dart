@@ -119,17 +119,11 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                         // 2) DROPDOWN: isi hanya kalau belum dipilih user
                         // =========================
 
-                        if (fieldComboMPropinsi == null) {
-                          fieldComboMPropinsi = contact.comboMPropinsi;
-                        }
+                        fieldComboMPropinsi ??= contact.comboMPropinsi;
 
-                        if (fieldComboMKota == null) {
-                          fieldComboMKota = contact.comboMKota;
-                        }
+                        fieldComboMKota ??= contact.comboMKota;
 
-                        if (fieldComboRKodepos == null) {
-                          fieldComboRKodepos = contact.comboRKodepos;
-                        }
+                        fieldComboRKodepos ??= contact.comboRKodepos;
 
                         _isFirstLoad = false;
                       }

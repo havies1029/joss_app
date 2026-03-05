@@ -39,7 +39,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   final comboMBankKey = GlobalKey<DropdownSearchState<ComboMBankModel>>();
 
   String? existingMrekanBankId;
-  bool _isFirstLoad = true;
+  final bool _isFirstLoad = true;
   @override
   void initState() {
     super.initState();

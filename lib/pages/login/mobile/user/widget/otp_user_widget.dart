@@ -9,11 +9,9 @@ import 'package:pinput/pinput.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../../blocs/login/forgot_password_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/indo_phone_result.dart';
 import '../../../../../models/login/emailverification_model.dart';
-import '../../../../../models/login/forgot_password_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
 class PopupUserWidget extends StatefulWidget {
