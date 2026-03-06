@@ -42,4 +42,26 @@ class RegUserModel {
         'userNama': userNama,
         'jnsClientId': jnsClientId,
       };
+
+  RegUserModel copyWith({
+    String? email,
+    String? kodePin,
+    String? password,
+    String? personalNama,
+    String? reguserId,
+    String? telepon,
+    String? userNama,
+    String? jnsClientId,
+  }) {
+    return RegUserModel(
+      email: email ?? this.email,
+      kodePin: kodePin ?? this.kodePin,
+      password: password ?? this.password,
+      personalNama: personalNama ?? this.personalNama,
+      reguserId: reguserId ?? this.reguserId,
+      telepon: telepon ?? this.telepon,
+      userNama: userNama ?? this.userNama,
+      jnsClientId: jnsClientId ?? this.jnsClientId,
+    );
+  }
 }

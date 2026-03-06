@@ -1,18 +1,18 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:async';
-import 'dart:math' as math;
-import 'package:pinput/pinput.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/helper/indo_phone_result.dart';
+import 'package:joss_app/models/login/forgot_password_model.dart';
 import 'package:joss_app/pages/login/mobile/client/kata_sandi_baru_page.dart';
+import 'package:pinput/pinput.dart';
 
-import '../../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../../common/constants.dart';
-import '../../../../../helper/indo_phone_result.dart';
-import '../../../../../models/login/emailverification_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
 class OtpForgotWidget extends StatefulWidget {
@@ -24,12 +24,11 @@ class OtpForgotWidget extends StatefulWidget {
   });
 
   @override
-  OtpForgotWidgetState createState() => OtpForgotWidgetState();
+  State<OtpForgotWidget> createState() => _OtpForgotWidgetState();
 }
 
-class OtpForgotWidgetState extends State<OtpForgotWidget>
+class _OtpForgotWidgetState extends State<OtpForgotWidget>
     with TickerProviderStateMixin {
-  // 🎬 Animations (DNA patokan)
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -40,12 +39,11 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  // 📌 OTP
   final TextEditingController _pinController = TextEditingController();
   final FocusNode _pinFocusNode = FocusNode();
+
   bool _otpError = false;
 
-  // ⏱ Timer
   Timer? _timer;
   int _remainingTime = 6;
   bool _isResendAvailable = false;
@@ -53,6 +51,7 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _pinFocusNode.requestFocus();
@@ -82,21 +81,41 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
-    ));
-
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
+    ).animate(
+      CurvedAnimation(
+        parent: _slideController,
+        curve: Curves.easeOutBack,
+      ),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
+    _fadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: Curves.easeOut,
+      ),
     );
 
-    _shakeAnimation = Tween<double>(begin: 0, end: math.pi * 2).animate(
-      CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        parent: _scaleController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    _shakeAnimation = Tween<double>(
+      begin: 0,
+      end: math.pi * 2,
+    ).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.easeInOut,
+      ),
     );
 
     _startAnimations();
@@ -105,12 +124,6 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
 
   bool _isEmail(String input) => EmailValidator.validate(input);
   bool _isPhone(String input) => IndoPhoneHelper.normalize(input).isValid;
-
-  String _buildRequestFrom(String input) {
-    if (_isEmail(input)) return "email";
-    if (_isPhone(input)) return "hp";
-    return "unknown";
-  }
 
   String _formatPhoneVisual(String phone62) {
     if (!phone62.startsWith('62')) return phone62;
@@ -149,15 +162,25 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
 
   void _startTimer() {
     _timer?.cancel();
+
+    setState(() {
+      _isResendAvailable = false;
+    });
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
+
       if (_remainingTime > 0) {
-        setState(() => _remainingTime--);
+        setState(() {
+          _remainingTime--;
+        });
       } else {
-        setState(() => _isResendAvailable = true);
+        setState(() {
+          _isResendAvailable = true;
+        });
         timer.cancel();
       }
     });
@@ -170,8 +193,11 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
   }
 
   void _resetOtpAndFocusFirst() {
-    setState(() => _otpError = false);
     _pinController.clear();
+    setState(() {
+      _otpError = false;
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _pinFocusNode.requestFocus();
@@ -184,33 +210,17 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
   }
 
   void _resendOtp() {
-    setState(() {
-      _remainingTime = 6;
-      _isResendAvailable = false;
-    });
-    _startTimer();
+    final forgotPasswordBloc = context.read<ForgotPasswordBloc>();
+    final existingRecord = forgotPasswordBloc.state.record;
 
-    HapticFeedback.lightImpact();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Kode OTP telah dikirim ulang'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+    final record = existingRecord ??
+        RequestOtpModel(
+          sentTo: widget.sentTo,
+          sentVia: _isEmail(widget.sentTo) ? "email" : "hp",
+          purpose: "forgot_password",
+        );
 
-    // ✅ LOGIC TETAP OTP FORGOT:
-    final record = context.read<ForgotPasswordBloc>().state.record;
-    context.read<EmailVerificationBloc>().add(
-      ResendOtpEvent(
-        record: EmailVerificationModel(
-          email: widget.sentTo,
-          requestId: record?.requestId ?? '',
-          requestFrom: _buildRequestFrom(widget.sentTo),
-        ),
-      ),
-    );
+    forgotPasswordBloc.add(ForgotPswdResendOtpEvent(record: record));
   }
 
   void _verifyOtp({String? otpOverride}) {
@@ -237,14 +247,14 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
       return;
     }
 
-    record.pin = otp;
+    record.kodePin = otp;
 
     context.read<ForgotPasswordBloc>().add(
-      ForgotPswdValidasiPinEmailEvent(
-        record: record,
-        requestAt: DateTime.now(),
-      ),
-    );
+          ForgotPswdValidasiPinEmailEvent(
+            record: record,
+            requestAt: DateTime.now(),
+          ),
+        );
   }
 
   void _handleResendSuccess() {
@@ -254,6 +264,7 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
       _remainingTime = 6;
       _isResendAvailable = false;
     });
+
     _startTimer();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -268,7 +279,6 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
     _scaleController.dispose();
     _shakeController.dispose();
     _timer?.cancel();
-
     _pinController.dispose();
     _pinFocusNode.dispose();
     super.dispose();
@@ -276,55 +286,75 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
-          listenWhen: (prev, curr) =>
-          prev.isSent != curr.isSent ||
-              prev.verificationPinSuccess != curr.verificationPinSuccess,
-          listener: (context, state) {
-            if (state.isSent && state.verificationPinSuccess) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => KataSandiBaruPage(
-                    email: widget.sentTo,
-                    requestId: state.record?.requestId ?? '',
-                  ),
-                ),
-              );
-              return;
-            }
+    return BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
+      listenWhen: (prev, curr) =>
+          prev.verificationPinSuccess != curr.verificationPinSuccess ||
+          prev.verificationPinFailed != curr.verificationPinFailed ||
+          prev.resendOtpSuccess != curr.resendOtpSuccess ||
+          prev.errorMessage != curr.errorMessage,
+      listener: (context, state) {
+        if (state.verificationPinSuccess) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => KataSandiBaruPage(
+                email: widget.sentTo,
+                requestId: state.record?.requestOtpId ?? '',
+              ),
+            ),
+          );
+          return;
+        }
 
-            if (state.isSent && !state.verificationPinSuccess) {
-              _shakeOtpFields();
-              setState(() => _otpError = true);
+        if (state.verificationPinFailed) {
+          _shakeOtpFields();
+          setState(() {
+            _otpError = true;
+          });
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar("Kode OTP salah / sudah kadaluarsa."),
-              );
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(
+              state.errorMessage.isNotEmpty
+                  ? state.errorMessage
+                  : "Kode OTP salah / sudah kadaluarsa.",
+            ),
+          );
 
-              _resetOtpAndFocusFirst();
-            }
-          },
-        ),
+          _resetOtpAndFocusFirst();
 
-        /// LISTENER RESEND OTP (LOGIC TETAP)
-        BlocListener<EmailVerificationBloc, EmailVerificationState>(
-          listenWhen: (prev, curr) =>
-          prev.isResendOtpSuccess != curr.isResendOtpSuccess ||
-              prev.hasFailure != curr.hasFailure,
-          listener: (context, state) {
-            if (state.isResendOtpSuccess) {
-              _handleResendSuccess();
-            }
-            if (state.hasFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar("Gagal mengirim ulang OTP."),
-              );
-            }
-          },
-        ),
-      ],
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdResetFlagsEvent());
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdClearMessageEvent());
+          return;
+        }
+
+        if (state.resendOtpSuccess) {
+          _handleResendSuccess();
+
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdResetFlagsEvent());
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdClearMessageEvent());
+          return;
+        }
+
+        if (state.errorMessage.isNotEmpty &&
+            !state.verificationPinFailed &&
+            !state.verificationPinSuccess &&
+            !state.resendOtpSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(state.errorMessage),
+          );
+
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdClearMessageEvent());
+        }
+      },
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
         body: SafeArea(
@@ -341,7 +371,9 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
+                                horizontal: 15,
+                                vertical: 10,
+                              ),
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Padding(
@@ -350,15 +382,16 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                     onPressed: () {
                                       _resetOtpAndFocusFirst();
                                       _timer?.cancel();
-                                      Navigator.of(context,
-                                          rootNavigator: false)
-                                          .pop();
+                                      Navigator.of(
+                                        context,
+                                        rootNavigator: false,
+                                      ).pop();
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(0, 0),
                                       tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
+                                          MaterialTapTargetSize.shrinkWrap,
                                     ),
                                     icon: Icon(
                                       Icons.arrow_back_ios_new,
@@ -367,15 +400,14 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                     ),
                                     label: Text(
                                       "Kembali",
-                                      style: bodyTextStyle(context)
-                                          .copyWith(color: primaryLightColor),
+                                      style: bodyTextStyle(context).copyWith(
+                                        color: primaryLightColor,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-
-                            // ✅ Card DNA patokan (gradient border)
                             Container(
                               decoration: BoxDecoration(
                                 gradient: cardBorderGradient,
@@ -399,7 +431,6 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                 ),
                                 child: Column(
                                   children: [
-                                    // ✅ icon DNA patokan
                                     SvgPicture.asset(
                                       "assets/icons/otp_icon.svg",
                                     ),
@@ -413,47 +444,63 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                       children: [
                                         Text(
                                           "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(widget.sentTo)}",
-                                          style:
-                                          bodyTextStyle(context, fontSize: 20),
+                                          style: bodyTextStyle(
+                                            context,
+                                            fontSize: 20,
+                                          ),
                                           textAlign: TextAlign.center,
                                         ),
                                         Text(
                                           _buildOtpValue(widget.sentTo),
-                                          style: bodyTextStyle(context, fontSize: 20)
-                                              .copyWith(color: primaryColor),
+                                          style: bodyTextStyle(
+                                            context,
+                                            fontSize: 20,
+                                          ).copyWith(color: primaryColor),
                                           textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 16),
-
-                                    // ⏱ Timer / resend (DNA)
-                                    AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 300),
-                                      child: _isResendAvailable
-                                          ? GestureDetector(
-                                        onTap: _resendOtp,
-                                        child: Text(
-                                          'Kirim ulang kode',
-                                          style: bodyTextStyle(context)
-                                              .copyWith(color: primaryColor),
-                                        ),
-                                      )
-                                          : Text(
-                                        _formatTime(_remainingTime),
-                                        style: bodyTextStyle(context)
-                                            .copyWith(color: pRed),
-                                      ),
+                                    BlocBuilder<ForgotPasswordBloc,
+                                        ForgotPasswordState>(
+                                      buildWhen: (prev, curr) =>
+                                          prev.isLoading != curr.isLoading,
+                                      builder: (context, state) {
+                                        return AnimatedSwitcher(
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
+                                          child: _isResendAvailable
+                                              ? GestureDetector(
+                                                  onTap: state.isLoading
+                                                      ? null
+                                                      : _resendOtp,
+                                                  child: Text(
+                                                    state.isLoading
+                                                        ? 'Mengirim ulang...'
+                                                        : 'Kirim ulang kode',
+                                                    style: bodyTextStyle(context)
+                                                        .copyWith(
+                                                      color: state.isLoading
+                                                          ? hintGrey
+                                                          : primaryColor,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Text(
+                                                  _formatTime(_remainingTime),
+                                                  style: bodyTextStyle(context)
+                                                      .copyWith(color: pRed),
+                                                ),
+                                        );
+                                      },
                                     ),
-
                                     const SizedBox(height: 16),
-
-                                    // 🔢 OTP fields + shake (DNA)
                                     TextSelectionTheme(
                                       data: TextSelectionThemeData(
                                         cursorColor: primaryColor,
                                         selectionColor:
-                                        primaryColor.withOpacity(0.25),
+                                            primaryColor.withOpacity(0.25),
                                         selectionHandleColor: primaryColor,
                                       ),
                                       child: AnimatedBuilder(
@@ -461,7 +508,8 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                         builder: (_, child) {
                                           return Transform.translate(
                                             offset: Offset(
-                                              math.sin(_shakeAnimation.value) * 8,
+                                              math.sin(_shakeAnimation.value) *
+                                                  8,
                                               0,
                                             ),
                                             child: child,
@@ -472,10 +520,12 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                           controller: _pinController,
                                           focusNode: _pinFocusNode,
                                           keyboardType: TextInputType.number,
-                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                          ],
                                           autofillHints: const <String>[],
 
-                                          // theme (DNA: sama ukuran & border)
                                           defaultPinTheme: PinTheme(
                                             width: 48,
                                             height: 48,
@@ -486,9 +536,14 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                             ),
                                             decoration: BoxDecoration(
                                               color: pGrey,
-                                              borderRadius: BorderRadius.circular(checkboxBorderRadius),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                checkboxBorderRadius,
+                                              ),
                                               border: Border.all(
-                                                color: _pinFocusNode.hasFocus ? primaryColor : sGrey,
+                                                color: _pinFocusNode.hasFocus
+                                                    ? primaryColor
+                                                    : sGrey,
                                                 width: 2,
                                               ),
                                             ),
@@ -503,8 +558,14 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                             ),
                                             decoration: BoxDecoration(
                                               color: pGrey,
-                                              borderRadius: BorderRadius.circular(checkboxBorderRadius),
-                                              border: Border.all(color: primaryColor, width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                checkboxBorderRadius,
+                                              ),
+                                              border: Border.all(
+                                                color: primaryColor,
+                                                width: 2,
+                                              ),
                                             ),
                                           ),
                                           errorPinTheme: PinTheme(
@@ -517,56 +578,83 @@ class OtpForgotWidgetState extends State<OtpForgotWidget>
                                             ),
                                             decoration: BoxDecoration(
                                               color: pGrey,
-                                              borderRadius: BorderRadius.circular(checkboxBorderRadius),
-                                              border: Border.all(color: pRed, width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                checkboxBorderRadius,
+                                              ),
+                                              border: Border.all(
+                                                color: pRed,
+                                                width: 2,
+                                              ),
                                             ),
                                           ),
                                           forceErrorState: _otpError,
-
                                           showCursor: true,
                                           cursor: Align(
                                             alignment: Alignment.center,
-                                            child: Container(width: 2, height: 24, color: primaryColor),
+                                            child: Container(
+                                              width: 2,
+                                              height: 24,
+                                              color: primaryColor,
+                                            ),
                                           ),
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                                          onTap: () => HapticFeedback.selectionClick(),
-
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          onTap: () =>
+                                              HapticFeedback.selectionClick(),
                                           onChanged: (v) {
-                                            if (_otpError) setState(() => _otpError = false);
+                                            if (_otpError) {
+                                              setState(() {
+                                                _otpError = false;
+                                              });
+                                            }
                                           },
-
-                                          // auto verify saat 6 digit
                                           onCompleted: (pin) {
-                                            if (_otpError) setState(() => _otpError = false);
+                                            if (_otpError) {
+                                              setState(() {
+                                                _otpError = false;
+                                              });
+                                            }
                                             _verifyOtp(otpOverride: pin);
                                           },
                                         ),
                                       ),
                                     ),
-
                                     const SizedBox(height: 18),
                                     Text(
                                       'Silakan masukkan kode di atas untuk melanjutkan.',
-                                      style: bodyTextStyle(context)
-                                          .copyWith(color: hintGrey),
+                                      style: bodyTextStyle(context).copyWith(
+                                        color: hintGrey,
+                                      ),
                                       textAlign: TextAlign.center,
                                     ),
-
                                     const SizedBox(height: 18),
+                                    BlocBuilder<ForgotPasswordBloc,
+                                        ForgotPasswordState>(
+                                      buildWhen: (prev, curr) =>
+                                          prev.isLoading != curr.isLoading,
+                                      builder: (context, state) {
+                                        return AppButton.primary(
+                                          text: state.isLoading
+                                              ? "Memverifikasi..."
+                                              : "Lanjut",
+                                          onPressed: state.isLoading
+                                              ? null
+                                              : () {
+                                                  final otp =
+                                                      _pinController.text.trim();
 
-                                    // ✅ tombol DNA patokan
-                                    AppButton.primary(
-                                      text: "Lanjut",
-                                      onPressed: () {
-                                        final otp = _pinController.text.trim();
-                                        if (otp.length == 6) {
-                                          _verifyOtp();
-                                        } else {
-                                          _shakeOtpFields();
-                                          setState(() => _otpError = true);
-                                          _pinFocusNode.requestFocus();
-                                        }
+                                                  if (otp.length == 6) {
+                                                    _verifyOtp();
+                                                  } else {
+                                                    _shakeOtpFields();
+                                                    setState(() {
+                                                      _otpError = true;
+                                                    });
+                                                    _pinFocusNode.requestFocus();
+                                                  }
+                                                },
+                                        );
                                       },
                                     ),
                                   ],

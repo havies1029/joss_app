@@ -155,10 +155,16 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   }
 
   void _resendOtp() {
+    //micky 2026-03-05
+    // cegah onCompleted kepanggil dari value lama / autofill
+    _pinController.clear();
     setState(() {
+      _otpError = false;
       _remainingTime = 59;
       _isResendAvailable = false;
     });
+    FocusScope.of(context).unfocus();
+    Future.microtask(() => _pinFocusNode.requestFocus());
     _startTimer();
 
     HapticFeedback.lightImpact();
@@ -261,6 +267,7 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     );
 
     return BlocListener<EmailVerificationBloc, EmailVerificationState>(
+      listenWhen: (previous, current) => previous.verificationFailed != current.verificationFailed,
       listener: (context, state) {
         if (state.verificationFailed) {
           _shakeOtpFields();
@@ -271,8 +278,8 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
           _pinFocusNode.requestFocus();
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kode OTP salah, silakan coba lagi'),
+            SnackBar(
+              content: Text(state.errors.isNotEmpty ? state.errors[0] : 'Verifikasi OTP gagal'),
               backgroundColor: Colors.red,
             ),
           );

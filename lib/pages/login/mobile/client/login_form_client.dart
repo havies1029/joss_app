@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
@@ -88,7 +89,7 @@ class _LoginFormClientState extends State<LoginFormClient>
         }
 
         // validasi email atau hp
-        final isEmail = emailValidatorRegExp.hasMatch(value.trim());
+        final isEmail = EmailValidator.validate(value.trim());
         final isPhone = phoneValidatorRegExp.hasMatch(value.trim());
 
         if (!isEmail && !isPhone) {

@@ -17,6 +17,13 @@ class AppData {
   // static String httpAuthority = "10.211.55.5";
 
 
+  // static bool useSSL = true;
+  // static String apiDomain =
+  //     "http${useSSL ? "s" : ""}://eassist-re.jpsre.co.id/joss_api/";
+  // static String prefixEndPoint = "joss_api";
+  // static String httpAuthority = "eassist-re.jpsre.co.id";
+
+
   // static bool useSSL = false;
   // static String apiDomain = "http://10.0.2.2/eAssistToolsAPI/";
   // static String prefixEndPoint = "/eAssistToolsAPI";

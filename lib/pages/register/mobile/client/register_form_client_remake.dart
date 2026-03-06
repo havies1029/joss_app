@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -81,7 +82,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
         setErr('form1.email', kStringNullError);
         ok = false;
       } else {
-        if (!emailValidatorRegExp.hasMatch(email)) {
+        if (!EmailValidator.validate(email)) {
           setErr('form1.email', "Format tidak valid");
           ok = false;
         }
@@ -244,7 +245,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   @override
   Widget build(BuildContext context) {
     var email = AppData.user.email??"";
-    final isEmail = emailValidatorRegExp.hasMatch(email.trim());
+    final isEmail = EmailValidator.validate(email.trim());
     lastLoginBy = isEmail ? "email" : "hp";
     return BlocConsumer<RegUserBloc, RegUserState>(
       listener: (context, state) {

@@ -1,36 +1,62 @@
 part of 'forgot_password_bloc.dart';
 
 abstract class ForgotPasswordEvent extends Equatable {
-	const ForgotPasswordEvent();
+  const ForgotPasswordEvent();
 
-	@override
-	List<Object> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 class ForgotPswdRequestPinEvent extends ForgotPasswordEvent {
-	final ForgotPasswordModel record;
-	const ForgotPswdRequestPinEvent({required this.record});
+  final RequestOtpModel record;
 
-	@override
-	List<Object> get props => [record];
+  const ForgotPswdRequestPinEvent({
+    required this.record,
+  });
+
+  @override
+  List<Object?> get props => [record];
 }
 
+class ForgotPswdResendOtpEvent extends ForgotPasswordEvent {
+  final RequestOtpModel record;
+
+  const ForgotPswdResendOtpEvent({
+    required this.record,
+  });
+
+  @override
+  List<Object?> get props => [record];
+}
 
 class ForgotPswdValidasiPinEmailEvent extends ForgotPasswordEvent {
-	final ForgotPasswordModel record;
-	final DateTime requestAt;
-	const ForgotPswdValidasiPinEmailEvent({required this.record, required this.requestAt});
+  final RequestOtpModel record;
+  final DateTime requestAt;
 
-	@override
-	List<Object> get props => [record, requestAt];
+  const ForgotPswdValidasiPinEmailEvent({
+    required this.record,
+    required this.requestAt,
+  });
+
+  @override
+  List<Object?> get props => [record, requestAt];
 }
 
 class ForgotPswdResetPasswordEvent extends ForgotPasswordEvent {
   final ResetPasswordModel record;
-  const ForgotPswdResetPasswordEvent({required this.record});
+
+  const ForgotPswdResetPasswordEvent({
+    required this.record,
+  });
 
   @override
-  List<Object> get props => [record];
+  List<Object?> get props => [record];
 }
 
+class ForgotPswdClearMessageEvent extends ForgotPasswordEvent {
+  const ForgotPswdClearMessageEvent();
+}
 
+class ForgotPswdResetFlagsEvent extends ForgotPasswordEvent {
+  const ForgotPswdResetFlagsEvent();
+}

@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
@@ -47,36 +48,55 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     final success = await (widget.onSubmit?.call(email) ?? Future.value(true));
     if (!mounted) return;
 
-    if (success) {
-
-      final record = ForgotPasswordModel(email: email); 
-      context.read<ForgotPasswordBloc>().add(
-        ForgotPswdRequestPinEvent(record: record),
-      );
-    } else {
+    if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar("Gagal mengirim OTP, coba lagi."),
       );
+      return;
     }
+
+    final record = RequestOtpModel(
+      sentTo: email,
+      sentVia: "email",
+      purpose: "forgot_password",
+    );
+
+    context.read<ForgotPasswordBloc>().add(
+          ForgotPswdRequestPinEvent(record: record),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
       listenWhen: (prev, curr) =>
-          prev.isSent != curr.isSent ||
-          prev.verificationEmailSuccess != curr.verificationEmailSuccess,
+          prev.requestOtpSuccess != curr.requestOtpSuccess ||
+          prev.errorMessage != curr.errorMessage,
       listener: (context, state) {
-        // OTP VALID (sukses)
-        if (state.isSent && state.verificationEmailSuccess) {
+        if (state.requestOtpSuccess) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => OtpForgotWidget(sentTo: state.record?.email ?? ""), // <-- buka OTP di sini
+              builder: (_) => OtpForgotWidget(
+                sentTo: state.record?.sentTo ?? _emailController.text.trim(),
+              ),
             ),
           );
+
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdResetFlagsEvent());
           return;
         }
-      
+
+        if (state.errorMessage.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(state.errorMessage),
+          );
+
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdClearMessageEvent());
+        }
       },
       child: Scaffold(
         backgroundColor: primaryBlackColor,
@@ -85,13 +105,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             backgroundColor: Colors.transparent,
             body: SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 6),
-      
-                    // ====== Logo (sesuai request) ======
                     Image.asset(
                       'assets/images/logo.png',
                       gaplessPlayback: true,
@@ -106,15 +125,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               ? 140
                               : 120,
                     ),
-      
                     const SizedBox(height: 12),
-      
-                    // ====== Kembali ======
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: widget.onBack ?? () => Navigator.of(context).maybePop(),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 6,
+                        ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -122,16 +141,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             const SizedBox(width: 4),
                             Text(
                               "Kembali",
-                              style: bodyTextStyle(context).copyWith(color: primaryColor),
+                              style: bodyTextStyle(context)
+                                  .copyWith(color: primaryColor),
                             ),
                           ],
                         ),
                       ),
                     ),
-      
                     const SizedBox(height: 8),
-      
-                    // ====== Title & desc ======
                     Text(
                       "Lupa Kata Sandi?",
                       style: headingStyle(context, fontSize: 30),
@@ -139,11 +156,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     const SizedBox(height: 8),
                     Text(
                       "Masukkan email terdaftar untuk mengatur ulang kata sandi.",
-                      style: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
+                      style: bodyTextStyle(context, fontSize: 16)
+                          .copyWith(color: hintGrey),
                     ),
-      
                     const SizedBox(height: 18),
-      
                     Container(
                       decoration: BoxDecoration(
                         gradient: cardBorderGradient,
@@ -168,7 +184,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 validator: (value) {
                                   final v = (value ?? "").trim();
                                   if (v.isEmpty) return "Mohon isi email";
-                                  if (!emailValidatorRegExp.hasMatch(v)) {
+                                  if (!EmailValidator.validate(v)) {
                                     return "Masukkan format email yang valid";
                                   }
                                   return null;
@@ -176,23 +192,27 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 onTap: () {},
                               ),
                               const SizedBox(height: 14),
-      
-                              // Tombol orange (mirip screenshot)
-                              AppButton.primary(
-                                text: "Kirim",
-                                onPressed: _submit,
-                                width: double.infinity,
-                                backgroundColor: const Color(0xFFF28A2E),
-                                textStyle: headingStyle(context, fontSize: 16)
-                                    .copyWith(color: Colors.white),
+                              BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
+                                buildWhen: (prev, curr) =>
+                                    prev.isLoading != curr.isLoading,
+                                builder: (context, state) {
+                                  return AppButton.primary(
+                                    text:
+                                        state.isLoading ? "Mengirim..." : "Kirim",
+                                    onPressed: state.isLoading ? null : _submit,
+                                    width: double.infinity,
+                                    backgroundColor: const Color(0xFFF28A2E),
+                                    textStyle:
+                                        headingStyle(context, fontSize: 16)
+                                            .copyWith(color: Colors.white),
+                                  );
+                                },
                               ),
                             ],
                           ),
                         ),
                       ),
                     ),
-      
-                    // spacer bawah biar ga mepet home indicator
                     const SizedBox(height: 28),
                   ],
                 ),

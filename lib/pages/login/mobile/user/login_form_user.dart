@@ -101,7 +101,7 @@ class _LoginFormUserState extends State<LoginFormUser>
     if (!_formKey.currentState!.validate()) return;
 
     final input = _emailOrPhoneController.text.trim();
-    final isEmail = emailValidatorRegExp.hasMatch(input);
+    final isEmail = EmailValidator.validate(input);
 
     // optional: tetap update state biar UI/validasi lain ikut kebawa
     if (isEmail) {

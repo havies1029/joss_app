@@ -160,12 +160,6 @@ const double defaultElevation = 3.0;
 const double buttonHeight = 41.0;
 
 const defaultDuration = Duration(milliseconds: 250);
-
-// Form Error
-final RegExp emailValidatorRegExp = RegExp(
-  r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-);
-
 const String kEmailNullError = "Email wajib diisi.";
 const String kInvalidEmailError = "Format email tidak valid.";
 const String kPassNullError = "Password wajib diisi.";

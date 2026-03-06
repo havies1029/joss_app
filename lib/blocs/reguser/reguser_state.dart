@@ -12,6 +12,7 @@ class RegUserState extends Equatable {
   final String requestFrom;
 	final List<String> errors;
 	final bool isEmail;
+  final bool isResendOtp;
 
 	const RegUserState(
 		{this.record,
@@ -24,6 +25,7 @@ class RegUserState extends Equatable {
     this.requestFrom = "",
     this.errors = const [],
 		this.isEmail = false,
+    this.isResendOtp = false,
 });
 
 	RegUserState copyWith({
@@ -37,6 +39,7 @@ class RegUserState extends Equatable {
     String? requestFrom,
     List<String>? errors,
 		bool? isEmail,
+    bool? isResendOtp,
 	}){
 		return RegUserState(
 			record: record ?? this.record,
@@ -49,10 +52,11 @@ class RegUserState extends Equatable {
       requestFrom: requestFrom ?? this.requestFrom,
       errors: errors ?? this.errors,
 			isEmail: isEmail ?? this.isEmail,
+      isResendOtp: isResendOtp ?? this.isResendOtp,
 		);
 	}
 
 	@override
 	List<Object> get props => [isEmail, isLoading, isLoaded, isSaving, isSaved, hasFailure,
-    verificationFailed, requestFrom, errors];
+    verificationFailed, requestFrom, errors, isResendOtp];
 }

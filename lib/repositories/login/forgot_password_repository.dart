@@ -6,12 +6,16 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 class ForgotPasswordRepository {
   ForgotPasswordApi api = ForgotPasswordApi();
 
-  Future<ReturnDataAPI> emailVerificationForgotPswd(ForgotPasswordModel record) async {
-    return await api.emailVerificationForgotPswdAPI(record);
+  Future<ReturnDataAPI> requestOtp(RequestOtpModel record) async {
+    return await api.requestOtpAPI(record);
   }
 
-  Future<ReturnDataAPI> validasiPinForgotPassword(ForgotPasswordModel record) async {
-    return await api.validasiPinForgotPasswordAPI(record);
+  Future<ReturnDataAPI> validasiOtp(RequestOtpModel record) async {
+    return await api.validasiOtpAPI(record);
+  }
+
+  Future<ReturnDataAPI> resendOtp(RequestOtpModel record) async {
+    return await api.resendOtpAPI(record);
   }
 
   Future<bool> resetPassword(ResetPasswordModel pswd) async {

@@ -23,6 +23,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<RegUserLihatEvent>(onLihatRegUser);
     on<ValidasiPinHPEvent>(onValidasiPinHP);
     on<SetIsEmailEvent>(_onSetIsEmail);
+    on<ResendOtpEvent>(onResendOtp);
   }
 
   void _onSetIsEmail(SetIsEmailEvent event, Emitter<RegUserState> emit) {
@@ -124,5 +125,25 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     else {
       authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));
     }
+  }
+
+  Future<void> onResendOtp(ResendOtpEvent event, Emitter<RegUserState> emit) async {
+    emit(state.copyWith(isSaving: true, isSaved: false, isResendOtp: true, verificationFailed: false, errors: const []));
+    ReturnDataAPI returnData = await repository.regUserResendOtp(event.reguserId);
+    bool hasFailure = !returnData.success;
+    List<String> errors = [];
+    if (hasFailure) {
+      errors.add(returnData.data);
+    }
+
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+      verificationFailed: false,
+      errors: errors,
+      isResendOtp: false,
+      record: state.record?.copyWith(reguserId: returnData.data)
+    )); 
   }
 }

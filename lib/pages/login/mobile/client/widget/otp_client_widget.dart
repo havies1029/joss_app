@@ -8,11 +8,9 @@ import 'dart:math' as math;
 import 'package:pinput/pinput.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/indo_phone_result.dart';
-import '../../../../../models/login/emailverification_model.dart';
 import '../../../../../models/reguser/reguser_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
@@ -202,20 +200,12 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       ),
     );
 
-    final emailVerificationRecord =
-        context.read<EmailVerificationBloc>().state.record;
-
-    context.read<EmailVerificationBloc>().add(
+    context.read<RegUserBloc>().add(
       ResendOtpEvent(
-        record: EmailVerificationModel(
-          email: widget.sentTo,
-          requestId: emailVerificationRecord?.requestId ?? '',
-          requestFrom: _buildRequestFrom(widget.sentTo),
-        ),
+        reguserId: context.read<RegUserBloc>().state.record?.reguserId ?? '',
       ),
     );
   }
-
 
   void _verifyOtp({String? otpOverride}) {
     final otp = (otpOverride ?? _pinController.text).trim();
@@ -284,16 +274,15 @@ class PopupClientWidgetState extends State<PopupClientWidget>
     );
 
     return BlocListener<RegUserBloc, RegUserState>(
-      listenWhen: (prev, curr) =>
-      prev.verificationFailed != curr.verificationFailed,
+      listenWhen: (prev, curr) => !prev.verificationFailed && curr.verificationFailed,
       listener: (context, state) {
         if (state.verificationFailed) {
           _shakeOtpFields();
           setState(() => _otpError = true);
-
+          
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kode OTP salah, silakan coba lagi'),
+            SnackBar(
+              content: Text(state.errors.isNotEmpty ? state.errors[0] : 'Verifikasi OTP gagal'),
               backgroundColor: Colors.red,
             ),
           );

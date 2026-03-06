@@ -6,7 +6,7 @@ import 'package:joss_app/models/authentication/reset_password_model.dart';
 
 class KataSandiBaruPage extends StatefulWidget {
   final String email;
-  final String requestId; // optional kalau kamu pakai requestId dari API
+  final String requestId;
   final Future<bool> Function({
     required String email,
     required String newPassword,
@@ -26,6 +26,8 @@ class KataSandiBaruPage extends StatefulWidget {
 
 class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
   final _formKey = GlobalKey<FormState>();
+
+  late final TextEditingController _emailController;
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -38,22 +40,24 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
   bool _hasStartedTypingNewPassword = false;
   bool _hasStartedTypingConfirmPassword = false;
 
-  bool _isSubmitting = false;
-
   @override
   void initState() {
     super.initState();
 
+    _emailController = TextEditingController(text: widget.email);
+
     _newPasswordController.addListener(() {
-      if (_newPasswordController.text.isNotEmpty && !_hasStartedTypingNewPassword) {
+      if (_newPasswordController.text.isNotEmpty &&
+          !_hasStartedTypingNewPassword) {
         setState(() => _hasStartedTypingNewPassword = true);
       } else {
-        setState(() {}); // biar indikator requirement update realtime
+        setState(() {});
       }
     });
 
     _confirmPasswordController.addListener(() {
-      if (_confirmPasswordController.text.isNotEmpty && !_hasStartedTypingConfirmPassword) {
+      if (_confirmPasswordController.text.isNotEmpty &&
+          !_hasStartedTypingConfirmPassword) {
         setState(() => _hasStartedTypingConfirmPassword = true);
       }
     });
@@ -73,6 +77,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
 
   @override
   void dispose() {
+    _emailController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     _newPasswordFocus.dispose();
@@ -80,14 +85,14 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
     super.dispose();
   }
 
-  // ======= password rules (sesuai gambar) =======
   bool _min8(String v) => v.length >= 8;
   bool _upper(String v) => v.contains(RegExp(r'[A-Z]'));
   bool _digit(String v) => v.contains(RegExp(r'\d'));
   bool _symbol(String v) =>
       v.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-\\/\[\]=+]'));
 
-  bool _allRulesOk(String v) => _min8(v) && _upper(v) && _digit(v) && _symbol(v);
+  bool _allRulesOk(String v) =>
+      _min8(v) && _upper(v) && _digit(v) && _symbol(v);
 
   String? _validateNewPassword(String? value) {
     if (!_hasStartedTypingNewPassword) return null;
@@ -129,9 +134,7 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
       return;
     }
 
-    setState(() => _isSubmitting = true);
-
-    final success = await (widget.onSubmit?.call(
+    final precheckSuccess = await (widget.onSubmit?.call(
           email: widget.email,
           newPassword: pwd,
           requestId: widget.requestId,
@@ -139,19 +142,22 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
         Future.value(true));
 
     if (!mounted) return;
-    setState(() => _isSubmitting = false);
 
-    if (success) {
-      final record = ResetPasswordModel(requestId: widget.requestId, newPassword: pwd); // sesuaikan ctor model kamu
-      context.read<ForgotPasswordBloc>().add(
-        ForgotPswdResetPasswordEvent(record: record),
-      );
-
-    } else {
+    if (!precheckSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar("Gagal membuat password, coba lagi."),
       );
+      return;
     }
+
+    final record = ResetPasswordModel(
+      requestId: widget.requestId,
+      newPassword: pwd,
+    );
+
+    context.read<ForgotPasswordBloc>().add(
+          ForgotPswdResetPasswordEvent(record: record),
+        );
   }
 
   @override
@@ -160,20 +166,35 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
 
     return BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
       listenWhen: (prev, curr) =>
-          prev.isSent != curr.isSent ||
-          prev.resetPasswordSuccess != curr.resetPasswordSuccess,
+          prev.resetPasswordSuccess != curr.resetPasswordSuccess ||
+          prev.errorMessage != curr.errorMessage,
       listener: (context, state) {
-        // OTP VALID (sukses)
-        if (state.isSent && state.resetPasswordSuccess) {
-          Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+        if (state.resetPasswordSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            successSnackBar("Password berhasil diubah."),
+          );
+
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdResetFlagsEvent());
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdClearMessageEvent());
+
+          Navigator.of(context, rootNavigator: true)
+              .popUntil((route) => route.isFirst);
           return;
         }
-        if (state.isSent && !state.resetPasswordSuccess) {
+
+        if (state.errorMessage.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar("Gagal membuat password, coba lagi."),
+            errorSnackBar(state.errorMessage),
           );
+
+          context
+              .read<ForgotPasswordBloc>()
+              .add(const ForgotPswdClearMessageEvent());
         }
-      
       },
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
@@ -197,7 +218,6 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  // ===== Card =====
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -214,15 +234,12 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Email (readonly)
                         appTextField(
-                          controller: TextEditingController(text: widget.email),
+                          controller: _emailController,
                           label: "Email",
                           enabled: false,
                         ),
                         const SizedBox(height: 12),
-      
-                        // Password baru
                         appTextField(
                           controller: _newPasswordController,
                           label: "Kata Sandi Baru",
@@ -231,22 +248,21 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                           validator: _validateNewPassword,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showNew ? Icons.visibility_off : Icons.visibility,
+                              _showNew
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: hintGrey,
                             ),
-                            onPressed: () => setState(() => _showNew = !_showNew),
+                            onPressed: () =>
+                                setState(() => _showNew = !_showNew),
                           ),
                         ),
-      
-                        // Requirement row
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: _PasswordRequirementRow(
                             password: pwd,
                           ),
                         ),
-      
-                        // Konfirmasi password
                         appTextField(
                           controller: _confirmPasswordController,
                           label: "Konfirmasi Kata Sandi",
@@ -255,15 +271,16 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                           validator: _validateConfirmPassword,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showConfirm ? Icons.visibility_off : Icons.visibility,
+                              _showConfirm
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: hintGrey,
                             ),
-                            onPressed: () => setState(() => _showConfirm = !_showConfirm),
+                            onPressed: () =>
+                                setState(() => _showConfirm = !_showConfirm),
                           ),
                         ),
                         const SizedBox(height: 12),
-      
-                        // Info keamanan (mirip gambar)
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -280,17 +297,21 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                       ],
                     ),
                   ),
-      
                   const SizedBox(height: 20),
-      
-                  // Button kirim (orange)
-                  AppButton.primary(
-                    text: _isSubmitting ? "Memproses..." : "Kirim",
-                    onPressed: _isSubmitting ? null : _submit,
-                    width: double.infinity,
-                    backgroundColor: const Color(0xFFF28A2E),
-                    textStyle: headingStyle(context, fontSize: 16).copyWith(color: Colors.white),
-                    isLoading: _isSubmitting,
+                  BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
+                    buildWhen: (prev, curr) =>
+                        prev.isLoading != curr.isLoading,
+                    builder: (context, state) {
+                      return AppButton.primary(
+                        text: state.isLoading ? "Memproses..." : "Kirim",
+                        onPressed: state.isLoading ? null : _submit,
+                        width: double.infinity,
+                        backgroundColor: const Color(0xFFF28A2E),
+                        textStyle: headingStyle(context, fontSize: 16)
+                            .copyWith(color: Colors.white),
+                        isLoading: state.isLoading,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -302,10 +323,12 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
   }
 }
 
-// ======= PASSWORD REQUIREMENTS (sama konsep dengan gambar 2) =======
 class _PasswordRequirementRow extends StatelessWidget {
   final String password;
-  const _PasswordRequirementRow({required this.password});
+
+  const _PasswordRequirementRow({
+    required this.password,
+  });
 
   bool get _min8 => password.length >= 8;
   bool get _upper => password.contains(RegExp(r'[A-Z]'));
@@ -325,7 +348,9 @@ class _PasswordRequirementRow extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              checked ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+              checked
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
               size: 15,
               color: checked ? primaryColor : hintGrey,
             ),

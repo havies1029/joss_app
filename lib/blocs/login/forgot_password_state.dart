@@ -1,57 +1,75 @@
 part of 'forgot_password_bloc.dart';
 
 class ForgotPasswordState extends Equatable {
-  final ForgotPasswordModel? record;
-  final bool isSending;
-  final bool isSent;
-  final bool hasFailure;
-  final bool verificationEmailSuccess;
+  final RequestOtpModel? record;
+
+  final bool isLoading;
+
+  final bool requestOtpSuccess;
+  final bool resendOtpSuccess;
   final bool verificationPinSuccess;
+  final bool verificationPinFailed;
   final bool resetPasswordSuccess;
+
   final String errorMessage;
 
   const ForgotPasswordState({
     this.record,
-    this.isSending = false,
-    this.isSent = false,
-    this.hasFailure = false,
-    this.verificationEmailSuccess = false,
+    this.isLoading = false,
+    this.requestOtpSuccess = false,
+    this.resendOtpSuccess = false,
     this.verificationPinSuccess = false,
+    this.verificationPinFailed = false,
     this.resetPasswordSuccess = false,
     this.errorMessage = "",
   });
 
   ForgotPasswordState copyWith({
-    ForgotPasswordModel? record,
-    bool? isSending,
-    bool? isSent,
-    bool? hasFailure,
-    bool? verificationEmailSuccess,
+    RequestOtpModel? record,
+    bool clearRecord = false,
+    bool? isLoading,
+    bool? requestOtpSuccess,
+    bool? resendOtpSuccess,
     bool? verificationPinSuccess,
+    bool? verificationPinFailed,
     bool? resetPasswordSuccess,
     String? errorMessage,
   }) {
     return ForgotPasswordState(
-      record: record ?? this.record,
-      isSending: isSending ?? this.isSending,
-      isSent: isSent ?? this.isSent,
-      hasFailure: hasFailure ?? this.hasFailure,
-      verificationEmailSuccess: verificationEmailSuccess ?? this.verificationEmailSuccess,
-      verificationPinSuccess: verificationPinSuccess ?? this.verificationPinSuccess,
-      resetPasswordSuccess: resetPasswordSuccess ?? this.resetPasswordSuccess,
+      record: clearRecord ? null : (record ?? this.record),
+      isLoading: isLoading ?? this.isLoading,
+      requestOtpSuccess: requestOtpSuccess ?? this.requestOtpSuccess,
+      resendOtpSuccess: resendOtpSuccess ?? this.resendOtpSuccess,
+      verificationPinSuccess:
+          verificationPinSuccess ?? this.verificationPinSuccess,
+      verificationPinFailed:
+          verificationPinFailed ?? this.verificationPinFailed,
+      resetPasswordSuccess:
+          resetPasswordSuccess ?? this.resetPasswordSuccess,
       errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
+
+  ForgotPasswordState resetActionFlags() {
+    return copyWith(
+      requestOtpSuccess: false,
+      resendOtpSuccess: false,
+      verificationPinSuccess: false,
+      verificationPinFailed: false,
+      resetPasswordSuccess: false,
+      errorMessage: "",
     );
   }
 
   @override
   List<Object?> get props => [
-    isSending,
-    isSent,
-    hasFailure,
-    verificationEmailSuccess,
-    verificationPinSuccess,
-    resetPasswordSuccess,
-    record,
-    errorMessage,
-  ];
+        record,
+        isLoading,
+        requestOtpSuccess,
+        resendOtpSuccess,
+        verificationPinSuccess,
+        verificationPinFailed,
+        resetPasswordSuccess,
+        errorMessage,
+      ];
 }

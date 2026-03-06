@@ -127,20 +127,22 @@ class EmailVerificationBloc
   Future<void> onValidasiPinEmail(
       ValidasiPinEmailEvent event, Emitter<EmailVerificationState> emit) async {
     ReturnDataAPI returnData;
-    bool hasFailure = true;
+
     emit(state.copyWith(
         isLoading: true, isLoaded: false, verificationFailed: false));
+
     event.record.requestId = state.record?.requestId ?? '';
     returnData = await repository.validasiPinEmail(event.record);
 
     debugPrint("onValidasiPinEmail returnData: ${returnData.data}");
 
-    hasFailure = !returnData.success;
-    emit(state.copyWith(
-      isLoading: false,
-      isLoaded: true,
-      hasFailure: hasFailure,
-    ));
+    bool hasFailure = !returnData.success;
+
+    // emit(state.copyWith(
+    //   isLoading: false,
+    //   isLoaded: true,
+    //   hasFailure: hasFailure,
+    // ));
 
     if (!hasFailure && returnData.data.isNotEmpty) {
 
@@ -164,10 +166,11 @@ class EmailVerificationBloc
       }
 
       authenticationBloc.add(UserAuthenticated(user: user, authenticatedFrom: "email_verification"));
+      emit(state.copyWith(isLoading: false, isLoaded: true, verificationFailed: false));
     } else {
       List<String> errors = [];
       errors.add(returnData.data);
-      emit(state.copyWith(verificationFailed: true, errors: errors));
+      emit(state.copyWith(isLoading: false, isLoaded: true, verificationFailed: true, errors: errors));
     }
   }
 
@@ -203,7 +206,7 @@ class EmailVerificationBloc
     EmailVerificationModel updatedRecord = state.record?.copyWith(requestId: returnData.data) ?? event.record.copyWith(requestId: returnData.data);
 
     emit(state.copyWith(
-      // record: updatedRecord,
+      record: updatedRecord,
       hasFailure: hasFailure,
       isResendOtpSuccess: !hasFailure,
     ));
