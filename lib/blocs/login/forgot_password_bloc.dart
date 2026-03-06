@@ -53,7 +53,7 @@ class ForgotPasswordBloc
         isLoading: false,
         record: updatedRecord,
         requestOtpSuccess: !hasFailure,
-        errorMessage: hasFailure ? (returnData.data?.toString() ?? "") : "",
+        errorMessage: hasFailure ? (returnData.data.toString() ?? "") : "",
       ),
     );
   }
@@ -86,7 +86,7 @@ class ForgotPasswordBloc
         isLoading: false,
         record: updatedRecord ?? state.record,
         resendOtpSuccess: !hasFailure,
-        errorMessage: hasFailure ? (returnData.data?.toString() ?? "") : "",
+        errorMessage: hasFailure ? (returnData.data.toString() ?? "") : "",
       ),
     );
   }
@@ -112,7 +112,7 @@ class ForgotPasswordBloc
         isLoading: false,
         verificationPinSuccess: !hasFailure,
         verificationPinFailed: hasFailure,
-        errorMessage: hasFailure ? (returnData.data?.toString() ?? "") : "",
+        errorMessage: hasFailure ? (returnData.data.toString() ?? "") : "",
       ),
     );
   }
