@@ -7,6 +7,8 @@ import 'package:joss_app/pages/login/welcome_header.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../common/constants.dart';
+import '../../../../common/loading_indicator.dart';
+import '../../../../helper/indo_phone_result.dart';
 
 class LoginFormClient extends StatefulWidget {
   const LoginFormClient({super.key});
@@ -26,7 +28,7 @@ class _LoginFormClientState extends State<LoginFormClient>
 
   bool _isPasswordVisible = false;
   bool _rememberPassword = true;
-
+  bool isSubmitting = false;
   bool _isInitialEmailApplied = false;
 
   void _applyInitialEmailFromState() {
@@ -74,26 +76,26 @@ class _LoginFormClientState extends State<LoginFormClient>
     super.dispose();
   }
 
-  //micky
-
   Widget _buildEmailField(double hPadding) {
     return appTextField(
       label: "Email atau No. Handphone",
       hint: "Masukkan email atau nomor HP kamu",
       controller: _usernameController,
       focusNode: _emailFocusNode,
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.text,
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        final input = (value ?? '').trim();
+        if (input.isEmpty) {
           return "Mohon isi email atau nomor handphone";
         }
 
-        // validasi email atau hp
-        final isEmail = EmailValidator.validate(value.trim());
-        final isPhone = phoneValidatorRegExp.hasMatch(value.trim());
+        final isEmail = EmailValidator.validate(input);
 
-        if (!isEmail && !isPhone) {
-          return "Masukkan format email atau nomor HP yang valid";
+        if (!isEmail) {
+          final phoneRes = IndoPhoneHelper.normalize(input);
+          if (!phoneRes.isValid) {
+            return phoneRes.error ?? "Masukkan format nomor HP yang valid";
+          }
         }
 
         return null;
@@ -103,7 +105,6 @@ class _LoginFormClientState extends State<LoginFormClient>
       },
     );
   }
-
 
   Widget _buildPasswordField(double hPadding) {
     return appTextField(
@@ -139,16 +140,32 @@ class _LoginFormClientState extends State<LoginFormClient>
   Widget _buildSignInButton() {
     return AppButton.primary(
       text: "Masuk",
-      onPressed: () {
+      isLoading: isSubmitting,
+      backgroundColor: isSubmitting ? secondaryBlackColor : primaryColor,
+      onPressed: isSubmitting
+          ? null
+          : () async {
         if (_formKey.currentState!.validate()) {
+          setState(() {
+            isSubmitting = true;
+          });
+
           _animationController.forward(from: 0);
+
           onLoginButtonPressed();
+
+          await Future.delayed(const Duration(seconds: 2));
+
+          if (mounted) {
+            setState(() {
+              isSubmitting = false;
+            });
+          }
         }
       },
     );
   }
 
-  // Fungsi untuk memicu event login
   void onLoginButtonPressed() {
     BlocProvider.of<LoginBloc>(context).add(
       LoginButtonPressed(
@@ -406,7 +423,7 @@ class _LoginFormClientState extends State<LoginFormClient>
               ),
             ),
           )
-              : const Center(child: CircularProgressIndicator());
+              : const Center(child: LoadingIndicator());
         },
       ),
     );

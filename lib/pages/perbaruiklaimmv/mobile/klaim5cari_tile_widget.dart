@@ -4,6 +4,8 @@ import 'package:joss_app/common/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../../common/loading_indicator.dart';
+
 class Klaim5cariTileWidget extends StatelessWidget {
   final String mjenisdocId;
   final String jenisDocLain;
@@ -238,7 +240,7 @@ class _Thumb extends StatelessWidget {
         loadingBuilder: (ctx, child, progress) {
           if (progress == null) return child;
           return const Center(
-            child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+            child: SizedBox(width: 16, height: 16, child: LoadingIndicator()),
           );
         },
       );
@@ -309,25 +311,70 @@ class _DocButton extends StatelessWidget {
     required this.onTap,
   });
 
+  bool _isOverflow(String text, double maxWidth, TextStyle style) {
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: maxWidth);
+
+    return textPainter.didExceedMaxLines;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 42,
-      child: ElevatedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, color: fg, size: 18),
-        label: Text(
-          label,
-          style: TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w800),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          disabledBackgroundColor: bg,
-          disabledForegroundColor: fg,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
+    final textStyle =
+    TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w800);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+
+        const iconWidth = 18.0;
+        const iconSpacing = 6.0;
+        const horizontalPadding = 24.0;
+
+        final iconSpace = iconWidth + iconSpacing + horizontalPadding;
+
+        final overflowWithIcon =
+        _isOverflow(label, maxWidth - iconSpace, textStyle);
+
+        final showIcon = !overflowWithIcon;
+
+        return SizedBox(
+          height: 42,
+          child: ElevatedButton(
+            onPressed: onTap,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: bg,
+              disabledBackgroundColor: bg,
+              disabledForegroundColor: fg,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (showIcon) ...[
+                  Icon(icon, color: fg, size: 18),
+                  const SizedBox(width: 6),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textStyle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

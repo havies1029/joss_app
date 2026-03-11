@@ -16,6 +16,8 @@ class BasePolisPage extends StatelessWidget {
     required this.cobKlaimNama,
   });
 
+
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PolissourcecariBloc, PolissourcecariState>(

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
+import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../widgets/apptheme/header_card_polis.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../base_polis_page.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 class RegistrasiKlaim extends StatefulWidget {
   final String cobKlaimId;
   final String cobKlaimNama;
@@ -28,6 +31,27 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
   }
 
   String get _headerTitle => "Klaim ${widget.cobKlaimNama}";
+
+  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mjenisClient == "10") {
+        mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+      }else if (mjenisClient == "20"){
+        mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

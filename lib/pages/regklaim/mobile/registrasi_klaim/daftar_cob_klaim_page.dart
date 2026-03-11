@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../common/constants.dart';
 import '../../../../widgets/apptheme/header_card.dart';
-import '../../../base/base_background_sidepage.dart';
 import '../../../base/base_background_firstpage.dart';
+import '../../../base/base_background_sidepage.dart';
 import 'button_klaim/button_cob_klaim.dart';
 
 enum DaftarCobKlaimType { page, menu }
@@ -37,122 +37,116 @@ class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
   }
 
   Widget _buildAsPage(BuildContext context) {
-    return SafeArea(
-      child: BaseBackgroundSidePage(
-        title: 'Klaim Baru',
-        child: Scaffold(
-          backgroundColor: secondaryBlackColor,
-          body: _buildContent(context),
-        ),
+    return BaseBackgroundSidePage(
+      title: 'Lapor Klaim',
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: hPadding),
+        child: _buildContent(context),
       ),
     );
   }
 
   Widget _buildAsMenu(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
-      backgroundColor: secondaryBlackColor,
       body: BaseBackgroundFirstPage(
         child: SafeArea(
           child: Container(
-            width: double.infinity,
-            constraints: BoxConstraints(
-              minHeight: size.height,
-            ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: secondaryBlackColor,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
             ),
-            child: _buildContent(context),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: hPadding),
+                  _buildContent(context),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    if (widget.type == DaftarCobKlaimType.page) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-        child: Column(
-          children: [
-            const SizedBox(height: vPadding),
-            Text(
-              "Ajukan Klaim",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: primaryLightColor,
-                fontSize: getResponsiveFont(context, 20),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: hPadding),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        const SizedBox(height: hPadding),
-        HeaderCard(
-          iconPath: "assets/icons/menu_lapor_klaim.svg",
-          title: "Klaim",
-          subtitle: "Masukkan klaim Anda sesuai dengan kategori asuransi yang tersedia.",
-        ),
-      ],
-    );
-  }
-
-
   Widget _buildContent(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: vPadding),
-        physics: const BouncingScrollPhysics(),
+      child: Container(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context),
-
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: hPadding * 1.5,
-                vertical: hPadding,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-
-                  Text(
-                    "Pilih Jenis Klaim yang ingin kamu ajukan",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: greyKlaim,
-                      fontSize: getResponsiveFont(context, 16),
-                    ),
-                  ),
-
-                  const SizedBox(height: vPadding),
-
-                  const ButtonCobKlaimWidget(),
-
-                  // next widgets here
-                ],
-              ),
+            const SizedBox(height: hPadding),
+            Container(
+              color: secondaryBlackColor,
+              child: _buildJenisKlaimSection(context),
             ),
-
           ],
         ),
       ),
     );
   }
 
+  Widget _buildHeader(BuildContext context) {
+    return HeaderCard(
+      iconPath: "assets/icons/menu_lapor_klaim.svg",
+      title: "Lapor Klaim",
+      subtitle:
+      "Lapor klaim Anda sesuai dengan kategori asuransi yang tersedia.",
+    );
+  }
+
+  Widget _buildJenisKlaimSection(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: hPadding),
+          decoration: const BoxDecoration(
+            color: secondaryBlackColor,
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: hPadding),
+              Text(
+                "Pilih Jenis Klaim yang ingin kamu ajukan",
+                style: bodyTextStyle(context),
+                textAlign: widget.type == DaftarCobKlaimType.page
+                    ? TextAlign.center
+                    : TextAlign.left,
+              ),
+              const SizedBox(height: vPadding),
+              kDivider(),
+            ],
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(
+            vertical: hPadding,
+            horizontal: hPadding * 1.5,
+          ),
+          decoration: const BoxDecoration(
+            color: secondaryBlackColor,
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ButtonCobKlaimWidget(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class DaftarCobKlaimPage extends DaftarCobKlaimWidget {

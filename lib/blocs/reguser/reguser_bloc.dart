@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/authentication/auth_model.dart';
@@ -32,6 +33,8 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
   Future<void> onTambahRegUser(
       RegUserTambahEvent event, Emitter<RegUserState> emit) async {
+
+    debugPrint("onTambahRegUser requestFrom (event) : ${event.requestFrom}");
     ReturnDataAPI returnData;
     bool hasFailure = true;
     emit(state.copyWith(isSaving: true, isSaved: false, requestFrom: event.requestFrom));
@@ -50,6 +53,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         record: event.record,
         errors: errors,
         hasFailure: hasFailure));
+    debugPrint("onTambahRegUser requestFrom (state after emit) : ${event.requestFrom}");
 
     if (!hasFailure) {
       authenticationBloc
@@ -82,6 +86,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
   Future<void> onValidasiPinHP(
       ValidasiPinHPEvent event, Emitter<RegUserState> emit) async {
+
     emit(state.copyWith(isSaving: true, isSaved: false));
     ReturnDataAPI returnData = await repository.validasiPinHP(event.record, state.requestFrom);
     bool hasFailure = !returnData.success;
@@ -96,7 +101,6 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       verificationFailed: hasFailure,
       errors: errors,
     ));
-
     if (!hasFailure) {
       authenticationBloc.add(PhonePinVerified());
 
@@ -123,7 +127,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
     }
     else {
-      authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));
+      // authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));
     }
   }
 

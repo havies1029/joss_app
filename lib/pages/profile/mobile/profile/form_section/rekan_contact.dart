@@ -10,6 +10,8 @@ import 'package:joss_app/models/combobox/combompropinsi_model.dart';
 import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../common/app_data.dart';
+import '../../../../../helper/indo_phone_result.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../../repositories/combobox/comborkodepos_repository.dart';
@@ -100,18 +102,32 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                         final rekanTelp  = (rekan?.telepon ?? '').trim();
 
                         if (fieldEmailController.text.trim().isEmpty) {
+
+                          final userEmail = (AppData.user.email ?? '').trim();
+
                           if (contactEmail.isNotEmpty) {
                             fieldEmailController.text = contactEmail;
+
                           } else if (rekanEmail.isNotEmpty) {
                             fieldEmailController.text = rekanEmail;
+
+                          } else if (userEmail.isNotEmpty) {
+                            fieldEmailController.text = userEmail;
                           }
                         }
 
                         if (fieldTelpController.text.trim().isEmpty) {
+
+                          final userTelp = (AppData.user.hp ?? '').trim();
+
                           if (contactTelp.isNotEmpty) {
                             fieldTelpController.text = contactTelp;
+
                           } else if (rekanTelp.isNotEmpty) {
                             fieldTelpController.text = rekanTelp;
+
+                          } else if (userTelp.isNotEmpty) {
+                            fieldTelpController.text = userTelp;
                           }
                         }
 
@@ -119,11 +135,7 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
                         // 2) DROPDOWN: isi hanya kalau belum dipilih user
                         // =========================
 
-                        fieldComboMPropinsi ??= contact.comboMPropinsi;
-
-                        fieldComboMKota ??= contact.comboMKota;
-
-                        fieldComboRKodepos ??= contact.comboRKodepos;
+                        _injectPayload(state.record!);
 
                         _isFirstLoad = false;
                       }
@@ -180,9 +192,9 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
               children: [
                 buildFieldEmail(),
                 const SizedBox(height: vPadding),
-                buildFieldTelp(),
-                const SizedBox(height: vPadding),
                 buildFieldAlamat1(),
+                const SizedBox(height: vPadding),
+                buildFieldTelp(),
                 const SizedBox(height: vPadding),
                 buildFieldMpropinsiId(),
                 const SizedBox(height: vPadding),
@@ -194,16 +206,16 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
           ),
 
           const SizedBox(height: vPadding),
-          AppButton.primary(text: " Simpan Perubahan", onPressed: onSaveForm),
+          AppButton.primary(text: "Simpan Perubahan", onPressed: onSaveForm),
         ],
       ),
     );
   }
 
   void _injectPayload(MRekanContactCrudModel record) {
-    fieldAlamat1Controller.text = record.alamat1;
-    fieldEmailController.text   = record.email;
-    fieldTelpController.text    = record.telp;
+    // fieldAlamat1Controller.text = record.alamat1;
+    // fieldEmailController.text   = record.email;
+    // fieldTelpController.text    = record.telp;
 
     fieldComboMKota     = record.comboMKota;
     fieldComboMPropinsi = record.comboMPropinsi;
@@ -215,20 +227,6 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
 
   void loadData() {
     mRekanContactCrudBloc.add(MRekanContactCrudLihatEvent());
-    debugPrint("Lihat event trigger");
-    // final email =
-    //     context.read<MRekan1CrudBloc>().state.record?.email;
-    //
-    // final telepon =
-    //     context.read<MRekan1CrudBloc>().state.record?.telepon;
-    //
-    // if (fieldEmailController.text.isEmpty && (email?.isNotEmpty ?? false)) {
-    //   fieldEmailController.text = email!;
-    // }
-    //
-    // if (fieldTelpController.text.isEmpty && (telepon?.isNotEmpty ?? false)) {
-    //   fieldTelpController.text = telepon!;
-    // }
   }
 
   Widget buildFieldEmail() => appTextField(
@@ -236,7 +234,13 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     controller: fieldEmailController,
     keyboardType: TextInputType.emailAddress,
     validator: (v) {
-      if (v == null || v.isEmpty) return kEmailNullError;
+      final email = v?.trim() ?? "";
+      if (email.isEmpty) {
+        return kEmailNullError;
+      }
+      if (!emailValidatorRegExp.hasMatch(email)) {
+        return "Format email tidak valid";
+      }
       return null;
     },
   );
@@ -245,8 +249,23 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
     label: "No. Telp Perusahaan",
     controller: fieldTelpController,
     keyboardType: TextInputType.phone,
+    prefix: Text(
+      "+62 | ",
+      style: inputTextStyle(context, color: primaryLightColor),
+    ),
     validator: (v) {
-      if (v == null || v.isEmpty) return kPhoneNumberNullError;
+      final telp = v?.trim() ?? "";
+
+      if (telp.isEmpty) {
+        return kPhoneNumberNullError;
+      }
+
+      final res = IndoPhoneHelper.normalize(telp);
+
+      if (!res.isValid) {
+        return res.error ?? "Nomor HP tidak valid";
+      }
+
       return null;
     },
   );
@@ -337,23 +356,27 @@ class MRekanContactCrudFormPageFormState extends State<MRekanContactCrudFormPage
 
 
   void onSaveForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    final phoneRes = IndoPhoneHelper.normalize(
+      fieldTelpController.text.trim(),
+    );
 
-      MRekanContactCrudModel record = MRekanContactCrudModel(
-        alamat1: fieldAlamat1Controller.text,
-        email: fieldEmailController.text,
-        mkotaId: fieldComboMKota?.mkotaId,          // biarkan null normal
-        mpropinsiId: fieldComboMPropinsi?.mpropinsiId, // biarkan null normal
-        mrekancontact1Id: '',
-        rkodeposId: fieldComboRKodepos?.rkodeposId ?? "", // 🔥 khusus ini aja jadi ""
-        telp: fieldTelpController.text,
-      );
+    final telpNormalized = phoneRes.phone62 ?? "";
 
-      record.mrekancontact1Id =
-          mRekanContactCrudBloc.state.record!.mrekancontact1Id;
+    MRekanContactCrudModel record = MRekanContactCrudModel(
+      alamat1: fieldAlamat1Controller.text.trim(),
+      email: fieldEmailController.text.trim(),
+      mkotaId: fieldComboMKota?.mkotaId,
+      mpropinsiId: fieldComboMPropinsi?.mpropinsiId,
+      mrekancontact1Id: '',
+      rkodeposId: fieldComboRKodepos?.rkodeposId,
+      telp: telpNormalized,
+    );
 
-      mRekanContactCrudBloc.add(MRekanContactCrudUbahEvent(record: record));
-    }
+    record.mrekancontact1Id =
+        mRekanContactCrudBloc.state.record!.mrekancontact1Id;
+
+    mRekanContactCrudBloc.add(
+      MRekanContactCrudUbahEvent(record: record),
+    );
   }
 }

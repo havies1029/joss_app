@@ -3,6 +3,9 @@ import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/sppa_detail_page.dart';
 
 import '../../../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
+import '../../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../../blocs/regklaim/sppaheader_bloc.dart';
 import '../../../../../../common/constants.dart';
@@ -15,6 +18,8 @@ import '../../../../../base/base_background_sidepage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
+import '../../../../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../../../../register/mobile/client/register_client_page.dart';
 import '../../../../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
@@ -170,9 +175,65 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                     child: AppButton(
                       text: "Lapor Klaim",
                       onPressed: () {
+                        final mjenisClient =
+                            context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
                         if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
                           User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
                           if (user.userType == "C"){
+                            if (mjenisClient == "10") {
+                              final mRekanNama1 =
+                                  context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
+                              debugPrint("MREKANNAMA! = ${mRekanNama1}");
+                              if (mRekanNama1.isEmpty) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: true, // klik luar = close
+                                  barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+                                  builder: (context) => RegisterClientPopUp(
+                                    header: 'Isi Data Pribadi Anda1',
+                                    description:
+                                    'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                                    buttonText: 'Lengkapi Data Pribadi',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                                return;
+                              }
+                            }
+                            else if (mjenisClient == "20") {
+                              final mRekanNama2 =
+                                  context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+
+                              if (mRekanNama2.isEmpty) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: true, // klik luar = close
+                                  barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+                                  builder: (context) => RegisterClientPopUp(
+                                    header: 'Isi Data Pribadi Anda2',
+                                    description:
+                                    'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                                    buttonText: 'Lengkapi Data Pribadi',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                                return;
+                              }
+                            }
                             regklaim1crudbloc.add(
                                 Regklaim1Tambah4PolisJpsEvent(
                                     sppa1Id: widget.sppa1Id));

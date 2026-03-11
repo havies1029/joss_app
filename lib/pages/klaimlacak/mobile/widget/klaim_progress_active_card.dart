@@ -81,25 +81,27 @@ class KlaimProgressActiveCard extends StatelessWidget {
                   children: [
                     Text(
                       progressNama,
-                      style: bodyTextStyle(context, fontSize: 16),
+                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16)),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       dateText,
-                      style: bodyTextStyle(context, fontSize: 14)
+                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context,14))
                           .copyWith(color: hintGrey),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       progressDesc,
                       softWrap: true,
-                      style: bodyTextStyle(context, fontSize: 14),
+                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 14)),
                     ),
                     if (showMetodeGantiKlaim && klaimProgressInfo != null) ...[
                       const SizedBox(height: 10),
-                      MetodeGantiKlaimWidget(
-                        metodeGantiKlaimId:
-                        klaimProgressInfo!.metodeKlaimId ?? '',
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: MetodeGantiKlaimWidget(
+                          metodeGantiKlaimId: klaimProgressInfo!.metodeKlaimId ?? '',
+                        ),
                       ),
                     ],
                   ],

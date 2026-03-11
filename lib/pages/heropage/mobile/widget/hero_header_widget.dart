@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 
 class HeroHeaderWidget extends StatelessWidget {
@@ -89,7 +90,12 @@ class HeroHeaderWidget extends StatelessWidget {
 
   Widget _avatarFallback() => Container(
     color: pGrey,
-    child: const Icon(Icons.person, color: primaryLightColor, size: 25),
+    child: SvgPicture.asset(
+      'assets/icons/place_holder_2.svg',
+      width: 25,
+      height: 25,
+      fit: BoxFit.contain,
+    ),
   );
 
   String _getGreeting() {

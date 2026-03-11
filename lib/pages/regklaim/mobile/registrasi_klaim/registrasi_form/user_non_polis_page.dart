@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/polis_detail/upload_section_widget.dart';
 
+import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
+import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_state.dart';
@@ -23,6 +26,8 @@ import '../../../../../repositories/regklaim/upload_repository.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
 import '../../../../../widgets/apptheme/register_client_pop_up.dart';
+import '../../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
+import '../../../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../../../register/mobile/client/register_client_page.dart';
 import '../../../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 
@@ -55,6 +60,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   final fieldLokasiObjectController = TextEditingController();
   bool _toKlaimTriggered = false;
 
+  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +85,20 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
+    });
+
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mjenisClient == "10") {
+        mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+      }else if (mjenisClient == "20"){
+        mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+      }
     });
   }
 
@@ -226,10 +248,66 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       polisNo: fieldPolisNoController.text,
       regklaim1Id: regklaim1Id,
     );
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
 
     if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
       User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
       if (user.userType == "C"){
+        if (mjenisClient == "10") {
+          final mRekanNama1 =
+              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
+
+          if (mRekanNama1.isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true, // klik luar = close
+              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
+        else if (mjenisClient == "20") {
+          final mRekanNama2 =
+              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+
+          if (mRekanNama2.isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true, // klik luar = close
+              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
         if (regklaim1Id.isNotEmpty) {
           regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
         } else {

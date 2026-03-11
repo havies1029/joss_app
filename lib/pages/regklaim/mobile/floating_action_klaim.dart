@@ -17,7 +17,6 @@ class FabActionKlaim extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Selected Tab: $selectedTab");
     return BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
       builder: (context, state) {
         debugPrint("Selected ID: ${state.selectedId}");
@@ -36,7 +35,8 @@ class FabActionKlaim extends StatelessWidget {
           final status = (selected?.statusDesc ?? '').toLowerCase().trim();
 
           isBerjalan = status == "berjalan";
-          isLacak = true;
+          // isLacak = true;
+          isLacak = selected != null;
         }
        
         final actions = [

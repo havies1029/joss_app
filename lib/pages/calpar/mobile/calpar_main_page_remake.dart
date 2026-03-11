@@ -12,6 +12,9 @@ import '../../../blocs/calpar/calpar2form_bloc.dart';
 import '../../../blocs/calpar/calpar3form_bloc.dart';
 import '../../../blocs/calpar/calpar4form_bloc.dart';
 import '../../../blocs/calpar/calpar_flow_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
+import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../common/constants.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../models/calpar/calpar1crud_model.dart';
@@ -37,6 +40,8 @@ import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
+import '../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../register/mobile/client/register_client_page.dart';
 import '../../regpar/mobile/regpar_main_page_remake.dart';
 
@@ -70,6 +75,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Calpar4FormModel? form4Record;
 
   Calpar3FormBloc? calpar3formBloc;
+  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
 
   bool _lockCheckboxes = true;
 
@@ -192,6 +199,20 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   @override
   void initState() {
     super.initState();
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mjenisClient == "10") {
+        mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+      }else if (mjenisClient == "20"){
+        mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+      }
+    });
+
     fieldCoverBulanController.text = "12";
 
     expanded = List.filled(CalparFormSection.values.length, false);
@@ -871,6 +892,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   Future<void> onLanjutkanPressed() async {
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
     if (context
         .read<Calpar1ListBloc>()
         .state
@@ -886,6 +909,60 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           .read<AuthenticationBloc>()
           .state as AuthenticationAuthenticated).user;
       if (user.userType == "C") {
+        if (mjenisClient == "10") {
+          final mRekanNama1 =
+              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
+
+          if (mRekanNama1.isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true, // klik luar = close
+              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
+        else if (mjenisClient == "20") {
+          final mRekanNama2 =
+              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+
+          if (mRekanNama2.isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true, // klik luar = close
+              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
         context.read<Calpar1ListBloc>().add(
           CalPar2RegParEvent(calpar1Id: calpar1Id!),
         );
@@ -898,7 +975,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           builder: (context) => RegisterClientPopUp(
             header: 'Data Klien Belum Terdaftar!',
             description:
-            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
             buttonText: 'Daftar Klien',
             onPressed: () {
               Navigator.push(

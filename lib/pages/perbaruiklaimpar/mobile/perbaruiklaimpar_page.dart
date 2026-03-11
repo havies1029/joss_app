@@ -111,7 +111,6 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                       }
                     },
                     text: 'Perbarui',
-                    backgroundColor: pBlue,
                     textStyle: headingStyle(context, fontSize: 18),
                   ),
                 ],

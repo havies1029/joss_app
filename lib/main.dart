@@ -2,9 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
+import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv4picker_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv5picker_repository.dart';
@@ -296,7 +299,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-  debugPrint("🔥 Firebase initialized: ${Firebase.apps.length}");
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
@@ -326,7 +332,6 @@ Future<void> main() async {
           create: (_) => SimulasiMvLocalCubit(appPrefs),
         ),
 
-        // NOTE: EmailVerificationBloc disediakan satu kali, dipakai oleh LoginBloc & UI lain
         BlocProvider<EmailVerificationBloc>(
           create: (context) => EmailVerificationBloc(
             repository: EmailVerificationRepository(),
@@ -748,15 +753,36 @@ class _AppState extends State<_App> {
             if (state is AuthenticationAuthenticated) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 final nav = _navigatorKey.currentState;
+                final mjenisClient =
+                    context.read<RegUserBloc>().state.record?.jnsClientId;
                 if (nav == null) return;
-
-                if (state.authenticatedFrom != "calmv_page" || state.authenticatedFrom != 'regisnonpolis_page' || state.authenticatedFrom != 'regispolis_page'){
-                  while (nav.canPop()) {
-                    nav.pop();
+                const singlePopPages = [
+                  "calmv_page",
+                  "regisnonpolis_page",
+                  "regispolis_page",
+                  "calpar_page",
+                ];
+                if (nav == null) return;
+                if (singlePopPages.contains(state.authenticatedFrom)) {
+                  if (mjenisClient == '10') {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showDialog(
+                        context: _navigatorKey.currentContext!,
+                        useRootNavigator: true,
+                        builder: (_) => const MRekanGeneralIdvPopUpPage(),
+                      );
+                    });
+                  } else if (mjenisClient == '20') {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showDialog(
+                        context: _navigatorKey.currentContext!,
+                        useRootNavigator: true,
+                        builder: (_) => const MRekanGeneralCmpPopUpPage(),
+                      );
+                    });
                   }
-                }
-                else {
-                  if (nav.canPop()) {
+                }else {
+                  while (nav.canPop()) {
                     nav.pop();
                   }
                 }

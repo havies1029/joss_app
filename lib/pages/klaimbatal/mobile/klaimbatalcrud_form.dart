@@ -66,7 +66,7 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
                               style: bodyTextStyle(context, fontSize: 16),
                             ),
 
-                            const SizedBox(height: 5),
+                            const SizedBox(height: hPadding),
                             // panel input besar
                             Container(
                               decoration: BoxDecoration(
@@ -96,8 +96,6 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
                     top: false,
                     child: AppButton.primary(
                       text: "Batalkan",
-                      height: 45,
-                      backgroundColor: pBlue,
                       onPressed: _isReasonFilled ? _onPressBatalkan : null,
                     ),
                   ),

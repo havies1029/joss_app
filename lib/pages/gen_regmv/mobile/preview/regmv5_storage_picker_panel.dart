@@ -133,7 +133,7 @@ class Regmv5StoragePickerPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "Unggah Foto Bangunan",
+            "Unggah Foto Mobil",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: getResponsiveFont(context, 16),
@@ -143,7 +143,7 @@ class Regmv5StoragePickerPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "Pastikan foto Bangunan terlihat jelas dan tidak buram untuk memudahkan proses verifikasi.",
+            "Pastikan foto Mobil terlihat jelas dan tidak buram untuk memudahkan proses verifikasi.",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: getResponsiveFont(context, 14),
@@ -213,7 +213,6 @@ class _ThumbCardState extends State<_ThumbCard> {
                   ),
                 ),
 
-                // ❌ tombol remove versi baru
                 Positioned(
                   top: 6,
                   right: 6,
@@ -224,7 +223,7 @@ class _ThumbCardState extends State<_ThumbCard> {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: sGrey, // ← ganti dari hitam
+                        color: sGrey,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(

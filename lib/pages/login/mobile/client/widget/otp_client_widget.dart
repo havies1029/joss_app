@@ -48,7 +48,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
   // ⏱ Timer
   Timer? _timer;
-  int _remainingTime = 6;
+  int _remainingTime = 59;
   bool _isResendAvailable = false;
 
   @override
@@ -107,12 +107,6 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
   bool _isEmail(String input) => EmailValidator.validate(input);
   bool _isPhone(String input) => IndoPhoneHelper.normalize(input).isValid;
-
-  String _buildRequestFrom(String input) {
-    if (_isEmail(input)) return "email";
-    if (_isPhone(input)) return "hp";
-    return "unknown";
-  }
 
   String _formatPhoneVisual(String phone62) {
     if (!phone62.startsWith('62')) return phone62;
@@ -184,7 +178,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
   void _resendOtp() {
     setState(() {
-      _remainingTime = 6;
+      _remainingTime = 59;
       _isResendAvailable = false;
       _otpError = false;
     });
@@ -231,7 +225,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       ),
     );
 
-    Navigator.of(context, rootNavigator: true).pop();
+    // Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override

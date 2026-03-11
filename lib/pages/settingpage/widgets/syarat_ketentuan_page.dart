@@ -17,7 +17,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
   final List<_SyaratItem> items = [
     _SyaratItem(
       title: "1. Kepatuhan Regulasi",
-      icon: 'assets/icons/penilaian.svg',
+      icon: 'assets/icons/syarat_1.svg',
       points: [
         "Kebijakan ini merupakan dokumen hukum yang mengikat dan berlaku untuk seluruh produk serta layanan asuransi yang disediakan Perusahaan.",
         "Seluruh ketentuan telah diselaraskan dengan:",
@@ -28,7 +28,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
     ),
     _SyaratItem(
       title: "2. Penggunaan Data Pribadi",
-      icon: 'assets/icons/arsitek.svg',
+      icon: 'assets/icons/syarat_2.svg',
       points: [
         "Data pribadi yang dikumpulkan akan digunakan secara terbatas untuk tujuan:",
         "Proses underwriting dan penilaian risiko asuransi",
@@ -39,7 +39,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
     ),
     _SyaratItem(
       title: "3. Hak Akses dan Kendali Data",
-      icon: 'assets/icons/konsultan.svg',
+      icon: 'assets/icons/syarat_3.svg',
       points: [
         "Nasabah memiliki hak untuk:",
         "Mengakses dan memperoleh salinan data pribadi yang dikelola Perusahaan",
@@ -49,7 +49,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
     ),
     _SyaratItem(
       title: "4. Pernyataan Persetujuan",
-      icon: 'assets/icons/pengacara.svg',
+      icon: 'assets/icons/syarat_4.svg',
       points: [
         "Dengan melanjutkan penggunaan layanan ini, Anda menyatakan telah membaca, memahami, dan menyetujui seluruh Syarat & Ketentuan yang berlaku.",
       ],
@@ -99,12 +99,12 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Syarat & Ketentuan',
+                            'Perlindungan Data Asuransi',
                             style: headingStyle(context, fontSize: 18),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Baca dan pahami syarat serta ketentuan penggunaan layanan asuransi JPS.',
+                            'Komitmen kami melindungi data sensitif nasabah asuransi.',
                             style: bodyTextStyle(
                               context,
                               fontSize: 16,
@@ -116,11 +116,11 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                   ],
                 )
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 14),
 
               _alertWidget(context),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
               ...List.generate(items.length, (i) {
                 final item = items[i];
@@ -157,25 +157,12 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                           const EdgeInsets.all(16),
                           child: Row(
                             children: [
-                              Container(
+                              SizedBox(
                                 width: 40,
                                 height: 40,
-                                padding:
-                                const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius:
-                                  BorderRadius
-                                      .circular(8),
-                                ),
                                 child: SvgPicture.asset(
                                   item.icon,
-                                  colorFilter:
-                                  const ColorFilter
-                                      .mode(
-                                    Colors.white,
-                                    BlendMode.srcIn,
-                                  ),
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                               const SizedBox(width: 14),
@@ -223,45 +210,34 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                         ),
                       ),
 
-                      AnimatedCrossFade(
-                        duration: const Duration(
-                            milliseconds: 300),
-                        crossFadeState: isExpanded
-                            ? CrossFadeState.showSecond
-                            : CrossFadeState.showFirst,
-                        firstChild:
-                        const SizedBox.shrink(),
-                        secondChild: Padding(
-                          padding:
-                          const EdgeInsets.fromLTRB(
-                              20, 0, 20, 20),
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-                            children: item.points
-                                .map(
-                                  (point) => Padding(
-                                padding:
-                                const EdgeInsets
-                                    .only(
-                                    top: 8),
-                                child: Text(
-                                  point,
-                                  style: bodyTextStyle(
-                                      context,
-                                      fontSize:
-                                      14)
-                                      .copyWith(
-                                      color:
-                                      hintGrey),
-                                ),
+                      ClipRect(
+                        child: AnimatedAlign(
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeInOut,
+                          alignment: Alignment.topCenter,
+                          heightFactor: isExpanded ? 1 : 0,
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 220),
+                            opacity: isExpanded ? 1 : 0.85,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: item.points.map((point) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text(
+                                      point,
+                                      style: bodyTextStyle(context, fontSize: 14)
+                                          .copyWith(color: hintGrey),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
-                            )
-                                .toList(),
+                            ),
                           ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 );
@@ -278,7 +254,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: const Color(0xFF432C1B),
-        border: Border.all(color: primaryColor),
+        // border: Border.all(color: primaryColor),
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),

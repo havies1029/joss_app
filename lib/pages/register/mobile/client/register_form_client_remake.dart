@@ -34,6 +34,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  bool isSubmitting = false;
 
   late EmailVerificationBloc emailVerificationBloc;
   late final RegUserModel? record;
@@ -228,7 +229,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   );
 
   Widget buildFieldComboMJnsclient() => ReusableComboBox<ComboMJnsclientModel>(
-    hintText: "Jenis Client",
+    hintText: "Jenis Klien",
     initItem: fieldComboJnsClient,
     dataLoader: () => ComboMJnsclientRepository().getComboMJnsclient(),
     displayText: (i) => i.jenisNama,
@@ -379,8 +380,24 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                 SizedBox(height: vPadding),
 
                                 AppButton.primary(
-                                  text: "Submit",
-                                  onPressed: onSubmit,
+                                  text: "Simpan",
+                                  isLoading: isSubmitting,
+                                  backgroundColor: isSubmitting ? secondaryBlackColor : primaryColor,
+                                  onPressed: isSubmitting
+                                      ? null
+                                      : () async {
+                                    setState(() {
+                                      isSubmitting = true;
+                                    });
+
+                                    onSubmit();
+
+                                    await Future.delayed(const Duration(seconds: 4));
+
+                                    setState(() {
+                                      isSubmitting = false;
+                                    });
+                                  },
                                 ),
 
                                 const Spacer(),

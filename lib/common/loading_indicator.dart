@@ -4,7 +4,6 @@ class LoadingIndicator extends StatelessWidget {
   const LoadingIndicator({super.key});
 
   @override
-  @override
   Widget build(BuildContext context) => Center(
     child: CircularProgressIndicator(color: primaryColor,),
   );

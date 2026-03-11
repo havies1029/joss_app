@@ -48,7 +48,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
             // HEADER
             Container(
               height: 56,
-              color: primaryBlackColor,
+              color: secondaryBlackColor,
               padding: const EdgeInsets.symmetric(horizontal: hPadding * 2),
               child: Stack(
                 children: [

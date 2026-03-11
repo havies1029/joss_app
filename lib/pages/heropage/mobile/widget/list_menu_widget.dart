@@ -5,10 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../klaimlacak/mobile/klaimnilaicrud_form.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
+import '../../../tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
@@ -29,12 +31,12 @@ class ListMenuWidget extends StatelessWidget {
     bool willWrapToSecondLine(String text) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: textStyle),
-        maxLines: 1, // cek apakah muat dalam 1 baris
+        maxLines: 1,
         textDirection: TextDirection.ltr,
         ellipsis: '…',
-      )..layout(maxWidth: itemWidth - 8); // kasih sedikit buffer padding
+      )..layout(maxWidth: itemWidth - 8);
 
-      return tp.didExceedMaxLines; // kalau exceed => butuh baris kedua
+      return tp.didExceedMaxLines;
     }
 
     final needsExtraHeight = menuItems.any((m) => willWrapToSecondLine(m.title));
@@ -364,7 +366,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      //MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -384,7 +386,7 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimnilaicrudFormPage(klaim1Id: '',)));
         break;
 
       case 'Klaim':

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:joss_app/blocs/notiflog/logtrscaritopx_bloc.dart'; // ✅ ganti ke bloc baru
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/models/notiflog/logtrscari_model.dart';
 import 'package:joss_app/pages/heropage/mobile/widget/transaksi_page.dart';
 import 'package:intl/intl.dart';
@@ -109,7 +110,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(),
+                        child: LoadingIndicator(),
                       ),
                     );
                   }

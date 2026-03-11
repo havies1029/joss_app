@@ -2,6 +2,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
+import '../../../tagihan_pembayaran_page.dart';
 
 //micky 2026-02-27
 
@@ -73,102 +75,240 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     Navigator.pop(context);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
-          listenWhen: (prev, curr) =>
-              prev.record != curr.record && curr.record != null,
-          listener: (context, state) {
-            final r = state.record!;
-
-            fieldVaNoController.text = (r.vaNo).toString();
-            fieldCurrController.text = (r.curr).toString();
-            final formatter = NumberFormat('#,###', 'id_ID');
-            fieldTotalBayarController.text = formatter.format(r.totalBayar);            
-            fieldBatasBayarController.text = (r.batasBayar).toString();
-          },
-        ),        
-      ],
-      child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
-        buildWhen: (prev, curr) =>
-            prev.record != curr.record ||
-            prev.isPollingVa != curr.isPollingVa ||
-            prev.isPollingStatus != curr.isPollingStatus,
-        builder: (context, state) {
-          final bankTitle = (state.record?.bankNama ?? '').trim();
-          final title = bankTitle.isNotEmpty ? bankTitle : "Pembayaran";
-
-          return BaseBackgroundSidePage(
-            title: title,
+  Future<bool?> showExitConfirmDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
             child: Container(
-              color: secondaryBlackColor,
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: SvgPicture.asset(
+                      "assets/icons/bi_exclamation-circle.svg",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Keluar dari Pembayaran?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Jika Anda keluar dari halaman metode pembayaran, data transaksi akan tersimpan di menu Riwayat Pembayaran.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
                     children: [
-                      const SizedBox(height: 10),
-
-                      // Logo bank
-                      Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: primaryLightColor,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(cardBorderRadius),
-                          ),
-                        ),
-                        width: 120,
-                        height: 60,
-                        alignment: Alignment.center,
-                        child: buildBankLogo(
-                          state.record?.iconId ?? '',
-                          state.record?.iconUrl ?? '',
-                          size: 120,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Status dinamis
-                      _buildPaymentStatus(state),
-
-                      const SizedBox(height: 6),
-                      buildFieldTotalBayar(),
-                      const SizedBox(height: 8),
-                      buildFieldVaNo(),
-                      const SizedBox(height: 18),
-                      buildFieldBatasBayar(),
-                      const SizedBox(height: 18),
-                      buildInstruksiPembayaran(state),
-                      const SizedBox(height: hPadding),
-
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        height: 60,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 30.0),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
                           child: ElevatedButton(
-                            onPressed: _dismissDialog,
-                            child: const Text(
-                              'Close',
-                              style: TextStyle(fontSize: 13),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              "Tidak",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                       ),
-
-                      FormError(errors: errors, key: null),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              "Iya, Keluar",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleExit(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const TagihanPembayaranPage(initialTab: 2),
+        ),
+            (route) => route.isFirst,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _handleExit(context);
+      },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
+            listenWhen: (prev, curr) =>
+            prev.record != curr.record && curr.record != null,
+            listener: (context, state) {
+              final r = state.record!;
+
+              fieldVaNoController.text = (r.vaNo).toString();
+              fieldCurrController.text = (r.curr).toString();
+              final formatter = NumberFormat('#,###', 'id_ID');
+              fieldTotalBayarController.text = formatter.format(r.totalBayar);
+              fieldBatasBayarController.text = (r.batasBayar).toString();
+            },
+          ),
+        ],
+        child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
+          buildWhen: (prev, curr) =>
+          prev.record != curr.record ||
+              prev.isPollingVa != curr.isPollingVa ||
+              prev.isPollingStatus != curr.isPollingStatus,
+          builder: (context, state) {
+            final bankTitle = (state.record?.bankNama ?? '').trim();
+            final title = bankTitle.isNotEmpty ? bankTitle : "Pembayaran";
+
+            return BaseBackgroundSidePage(
+              title: title,
+              onBack: () async => _handleExit(context),
+              child: Container(
+                color: secondaryBlackColor,
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: primaryLightColor,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(cardBorderRadius),
+                            ),
+                          ),
+                          width: 120,
+                          height: 60,
+                          alignment: Alignment.center,
+                          child: buildBankLogo(
+                            state.record?.iconId ?? '',
+                            state.record?.iconUrl ?? '',
+                            size: 120,
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _buildPaymentStatus(state),
+
+                        const SizedBox(height: 6),
+                        buildFieldTotalBayar(),
+                        const SizedBox(height: 8),
+                        buildFieldVaNo(),
+                        const SizedBox(height: 18),
+                        buildFieldBatasBayar(),
+                        const SizedBox(height: 18),
+                        buildInstruksiPembayaran(state),
+                        const SizedBox(height: hPadding),
+
+                        AppButton.primary(
+                          text: "Kembali",
+                          onPressed: () => _handleExit(context),
+                        ),
+
+                        FormError(errors: errors, key: null),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

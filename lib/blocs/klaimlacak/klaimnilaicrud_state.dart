@@ -40,5 +40,13 @@ class KlaimnilaicrudState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, klaimNilaiId];
+	List<Object?> get props => [
+		record,
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		klaimNilaiId,
+	];
 }

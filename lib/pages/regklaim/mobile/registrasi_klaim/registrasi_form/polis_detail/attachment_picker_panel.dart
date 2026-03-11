@@ -28,32 +28,22 @@ class AttachmentPickerPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF2B2B2B),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.10)),
+        color: formGrey,
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        border: Border.all(color: sGrey),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ===== preview strip =====
-          Container(
+          items.isEmpty
+              ? _emptyState(context)
+              : SizedBox(
             height: 160,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1F1F1F),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: items.isEmpty
-                ? Center(
-              child: Text(
-                "Belum ada file",
-                style: TextStyle(color: Colors.white.withOpacity(0.55)),
-              ),
-            )
-                : ListView.separated(
+            child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               itemCount: items.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, i) {
@@ -66,39 +56,79 @@ class AttachmentPickerPanel extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 14),
 
-          // ===== buttons ===== ardi
-          Row(
-            children: [
-              Expanded(
-                child: AppButton.iconLeft(
-                  text: "Ambil File",
-                  icon: SvgPicture.asset(
-                    "assets/icons/gallery_img.svg",
-                    width: 18,
-                    height: 18,
-                    color: Colors.white,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: AppButton.iconLeft(
+                    text: "Ambil File",
+                    icon: SvgPicture.asset(
+                      "assets/icons/gallery_img.svg",
+                      width: 18,
+                      height: 18,
+                      color: Colors.white,
+                    ),
+                    backgroundColor: const Color(0xFF4A4A4A),
+                    onPressed: onPickFile,
                   ),
-                  backgroundColor: const Color(0xFF4A4A4A),
-                  onPressed: onPickFile,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: AppButton.iconLeft(
-                  text: "Ambil Foto",
-                  icon: SvgPicture.asset(
-                    "assets/icons/photo_img.svg",
-                    width: 18,
-                    height: 18,
-                    color: Colors.white,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: AppButton.iconLeft(
+                    text: "Ambil Foto",
+                    icon: SvgPicture.asset(
+                      "assets/icons/photo_img.svg",
+                      width: 18,
+                      height: 18,
+                      color: Colors.white,
+                    ),
+                    backgroundColor: const Color(0xFFF28C28),
+                    onPressed: onPickPhoto,
                   ),
-                  backgroundColor: const Color(0xFFF28C28),
-                  onPressed: onPickPhoto,
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyState(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                "assets/icons/upload_simbol.svg",
+                width: 26,
+                height: 26,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                "Unggah Foto Polis",
+                style: TextStyle(
+                  fontSize: getResponsiveFont(context, 16),
+                  fontWeight: FontWeight.w600,
+                  color: primaryLightColor,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Pastikan foto Bangunan terlihat jelas dan tidak buram untuk memudahkan proses verifikasi.",
+            style: TextStyle(
+              fontSize: getResponsiveFont(context, 14),
+              color: cardGrey,
+            ),
           ),
         ],
       ),
@@ -122,74 +152,69 @@ class _ThumbCard extends StatefulWidget {
 }
 
 class _ThumbCardState extends State<_ThumbCard> {
-  static const double _w = 180; // lebih ramping
-  static const double _h = 130;
+  static const double _size = 146;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(right: 2), // optional, boleh hapus
+      margin: const EdgeInsets.only(right: 8),
       child: Material(
         color: const Color(0xFF101010),
-        borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(12),
           child: Container(
-            width: _w,
-            height: _h,
+            width: _size,
+            height: _size,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white.withOpacity(0.10)),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Stack(
-                children: [
-                  // content
-                  SizedBox(width: _w, height: _h, child: _content()),
+            child: Stack(
+              children: [
+                SizedBox(
+                  width: _size,
+                  height: _size,
+                  child: _content(),
+                ),
 
-                  // overlay gradient tipis biar text/chip kebaca kalau background terang
-                  Positioned.fill(
-                    child: DecoratedBox(
+                // gradient tetap
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.18),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: widget.onRemove,
+                    child: Container(
+                      width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.18),
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.18),
-                          ],
-                        ),
+                        color: sGrey,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
                   ),
-
-                  // tombol remove (lebih kecil & rapih)
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: widget.onRemove,
-                      child: Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.45),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withOpacity(0.15)),
-                        ),
-                        child: const Icon(Icons.close, color: Colors.white, size: 18),
-                      ),
-                    ),
-                  ),
-
-                  // kamu bisa taruh status chip kecil di kanan bawah kalau perlu
-                  // Positioned(bottom: 10, right: 10, child: _StatusChip(item: widget.item)),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -198,7 +223,6 @@ class _ThumbCardState extends State<_ThumbCard> {
   }
 
   Widget _content() {
-    // LOGIC SAMA PERSIS seperti punyamu, cuma ganti width/height pdf thumb
     if (widget.item.isImage) {
       return Image.file(File(widget.item.path), fit: BoxFit.cover);
     }
@@ -206,11 +230,7 @@ class _ThumbCardState extends State<_ThumbCard> {
     if (widget.item.isPdf) {
       return Stack(
         children: [
-          _PdfThumbImage(
-            path: widget.item.path,
-            width: _w,
-            height: _h,
-          ),
+          _PdfThumbImage(path: widget.item.path, width: _size, height: _size),
           Positioned(
             bottom: 10,
             left: 10,

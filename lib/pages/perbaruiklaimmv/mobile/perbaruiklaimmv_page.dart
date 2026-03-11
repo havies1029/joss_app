@@ -460,7 +460,6 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       }
                     },
                     text: 'Perbarui',
-                    backgroundColor: pBlue,
                     textStyle: headingStyle(context, fontSize: 18),
                   ),
                 ],

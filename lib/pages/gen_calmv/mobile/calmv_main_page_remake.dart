@@ -10,6 +10,9 @@ import '../../../blocs/gen_calmv/calmv1list_bloc.dart';
 import '../../../blocs/gen_calmv/calmv2form_bloc.dart';
 import '../../../blocs/gen_calmv/calmv3form_bloc.dart';
 import '../../../blocs/gen_calmv/calmv_flow_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
+import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../common/constants.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../models/combobox/combommvgrupojk_model.dart';
@@ -32,6 +35,8 @@ import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../gen_regmv/mobile/regmv_main_page_remake.dart';
+import '../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
+import '../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../register/mobile/client/register_client_page.dart';
 
 class CalmvMainPageRemake extends StatefulWidget {
@@ -57,6 +62,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
   Calmv2FormModel? form2Record;
   Calmv3FormModel? form3Record;
+
+  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
  
   //form1
   final fieldCoverBulanController = TextEditingController();
@@ -102,6 +110,18 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   @override
   void initState() {
     super.initState();
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mjenisClient == "10") {
+        mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+      }else if (mjenisClient == "20"){
+        mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+      }
+    });
 
     // default passenger count = 1
     selectedPassengerCount = selectedPassengerCount.trim().isEmpty ? "1" : selectedPassengerCount;
@@ -799,12 +819,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     }
 
     if (!ok) {
-      openForm1Force(); // ini akan reset expanded jadi single-open
+      openForm1Force();
     }
 
     return ok;
   }
-
 
   bool validateForm2() {
     bool ok = true;
@@ -816,57 +835,63 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       ok = false;
     }
 
-    // ---- GROUP RULE: TPL/PAD/PAP/PLL -> minimal isi 1 ----
     String cleanNum(String v) => v.replaceAll(",", "").trim();
 
-    final tplC = cleanNum(fieldTplController.text);
-    final padC = cleanNum(fieldPadController.text);
-    final papC = cleanNum(fieldPapController.text);
-    final pllC = cleanNum(fieldPllController.text);
+    double parseOrDefaultZero(TextEditingController controller) {
+      final raw = cleanNum(controller.text);
 
-    final allEmpty = tplC.isEmpty && padC.isEmpty && papC.isEmpty && pllC.isEmpty;
-
-    if (allEmpty) {
-      const msg = "Isi minimal salah satu (TPL/PAD/PAP/PLL)";
-      setErr('form2.tpl', msg);
-      setErr('form2.pad', msg);
-      setErr('form2.pap', msg);
-      setErr('form2.pll', msg);
-      ok = false;
-    } else {
-      // helper validate + auto default 0 untuk yang kosong
-      bool validateOrDefaultZero({
-        required String key,
-        required TextEditingController controller,
-      }) {
-        final c = cleanNum(controller.text);
-
-        if (c.isEmpty) {
-          controller.text = "0";       // auto default
-          clearErr(key);
-          return true;
-        }
-
-        final angka = double.tryParse(c);
-        if (angka == null) {
-          setErr(key, "Format tidak valid");
-          return false;
-        }
-        if (angka < 0) {
-          setErr(key, "Tidak boleh minus");
-          return false;
-        }
-
-        clearErr(key);
-        return true;
+      if (raw.isEmpty) {
+        controller.text = "0"; // auto default
+        return 0;
       }
 
-      final a = validateOrDefaultZero(key: 'form2.tpl', controller: fieldTplController);
-      final b = validateOrDefaultZero(key: 'form2.pad', controller: fieldPadController);
-      final c = validateOrDefaultZero(key: 'form2.pap', controller: fieldPapController);
-      final d = validateOrDefaultZero(key: 'form2.pll', controller: fieldPllController);
+      return double.tryParse(raw) ?? double.nan;
+    }
 
-      if (!(a && b && c && d)) ok = false;
+    bool validateNonNegative({
+      required String key,
+      required double value,
+    }) {
+      if (value.isNaN) {
+        setErr(key, "Format tidak valid");
+        return false;
+      }
+
+      if (value < 0) {
+        setErr(key, "Tidak boleh minus");
+        return false;
+      }
+
+      clearErr(key);
+      return true;
+    }
+
+    final tpl = parseOrDefaultZero(fieldTplController);
+    final pad = parseOrDefaultZero(fieldPadController);
+    final pap = parseOrDefaultZero(fieldPapController);
+    final pll = parseOrDefaultZero(fieldPllController);
+
+    final a = validateNonNegative(key: 'form2.tpl', value: tpl);
+    final b = validateNonNegative(key: 'form2.pad', value: pad);
+    final c = validateNonNegative(key: 'form2.pap', value: pap);
+    final d = validateNonNegative(key: 'form2.pll', value: pll);
+
+    ok = a && ok;
+    ok = b && ok;
+    ok = c && ok;
+    ok = d && ok;
+
+    if (ok) {
+      final anyGreaterThanZero = tpl > 0 || pad > 0 || pap > 0 || pll > 0;
+
+      if (!anyGreaterThanZero) {
+        const msg = "Minimal salah satu nilai harus lebih dari 0";
+        setErr('form2.tpl', msg);
+        setErr('form2.pad', msg);
+        setErr('form2.pap', msg);
+        setErr('form2.pll', msg);
+        ok = false;
+      }
     }
 
     return ok;
@@ -874,13 +899,70 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
 
   Future<void> onLanjutkanPressed() async {
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
     if (context.read<Calmv1ListBloc>().state.isProcessing) return;
-
     if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
       User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
       if (user.userType == "C"){
+        if (mjenisClient == "10") {
+          final mRekanNama1 =
+              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
+          debugPrint("MREKANNAMA! = ${mRekanNama1}");
+
+          if (mRekanNama1.isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true, // klik luar = close
+              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
+        else if (mjenisClient == "20") {
+          final mRekanNama2 =
+              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+
+          if (mRekanNama2.isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true, // klik luar = close
+              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
         context.read<Calmv1ListBloc>().add(
-            CalMv2RegMvEvent(calmv1Id: calmv1Id!));
+          CalMv2RegMvEvent(calmv1Id: calmv1Id!),
+        );
       }
       else {
         showDialog(
@@ -890,7 +972,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           builder: (context) => RegisterClientPopUp(
             header: 'Data Klien Belum Terdaftar!',
             description:
-            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
             buttonText: 'Daftar Klien',
             onPressed: () {
               Navigator.push(
@@ -902,8 +984,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
             },
           ),
         );
-
-
       }
     }
   }

@@ -39,7 +39,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   final comboMBankKey = GlobalKey<DropdownSearchState<ComboMBankModel>>();
 
   String? existingMrekanBankId;
-  final bool _isFirstLoad = true;
+  bool _isFirstLoad = true;
   @override
   void initState() {
     super.initState();
@@ -148,7 +148,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
           const SizedBox(height: vPadding),
 
           AppButton.primary(
-            text: " Simpan Perubahan",
+            text: "Simpan Perubahan",
             onPressed: onSaveForm,
           )
         ],

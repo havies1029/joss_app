@@ -1,0 +1,11 @@
+<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="0.426562" y="0.424609" width="34.85" height="34.85" rx="7.225" fill="#EF7A28"/>
+<rect x="0.426562" y="0.424609" width="34.85" height="34.85" rx="7.225" stroke="#F6924B" stroke-width="0.85"/>
+<rect x="7.65234" y="7.84961" width="20" height="20" fill="url(#pattern0_4188_8380)"/>
+<defs>
+<pattern id="pattern0_4188_8380" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_4188_8380" transform="scale(0.0104167)"/>
+</pattern>
+<image id="image0_4188_8380" width="96" height="96" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAADnklEQVR4nO3dz4tNYRzH8S/5GWqwoGzIwjTULGwslMRGmn+AWFqILK/lXbIYRkpWFooaCxulUMJQilAoJU0pWYiF3/LjrSencI05557znOf5Pj9eNTWLufd8vs/n3nPm3HtPVyTLsizLsizLsqwhYC1wFHgEvMe/rqQAmAMcB76hT1cSWPwr6NaVWBWP/BB0JdJ9vsbdTholAGOE55DEAniMLt2qfycxAN6hiPzK1EnmmYAy8jtXGiWgjPydLf4SUEb+zRd3CSgjU2eMtwSUkf/njLMElJHps8ZXAspIed64SkAZqZY5nhJQRqrnjqMElJH+sodfAspI//nDLgFlpN4M4ZaAMlJ/jjBLQBlpNkt4JaCMNJ8nrBJQRuzMFE4JKCP25uq43F6ToKqI3dk6LrdXN6QqYn++jsvt1QmoirQzY8fl9voNlzTxjcSJbyROfCNx4huJE99InPhG4sQ3Eie+kY47wH5gCJgNzAIGfa9/7AV8By4AW0Ur4vQJOK3iEV6GuLwsLvBYKqFoOrHoyH8f2APMk9BEUMBmCVnoBQQvF+BZSgUAM4ER4CZwF9htzgd8h4q+AGARcACYnGKEyeIds8W+wkVbALDSfPQEeFNhlLfAMXMb1yGjKwBYX5yIfW1w9rzRVVhVxM7+3Zb2jxMoI3b377a0d5xAGWln/26L/eMEyki7+3db7B0nUEYiy5sLaFkuwLNcQOoFiGMo430gcQxlvA8kjqGM94HEMZTxPpA4hjLeBxLHUMb7QOIYyngfSBxDmegGouSzPcAX9PgcYwHLS/K+Ro9XMRYwWJK3zTde+vUsxgI2lOS9jh5XYyxge0nek+hxIsYCDpbk3Ycee2MsYLzCN35osSbGAp6W5J0BvPAdEnjeePGLgcw7/Zr8AAZKMptPJvg2aqsA84Vt2uwoyTzsOyCwzlYBR9DnfIXcNzzmu2Zl8YtBhhR+jdVHYGFJ7i0e822yVoCifWqvnRVyX8K9i1YXvxjEXLh8GV3umf94SnKvLp4trnwAVlkv4I8Sxjx/5K/Xtgq5zdXv4Zx4VTwmjAIPFXzH2ETFzOMOspxtffFDBcw3ZbW4+LeBBb7nVA1YAjxoYfHNReBLfM8XBGAAuGVx8SfKzsqzHsBc4JSFxT9jdm29959VVFzbVeftS3ObXVW3k00DWAac62PxzVUvK6a7z6wGcylRsbjmldapmCsrR+rcdybVFa+iHgaeFD/m9+Emd/oTWOOxXHLjktYAAAAASUVORK5CYII="/>
+</defs>
+</svg>

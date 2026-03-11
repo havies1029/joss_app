@@ -6,6 +6,8 @@ import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../common/constants.dart';
+import '../../../../common/loading_indicator.dart';
+import '../../../../widgets/apptheme/empty_state_page.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_success/payment_success.dart';
@@ -152,13 +154,32 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
   }
 
   Widget buildList() {
-    return Flexible(
-      child: FractionallySizedBox(
-        heightFactor: 0.85,
-        alignment: Alignment.topCenter,
-        child: RiwayatTablePageRemake(
-          searchText: _searchController.text,
-        ),
+    return Expanded(
+      child: BlocBuilder<HistorybayarCariBloc, HistorybayarCariState>(
+        builder: (context, state) {
+          if (state.status != ListStatus.success) {
+            return const Center(child: LoadingIndicator());
+          }
+
+          if (state.items.isEmpty) {
+            return const Center(
+              child: EmptyStatePage(
+                iconPath: 'assets/icons/belipolis_no_file.svg',
+                title: 'Tidak ada Riwayat Pembayaran',
+                description:
+                'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
+              ),
+            );
+          }
+
+          return FractionallySizedBox(
+            heightFactor: 0.95,
+            alignment: Alignment.topCenter,
+            child: RiwayatTablePageRemake(
+              searchText: _searchController.text,
+            ),
+          );
+        },
       ),
     );
   }

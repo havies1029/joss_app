@@ -103,7 +103,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Anda belum menyelesaikan proses pembayaran. Jika keluar sekarang, data yang telah diisi tidak akan disimpan.",
+                    "Jika Anda keluar dari halaman metode pembayaran, data transaksi akan tersimpan di menu Riwayat Pembayaran.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor.withOpacity(0.7),

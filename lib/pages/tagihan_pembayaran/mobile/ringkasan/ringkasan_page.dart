@@ -5,6 +5,7 @@ import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../common/constants.dart';
+import '../../../../common/loading_indicator.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
@@ -130,7 +131,7 @@ class RingkasanPageState extends State<RingkasanPage> {
                   child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
                     builder: (context, state) {
                       if (state.status != ListStatus.success) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: LoadingIndicator());
                       }
 
                       if (state.items.isEmpty) {

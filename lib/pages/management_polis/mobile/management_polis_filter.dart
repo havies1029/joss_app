@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_aset_health/asethealthcari_bloc.dart';
 import 'package:joss_app/blocs/gen_aset_mv/asetmvcari_bloc.dart';
@@ -12,6 +14,7 @@ import 'package:joss_app/pages/gen_status_aset/button_group_status_aset.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
@@ -29,7 +32,6 @@ import 'cob_polis/kargo_cob_table.dart';
 import 'cob_polis/kendaraan_cob_table.dart';
 import 'cob_polis/property_cob_table.dart';
 import 'cob_polis/ringkasan_cob_table.dart';
-import 'package:share_plus/share_plus.dart';
 
 class ManagementPolisFilter extends StatefulWidget {
   const ManagementPolisFilter({super.key});
@@ -554,55 +556,59 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
     if (cobId == "10003") {
       final st = context.read<AsetMvCariBloc>().state;
-      return st.items
-          .where((x) => st.selectedIds.contains(x.asetMvId))
-          .map((d) => {
+
+      final dataSource = st.selectedIds.isNotEmpty
+          ? st.items.where((x) => st.selectedIds.contains(x.asetMvId))
+          : st.items;
+
+      return dataSource.map((d) => {
         "No": d.nomor,
         "Tertanggung": d.tertanggung,
-        "Periode Mulai": "${d.periodeMulai}",
-        "Periode Akhir": "${d.periodeAkhir}",
+        "Periode Mulai": d.periodeMulai,
+        "Periode Akhir": d.periodeAkhir,
         "Merk Kendaraan": d.merk,
         "Nomor Polisi": d.noPolisi,
         "Nilai Tertanggung": d.sumInsured,
         "Premi": d.premi,
         "Status": d.status,
-      })
-          .toList();
+      }).toList();
     }
 
     if (cobId == "10004") {
       final st = context.read<AsethullCariBloc>().state;
-      return st.items
-          .where((x) => st.selectedIds.contains(x.asetHullId))
-          .map((d) => {
+
+      final dataSource = st.selectedIds.isNotEmpty
+          ? st.items.where((x) => st.selectedIds.contains(x.asetHullId))
+          : st.items;
+
+      return dataSource.map((d) => {
         "No": st.items.indexOf(d) + 1,
         "Tertanggung": d.tertanggung,
         "Detail Rangka Kapal": d.namaKapal,
         "Nilai Tertanggung": d.tsi,
         "Premi": d.premi,
         "Status": d.status,
-      })
-          .toList();
+      }).toList();
     }
 
     if (cobId == "10005") {
       final st = context.read<AsetHealthCariBloc>().state;
-      return st.items
-          .where((x) => st.selectedIds.contains(x.asethealthId))
-          .map((d) => {
+
+      final dataSource = st.selectedIds.isNotEmpty
+          ? st.items.where((x) => st.selectedIds.contains(x.asethealthId))
+          : st.items;
+
+      return dataSource.map((d) => {
         "No": d.nomor,
         "Nama": d.nama,
         "Status": d.status,
-      })
-          .toList();
+      }).toList();
     }
 
     if (cobId == "10001") {
       final st = context.read<AsetRingkasanCariBloc>().state;
 
-      // tetap seperti semula: ringkasan export semua items (bukan selected)
-      return st.items
-          .map((d) => {
+      return st.items.map((d) => {
         "No": st.items.indexOf(d) + 1,
         "Jenis Polis": d.asetNama,
         "Currency": d.curr,
@@ -611,15 +617,16 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         "Premi": d.nilaiPremi,
         "Nomor Urut": d.noUrut,
         "Satuan": d.satuan,
-      })
-          .toList();
+      }).toList();
     }
 
-    // default => Others/Kargo
     final st = context.read<AsetothersCariBloc>().state;
-    return st.items
-        .where((x) => st.selectedIds.contains(x.asetOthersId))
-        .map((d) => {
+
+    final dataSource = st.selectedIds.isNotEmpty
+        ? st.items.where((x) => st.selectedIds.contains(x.asetOthersId))
+        : st.items;
+
+    return dataSource.map((d) => {
       "No": d.nomor,
       "Object": d.objectDesc,
       "Polis No": d.polisNo,
@@ -627,8 +634,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       "Sum Insured": d.sumInsured,
       "Premi": d.premi,
       "Status": d.status,
-    })
-        .toList();
+    }).toList();
   }
 
   String _exportLabel() {

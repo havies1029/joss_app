@@ -28,9 +28,26 @@ class ArtikelListPage extends StatelessWidget {
       RefreshBerita3CariEvent(berita1Id: artikel.berita1Id!),
     );
 
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const ArtikelDetailPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ArtikelDetailPage(
+          authorNama: artikel.authorNama ?? '',
+          tglTerbit: artikel.tglTerbit != null
+              ? formatTanggalCard(artikel.tglTerbit!)
+              : "",
+        ),
+      ),
+    );
+  }
+
+  String formatTanggalCard(DateTime dt) {
+    const bulan = [
+      '',
+      'Jan','Feb','Mar','Apr','Mei','Jun',
+      'Jul','Agu','Sep','Okt','Nov','Des'
+    ];
+
+    return "${dt.day} ${bulan[dt.month]}, ${dt.year}";
   }
 
   @override
@@ -56,9 +73,9 @@ class ArtikelListPage extends StatelessWidget {
                       (artikel.lamaBaca != null)
                           ? "${artikel.lamaBaca} min"
                           : null,
-                      tglTerbit:
-                      artikel.tglTerbit.toString().split(' ').first ??
-                          "",
+                          tglTerbit: artikel.tglTerbit != null
+                              ? formatTanggalCard(artikel.tglTerbit!)
+                              : "",
                     ),
                   ),
                 ],
@@ -84,9 +101,9 @@ class ArtikelListPage extends StatelessWidget {
                       (artikel.lamaBaca != null)
                           ? "${artikel.lamaBaca} min"
                           : null,
-                      tglTerbit:
-                      artikel.tglTerbit.toString().split(' ').first ??
-                          "",
+                          tglTerbit: artikel.tglTerbit != null
+                              ? formatTanggalCard(artikel.tglTerbit!)
+                              : "",
                     ),
                   ),
                 ],
@@ -112,9 +129,9 @@ class ArtikelListPage extends StatelessWidget {
                       (artikel.lamaBaca != null)
                           ? "${artikel.lamaBaca} min"
                           : null,
-                      tglTerbit:
-                      artikel.tglTerbit.toString().split(' ').first ??
-                          "",
+                          tglTerbit: artikel.tglTerbit != null
+                              ? formatTanggalCard(artikel.tglTerbit!)
+                              : "",
                     ),
                   ),
                 ],

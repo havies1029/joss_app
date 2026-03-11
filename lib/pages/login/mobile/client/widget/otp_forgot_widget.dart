@@ -45,7 +45,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   bool _otpError = false;
 
   Timer? _timer;
-  int _remainingTime = 6;
+  int _remainingTime = 59;
   bool _isResendAvailable = false;
 
   @override
@@ -261,7 +261,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
     _resetOtpAndFocusFirst();
 
     setState(() {
-      _remainingTime = 6;
+      _remainingTime = 59;
       _isResendAvailable = false;
     });
 

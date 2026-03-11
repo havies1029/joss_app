@@ -216,6 +216,11 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+        loadingBuilder: (context, searchEntry) {
+          return const Center(
+            child: LoadingIndicator(),
+          );
+        },
         constraints: BoxConstraints(maxHeight: widget.maxHeight),
         showSelectedItems: true,
         showSearchBox: widget.enableSearch,

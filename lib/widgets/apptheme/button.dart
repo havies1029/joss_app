@@ -7,6 +7,7 @@ enum ButtonLayoutType {
   iconRight,
   iconTop,
   iconBottom,
+  adaptive
 }
 
 class AppButton extends StatefulWidget {
@@ -54,6 +55,46 @@ class AppButton extends StatefulWidget {
     this.squareSize,
     this.isOutlined = false,
   });
+
+  factory AppButton.adaptive({
+    required String text,
+    Widget? icon,
+    bool iconLeft = true,
+    VoidCallback? onPressed,
+    Color? backgroundColor,
+    Color? textColor,
+    double? borderRadius,
+    double? elevation,
+    EdgeInsets? padding,
+    TextStyle? textStyle,
+    double iconTextSpacing = 6,
+    bool isLoading = false,
+    bool hasAnimation = true,
+    bool isOutlined = false,
+    BorderSide? borderSide,
+  }) {
+    return AppButton(
+      text: text,
+      icon: icon,
+      onPressed: onPressed,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      textStyle: textStyle,
+      iconTextSpacing: iconTextSpacing,
+      isLoading: isLoading,
+      hasAnimation: hasAnimation,
+      isOutlined: isOutlined,
+      borderSide: borderSide,
+      layoutType:
+      icon == null ? ButtonLayoutType.textOnly
+          : iconLeft
+          ? ButtonLayoutType.iconLeft
+          : ButtonLayoutType.iconRight,
+    );
+  }
 
   // Factory constructor untuk button text saja
   factory AppButton.primary({
@@ -299,7 +340,7 @@ class _AppButtonState extends State<AppButton>
         child: CircularProgressIndicator(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(
-            widget.textColor ?? Colors.white,
+            widget.textColor ?? primaryColor,
           ),
         ),
       );
@@ -366,6 +407,33 @@ class _AppButtonState extends State<AppButton>
             widget.icon ?? const Icon(Icons.add),
           ],
         );
+
+      case ButtonLayoutType.adaptive:
+        final hasText = widget.text != null && widget.text!.isNotEmpty;
+        final hasIcon = widget.icon != null;
+
+        if (hasText && hasIcon) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget.icon!,
+              SizedBox(width: widget.iconTextSpacing),
+              Text(
+                widget.text!,
+                style: _getTextStyle(),
+              ),
+            ],
+          );
+        }
+
+        if (hasIcon) {
+          return widget.icon!;
+        }
+
+        return Text(
+          widget.text ?? '',
+          style: _getTextStyle(),
+        );
     }
   }
 
@@ -431,9 +499,21 @@ class _AppButtonState extends State<AppButton>
       child: buttonChild,
     );
 
+    double? width;
+
+    if (widget.isSquare) {
+      width = widget.squareSize;
+    } else if (widget.layoutType == ButtonLayoutType.adaptive) {
+      width = widget.width;
+    } else {
+      width = widget.width ?? double.infinity;
+    }
+
     Widget wrappedButton = SizedBox(
-      width: widget.isSquare ? widget.squareSize : (widget.width ?? double.infinity),
-      height: widget.isSquare ? widget.squareSize : (widget.height ?? buttonHeight),
+      width: width,
+      height: widget.isSquare
+          ? widget.squareSize
+          : (widget.height ?? buttonHeight),
       child: button,
     );
 
