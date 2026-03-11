@@ -32,9 +32,9 @@ class AppData {
 
   static bool useSSL = false;
   static String apiDomain =
-      "http://uat.smartsoft-id.com/jossadminapidev/";
-  static String prefixEndPoint = "jossadminapidev";
-  static String httpAuthority = "uat.smartsoft-id.com";
+      "http${useSSL ? "s" : ""}://eassisttoolsapi.smartsoft-id.com/";
+  static String prefixEndPoint = "";
+  static String httpAuthority = "eassisttoolsapi.smartsoft-id.com";
 
 
   //

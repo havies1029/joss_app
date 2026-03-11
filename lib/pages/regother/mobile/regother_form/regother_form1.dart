@@ -354,6 +354,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       Regother1CrudModel record = Regother1CrudModel(
         currId: fieldComboRMatauang?.rmatauangKode,
         regother1Id: '',
+        comboMCobApp1: fieldComboMCobApp1,
         mcobId: fieldComboMCobApp1!.mCobApp1Id,
         remark: fieldRemarkController.text,
         tsi: double.parse(fieldTsiController.text.replaceAll(',', '')),

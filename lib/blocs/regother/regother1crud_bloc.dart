@@ -27,6 +27,9 @@ class Regother1CrudBloc extends Bloc<Regother1CrudEvents, Regother1CrudState> {
 			SelectButton event, Emitter<Regother1CrudState> emit) async {
 		emit(state.copyWith(
 			selectedCOBId: event.id,
+			namaCob: event.namaCob,
+			isSaved: false,
+			hasFailure: false,
 		));
 	}
 

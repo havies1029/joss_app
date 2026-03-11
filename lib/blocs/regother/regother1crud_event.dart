@@ -56,10 +56,10 @@ class ResetRegother1CrudEvent extends Regother1CrudEvents {}
 
 class SelectButton extends Regother1CrudEvents {
 	final String id;
-
-	const SelectButton(this.id);
+  final String namaCob;
+	const SelectButton(this.id, this.namaCob);
 
 	@override
-	List<Object> get props => [id];
+	List<Object> get props => [id, namaCob];
 }
 

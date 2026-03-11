@@ -44,7 +44,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   void initState() {
     super.initState();
     invbayarvaFormBloc = context.read<InvbayarvaFormBloc>();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 

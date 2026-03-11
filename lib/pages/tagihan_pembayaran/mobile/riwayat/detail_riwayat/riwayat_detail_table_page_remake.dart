@@ -152,6 +152,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                                 if (selected.stsInvId == '10002') {
                                   context.read<DnRekap2invBloc>().add(
                                     CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                                      // SetPaymentSummaryEvent(curr: state.)
                                   );
                                 } else {
                                   // klik -> event -> bloc set isDownloading=true -> loading langsung muncul

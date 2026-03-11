@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -9,25 +10,51 @@ class Regother1CrudAPI {
 	Future<ReturnDataAPI> regother1CrudTambahAPI(Regother1CrudModel record) async {
 		String tambahEndpoint =
 				"${AppData.prefixEndPoint}/api/regother/regother1crud/create";
+
 		Map<String, String> queryParams = {"modul_id": "regother1CrudTambahAPI"};
+
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
+		debugPrint("========== API REQUEST ==========");
+		debugPrint("URL: $uri");
+		debugPrint("BODY: ${jsonEncode(record.toJson())}");
+		debugPrint("TOKEN: ${AppData.userToken}");
+
 		ReturnDataAPI returnData;
-		final http.Response response = await http.post(uri,
+
+		try {
+			final http.Response response = await http.post(
+				uri,
 				headers: <String, String>{
 					'Content-Type': 'application/json; odata=verbos',
 					'Accept': 'application/json; odata=verbos',
 					'Authorization': 'Bearer ${AppData.userToken}'
 				},
-				body: jsonEncode(record.toJson()));
+				body: jsonEncode(record.toJson()),
+			);
 
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
+			debugPrint("========== API RESPONSE ==========");
+			debugPrint("STATUS CODE: ${response.statusCode}");
+			debugPrint("BODY: ${response.body}");
+
+			if (response.statusCode == 200) {
+				returnData =
+						ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			} else {
+				debugPrint("API ERROR STATUS: ${response.statusCode}");
+				returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+			}
+		} catch (e, stack) {
+			debugPrint("========== API EXCEPTION ==========");
+			debugPrint("ERROR: $e");
+			debugPrint("STACK: $stack");
+
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
+
 		return returnData;
 	}
+
 	Future<bool> regother1CrudUbahAPI(Regother1CrudModel record) async {
 		String ubahEndpoint =
 				"${AppData.prefixEndPoint}/api/regother/regother1crud/update";

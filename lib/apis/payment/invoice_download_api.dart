@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class InvoiceDownloadApi {
-  static String? _token = "MjAyNTEySk9TUzAzOlhQb29mSDZneXZ1UjBzQTFQOWdBK1E9PQ==";
+  static String? _token = "MjAyNTEySk9TUzAzOlhQb29mSDZneXZ2T2t4cDZWZEVzVlE9PQ==";
 
   static void setToken(String token) {
     _token = token.trim();
