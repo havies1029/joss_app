@@ -153,15 +153,9 @@ class MRekanGeneralCmpPopUpPageFormState
                             fieldIdKlienController.text = idKlien ?? "";
                           }
 
-                          if (fieldComboMBentukCst == null) {
-                            fieldComboMBentukCst =
-                                rec?.comboMBentukCst ?? state.comboMBentukCst;
-                          }
+                          fieldComboMBentukCst ??= rec?.comboMBentukCst ?? state.comboMBentukCst;
 
-                          if (fieldComboMBidang == null) {
-                            fieldComboMBidang =
-                                rec?.comboMBidang ?? state.comboMBidang;
-                          }
+                          fieldComboMBidang ??= rec?.comboMBidang ?? state.comboMBidang;
 
                           _isFirstLoad = false;
                         }

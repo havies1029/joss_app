@@ -101,7 +101,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     ),
                   ),
                 );
-                final curr = (state.curr == null || state.curr!.isEmpty)
+                final curr = (state.curr.isEmpty)
                     ? globalMataUang ?? ""
                     : state.curr;
                 onViewPaymentMethods(curr, state.totalBayar);

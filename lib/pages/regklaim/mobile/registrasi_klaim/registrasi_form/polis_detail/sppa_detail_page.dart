@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/common/loading_indicator.dart';
 
 import '../../../../../../models/regklaim/sppadetail_model.dart';
 
