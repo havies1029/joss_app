@@ -114,21 +114,10 @@ class _LoginFormUserState extends State<LoginFormUser>
     if (!_formKey.currentState!.validate()) return;
 
     final input = _emailOrPhoneController.text.trim();
-    final isEmail = EmailValidator.validate(input);
 
     context.read<EmailVerificationBloc>().add(
       FieldEmailVerificationChangedEvent(email: input),
-    );
-    // if (isEmail) {
-    //   context.read<EmailVerificationBloc>().add(
-    //     FieldEmailVerificationChangedEvent(email: input),
-    //   );
-    // }
-    // else {
-    //   context.read<EmailVerificationBloc>().add(
-    //     FieldTeleponVerificationChangedEvent(telepon: input),
-    //   );
-    // }
+    );    
 
     AuthInputRouter.handleInput(context, input);
   }
@@ -171,6 +160,16 @@ class _LoginFormUserState extends State<LoginFormUser>
             if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Username atau Password Anda salah!"),
+              );
+            }
+          },
+        ),
+        BlocListener<EmailVerificationBloc, EmailVerificationState>(
+          listenWhen: (previous, current) => previous.hasFailure != current.hasFailure || previous.errors != current.errors,
+          listener: (context, state) {
+            if (state.hasFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(state.errors.isNotEmpty ? state.errors.join("\n") : "Terjadi kesalahan saat verifikasi email/telepon."),
               );
             }
           },

@@ -103,15 +103,19 @@ class EmailVerificationBloc
       }
     } else if (returnData.data.isNotEmpty) {
       final infoData = returnData.data.split(";");
+      final errorMsg = infoData.length > 1
+        ? infoData[1]
+        : returnData.data;
       if (infoData[0] == '9') {
-        errors.add(infoData[1]);
-
         authenticationBloc.add(
           RequireLoginClient(
             requiredFrom: "bloc_email_verification",
-            errorMsg: infoData[1],
+            errorMsg: errorMsg,
           ),
         );
+      }
+      else {
+        errors.add(errorMsg);
       }
     }
 
