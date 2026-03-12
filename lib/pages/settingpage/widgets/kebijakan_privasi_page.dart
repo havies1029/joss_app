@@ -16,7 +16,7 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
   final List<_PrivasiItem> items = [
     _PrivasiItem(
       title: "1. Kebijakan Asuransi",
-      icon: 'assets/icons/syarat_5.svg',
+      icon: 'assets/icons/syarat_5.png',
       points: [
         "Aplikasi ini menyediakan layanan informasi dan pengelolaan polis asuransi bagi pengguna.",
         "Setiap proses pembelian polis, pembayaran premi, maupun pengajuan klaim dilakukan sesuai dengan ketentuan dan peraturan yang berlaku di perusahaan asuransi.",
