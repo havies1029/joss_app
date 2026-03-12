@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:path/path.dart';
 
 import '../../../blocs/regother/regother1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
