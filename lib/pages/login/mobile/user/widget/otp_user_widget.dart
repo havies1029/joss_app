@@ -267,29 +267,34 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
 
     return BlocListener<EmailVerificationBloc, EmailVerificationState>(
       listenWhen: (previous, current) =>
-      previous.verificationFailed != current.verificationFailed,
+      previous.isLoaded != current.isLoaded ||
+          previous.verificationFailed != current.verificationFailed,
       listener: (context, state) {
+        if (!state.isLoaded) return;
+
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+
         if (state.verificationFailed) {
           _shakeOtpFields();
-
           setState(() => _otpError = true);
 
           _pinController.clear();
           _pinFocusNode.requestFocus();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.errors.isNotEmpty
-                    ? state.errors[0]
-                    : 'Verifikasi OTP gagal',
-              ),
-              backgroundColor: Colors.red,
+          messenger.showSnackBar(
+            errorSnackBar(
+              state.errors.isNotEmpty
+                  ? state.errors.first
+                  : 'Verifikasi OTP gagal',
             ),
+          );
+        } else {
+          messenger.showSnackBar(
+            successSnackBar('Verifikasi OTP berhasil'),
           );
         }
       },
-
       child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {

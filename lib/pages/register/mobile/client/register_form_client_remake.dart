@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
+import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
@@ -295,10 +296,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                           child: Padding(
                             padding: const EdgeInsets.only(left: 4),
                             child: TextButton.icon(
-                              onPressed: () => Navigator.of(
-                                context,
-                                rootNavigator: true,
-                              ).pop(),
+                              onPressed: () {
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                              },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 minimumSize: const Size(0, 0),

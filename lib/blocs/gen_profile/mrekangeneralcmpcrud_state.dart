@@ -1,7 +1,6 @@
 part of 'mrekangeneralcmpcrud_bloc.dart';
 
 class MRekanGeneralCmpCrudState extends Equatable {
-
 	final MRekanGeneralCmpCrudModel? record;
 	final bool isLoading;
 	final bool isLoaded;
@@ -10,8 +9,9 @@ class MRekanGeneralCmpCrudState extends Equatable {
 	final bool hasFailure;
 	final ComboMBentukCstModel? comboMBentukCst;
 	final ComboMBidangModel? comboMBidang;
-	const MRekanGeneralCmpCrudState(
-		{this.record,
+
+	const MRekanGeneralCmpCrudState({
+		this.record,
 		this.isLoading = false,
 		this.isLoaded = false,
 		this.isSaving = false,
@@ -19,30 +19,45 @@ class MRekanGeneralCmpCrudState extends Equatable {
 		this.hasFailure = false,
 		this.comboMBentukCst,
 		this.comboMBidang,
-});
+	});
+
+	static const _unset = Object();
 
 	MRekanGeneralCmpCrudState copyWith({
-		MRekanGeneralCmpCrudModel? record,
+		Object? record = _unset,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMBentukCstModel? comboMBentukCst,
-		ComboMBidangModel? comboMBidang,
-	}){
+		Object? comboMBentukCst = _unset,
+		Object? comboMBidang = _unset,
+	}) {
 		return MRekanGeneralCmpCrudState(
-			record: record ?? this.record,
+			record: record == _unset ? this.record : record as MRekanGeneralCmpCrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMBentukCst: comboMBentukCst?? this.comboMBentukCst,
-			comboMBidang: comboMBidang?? this.comboMBidang,
+			comboMBentukCst: comboMBentukCst == _unset
+					? this.comboMBentukCst
+					: comboMBentukCst as ComboMBentukCstModel?,
+			comboMBidang: comboMBidang == _unset
+					? this.comboMBidang
+					: comboMBidang as ComboMBidangModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [
+		record,
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		comboMBentukCst,
+		comboMBidang,
+	];
 }

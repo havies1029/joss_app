@@ -30,7 +30,7 @@ class PopupClientWidget extends StatefulWidget {
 
 class PopupClientWidgetState extends State<PopupClientWidget>
     with TickerProviderStateMixin {
-  // 🎬 Animations (DNA patokan)
+
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -51,9 +51,12 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   int _remainingTime = 59;
   bool _isResendAvailable = false;
 
+  late AuthenticationBloc authenticationBloc;
+
   @override
   void initState() {
     super.initState();
+    authenticationBloc = context.read<AuthenticationBloc>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -225,6 +228,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       ),
     );
 
+
     // Navigator.of(context, rootNavigator: true).pop();
   }
 
@@ -268,20 +272,31 @@ class PopupClientWidgetState extends State<PopupClientWidget>
     );
 
     return BlocListener<RegUserBloc, RegUserState>(
-      listenWhen: (prev, curr) => !prev.verificationFailed && curr.verificationFailed,
+      listenWhen: (prev, curr) =>
+      prev.isSaved != curr.isSaved || prev.hasFailure != curr.hasFailure,
       listener: (context, state) {
-        if (state.verificationFailed) {
+        if (!state.isSaved) return;
+
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+
+        if (state.hasFailure) {
           _shakeOtpFields();
           setState(() => _otpError = true);
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errors.isNotEmpty ? state.errors[0] : 'Verifikasi OTP gagal'),
-              backgroundColor: Colors.red,
+
+          messenger.showSnackBar(
+            errorSnackBar(
+              state.errors.isNotEmpty
+                  ? state.errors.first
+                  : 'Verifikasi OTP gagal',
             ),
           );
 
           _resetOtpAndFocusFirst();
+        } else {
+          messenger.showSnackBar(
+            successSnackBar("Verifikasi OTP berhasil"),
+          );
         }
       },
       child: Scaffold(

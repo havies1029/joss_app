@@ -12,7 +12,6 @@ import 'package:joss_app/models/combobox/combombidang_model.dart';
 
 import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../../../common/app_data.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/image_uploader.dart';
 import '../../../../../../repositories/combobox/combombentukcst_repository.dart';
@@ -34,56 +33,68 @@ class MRekanGeneralCmpPopUpPage extends StatefulWidget {
 
 class MRekanGeneralCmpPopUpPageFormState
     extends State<MRekanGeneralCmpPopUpPage> {
-  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late final MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+
   ComboMBentukCstModel? fieldComboMBentukCst;
   final comboMBentukCstKey =
   GlobalKey<DropdownSearchState<ComboMBentukCstModel>>();
+
   ComboMBidangModel? fieldComboMBidang;
-  final comboMBidangKey = GlobalKey<DropdownSearchState<ComboMBidangModel>>();
-  var fieldRekanNamaController = TextEditingController();
-  var fieldNamaBadanUsahaController = TextEditingController();
-  var fieldIdKlienController = TextEditingController();
+  final comboMBidangKey =
+  GlobalKey<DropdownSearchState<ComboMBidangModel>>();
+
+  final fieldRekanNamaController = TextEditingController();
+  final fieldNamaBadanUsahaController = TextEditingController();
+  final fieldIdKlienController = TextEditingController();
+
   bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
     });
   }
+
+  @override
+  void dispose() {
+    fieldRekanNamaController.dispose();
+    fieldNamaBadanUsahaController.dispose();
+    fieldIdKlienController.dispose();
+    super.dispose();
+  }
+
+  void _handleClose() {
+    if (widget.popTwice) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // init bloc contact
-    mRekanGeneralCmpCrudBloc =
-        BlocProvider.of<MRekanGeneralCmpCrudBloc>(context);
-
     SizeConfig().init(context);
 
     return BaseBackgroundSidePage(
       title: 'Informasi Perusahaan',
-      onBack: () {
-        if (widget.popTwice) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-        } else {
-          Navigator.pop(context);
-        }
-      },
+      onBack: _handleClose,
       child: LayoutBuilder(
         builder: (context, constraints) {
           return PopScope(
             canPop: false,
             onPopInvoked: (didPop) {
               if (didPop) return;
-
-              if (widget.popTwice) {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              } else {
-                Navigator.pop(context);
-              }
+              _handleClose();
             },
             child: Container(
               width: double.infinity,
@@ -103,8 +114,8 @@ class MRekanGeneralCmpPopUpPageFormState
                     child: BlocConsumer<MRekanGeneralCmpCrudBloc,
                         MRekanGeneralCmpCrudState>(
                       listenWhen: (prev, curr) =>
-                      curr.isLoaded == true ||
-                          prev.isSaved != curr.isSaved && curr.isSaved,
+                      prev.isLoaded != curr.isLoaded ||
+                          prev.isSaved != curr.isSaved,
                       listener: (context, state) {
                         if (state.isLoaded && _isFirstLoad) {
                           final rec = state.record;
@@ -139,15 +150,16 @@ class MRekanGeneralCmpPopUpPageFormState
                             }
                           }
 
-                          if (fieldNamaBadanUsahaController.text
-                              .trim()
-                              .isEmpty) {
-                            if (mjenisClient == '10') {
-                              fieldNamaBadanUsahaController.text = "Individu";
-                            } else if (mjenisClient == '20') {
-                              fieldNamaBadanUsahaController.text = "Perusahaan";
-                            }
-                          }
+                          // if (fieldNamaBadanUsahaController.text
+                          //     .trim()
+                          //     .isEmpty) {
+                          //   if (mjenisClient == '10') {
+                          //     fieldNamaBadanUsahaController.text = "Individu";
+                          //   } else if (mjenisClient == '20') {
+                          //     fieldNamaBadanUsahaController.text = "Perusahaan";
+                          //   }
+                          // }
+                          fieldNamaBadanUsahaController.text = "Perusahaan";
 
                           if (fieldIdKlienController.text.trim().isEmpty) {
                             fieldIdKlienController.text = idKlien ?? "";
@@ -163,19 +175,29 @@ class MRekanGeneralCmpPopUpPageFormState
                                 rec?.comboMBidang ?? state.comboMBidang;
                           }
 
+                          setState(() {});
                           _isFirstLoad = false;
                         }
 
-                        if (state.isSaved && !state.hasFailure) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan!"),
-                          );
+                        if (state.isSaved) {
+                          if (!state.hasFailure) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              successSnackBar("Data berhasil disimpan!"),
+                            );
 
-                          if (widget.popTwice) {
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            context
+                                .read<MRekanGeneralCmpCrudBloc>()
+                                .add(MRekanGeneralCmpCrudResetStatusEvent());
+
+                            _handleClose();
                           } else {
-                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              errorSnackBar("Data gagal disimpan!"),
+                            );
+
+                            context
+                                .read<MRekanGeneralCmpCrudBloc>()
+                                .add(MRekanGeneralCmpCrudResetStatusEvent());
                           }
                         }
                       },
@@ -195,6 +217,7 @@ class MRekanGeneralCmpPopUpPageFormState
                                   state is ProfileDownloadFotoLoaded
                                       ? state.imageBytes
                                       : null;
+
                                   return Center(
                                     child: InkResponse(
                                       onTap: () =>
@@ -207,7 +230,8 @@ class MRekanGeneralCmpPopUpPageFormState
                                           CircleAvatar(
                                             radius: 50,
                                             backgroundColor: secondaryBlackColor,
-                                            backgroundImage: (imageBytes != null &&
+                                            backgroundImage:
+                                            (imageBytes != null &&
                                                 imageBytes.isNotEmpty)
                                                 ? MemoryImage(imageBytes)
                                                 : null,
@@ -270,9 +294,7 @@ class MRekanGeneralCmpPopUpPageFormState
                                   );
                                 },
                               ),
-
                               const SizedBox(height: vPadding),
-
                               Text(
                                 "Informasi Perusahaan",
                                 style: headingStyle(
@@ -287,9 +309,7 @@ class MRekanGeneralCmpPopUpPageFormState
                                   fontSize: getResponsiveFont(context, 16),
                                 ).copyWith(color: hintGrey),
                               ),
-
                               const SizedBox(height: vPadding),
-
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
@@ -316,9 +336,7 @@ class MRekanGeneralCmpPopUpPageFormState
                                   ],
                                 ),
                               ),
-
                               const SizedBox(height: vPadding),
-
                               AppButton.primary(
                                 text: "Simpan Perubahan",
                                 onPressed: onSaveForm,
@@ -345,21 +363,25 @@ class MRekanGeneralCmpPopUpPageFormState
     fit: BoxFit.cover,
   );
 
-
   void loadData() {
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
-
-    // final name =
-    //     context.read<MRekan1CrudBloc>().state.record?.rekanNama;
-    //
-    //
-    // if (fieldRekanNamaController.text.isEmpty && (name?.isNotEmpty ?? false)) {
-    //   fieldRekanNamaController.text = name!;
-    // }
-
   }
 
   Widget buildFieldBentukPerusahaan() {
+    final mjenisClient = context
+        .read<MRekan1CrudBloc>()
+        .state
+        .record
+        ?.mjnsclientId;
+
+    String hint = "Bentuk";
+
+    if (mjenisClient == '10') {
+      hint = "Bentuk Badan Individu";
+    } else if (mjenisClient == '20') {
+      hint = "Bentuk Badan Perusahaan";
+    }
+
     return ReusableComboBox<ComboMBentukCstModel>(
       hintText: "Bentuk Badan",
       enableSearch: false,
@@ -372,6 +394,7 @@ class MRekanGeneralCmpPopUpPageFormState
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: kStringNullError);
+          fieldComboMBentukCst = value;
           mRekanGeneralCmpCrudBloc.add(
             ComboMBentukCstChangedEvent(comboMBentukCst: value),
           );
@@ -402,6 +425,7 @@ class MRekanGeneralCmpPopUpPageFormState
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: kStringNullError);
+          fieldComboMBidang = value;
           mRekanGeneralCmpCrudBloc.add(
             ComboMBidangChangedEvent(comboMBidang: value),
           );
@@ -454,18 +478,20 @@ class MRekanGeneralCmpPopUpPageFormState
   }
 
   void onSaveForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      MRekanGeneralCmpCrudModel record = MRekanGeneralCmpCrudModel(
-        mbentukcstId: fieldComboMBentukCst?.mbentukcstId,
-        mbidangId: fieldComboMBidang?.mbidangId,
-        rekanNama: fieldRekanNamaController.text,
-      );
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
 
-      mRekanGeneralCmpCrudBloc.add(
-        MRekanGeneralCmpCrudUbahEvent(record: record),
-      );
-    }
+    final record = MRekanGeneralCmpCrudModel(
+      mbentukcstId: fieldComboMBentukCst?.mbentukcstId,
+      mbidangId: fieldComboMBidang?.mbidangId,
+      rekanNama: fieldRekanNamaController.text.trim(),
+      comboMBentukCst: fieldComboMBentukCst,
+      comboMBidang: fieldComboMBidang,
+    );
+
+    mRekanGeneralCmpCrudBloc.add(
+      MRekanGeneralCmpCrudUbahEvent(record: record),
+    );
   }
 
   void removeError({required String error}) {

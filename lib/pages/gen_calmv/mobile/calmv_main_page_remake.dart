@@ -748,15 +748,37 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     context.read<Calmv2FormBloc>().add(Calmv2FormDraftEvent(record: record));
   }
 
+  bool _isHitungPremiLoading = false;
+
   Widget buildButtonHitungPremi() => Padding(
-    padding: EdgeInsets.symmetric(horizontal: 4),
+    padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
-      text: "Hitung Premi",
-      onPressed: onHitungPremi,
+      text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
+      isLoading: _isHitungPremiLoading,
+      onPressed: _isHitungPremiLoading
+          ? null
+          : () async {
+        if (_isHitungPremiLoading) return;
+
+        setState(() {
+          _isHitungPremiLoading = true;
+        });
+
+        try {
+          await Future.delayed(const Duration(milliseconds: 2));
+          await onHitungPremi();
+        } finally {
+          if (mounted) {
+            setState(() {
+              _isHitungPremiLoading = false;
+            });
+          }
+        }
+      },
     ),
   );
 
-  Future<void>  onHitungPremi() async {
+  Future<void> onHitungPremi() async {
     final okForm1 = validateForm1();
     if (!okForm1) {
       openForm1();

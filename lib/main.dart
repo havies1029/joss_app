@@ -761,6 +761,7 @@ class _AppState extends State<_App> {
                   "regisnonpolis_page",
                   "regispolis_page",
                   "calpar_page",
+                  "regother_page",
                 ];
                 if (nav == null) return;
                 if (singlePopPages.contains(state.authenticatedFrom)) {

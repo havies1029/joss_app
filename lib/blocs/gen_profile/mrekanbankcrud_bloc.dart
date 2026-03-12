@@ -23,32 +23,48 @@ class MRekanBankCrudBloc extends Bloc<MRekanBankCrudEvents, MRekanBankCrudState>
 	}
 
 	Future<void> onTambahMRekanBankCrud(
-			MRekanBankCrudTambahEvent event, Emitter<MRekanBankCrudState> emit) async {
-		print("🟡 [onTambahMRekanBankCrud] Memulai tambah data...");
-		print("📤 Data yang dikirim: ${event.record.toJson()}");
+			MRekanBankCrudTambahEvent event,
+			Emitter<MRekanBankCrudState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+			record: null,
+		));
 
-		emit(state.copyWith(isSaving: true, isSaved: false));
+		final ReturnDataAPI returnData =
+		await repository.mRekanBankCrudTambah(event.record);
 
-		ReturnDataAPI returnData = await repository.mRekanBankCrudTambah(event.record);
-		bool hasFailure = !returnData.success;
-
-		// print("✅ [onTambahMRekanBankCrud] Response: ${returnData.toJson()}");
+		final bool hasFailure = !returnData.success;
 
 		emit(state.copyWith(
 			isSaving: false,
 			isSaved: true,
 			hasFailure: hasFailure,
+			record: hasFailure ? null : event.record,
 		));
 	}
 
 	Future<void> onUbahMRekanBankCrud(
-			MRekanBankCrudUbahEvent event, Emitter<MRekanBankCrudState> emit) async {
+			MRekanBankCrudUbahEvent event,
+			Emitter<MRekanBankCrudState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
 
-		emit(state.copyWith(isSaving: true, isSaved: false));
+		final bool result = await repository.mRekanBankCrudUbah(event.record);
+		final bool hasFailure = !result;
 
-		bool result = await repository.mRekanBankCrudUbah(event.record);
-		bool hasFailure = !result;
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: hasFailure,
+			record: hasFailure ? state.record : event.record,
+		));
 	}
 
 	Future<void> onHapusMRekanBankCrud(
@@ -66,14 +82,22 @@ class MRekanBankCrudBloc extends Bloc<MRekanBankCrudEvents, MRekanBankCrudState>
 			MRekanBankCrudLihatEvent event,
 			Emitter<MRekanBankCrudState> emit,
 			) async {
-
-		emit(state.copyWith(isLoading: true, isLoaded: false));
+		emit(state.copyWith(
+			isLoading: true,
+			isLoaded: false,
+			record: null,
+		));
 
 		try {
 			final record = await repository.mRekanBankCrudLihat();
 
 			if (record.mrekanbankId.isEmpty) {
-				emit(state.copyWith(isLoading: false, isLoaded: true, record: null));
+				emit(state.copyWith(
+					isLoading: false,
+					isLoaded: true,
+					record: null,
+					comboMBank: null,
+				));
 			} else {
 				emit(state.copyWith(
 					isLoading: false,
@@ -83,21 +107,21 @@ class MRekanBankCrudBloc extends Bloc<MRekanBankCrudEvents, MRekanBankCrudState>
 				));
 			}
 		} catch (e) {
-			emit(state.copyWith(isLoading: false, isLoaded: true, record: null));
+			emit(state.copyWith(
+				isLoading: false,
+				isLoaded: true,
+				record: null,
+				comboMBank: null,
+			));
 		}
 	}
 
-
 	Future<void> onComboMBankChanged(
-			ComboMBankChangedEvent event, Emitter<MRekanBankCrudState> emit) async {
-		print("🔁 [onComboMBankChanged] Combo dipilih: ${event.comboMBank.toJson()}");
-
+			ComboMBankChangedEvent event,
+			Emitter<MRekanBankCrudState> emit,
+			) async {
 		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
 			comboMBank: event.comboMBank,
 		));
 	}
-
-
 }

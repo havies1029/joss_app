@@ -1,15 +1,13 @@
-import 'dart:async';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
-import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
+import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
@@ -32,38 +30,49 @@ class EditPicWidget extends StatefulWidget {
 }
 
 class _EditPicWidgetState extends State<EditPicWidget> {
-  List< RekanPicCobCariModel> _pendingCobList = [];
-  final List<String> errors = [];
-  bool _saving = false;
   final _formKey = GlobalKey<FormState>();
+  final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
 
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
-  final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
-  ComboMJabatanModel? _jabatan;
-  bool _isDefault = false;
 
   late final MRekanPicCrudBloc crudBloc;
   late final RekanPicCobCariBloc cobBloc;
 
+  ComboMJabatanModel? _jabatan;
+  List<RekanPicCobCariModel> _pendingCobList = [];
+
+  bool _isDefault = false;
+  bool _saving = false;
+  bool _showErrors = false;
+
+  bool _payloadInjected = false;
+  bool _initialCobInjected = false;
+  bool _isSubmitting = false;
+
   @override
   void initState() {
     super.initState();
-    cobBloc = context.read<RekanPicCobCariBloc>();
     crudBloc = context.read<MRekanPicCrudBloc>();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      loadData();
+    cobBloc = context.read<RekanPicCobCariBloc>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadInitialData();
     });
   }
 
-  void loadData() {
-    cobBloc.add(RefreshRekanPicCobCariEvent(
-      rekanPicId: widget.mrekanpicId,
-      searchText: '',
-    ));
+  void _loadInitialData() {
     crudBloc.add(
-        MRekanPicCrudLihatEvent(recordId: widget.mrekanpicId));
+      MRekanPicCrudLihatEvent(recordId: widget.mrekanpicId),
+    );
+
+    cobBloc.add(
+      RefreshRekanPicCobCariEvent(
+        rekanPicId: widget.mrekanpicId,
+        searchText: '',
+      ),
+    );
   }
 
   @override
@@ -74,7 +83,180 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     super.dispose();
   }
 
-  String _normalizeHp(String s) => s.replaceAll(' ', '');
+  String _normalizeHp(String value) {
+    return value.replaceAll(' ', '');
+  }
+
+  Future<void> _openCobPicker() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => RekanPicCobCariBloc(),
+          child: RekanPicCobCariPage(
+            rekanPicId: widget.mrekanpicId,
+            viewMode: 'ubah',
+            initialSelectedItems: _pendingCobList,
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || result == null) return;
+
+    final selected = (result as List)
+        .whereType<RekanPicCobCariModel>()
+        .where((e) => e.isChecked)
+        .toList();
+
+    setState(() {
+      _pendingCobList = selected;
+    });
+  }
+
+  void _injectPayload(MRekanPicCrudModel record) {
+    if (_payloadInjected) return;
+
+    _nama.text = (record.picNama ?? '').trim();
+    _email.text = (record.picEmail ?? '').trim();
+    _hp.text = (record.picHp ?? '').trim();
+    _isDefault = record.isDefault ?? false;
+
+    final comboFromRecord = record.comboMJabatan;
+    final mjabatanId = (record.mjabatanId ?? '').trim();
+
+    if (comboFromRecord != null) {
+      _jabatan = comboFromRecord;
+    } else if (mjabatanId.isNotEmpty) {
+      _jabatan = ComboMJabatanModel(
+        mjabatanId: mjabatanId,
+        jabatanDesc: '',
+      );
+    } else {
+      _jabatan = null;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (_jabatan != null) {
+        _comboKey.currentState?.changeSelectedItem(_jabatan);
+      }
+    });
+
+    _payloadInjected = true;
+    setState(() {});
+  }
+
+  Future<void> _save() async {
+    if (_isSubmitting || _saving) return;
+
+    final selectedCob = _pendingCobList.where((e) => e.isChecked).toList();
+    if (selectedCob.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'),
+      );
+      return;
+    }
+
+    final valid = _formKey.currentState?.validate() ?? false;
+    if (!valid) {
+      if (!_showErrors) {
+        setState(() => _showErrors = true);
+      }
+      return;
+    }
+
+    _formKey.currentState?.save();
+
+    ComboMJabatanModel? selectedJabatan = _jabatan;
+    try {
+      selectedJabatan ??= _comboKey.currentState?.getSelectedItem;
+    } catch (_) {}
+
+    final mjnsclientId =
+        context.read<RegUserBloc>().state.record?.jnsClientId;
+
+    final idJabatan = (mjnsclientId == '10')
+        ? ''
+        : (selectedJabatan?.mjabatanId.trim() ?? '');
+
+    if (mjnsclientId != '10' && idJabatan.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        infoSnackBar('Jabatan harus dipilih'),
+      );
+      return;
+    }
+
+    final record = MRekanPicCrudModel(
+      mrekanpicId: widget.mrekanpicId,
+      picNama: _nama.text.trim(),
+      picEmail: _email.text.trim().toLowerCase(),
+      picHp: _normalizeHp(_hp.text.trim()),
+      mjabatanId: idJabatan,
+      isDefault: _isDefault,
+    );
+
+    setState(() {
+      _saving = true;
+      _isSubmitting = true;
+    });
+
+    crudBloc.add(
+      MRekanPicCrudUbahEvent(record: record),
+    );
+  }
+
+  Future<void> _handleCrudSaved() async {
+    final selectedCob = _pendingCobList.where((e) => e.isChecked).toList();
+
+    final listCheckbox = selectedCob
+        .map(
+          (e) => RekanPicCobCariCheckboxModel(
+        mcobId: e.mcobId,
+        isChecked: true,
+      ),
+    )
+        .toList();
+
+    try {
+      final cobRepo = RekanPicCobCariRepository();
+      final cobResult = await cobRepo.rekanPicCobUpdateList(
+        widget.mrekanpicId,
+        listCheckbox,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _saving = false;
+        _isSubmitting = false;
+      });
+
+      if (cobResult.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          successSnackBar(
+            'PIC & ${listCheckbox.length} COB berhasil diperbarui!',
+          ),
+        );
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('PIC tersimpan, tapi gagal update COB.'),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _saving = false;
+        _isSubmitting = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar('PIC tersimpan, tapi terjadi error saat update COB.'),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,64 +264,60 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     return MultiBlocListener(
       listeners: [
-        // =========================
-        // 1) LISTENER CRUD PIC
-        // =========================
         BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
           listenWhen: (prev, curr) =>
-          prev.isSaved != curr.isSaved ||
-              prev.hasFailure != curr.hasFailure ||
-              prev.isLoaded != curr.isLoaded ||
-              prev.record != curr.record,
-          listener: (context, state) {
-            if (state.isSaved == true) {
-              Navigator.pop(context, true);
-              return;
-            }
+          prev.isLoaded != curr.isLoaded ||
+              prev.record != curr.record ||
+              prev.isSaved != curr.isSaved ||
+              prev.hasFailure != curr.hasFailure,
+          listener: (context, state) async {
+            if (!mounted) return;
 
-            if (state.isLoaded == true && state.record != null) {
+            if (state.isLoaded && state.record != null && !_payloadInjected) {
               _injectPayload(state.record!);
             }
 
-            if (state.hasFailure == true) {
-              setState(() => _saving = false);
+            if (state.hasFailure) {
+              setState(() {
+                _saving = false;
+                _isSubmitting = false;
+              });
+
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar('Gagal menyimpan perubahan. Coba lagi.'),
               );
+              return;
+            }
+
+            if (state.isSaved && _isSubmitting) {
+              await _handleCrudSaved();
             }
           },
         ),
 
-        // =========================
-        // 2) LISTENER COB (inject cob awal ke pending list)
-        // =========================
         BlocListener<RekanPicCobCariBloc, RekanPicCobCariState>(
           listenWhen: (prev, curr) =>
           prev.status != curr.status || prev.items != curr.items,
           listener: (context, state) {
-            // sesuaikan kalau enum kamu bukan "success"
+            if (!mounted) return;
             if (state.status != ListStatus.success) return;
+            if (_initialCobInjected) return;
 
-            final selected = state.items.where((e) => e.isChecked == true).toList();
+            final selected = state.items.where((e) => e.isChecked).toList();
 
-            // isi pending hanya dari hasil fetch awal
             setState(() {
               _pendingCobList = List<RekanPicCobCariModel>.from(selected);
+              _initialCobInjected = true;
             });
-
-            debugPrint('✅ [COB INIT] pendingCobList=${_pendingCobList.length}');
           },
         ),
       ],
-
-      // =========================
-      // CHILD UI KAMU TETAP
-      // =========================
       child: BaseBackgroundSidePage(
         title: 'Edit PIC',
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+            final mjnsclientId =
+            context.select((RegUserBloc b) => b.state.record?.jnsClientId);
 
             return SingleChildScrollView(
               padding: EdgeInsets.only(
@@ -161,25 +339,23 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                     padding: const EdgeInsets.all(16),
                     child: Form(
                       key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      autovalidateMode: _showErrors
+                          ? AutovalidateMode.always
+                          : AutovalidateMode.onUserInteraction,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Text('Form Edit PIC',
-                          //     style: headingStyle(context, fontSize: 20)),
-                          // const SizedBox(height: vPadding),
-
-                          buildFieldEmail(),
+                          _buildFieldEmail(),
                           const SizedBox(height: hPadding),
 
-                          buildFieldRekanNama(),
+                          _buildFieldNama(),
                           const SizedBox(height: hPadding),
 
-                          buildFiledTelp(),
+                          _buildFieldTelp(),
                           const SizedBox(height: hPadding),
 
-                          if (mjnsclientId != '10') buildFieldJabatan(),
+                          if (mjnsclientId != '10') _buildFieldJabatan(),
                           const SizedBox(height: hPadding),
 
                           CheckboxWidget(
@@ -187,45 +363,16 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                             rightLabel: 'PIC Default',
                             initialValue: _isDefault,
                             callback: (val) {
-                              setState(() => _isDefault = val);
+                              setState(() {
+                                _isDefault = val;
+                              });
                             },
                           ),
 
                           const SizedBox(height: hPadding),
 
                           GestureDetector(
-                            onTap: () async {
-                              final selectedCobs = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => RekanPicCobCariPage(
-                                    rekanPicId: widget.mrekanpicId,
-                                    viewMode: 'ubah',
-                                  ),
-                                ),
-                              );
-
-                              if (selectedCobs != null) {
-                                setState(() {
-                                  final combined = <RekanPicCobCariModel>[];
-
-                                  for (final cob in selectedCobs) {
-                                    if (cob.isChecked) {
-                                      combined.add(cob);
-                                    }
-                                  }
-
-                                  for (final old in _pendingCobList) {
-                                    if (!combined.any((c) => c.mcobId == old.mcobId)) {
-                                      combined.add(old);
-                                    }
-                                  }
-
-                                  _pendingCobList = combined;
-                                });
-                              }
-
-                            },
+                            onTap: _saving ? null : _openCobPicker,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -251,35 +398,45 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         height: 10,
                                       ),
                                     ),
-
                                     const SizedBox(width: 10),
-
                                     Expanded(
                                       child: _pendingCobList.isEmpty
                                           ? Text(
                                         'Pilih Daftar COB',
-                                        style: bodyTextStyle(context, fontSize: 16),
+                                        style: bodyTextStyle(
+                                          context,
+                                          fontSize: 16,
+                                        ),
                                       )
                                           : Wrap(
                                         spacing: 6,
                                         runSpacing: 6,
-                                        children: _pendingCobList.map((e) => Container(
-                                          height: 30,
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                          decoration: BoxDecoration(
-                                            color: primaryColor,
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            e.cobNama,
-                                            style: bodyTextStyle(context, fontSize: 16),
-                                          ),
-                                        )).toList(),
+                                        children: _pendingCobList.map((e) {
+                                          return Container(
+                                            height: 30,
+                                            padding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 5,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: primaryColor,
+                                              borderRadius:
+                                              BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              e.cobNama,
+                                              style: bodyTextStyle(
+                                                context,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
                                       ),
                                     ),
                                   ],
                                 ),
-
                               ],
                             ),
                           ),
@@ -290,16 +447,19 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                             children: [
                               Expanded(
                                 child: TextButton(
-                                  onPressed:
-                                  _saving ? null : () => Navigator.pop(context, false),
+                                  onPressed: _saving
+                                      ? null
+                                      : () => Navigator.pop(context, false),
                                   style: TextButton.styleFrom(
-                                    padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
                                     backgroundColor: sGrey.withOpacity(0.25),
                                     foregroundColor: primaryLightColor,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(cardBorderRadius),
+                                      borderRadius: BorderRadius.circular(
+                                        cardBorderRadius,
+                                      ),
                                     ),
                                   ),
                                   child: const Text('Batal'),
@@ -310,20 +470,25 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                 child: TextButton(
                                   onPressed: _saving ? null : _save,
                                   style: TextButton.styleFrom(
-                                    padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
                                     backgroundColor: primaryColor,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(cardBorderRadius),
+                                      borderRadius: BorderRadius.circular(
+                                        cardBorderRadius,
+                                      ),
                                     ),
                                   ),
                                   child: _saving
                                       ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
                                       : const Text('Simpan'),
                                 ),
@@ -341,141 +506,62 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         ),
       ),
     );
-
   }
 
-  void _injectPayload(MRekanPicCrudModel record) {
-    // ✅ isi controller text
-    _nama.text  = (record.picNama ?? '').trim();
-    _email.text = (record.picEmail ?? '').trim();
-    _hp.text    = (record.picHp ?? '').trim();
-
-    _isDefault = record.isDefault ?? false;
-
-
-    _jabatan = record.comboMJabatan ??
-        ((record.mjabatanId ?? '').trim().isNotEmpty
-            ? ComboMJabatanModel(
-          mjabatanId: (record.mjabatanId ?? '').trim(),
-          jabatanDesc: record.comboMJabatan?.jabatanDesc ?? '',
-        )
-            : null);
-
-    if (_jabatan != null) {
-      _comboKey.currentState?.changeSelectedItem(_jabatan);
-    }
-
-    setState(() {});
-  }
-
-
-  Future<void> _save() async {
-
-    if (_pendingCobList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'),
-      );
-      return;
-    }
-
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    ComboMJabatanModel? selected = _jabatan;
-    try {
-      final st = _comboKey.currentState;
-      selected ??= st?.getSelectedItem;
-    } catch (_) {}
-    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
-
-    final idJabatan = (mjnsclientId == '10') ? '' : (selected?.mjabatanId ?? '').trim();
-    if (idJabatan.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        infoSnackBar('Jabatan harus dipilih'),
-      );
-      return;
-    }
-
-    final record = MRekanPicCrudModel(
-      mrekanpicId: widget.mrekanpicId,
-      picNama: _nama.text.trim(),
-      picEmail: _email.text.trim().toLowerCase(),
-      picHp: _normalizeHp(_hp.text.trim()),
-      mjabatanId: idJabatan,
-      isDefault: _isDefault,
-    );
-
-    context.read<MRekanPicCrudBloc>().add(
-      MRekanPicCrudUbahEvent(record: record),
-    );
-
-    final cobRepo = RekanPicCobCariRepository();
-
-    final listCheckbox = _pendingCobList.map((e) =>
-        RekanPicCobCariCheckboxModel(
-          mcobId: e.mcobId,
-          isChecked: e.isChecked,
-        )).toList();
-
-    final cobResult = await cobRepo.rekanPicCobUpdateList(widget.mrekanpicId, listCheckbox);
-    if (cobResult.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        successSnackBar('PIC & ${listCheckbox.length} COB berhasil diperbarui!'),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar('PIC tersimpan, tapi gagal update COB.'),
-      );
-    }
-
-  }
-
-  Widget buildFieldRekanNama(){
+  Widget _buildFieldNama() {
     return appTextField(
       label: 'Nama PIC',
       controller: _nama,
       keyboardType: TextInputType.text,
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        if (value == null || value.trim().isEmpty) {
           return kNameNullError;
         }
         return null;
       },
-      // textInputAction: TextInputAction.next,
     );
   }
 
-  Widget buildFieldEmail(){
+  Widget _buildFieldEmail() {
     return appTextField(
       label: 'Email',
       controller: _email,
       keyboardType: TextInputType.emailAddress,
       validator: (v) {
-        if (v == null || v.isEmpty) return kEmailNullError;
+        if (v == null || v.trim().isEmpty) {
+          return kEmailNullError;
+        }
+
+        final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+        if (!emailRegex.hasMatch(v.trim())) {
+          return 'Format email tidak valid';
+        }
+
         return null;
       },
-      // textInputAction: TextInputAction.next,
     );
   }
 
-  Widget buildFiledTelp(){
+  Widget _buildFieldTelp() {
     return appTextField(
       label: 'No. Telp',
       controller: _hp,
       keyboardType: TextInputType.phone,
       inputFormatters: [
-        FilteringTextInputFormatter.allow(
-            RegExp(r'[0-9+ ]')),
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]')),
       ],
-      validator: (v) => (v == null ||
-          v.trim().isEmpty)
-          ? kPhoneNumberNullError
-          : null,
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) {
+          return kPhoneNumberNullError;
+        }
+        return null;
+      },
     );
   }
 
-  Widget buildFieldJabatan(){
+  Widget _buildFieldJabatan() {
     return ReusableComboBox<ComboMJabatanModel>(
-      hintText: "Jabatan",
+      hintText: 'Jabatan',
       comboKey: _comboKey,
       initItem: _jabatan,
       dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
@@ -483,7 +569,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(error: kStringNullError);
+          setState(() {
+            _jabatan = value;
+          });
           crudBloc.add(ComboMJabatanChangedEvent(comboMJabatan: value));
         }
       },
@@ -499,13 +587,5 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         return null;
       },
     );
-  }
-
-  void removeError({required String error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
   }
 }

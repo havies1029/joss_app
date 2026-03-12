@@ -8,6 +8,8 @@ import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../blocs/dashboard/sumdash_bloc.dart';
+import '../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
@@ -207,6 +209,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     final shouldLeave = await showExitConfirmDialog(context);
 
     if (shouldLeave == true) {
+      context.read<SumdashBloc>().add(SumdashLihatEvent());
+      context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
+
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => const TagihanPembayaranPage(initialTab: 2),

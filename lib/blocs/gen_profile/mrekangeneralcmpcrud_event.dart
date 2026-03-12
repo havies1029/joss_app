@@ -32,3 +32,5 @@ class ComboMBidangChangedEvent extends MRekanGeneralCmpCrudEvents {
   @override
   List<Object> get props => [comboMBidang];
 }
+
+class MRekanGeneralCmpCrudResetStatusEvent extends MRekanGeneralCmpCrudEvents {}

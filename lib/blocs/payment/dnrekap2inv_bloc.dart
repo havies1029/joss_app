@@ -34,9 +34,16 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       SetPaymentSummaryEvent event,
       Emitter<DnRekap2invState> emit,
       ) async {
+
+    final newCurr =
+    event.curr.isNotEmpty ? event.curr : state.curr;
+
+    final newTotalBayar =
+    event.totalBayar != 0 ? event.totalBayar : state.totalBayar;
+
     emit(state.copyWith(
-      curr: event.curr,
-      totalBayar: event.totalBayar,
+      curr: newCurr,
+      totalBayar: newTotalBayar,
     ));
   }
 
@@ -107,25 +114,36 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
   }
 
   Future<void> onCheckInvoiceStatus(
-      CheckInvoiceStatusEvent event, Emitter<DnRekap2invState> emit) async {
-    if (state.isProcessing) return;
-
-    emit(state.copyWith(isProcessing: true, isProcessed: false, hasFailure: false));
-
+      CheckInvoiceStatusEvent event,
+      Emitter<DnRekap2invState> emit,
+      ) async {
+    if (state.isProcessing) {
+      return;
+    }
+    emit(state.copyWith(
+      isProcessing: true,
+      isProcessed: false,
+      hasFailure: false,
+    ));
     try {
-
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
-      InvoiceStatusModel invoiceStatus = await repo.fetchInvoiceStatus(event.invoiceId);
+
+      InvoiceStatusModel invoiceStatus =
+      await repo.fetchInvoiceStatus(event.invoiceId);
+
+      final double finalTotalBayar =
+      (invoiceStatus.totalBayar > 0) ? invoiceStatus.totalBayar : state.totalBayar;
 
       emit(state.copyWith(
         invoiceId: event.invoiceId,
         isProcessing: false,
         isProcessed: true,
         paymentStatus: invoiceStatus.status,
-        totalBayar: invoiceStatus.totalBayar,
+        totalBayar: finalTotalBayar,
       ));
-    } catch (e) {
+
+    } catch (e, stack) {
       emit(state.copyWith(
         isProcessing: false,
         hasFailure: true,

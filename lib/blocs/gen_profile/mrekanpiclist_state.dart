@@ -1,42 +1,28 @@
 part of 'mrekanpiclist_bloc.dart';
 
 class MRekanPicListState extends Equatable {
-
 	final ListStatus status;
 	final List<MRekanPicListModel> items;
-	final bool hasReachedMax;
-	final int hal;
-	final String viewMode;
-	final String searchText;
-	final String recordId;
+	final String errorMessage;
 
-	const MRekanPicListState(
-		{this.status = ListStatus.initial,
+	const MRekanPicListState({
+		this.status = ListStatus.initial,
 		this.items = const <MRekanPicListModel>[],
-		this.hasReachedMax = false,
-		this.hal = 0,
-		this.viewMode = "",
-		this.searchText = "",
-		this.recordId = ""});
+		this.errorMessage = '',
+	});
 
-	MRekanPicListState copyWith(
-		{List<MRekanPicListModel>? items,
-		bool? hasReachedMax,
+	MRekanPicListState copyWith({
 		ListStatus? status,
-		int? hal,
-		String? viewMode,
-		String? searchText,
-		String? recordId}) {
+		List<MRekanPicListModel>? items,
+		String? errorMessage,
+	}) {
 		return MRekanPicListState(
-			items: items ?? this.items,
-			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
-			hal: hal ?? this.hal,
-			viewMode: viewMode ?? this.viewMode,
-			searchText: searchText ?? this.searchText,
-			recordId: recordId ?? this.recordId);
+			items: items ?? this.items,
+			errorMessage: errorMessage ?? this.errorMessage,
+		);
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, hal, viewMode, recordId, searchText];
+	List<Object> get props => [status, items, errorMessage];
 }

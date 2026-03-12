@@ -151,6 +151,13 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                               onPressed: () {
                                 if (selected.stsInvId == '10002') {
                                   context.read<DnRekap2invBloc>().add(
+                                    SetPaymentSummaryEvent(
+                                      curr: '', // isi kalau ada currency
+                                      totalBayar: selected.totalBayar,
+                                    ),
+                                  );
+
+                                  context.read<DnRekap2invBloc>().add(
                                     CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
                                       // SetPaymentSummaryEvent(curr: state.)
                                   );

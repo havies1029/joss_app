@@ -13,10 +13,15 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_cob_list_page.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_success.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
+import '../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
+import '../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
 import '../../../../models/user/user_model.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
+import '../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
+import '../../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 
 class Regother1CrudFormPage extends StatefulWidget {
@@ -44,10 +49,27 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
   var fieldRemarkController = TextEditingController();
   var fieldTsiController = TextEditingController();
+
+  late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+
+
   @override
   void initState() {
     super.initState();
     _loadDefaultCurrency();
+    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mjenisClient == "10") {
+        mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
+      }else if (mjenisClient == "20"){
+        mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+      }
+    });
     Future.delayed(const Duration(milliseconds: 500), () {
       loadData();
     });
@@ -279,8 +301,74 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 
   void _showPengajuanDialog() {
     if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
-      User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
-      if (user.userType == "C"){
+      final user =
+          (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated)
+              .user;
+
+      if (user.userType == "C") {
+        final mjenisClient =
+            context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+
+        if (mjenisClient == "10") {
+          final mRekanNama =
+              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ??
+                  "";
+
+          if (mRekanNama.trim().isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Pribadi Anda',
+                description:
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Pribadi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const MRekanGeneralIdvPopUpPage(
+                        popTwice: false,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        } else if (mjenisClient == "20") {
+          final mRekanNama =
+              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ??
+                  "";
+
+          if (mRekanNama.trim().isEmpty) {
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
+              builder: (context) => RegisterClientPopUp(
+                header: 'Isi Data Perusahaan Anda',
+                description:
+                'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',
+                buttonText: 'Lengkapi Data Perusahaan',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const MRekanGeneralCmpPopUpPage(
+                        popTwice: false,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+            return;
+          }
+        }
+
         showDialog(
           context: context,
           barrierDismissible: true,
@@ -291,7 +379,8 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                padding:
+                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -307,12 +396,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                       style: headingStyle(context, fontSize: 17.49),
                     ),
                     const SizedBox(height: 12),
-
                     AppButton.primary(
                       text: 'Ajukan Sekarang',
                       backgroundColor: const Color(0xFF0ED7FF),
                       onPressed: () {
-                        Navigator.pop(context); // tutup dialog
+                        Navigator.pop(context);
                         _executeSave();
                       },
                     ),
@@ -322,12 +410,11 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
             );
           },
         );
-      }
-      else {
+      } else {
         showDialog(
           context: context,
-          barrierDismissible: true, // klik luar = close
-          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+          barrierDismissible: true,
+          barrierColor: Colors.black.withOpacity(0.6),
           builder: (context) => RegisterClientPopUp(
             header: 'Data Klien Belum Terdaftar!',
             description:
@@ -337,7 +424,9 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => RegisterClient(requestFrom: 'calmv_page')
+                  builder: (context) => RegisterClient(
+                    requestFrom: 'regother_page',
+                  ),
                 ),
               );
             },
