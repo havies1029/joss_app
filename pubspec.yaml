@@ -24,7 +24,7 @@ dependencies:
   docx_template: ^0.4.0
   dropdown_search: ^6.0.1  
   equatable: ^2.0.3
-  flex_color_scheme: 8.0.2
+  flex_color_scheme: 8.4.0
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4  
   file_picker: ^8.0.0+1
@@ -43,8 +43,8 @@ dependencies:
   open_filex: ^4.6.0
   google_fonts: ^6.1.0   
   grouped_list: ^6.0.0
-  google_sign_in: ^6.2.2
-#  google_sign_in: ^6.3.0
+# google_sign_in: ^6.2.2
+  google_sign_in: ^6.3.0
   http: ^1.2.1
   image: any
   image_picker: ^1.0.7

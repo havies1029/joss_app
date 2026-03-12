@@ -17,7 +17,6 @@ import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
-import '../../../../models/user/user_model.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';

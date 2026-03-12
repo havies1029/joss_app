@@ -5,7 +5,6 @@ import 'package:joss_app/pages/literasi/mobile/testimoni_page.dart';
 import '../widgets/company_profile_widget.dart';
 import '../../../widgets/klien_jps_widget.dart';
 import '../widgets/tentang_jps_widget.dart';
-import '../widgets/testimoni_widget2.dart';
 
 class TentangJPSPage extends StatefulWidget {
   const TentangJPSPage({super.key});

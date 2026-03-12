@@ -763,7 +763,6 @@ class _AppState extends State<_App> {
                   "calpar_page",
                   "regother_page",
                 ];
-                if (nav == null) return;
                 if (singlePopPages.contains(state.authenticatedFrom)) {
                   if (mjenisClient == '10') {
                     WidgetsBinding.instance.addPostFrameCallback((_) {

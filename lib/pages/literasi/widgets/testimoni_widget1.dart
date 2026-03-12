@@ -359,22 +359,22 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
     if (totalPages <= 1) return const SizedBox.shrink();
 
     ButtonStyle buttonStyle = ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.disabled)) {
+      backgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
           return pGrey;
         }
         return primaryColor;
       }),
-      shape: MaterialStateProperty.all(
+      shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
       ),
-      elevation: MaterialStateProperty.all(0),
-      minimumSize: MaterialStateProperty.all(
+      elevation: WidgetStateProperty.all(0),
+      minimumSize: WidgetStateProperty.all(
         Size(mobile ? 36 : 40, mobile ? 36 : 40),
       ),
-      padding: MaterialStateProperty.all(EdgeInsets.zero),
+      padding: WidgetStateProperty.all(EdgeInsets.zero),
     );
 
     return Row(

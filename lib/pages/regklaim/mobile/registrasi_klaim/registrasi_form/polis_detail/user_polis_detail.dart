@@ -183,7 +183,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                             if (mjenisClient == "10") {
                               final mRekanNama1 =
                                   context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
-                              debugPrint("MREKANNAMA! = ${mRekanNama1}");
+                              debugPrint("MREKANNAMA! = $mRekanNama1");
                               if (mRekanNama1.isEmpty) {
                                 showDialog(
                                   context: context,

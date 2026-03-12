@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
-import '../../../../blocs/authentication/authentication_bloc.dart';
+import 'package:joss_app/models/user/user_model.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
@@ -424,27 +424,29 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     final ok = validateForm1();
     if (!ok) return;
 
-    final evState = context.read<EmailVerificationBloc>().state;
-
+    User user = AppData.user;
+  
     final bool fromEmail = lastLoginBy == 'email';
 
     final String email = fromEmail
-        ? evState.email
+        ? user.email??''
         : fieldEmailController.text.trim();
 
-    final String teleponRaw = fromEmail
+    String telepon = fromEmail
         ? fieldTeleponController.text.trim()
-        : evState.telepon;
+        : user.email??'';
 
-    final phoneRes = IndoPhoneHelper.normalize(teleponRaw);
-    final String teleponNormalized = phoneRes.phone62 ?? '';
+    if (lastLoginBy == 'email') {      
+      var phoneRes = IndoPhoneHelper.normalize(telepon);
+      telepon = phoneRes.phone62 ?? '';
+    }
 
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
-      telepon: teleponNormalized,
+      telepon: telepon,
       password: fieldPasswordController.text,
       jnsClientId: fieldComboJnsClient!.mjnsclientId,
-      email: email,
+      email: email,      
       userNama: fieldNameController.text.trim(),
     );
 
@@ -452,7 +454,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       RegUserTambahEvent(
         record: record,
         requestFrom: widget.requestFrom,
-        pinSentTo: fromEmail ? teleponNormalized : email,
+        pinSentTo: fromEmail ? telepon : email,
         pinSentVia: fromEmail ? "hp" : "email",
       ),
     );

@@ -143,7 +143,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         totalBayar: finalTotalBayar,
       ));
 
-    } catch (e, stack) {
+    } catch (e) {
       emit(state.copyWith(
         isProcessing: false,
         hasFailure: true,

@@ -10,7 +10,6 @@ import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
-import '../../../tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 

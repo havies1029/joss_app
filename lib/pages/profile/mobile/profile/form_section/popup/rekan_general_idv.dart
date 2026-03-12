@@ -159,13 +159,9 @@ class MRekanGeneralIdvPopUpPageFormState
                             }
                           }
 
-                          if (fieldComboMPekerjaan == null) {
-                            fieldComboMPekerjaan = rec.comboMPekerjaan;
-                          }
+                          fieldComboMPekerjaan ??= rec.comboMPekerjaan;
 
-                          if (fieldComboMJnskel == null) {
-                            fieldComboMJnskel = rec.comboMJnskel;
-                          }
+                          fieldComboMJnskel ??= rec.comboMJnskel;
 
                           setState(() {});
                           _isFirstLoad = false;
