@@ -12,7 +12,6 @@ import 'package:joss_app/models/combobox/combombidang_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
-import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combombentukcst_repository.dart';

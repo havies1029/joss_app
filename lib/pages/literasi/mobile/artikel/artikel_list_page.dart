@@ -73,7 +73,7 @@ class ArtikelListPage extends StatelessWidget {
                       (artikel.lamaBaca != null)
                           ? "${artikel.lamaBaca} min"
                           : null,
-                          tglTerbit: formatTanggalCard(artikel.tglTerbit!),
+                          tglTerbit: formatTanggalCard(artikel.tglTerbit),
                     ),
                   ),
                 ],
@@ -99,7 +99,7 @@ class ArtikelListPage extends StatelessWidget {
                       (artikel.lamaBaca != null)
                           ? "${artikel.lamaBaca} min"
                           : null,
-                          tglTerbit: formatTanggalCard(artikel.tglTerbit!),
+                          tglTerbit: formatTanggalCard(artikel.tglTerbit),
                     ),
                   ),
                 ],
@@ -125,7 +125,7 @@ class ArtikelListPage extends StatelessWidget {
                       (artikel.lamaBaca != null)
                           ? "${artikel.lamaBaca} min"
                           : null,
-                          tglTerbit: formatTanggalCard(artikel.tglTerbit!),
+                          tglTerbit: formatTanggalCard(artikel.tglTerbit),
                     ),
                   ),
                 ],

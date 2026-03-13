@@ -634,12 +634,6 @@ Future<void> main() async {
         BlocProvider(create: (context) => MstatusringkasCariBloc()),
         BlocProvider(create: (context) => MstatusrinciCariBloc()),
         BlocProvider(create: (context) => GroupcobCariBloc()),
-        // BlocProvider(
-        //   create: (_) => AttachBloc(
-        //     pickerRepo: PickerRepositoryImpl(),
-        //     uploadRepo: UploadRepositoryImpl(Dio()),
-        //   ),
-        // ),
 
         // Log Notification
         BlocProvider(create: (context) => NotifeventcariBloc()),

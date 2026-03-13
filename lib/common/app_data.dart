@@ -7,7 +7,7 @@ class AppData {
   static bool kIsWeb = false;
   static User user = User();
   static var uriHtpp = useSSL ? Uri.https : Uri.http;
-  static String version = "1.   0.2";
+  static String version = "1.0.2";
   static bool isInOtpProcess = false;
 
 

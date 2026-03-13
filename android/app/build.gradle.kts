@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
   // Import the Firebase BoM
-  implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+  implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
 
 
   // TODO: Add the dependencies for Firebase products you want to use
@@ -23,12 +23,12 @@ dependencies {
 }
 
 android {
-    namespace = "id.co.jayaproteksindo.joss_app"
+    namespace = "id.co.jayaproteksindo.jossapp"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "id.co.jayaproteksindo.joss_app"
+        applicationId = "id.co.jayaproteksindo.jossapp"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = 1
