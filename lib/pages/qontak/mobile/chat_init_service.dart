@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart';
 
 class ChatInitResult {

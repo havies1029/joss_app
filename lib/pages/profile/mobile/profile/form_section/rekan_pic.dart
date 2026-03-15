@@ -6,7 +6,6 @@ import 'package:joss_app/blocs/gen_profile/mrekanpiclist_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 
 import '../../../../../blocs/gen_invite/invite_bloc.dart';
-import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/gen_profile/mrekanpiclist_model.dart';
@@ -27,7 +26,6 @@ class MrekanPicMainPage extends StatefulWidget {
 class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
   late MRekanPicListBloc listBloc;
   late MRekanPicCrudBloc crudBloc;
-  List<String> _mrekanPicIds = [];
 
   @override
   void initState() {
@@ -65,17 +63,6 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
 
                 child: MultiBlocListener(
                   listeners: [
-                    BlocListener<MRekanPicListBloc, MRekanPicListState>(
-                      listenWhen: (prev, curr) =>
-                      prev.items.length != curr.items.length ||
-                          prev.status != curr.status,
-                      listener: (context, state) {
-                        _mrekanPicIds = state.items
-                            .map((e) => (e.mrekanpicId ?? '').trim())
-                            .where((id) => id.isNotEmpty)
-                            .toList();
-                      },
-                    ),
 
                     BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
                       listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
@@ -252,7 +239,11 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
                 const Spacer(),
 
                 if ((it.statusPic ?? '').toLowerCase() != 'sudah aksep')
-                  _inviteButton(email: (it.picEmail ?? '').trim()),
+                  _inviteButton(
+                    mrekanpicId: it.mrekanpicId,
+                    nama: it.picNama,
+                    email: it.picEmail,
+                  ),
               ],
             ),
 
@@ -260,12 +251,12 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
             Divider(color: sGrey),
             const SizedBox(height: 8),
 
-            _cardRow('Email:', it.picEmail ?? '-', labelStyle, valueStyle),
-            _cardRow('Nama:', it.picNama ?? '-', labelStyle, valueStyle),
-            _cardRow('No Telp:', it.picHp ?? '-', labelStyle, valueStyle),
-            // _cardRow('Jabatan:', it.jabatanDesc ?? '-', labelStyle, valueStyle),
-            // _cardRow('Peran:', it.peranan ?? '-', labelStyle, valueStyle),
-            // _cardRow('Status:', it.statusPic ?? '-', labelStyle, valueStyle),
+            _cardRow('Email:', it.picEmail, labelStyle, valueStyle),
+            _cardRow('Nama:', it.picNama, labelStyle, valueStyle),
+            _cardRow('No Telp:', it.picHp, labelStyle, valueStyle),
+            // _cardRow('Jabatan:', it.jabatanDesc, labelStyle, valueStyle),
+            // _cardRow('Peran:', it.peranan, labelStyle, valueStyle),
+            // _cardRow('Status:', it.statusPic, labelStyle, valueStyle),
 
             const SizedBox(height: 8),
             Divider(color: sGrey),
@@ -356,6 +347,8 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
   }
 
   Widget _inviteButton({
+    required String mrekanpicId,
+    required String nama,
     required String email,
   }) {
     return BlocProvider(
@@ -392,25 +385,12 @@ class _MrekanPicMainPageState extends State<MrekanPicMainPage> {
             onPressed: isLoading
                 ? null
                 : () {
-              final mrekan1Id =
-                  context.read<MRekan1CrudBloc>().state.record?.mrekan1Id;
-
-              final userId = mrekan1Id ?? '0';
-              final emailClean = email.trim().toLowerCase();
-
-              if (emailClean.isEmpty || !emailClean.contains('@')) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Email PIC tidak valid.'),
-                  ),
-                );
-                return;
-              }
-
+              
               context.read<InviteBloc>().add(
                 SendInviteEvent(
-                  userId: userId,
-                  email: emailClean,
+                  mrekanpicId: mrekanpicId,
+                  nama: nama,
+                  email: email,
                 ),
               );
             },

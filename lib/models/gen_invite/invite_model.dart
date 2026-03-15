@@ -1,28 +1,26 @@
 // lib/models/gen_invite/invite_model.dart
 class InviteModel {
-  final String userId;
+  final String mrekanpicId;
+  final String nama;
   final String email;
-  final bool success;
-  final String message;
 
   InviteModel({
-    required this.userId,
-    required this.email,
-    this.success = false,
-    this.message = '',
+    required this.mrekanpicId,
+    required this.nama,
+    required this.email,  
   });
 
   factory InviteModel.fromJson(Map<String, dynamic> json) {
     return InviteModel(
-      userId: json['userId'] ?? '',
+      mrekanpicId: json['mrekanpicId'] ?? '',
+      nama: json['nama'] ?? '',
       email: json['email'] ?? '',
-      success: json['success'] ?? false,
-      message: json['message'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'userId': userId,
+    'mrekanpicId': mrekanpicId,
+    'nama': nama,
     'email': email,
   };
 }

@@ -646,14 +646,15 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                         .trim()
                                                         .toLowerCase();
 
-                                                    context
-                                                        .read<
-                                                        InviteBloc>()
-                                                        .add(SendInviteEvent(
-                                                        userId:
-                                                        mrekan1Id,
-                                                        email:
-                                                        email));
+                                                    // context
+                                                    //     .read<
+                                                    //     InviteBloc>()
+                                                    //     .add(SendInviteEvent(
+                                                    //     mrekanpicId:
+                                                    //     widget.mrekanpicId,
+                                                    //     nama: widget.nama,
+                                                    //     email:
+                                                    //     email));
                                                   },
                                                   style: TextButton.styleFrom(
                                                     padding: const EdgeInsets

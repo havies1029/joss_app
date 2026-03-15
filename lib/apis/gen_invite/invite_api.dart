@@ -1,43 +1,46 @@
-// lib/apis/gen_invite/invite_api.dart
 import 'dart:convert';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/common/app_data.dart';
-import 'package:joss_app/models/gen_invite/invite_model.dart';
+import 'package:joss_app/models/gen_invite/invite_result_model.dart';
 
 class InviteAPI {
-  Future<InviteModel> sendInvite(String userId, String email) async {
-    final uri = Uri.parse(
-      'https://eassisttoolsapi.smartsoft-id.com/api/undangan/menjadiuser/kirim'
-          '?userId=$userId&email=${Uri.encodeComponent(email)}',
-    );
+  Future<InviteResultModel> sendInvite(
+    String mrekanpicId,
+    String nama,
+    String email,
+  ) async {
+    try {
 
-    print('🌐 [InviteAPI] Request: $uri');
+      String urlEndpoint =
+			  "${AppData.prefixEndPoint}/api/undangan/menjadiuser/kirim";
 
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${AppData.userToken}',
-      },
-    );
+		  Map<String, String> queryParams = {"mrekanpicId": mrekanpicId, "nama": nama, "email": email};
+		  var uri = AppData.uriHtpp(AppData.httpAuthority, urlEndpoint, queryParams);
 
-    print('📡 [InviteAPI] Status: ${response.statusCode}');
-    print('📦 [InviteAPI] Body: ${response.body}');
+      final response = await http.post(
+        uri,
+        headers: {
+				'Content-Type': 'application/json; odata=verbose',
+				'Accept': 'application/json; odata=verbose',
+          'Authorization': 'Bearer ${AppData.userToken}',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      return InviteModel.fromJson({
-        'userId': userId,
-        'email': email,
-        'success': decoded['success'] ?? true,
-        'message': decoded['message'] ?? 'Undangan berhasil dikirim',
-      });
-    } else {
-      return InviteModel(
-        userId: userId,
-        email: email,
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        return InviteResultModel.fromJson(decoded);
+      }
+
+      return InviteResultModel(
         success: false,
         message: 'Gagal mengirim undangan (${response.statusCode})',
+      );
+    } catch (e) {
+      debugPrint('Error in sendInvite: $e');
+      return InviteResultModel(
+        success: false,
+        message: 'Terjadi kesalahan koneksi.',
       );
     }
   }

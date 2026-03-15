@@ -10,7 +10,6 @@ import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
 import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 
 import '../../../../../../blocs/gen_invite/invite_bloc.dart';
-import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
@@ -71,7 +70,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
       return;
     }
 
-    final mjnsclientId = context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+    final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
     final idJabatan = (mjnsclientId == '10')
         ? ''
@@ -491,22 +490,15 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                       : inviteState.isLoading
                                                       ? null
                                                       : () {
-                                                    final mrekan1Id =
-                                                        context.read<MRekan1CrudBloc>().state.record?.mrekan1Id ?? "";
-
-                                                    final email = _email
-                                                        .text
-                                                        .trim()
-                                                        .toLowerCase();
 
                                                     context
                                                         .read<
                                                         InviteBloc>()
                                                         .add(SendInviteEvent(
-                                                        userId:
-                                                        mrekan1Id,
-                                                        email:
-                                                        email));
+                                                          email: _email.text.trim(),
+                                                          nama: _nama.text.trim(),
+                                                          mrekanpicId: crudBloc.state.savedId ?? '',
+                                                        ));
                                                   },
                                                   style: TextButton.styleFrom(
                                                     padding: const EdgeInsets

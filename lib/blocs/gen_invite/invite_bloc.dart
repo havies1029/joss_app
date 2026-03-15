@@ -16,7 +16,7 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
     emit(state.copyWith(isLoading: true, isSuccess: false, message: ''));
 
     try {
-      final result = await repo.sendInvite(event.userId, event.email);
+      final result = await repo.sendInvite(event.mrekanpicId, event.nama, event.email);
       emit(state.copyWith(
         isLoading: false,
         isSuccess: result.success,
