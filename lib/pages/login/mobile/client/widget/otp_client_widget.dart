@@ -41,22 +41,17 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  // 📌 OTP (Pinput)
   final TextEditingController _pinController = TextEditingController();
   final FocusNode _pinFocusNode = FocusNode();
   bool _otpError = false;
 
-  // ⏱ Timer
   Timer? _timer;
   int _remainingTime = 59;
   bool _isResendAvailable = false;
 
-  late AuthenticationBloc authenticationBloc;
-
   @override
   void initState() {
     super.initState();
-    authenticationBloc = context.read<AuthenticationBloc>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -327,9 +322,6 @@ class PopupClientWidgetState extends State<PopupClientWidget>
                                       Navigator.of(context,
                                           rootNavigator: false)
                                           .pop();
-                                      context
-                                          .read<AuthenticationBloc>()
-                                          .add(LoggedOut());
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,

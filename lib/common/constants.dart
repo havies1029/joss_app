@@ -110,6 +110,7 @@ const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
 const Color successGreen = Color(0xFF4BB34B);
 const Color greenforPayment = Color(0xFF12C127);
+const Color sGreen = Color(0xFF27C840);
 const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);

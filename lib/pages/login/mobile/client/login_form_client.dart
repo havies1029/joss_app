@@ -93,9 +93,13 @@ class _LoginFormClientState extends State<LoginFormClient>
 
         if (!isEmail) {
           final phoneRes = IndoPhoneHelper.normalize(input);
+
           if (!phoneRes.isValid) {
             return phoneRes.error ?? "Masukkan format nomor HP yang valid";
           }
+
+          // ubah ke format 62
+          _usernameController.text = phoneRes.phone62!;
         }
 
         return null;
@@ -399,6 +403,9 @@ class _LoginFormClientState extends State<LoginFormClient>
                                         GestureDetector(
                                           onTap: () {
                                             _clearEmailStateAndController(); // ✅ kosongin dulu
+                                            context.read<EmailVerificationBloc>().add(
+                                              ClearEmailVerificationEvent(),
+                                            );
                                             context.read<AuthenticationBloc>().add(RequireLoginUser());
                                           },
                                           child: Text(

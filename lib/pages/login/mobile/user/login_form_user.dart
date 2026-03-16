@@ -114,10 +114,11 @@ class _LoginFormUserState extends State<LoginFormUser>
     if (!_formKey.currentState!.validate()) return;
 
     final input = _emailOrPhoneController.text.trim();
+    final isEmail = EmailValidator.validate(input);
 
     context.read<EmailVerificationBloc>().add(
       FieldEmailVerificationChangedEvent(email: input),
-    );    
+    );
 
     AuthInputRouter.handleInput(context, input);
   }

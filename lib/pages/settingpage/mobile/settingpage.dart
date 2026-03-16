@@ -15,7 +15,7 @@ import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_idv.dart';
-import '../../profile/mobile/profile/form_section/rekan_pic.dart';
+import '../../profile/mobile/profile/form_section/rekan_pic_widget.dart';
 import '../widgets/kebijakan_privasi_page.dart';
 import '../widgets/syarat_ketentuan_page.dart';
 import '../widgets/ubah_password_popup.dart';
@@ -651,7 +651,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) =>
-                                            const MrekanPicMainPage(),
+                                            const RekanPicWidgetPage(),
                                           ),
                                         );
                                       },
@@ -861,7 +861,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeThumbColor: primaryLightColor,
+              activeColor: primaryLightColor,
               activeTrackColor: pBlue,
               inactiveThumbColor: primaryLightColor,
               inactiveTrackColor: pGrey,

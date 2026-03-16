@@ -370,10 +370,11 @@ Future<void> main() async {
         BlocProvider(create: (_) => MRekanBankListBloc()),
         BlocProvider(create: (_) => MRekanGeneralIdvCrudBloc(repository: MRekanGeneralIdvCrudRepository())),
         BlocProvider(create: (_) => MRekanGeneralCmpCrudBloc(repository: MRekanGeneralCmpCrudRepository())),
-        BlocProvider<MRekanPicListBloc>(
-          create: (context) => MRekanPicListBloc(repository: MRekanPicListRepository())
-            ..add(FetchMRekanPicListEvent()),
-        ),
+        // BlocProvider<MRekanPicListBloc>(
+        //   create: (context) => MRekanPicListBloc(repository: MRekanPicListRepository())
+        //     ..add(FetchMRekanPicListEvent()),
+        // ),
+        BlocProvider(create: (_) => MRekanPicListBloc()),
         BlocProvider<MRekanPicCrudBloc>(
           create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),

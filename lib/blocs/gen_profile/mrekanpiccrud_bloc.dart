@@ -67,23 +67,32 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
       MRekanPicCrudUbahEvent event,
       Emitter<MRekanPicCrudState> emit,
       ) async {
-
-    emit(state.copyWith(isSaving: true, isSaved: false));
-
-    bool result = await repository.mRekanPicCrudUbah(event.record);
-
-    bool hasFailure = !result;
-
     emit(state.copyWith(
-      isSaving: false,
-      isSaved: true,
-      hasFailure: hasFailure,
+      isSaving: true,
+      isSaved: false,
+      hasFailure: false,
     ));
 
-    if (!hasFailure) {
-      debugPrint('[✅ Bloc] Data berhasil diubah dan disimpan');
-    } else {
-      debugPrint('[❌ Bloc] Gagal menyimpan perubahan');
+    try {
+      final result = await repository.mRekanPicCrudUbah(event.record);
+
+      emit(state.copyWith(
+        isSaving: false,
+        isSaved: result,
+        hasFailure: !result,
+      ));
+
+      if (result) {
+        debugPrint('[✅ Bloc] Data berhasil diubah dan disimpan');
+      } else {
+        debugPrint('[❌ Bloc] Gagal menyimpan perubahan');
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isSaving: false,
+        isSaved: false,
+        hasFailure: true,
+      ));
     }
   }
 
@@ -96,12 +105,26 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
   }
 
   Future<void> onLihatMRekanPicCrud(
-      MRekanPicCrudLihatEvent event, Emitter<MRekanPicCrudState> emit) async {
-    emit(state.copyWith(isLoading: true, isLoaded: false));
-    MRekanPicCrudModel record =
-    await repository.mRekanPicCrudLihat(event.recordId);
+      MRekanPicCrudLihatEvent event,
+      Emitter<MRekanPicCrudState> emit,
+      ) async {
+    emit(state.copyWith(
+      isLoading: true,
+      isLoaded: false,
+      isSaved: false,
+      hasFailure: false,
+    ));
 
-    emit(state.copyWith(isLoading: false, isLoaded: true, record: record, comboMJabatan: record.comboMJabatan));
+    final record = await repository.mRekanPicCrudLihat(event.recordId);
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      isSaved: false,
+      hasFailure: false,
+      record: record,
+      comboMJabatan: record.comboMJabatan,
+    ));
   }
 
   Future<void> onComboMJabatanChanged(

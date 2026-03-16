@@ -5,19 +5,16 @@ import 'package:joss_app/blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import 'package:joss_app/pages/gen_profile/common/rekanpiccobcari_list_widget.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import '../../../common/constants.dart';
-import '../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../base/base_background_sidepage.dart';
 
 class RekanPicCobCariPage extends StatefulWidget {
   final String rekanPicId;
   final String viewMode; // 'tambah' | 'ubah' | 'display'
-  final List<RekanPicCobCariModel> initialSelectedItems;
 
   const RekanPicCobCariPage({
     super.key,
     required this.rekanPicId,
     required this.viewMode,
-    this.initialSelectedItems = const [],
   });
 
   @override
@@ -28,67 +25,28 @@ class _RekanPicCobCariPageState extends State<RekanPicCobCariPage> {
   late RekanPicCobCariBloc rekanPicCobCariBloc;
   final TextEditingController _searchController = TextEditingController();
 
-  String get _effectivePicId =>
-      widget.viewMode == 'tambah' ? '0' : widget.rekanPicId;
-
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      rekanPicCobCariBloc = BlocProvider.of<RekanPicCobCariBloc>(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      rekanPicCobCariBloc = context.read<RekanPicCobCariBloc>();
+      final picId = widget.viewMode == 'tambah' ? '0' : widget.rekanPicId;
 
+      // 🔹 Bedakan: ubah juga refresh paksa biar sinkron
       rekanPicCobCariBloc.add(
         RefreshRekanPicCobCariEvent(
-          rekanPicId: _effectivePicId,
+          rekanPicId: picId,
           searchText: '',
         ),
       );
-
-      if (widget.initialSelectedItems.isNotEmpty) {
-        rekanPicCobCariBloc.add(
-          InitialSelectedCOBRekanPicCobEvent(
-            selectedCOB: List<RekanPicCobCariModel>.from(
-              widget.initialSelectedItems.map(
-                    (e) => e.copyWith(isChecked: true),
-              ),
-            ),
-          ),
-        );
-      }
     });
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _refreshList() {
-    rekanPicCobCariBloc.add(
-      RefreshRekanPicCobCariEvent(
-        rekanPicId: _effectivePicId,
-        searchText: _searchController.text.trim(),
-      ),
-    );
-
-    if (widget.initialSelectedItems.isNotEmpty) {
-      rekanPicCobCariBloc.add(
-        InitialSelectedCOBRekanPicCobEvent(
-          selectedCOB: List<RekanPicCobCariModel>.from(
-            widget.initialSelectedItems.map(
-                  (e) => e.copyWith(isChecked: true),
-            ),
-          ),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    rekanPicCobCariBloc = context.read<RekanPicCobCariBloc>();
+    rekanPicCobCariBloc = BlocProvider.of<RekanPicCobCariBloc>(context);
 
     return Scaffold(
       body: SafeArea(
@@ -102,26 +60,45 @@ class _RekanPicCobCariPageState extends State<RekanPicCobCariPage> {
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: Column(
                 children: [
-                  SizedBox(height: vPadding),
+                  SizedBox(height: vPadding,),
+                  // 🔍 Search bar + refresh button
                   Row(
                     children: [
+                      // 🔍 Search field
                       Expanded(
                         child: ListPageFilterBarUIWidget(
                           searchController: _searchController,
                           searchButton: IconButton(
                             icon: const Icon(Icons.search, color: Colors.white70),
-                            onPressed: _refreshList,
+                            onPressed: () {
+                              rekanPicCobCariBloc.add(
+                                RefreshRekanPicCobCariEvent(
+                                  rekanPicId: '0',
+                                  searchText: _searchController.text,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
+
                       const SizedBox(width: 8),
+
+                      // 🔄 Refresh button (tinggi sama persis dengan filter bar)
                       GestureDetector(
-                        onTap: _refreshList,
+                        onTap: () {
+                          rekanPicCobCariBloc.add(
+                            RefreshRekanPicCobCariEvent(
+                              rekanPicId: '0',
+                              searchText: _searchController.text,
+                            ),
+                          );
+                        },
                         child: Container(
-                          height: 44,
+                          height: 44, // ✅ sama seperti filter bar
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00C8FF),
+                            color: const Color(0xFF00C8FF), // 💠 Biru refresh
                             borderRadius: BorderRadius.circular(cardBorderRadius),
                           ),
                           child: Row(
@@ -151,14 +128,21 @@ class _RekanPicCobCariPageState extends State<RekanPicCobCariPage> {
                       ),
                     ],
                   ),
+
+
                   const SizedBox(height: 10),
+
+                  // 📋 List COB
                   Expanded(
                     child: RekanPicCobCariListWidget(
-                      rekanPicId: _effectivePicId,
+                      rekanPicId: widget.rekanPicId,
                       viewMode: widget.viewMode,
                       searchText: _searchController.text,
                     ),
                   ),
+
+                  // 💾 Button Simpan Pilihan
+                  // 💾 Button Simpan Pilihan
                   if (widget.viewMode != 'display')
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
@@ -166,24 +150,50 @@ class _RekanPicCobCariPageState extends State<RekanPicCobCariPage> {
                         alignment: Alignment.centerRight,
                         child: BlocBuilder<RekanPicCobCariBloc, RekanPicCobCariState>(
                           builder: (context, state) {
-                            final selectedItems =
-                            state.items.where((e) => e.isChecked).toList();
-
-                            final hasSelected = selectedItems.isNotEmpty;
+                            final hasSelected = state.items.any((e) => e.isChecked);
 
                             return GestureDetector(
                               onTap: hasSelected
-                                  ? () {
-                                Navigator.pop(context, selectedItems);
+                                  ? () async {
+                                if (widget.viewMode == 'ubah') {
+                                  // ✅ mode edit → langsung update ke API
+                                  // final items = rekanPicCobCariBloc.state.items;
+                                  // final listCheckbox = List<RekanPicCobCariCheckboxModel>.generate(
+                                  //   items.length,
+                                  //       (index) => RekanPicCobCariCheckboxModel(
+                                  //     mcobId: items[index].mcobId,
+                                  //     isChecked: items[index].isChecked,
+                                  //   ),
+                                  // );
+                                  // listCheckbox.removeWhere((e) => !e.isChecked);
+                                  //
+                                  // final repo = RekanPicCobCariRepository();
+                                  // final result = await repo.rekanPicCobUpdateList(
+                                  //   widget.rekanPicId,
+                                  //   listCheckbox,
+                                  // );
+                                  //
+                                  // if (result.success) {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //     const SnackBar(content: Text("✅ Data COB berhasil disimpan")),
+                                  //   );
+                                  //   Navigator.pop(context, items);
+                                  // } else {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //     const SnackBar(content: Text("⚠️ Gagal menyimpan data COB")),
+                                  //   );
+                                  // }
+                                  Navigator.pop(context, state.selectedItems);
+                                } else if (widget.viewMode == 'tambah') {
+                                  // ✅ mode tambah → pending simpan, belum ke API
+                                  Navigator.pop(context, state.selectedItems);
+                                }
                               }
-                                  : null,
+                                  : null, // disable kalau gak ada centang
                               child: Opacity(
                                 opacity: hasSelected ? 1.0 : 0.5,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 10,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF4ACF1E),
                                     borderRadius: BorderRadius.circular(10),
@@ -218,7 +228,9 @@ class _RekanPicCobCariPageState extends State<RekanPicCobCariPage> {
                         ),
                       ),
                     ),
-                  SizedBox(height: vPadding),
+
+
+                  SizedBox(height: vPadding,),
                 ],
               ),
             ),

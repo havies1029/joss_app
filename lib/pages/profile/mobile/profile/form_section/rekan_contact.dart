@@ -121,11 +121,11 @@ class MRekanContactCrudFormPageFormState
                           final userTelp = (AppData.user.hp ?? '').trim();
 
                           if (contactTelp.isNotEmpty) {
-                            fieldTelpController.text = contactTelp;
+                            fieldTelpController.text = IndoPhoneHelper.toDisplay(contactTelp);
                           } else if (rekanTelp.isNotEmpty) {
-                            fieldTelpController.text = rekanTelp;
+                            fieldTelpController.text = IndoPhoneHelper.toDisplay(rekanTelp);
                           } else if (userTelp.isNotEmpty) {
-                            fieldTelpController.text = userTelp;
+                            fieldTelpController.text = IndoPhoneHelper.toDisplay(userTelp);
                           }
                         }
 
@@ -242,7 +242,6 @@ class MRekanContactCrudFormPageFormState
       return null;
     },
   );
-
   Widget buildFieldTelp() => appTextField(
     label: "No. Telp Perusahaan",
     controller: fieldTelpController,

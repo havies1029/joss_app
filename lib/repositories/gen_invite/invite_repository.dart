@@ -9,7 +9,7 @@ class InviteRepository {
     try {
       final result = await _api.sendInvite(mrekanpicId, nama, email);
       return result;
-    } catch (e) {      
+    } catch (e) {
       return InviteResultModel(
         success: false,
         message: e.toString(),

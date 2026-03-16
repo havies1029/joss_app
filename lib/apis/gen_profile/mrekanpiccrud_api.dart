@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -8,47 +9,117 @@ class MRekanPicCrudAPI {
 
 	Future<ReturnDataAPI> mRekanPicCrudTambahAPI(MRekanPicCrudModel record) async {
 		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/create";
-		Map<String, String> queryParams = {"modul_id": "mRekanPicCrudTambahAPI"};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
+				"${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/create";
+
+		Map<String, String> queryParams = {
+			"modul_id": "mRekanPicCrudTambahAPI"
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			tambahEndpoint,
+			queryParams,
+		);
 
 		ReturnDataAPI returnData;
-		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
 
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		try {
+			final bodyJson = jsonEncode(record.toJson());
+
+			debugPrint("=== API REQUEST : mRekanPicCrudTambahAPI ===");
+			debugPrint("URL      : $uri");
+			debugPrint("METHOD   : POST");
+			debugPrint("HEADERS  : Authorization Bearer ${AppData.userToken}");
+			debugPrint("BODY     : $bodyJson");
+
+			final http.Response response = await http.post(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+				body: bodyJson,
+			);
+
+			debugPrint("=== API RESPONSE : mRekanPicCrudTambahAPI ===");
+			debugPrint("STATUS CODE : ${response.statusCode}");
+			debugPrint("BODY        : ${response.body}");
+
+			if (response.statusCode == 200) {
+				returnData =
+						ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			} else {
+				debugPrint("API ERROR STATUS : ${response.statusCode}");
+
+				returnData = ReturnDataAPI(
+					success: false,
+					data: "",
+					rowcount: 0,
+				);
+			}
+		} catch (e, stack) {
+			debugPrint("=== API EXCEPTION : mRekanPicCrudTambahAPI ===");
+			debugPrint("ERROR : $e");
+			debugPrint("STACK : $stack");
+
+			returnData = ReturnDataAPI(
+				success: false,
+				data: "",
+				rowcount: 0,
+			);
 		}
+
 		return returnData;
-	}
-	Future<bool> mRekanPicCrudUbahAPI(MRekanPicCrudModel record) async {
+	}Future<bool> mRekanPicCrudUbahAPI(MRekanPicCrudModel record) async {
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/update";
-		Map<String, String> queryParams = {"modul_id": "mRekanPicCrudUbahAPI"};
+				"${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/update";
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
+		Map<String, String> queryParams = {
+			"modul_id": "mRekanPicCrudUbahAPI"
+		};
 
-		final http.Response response = await http.post(uri,
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			ubahEndpoint,
+			queryParams,
+		);
+
+		final body = jsonEncode(record.toJson());
+
+		debugPrint("🚀 [API CALL] mRekanPicCrudUbahAPI");
+		debugPrint("📍 URI : $uri");
+		debugPrint("📦 BODY : $body");
+		debugPrint("🔑 TOKEN : ${AppData.userToken}");
+
+		final http.Response response = await http.post(
+			uri,
 			headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
 				'Authorization': 'Bearer ${AppData.userToken}'
 			},
-			body: jsonEncode(record.toJson()));
+			body: body,
+		);
+
+		debugPrint("📡 STATUS CODE : ${response.statusCode}");
+		debugPrint("📥 RESPONSE BODY : ${response.body}");
 
 		ReturnDataAPI returnData;
+
 		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			returnData =
+					ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+			returnData = ReturnDataAPI(
+				success: false,
+				data: "",
+				rowcount: 0,
+			);
 		}
+
+		debugPrint("✅ API SUCCESS : ${returnData.success}");
+
 		return returnData.success;
 	}
 
