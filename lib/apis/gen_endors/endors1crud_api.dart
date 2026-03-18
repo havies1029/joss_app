@@ -15,8 +15,8 @@ class Endors1CrudAPI {
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
 			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
+				'Content-Type': 'application/json; odata=verbose',
+				'Accept': 'application/json; odata=verbose',
 				'Authorization': 'Bearer ${AppData.userToken}'
 			},
 			body: jsonEncode(record.toJson()));

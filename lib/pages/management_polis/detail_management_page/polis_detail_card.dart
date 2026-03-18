@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../blocs/regother/regother1crud_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 class PolisDetailCard extends StatelessWidget {
   final Map<String, dynamic> dataMap;
   final String cobId;
@@ -35,12 +37,9 @@ class PolisDetailCard extends StatelessWidget {
   });
 
   /// ====== CARD ROWS (harus sama dengan yang ditampilkan di page detail / header table) ======
-  List<MapEntry<String, String>> _rowsForCard() {
+  List<MapEntry<String, String>> _rowsForCard(BuildContext context) {
     String s(String key) =>
-        (dataMap[key]
-            ?.toString()
-            .trim()
-            .isNotEmpty ?? false)
+        (dataMap[key]?.toString().trim().isNotEmpty ?? false)
             ? dataMap[key].toString().trim()
             : "-";
 
@@ -95,6 +94,16 @@ class PolisDetailCard extends StatelessWidget {
           MapEntry("Benefit", s("status")),
         ];
 
+      case "":
+        return [
+          MapEntry(
+            "Kategori Asuransi",
+            context.read<Regother1CrudBloc>().state.namaCob,
+          ),
+          MapEntry("Nilai Pertanggungan", s("tsi")),
+          MapEntry("Catatan", s("remark")),
+        ];
+
       default:
         return [
           MapEntry("Object", s("objectDesc")),
@@ -102,14 +111,13 @@ class PolisDetailCard extends StatelessWidget {
           MapEntry("Sum Insured", money("sumInsured")),
           MapEntry("Premi", money("premi")),
         ];
-
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final bool hasCobId = cobId.trim().isNotEmpty;
-    final rows = _rowsForCard()
+    final rows = _rowsForCard(context)
         .where((r) => !_isEmptyValue(r.value))
         .toList();
 

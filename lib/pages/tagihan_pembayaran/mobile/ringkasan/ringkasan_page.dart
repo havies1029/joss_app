@@ -5,12 +5,12 @@ import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../common/constants.dart';
+import '../../../../common/loading_indicator.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
-import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import '../bayar_button.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
@@ -131,7 +131,7 @@ class RingkasanPageState extends State<RingkasanPage> {
                   child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
                     builder: (context, state) {
                       if (state.status != ListStatus.success) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: LoadingIndicator());
                       }
 
                       if (state.items.isEmpty) {

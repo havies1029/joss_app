@@ -8,11 +8,9 @@ import 'dart:math' as math;
 import 'package:pinput/pinput.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/indo_phone_result.dart';
-import '../../../../../models/login/emailverification_model.dart';
 import '../../../../../models/reguser/reguser_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
@@ -32,7 +30,7 @@ class PopupClientWidget extends StatefulWidget {
 
 class PopupClientWidgetState extends State<PopupClientWidget>
     with TickerProviderStateMixin {
-  // 🎬 Animations (DNA patokan)
+
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -43,14 +41,12 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
 
-  // 📌 OTP (Pinput)
   final TextEditingController _pinController = TextEditingController();
   final FocusNode _pinFocusNode = FocusNode();
   bool _otpError = false;
 
-  // ⏱ Timer
   Timer? _timer;
-  int _remainingTime = 6;
+  int _remainingTime = 59;
   bool _isResendAvailable = false;
 
   @override
@@ -109,12 +105,6 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
   bool _isEmail(String input) => EmailValidator.validate(input);
   bool _isPhone(String input) => IndoPhoneHelper.normalize(input).isValid;
-
-  String _buildRequestFrom(String input) {
-    if (_isEmail(input)) return "email";
-    if (_isPhone(input)) return "hp";
-    return "unknown";
-  }
 
   String _formatPhoneVisual(String phone62) {
     if (!phone62.startsWith('62')) return phone62;
@@ -186,7 +176,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
   void _resendOtp() {
     setState(() {
-      _remainingTime = 6;
+      _remainingTime = 59;
       _isResendAvailable = false;
       _otpError = false;
     });
@@ -202,20 +192,12 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       ),
     );
 
-    final emailVerificationRecord =
-        context.read<EmailVerificationBloc>().state.record;
-
-    context.read<EmailVerificationBloc>().add(
+    context.read<RegUserBloc>().add(
       ResendOtpEvent(
-        record: EmailVerificationModel(
-          email: widget.sentTo,
-          requestId: emailVerificationRecord?.requestId ?? '',
-          requestFrom: _buildRequestFrom(widget.sentTo),
-        ),
+        reguserId: context.read<RegUserBloc>().state.record?.reguserId ?? '',
       ),
     );
   }
-
 
   void _verifyOtp({String? otpOverride}) {
     final otp = (otpOverride ?? _pinController.text).trim();
@@ -241,7 +223,8 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       ),
     );
 
-    Navigator.of(context, rootNavigator: true).pop();
+
+    // Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override
@@ -285,20 +268,30 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
     return BlocListener<RegUserBloc, RegUserState>(
       listenWhen: (prev, curr) =>
-      prev.verificationFailed != curr.verificationFailed,
+      prev.isSaved != curr.isSaved || prev.hasFailure != curr.hasFailure,
       listener: (context, state) {
-        if (state.verificationFailed) {
+        if (!state.isSaved) return;
+
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+
+        if (state.hasFailure) {
           _shakeOtpFields();
           setState(() => _otpError = true);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kode OTP salah, silakan coba lagi'),
-              backgroundColor: Colors.red,
+          messenger.showSnackBar(
+            errorSnackBar(
+              state.errors.isNotEmpty
+                  ? state.errors.first
+                  : 'Verifikasi OTP gagal',
             ),
           );
 
           _resetOtpAndFocusFirst();
+        } else {
+          messenger.showSnackBar(
+            successSnackBar("Verifikasi OTP berhasil"),
+          );
         }
       },
       child: Scaffold(
@@ -329,9 +322,6 @@ class PopupClientWidgetState extends State<PopupClientWidget>
                                       Navigator.of(context,
                                           rootNavigator: false)
                                           .pop();
-                                      context
-                                          .read<AuthenticationBloc>()
-                                          .add(LoggedOut());
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,

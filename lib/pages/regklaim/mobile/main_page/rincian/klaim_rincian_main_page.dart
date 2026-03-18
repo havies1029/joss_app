@@ -9,12 +9,13 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
-import 'package:joss_app/widgets/EmptyStateWidget.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../../common/loading_indicator.dart';
+import '../../../../../widgets/apptheme/empty_state_page.dart';
 import 'klaim_rincian_status_widget.dart';
 import 'klaim_rincian_table_widget.dart';
 
@@ -151,13 +152,16 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     final statusId = context.select<MstatusrinciCariBloc, String>(
           (b) => b.state.selectedStatusId,
     );
+
     return Expanded(
       child: BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
-        buildWhen: (previous, current) => current.status != previous.status,
+        buildWhen: (previous, current) =>
+        current.status != previous.status ||
+            current.items != previous.items,
         builder: (context, state) {
           if (state.status == ListStatus.initial ||
               state.status == ListStatus.loadingMore) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           }
 
           if (state.status == ListStatus.failure) {
@@ -169,8 +173,14 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
             );
           }
 
-          if (state.items.isEmpty) {
-            return EmptyStateWidget(statusId: statusId);
+          if (state.status == ListStatus.success && state.items.isEmpty) {
+            return const Center(
+              child: EmptyStatePage(
+                iconPath: 'assets/icons/belipolis_no_file.svg',
+                title: 'Tidak ada Rincian Klaim',
+                description: 'Detail klaim akan muncul di sini ketika tersedia.',
+              ),
+            );
           }
 
           return const KlaimRincianTableWidget();

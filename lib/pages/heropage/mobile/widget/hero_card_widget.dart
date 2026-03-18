@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 
+import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import 'hero_header_widget.dart';
 import 'premi_polis_summary_widget.dart';
 
-class HeroCardWidget extends StatelessWidget {
+class HeroCardWidget extends StatefulWidget {
   final String userName;
   final Uint8List? imageBytes;
   final String? userImage;
@@ -28,6 +30,23 @@ class HeroCardWidget extends StatelessWidget {
   });
 
   @override
+  State<HeroCardWidget> createState() => _HeroCardWidgetState();
+}
+
+class _HeroCardWidgetState extends State<HeroCardWidget> {
+
+  String? mjenisClient;
+
+  @override
+  void initState() {
+    super.initState();
+
+    mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
@@ -47,18 +66,19 @@ class HeroCardWidget extends StatelessWidget {
             const SizedBox(height: 16),
 
             HeroHeaderWidget(
-              userName: userName,
-              imageBytes: imageBytes,
-              userImage: userImage,
-              userType: userType,
+              userName: widget.userName,
+              imageBytes: widget.imageBytes,
+              userImage: widget.userImage,
+              userType: widget.userType,
             ),
 
             const SizedBox(height: 16),
 
-            PremiPolisSummaryWidget(
-              userType: userType,
-              onDetailTap: onDetailTap,
-            ),
+            if (mjenisClient == "10")
+              PremiPolisSummaryWidget(
+                userType: widget.userType,
+                onDetailTap: widget.onDetailTap,
+              ),
 
             const SizedBox(height: 12),
           ],

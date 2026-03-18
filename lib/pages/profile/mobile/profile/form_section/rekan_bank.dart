@@ -40,11 +40,16 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
   String? existingMrekanBankId;
   bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
     mRekanBankCrudBloc = context.read<MRekanBankCrudBloc>();
-    Future.delayed(const Duration(milliseconds: 500), () {
+
+    // reset dulu status lama supaya snackbar lama gak nongol lagi
+    mRekanBankCrudBloc.add(MRekanBankCrudResetStatusEvent());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
     });
   }
@@ -84,20 +89,28 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
                     child: BlocListener<MRekanBankCrudBloc, MRekanBankCrudState>(
                       listenWhen: (prev, curr) =>
-                      curr.isLoaded == true || curr.isSaved == true,
-
+                      prev.isLoaded != curr.isLoaded ||
+                          prev.isSaved != curr.isSaved,
                       listener: (context, state) {
                         if (state.isLoaded && _isFirstLoad && state.record != null) {
                           _injectPayload(state.record!);
+                          _isFirstLoad = false;
                         }
 
-                        if (state.isSaved && !state.hasFailure) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            successSnackBar("Data berhasil disimpan!"),
-                          );
+                        if (state.isSaved) {
+                          if (!state.hasFailure) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              successSnackBar("Data berhasil disimpan!"),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              errorSnackBar("Gagal menyimpan data!"),
+                            );
+                          }
+
+                          context.read<MRekanBankCrudBloc>().add(MRekanBankCrudResetStatusEvent());
                         }
                       },
-
                       child: _buildFormContent(context),
                     ),
                   ),
@@ -148,7 +161,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
           const SizedBox(height: vPadding),
 
           AppButton.primary(
-            text: " Simpan Perubahan",
+            text: "Simpan Perubahan",
             onPressed: onSaveForm,
           )
         ],
@@ -158,10 +171,10 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
   void _injectPayload(MRekanBankCrudModel record) {
     fieldMrekan1IdController.text = record.mrekan1Id;
-    fieldRekNamaController.text   = record.rekNama;
-    fieldRekNoController.text     = record.rekNo;
-
+    fieldRekNamaController.text = record.rekNama;
+    fieldRekNoController.text = record.rekNo;
     fieldComboMBank = record.comboMBank;
+    existingMrekanBankId = record.mrekanbankId;
 
     setState(() {});
   }

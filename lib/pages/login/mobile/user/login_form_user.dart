@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 
 import '../../../../blocs/authentication/authentication_bloc.dart';
@@ -27,20 +28,15 @@ class _LoginFormUserState extends State<LoginFormUser>
     with SingleTickerProviderStateMixin {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: <String>['email'], // default sudah email
+    scopes: <String>['email'],
   );
 
-  // Controller untuk input field
   final TextEditingController _emailOrPhoneController = TextEditingController();
-
-  String? _emailError;
-  // GlobalKey untuk validasi form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // Untuk animasi
   late AnimationController _animationController;
   final FocusNode _emailFocusNode = FocusNode();
-  final bool _isHoveringGmail = false;
-  bool _rememberPassword = true; // Variabel untuk checkbox Remember Password
+  bool _rememberPassword = true;
+  bool isSigningIn = false;
 
   @override
   void initState() {
@@ -88,10 +84,27 @@ class _LoginFormUserState extends State<LoginFormUser>
   Widget _buildSignInButton() {
     return AppButton.primary(
       text: "Masuk",
-      onPressed: () {
+      isLoading: isSigningIn,
+      backgroundColor: isSigningIn ? secondaryBlackColor : primaryColor,
+      onPressed: isSigningIn
+          ? null
+          : () async {
         if (_formKey.currentState!.validate()) {
+          setState(() {
+            isSigningIn = true;
+          });
+
           _animationController.forward(from: 0);
-          onRegisterButtonPressed(context); // ⬅️ kirim context ke fungsi
+
+          onRegisterButtonPressed(context);
+
+          await Future.delayed(const Duration(seconds: 2));
+
+          if (mounted) {
+            setState(() {
+              isSigningIn = false;
+            });
+          }
         }
       },
     );
@@ -101,20 +114,12 @@ class _LoginFormUserState extends State<LoginFormUser>
     if (!_formKey.currentState!.validate()) return;
 
     final input = _emailOrPhoneController.text.trim();
-    final isEmail = emailValidatorRegExp.hasMatch(input);
+    final isEmail = EmailValidator.validate(input);
 
-    // optional: tetap update state biar UI/validasi lain ikut kebawa
-    if (isEmail) {
-      context.read<EmailVerificationBloc>().add(
-        FieldEmailVerificationChangedEvent(email: input),
-      );
-    } else {
-      context.read<EmailVerificationBloc>().add(
-        FieldTeleponVerificationChangedEvent(telepon: input),
-      );
-    }
+    context.read<EmailVerificationBloc>().add(
+      FieldEmailVerificationChangedEvent(email: input),
+    );
 
-    // penting: submit pakai input yang baru diketik user
     AuthInputRouter.handleInput(context, input);
   }
 
@@ -156,6 +161,16 @@ class _LoginFormUserState extends State<LoginFormUser>
             if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Username atau Password Anda salah!"),
+              );
+            }
+          },
+        ),
+        BlocListener<EmailVerificationBloc, EmailVerificationState>(
+          listenWhen: (previous, current) => previous.hasFailure != current.hasFailure || previous.errors != current.errors,
+          listener: (context, state) {
+            if (state.hasFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(state.errors.isNotEmpty ? state.errors.join("\n") : "Terjadi kesalahan saat verifikasi email/telepon."),
               );
             }
           },
@@ -333,7 +348,7 @@ class _LoginFormUserState extends State<LoginFormUser>
               ),
             ),
           )
-              : const Center(child: CircularProgressIndicator());
+              : const Center(child: LoadingIndicator());
         },
       ),
     );

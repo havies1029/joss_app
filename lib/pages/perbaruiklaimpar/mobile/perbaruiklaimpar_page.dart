@@ -8,7 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
+import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 import '../../perbaruiklaimmv/mobile/klaim5cari_list.dart';
+import '../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 import 'klaimparaccordioncard.dart';
 import 'klaimparklaimcrud_form.dart';
 
@@ -103,15 +105,79 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                   const SizedBox(height: 24),
                   AppButton.primary(
                     onPressed: () {
+                      debugPrint('=== BUTTON PERBARUI CLICKED ===');
+                      debugPrint('openedIndex: ${acc.openedIndex}');
+
                       switch (acc.openedIndex) {
                         case 0:
-                          klaimparklaimcrudBloc
-                              .add(KlaimparklaimcrudAutoSaveEvent());
+                          debugPrint('trigger -> save klaim par from button');
+                          klaimparklaimcrudBloc.add(
+                            KlaimparklaimcrudAutoSaveEvent(),
+                          );
                           break;
+
+                        case 1:
+                          debugPrint('trigger -> final check before finish');
+
+                          final klaimState = context.read<KlaimparklaimcrudBloc>().state;
+                          final dokState = context.read<Klaim5cariBloc>().state;
+
+                          final hasValidDoc = dokState.items.any(
+                                (x) => x.fileUrl!.isNotEmpty || x.fileName!.isNotEmpty,
+                          );
+
+                          final allDone =
+                              !klaimState.isDirty &&
+                                  !klaimState.hasFailure &&
+                                  hasValidDoc;
+
+                          debugPrint('klaimState.isDirty: ${klaimState.isDirty}');
+                          debugPrint('klaimState.hasFailure: ${klaimState.hasFailure}');
+                          debugPrint('dok items count: ${dokState.items.length}');
+                          debugPrint('hasValidDoc: $hasValidDoc');
+                          debugPrint('allDone: $allDone');
+
+                          if (allDone) {
+                            debugPrint('SEMUA STEP SUDAH SELESAI -> lanjut');
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentSuccess(
+                                  display: "Klaim Berhasil Diperbarui",
+                                  description: "Data klaim telah berhasil diperbarui.",
+                                  displayButton: "Kembali",
+                                  onButtonPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => KlaimMainPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          } else {
+                            debugPrint('BELUM SEMUA DATA LENGKAP');
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Dokumen klaim belum lengkap'),
+                              ),
+                            );
+                          }
+                          break;
+
+                        default:
+                          debugPrint(
+                            'trigger -> tidak ada handler untuk openedIndex: ${acc.openedIndex}',
+                          );
                       }
+
+                      debugPrint('=== BUTTON PERBARUI END ===');
                     },
                     text: 'Perbarui',
-                    backgroundColor: pBlue,
                     textStyle: headingStyle(context, fontSize: 18),
                   ),
                 ],
@@ -119,17 +185,39 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
             );
           },
           listener: (BuildContext context, KlaimparaccordionState state) async {
+            debugPrint('=== ACCORDION LISTENER TRIGGERED ===');
+            debugPrint('previousIndex: ${state.previousIndex}');
+            debugPrint('openedIndex: ${state.openedIndex}');
+
             if (state.previousIndex != null &&
                 state.previousIndex != state.openedIndex) {
+
+              debugPrint('accordion pindah section -> autosave previous section');
+
               FocusManager.instance.primaryFocus?.unfocus();
+              debugPrint('focus unfocus done');
+
               await Future.delayed(const Duration(milliseconds: 50));
+              debugPrint('delay selesai, cek previousIndex...');
 
               switch (state.previousIndex) {
                 case 0:
-                  klaimparklaimcrudBloc.add(KlaimparklaimcrudAutoSaveEvent());
+                  debugPrint('trigger -> autosave klaim par from accordion');
+                  klaimparklaimcrudBloc.add(
+                    KlaimparklaimcrudAutoSaveEvent(),
+                  );
                   break;
+
+                default:
+                  debugPrint(
+                    'tidak ada autosave handler untuk previousIndex: ${state.previousIndex}',
+                  );
               }
+            } else {
+              debugPrint('accordion listener lewat, tapi tidak ada perpindahan section');
             }
+
+            debugPrint('=== ACCORDION LISTENER END ===');
           },
         ),
       ),

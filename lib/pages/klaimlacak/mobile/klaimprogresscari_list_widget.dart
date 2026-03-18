@@ -8,6 +8,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/klaimlacak/klaimprogresscari_bloc.dart';
 import 'package:joss_app/pages/klaimlacak/mobile/widget/klaim_progress_cari_tile.dart';
 
+import '../../../common/loading_indicator.dart';
 import 'klaimnilaicrud_form.dart';
 
 class KlaimprogresscariListWidget extends StatefulWidget {
@@ -53,8 +54,6 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
             controller: _scrollController,
             itemCount: stateProgress.items.length + extra,
             itemBuilder: (_, index) {
-
-              // ===== item tambahan terakhir: tombol =====
               if (showButton && index == stateProgress.items.length) {
                 return BlocSelector<KlaimnilaicrudBloc, KlaimnilaicrudState, bool>(
                     selector: (s) {
@@ -70,29 +69,34 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
                           width: 120,
                           text: 'Masukan',
                           icon: SvgPicture.asset(
-                            'assets/icons/masukan.svg', // sesuaikan path lo
+                            'assets/icons/masukan.svg',
                             width: 16,
                             height: 16,
-                            colorFilter: ColorFilter.mode(
-                              enabledByBloc ? Colors.white : const Color(0xFF6B4B10),
+                            colorFilter: const ColorFilter.mode(
+                              primaryLightColor,
                               BlendMode.srcIn,
                             ),
                           ),
-                          height: 20,
+                          height: 26,
                           borderRadius: 4,
-                          backgroundColor: enabledByBloc ? const Color(0xFFECB43C) : const Color(0xFFF2D9A1),
-                          textColor: enabledByBloc ? primaryLightColor : const Color(0xFF6B4B10),
+                          backgroundColor: enabledByBloc ? sYellow : sGrey,
+                          textColor: enabledByBloc
+                              ? primaryLightColor
+                              : const Color(0xFF6B4B10),
                           iconTextSpacing: 4,
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                          borderSide: enabledByBloc ? BorderSide.none : const BorderSide(color: Color(0xFFB98A2A)),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                           onPressed: () {
                             if (enabledByBloc) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) {
-                                return KlaimnilaicrudFormPage(klaim1Id: widget.klaim1Id,);
-                              }),
-                            );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return KlaimnilaicrudFormPage(
+                                      klaim1Id: widget.klaim1Id,
+                                    );
+                                  },
+                                ),
+                              );
                             }
                           },
                         ),
@@ -103,17 +107,16 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
 
               final curr = stateProgress.items[index];
               final currActive = curr.klaimprogressId.trim().isNotEmpty;
-
               final nextIsPlaceholder = (index < stateProgress.items.length - 1)
                   ? stateProgress.items[index + 1].klaimprogressId.trim().isEmpty
                   : true;
 
               final isLastActive = currActive && nextIsPlaceholder;
-              final isLastRow = index == stateProgress.items.length - 1; // ini buat garis paling bawah
+              final isLastRow = index == stateProgress.items.length - 1;
               return KlaimProgressCariTileWidget(
                 item: curr,
-                isLast: isLastRow,          // untuk garis vertikal stop di item terakhir list
-                isLastActive: isLastActive, // untuk icon lampu
+                isLast: isLastRow,
+                isLastActive: isLastActive,
                 infoNilaiKlaim: curr.actioncode.trim().toLowerCase() == 'nilai_klaim' ? stateProgress.nilaiKlaim : null,
                 jadwalBayarItems: curr.actioncode.trim().toLowerCase() == 'table_payment' ? stateProgress.jadwalBayar : null,
                 klaimProgressInfo: curr.actioncode.trim().toLowerCase() == 'table_payment' ? stateProgress.klaimProgressInfo : null,
@@ -121,15 +124,8 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
             },
           );
         }
-
         return const Center(
-          child: Padding(
-            padding: EdgeInsets.only(top: 80.0),
-            child: Text(
-              'No Data Available!!',
-              style: TextStyle(color: Colors.red, fontSize: 12.0, fontWeight: FontWeight.bold),
-            ),
-          ),
+          child: LoadingIndicator(),
         );
       },
     );

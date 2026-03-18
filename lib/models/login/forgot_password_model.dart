@@ -1,25 +1,27 @@
-class ForgotPasswordModel {
-  String? requestId = '';
-  String email;
-  String? pin;
-  String? requestFrom;
+class RequestOtpModel {
+  String? requestOtpId;
+  String sentTo;
+  String? kodePin;
+  String sentVia;
+  String purpose;
 
-  ForgotPasswordModel({required this.email, this.pin, this.requestId, this.requestFrom});
+  RequestOtpModel({required this.sentTo, this.kodePin, this.requestOtpId, required this.sentVia, required this.purpose});
 
-  factory ForgotPasswordModel.fromJson(Map<String, dynamic> data) {
-    return ForgotPasswordModel(
-      email: data['email'] ?? '',
-      pin: data['pin'] ?? '',
-      requestId: data['requestId'] ?? '',
-      requestFrom: data['requestFrom'] ?? '',
-
+  factory RequestOtpModel.fromJson(Map<String, dynamic> data) {
+    return RequestOtpModel(
+      sentTo: data['sentTo'] ?? '',
+      kodePin: data['kodePin'] ?? '',
+      requestOtpId: data['requestOtpId'] ?? '',
+      sentVia: data['sentVia'] ?? '',
+      purpose: data['purpose'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'email': email,
-        'pin': pin,
-        'requestId': requestId,
-        'requestFrom': requestFrom,
+        'sentTo': sentTo,
+        'kodePin': kodePin,
+        'requestOtpId': requestOtpId,
+        'sentVia': sentVia,
+        'purpose': purpose,
       };
 }

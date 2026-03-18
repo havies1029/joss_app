@@ -2,78 +2,89 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../../../../../common/constants.dart';
 import '../../../../../../models/regklaim/attachment_item.dart';
 
 void openPreview(BuildContext context, AttachmentItem item) {
-  if (item.isImage) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(backgroundColor: Colors.black),
-        body: Center(
-          child: InteractiveViewer(
-            child: Image.file(File(item.path)),
-          ),
-        ),
-      );
-    }));
-    return;
-  }
-
-  if (item.isPdf) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) {
-      return PdfPreviewPage(path: item.path);
-    }));
-  }
+  Navigator.push(context, MaterialPageRoute(builder: (_) {
+    return AttachmentUnifiedPreviewPage(item: item);
+  }));
 }
 
-class PdfPreviewPage extends StatefulWidget {
-  final String path;
+class AttachmentUnifiedPreviewPage extends StatefulWidget {
+  final AttachmentItem item;
 
-  const PdfPreviewPage({
+  const AttachmentUnifiedPreviewPage({
     super.key,
-    required this.path,
+    required this.item,
   });
 
   @override
-  State<PdfPreviewPage> createState() => _PdfPreviewPageState();
+  State<AttachmentUnifiedPreviewPage> createState() =>
+      _AttachmentUnifiedPreviewPageState();
 }
 
-class _PdfPreviewPageState extends State<PdfPreviewPage> {
-  late PdfControllerPinch _pdfController;
+class _AttachmentUnifiedPreviewPageState
+    extends State<AttachmentUnifiedPreviewPage> {
+
+  PdfControllerPinch? _pdfController;
 
   @override
   void initState() {
     super.initState();
-    _pdfController = PdfControllerPinch(
-      document: PdfDocument.openFile(widget.path),
-    );
+
+    if (widget.item.isPdf) {
+      _pdfController = PdfControllerPinch(
+        document: PdfDocument.openFile(widget.item.path),
+      );
+    }
   }
 
   @override
   void dispose() {
-    _pdfController.dispose();
+    _pdfController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+
     return Scaffold(
+      backgroundColor: secondaryBlackColor,
       appBar: AppBar(
-        title: const Text("Preview PDF"),
+        backgroundColor: secondaryBlackColor,
+        iconTheme: const IconThemeData(color: primaryLightColor),
+        title: Text(
+          item.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: primaryLightColor,
+          ),
+        ),
       ),
-      body: PdfViewPinch(
-        controller: _pdfController,
-        onDocumentLoaded: (doc) {
-          debugPrint("✅ PDF Loaded - pages: ${doc.pagesCount}");
-        },
-        onDocumentError: (error) {
-          debugPrint("❌ PDF Load Error: $error");
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal buka PDF: $error')),
-          );
-        },
+      body: Center(
+        child: item.isImage
+            ? InteractiveViewer(
+          child: Image.file(File(item.path)),
+        )
+            : item.isPdf
+            ? PdfViewPinch(
+          controller: _pdfController!,
+          onDocumentError: (error) {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Gagal membuka PDF: $error"),
+              ),
+            );
+          },
+        )
+            : const Text(
+          "Format file belum didukung untuk preview.",
+          style: TextStyle(color: Colors.white70),
+        ),
       ),
     );
   }

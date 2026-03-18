@@ -53,6 +53,8 @@ import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regpar_page.dart';
 
+enum RegparSection { form1, form2, form3, form4, form6, form5 } 
+// urutan sesuai UI kamu sekarang: 1,2,3,4,6,5 (premi terakhir)
 
 class RegparFormMainRemake extends StatefulWidget {
   final String? regpar1Id;
@@ -69,7 +71,7 @@ class RegparFormMainRemake extends StatefulWidget {
 }
 
 class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
-  List<bool> expanded = [false, false, false, false, false, false];
+  late List<bool> expanded;
 
 
   String? regpar1Id;
@@ -159,12 +161,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     return cleanNum(value);
   }
 
-
-  double getProgressValue() {
-    final openedCount = expanded.where((v) => v).length;
-    return openedCount / 6;
-  }
-
   //form1
   final fieldTtgAlamatController = TextEditingController();
   final fieldTtgNamaController = TextEditingController();
@@ -243,15 +239,21 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   @override
   void initState() {
     super.initState();
+
+    expanded = List.filled(RegparSection.values.length, false);
+    expanded[sectionIndex(RegparSection.form1)] = true;
+
     final regpar1 = context.read<Regpar1CrudBloc>().state.record?.regpar1Id ?? "";
     regpar1Id = widget.regpar1Id ?? regpar1;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
     });
+
+    //reset foto dari record lama
+    context.read<RegparUploadFotoObjectBloc>().add(RegparUploadReset());
   }
 
   @override
@@ -714,37 +716,17 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           ),
 
           BlocListener<Regpar5FormBloc, Regpar5FormState>(
+            listenWhen: (prev, curr) =>
+                prev.isCalculated != curr.isCalculated && curr.isCalculated,
             listener: (context, state) {
-              if (state.record != null) {
-                _payloadform5(state.record!);
+              final rec = state.record;
+              if (rec == null) return;
 
-                openForm6(recordId: regpar1Id);
-                //
-                // if (state.isLoaded) {
-                //   setState(() {
-                //     regpar6Id = state.record!.regpar6Id;
-                //   });
-                //
-                //   _payloadform6(state.record!);
-                //
-                //   // if (state.record!.regpar6Id.isNotEmpty) {
-                //   //   openForm7();
-                //   // }
-                //   openForm7();
-                // }
-
-                if (state.isSaved) {
-                  setState(() {
-                    regpar5Id = state.record!.regpar5Id;
-                  });
-
-                  if (state.record!.regpar5Id.isNotEmpty) {
-                    openForm6(recordId: regpar1Id);
-                  }
-                }
-              }
+              _payloadform5(rec);
+              setState(() => regpar5Id = rec.regpar5Id);
+              openPremiSection(recordId: regpar1Id);
             },
-          ),
+          )
         ],
         child: _buildForm(),
       ),
@@ -793,7 +775,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     context: context,
                     title: "Data Tertanggung",
                     isExpanded: expanded[0],
-                    onToggle: (v) => setState(() => expanded[0] = v),
                     onRefresh: () {
                       if (regpar1Id != null && regpar1Id!.isNotEmpty) {
                         refreshForm1(recordId: regpar1Id);
@@ -814,7 +795,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     context: context,
                     title: "Informasi Polis",
                     isExpanded: expanded[1],
-                    onToggle: (v) => setState(() => expanded[1] = v),
                     onRefresh: () {
                       if (regpar1Id != null && regpar1Id!.isNotEmpty) {
                         refreshForm2(recordId: regpar1Id);
@@ -855,7 +835,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     context: context,
                     title: "Pertanggungan",
                     isExpanded: expanded[2],
-                    onToggle: (v) => setState(() => expanded[2] = v),
                     onRefresh: () {
                       if (regpar1Id != null && regpar1Id!.isNotEmpty) {
                         refreshForm3(recordId: regpar1Id);
@@ -913,7 +892,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     context: context,
                     title: "Nilai Pertanggungan",
                     isExpanded: expanded[3],
-                    onToggle: (v) => setState(() => expanded[3] = v),
                     onRefresh: () {
                       if (regpar1Id != null && regpar1Id!.isNotEmpty) {
                         refreshForm4(recordId: regpar1Id);
@@ -955,7 +933,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     context: context,
                     title: "Upload Foto Bangunan",
                     isExpanded: expanded[4],
-                    onToggle: (v) => setState(() => expanded[4] = v),
                     onRefresh: () {
                       if (regpar1Id != null && regpar1Id!.isNotEmpty) {
                         refreshForm6(recordId: regpar1Id);
@@ -992,7 +969,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     context: context,
                     title: "Premi",
                     isExpanded: expanded[5],
-                    onToggle: (v) => setState(() => expanded[5] = v),
                     child: (hasForm5Record)
                         ? Column(
                       children: [
@@ -1148,7 +1124,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget Form1Page({
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 1",
@@ -1166,8 +1141,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegparSection.form1, onRefresh: onRefresh);
             },
 
           ),
@@ -1184,7 +1158,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget Form2Page({
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 2",
@@ -1202,8 +1175,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegparSection.form2, onRefresh: onRefresh);
             },
 
           ),
@@ -1220,7 +1192,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget Form3Page({
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 3",
@@ -1238,8 +1209,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegparSection.form3, onRefresh: onRefresh);
             },
 
           ),
@@ -1256,7 +1226,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget Form4Page({
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 4",
@@ -1274,8 +1243,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegparSection.form4, onRefresh: onRefresh);
             },
 
           ),
@@ -1292,7 +1260,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget Form5Page({
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
     required Widget child,
     String title = "Form 5",
   }) {
@@ -1309,7 +1276,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
+              tryOpenSection(RegparSection.form5);
             },
           ),
           if (isExpanded)
@@ -1329,7 +1296,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget Form6Page({
     required BuildContext context,
     required bool isExpanded,
-    required ValueChanged<bool> onToggle,
     required Widget child,
     VoidCallback? onRefresh,
     String title = "Form 6",
@@ -1347,8 +1313,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              onToggle(!isExpanded);
-              onRefresh?.call();
+              tryOpenSection(RegparSection.form6, onRefresh: onRefresh);
             },
           ),
           if (isExpanded)
@@ -1459,7 +1424,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     if (!ok6) {
       setState(() => _showVal6 = true);
-      openForm5(recordId: regpar1Id);
+      openUploadFotoSection(recordId: regpar1Id);
       return;
     }
 
@@ -1480,47 +1445,31 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     context.read<RegparFlowBloc>().add(RegparFlowStartEvent());
   }
 
-  void openForm1({required String? recordId}) {
-    setState(() {
-      expanded = [true, false, false, false, false, false];
-    });
-    refreshForm1(recordId: recordId);
-  }
+  void openForm1({required String? recordId}) =>
+    openSection(RegparSection.form1, onRefresh: () => refreshForm1(recordId: recordId));
 
-  void openForm2({required String? recordId}) {
-    setState(() {
-      expanded = [false, true, false, false, false, false];
-    });
-    refreshForm2(recordId: recordId);
-  }
+  void openForm2({required String? recordId}) =>
+      openSection(RegparSection.form2, onRefresh: () => refreshForm2(recordId: recordId));
 
-  void openForm3({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, true, false, false, false];
-    });
-    refreshForm3(recordId: recordId);
-  }
+  void openForm3({required String? recordId}) =>
+      openSection(RegparSection.form3, onRefresh: () => refreshForm3(recordId: recordId));
 
-  void openForm4({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, true, false, false];
-    });
-    refreshForm4(recordId: recordId);
-  }
+  void openForm4({required String? recordId}) =>
+      openSection(RegparSection.form4, onRefresh: () => refreshForm4(recordId: recordId));
 
-  void openForm5({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, false, true, false];
-    });
-    refreshForm6(recordId: recordId);
-  }
+  void openUploadFotoSection({required String? recordId}) =>
+      openSection(RegparSection.form6, onRefresh: () => refreshForm6(recordId: recordId)); // catatan: ini Form6
 
-  void openForm6({required String? recordId}) {
-    setState(() {
-      expanded = [false, false, false, false, false, true];
-    });
-    // refreshForm5(recordId: recordId);
-  }
+  void openPremiSection({required String? recordId}) =>
+    openSection(
+      RegparSection.form5,
+      onRefresh: () {
+        final st = context.read<Regpar5FormBloc>().state;
+        if (st.record == null) {
+          refreshForm5(recordId: recordId);
+        }
+      },
+    );
 
   bool validateForm1() {
     clearErrsByPrefix('form1.');
@@ -1538,9 +1487,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       ok = false;
     }
 
-    if (!ok) {
-      setState(() => expanded[0] = true);
-    }
+    if (!ok) openSection(RegparSection.form1);
 
     return ok;
   }
@@ -1587,9 +1534,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     // kalau gagal, buka panel form2 (index 1)
-    if (!ok) {
-      setState(() => expanded[1] = true);
-    }
+    if (!ok) openSection(RegparSection.form2);
 
     return ok;
   }
@@ -1615,9 +1560,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
 
-    if (!ok) {
-      setState(() => expanded[2] = true);
-    }
+    if (!ok) openSection(RegparSection.form3);
 
     return ok;
   }
@@ -1665,7 +1608,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     if (!validateMoneyNonNegativeRequired(key: 'form4.siStock', controller: fieldSiStockController)) ok = false;
 
     if (!ok) {
-      setState(() => expanded[3] = true); // form4 panel index
+      openSection(RegparSection.form4);
     }
 
     return ok;
@@ -1991,7 +1934,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         clearErr('form3.wilayah');
         fieldComboMKabZonaGempa = null;
         regpar3formbloc?.add(ComboMWilayahChangedEvent(comboMWilayah: v));
-        comboMWilayahKey.currentState?.clear();
+        comboMKabZonaGempaKey.currentState?.clear();
         clearErr('form3.zonaGempa');
       }
     },
@@ -2264,6 +2207,112 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   void _clearIfNotEmpty(String key, String v) {
     if (v.trim().isNotEmpty) clearErr(key);
+  }
+
+  int sectionIndex(RegparSection s) => RegparSection.values.indexOf(s);
+
+  double getProgressValue() {
+    final done = [
+      isForm1Complete(),
+      isForm2Complete(),
+      isForm3Complete(),
+      isForm4Complete(),
+      isForm6Complete(),
+      isForm5Complete(), // premi (hasil)
+    ].where((x) => x).length;
+
+    return done / RegparSection.values.length;
+  }
+
+  bool isForm1Complete() =>
+    fieldTtgNamaController.text.trim().isNotEmpty &&
+    fieldTtgAlamatController.text.trim().isNotEmpty;
+
+  bool isForm2Complete() =>
+      fieldComboRKonstruksiojk != null &&
+      fieldComboROkupasi != null &&
+      fieldObjectAlamatController.text.trim().isNotEmpty &&
+      fieldComboMPropinsi != null &&
+      fieldComboMKota != null &&
+      fieldComboMKecamatan != null &&
+      fieldComboMKelurahan != null;
+
+  bool isForm3Complete() =>
+      fieldComboMJnscoverPar != null &&
+      fieldComboMWilayah != null &&
+      fieldComboMKabZonaGempa != null;
+
+  bool isForm4Complete() {
+    if (fieldComboRMatauang == null) return false;
+
+    double n(TextEditingController c) =>
+        double.tryParse(c.text.replaceAll(',', '').trim()) ?? 0;
+
+    // minimal salah satu SI > 0 (atau aturan kamu)
+    final a = n(fieldSiBuildingController);
+    final b = n(fieldSiContentController);
+    final c1 = n(fieldSiMachineryController);
+    final d = n(fieldSiStockController);
+    final e = n(fieldSiOtherController);
+
+    return (a > 0 || b > 0 || c1 > 0 || d > 0 || e > 0);
+  }
+
+  bool isForm6Complete() {
+    final st = context.read<RegparUploadFotoObjectBloc>().state;
+    return st.items.isNotEmpty;
+  }
+
+  bool isForm5Complete() {
+    // premi sudah ada hasil dari backend
+    return context.read<Regpar5FormBloc>().state.record != null;
+  }
+
+  int getOpenedIndex() => expanded.indexWhere((e) => e);
+
+  void openSection(RegparSection section, {VoidCallback? onRefresh}) {
+    final idx = sectionIndex(section);
+    setState(() {
+      expanded = List.filled(expanded.length, false);
+      expanded[idx] = true;
+    });
+    onRefresh?.call();
+  }
+
+  bool validateOpenedSection() {
+    final opened = getOpenedIndex();
+    if (opened < 0) return true;
+
+    final section = RegparSection.values[opened];
+    switch (section) {
+      case RegparSection.form1:
+        return validateForm1();
+      case RegparSection.form2:
+        return validateForm2();
+      case RegparSection.form3:
+        return validateForm3();
+      case RegparSection.form4:
+        return validateForm4();
+      case RegparSection.form6:
+        final ok6 = isForm6Complete();
+        if (!ok6) {
+          setState(() => _showVal6 = true);
+        }
+        return ok6;
+      case RegparSection.form5:
+        return true; // hasil
+    }
+  }
+
+  void tryOpenSection(RegparSection target, {VoidCallback? onRefresh}) {
+    final targetIdx = sectionIndex(target);
+    final opened = getOpenedIndex();
+    if (opened == targetIdx) return;
+
+    final ok = validateOpenedSection();
+    if (!ok) return;
+
+    openSection(target, onRefresh: onRefresh);
   }
 
 }

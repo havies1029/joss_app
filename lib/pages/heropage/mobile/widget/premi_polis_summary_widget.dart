@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import '../../../../blocs/dashboard/sumdash_bloc.dart';
 
 class PremiPolisSummaryWidget extends StatefulWidget {
@@ -21,7 +22,7 @@ class PremiPolisSummaryWidget extends StatefulWidget {
 class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
   bool _isPremiumVisible = false;
 
-  String _getStarsText() => '-' * 6;
+  String _getStarsText(amount) => '*' * amount.length;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
 
         return _SummaryVM(
           isLoading: state.isLoading,
-          currency: record?.curr ?? 'Rp',
+          currency: record?.curr ?? '',
           polisCount: record?.jmlpolis ?? 0,
           totalPremi: record?.totalpremi ?? 0,
         );
@@ -61,6 +62,10 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
         required int polisCount,
         required bool isLoading,
       }) {
+    final parts = premiumAmount.split(' ');
+    final currency = parts.isNotEmpty ? parts.first : '';
+    final amount = parts.length > 1 ? parts.sublist(1).join(' ') : premiumAmount;
+
     return IntrinsicHeight(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -83,54 +88,80 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Premi',
                       style: bodyTextStyle(context, fontSize: 16),
                     ),
+
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 400),
-                          transitionBuilder: (child, animation) =>
-                              FadeTransition(opacity: animation, child: child),
-                          child: _isPremiumVisible
-                              ? Text(
-                            isLoading ? '...' : premiumAmount,
-                            key: const ValueKey('visible'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: headingStyle(context),
-                          )
-                              : Text(
-                            _getStarsText(),
-                            key: const ValueKey('stars'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: headingStyle(context),
+                        Text(
+                          currency,
+                          style: headingStyle(context).copyWith(
+                            fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                         ),
+
                         const SizedBox(width: 4),
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: GestureDetector(
-                            onTap: () => setState(() {
-                              _isPremiumVisible = !_isPremiumVisible;
-                            }),
-                            child: Icon(
-                              _isPremiumVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off_outlined,
-                              color: primaryColor,
-                              size: 20,
+
+                        IntrinsicWidth(
+                          child: isLoading
+                              ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: LoadingIndicator(),
+                          )
+                              : AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 350),
+                            transitionBuilder: (child, animation) =>
+                                FadeTransition(opacity: animation, child: child),
+                            child: (amount.isEmpty)
+                                ? const SizedBox(height: 22) // placeholder supaya ruang tetap ada
+                                : (_isPremiumVisible
+                                ? Text(
+                              amount,
+                              key: const ValueKey('visible'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: headingStyle(context).copyWith(
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            )
+                                : Text(
+                              _getStarsText(amount),
+                              key: const ValueKey('stars'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: headingStyle(context).copyWith(
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            )),
+                          ),
+                        ),
+
+                        if (!isLoading) ...[
+                          const SizedBox(width: 4),
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: GestureDetector(
+                              onTap: () => setState(() {
+                                _isPremiumVisible = !_isPremiumVisible;
+                              }),
+                              child: Icon(
+                                _isPremiumVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off_outlined,
+                                color: primaryColor,
+                                size: 20,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -151,8 +182,15 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                     style: bodyTextStyle(context, fontSize: 16),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    isLoading ? '...' : polisCount.toString(),
+
+                  isLoading
+                      ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: LoadingIndicator(),
+                  )
+                      : Text(
+                    polisCount.toString(),
                     textAlign: TextAlign.center,
                     style: headingStyle(context),
                   ),

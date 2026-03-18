@@ -175,38 +175,52 @@ class _FormButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 46,
-      child: ElevatedButton(
-        onPressed: isEnabled ? onTap : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          disabledBackgroundColor: bg.withOpacity(0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          elevation: 0,
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // kalau tombol sempit, icon disembunyikan
+        final showIcon = constraints.maxWidth > 140;
+
+        return SizedBox(
+          height: 46,
+          child: ElevatedButton(
+            onPressed: isEnabled ? onTap : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: bg,
+              disabledBackgroundColor: bg.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              elevation: 0,
+            ),
+            child: isLoading
+                ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (showIcon) ...[
                   Icon(icon, size: 18, color: fg),
                   const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: fg,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
                 ],
-              ),
-      ),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

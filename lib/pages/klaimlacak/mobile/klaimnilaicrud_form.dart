@@ -6,6 +6,8 @@ import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/klaimlacak/klaimnilaicrud_bloc.dart';
 import 'package:joss_app/models/klaimlacak/klaimnilaicrud_model.dart';
 
+import '../../../blocs/gen_review/reviewcari_bloc.dart';
+
 class KlaimnilaicrudFormPage extends StatefulWidget {
   final String klaim1Id;
 
@@ -79,31 +81,30 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
                                       inactiveColor: pGrey,
                                       onChanged: (v) {
                                         setState(() => _nilaiSuka = v);
-                                        // remove error rating kalau sebelumnya belum pilih
-                                        removeError(error: kStringNullError);
+                                        removeError(error: 'Rating wajib dipilih');
                                       },
                                     ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: hPadding),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text('Sangat Tidak suka',
-                                            style: headingStyle(context, fontSize: 16)),
+                                            style: headingStyle(context, fontSize: getResponsiveFont(context, 16))),
                                         Text('Sangat suka',
-                                            style: headingStyle(context, fontSize: 16)),                          ],
+                                            style: headingStyle(context, fontSize: getResponsiveFont(context, 16))),
+                                      ],
                                     ),
                                   ],
                                 ),
 
-                                const SizedBox(height: 20),
+                                const SizedBox(height: vPadding),
 
                                 Text(
                                     "Apa alasan anda memberi penilaian ini?",
                                     style: headingStyle(context, fontSize: 16)
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: hPadding),
 
-                                // ===== ALASAN TEXTAREA (opsional) =====
                                 Container(
                                   decoration: BoxDecoration(
                                     color: formGrey,
@@ -117,22 +118,21 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
                                     maxLines: 7,
                                     style: bodyTextStyle(context, fontSize: 16),
                                     decoration: InputDecoration(
-                                      hintText: "Tulis pengalaman atau masukan anda (Opsional)",
+                                      hintText: "Tulis pengalaman atau masukan anda",
                                       hintStyle: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
                                       contentPadding: const EdgeInsets.all(10),
                                       border: InputBorder.none,
+                                      errorText: err('form.alasan'),
                                     ),
                                     onChanged: (value) {
-                                      // alasan optional => tidak wajib removeError
-                                    },
-                                    validator: (value) {
-                                      // sesuai gambar: optional => selalu valid
-                                      return null;
+                                      if (value.trim().isNotEmpty) {
+                                        clearErr('form.alasan');
+                                      }
                                     },
                                   ),
                                 ),
 
-                                const SizedBox(height: 20),
+                                const SizedBox(height: vPadding),
 
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +141,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
                                     const SizedBox(width: 5),
                                     Expanded(
                                       child: Text(
-                                          "Masukan anda akan kami gunakan untuk peningkatan kualitas\ndan layanan kami",
+                                          "Masukan anda akan kami gunakan untuk peningkatan kualitasdan layanan kami",
                                           style: bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey)
                                       ),
                                     ),
@@ -173,30 +173,52 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
     );
   }
 
+  bool validateForm() {
+    clearErrsByPrefix('form.');
+
+    setState(() {
+      errors.clear();
+    });
+
+    bool ok = true;
+
+    if (_nilaiSuka <= 0) {
+      addError(error: 'Rating wajib dipilih');
+      ok = false;
+    }
+
+    // final alasan = fieldAlasanController.text.trim();
+    // if (alasan.isEmpty) {
+    //   setErr('form.alasan', 'Alasan penilaian wajib diisi');
+    //   ok = false;
+    // } else if (alasan.length < 5) {
+    //   setErr('form.alasan', 'Alasan penilaian minimal 5 karakter');
+    //   ok = false;
+    // }
+
+    return ok;
+  }
+
   void _dismissDialog() {
     Navigator.pop(context);
   }
 
   void onSaveForm() {
-    // validasi rating: minimal pilih 1 bintang
-    if (_nilaiSuka <= 0) {
-      addError(error: "Rating wajib dipilih");
-      return;
-    }
+    FocusScope.of(context).unfocus();
 
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    final ok = validateForm();
+    if (!ok) return;
 
-      final record = KlaimnilaicrudModel(
-        klaim1Id: widget.klaim1Id,
-        alasan: fieldAlasanController.text,
-        klaimnilaiId: '',
-        nilaiSuka: _nilaiSuka,
-      );
+    final record = KlaimnilaicrudModel(
+      klaim1Id: widget.klaim1Id,
+      alasan: fieldAlasanController.text.trim(),
+      klaimnilaiId: '',
+      nilaiSuka: _nilaiSuka,
+    );
 
-      klaimnilaicrudBloc.add(KlaimnilaicrudTambahEvent(record: record));
-      _dismissDialog();
-    }
+    context.read<ReviewCariBloc>().add(RefreshReviewCariEvent());
+    klaimnilaicrudBloc.add(KlaimnilaicrudTambahEvent(record: record));
+    _dismissDialog();
   }
 
   void addError({required String error}) {
@@ -210,10 +232,29 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
       setState(() => errors.remove(error));
     }
   }
+
+  final Map<String, String?> fieldErrors = {};
+
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrsByPrefix(String prefix) {
+    setState(() {
+      fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
+    });
+  }
 }
 
 class _StarRating extends StatelessWidget {
-  final int value; // 0..5
+  final int value;
   final int max;
   final double size;
   final ValueChanged<int> onChanged;
@@ -232,20 +273,18 @@ class _StarRating extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(max, (i) {
         final idx = i + 1;
         final isOn = idx <= value;
+
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => onChanged(idx),
-          child: Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: Icon(
-              isOn ? Icons.star_rounded : Icons.star_outline_rounded,
-              size: size,
-              color: isOn ? activeColor : inactiveColor,
-            ),
+          child: Icon(
+            isOn ? Icons.star_rounded : Icons.star_outline_rounded,
+            size: size,
+            color: isOn ? activeColor : inactiveColor,
           ),
         );
       }),

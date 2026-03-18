@@ -49,3 +49,10 @@ class InitialSelectedCOBRekanPicCobEvent extends RekanPicCobCariEvents {
   @override
   List<Object> get props => [selectedCOB];
 }
+
+class ResetSelectedCOBRekanPicCobEvent extends RekanPicCobCariEvents {
+  const ResetSelectedCOBRekanPicCobEvent();
+
+  @override
+  List<Object> get props => [];
+}

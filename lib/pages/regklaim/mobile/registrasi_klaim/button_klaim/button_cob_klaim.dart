@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../../blocs/regklaim/cobklaimcari_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../common/loading_indicator.dart';
 import '../../../../../models/regklaim/cobklaimcari_model.dart';
 import '../cob_klaim_page/registrasi_klaim.dart';
 
@@ -55,7 +56,7 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
             height: 44,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: LoadingIndicator(),
             ),
           );
         }
@@ -77,7 +78,7 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
               final isSelected = state.selectedItem?.mcobklaim1Id == item.mcobklaim1Id;
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: hPadding * 1.5),
+                padding: const EdgeInsets.only(bottom: hPadding ),
                 child: _CobKlaimTile(
                   item: item,
                   iconPath: _iconPath(item.mcobklaim1Id),
@@ -131,13 +132,14 @@ class _CobKlaimTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(cardBorderRadius),
         onTap: onTap,
         child: Container(
-          height: 74,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: hPadding,
+            vertical: 10,
+          ),
           decoration: BoxDecoration(
             color: pGrey,
             borderRadius: BorderRadius.circular(cardBorderRadius),
             border: Border.all(
-              // color: isSelected ? primaryColor : Colors.white.withOpacity(0.12),
               color: sGrey,
               width: 1,
             ),
@@ -146,8 +148,8 @@ class _CobKlaimTile extends StatelessWidget {
             children: [
               SvgPicture.asset(
                 iconPath,
-                width: 48,
-                height: 48,
+                width: 40,
+                height: 40,
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -156,7 +158,6 @@ class _CobKlaimTile extends StatelessWidget {
                   style: TextStyle(
                     color: primaryLightColor,
                     fontSize: getResponsiveFont(context, 18),
-                    // fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -166,8 +167,7 @@ class _CobKlaimTile extends StatelessWidget {
                 size: 22,
               ),
             ],
-          )
-
+          ),
         ),
       ),
     );

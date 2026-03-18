@@ -17,12 +17,10 @@ class SppaDetailTableWidget extends StatefulWidget {
 }
 
 class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
-  //final ScrollController hController = ScrollController();
   final DateFormat _dateFmt = DateFormat('dd MMM yyyy');
 
   @override
   void dispose() {
-    //hController.dispose();
     super.dispose();
   }
 
@@ -45,9 +43,16 @@ class _SppaDetailTableWidgetState extends State<SppaDetailTableWidget> {
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         decoration: _boxDecoration(),
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: const Center(
-          child: CircularProgressIndicator(),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        child: Center(
+          child: Text(
+            "Detail Transaksi tidak tersedia",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: hintGrey,
+              fontSize: 14,
+            ),
+          ),
         ),
       ),
     );

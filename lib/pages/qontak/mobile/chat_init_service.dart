@@ -1,6 +1,8 @@
 // lib/services/chat_init_service.dart
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_initialization.dart';
 
 class ChatInitResult {
@@ -42,49 +44,98 @@ class ChatInitService {
     required String displayName,
     bool force = false,
   }) async {
-    if (!force && _initialized && _lastUserId == userId && _lastDisplayName == displayName) {
-      return ChatInitResult(success: true, userId: userId, displayName: displayName);
+    final safeUserId = userId.trim();
+    final safeDisplayName = displayName.trim();
+
+    if (!force &&
+        _initialized &&
+        _lastUserId == safeUserId &&
+        _lastDisplayName == safeDisplayName) {
+      return ChatInitResult(
+        success: true,
+        userId: safeUserId,
+        displayName: safeDisplayName,
+      );
     }
 
     if (_pending != null) return _pending!.future;
 
     _pending = Completer<ChatInitResult>();
+
     try {
-      // ✅ tunggu sampai init selesai
+      if (kIsWeb) {
+        throw UnsupportedError(
+          'MobileChatInitialization tidak didukung di Web.',
+        );
+      }
+
+      String platformName;
+      String appId;
+      String accessKey;
+      String secretKey;
+
+      if (Platform.isAndroid) {
+        platformName = 'Android';
+
+        appId = "_zGBGl1xg9V1ZQJVZNyFJg";
+        accessKey = "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc";
+        secretKey = "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE";
+      } else if (Platform.isIOS) {
+        platformName = 'iOS';
+
+        appId = "lf66qYomUMX6ejBxKZmVhg";
+        accessKey = "a6lWRoRwYldgpoFu1Cev0ExdfhkuWPy3jaa6Z6Log1g";
+        secretKey = "RknsOIHQdEfWts0i2RH-cuVzeO7DSNOmoY_6M4fTKIo";
+      } else {
+        throw UnsupportedError(
+          'Platform ini tidak didukung untuk MobileChatInitialization.',
+        );
+      }
+
+      debugPrint(
+        "🚀 Chat init started | platform=$platformName | "
+        "userId=$safeUserId | displayName=$safeDisplayName",
+      );
+
       await MobileChatInitialization.init(
-        "_zGBGl1xg9V1ZQJVZNyFJg",
-        "-8riuV9imwrYLkoV89aerSoTYsxiEAG-fPplAUw3dsc",
-        "n_pujcjS8Dg7kd-AWjnDKSIPDL0gQhflerRNPhm5XAE",
-        userId,
-        displayName,
+        appId,
+        accessKey,
+        secretKey,
+        safeUserId,
+        safeDisplayName,
       );
 
       _initialized = true;
-      _lastUserId = userId;
-      _lastDisplayName = displayName;
+      _lastUserId = safeUserId;
+      _lastDisplayName = safeDisplayName;
 
       final result = ChatInitResult(
         success: true,
-        userId: userId,
-        displayName: displayName,
+        userId: safeUserId,
+        displayName: safeDisplayName,
       );
+
+      debugPrint(
+        "✅ Chat init success | platform=$platformName | userId=$safeUserId",
+      );
+
       _pending?.complete(result);
       return result;
-
     } catch (e, st) {
-      // ✅ tangkap error dengan jelas
       final result = ChatInitResult(
         success: false,
-        userId: userId,
-        displayName: displayName,
+        userId: safeUserId,
+        displayName: safeDisplayName,
         error: e.toString(),
       );
+
       debugPrint(
         'ChatInitResult => success=${result.success}, '
         'userId=${result.userId}, displayName=${result.displayName}, '
         'error=${result.error}',
       );
       debugPrint("❌ Chat init gagal: $e\n$st");
+
       _pending?.complete(result);
       return result;
     } finally {

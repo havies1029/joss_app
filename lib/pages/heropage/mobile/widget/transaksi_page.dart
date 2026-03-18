@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 
 import '../../../../blocs/notiflog/logtrscari_bloc.dart';
@@ -77,7 +78,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: vPadding),
+            const SizedBox(height: hPadding),
 
             // Filter chips
             Container(
@@ -96,7 +97,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
               ),
             ),
 
-            const SizedBox(height: vPadding),
+            const SizedBox(height: hPadding),
 
             // List
             Expanded(
@@ -106,7 +107,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(),
+                        child: LoadingIndicator(),
                       ),
                     );
                   }
@@ -205,8 +206,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
                                 },
                               ),
                             ),
-
-                            const SizedBox(height: vPadding),
                           ],
                         );
                       },
@@ -215,8 +214,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 },
               ),
             ),
-
-            const SizedBox(height: 16),
           ],
         ),
       ),

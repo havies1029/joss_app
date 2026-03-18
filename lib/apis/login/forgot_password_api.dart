@@ -8,10 +8,10 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 
 class ForgotPasswordApi {
 
-  Future<ReturnDataAPI> emailVerificationForgotPswdAPI(ForgotPasswordModel record) async {
+  Future<ReturnDataAPI> requestOtpAPI(RequestOtpModel record) async {
 		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/login/emailverification/reqtokenforgotpassword";
-		Map<String, String> queryParams = {"modul_id": "emailVerificationForgotPswdAPI"};
+			"${AppData.prefixEndPoint}/api/requestotp/create";
+		Map<String, String> queryParams = {"modul_id": "forgotPasswordRequestOtpAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
 		ReturnDataAPI returnData;
@@ -31,17 +31,39 @@ class ForgotPasswordApi {
 	}
 
 
-  Future<ReturnDataAPI> validasiPinForgotPasswordAPI(ForgotPasswordModel record) async {
-		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/login/emailverification/forgotpasswordvalidasipin";
-		Map<String, String> queryParams = {"modul_id": "validasiPinForgotPasswordAPI"};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
+  Future<ReturnDataAPI> validasiOtpAPI(RequestOtpModel record) async {
+		String endpoint =
+			"${AppData.prefixEndPoint}/api/requestotp/validasiotp";
+		Map<String, String> queryParams = {"modul_id": "validasiOtpAPI"};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
 
 		ReturnDataAPI returnData;
 		final http.Response response = await http.post(uri,
 			headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
+			},
+			body: jsonEncode(record.toJson()));
+
+		if (response.statusCode == 200) {
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		}
+		return returnData;
+	}
+
+  Future<ReturnDataAPI> resendOtpAPI(RequestOtpModel record) async {
+		String endpoint =
+			"${AppData.prefixEndPoint}/api/requestotp/resendotp";
+		Map<String, String> queryParams = {"modul_id": "resendOtpAPI"};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, endpoint, queryParams);
+
+		ReturnDataAPI returnData;
+		final http.Response response = await http.post(uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbose',
+				'Accept': 'application/json; odata=verbose',
 			},
 			body: jsonEncode(record.toJson()));
 

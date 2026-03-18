@@ -12,11 +12,14 @@ import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
 // import 'klaim5cari_list.dart';
+import '../../../blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
+import '../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 import 'klaimmvaccordioncard.dart';
 import 'klaimmvbengkelcrud_form.dart';
 import 'klaimmvklaimcrud_form.dart';
 import 'klaimmvpoliscrud_form.dart';
 import 'klaimmvstatuscari_list.dart';
+import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
 class PerbaruiKlaimMvPage extends StatefulWidget {
   final String cobGroupNama;
@@ -444,48 +447,149 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       ),
                     ),
                   ),
-      
+
                   AppButton.primary(
                     onPressed: () {
-                      switch(acc.openedIndex) {
+                      debugPrint('=== BUTTON PERBARUI CLICKED ===');
+                      debugPrint('openedIndex: ${acc.openedIndex}');
+
+                      switch (acc.openedIndex) {
                         case 0:
-                          klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent(saveFrom: "button"));  
+                          debugPrint('trigger -> save polis from button');
+                          klaimmvpoliscrudBloc.add(
+                            KlaimmvPolisAutoSaveEvent(saveFrom: "button"),
+                          );
                           break;
+
                         case 1:
-                          klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent(saveFrom: "button"));
+                          debugPrint('trigger -> save klaim from button');
+                          klaimmvklaimcrudBloc.add(
+                            KlaimmvklaimAutoSaveEvent(saveFrom: "button"),
+                          );
                           break;
+
+                        case 2:
+                        case 3:
                         case 4:
-                          klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent(saveFrom: "button"));
+                          debugPrint('trigger -> final check before finish');
+
+                          final polisState = context.read<KlaimmvpoliscrudBloc>().state;
+                          final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
+                          final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
+                          final dokState = context.read<Klaim5cariBloc>().state;
+
+                          final hasValidDoc = dokState.items.any(
+                                (x) => (x.fileUrl?.isNotEmpty ?? false) || (x.fileName?.isNotEmpty ?? false),
+                          );
+
+                          final allDone =
+                              !polisState.isDirty &&
+                                  !polisState.hasFailure &&
+                                  !klaimState.isDirty &&
+                                  !klaimState.hasFailure;
+
+                          debugPrint('polisState.isDirty: ${polisState.isDirty}');
+                          debugPrint('polisState.hasFailure: ${polisState.hasFailure}');
+                          debugPrint('klaimState.isDirty: ${klaimState.isDirty}');
+                          debugPrint('klaimState.hasFailure: ${klaimState.hasFailure}');
+                          debugPrint('bengkelState.isDirty: ${bengkelState.isDirty}');
+                          debugPrint('bengkelState.hasFailure: ${bengkelState.hasFailure}');
+                          debugPrint('dok items count: ${dokState.items.length}');
+                          debugPrint('hasValidDoc: $hasValidDoc');
+                          debugPrint('allDone: $allDone');
+
+                          if (allDone) {
+                            debugPrint('SEMUA STEP SUDAH SELESAI -> lanjut');
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentSuccess(
+                                  display: "Klaim Berhasil Diperbarui",
+                                  description: "Data klaim telah berhasil diperbarui.",
+                                  displayButton: "Kembali",
+                                  onButtonPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => KlaimMainPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          } else {
+                            debugPrint('BELUM SEMUA DATA LENGKAP');
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Lengkapi dan simpan semua data terlebih dahulu'),
+                              ),
+                            );
+                          }
                           break;
+
+                        default:
+                          debugPrint(
+                            'trigger -> tidak ada handler untuk openedIndex: ${acc.openedIndex}',
+                          );
                       }
+
+                      debugPrint('=== BUTTON PERBARUI END ===');
                     },
                     text: 'Perbarui',
-                    backgroundColor: pBlue,
                     textStyle: headingStyle(context, fontSize: 18),
                   ),
                 ],
               );
-            }, listener: (BuildContext context, KlaimmvaccordionState state) async {
-            if (state.previousIndex != null &&
-                state.previousIndex != state.openedIndex) {
-      
-              FocusManager.instance.primaryFocus?.unfocus();
-              await Future.delayed(const Duration(milliseconds: 50));
-      
-              switch(state.previousIndex) {
-                case 0:
-                  klaimmvpoliscrudBloc.add(KlaimmvPolisAutoSaveEvent(saveFrom: "accordion"));
-                  break;
-                case 1:
-                  klaimmvklaimcrudBloc.add(KlaimmvklaimAutoSaveEvent(saveFrom: "accordion"));
-                  break;
-                case 4:
-                  klaimmvbengkelcrudBloc.add(KlaimmvbengkelAutoSaveEvent(saveFrom: "accordion"));
-                  break;
+            },
+            listener: (BuildContext context, KlaimmvaccordionState state) async {
+              debugPrint('=== ACCORDION LISTENER TRIGGERED ===');
+              debugPrint('previousIndex: ${state.previousIndex}');
+              debugPrint('openedIndex: ${state.openedIndex}');
+
+              if (state.previousIndex != null &&
+                  state.previousIndex != state.openedIndex) {
+                debugPrint('accordion pindah section -> autosave previous section');
+
+                FocusManager.instance.primaryFocus?.unfocus();
+                debugPrint('focus unfocus done, wait 50ms...');
+                await Future.delayed(const Duration(milliseconds: 50));
+
+                switch (state.previousIndex) {
+                  case 0:
+                    debugPrint('trigger -> autosave polis from accordion');
+                    klaimmvpoliscrudBloc.add(
+                      KlaimmvPolisAutoSaveEvent(saveFrom: "accordion"),
+                    );
+                    break;
+
+                  case 1:
+                    debugPrint('trigger -> autosave klaim from accordion');
+                    klaimmvklaimcrudBloc.add(
+                      KlaimmvklaimAutoSaveEvent(saveFrom: "accordion"),
+                    );
+                    break;
+
+                  case 4:
+                    debugPrint('trigger -> autosave bengkel from accordion');
+                    klaimmvbengkelcrudBloc.add(
+                      KlaimmvbengkelAutoSaveEvent(saveFrom: "accordion"),
+                    );
+                    break;
+
+                  default:
+                    debugPrint(
+                      'trigger -> tidak ada autosave handler untuk previousIndex: ${state.previousIndex}',
+                    );
+                }
+              } else {
+                debugPrint('accordion listener lewat, tapi tidak pindah section');
               }
-      
-            }
-          },
+
+              debugPrint('=== ACCORDION LISTENER END ===');
+            },
           ),
         ),
       ),

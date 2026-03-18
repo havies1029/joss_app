@@ -14,7 +14,7 @@ class EmailVerificationState extends Equatable {
   final String email;
   final String telepon;
   final bool isResendOtpSuccess;
-
+  
   const EmailVerificationState({
     this.record,
     this.isLoading = false,

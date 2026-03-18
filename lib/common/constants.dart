@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
+import 'loading_indicator.dart';
+
 part '../widgets/apptheme/textfield.dart';
 part '../widgets/apptheme/button.dart';
 part '../widgets/apptheme/snackbar.dart';
@@ -70,6 +72,10 @@ double getProportionateScreenWidth(double inputWidth) {
 final RegExp phoneValidatorRegExp =
 RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
 
+final RegExp emailValidatorRegExp = RegExp(
+  r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+);
+
 /// Color Palette
 const Color primaryColor = Color(0xFFEF7A28);
 const Color primaryLightColor = Color(0xFFF7F7F7);
@@ -97,12 +103,14 @@ const Color bdBlue = Color(0xFF5D86FF);
 const Color cGrey = Color(0xFFA1A1A1);
 
 const Color pYellow = Color(0xFFEFA728);
+const Color sYellow = Color(0xFFECB43C);
 const Color pBlue = Color(0xFF377BFC);
 const Color sBlue = Color(0xFF0088FF);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
 const Color successGreen = Color(0xFF4BB34B);
 const Color greenforPayment = Color(0xFF12C127);
+const Color sGreen = Color(0xFF27C840);
 const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
 const Color kategoriYellow = Color(0xFFFFC107);
@@ -160,12 +168,6 @@ const double defaultElevation = 3.0;
 const double buttonHeight = 41.0;
 
 const defaultDuration = Duration(milliseconds: 250);
-
-// Form Error
-final RegExp emailValidatorRegExp = RegExp(
-  r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-);
-
 const String kEmailNullError = "Email wajib diisi.";
 const String kInvalidEmailError = "Format email tidak valid.";
 const String kPassNullError = "Password wajib diisi.";

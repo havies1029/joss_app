@@ -7,15 +7,22 @@ class AppData {
   static bool kIsWeb = false;
   static User user = User();
   static var uriHtpp = useSSL ? Uri.https : Uri.http;
-  static String version = "1.   0.2";
+  static String version = "1.0.2";
   static bool isInOtpProcess = false;
 
-/*
-  static bool useSSL = false;
-  static String apiDomain = "http://10.211.55.5/eAssistToolsAPI/";
-  static String prefixEndPoint = "/eAssistToolsAPI";
-  static String httpAuthority = "10.211.55.5";
-*/
+
+  // static bool useSSL = false;
+  // static String apiDomain = "http://10.211.55.5/eAssistToolsAPI/";
+  // static String prefixEndPoint = "/eAssistToolsAPI";
+  // static String httpAuthority = "10.211.55.5";
+
+
+  // static bool useSSL = true;
+  // static String apiDomain =
+  //     "http${useSSL ? "s" : ""}://eassist-re.jpsre.co.id/joss_api/";
+  // static String prefixEndPoint = "joss_api";
+  // static String httpAuthority = "eassist-re.jpsre.co.id";
+
 
   // static bool useSSL = false;
   // static String apiDomain = "http://10.0.2.2/eAssistToolsAPI/";

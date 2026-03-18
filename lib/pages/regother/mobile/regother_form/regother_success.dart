@@ -113,8 +113,8 @@ class _RegotherSucessState extends State<RegotherSucess> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => DetailManagementPolisPage(
-                              data: selectedItem,
-                              cobId: cobOthers,
+                              data: context.read<Regother1CrudBloc>().state.record,
+                              cobId: "",
                               statusId: "",
                               jenisProses: widget.purpose,
                             ),

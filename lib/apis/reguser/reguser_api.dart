@@ -111,4 +111,25 @@ class RegUserAPI {
       return ReturnDataAPI(success: false, data: "", rowcount: 0);
     }
   } 
+
+  Future<ReturnDataAPI> regUserResendOtpAPI(String reguserId) async {
+		String lihatEndpoint = "${AppData.prefixEndPoint}/api/reguser/resendotp";
+		Map<String, String> queryParams = {'reguserId': reguserId, 'modul_id': 'regUserResendOtpAPI'};
+		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		final http.Response response =
+			await http.get(uri, headers: <String, String>{
+			'Content-Type': 'application/json; odata=verbos',
+			'Accept': 'application/json; odata=verbos',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		});
+
+		if (response.statusCode == 200) {
+			var returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			return returnData;
+		} else {
+			return ReturnDataAPI(success: false, data: "", rowcount: 0);
+		}
+	}
+
+
 }

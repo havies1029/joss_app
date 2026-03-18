@@ -48,3 +48,5 @@ class ComboMJnskelChangedEvent extends MRekanGeneralIdvCrudEvents{
 }
 
 class MRekanGeneralIdvCrudReloadEvent extends MRekanGeneralIdvCrudEvents {}
+
+class MRekanGeneralIdvCrudResetStatusEvent extends MRekanGeneralIdvCrudEvents {}

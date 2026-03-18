@@ -12,6 +12,7 @@ import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../../common/loading_indicator.dart';
 import 'klaim5cari_tile_widget.dart';
 
 class Klaim5cariListWidget extends StatefulWidget {
@@ -108,14 +109,8 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                     ),
                   );
           } else {
-            return const Center(
-              child: Text(
-                'No Data Available!!',
-                style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.bold),
-              ),
+            return Center(
+              child: LoadingIndicator(),
             );
           }
         },

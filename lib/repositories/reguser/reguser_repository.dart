@@ -22,4 +22,9 @@ class RegUserRepository {
   Future<ReturnDataAPI> validasiPinHP(RegUserModel record, String requestFrom) async {
     return await api.validasiPinHP(record, requestFrom);
   }
+
+  Future<ReturnDataAPI> regUserResendOtp(String reguserId) async {
+    return await api.regUserResendOtpAPI(reguserId);
+  }
+
 }

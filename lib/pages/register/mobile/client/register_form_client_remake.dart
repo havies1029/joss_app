@@ -1,7 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
+import '../../../../blocs/authentication/authentication_bloc.dart';
+import 'package:joss_app/models/user/user_model.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
@@ -33,9 +36,19 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  bool isSubmitting = false;
 
   late EmailVerificationBloc emailVerificationBloc;
+  late AuthenticationBloc authenticationBloc;
+
   late final RegUserModel? record;
+
+
+  @override
+  void initState() {
+    super.initState();
+    authenticationBloc = context.read<AuthenticationBloc>();
+  }
 
   @override
   void dispose(){
@@ -81,7 +94,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
         setErr('form1.email', kStringNullError);
         ok = false;
       } else {
-        if (!emailValidatorRegExp.hasMatch(email)) {
+        if (!EmailValidator.validate(email)) {
           setErr('form1.email', "Format tidak valid");
           ok = false;
         }
@@ -227,7 +240,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   );
 
   Widget buildFieldComboMJnsclient() => ReusableComboBox<ComboMJnsclientModel>(
-    hintText: "Jenis Client",
+    hintText: "Jenis Klien",
     initItem: fieldComboJnsClient,
     dataLoader: () => ComboMJnsclientRepository().getComboMJnsclient(),
     displayText: (i) => i.jenisNama,
@@ -243,159 +256,187 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
   @override
   Widget build(BuildContext context) {
-    var email = AppData.user.email??"";
-    final isEmail = emailValidatorRegExp.hasMatch(email.trim());
+    var email = AppData.user.email ?? "";
+    final isEmail = EmailValidator.validate(email.trim());
     lastLoginBy = isEmail ? "email" : "hp";
-    return BlocConsumer<RegUserBloc, RegUserState>(
-      listener: (context, state) {
-        // gagal dari API
-        if (state.hasFailure && state.errors.isNotEmpty) {
-          final msg = state.errors.first;
-          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
-          return;
-        }
+
+    void _handleBack() {
+      Navigator.of(context, rootNavigator: true).pop();
+      authenticationBloc.add(LoggedIn(user: AppData.user));
+    }
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack();
       },
-      builder: (context, state) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ===== Header Section (DESAIN) =====
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: vPadding,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset(
-                          'assets/images/logo.png',
-                          height: isDesktop(context)
-                              ? 56
-                              : isTablet(context)
-                              ? 48
-                              : 42,
-                          width: isDesktop(context)
-                              ? 180
-                              : isTablet(context)
-                              ? 140
-                              : 120,
-                        ),
-                        SizedBox(height: vPadding * 0.6),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: TextButton.icon(
-                              onPressed: () => Navigator.of(
-                                context,
-                                rootNavigator: true,
-                              ).pop(),
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(0, 0),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              icon: Icon(
-                                Icons.arrow_back_ios_new,
-                                color: primaryColor,
-                                size: getResponsiveFont(context, 18),
-                              ),
-                              label: Text(
-                                "Kembali",
-                                style: bodyTextStyle(context).copyWith(
+      child: BlocConsumer<RegUserBloc, RegUserState>(
+        listener: (context, state) {
+          if (state.hasFailure && state.errors.isNotEmpty) {
+            final msg = state.errors.first;
+            ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
+            return;
+          }
+        },
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: vPadding,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                            'assets/images/logo.png',
+                            height: isDesktop(context)
+                                ? 56
+                                : isTablet(context)
+                                ? 48
+                                : 42,
+                            width: isDesktop(context)
+                                ? 180
+                                : isTablet(context)
+                                ? 140
+                                : 120,
+                          ),
+                          SizedBox(height: vPadding * 0.6),
+
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: TextButton.icon(
+                                onPressed: _handleBack,
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new,
                                   color: primaryColor,
+                                  size: getResponsiveFont(context, 18),
+                                ),
+                                label: Text(
+                                  "Kembali",
+                                  style: bodyTextStyle(context)
+                                      .copyWith(color: primaryColor),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: vPadding * 0.8),
-                        WelcomeHeader(type: "register_client"),
-                      ],
-                    ),
-                  ),
 
-                  // ===== Card Section (DESAIN) =====
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: cardBorderGradient,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
+                          SizedBox(height: vPadding * 0.8),
+                          WelcomeHeader(type: "register_client"),
+                        ],
                       ),
+                    ),
+
+                    Expanded(
                       child: Container(
-                        margin: const EdgeInsets.all(1),
                         decoration: BoxDecoration(
-                          color: secondaryBlackColor,
+                          gradient: cardBorderGradient,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20),
                           ),
                         ),
-                        child: Card(
-                          color: secondaryBlackColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          margin: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: secondaryBlackColor,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
                           ),
-                          child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                _buildNameField(),
-                                SizedBox(height: vPadding),
+                          child: Card(
+                            color: secondaryBlackColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  _buildNameField(),
+                                  SizedBox(height: vPadding),
 
-                                if (lastLoginBy == 'email') ...[
-                                  _buildTeleponField(),
+                                  if (lastLoginBy == 'email') ...[
+                                    _buildTeleponField(),
+                                    SizedBox(height: vPadding),
+                                  ] else if (lastLoginBy == 'hp') ...[
+                                    _buildEmailField(),
+                                    SizedBox(height: vPadding),
+                                  ],
+
+                                  _buildPasswordField(),
                                   SizedBox(height: vPadding),
-                                ] else if (lastLoginBy == 'hp') ...[
-                                  _buildEmailField(),
+
+                                  _PasswordRequirementRow(
+                                      controller: fieldPasswordController),
+
                                   SizedBox(height: vPadding),
+
+                                  _buildKonfirmasiPasswordField(),
+                                  SizedBox(height: vPadding),
+
+                                  buildFieldComboMJnsclient(),
+                                  SizedBox(height: vPadding),
+
+                                  AppButton.primary(
+                                    text: "Simpan",
+                                    isLoading: isSubmitting,
+                                    backgroundColor: isSubmitting
+                                        ? secondaryBlackColor
+                                        : primaryColor,
+                                    onPressed: isSubmitting
+                                        ? null
+                                        : () async {
+                                      setState(() {
+                                        isSubmitting = true;
+                                      });
+
+                                      onSubmit();
+
+                                      await Future.delayed(
+                                          const Duration(seconds: 4));
+
+                                      setState(() {
+                                        isSubmitting = false;
+                                      });
+                                    },
+                                  ),
+
+                                  const Spacer(),
                                 ],
-
-                                _buildPasswordField(),
-                                SizedBox(height: vPadding),
-
-                                _PasswordRequirementRow(controller: fieldPasswordController),
-
-                                SizedBox(height: vPadding),
-
-
-                                _buildKonfirmasiPasswordField(),
-                                SizedBox(height: vPadding),
-
-                                buildFieldComboMJnsclient(),
-                                SizedBox(height: vPadding),
-
-                                AppButton.primary(
-                                  text: "Submit",
-                                  onPressed: onSubmit,
-                                ),
-
-                                const Spacer(),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -403,24 +444,24 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     final ok = validateForm1();
     if (!ok) return;
 
-    final evState = context.read<EmailVerificationBloc>().state;
+    User user = AppData.user;
 
     final bool fromEmail = lastLoginBy == 'email';
 
     final String email = fromEmail
-        ? evState.email
+        ? user.email??''
         : fieldEmailController.text.trim();
 
-    final String teleponRaw = fromEmail
-        ? fieldTeleponController.text.trim()
-        : evState.telepon;
+    String telepon = fromEmail ? fieldTeleponController.text.trim() : user.email??'';
 
-    final phoneRes = IndoPhoneHelper.normalize(teleponRaw);
-    final String teleponNormalized = phoneRes.phone62 ?? '';
+    if (lastLoginBy == 'email') {
+      var phoneRes = IndoPhoneHelper.normalize(telepon);
+      telepon = phoneRes.phone62 ?? '';
+    }
 
     final record = RegUserModel(
       personalNama: fieldNameController.text.trim(),
-      telepon: teleponNormalized,
+      telepon: telepon,
       password: fieldPasswordController.text,
       jnsClientId: fieldComboJnsClient!.mjnsclientId,
       email: email,
@@ -431,7 +472,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       RegUserTambahEvent(
         record: record,
         requestFrom: widget.requestFrom,
-        pinSentTo: fromEmail ? teleponNormalized : email,
+        pinSentTo: fromEmail ? telepon : email,
         pinSentVia: fromEmail ? "hp" : "email",
       ),
     );

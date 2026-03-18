@@ -5,59 +5,73 @@ class RekanPicCobCariState extends Equatable {
   final List<RekanPicCobCariModel> items;
   final List<RekanPicCobCariModel> selectedItems;
   final bool hasReachedMax;
+  final bool isSaved;
+  final bool isSaving;
+  final bool hasFailure;
+  final bool requestToUpdate;
+  final bool isFetchingMore;
   final String searchText;
   final String rekanPicId;
-  final int hal;  
-  final bool isSaving;
-  final bool isSaved;  
-  final bool requestToUpdate;
-  final bool hasFailure;
-  const RekanPicCobCariState(
-      {this.status = ListStatus.initial,
-      this.items = const <RekanPicCobCariModel>[],
-      this.selectedItems = const <RekanPicCobCariModel>[],
-      this.hasReachedMax = false,
-      this.searchText = "",
-      this.rekanPicId = "",
-      this.hal = 0,
-      this.isSaving = false,
-      this.isSaved = false,
-      this.requestToUpdate = false,
-      this.hasFailure = false});
+  final int hal;
 
-  const RekanPicCobCariState.success(List<RekanPicCobCariModel> items)
-      : this(status: ListStatus.success, items: items);
+  const RekanPicCobCariState({
+    this.status = ListStatus.initial,
+    this.items = const <RekanPicCobCariModel>[],
+    this.selectedItems = const <RekanPicCobCariModel>[],
+    this.hasReachedMax = false,
+    this.isSaved = false,
+    this.isSaving = false,
+    this.hasFailure = false,
+    this.requestToUpdate = false,
+    this.isFetchingMore = false,
+    this.searchText = '',
+    this.rekanPicId = '',
+    this.hal = 0,
+  });
 
-  const RekanPicCobCariState.failure() : this(status: ListStatus.failure);
-
-  RekanPicCobCariState copyWith(
-      {List<RekanPicCobCariModel>? items,
-      List<RekanPicCobCariModel>? selectedItems,
-      bool? hasReachedMax,
-      ListStatus? status,
-      String? searchText,
-      String? rekanPicId,
-      int? hal,
-      bool? isSaving,
-      bool? isSaved,
-      bool? requestToUpdate,
-      bool? hasFailure}) {
+  RekanPicCobCariState copyWith({
+    ListStatus? status,
+    List<RekanPicCobCariModel>? items,
+    List<RekanPicCobCariModel>? selectedItems,
+    bool? hasReachedMax,
+    bool? isSaved,
+    bool? isSaving,
+    bool? hasFailure,
+    bool? requestToUpdate,
+    bool? isFetchingMore,
+    String? searchText,
+    String? rekanPicId,
+    int? hal,
+  }) {
     return RekanPicCobCariState(
-        items: items ?? this.items,
-        selectedItems: selectedItems ?? this.selectedItems,
-        hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-        status: status ?? this.status,
-        searchText: searchText ?? this.searchText,
-        rekanPicId: rekanPicId ?? this.rekanPicId,
-        hal: hal ?? this.hal,
-        isSaving: isSaving ?? this.isSaving,
-        isSaved: isSaved ?? this.isSaved,
-        requestToUpdate: requestToUpdate ?? this.requestToUpdate,
-        hasFailure: hasFailure ?? this.hasFailure
-        );
+      status: status ?? this.status,
+      items: items ?? this.items,
+      selectedItems: selectedItems ?? this.selectedItems,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isSaved: isSaved ?? this.isSaved,
+      isSaving: isSaving ?? this.isSaving,
+      hasFailure: hasFailure ?? this.hasFailure,
+      requestToUpdate: requestToUpdate ?? this.requestToUpdate,
+      isFetchingMore: isFetchingMore ?? this.isFetchingMore,
+      searchText: searchText ?? this.searchText,
+      rekanPicId: rekanPicId ?? this.rekanPicId,
+      hal: hal ?? this.hal,
+    );
   }
 
   @override
-  List<Object> get props =>
-      [status, items, selectedItems, hasReachedMax, searchText, rekanPicId, hal, isSaving, isSaved, hasFailure, requestToUpdate];
+  List<Object?> get props => [
+    status,
+    items,
+    selectedItems,
+    hasReachedMax,
+    isSaved,
+    isSaving,
+    hasFailure,
+    requestToUpdate,
+    isFetchingMore,
+    searchText,
+    rekanPicId,
+    hal,
+  ];
 }

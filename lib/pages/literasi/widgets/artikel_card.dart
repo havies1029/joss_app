@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 
 Widget sectionTitleBar(BuildContext context, String text) {
   return Container(
@@ -120,28 +122,42 @@ class ArticleCardWidget extends StatelessWidget {
   Widget _buildImageWidget() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child:
-          (imageUrl != null && imageUrl!.isNotEmpty)
-              ? Image.network(
-                imageUrl!,
-                width: 160,
-                height: 113,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 160,
-                    height: 113,
-                    color: sGrey,
-                    child: const Icon(Icons.image, color: sGrey, size: 32),
-                  );
-                },
-              )
-              : Container(
-                width: 80,
-                height: 80,
-                color: sGrey,
-                child: const Icon(Icons.image, color: sGrey, size: 32),
-              ),
+      child: (imageUrl != null && imageUrl!.isNotEmpty)
+          ? CachedNetworkImage(
+        imageUrl: imageUrl!,
+        width: 160,
+        height: 113,
+        fit: BoxFit.cover,
+        placeholder: (context, url) {
+          return Container(
+            width: 160,
+            height: 113,
+            color: secondaryBlackColor,
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 22,
+              height: 22,
+              child: LoadingIndicator(),
+            ),
+          );
+        },
+        errorWidget: (context, url, error) {
+          return Container(
+            width: 160,
+            height: 113,
+            color: sGrey,
+            alignment: Alignment.center,
+            child: const Icon(Icons.image, color: sGrey, size: 32),
+          );
+        },
+      )
+          : Container(
+        width: 160,
+        height: 113,
+        color: sGrey,
+        alignment: Alignment.center,
+        child: const Icon(Icons.image, color: sGrey, size: 32),
+      ),
     );
   }
 

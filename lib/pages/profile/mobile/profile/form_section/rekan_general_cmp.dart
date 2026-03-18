@@ -31,29 +31,43 @@ class MRekanGeneralCmpCrudFormPageFormState
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+
   ComboMBentukCstModel? fieldComboMBentukCst;
   final comboMBentukCstKey =
   GlobalKey<DropdownSearchState<ComboMBentukCstModel>>();
+
   ComboMBidangModel? fieldComboMBidang;
-  final comboMBidangKey = GlobalKey<DropdownSearchState<ComboMBidangModel>>();
-  var fieldRekanNamaController = TextEditingController();
+  final comboMBidangKey =
+  GlobalKey<DropdownSearchState<ComboMBidangModel>>();
+
+  final fieldRekanNamaController = TextEditingController();
+  final fieldNamaBadanUsahaController = TextEditingController();
+  final fieldIdKlienController = TextEditingController();
+
   bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
+    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
+    // mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
     });
   }
 
+  @override
+  void dispose() {
+    fieldRekanNamaController.dispose();
+    fieldNamaBadanUsahaController.dispose();
+    fieldIdKlienController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // init bloc contact
-    mRekanGeneralCmpCrudBloc = BlocProvider.of<MRekanGeneralCmpCrudBloc>(
-      context,
-    );
-
     SizeConfig().init(context);
 
     return BaseBackgroundSidePage(
@@ -71,15 +85,37 @@ class MRekanGeneralCmpCrudFormPageFormState
                   minHeight: constraints.maxHeight,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  child: BlocConsumer<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  child: BlocConsumer<MRekanGeneralCmpCrudBloc,
+                      MRekanGeneralCmpCrudState>(
+                    listenWhen: (prev, curr) =>
+                    prev.isLoaded != curr.isLoaded ||
+                        prev.isSaved != curr.isSaved,
                     listener: (context, state) {
                       if (state.isLoaded && _isFirstLoad) {
                         final rec = state.record;
 
                         final formName = (rec?.rekanNama ?? '').trim();
-                        final fallbackName =
-                        (context.read<MRekan1CrudBloc>().state.record?.rekanNama ?? '').trim();
+                        final fallbackName = (context
+                            .read<MRekan1CrudBloc>()
+                            .state
+                            .record
+                            ?.rekanNama ??
+                            '')
+                            .trim();
+
+                        final mjenisClient = context
+                            .read<MRekan1CrudBloc>()
+                            .state
+                            .record
+                            ?.mjnsclientId;
+
+                        final idKlien = context
+                            .read<MRekan1CrudBloc>()
+                            .state
+                            .record
+                            ?.mrekan1Id;
 
                         if (fieldRekanNamaController.text.trim().isEmpty) {
                           if (formName.isNotEmpty) {
@@ -88,24 +124,42 @@ class MRekanGeneralCmpCrudFormPageFormState
                             fieldRekanNamaController.text = fallbackName;
                           }
                         }
-                        if (fieldComboMBentukCst == null) {
-                          fieldComboMBentukCst =
-                              rec?.comboMBentukCst ?? state.comboMBentukCst;
+
+                        // if (fieldNamaBadanUsahaController.text.trim().isEmpty) {
+                        //   if (mjenisClient == '10') {
+                        //     fieldNamaBadanUsahaController.text = "Individu";
+                        //   } else if (mjenisClient == '20') {
+                        //     fieldNamaBadanUsahaController.text = "Perusahaan";
+                        //   }
+                        // }
+                        fieldNamaBadanUsahaController.text = "Perusahaan";
+
+                        if (fieldIdKlienController.text.trim().isEmpty) {
+                          fieldIdKlienController.text = idKlien ?? "";
                         }
 
-                        if (fieldComboMBidang == null) {
-                          fieldComboMBidang =
-                              rec?.comboMBidang ?? state.comboMBidang;
-                        }
+                        fieldComboMBentukCst ??= rec?.comboMBentukCst ?? state.comboMBentukCst;
 
+                        fieldComboMBidang ??= rec?.comboMBidang ?? state.comboMBidang;
+
+                        setState(() {});
                         _isFirstLoad = false;
                       }
 
+                      if (state.isSaved) {
+                        if (!state.hasFailure) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            successSnackBar("Data berhasil disimpan!"),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            errorSnackBar("Data gagal disimpan!"),
+                          );
+                        }
 
-                      if (state.isSaved && !state.hasFailure) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          successSnackBar("Data berhasil disimpan!"),
-                        );
+                        context
+                            .read<MRekanGeneralCmpCrudBloc>()
+                            .add(MRekanGeneralCmpCrudResetStatusEvent());
                       }
                     },
                     builder: (context, state) {
@@ -114,15 +168,20 @@ class MRekanGeneralCmpCrudFormPageFormState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // --- Avatar ---
-                            BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-                              buildWhen: (prev, curr) => prev.runtimeType != curr.runtimeType || curr is ProfileDownloadFotoLoaded,
+                            BlocBuilder<ProfileDownloadFotoBloc,
+                                ProfileDownloadFotoState>(
+                              buildWhen: (prev, curr) =>
+                              prev.runtimeType != curr.runtimeType ||
+                                  curr is ProfileDownloadFotoLoaded,
                               builder: (context, state) {
                                 final Uint8List? imageBytes =
-                                state is ProfileDownloadFotoLoaded ? state.imageBytes : null;
+                                state is ProfileDownloadFotoLoaded
+                                    ? state.imageBytes
+                                    : null;
                                 return Center(
                                   child: InkResponse(
-                                    onTap: () => ImageUploader.pickAndUpload(context),
+                                    onTap: () =>
+                                        ImageUploader.pickAndUpload(context),
                                     containedInkWell: true,
                                     customBorder: const CircleBorder(),
                                     child: Stack(
@@ -131,22 +190,14 @@ class MRekanGeneralCmpCrudFormPageFormState
                                         CircleAvatar(
                                           radius: 50,
                                           backgroundColor: secondaryBlackColor,
-                                          backgroundImage: (imageBytes != null && imageBytes.isNotEmpty)
+                                          backgroundImage:
+                                          (imageBytes != null &&
+                                              imageBytes.isNotEmpty)
                                               ? MemoryImage(imageBytes)
                                               : null,
-                                          child: (imageBytes == null || imageBytes.isEmpty)
-                                              ? Container(
-                                            alignment: Alignment.center,
-                                            child: SvgPicture.asset(
-                                              "assets/icons/placeholder_icon.svg",
-                                              width: 40,
-                                              height: 40,
-                                              colorFilter: const ColorFilter.mode(
-                                                Colors.white,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                          )
+                                          child: (imageBytes == null ||
+                                              imageBytes.isEmpty)
+                                              ? _avatarFallback()
                                               : null,
                                         ),
                                         Positioned(
@@ -156,18 +207,42 @@ class MRekanGeneralCmpCrudFormPageFormState
                                             padding: const EdgeInsets.all(2),
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              border: Border.all(color: sGrey),
-                                              color: secondaryBlackColor,
+                                              border: Border.all(
+                                                  color: sGrey, width: 1),
+                                              color: pGrey,
                                             ),
                                             child: CircleAvatar(
                                               radius: 16,
-                                              backgroundColor: secondaryBlackColor,
-                                              child: SvgPicture.asset(
-                                                "assets/icons/camera.svg",
-                                                width: 22,
-                                                colorFilter: const ColorFilter.mode(
-                                                  Colors.white,
-                                                  BlendMode.srcIn,
+                                              backgroundColor:
+                                              Colors.transparent,
+                                              child: Center(
+                                                child: SizedBox(
+                                                  width: 22,
+                                                  height: 22,
+                                                  child: ShaderMask(
+                                                    shaderCallback:
+                                                        (Rect bounds) {
+                                                      return const LinearGradient(
+                                                        begin: Alignment
+                                                            .centerLeft,
+                                                        end: Alignment
+                                                            .centerRight,
+                                                        colors: [
+                                                          Color(0xFFFCCF6F),
+                                                          Color(0xFFEF7A28),
+                                                        ],
+                                                      ).createShader(bounds);
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      "assets/icons/camera.svg",
+                                                      width: 22,
+                                                      colorFilter:
+                                                      const ColorFilter.mode(
+                                                        Colors.white,
+                                                        BlendMode.srcIn,
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -179,22 +254,22 @@ class MRekanGeneralCmpCrudFormPageFormState
                                 );
                               },
                             ),
-
                             const SizedBox(height: vPadding),
-
-                            // --- Heading ---
                             Text(
                               "Informasi Perusahaan",
-                              style: headingStyle(context, fontSize: getResponsiveFont(context, 22))
-                                  .copyWith(color: Colors.white),
+                              style: headingStyle(
+                                context,
+                                fontSize: getResponsiveFont(context, 22),
+                              ).copyWith(color: Colors.white),
                             ),
                             Text(
                               "Lengkapi identitas dasar Anda dengan benar.",
-                              style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16))
-                                  .copyWith(color: hintGrey),
+                              style: bodyTextStyle(
+                                context,
+                                fontSize: getResponsiveFont(context, 16),
+                              ).copyWith(color: hintGrey),
                             ),
                             const SizedBox(height: vPadding),
-
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -203,10 +278,13 @@ class MRekanGeneralCmpCrudFormPageFormState
                               decoration: BoxDecoration(
                                 color: pGrey,
                                 border: Border.all(color: sGrey),
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
                               ),
                               child: Column(
                                 children: [
+                                  buildFieldIdKlien(),
+                                  const SizedBox(height: vPadding),
                                   buildFieldJenisKlien(),
                                   const SizedBox(height: vPadding),
                                   buildFieldNamaPerusahaan(),
@@ -217,9 +295,11 @@ class MRekanGeneralCmpCrudFormPageFormState
                                 ],
                               ),
                             ),
-
                             const SizedBox(height: vPadding),
-                            AppButton.primary(text: " Simpan Perubahan", onPressed: onSaveForm),
+                            AppButton.primary(
+                              text: "Simpan Perubahan",
+                              onPressed: onSaveForm,
+                            ),
                           ],
                         ),
                       );
@@ -234,22 +314,34 @@ class MRekanGeneralCmpCrudFormPageFormState
     );
   }
 
+  Widget _avatarFallback() => SvgPicture.asset(
+    'assets/icons/place_holder_2.svg',
+    width: 100,
+    height: 100,
+    fit: BoxFit.cover,
+  );
+
   void loadData() {
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
-
-    // final name =
-    //     context.read<MRekan1CrudBloc>().state.record?.rekanNama;
-    //
-    //
-    // if (fieldRekanNamaController.text.isEmpty && (name?.isNotEmpty ?? false)) {
-    //   fieldRekanNamaController.text = name!;
-    // }
-
   }
 
   Widget buildFieldBentukPerusahaan() {
+    final mjenisClient = context
+        .read<MRekan1CrudBloc>()
+        .state
+        .record
+        ?.mjnsclientId;
+
+    String hint = "Bentuk";
+
+    if (mjenisClient == '10') {
+      hint = "Bentuk Badan Individu";
+    } else if (mjenisClient == '20') {
+      hint = "Bentuk Badan Perusahaan";
+    }
+
     return ReusableComboBox<ComboMBentukCstModel>(
-      hintText: "Bentuk Badan Usaha",
+      hintText: "Bentuk Badan",
       enableSearch: false,
       comboKey: comboMBentukCstKey,
       initItem: fieldComboMBentukCst,
@@ -260,6 +352,7 @@ class MRekanGeneralCmpCrudFormPageFormState
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: kStringNullError);
+          fieldComboMBentukCst = value;
           mRekanGeneralCmpCrudBloc.add(
             ComboMBentukCstChangedEvent(comboMBentukCst: value),
           );
@@ -281,7 +374,7 @@ class MRekanGeneralCmpCrudFormPageFormState
 
   Widget buildFieldBidangUsaha() {
     return ReusableComboBox<ComboMBidangModel>(
-      hintText: "Pilih Bidang Usaha",
+      hintText: "Bisnis Utama",
       comboKey: comboMBidangKey,
       initItem: fieldComboMBidang,
       dataLoader: () => ComboMBidangRepository().getComboMBidang(),
@@ -290,6 +383,7 @@ class MRekanGeneralCmpCrudFormPageFormState
       onChangedCallback: (value) {
         if (value != null) {
           removeError(error: kStringNullError);
+          fieldComboMBidang = value;
           mRekanGeneralCmpCrudBloc.add(
             ComboMBidangChangedEvent(comboMBidang: value),
           );
@@ -327,25 +421,35 @@ class MRekanGeneralCmpCrudFormPageFormState
 
   Widget buildFieldJenisKlien() {
     return appTextField(
-      label: "Badan Usaha",
-      controller: TextEditingController(),
+      label: "Tipe",
+      controller: fieldNamaBadanUsahaController,
+      enabled: false,
+    );
+  }
+
+  Widget buildFieldIdKlien() {
+    return appTextField(
+      label: "ID KLIEN",
+      controller: fieldIdKlienController,
       enabled: false,
     );
   }
 
   void onSaveForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      MRekanGeneralCmpCrudModel record = MRekanGeneralCmpCrudModel(
-        mbentukcstId: fieldComboMBentukCst?.mbentukcstId,
-        mbidangId: fieldComboMBidang?.mbidangId,
-        rekanNama: fieldRekanNamaController.text,
-      );
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
 
-      mRekanGeneralCmpCrudBloc.add(
-        MRekanGeneralCmpCrudUbahEvent(record: record),
-      );
-    }
+    final record = MRekanGeneralCmpCrudModel(
+      mbentukcstId: fieldComboMBentukCst?.mbentukcstId,
+      mbidangId: fieldComboMBidang?.mbidangId,
+      rekanNama: fieldRekanNamaController.text.trim(),
+      comboMBentukCst: fieldComboMBentukCst,
+      comboMBidang: fieldComboMBidang,
+    );
+
+    mRekanGeneralCmpCrudBloc.add(
+      MRekanGeneralCmpCrudUbahEvent(record: record),
+    );
   }
 
   void removeError({required String error}) {

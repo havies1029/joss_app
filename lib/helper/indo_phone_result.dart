@@ -49,6 +49,22 @@ class IndoPhoneHelper {
     return IndoPhoneResult.success(normalized);
   }
 
+  static String toDisplay(String? rawInput) {
+    if (rawInput == null || rawInput.trim().isEmpty) return '';
+
+    final digits = _clean(rawInput);
+
+    if (digits.startsWith('62')) {
+      return digits.substring(2);
+    }
+
+    if (digits.startsWith('0')) {
+      return digits.substring(1);
+    }
+
+    return digits;
+  }
+
   /// Shortcut: cek valid atau tidak
   static bool isValid(String input) {
     return normalize(input).isValid;

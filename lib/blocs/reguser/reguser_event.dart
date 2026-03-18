@@ -61,3 +61,12 @@ class SetIsEmailEvent extends RegUserEvents {
 	@override
 	List<Object> get props => [isEmail];
 }
+
+class ResendOtpEvent extends RegUserEvents {
+  final String reguserId;
+
+  const ResendOtpEvent({required this.reguserId});
+
+  @override
+  List<Object> get props => [reguserId];
+}

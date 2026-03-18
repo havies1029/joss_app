@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../../common/constants.dart';
 import '../../../../../../blocs/regklaim/polissourcecari_bloc.dart';
+import '../../../../../common/loading_indicator.dart';
 
 class ButtonPolisSourceWidget extends StatefulWidget {
   const ButtonPolisSourceWidget({super.key});
@@ -27,7 +28,7 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
             height: 44,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: LoadingIndicator(),
             ),
           );
         }

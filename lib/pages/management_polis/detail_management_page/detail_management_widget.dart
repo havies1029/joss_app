@@ -292,179 +292,169 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     SizeConfig().init(context);
     final dataMap = _toMap(widget.data);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: BaseBackgroundSidePage(
-          onBack: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const ManagementPolisPage()),
-                  (route) => route.isFirst,
-            );
-          },
-          title: 'Detail Management Polis',
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: secondaryBlackColor,
+    void goToManagementPolis() {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const ManagementPolisPage()),
+            (route) => route.isFirst,
+      );
+    }
 
-            child: Column(
-              children: [
-                Expanded(
-                  child: MultiBlocListener(
-                    listeners: [
-                      BlocListener<Regendors2CariBloc, Regendors2CariState>(
-                        listenWhen: (prev, next) =>
-                        prev.status != next.status || prev.items != next.items,
-                        listener: (context, state) {
-                          if (state.status == ListStatus.initial) {
-                            setState(() => _loading = true);
-                            return;
-                          }
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        goToManagementPolis();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: BaseBackgroundSidePage(
+            onBack: goToManagementPolis,
+            title: 'Detail Management Polis',
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: secondaryBlackColor,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: MultiBlocListener(
+                      listeners: [
+                        BlocListener<Regendors2CariBloc, Regendors2CariState>(
+                          listenWhen: (prev, next) =>
+                          prev.status != next.status || prev.items != next.items,
+                          listener: (context, state) {
+                            if (state.status == ListStatus.initial) {
+                              setState(() => _loading = true);
+                              return;
+                            }
 
-                          setState(() {
-                            _loading = false;
-                            _items = List.from(state.items);
-                            _emptyText = "Belum ada proses Endorsement";
-                            _getDateTime =
-                                (x) => (x as Regendors2CariModel).tglStatus;
-                            _getStatusText =
-                                (x) => (x as Regendors2CariModel).progressNama;
-                            _recomputeNewest();
-                          });
-                        },
-                      ),
-                      BlocListener<Regreaktif2CariBloc, Regreaktif2CariState>(
-                        listenWhen: (prev, next) =>
-                        prev.status != next.status || prev.items != next.items,
-                        listener: (context, state) {
-                          if (state.status == ListStatus.initial) {
-                            setState(() => _loading = true);
-                            return;
-                          }
+                            setState(() {
+                              _loading = false;
+                              _items = List.from(state.items);
+                              _emptyText = "Belum ada proses Endorsement";
+                              _getDateTime =
+                                  (x) => (x as Regendors2CariModel).tglStatus;
+                              _getStatusText =
+                                  (x) => (x as Regendors2CariModel).progressNama;
+                              _recomputeNewest();
+                            });
+                          },
+                        ),
+                        BlocListener<Regreaktif2CariBloc, Regreaktif2CariState>(
+                          listenWhen: (prev, next) =>
+                          prev.status != next.status || prev.items != next.items,
+                          listener: (context, state) {
+                            if (state.status == ListStatus.initial) {
+                              setState(() => _loading = true);
+                              return;
+                            }
 
-                          setState(() {
-                            _loading = false;
-                            _items = List.from(state.items);
-                            _emptyText = "Belum ada proses Aktifkan Kembali";
-                            _getDateTime =
-                                (x) => (x as Regreaktif2CariModel).tglStatus;
-                            _getStatusText =
-                                (x) => (x as Regreaktif2CariModel).progressNama;
-                            _recomputeNewest();
-                          });
-                        },
-                      ),
-                      BlocListener<Regrenewal2CariBloc, Regrenewal2CariState>(
-                        listenWhen: (prev, next) =>
-                        prev.status != next.status || prev.items != next.items,
-                        listener: (context, state) {
-                          if (state.status == ListStatus.initial) {
-                            setState(() => _loading = true);
-                            return;
-                          }
+                            setState(() {
+                              _loading = false;
+                              _items = List.from(state.items);
+                              _emptyText = "Belum ada proses Aktifkan Kembali";
+                              _getDateTime =
+                                  (x) => (x as Regreaktif2CariModel).tglStatus;
+                              _getStatusText =
+                                  (x) => (x as Regreaktif2CariModel).progressNama;
+                              _recomputeNewest();
+                            });
+                          },
+                        ),
+                        BlocListener<Regrenewal2CariBloc, Regrenewal2CariState>(
+                          listenWhen: (prev, next) =>
+                          prev.status != next.status || prev.items != next.items,
+                          listener: (context, state) {
+                            if (state.status == ListStatus.initial) {
+                              setState(() => _loading = true);
+                              return;
+                            }
 
-                          setState(() {
-                            _loading = false;
-                            _items = List.from(state.items);
-                            _emptyText = "Belum ada proses Perpanjang";
-                            _getDateTime =
-                                (x) => (x as Regrenewal2CariModel).tglStatus;
-                            _getStatusText =
-                                (x) => (x as Regrenewal2CariModel).progressNama;
-                            _recomputeNewest();
-                          });
-                        },
-                      ),
-                      BlocListener<Regother3cariBloc, Regother3cariState>(
-                        listenWhen: (prev, next) =>
-                        prev.status != next.status || prev.items != next.items,
-                        listener: (context, state) {
-                          if (state.status == ListStatus.initial) {
-                            setState(() => _loading = true);
-                            return;
-                          }
+                            setState(() {
+                              _loading = false;
+                              _items = List.from(state.items);
+                              _emptyText = "Belum ada proses Perpanjang";
+                              _getDateTime =
+                                  (x) => (x as Regrenewal2CariModel).tglStatus;
+                              _getStatusText =
+                                  (x) => (x as Regrenewal2CariModel).progressNama;
+                              _recomputeNewest();
+                            });
+                          },
+                        ),
+                        BlocListener<Regother3cariBloc, Regother3cariState>(
+                          listenWhen: (prev, next) =>
+                          prev.status != next.status || prev.items != next.items,
+                          listener: (context, state) {
+                            if (state.status == ListStatus.initial) {
+                              setState(() => _loading = true);
+                              return;
+                            }
 
-                          setState(() {
-                            _loading = false;
-                            _items = List.from(state.items);
-                            _emptyText = "Belum ada proses Others";
-                            _getDateTime =
-                                (x) => (x as Regother3cariModel).tglStatus;
-                            _getStatusText =
-                                (x) => (x as Regother3cariModel).progressNama;
-                          });
-                        },
-                      ),
-                    ],
-
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: hPadding * 1.5,
-                        vertical: hPadding,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PolisDetailCard(
-                            cobId: widget.cobId,
-                            dataMap: dataMap,
-                            title: null,
-                            excludeKeys: const {},
-                            cardColor: pGrey,
-                            borderColor: sGrey,
-                            dividerColor: sGrey,
-                            labelColor: hintGrey,
-                            valueColor: primaryLightColor,
-                            borderRadius: cardBorderRadius,
-                            fontSize: (ctx, base) => getResponsiveFont(ctx, base),
-                          ),
-                          const SizedBox(height: 20),
-                          _buildTimeline(),
-                          // const SizedBox(height: 20),
-                          // HelpContactCardWidget(
-                          //   title: "Butuh bantuan?",
-                          //   contactText: "Hubungi 021-123456 atau support@email.com",
-                          //   onPressed: () => debugPrint("☎️ Tombol Hubungi diklik!"),
-                          // ),
-
-                          const SizedBox(height: 16),
-                        ],
+                            setState(() {
+                              _loading = false;
+                              _items = List.from(state.items);
+                              _emptyText = "Belum ada proses Others";
+                              _getDateTime =
+                                  (x) => (x as Regother3cariModel).tglStatus;
+                              _getStatusText =
+                                  (x) => (x as Regother3cariModel).progressNama;
+                            });
+                          },
+                        ),
+                      ],
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: hPadding * 1.5,
+                          vertical: hPadding,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            PolisDetailCard(
+                              cobId: widget.cobId,
+                              dataMap: dataMap,
+                              title: null,
+                              excludeKeys: const {},
+                              cardColor: pGrey,
+                              borderColor: sGrey,
+                              dividerColor: sGrey,
+                              labelColor: hintGrey,
+                              valueColor: primaryLightColor,
+                              borderRadius: cardBorderRadius,
+                              fontSize: (ctx, base) => getResponsiveFont(ctx, base),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildTimeline(),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-
-                Container(
-                  width: double.infinity,
-                  color: secondaryBlackColor,
-                  padding: EdgeInsets.fromLTRB(
-                    hPadding * 1.5,
-                    12,
-                    hPadding * 1.5,
-                    12 + MediaQuery.of(context).padding.bottom,
+                  Container(
+                    width: double.infinity,
+                    color: secondaryBlackColor,
+                    padding: EdgeInsets.fromLTRB(
+                      hPadding * 1.5,
+                      12,
+                      hPadding * 1.5,
+                      12 + MediaQuery.of(context).padding.bottom,
+                    ),
+                    child: AppButton(
+                      text: "Kembali ke Polis",
+                      onPressed: goToManagementPolis,
+                    ),
                   ),
-                  child: AppButton(
-                    text: "Kembali ke Polis",
-                    // icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      // int count = 0;
-                      // Navigator.popUntil(context, (route) => count++ == 4);
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const ManagementPolisPage()),
-                            (route) => route.isFirst,
-                      );
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
-
 
   Widget _buildTimeline() {
     if (_loading) {

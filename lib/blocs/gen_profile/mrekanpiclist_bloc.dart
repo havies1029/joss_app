@@ -9,28 +9,8 @@ part 'mrekanpiclist_event.dart';
 part 'mrekanpiclist_state.dart';
 
 class MRekanPicListBloc extends Bloc<MRekanPicListEvents, MRekanPicListState> {
-	final MRekanPicListRepository repository;
-
-	MRekanPicListBloc({required this.repository}) : super(const MRekanPicListState()) {
-		on<FetchMRekanPicListEvent>((event, emit) async {
-			emit(state.copyWith(
-				// status: ListStatus.loading,
-				items: [],
-				hasReachedMax: false,
-			));
-
-			try {
-				final newItems = await repository.getMRekanPicList();
-
-				emit(state.copyWith(
-					status: ListStatus.success,
-					items: newItems,
-				));
-			} catch (e) {
-				emit(state.copyWith(status: ListStatus.failure));
-			}
-		});
-
+	MRekanPicListBloc() : super(const MRekanPicListState()) {
+		on<FetchMRekanPicListEvent>(onFetchMRekanPicList);
 		on<RefreshMRekanPicListEvent>(onRefreshMRekanPicList);
 		on<UbahMRekanPicListEvent>(onUbahMRekanPicList);
 		on<TambahMRekanPicListEvent>(onTambahMRekanPicList);
@@ -39,41 +19,46 @@ class MRekanPicListBloc extends Bloc<MRekanPicListEvents, MRekanPicListState> {
 	}
 
 	Future<void> onRefreshMRekanPicList(
-			RefreshMRekanPicListEvent event, Emitter<MRekanPicListState> emit) async {
-		emit(const MRekanPicListState());
-		add(FetchMRekanPicListEvent());
+			RefreshMRekanPicListEvent event,
+			Emitter<MRekanPicListState> emit,
+			) async {
+		try {
+			emit(const MRekanPicListState());
+
+			final repo = MRekanPicListRepository();
+			final items = await repo.getMRekanPicList();
+
+			emit(state.copyWith(
+				items: items,
+				status: ListStatus.success,
+				hasReachedMax: true,
+				hal: 1,
+			));
+		} catch (e) {
+			emit(state.copyWith(status: ListStatus.failure));
+		}
 	}
 
 	Future<void> onFetchMRekanPicList(
-			FetchMRekanPicListEvent event, Emitter<MRekanPicListState> emit) async {
-		if (state.hasReachedMax) return;
+			FetchMRekanPicListEvent event,
+			Emitter<MRekanPicListState> emit,
+			) async {
+		try {
+			emit(state.copyWith(status: ListStatus.initial));
 
-		MRekanPicListRepository repo = MRekanPicListRepository();
-		if (state.status == ListStatus.initial) {
-			List<MRekanPicListModel> items = await repo.getMRekanPicList();
-			return emit(state.copyWith(
-					items: items,
-					hasReachedMax: false,
-					status: ListStatus.success,
-					hal: 1));
-		}
-		List<MRekanPicListModel> items = await repo.getMRekanPicList();
-		if (items.isEmpty) {
-			return emit(state.copyWith(hasReachedMax: true));
-		} else {
-			List<MRekanPicListModel> mRekanPicList = List.of(state.items)..addAll(items);
+			final repo = MRekanPicListRepository();
+			final items = await repo.getMRekanPicList();
 
-			final result = mRekanPicList
-					.whereWithIndex((e, index) =>
-			mRekanPicList.indexWhere((e2) => e2.mrekanpicId == e.mrekanpicId) ==
-					index)
-					.toList();
-
-			return emit(state.copyWith(
-					items: result,
-					hasReachedMax: false,
-					status: ListStatus.success,
-					hal: state.hal + 1));
+			emit(state.copyWith(
+				items: items,
+				status: ListStatus.success,
+				hasReachedMax: true,
+				hal: 1,
+			));
+		} catch (e) {
+			emit(state.copyWith(
+				status: ListStatus.failure,
+			));
 		}
 	}
 

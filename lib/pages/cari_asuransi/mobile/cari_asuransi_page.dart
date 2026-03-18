@@ -101,6 +101,7 @@ class CariAsuransiWidget extends StatelessWidget {
           decoration: BoxDecoration(color: secondaryBlackColor),
           child: Column(
             children: [
+              const SizedBox(height: hPadding),
               Text(
                 "Kategori Asuransi",
                 style: bodyTextStyle(context),

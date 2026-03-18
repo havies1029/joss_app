@@ -12,7 +12,7 @@ class Regother1CrudState extends Equatable {
 	final ComboRMatauangModel? comboRMatauang;
 	final Regother1CrudModel? selectedItem;
 	final String selectedCOBId;
-
+	final String namaCob;
 	const Regother1CrudState(
 			{this.record,
 				this.selectedItem,
@@ -24,6 +24,7 @@ class Regother1CrudState extends Equatable {
 				this.hasFailure = false,
 				this.comboMCobApp1,
 				this.comboRMatauang,
+				this.namaCob = '',
 			});
 
 	Regother1CrudState copyWith({
@@ -37,6 +38,7 @@ class Regother1CrudState extends Equatable {
 		bool? hasFailure,
 		ComboMCobApp1Model? comboMCobApp1,
 		ComboRMatauangModel? comboRMatauang,
+		String? namaCob,
 	}){
 		return Regother1CrudState(
 			record: record ?? this.record,
@@ -49,11 +51,12 @@ class Regother1CrudState extends Equatable {
 			comboMCobApp1: comboMCobApp1?? this.comboMCobApp1,
 			comboRMatauang: comboRMatauang?? this.comboRMatauang,
 			selectedCOBId: selectedCOBId ?? this.selectedCOBId,
+			namaCob: namaCob ?? this.namaCob,
 		);
 	}
 
 	factory Regother1CrudState.initial() {
-		return const Regother1CrudState(
+		return Regother1CrudState(
 			record: null,
 			isLoading: false,
 			isLoaded: false,
@@ -67,5 +70,5 @@ class Regother1CrudState extends Equatable {
 
 
 	@override
-	List<Object?> get props => [record, selectedItem, isLoading, isLoaded, isSaving, isSaved, hasFailure, selectedCOBId];
+	List<Object?> get props => [record, selectedItem, isLoading, isLoaded, isSaving, isSaved, hasFailure, selectedCOBId, namaCob];
 }

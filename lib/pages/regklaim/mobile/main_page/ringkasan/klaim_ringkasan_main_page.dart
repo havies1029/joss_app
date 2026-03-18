@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/helper/expert_helper.dart';
 import 'package:joss_app/helper/mobile_expert_helper.dart';
-import 'package:joss_app/widgets/EmptyStateWidget.dart';
 import 'package:joss_app/widgets/apptheme/polis_button.dart';
 import 'package:joss_app/widgets/apptheme/popup_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../../common/loading_indicator.dart';
+import '../../../../../widgets/apptheme/empty_state_page.dart';
 import 'klaim_ringkasan_status_widget.dart';
 import 'klaim_ringkasan_table_widget.dart';
 
@@ -21,101 +22,110 @@ class KlaimRingkasanMainPage extends StatefulWidget {
   State<KlaimRingkasanMainPage> createState() => _KlaimRingkasanMainPageState();
 }
 
-class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
-  final TextEditingController _searchController = TextEditingController();
+  class _KlaimRingkasanMainPageState extends State<KlaimRingkasanMainPage> {
+    final TextEditingController _searchController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      refreshData();
-    });
-  }
+    @override
+    void initState() {
+      super.initState();
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        refreshData();
+      });
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _buildHeader(context),
-        Expanded(child: _buildBody(context)),
-      ],
-    );
-  }
+    @override
+    void dispose() {
+      _searchController.dispose();
+      super.dispose();
+    }
 
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      color: secondaryBlackColor,
-      padding: EdgeInsets.symmetric(
-        horizontal: hPadding * 1.5,
-        vertical: hPadding,
-      ),
-      child: Column(
+    @override
+    Widget build(BuildContext context) {
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              PolisButton(
-                assetPath: "assets/icons/unduh.svg",
-                bgColor: bGrey,
-                borderColor: bdGrey,
-                onTap: () => _showExportDialog(context),
-                iconSize: 16,
-                height: 36,
-                width: 36,
-              ),
-              const SizedBox(width: 8),
-              PolisButton(
-                assetPath: "assets/icons/bagikan.svg",
-                bgColor: bBlue,
-                borderColor: bdBlue,
-                onTap: () => _onShare(context),
-                iconSize: 16,
-                height: 36,
-                width: 36,
-              ),
-            ],
-          ),
-          const SizedBox(height: hPadding),
-          const KlaimRingkasanStatusWidget(),
+          _buildHeader(context),
+          Expanded(child: _buildBody(context)),
         ],
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildBody(BuildContext context) {
-    return BlocBuilder<KlaimringkasCariBloc, KlaimringkasCariState>(
-      builder: (context, s) {
-        final statusId = context.select<MstatusringkasCariBloc, String>(
-              (b) => b.state.selectedStatusId,
-        );
+    Widget _buildHeader(BuildContext context) {
+      return Container(
+        color: secondaryBlackColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: hPadding * 1.5,
+          vertical: hPadding,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                PolisButton(
+                  assetPath: "assets/icons/unduh.svg",
+                  bgColor: bGrey,
+                  borderColor: bdGrey,
+                  onTap: () => _showExportDialog(context),
+                  iconSize: 16,
+                  height: 36,
+                  width: 36,
+                ),
+                const SizedBox(width: 8),
+                PolisButton(
+                  assetPath: "assets/icons/bagikan.svg",
+                  bgColor: bBlue,
+                  borderColor: bdBlue,
+                  onTap: () => _onShare(context),
+                  iconSize: 16,
+                  height: 36,
+                  width: 36,
+                ),
+              ],
+            ),
+            const SizedBox(height: hPadding),
+            const KlaimRingkasanStatusWidget(),
+          ],
+        ),
+      );
+    }
 
-        if (s.status == ListStatus.initial ||
-            s.status == ListStatus.loadingMore) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    Widget _buildBody(BuildContext context) {
+      final statusId = context.select<MstatusringkasCariBloc, String>(
+            (b) => b.state.selectedStatusId,
+      );
 
-        if (s.status == ListStatus.failure) {
-          return const Center(child: Text('Failed to fetch data'));
-        }
+      return BlocBuilder<KlaimringkasCariBloc, KlaimringkasCariState>(
+        buildWhen: (previous, current) =>
+        previous.status != current.status ||
+            previous.items != current.items,
+        builder: (context, s) {
+          if (s.status == ListStatus.initial ||
+              s.status == ListStatus.loadingMore) {
+            return const Center(child: LoadingIndicator());
+          }
 
-        if (s.items.isEmpty) {
-          return EmptyStateWidget(statusId: statusId);
-        }
+          if (s.status == ListStatus.failure) {
+            return const Center(child: Text('Failed to fetch data'));
+          }
 
-        return KlaimRingkasanTableWidget();
-      },
-    );
-  }
+          if (s.status == ListStatus.success && s.items.isEmpty) {
+            return const Center(
+              child: EmptyStatePage(
+                iconPath: 'assets/icons/belipolis_no_file.svg',
+                title: 'Tidak ada Klaim',
+                description: 'Klaim yang Anda ajukan akan muncul di sini ketika tersedia.',
+              ),
+            );
+          }
+
+          return KlaimRingkasanTableWidget();
+        },
+      );
+    }
 
   void refreshData() {
     final statusId =

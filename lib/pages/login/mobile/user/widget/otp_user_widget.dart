@@ -9,11 +9,9 @@ import 'package:pinput/pinput.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../../blocs/login/forgot_password_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/indo_phone_result.dart';
 import '../../../../../models/login/emailverification_model.dart';
-import '../../../../../models/login/forgot_password_model.dart';
 import '../../../../base/base_background_firstpage.dart';
 
 class PopupUserWidget extends StatefulWidget {
@@ -157,10 +155,16 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   }
 
   void _resendOtp() {
+    //micky 2026-03-05
+    // cegah onCompleted kepanggil dari value lama / autofill
+    _pinController.clear();
     setState(() {
+      _otpError = false;
       _remainingTime = 59;
       _isResendAvailable = false;
     });
+    FocusScope.of(context).unfocus();
+    Future.microtask(() => _pinFocusNode.requestFocus());
     _startTimer();
 
     HapticFeedback.lightImpact();
@@ -230,7 +234,6 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
 
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -263,253 +266,297 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
     );
 
     return BlocListener<EmailVerificationBloc, EmailVerificationState>(
+      listenWhen: (previous, current) =>
+      previous.isLoaded != current.isLoaded ||
+          previous.verificationFailed != current.verificationFailed,
       listener: (context, state) {
+        if (!state.isLoaded) return;
+
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+
         if (state.verificationFailed) {
           _shakeOtpFields();
-
           setState(() => _otpError = true);
 
           _pinController.clear();
           _pinFocusNode.requestFocus();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kode OTP salah, silakan coba lagi'),
-              backgroundColor: Colors.red,
+          messenger.showSnackBar(
+            errorSnackBar(
+              state.errors.isNotEmpty
+                  ? state.errors.first
+                  : 'Verifikasi OTP gagal',
             ),
+          );
+        } else {
+          messenger.showSnackBar(
+            successSnackBar('Verifikasi OTP berhasil'),
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: secondaryBlackColor,
-        body: SafeArea(
-          child: BaseBackgroundFirstPage(
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: TextButton.icon(
-                                    onPressed: () {
-                                      _pinController.clear();
-                                      _timer?.cancel();
-                                      Navigator.of(context,
-                                          rootNavigator: false)
-                                          .pop();
-                                      context
-                                          .read<AuthenticationBloc>()
-                                          .add(LoggedOut());
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: const Size(0, 0),
-                                      tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    icon: Icon(
-                                      Icons.arrow_back_ios_new,
-                                      color: primaryLightColor,
-                                      size: getResponsiveFont(context, 18),
-                                    ),
-                                    label: Text(
-                                      "Kembali",
-                                      style: bodyTextStyle(context).copyWith(
-                                          color: primaryLightColor),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+
+          _pinController.clear();
+          _timer?.cancel();
+
+          Navigator.of(context, rootNavigator: false).pop();
+
+          context.read<AuthenticationBloc>().add(LoggedOut());
+        },
+
+        child: Scaffold(
+          backgroundColor: secondaryBlackColor,
+          body: SafeArea(
+            child: BaseBackgroundFirstPage(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: SlideTransition(
+                          position: _slideAnimation,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: TextButton.icon(
+                                      onPressed: () {
+                                        _pinController.clear();
+                                        _timer?.cancel();
+                                        Navigator.of(context,
+                                            rootNavigator: false)
+                                            .pop();
+                                        context
+                                            .read<AuthenticationBloc>()
+                                            .add(LoggedOut());
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: const Size(0, 0),
+                                        tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new,
+                                        color: primaryLightColor,
+                                        size:
+                                        getResponsiveFont(context, 18),
+                                      ),
+                                      label: Text(
+                                        "Kembali",
+                                        style: bodyTextStyle(context)
+                                            .copyWith(
+                                            color: primaryLightColor),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: cardBorderGradient,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  topRight: Radius.circular(20),
-                                ),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: vPadding * 2,
-                                  horizontal: hPadding * 1.5,
-                                ),
-                                margin: const EdgeInsets.all(1),
-                                decoration: const BoxDecoration(
-                                  color: secondaryBlackColor,
-                                  borderRadius: BorderRadius.only(
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: cardBorderGradient,
+                                  borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(20),
                                     topRight: Radius.circular(20),
                                   ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    SvgPicture.asset(
-                                      "assets/icons/otp_icon.svg",
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: vPadding * 2,
+                                    horizontal: hPadding * 1.5,
+                                  ),
+                                  margin: const EdgeInsets.all(1),
+                                  decoration: const BoxDecoration(
+                                    color: secondaryBlackColor,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
                                     ),
-                                    const SizedBox(height: 24),
-                                    Text(
-                                      'Verifikasi OTP',
-                                      style: headingStyle(context,
-                                          fontSize: 25),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(widget.email)}",
-                                          style: bodyTextStyle(context,
-                                              fontSize: 20),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Text(
-                                          _buildOtpValue(widget.email),
-                                          style: bodyTextStyle(context,
-                                              fontSize: 20)
-                                              .copyWith(color: primaryColor),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    AnimatedSwitcher(
-                                      duration:
-                                      const Duration(milliseconds: 300),
-                                      child: _isResendAvailable
-                                          ? GestureDetector(
-                                        onTap: _resendOtp,
-                                        child: Text(
-                                          'Kirim ulang kode',
-                                          style: bodyTextStyle(context)
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/icons/otp_icon.svg",
+                                      ),
+                                      const SizedBox(height: 24),
+                                      Text(
+                                        'Verifikasi OTP',
+                                        style: headingStyle(context,
+                                            fontSize: 25),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(widget.email)}",
+                                            style: bodyTextStyle(context,
+                                                fontSize: 20),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          Text(
+                                            _buildOtpValue(widget.email),
+                                            style: bodyTextStyle(context,
+                                                fontSize: 20)
+                                                .copyWith(
+                                                color: primaryColor),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      AnimatedSwitcher(
+                                        duration: const Duration(
+                                            milliseconds: 300),
+                                        child: _isResendAvailable
+                                            ? GestureDetector(
+                                          onTap: _resendOtp,
+                                          child: Text(
+                                            'Kirim ulang kode',
+                                            style: bodyTextStyle(
+                                                context)
+                                                .copyWith(
+                                                color:
+                                                primaryColor),
+                                          ),
+                                        )
+                                            : Text(
+                                          _formatTime(
+                                              _remainingTime),
+                                          style: bodyTextStyle(
+                                              context)
                                               .copyWith(
-                                              color: primaryColor),
+                                              color: pRed),
                                         ),
-                                      )
-                                          : Text(
-                                        _formatTime(_remainingTime),
-                                        style: bodyTextStyle(context)
-                                            .copyWith(color: pRed),
                                       ),
-                                    ),
-                                    const SizedBox(height: 16),
+                                      const SizedBox(height: 16),
 
-                                    // 🔢 OTP Field (Pinput) + Shake (tetap)
-                                    AnimatedBuilder(
-                                      animation: _shakeAnimation,
-                                      builder: (_, child) {
-                                        return Transform.translate(
-                                          offset: Offset(
-                                            math.sin(_shakeAnimation.value) *
-                                                8,
-                                            0,
-                                          ),
-                                          child: child,
-                                        );
-                                      },
-                                      child: TextSelectionTheme(
-                                        data: TextSelectionThemeData(
-                                          cursorColor: primaryColor,
-                                          selectionColor: primaryColor
-                                              .withOpacity(0.25),
-                                          selectionHandleColor: primaryColor,
-                                        ),
-                                        child: Pinput(
-                                          length: 6,
-                                          controller: _pinController,
-                                          focusNode: _pinFocusNode,
-
-                                          keyboardType:
-                                          TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly
-                                          ],
-                                          autofillHints: const <String>[],
-
-                                          defaultPinTheme: basePinTheme,
-                                          focusedPinTheme: focusedPinTheme,
-                                          errorPinTheme: errorPinTheme,
-                                          forceErrorState: _otpError,
-
-                                          showCursor: true,
-                                          cursor: Align(
-                                            alignment: Alignment.center,
-                                            child: Container(
-                                              width: 2,
-                                              height: 24,
-                                              color: primaryColor,
+                                      AnimatedBuilder(
+                                        animation: _shakeAnimation,
+                                        builder: (_, child) {
+                                          return Transform.translate(
+                                            offset: Offset(
+                                              math.sin(_shakeAnimation
+                                                  .value) *
+                                                  8,
+                                              0,
                                             ),
+                                            child: child,
+                                          );
+                                        },
+                                        child: TextSelectionTheme(
+                                          data: TextSelectionThemeData(
+                                            cursorColor: primaryColor,
+                                            selectionColor: primaryColor
+                                                .withOpacity(0.25),
+                                            selectionHandleColor:
+                                            primaryColor,
                                           ),
+                                          child: Pinput(
+                                            length: 6,
+                                            controller: _pinController,
+                                            focusNode: _pinFocusNode,
+                                            keyboardType:
+                                            TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly
+                                            ],
+                                            autofillHints:
+                                            const <String>[],
 
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                            defaultPinTheme: basePinTheme,
+                                            focusedPinTheme:
+                                            focusedPinTheme,
+                                            errorPinTheme:
+                                            errorPinTheme,
+                                            forceErrorState: _otpError,
 
-                                          onTap: () => HapticFeedback
-                                              .selectionClick(),
+                                            showCursor: true,
+                                            cursor: Align(
+                                              alignment:
+                                              Alignment.center,
+                                              child: Container(
+                                                width: 2,
+                                                height: 24,
+                                                color: primaryColor,
+                                              ),
+                                            ),
 
-                                          onChanged: (v) {
-                                            // reset error state saat user mulai input lagi
-                                            if (_otpError) {
-                                              setState(() => _otpError = false);
-                                            }
-                                          },
+                                            mainAxisAlignment:
+                                            MainAxisAlignment
+                                                .spaceEvenly,
 
-                                          // auto verify saat 6 digit
-                                          onCompleted: (pin) {
-                                            if (_otpError) {
-                                              setState(
-                                                      () => _otpError = false);
-                                            }
-                                            _verifyOtpFromPin(pin);
-                                          },
+                                            onTap: () =>
+                                                HapticFeedback
+                                                    .selectionClick(),
+
+                                            onChanged: (v) {
+                                              if (_otpError) {
+                                                setState(() =>
+                                                _otpError =
+                                                false);
+                                              }
+                                            },
+
+                                            onCompleted: (pin) {
+                                              if (_otpError) {
+                                                setState(() =>
+                                                _otpError =
+                                                false);
+                                              }
+                                              _verifyOtpFromPin(pin);
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ),
 
-                                    const SizedBox(height: 18),
-                                    Text(
-                                      'Silakan masukkan kode di atas untuk melanjutkan.',
-                                      style: bodyTextStyle(context)
-                                          .copyWith(color: hintGrey),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 18),
+                                      const SizedBox(height: 18),
+                                      Text(
+                                        'Silakan masukkan kode di atas untuk melanjutkan.',
+                                        style: bodyTextStyle(context)
+                                            .copyWith(color: hintGrey),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 18),
 
-                                    AppButton.primary(
-                                      text: "Lanjut",
-                                      onPressed: () {
-                                        final otp = _pinController.text;
-                                        if (otp.length == 6) {
-                                          _verifyOtpFromPin(otp);
-                                        } else {
-                                          _shakeOtpFields();
-                                          setState(() => _otpError = true);
-                                          _pinFocusNode.requestFocus();
-                                        }
-                                      },
-                                    ),
-                                  ],
+                                      AppButton.primary(
+                                        text: "Lanjut",
+                                        onPressed: () {
+                                          final otp =
+                                              _pinController.text;
+                                          if (otp.length == 6) {
+                                            _verifyOtpFromPin(otp);
+                                          } else {
+                                            _shakeOtpFields();
+                                            setState(() =>
+                                            _otpError = true);
+                                            _pinFocusNode
+                                                .requestFocus();
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

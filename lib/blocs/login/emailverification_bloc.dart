@@ -25,9 +25,18 @@ class EmailVerificationBloc
     on<ValidasiPinEmailEvent>(onValidasiPinEmail);
     on<FieldSimpanPasswordChangedEvent>(onFieldSimpanPasswordChangedEvent);
     on<FieldEmailVerificationChangedEvent>(onFieldEmailVerificationChangedEvent);
-    on<FieldTeleponVerificationChangedEvent>(onFieldTeleponVerificationChangedEvent);
-    on<ResendOtpEvent>(onResendOtp);     
+    on<ClearEmailVerificationEvent>(onClearEmailVerification);
+    on<ResendOtpEvent>(onResendOtp);
 
+  }
+
+  Future<void> onClearEmailVerification(
+      ClearEmailVerificationEvent event,
+      Emitter<EmailVerificationState> emit,
+      ) async {
+    emit(state.copyWith(
+      email: "",
+    ));
   }
 
   Future<void> onFieldEmailVerificationChangedEvent(
@@ -37,16 +46,6 @@ class EmailVerificationBloc
     emit(state.copyWith(
       email: event.email.trim(),
       telepon: '',
-    ));
-  }
-
-  Future<void> onFieldTeleponVerificationChangedEvent(
-      FieldTeleponVerificationChangedEvent event,
-      Emitter<EmailVerificationState> emit,
-      ) async {
-    emit(state.copyWith(
-      telepon: event.telepon.trim(),
-      email: '',
     ));
   }
 
@@ -103,15 +102,19 @@ class EmailVerificationBloc
       }
     } else if (returnData.data.isNotEmpty) {
       final infoData = returnData.data.split(";");
+      final errorMsg = infoData.length > 1
+        ? infoData[1]
+        : returnData.data;
       if (infoData[0] == '9') {
-        errors.add(infoData[1]);
-
         authenticationBloc.add(
           RequireLoginClient(
             requiredFrom: "bloc_email_verification",
-            errorMsg: infoData[1],
+            errorMsg: errorMsg,
           ),
         );
+      }
+      else {
+        errors.add(errorMsg);
       }
     }
 
@@ -127,20 +130,22 @@ class EmailVerificationBloc
   Future<void> onValidasiPinEmail(
       ValidasiPinEmailEvent event, Emitter<EmailVerificationState> emit) async {
     ReturnDataAPI returnData;
-    bool hasFailure = true;
+
     emit(state.copyWith(
         isLoading: true, isLoaded: false, verificationFailed: false));
+
     event.record.requestId = state.record?.requestId ?? '';
     returnData = await repository.validasiPinEmail(event.record);
 
     debugPrint("onValidasiPinEmail returnData: ${returnData.data}");
 
-    hasFailure = !returnData.success;
-    emit(state.copyWith(
-      isLoading: false,
-      isLoaded: true,
-      hasFailure: hasFailure,
-    ));
+    bool hasFailure = !returnData.success;
+
+    // emit(state.copyWith(
+    //   isLoading: false,
+    //   isLoaded: true,
+    //   hasFailure: hasFailure,
+    // ));
 
     if (!hasFailure && returnData.data.isNotEmpty) {
 
@@ -164,10 +169,11 @@ class EmailVerificationBloc
       }
 
       authenticationBloc.add(UserAuthenticated(user: user, authenticatedFrom: "email_verification"));
+      emit(state.copyWith(isLoading: false, isLoaded: true, verificationFailed: false));
     } else {
       List<String> errors = [];
       errors.add(returnData.data);
-      emit(state.copyWith(verificationFailed: true, errors: errors));
+      emit(state.copyWith(isLoading: false, isLoaded: true, verificationFailed: true, errors: errors));
     }
   }
 
@@ -203,7 +209,7 @@ class EmailVerificationBloc
     EmailVerificationModel updatedRecord = state.record?.copyWith(requestId: returnData.data) ?? event.record.copyWith(requestId: returnData.data);
 
     emit(state.copyWith(
-      // record: updatedRecord,
+      record: updatedRecord,
       hasFailure: hasFailure,
       isResendOtpSuccess: !hasFailure,
     ));

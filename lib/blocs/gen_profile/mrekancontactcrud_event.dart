@@ -35,3 +35,4 @@ class ComboRKodeposChangedEvent extends MRekanContactCrudEvents{
 
 	@override	List<Object> get props => [comboRKodepos];}
 
+class MRekanContactCrudResetStatusEvent extends MRekanContactCrudEvents {}

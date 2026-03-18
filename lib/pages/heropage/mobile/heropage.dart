@@ -8,6 +8,7 @@ import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
+import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 
@@ -62,7 +63,7 @@ class _HeroPageState extends State<HeroPage> {
                               builder: (context, rekanState) {
                                 final nama = rekanState.record?.rekanNama.trim();
                                 final displayName =
-                                (nama != null && nama.isNotEmpty) ? nama : 'Client User';
+                                (nama != null && nama.isNotEmpty) ? nama : AppData.user.nama ?? "Klien Baru";
 
                                 return BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
                                   buildWhen: (prev, curr) =>
@@ -137,6 +138,7 @@ class _HeroPageState extends State<HeroPage> {
       ),
     );
   }
+
 
   /// Helper untuk bangun HeroPage UI
   Widget _buildHeroContent(

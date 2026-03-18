@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:771608260840:android:c7ab59231909d1d232595d",
+        "mobilesdk_app_id": "1:771608260840:android:07b927b86f808f1532595d",
         "android_client_info": {
-          "package_name": "id.co.jayaproteksindo.joss_app"
+          "package_name": "id.co.jayaproteksindo.jossapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "771608260840-du8rkdo99t5f8630hvspvspituji7mr4.apps.googleusercontent.com",
+          "client_id": "771608260840-h5ervqq9r8icn04vsn1tnli3vo9e7ns1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "id.co.jayaproteksindo.joss_app",
+            "package_name": "id.co.jayaproteksindo.jossapp",
             "certificate_hash": "458608362630527b654f3e1835bdc44f7bbe6354"
           }
         },
@@ -37,6 +37,13 @@
             {
               "client_id": "771608260840-1oieolascqum91j5p70fb7e8776bl3ud.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "771608260840-0ndo7e96koooc4p6nc2vqoas4aa3fo50.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "id.co.jayaproteksindo.joss-app"
+              }
             }
           ]
         }
