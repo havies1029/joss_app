@@ -749,30 +749,28 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   bool _isHitungPremiLoading = false;
-
   Widget buildButtonHitungPremi() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
-      text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
+      text: "Hitung Premi",
       isLoading: _isHitungPremiLoading,
+      backgroundColor:
+      _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
       onPressed: _isHitungPremiLoading
           ? null
           : () async {
-        if (_isHitungPremiLoading) return;
-
         setState(() {
           _isHitungPremiLoading = true;
         });
 
-        try {
-          await Future.delayed(const Duration(milliseconds: 2));
-          await onHitungPremi();
-        } finally {
-          if (mounted) {
-            setState(() {
-              _isHitungPremiLoading = false;
-            });
-          }
+        await onHitungPremi();
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          setState(() {
+            _isHitungPremiLoading = false;
+          });
         }
       },
     ),

@@ -37,6 +37,7 @@ class _LoginFormUserState extends State<LoginFormUser>
   final FocusNode _emailFocusNode = FocusNode();
   bool _rememberPassword = true;
   bool isSigningIn = false;
+  bool isGoogleSigningIn = false;
 
   @override
   void initState() {
@@ -327,8 +328,27 @@ class _LoginFormUserState extends State<LoginFormUser>
                                         width: 20,
                                         height: 20,
                                       ),
-                                      onPressed: () => _handleGmailRegisterForMobile(context),
-                                      backgroundColor: pGrey,
+                                      isLoading: isGoogleSigningIn,
+                                      backgroundColor: isGoogleSigningIn ? secondaryBlackColor : pGrey,
+                                      onPressed: isGoogleSigningIn
+                                          ? null
+                                          : () async {
+                                        setState(() {
+                                          isGoogleSigningIn = true;
+                                        });
+
+                                        try {
+                                          _handleGmailRegisterForMobile(context);
+
+                                          await Future.delayed(const Duration(seconds: 2));
+                                        } finally {
+                                          if (mounted) {
+                                            setState(() {
+                                              isGoogleSigningIn = false;
+                                            });
+                                          }
+                                        }
+                                      },
                                     ),
 
                                     SizedBox(height: vPadding,),

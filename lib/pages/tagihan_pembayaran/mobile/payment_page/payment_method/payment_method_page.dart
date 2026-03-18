@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_event.dart';
@@ -220,7 +221,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                 child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
                   builder: (context, state) {
                     if (state.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: LoadingIndicator());
                     }
 
                     if (state.hasError) {

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../blocs/notifevent/notifeventcari_bloc.dart';
 import '../../../common/constants.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../models/notifevent/notifeventcari_model.dart';
 import '../../base/base_background_sidepage.dart';
 
@@ -69,7 +70,7 @@ class notificationPage extends State<NotificationPage> {
       List<NotifeventcariModel> items,
       ) {
     if (state.status == ListStatus.initial && items.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: LoadingIndicator());
     }
     if (items.isEmpty) {
       return _centerContainer(context);
@@ -81,7 +82,7 @@ class notificationPage extends State<NotificationPage> {
         if (index >= items.length) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: LoadingIndicator()),
           );
         }
         return _notificationItem(items[index]);

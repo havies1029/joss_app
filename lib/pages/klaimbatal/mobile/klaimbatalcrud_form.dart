@@ -63,27 +63,17 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
                           children: [
                             Text(
                               "Isi alasan pembatalan untuk proses verifikasi permintaan Anda.",
-                              style: bodyTextStyle(context, fontSize: 16),
+                              style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16)),
                             ),
 
                             const SizedBox(height: hPadding),
-                            // panel input besar
-                            Container(
-                              decoration: BoxDecoration(
-                                color: pGrey,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: sGrey,),
-                              ),
-                              padding: const EdgeInsets.all(5),
-                              child: _buildAlasanField(),
-                            ),
-
+                            _buildAlasanField(),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               "* Pastikan alasan pembatalan sesuai dengan dokumen Anda.",
                               style: TextStyle(
                                 color: hintGrey,
-                                fontSize: 12,
+                                fontSize: getResponsiveFont(context, 12),
                                 fontStyle: FontStyle.italic,
                               ),
                             ),

@@ -4,6 +4,7 @@ import 'package:open_filex/open_filex.dart';
 import '../../../../../../common/constants.dart';
 import '../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
 import '../../../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../widgets/apptheme/empty_state_page.dart';
 import '../../../widgets/apptheme/header_card.dart';
 import '../../base/base_background_sidepage.dart';
@@ -43,19 +44,6 @@ class _ManagementPolisPageState extends State<ManagementPolisPage>
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<SppaDownloadPolisBloc, SppaDownloadPolisState>(
-
-          listener: (context, state) {
-            if (state is DownloadSuccess) {
-              OpenFilex.open(state.filePath);
-            } else if (state is DownloadFailure) {
-              final message = state.message;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Download failed: $message')),
-              );
-            }
-          },
-        ),
         BlocListener<CobManPolBloc, CobManPolState>(
           listener: (context, state) {
             if (state.status == ListStatus.failure) {
@@ -74,55 +62,88 @@ class _ManagementPolisPageState extends State<ManagementPolisPage>
           },
         ),
       ],
-      child: Scaffold(
-        backgroundColor: secondaryBlackColor,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              BaseBackgroundSidePage(
-                title: 'Polis',
-                child: Form(
-                  key: _formKey,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: IntrinsicHeight(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                HeaderCard(
-                                  iconPath: "assets/icons/menu_polis.svg",
-                                  title: "Polis",
-                                  subtitle:
-                                  "Kelola dan pantau semua polis Anda dalam satu aplikasi.",
-                                ),
+      child: BlocConsumer<SppaDownloadPolisBloc, SppaDownloadPolisState>(
+        listener: (context, state) {
+          if (state is DownloadSuccess) {
+            OpenFilex.open(state.filePath);
+          } else if (state is DownloadFailure) {
+            final message = state.message;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Download failed: $message')),
+            );
+          }
+        },
+        builder: (context, state) {
+          final isDownloading = state is DownloadLoading;
 
-                                hasData
-                                    ? const ManagementPolisFilter()
-                                    : const Expanded(
-                                    child: Center(
-                                      child: _EmptyPolisView(),
-                                    )
+          return Stack(
+            children: [
+              Scaffold(
+                backgroundColor: secondaryBlackColor,
+                body: SafeArea(
+                  child: Stack(
+                    children: [
+                      BaseBackgroundSidePage(
+                        title: 'Polis',
+                        child: Form(
+                          key: _formKey,
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                padding: const EdgeInsets.only(bottom: 24),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minHeight: constraints.maxHeight,
+                                  ),
+                                  child: IntrinsicHeight(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .stretch,
+                                      children: [
+                                        HeaderCard(
+                                          iconPath: "assets/icons/menu_polis.svg",
+                                          title: "Polis",
+                                          subtitle:
+                                          "Kelola dan pantau semua polis Anda dalam satu aplikasi.",
+                                        ),
+                                        hasData
+                                            ? const ManagementPolisFilter()
+                                            : const Expanded(
+                                          child: Center(
+                                            child: _EmptyPolisView(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
+                floatingActionButtonLocation: FloatingActionButtonLocation
+                    .endFloat,
+                floatingActionButton: const FloatingMenuWrapper(),
               ),
+
+              if (isDownloading)
+                Positioned.fill(
+                  child: AbsorbPointer(
+                    absorbing: true,
+                    child: Container(
+                      color: Colors.black45,
+                      alignment: Alignment.center,
+                      child: LoadingIndicator(),
+                    ),
+                  ),
+                ),
             ],
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: const FloatingMenuWrapper(),
+          );
+        },
       ),
     );
   }

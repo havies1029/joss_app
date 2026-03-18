@@ -40,6 +40,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
   String? existingMrekanBankId;
   bool _isFirstLoad = true;
+  bool isSaving = false;
 
   @override
   void initState() {
@@ -162,7 +163,27 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
 
           AppButton.primary(
             text: "Simpan Perubahan",
-            onPressed: onSaveForm,
+            isLoading: isSaving,
+            onPressed: isSaving
+                ? null
+                : () async {
+              setState(() {
+                isSaving = true;
+              });
+
+              try {
+                onSaveForm();
+
+                // loading palsu
+                await Future.delayed(const Duration(seconds: 2));
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    isSaving = false;
+                  });
+                }
+              }
+            },
           )
         ],
       ),

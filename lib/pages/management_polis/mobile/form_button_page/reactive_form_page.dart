@@ -62,6 +62,8 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     regreaktif1Bloc = context.read<Regreaktif1Bloc>();
   }
 
+  bool _isAjukanLoading = false;
+
   dynamic _selectedItemByCob(BuildContext context, String cobId) {
     return switch (cobId) {
       "10002" => context.read<AsetParCariBloc>().state.selectedItem,
@@ -88,13 +90,29 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
               ),
               child: AppButton.primary(
                 text: 'Ajukan Perubahan',
-                backgroundColor: primaryColor,
-                onPressed: () {
+                isLoading: _isAjukanLoading,
+                backgroundColor:
+                _isAjukanLoading ? secondaryBlackColor : primaryColor,
+                onPressed: _isAjukanLoading
+                    ? null
+                    : () async {
                   final okForm1 = validateForm1();
                   if (!okForm1) {
                     return;
-                  }else {
-                    _showPengajuanDialog(context);
+                  }
+
+                  setState(() {
+                    _isAjukanLoading = true;
+                  });
+
+                  _showPengajuanDialog(context);
+
+                  await Future.delayed(const Duration(seconds: 2));
+
+                  if (mounted) {
+                    setState(() {
+                      _isAjukanLoading = false;
+                    });
                   }
                 },
               ),

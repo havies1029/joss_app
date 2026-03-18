@@ -48,6 +48,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
   }
 
   String get _headerTitle => "Klaim ${widget.cobKlaimNama}";
+  bool _isLaporKlaimLoading = false;
 
   final fieldCobNamaController = TextEditingController();
   final fieldInsuredNamaController = TextEditingController();
@@ -172,23 +173,38 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                       hPadding * 1.5,
                       vPadding,
                     ),
-                    child: AppButton(
+                    child: AppButton.primary(
                       text: "Lapor Klaim",
-                      onPressed: () {
+                      isLoading: _isLaporKlaimLoading,
+                      backgroundColor:
+                      _isLaporKlaimLoading ? secondaryBlackColor : primaryColor,
+                      onPressed: _isLaporKlaimLoading
+                          ? null
+                          : () async {
+                        setState(() {
+                          _isLaporKlaimLoading = true;
+                        });
+
                         final mjenisClient =
                             context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
-                        if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
-                          User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
-                          if (user.userType == "C"){
+
+                        if (context.read<AuthenticationBloc>().state
+                        is AuthenticationAuthenticated) {
+                          User user = (context.read<AuthenticationBloc>().state
+                          as AuthenticationAuthenticated)
+                              .user;
+
+                          if (user.userType == "C") {
                             if (mjenisClient == "10") {
                               final mRekanNama1 =
                                   context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
                               debugPrint("MREKANNAMA! = $mRekanNama1");
+
                               if (mRekanNama1.isEmpty) {
                                 showDialog(
                                   context: context,
-                                  barrierDismissible: true, // klik luar = close
-                                  barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+                                  barrierDismissible: true,
+                                  barrierColor: Colors.black.withOpacity(0.6),
                                   builder: (context) => RegisterClientPopUp(
                                     header: 'Isi Data Pribadi Anda1',
                                     description:
@@ -198,24 +214,33 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                                          builder: (_) => MRekanGeneralIdvPopUpPage(
+                                            popTwice: false,
+                                          ),
                                         ),
                                       );
                                     },
                                   ),
                                 );
+
+                                await Future.delayed(const Duration(seconds: 2));
+
+                                if (mounted) {
+                                  setState(() {
+                                    _isLaporKlaimLoading = false;
+                                  });
+                                }
                                 return;
                               }
-                            }
-                            else if (mjenisClient == "20") {
+                            } else if (mjenisClient == "20") {
                               final mRekanNama2 =
                                   context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
 
                               if (mRekanNama2.isEmpty) {
                                 showDialog(
                                   context: context,
-                                  barrierDismissible: true, // klik luar = close
-                                  barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+                                  barrierDismissible: true,
+                                  barrierColor: Colors.black.withOpacity(0.6),
                                   builder: (context) => RegisterClientPopUp(
                                     header: 'Isi Data Pribadi Anda2',
                                     description:
@@ -225,23 +250,36 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                                          builder: (_) => MRekanGeneralCmpPopUpPage(
+                                            popTwice: false,
+                                          ),
                                         ),
                                       );
                                     },
                                   ),
                                 );
+
+                                await Future.delayed(const Duration(seconds: 2));
+
+                                if (mounted) {
+                                  setState(() {
+                                    _isLaporKlaimLoading = false;
+                                  });
+                                }
                                 return;
                               }
                             }
+
                             regklaim1crudbloc.add(
-                                Regklaim1Tambah4PolisJpsEvent(
-                                    sppa1Id: widget.sppa1Id));
-                          }else {
+                              Regklaim1Tambah4PolisJpsEvent(
+                                sppa1Id: widget.sppa1Id,
+                              ),
+                            );
+                          } else {
                             showDialog(
                               context: context,
-                              barrierDismissible: true, // klik luar = close
-                              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+                              barrierDismissible: true,
+                              barrierColor: Colors.black.withOpacity(0.6),
                               builder: (context) => RegisterClientPopUp(
                                 header: 'Data Klien Belum Terdaftar!',
                                 description:
@@ -251,13 +289,31 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => RegisterClient(requestFrom: 'regispolis_page')
+                                      builder: (context) =>
+                                          RegisterClient(requestFrom: 'regispolis_page'),
                                     ),
                                   );
                                 },
                               ),
                             );
+
+                            await Future.delayed(const Duration(seconds: 2));
+
+                            if (mounted) {
+                              setState(() {
+                                _isLaporKlaimLoading = false;
+                              });
+                            }
+                            return;
                           }
+                        }
+
+                        await Future.delayed(const Duration(seconds: 2));
+
+                        if (mounted) {
+                          setState(() {
+                            _isLaporKlaimLoading = false;
+                          });
                         }
                       },
                     ),

@@ -30,6 +30,7 @@ class MRekanContactCrudFormPageFormState
   late final MRekanContactCrudBloc mRekanContactCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  bool isSaving = false;
 
   final fieldAlamat1Controller = TextEditingController();
   final fieldEmailController = TextEditingController();
@@ -208,8 +209,26 @@ class MRekanContactCrudFormPageFormState
           const SizedBox(height: vPadding),
           AppButton.primary(
             text: "Simpan Perubahan",
-            onPressed: onSaveForm,
-          ),
+            isLoading: isSaving,
+            backgroundColor: isSaving ? secondaryBlackColor : primaryColor,
+            onPressed: isSaving
+                ? null
+                : () async {
+              setState(() {
+                isSaving = true;
+              });
+
+              onSaveForm();
+
+              await Future.delayed(const Duration(seconds: 2));
+
+              if (mounted) {
+                setState(() {
+                  isSaving = false;
+                });
+              }
+            },
+          )
         ],
       ),
     );

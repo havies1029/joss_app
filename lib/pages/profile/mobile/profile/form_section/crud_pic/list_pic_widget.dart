@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../common/constants.dart';
+import '../../../../../../common/loading_indicator.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
 import '../../../../../../widgets/listpage_filter_bar_ui.dart';
 import '../../../../../base/base_background_sidepage.dart';
@@ -115,7 +116,7 @@ class _ListPicWidgetState extends State<ListPicWidget> {
 
         if (state.status == ListStatus.initial) {
           return const Center(
-            child: CircularProgressIndicator(),
+            child: LoadingIndicator(),
           );
         }
 
@@ -152,7 +153,7 @@ class _ListPicWidgetState extends State<ListPicWidget> {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Center(
-                    child: CircularProgressIndicator(),
+                    child: LoadingIndicator(),
                   ),
                 );
               }

@@ -1,7 +1,6 @@
 part of 'mrekanpiccrud_bloc.dart';
 
 class MRekanPicCrudState extends Equatable {
-
 	final MRekanPicCrudModel? record;
 	final bool isLoading;
 	final bool isLoaded;
@@ -11,17 +10,20 @@ class MRekanPicCrudState extends Equatable {
 	final bool isFieldIsDefaultChanged;
 	final ComboMJabatanModel? comboMJabatan;
 	final String? savedId;
-	const MRekanPicCrudState(
-			{this.record,
-				this.isLoading = false,
-				this.isLoaded = false,
-				this.isSaving = false,
-				this.isSaved = false,
-				this.hasFailure = false,
-				this.comboMJabatan,
-				this.isFieldIsDefaultChanged = false,
-				this.savedId,
-			});
+	final String? message;
+
+	const MRekanPicCrudState({
+		this.record,
+		this.isLoading = false,
+		this.isLoaded = false,
+		this.isSaving = false,
+		this.isSaved = false,
+		this.hasFailure = false,
+		this.comboMJabatan,
+		this.isFieldIsDefaultChanged = false,
+		this.savedId,
+		this.message,
+	});
 
 	MRekanPicCrudState copyWith({
 		MRekanPicCrudModel? record,
@@ -31,21 +33,25 @@ class MRekanPicCrudState extends Equatable {
 		bool? isSaved,
 		bool? hasFailure,
 		String? savedId,
+		String? message,
 		ComboMJabatanModel? comboMJabatan,
-		bool? isFieldIsDefaultChanged
-	}){
+		bool? isFieldIsDefaultChanged,
+	}) {
 		return MRekanPicCrudState(
-				record: record ?? this.record,
-				isLoading: isLoading ?? this.isLoading,
-				isLoaded: isLoaded ?? this.isLoaded,
-				isSaving: isSaving ?? this.isSaving,
-				isSaved: isSaved ?? this.isSaved,
-				hasFailure: hasFailure ?? this.hasFailure,
-				comboMJabatan: comboMJabatan?? this.comboMJabatan,
-				savedId: savedId ?? this.savedId,
-				isFieldIsDefaultChanged: isFieldIsDefaultChanged ?? this.isFieldIsDefaultChanged
+			record: record ?? this.record,
+			isLoading: isLoading ?? this.isLoading,
+			isLoaded: isLoaded ?? this.isLoaded,
+			isSaving: isSaving ?? this.isSaving,
+			isSaved: isSaved ?? this.isSaved,
+			hasFailure: hasFailure ?? this.hasFailure,
+			comboMJabatan: comboMJabatan ?? this.comboMJabatan,
+			savedId: savedId ?? this.savedId,
+			message: message,
+			isFieldIsDefaultChanged:
+			isFieldIsDefaultChanged ?? this.isFieldIsDefaultChanged,
 		);
 	}
+
 	@override
 	List<Object?> get props => [
 		record,
@@ -56,6 +62,7 @@ class MRekanPicCrudState extends Equatable {
 		isSaved,
 		hasFailure,
 		savedId,
+		message,
 		isFieldIsDefaultChanged,
 	];
 }

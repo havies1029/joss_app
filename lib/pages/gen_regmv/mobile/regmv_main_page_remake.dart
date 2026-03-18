@@ -1127,7 +1127,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "DISKON 25%",
+                              label: "DISKON",
                               controller: fieldPremiDiskonController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1514,11 +1514,31 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     context.read<Regmv3FormBloc>().add(Regmv3DraftEvent(record: record));
   }
 
+  bool _isHitungPremiLoading = false;
   Widget buildButtonHitungPremi() => Padding(
-    padding: EdgeInsets.symmetric(horizontal: 4),
+    padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
       text: "Hitung Premi",
-      onPressed: onHitungPremi,
+      isLoading: _isHitungPremiLoading,
+      backgroundColor:
+      _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+      onPressed: _isHitungPremiLoading
+          ? null
+          : () async {
+        setState(() {
+          _isHitungPremiLoading = true;
+        });
+
+        onHitungPremi();
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          setState(() {
+            _isHitungPremiLoading = false;
+          });
+        }
+      },
     ),
   );
 

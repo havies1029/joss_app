@@ -50,6 +50,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   late Regklaim1CrudBloc regklaim1formBloc;
   late final Dio _dio;
   late final AttachBloc _attachBloc;
+  bool _isCariPolisLoading = false;
 
   final fieldInsuredNamaController = TextEditingController();
   ComboMInsuranceModel? fieldComboMInsurance;
@@ -210,9 +211,28 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: AppButton(
+                child: AppButton.primary(
                   text: "Simpan",
-                  onPressed: onPressCariPolis,
+                  isLoading: _isCariPolisLoading,
+                  backgroundColor:
+                  _isCariPolisLoading ? secondaryBlackColor : primaryColor,
+                  onPressed: _isCariPolisLoading
+                      ? null
+                      : () async {
+                    setState(() {
+                      _isCariPolisLoading = true;
+                    });
+
+                    onPressCariPolis();
+
+                    await Future.delayed(const Duration(seconds: 2));
+
+                    if (mounted) {
+                      setState(() {
+                        _isCariPolisLoading = false;
+                      });
+                    }
+                  },
                 ),
               ),
             ],

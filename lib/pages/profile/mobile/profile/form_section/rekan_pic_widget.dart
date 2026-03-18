@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../../blocs/gen_invite/invite_bloc.dart';
-import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekanpiclist_bloc.dart';
 import '../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
-import '../../../../../helper/indo_phone_result.dart';
 import '../../../../../models/gen_profile/mrekanpiclist_model.dart';
 import '../../../../../repositories/gen_invite/invite_repository.dart';
 import '../../../../../widgets/apptheme/empty_state_page.dart';
@@ -264,13 +262,16 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
             const SizedBox(height: 8),
             _cardRow('Email:', it.picEmail.isEmpty ? '-' : it.picEmail, labelStyle, valueStyle),
             _cardRow('Nama:', it.picNama.isEmpty ? '-' : it.picNama, labelStyle, valueStyle),
+            _cardRow('Alamat:', it.alamat1.isEmpty ? '-' : it.alamat1, labelStyle, valueStyle),
             _cardRow('No Telp:', it.picHp.isEmpty ? '-' : it.picHp, labelStyle, valueStyle),
+            _cardRow('Jabatan:', it.jabatanNama.isEmpty ? '-' : it.jabatanNama, labelStyle, valueStyle),
+            _cardRow('Status:', it.statusPic!.isEmpty ? '-' : it.statusPic ?? "-", labelStyle, valueStyle),
             const SizedBox(height: 8),
             Divider(color: sGrey),
             const SizedBox(height: 8),
             Text(
-              'Polis yang bisa diakses:',
-              style: bodyTextStyle(context, fontSize: 16),
+              'Polis yang tidak bisa diakses:',
+              style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16)),
             ),
             const SizedBox(height: 6),
             _cobListSection(cobItems: _parseCobItems(it.listCob)),
@@ -279,7 +280,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
       ),
     );
   }
-
   List<String> _parseCobItems(String listCob) {
     return listCob
         .split(',')
@@ -287,7 +287,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
         .where((e) => e.isNotEmpty)
         .toList();
   }
-
   Widget _cobListSection({required List<String> cobItems}) {
     if (cobItems.isEmpty) {
       return Text(
@@ -314,7 +313,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
       }).toList(),
     );
   }
-
   Widget _cardRow(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -327,7 +325,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     );
   }
 
-
   Future<void> _goEditById(String id) async {
     final changed = await Navigator.push<bool>(
       context,
@@ -336,6 +333,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
       ),
     );
 
+    context.read<RekanPicCobCariBloc>().add(
+      const ResetSelectedCOBRekanPicCobEvent(),
+    );
     // if (changed == true) {
     //   context.read<MRekanPicListBloc>().add(
     //     FetchMRekanPicListEvent(),

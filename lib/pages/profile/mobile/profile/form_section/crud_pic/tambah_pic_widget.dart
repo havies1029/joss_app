@@ -36,9 +36,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
-
-  final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
-  ComboMJabatanModel? _jabatan;
+  final _jabatanNama = TextEditingController();
+  final _alamat1 = TextEditingController();
 
   bool _isDefault = false;
   bool _saving = false;
@@ -58,6 +57,8 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     _nama.dispose();
     _email.dispose();
     _hp.dispose();
+    _jabatanNama.dispose();
+    _alamat1.dispose();
     super.dispose();
   }
 
@@ -87,17 +88,17 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
-    final idJabatan = (mjnsclientId == '10')
+    final jabatanNama = (mjnsclientId == '10')
         ? ''
-        : (_jabatan?.mjabatanId.trim().isEmpty ?? true)
-        ? ''
-        : _jabatan!.mjabatanId.trim();
+        : _jabatanNama.text.trim();
 
     final record = MRekanPicCrudModel(
       picNama: _nama.text.trim(),
       picEmail: _email.text.trim().toLowerCase(),
       picHp: hpNormalized,
-      mjabatanId: idJabatan,
+      jabatanNama: jabatanNama,
+      alamat1: _alamat1.text.trim(),
+      alamat2: "",
       isDefault: _isDefault,
     );
 
@@ -142,8 +143,12 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Gagal menyimpan data PIC.'),
+                SnackBar(
+                  content: Text(
+                    (state.message ?? '').trim().isNotEmpty
+                        ? state.message!
+                        : 'Gagal menyimpan data PIC.',
+                  ),
                   backgroundColor: Colors.redAccent,
                 ),
               );
@@ -277,13 +282,16 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                       buildFieldRekanNama(),
                                       const SizedBox(height: vPadding),
 
+                                      buildFieldAlamat1(),
+                                      const SizedBox(height: vPadding),
+
                                       buildFieldEmail(),
                                       const SizedBox(height: vPadding),
 
                                       buildFiledTelp(),
                                       const SizedBox(height: vPadding),
 
-                                      if (mjnsclientId != '10') buildFieldJabatan(),
+                                      if (mjnsclientId != '10') buildFieldJabatanNama(),
                                       const SizedBox(height: vPadding),
 
                                       CheckboxListTile(
@@ -506,36 +514,34 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     );
   }
 
-  Widget buildFieldJabatan() {
-    return ReusableComboBox<ComboMJabatanModel>(
-      hintText: "Jabatan",
-      comboKey: _comboKey,
-      initItem: _jabatan,
-      dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
-      displayText: (i) => i.jabatanDesc,
-      compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
-      onChangedCallback: (value) {
-        if (value != null) {
-          removeError(error: kStringNullError);
-          setState(() {
-            _jabatan = value;
-          });
-          crudBloc.add(ComboMJabatanChangedEvent(comboMJabatan: value));
-        }
-      },
-      onSaveCallback: (value) {
-        if (value != null) {
-          _jabatan = value;
-        }
-      },
-      validatorCallback: (value) {
-        if (value == null) {
-          return kStringNullError;
+  Widget buildFieldJabatanNama() {
+    return appTextField(
+      label: 'Jabatan',
+      controller: _jabatanNama,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Jabatan wajib diisi';
         }
         return null;
       },
     );
   }
+
+  Widget buildFieldAlamat1() {
+    return appTextField(
+      label: 'Alamat',
+      controller: _alamat1,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Alamat wajib diisi';
+        }
+        return null;
+      },
+    );
+  }
+
 
   void removeError({required String error}) {
     if (errors.contains(error)) {

@@ -810,10 +810,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding,),
-                        const SizedBox(width: hPadding,),
+                        buildFieldRokupasiId(),
                         buildFieldRkonstruksiojkId(),
                         const SizedBox(height: hPadding),
-                        buildFieldRokupasiId(),
+                        buildFieldRkonstruksiojkId(),
                         const SizedBox(height: hPadding),
                         buildFieldObjectAlamat(),
                         const SizedBox(height: hPadding),
@@ -1385,11 +1385,31 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     context.read<Regpar4FormBloc>().add(Regpar4DraftEvent(record: record));
   }
 
+  bool _isHitungPremiLoading = false;
   Widget buildButtonHitungPremi() => Padding(
-    padding: EdgeInsets.symmetric(horizontal: 4),
+    padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
       text: "Hitung Premi",
-      onPressed: onHitungPremi,
+      isLoading: _isHitungPremiLoading,
+      backgroundColor:
+      _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+      onPressed: _isHitungPremiLoading
+          ? null
+          : () async {
+        setState(() {
+          _isHitungPremiLoading = true;
+        });
+
+        onHitungPremi();
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          setState(() {
+            _isHitungPremiLoading = false;
+          });
+        }
+      },
     ),
   );
 
@@ -1686,8 +1706,26 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     );
   }
 
+  ComboRKonstruksiojkModel? previousKonstruksi;
+  final konstruksiKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
+
+  String getKonstruksiSubtitle(String kelasNama) {
+    switch (kelasNama) {
+      case "Kelas Konstruksi 1":
+        return "Bangunan permanen dengan struktur beton bertulang atau pasangan bata.";
+      case "Kelas Konstruksi 2":
+        return "Bangunan semi permanen, kombinasi bata dan kayu.";
+      case "Kelas Konstruksi 3":
+        return "Bangunan dengan dominasi material kayu atau mudah terbakar.";
+      default:
+        return "Deskripsi konstruksi tidak tersedia.";
+    }
+  }
+
   Widget buildFieldRkonstruksiojkId() => ReusableComboBox<ComboRKonstruksiojkModel>(
     hintText: "Kelas Konstruksi",
+    comboKey: konstruksiKey,
+    maxHeight: 200,
     initItem: fieldComboRKonstruksiojk,
     dataLoader: () => ComboRKonstruksiojkRepository().getComboRKonstruksiojk(),
     displayText: (i) => i.kelasNama,
@@ -1696,16 +1734,85 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     validatorCallback: (_) => err('form2.kelasKonstruksi'),
     errorText: err('form2.kelasKonstruksi'),
 
-    onChangedCallback: (v) {
-      fieldComboRKonstruksiojk = v;
-      if (v != null) clearErr('form2.kelasKonstruksi');
+    onChangedCallback: (item) async {
+      if (item == null) return;
 
-      if (v != null) {
-        comboROkupasiKey.currentState?.clear();
-        fieldComboROkupasi = null;
-        clearErr('form2.okupasi');
+      final subtitle = getKonstruksiSubtitle(item.kelasNama);
+
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (_) => Dialog(
+          backgroundColor: formGrey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  item.kelasNama,
+                  style: bodyTextStyle(context),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: bodyTextStyle(context, fontSize: 15)
+                      .copyWith(color: hintGrey),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Apakah Anda yakin ingin memilih kelas ini?",
+                  style: bodyTextStyle(context, fontSize: 15)
+                      .copyWith(color: hintGrey),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 13),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.primary(
+                        text: "Tidak",
+                        backgroundColor: sGrey,
+                        onPressed: () => Navigator.pop(context, false),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppButton.primary(
+                        text: "Iya",
+                        onPressed: () => Navigator.pop(context, true),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      if (confirm == true) {
+        setState(() {
+          fieldComboRKonstruksiojk = item;
+          previousKonstruksi = item;
+          clearErr('form2.kelasKonstruksi');
+
+          // comboROkupasiKey.currentState?.clear();
+          // fieldComboROkupasi = null;
+          // clearErr('form2.okupasi');
+        });
+      } else {
+        setState(() {
+          konstruksiKey.currentState?.clear();
+          fieldComboRKonstruksiojk = previousKonstruksi;
+        });
       }
     },
+
     onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
   );
 
@@ -1714,7 +1821,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     comboKey: comboROkupasiKey,
     initItem: fieldComboROkupasi,
     dataLoader: () => ComboROkupasiRepository()
-        .getComboROkupasi(fieldComboRKonstruksiojk?.rkonstruksiojkId ?? ""),
+        .getComboROkupasi(""),
     displayText: (i) => i.okupasiDesc,
     compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
     validatorCallback: (_) => err('form2.okupasi'),

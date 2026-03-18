@@ -31,6 +31,7 @@ class MRekanGeneralCmpCrudFormPageFormState
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  bool isSaving = false;
 
   ComboMBentukCstModel? fieldComboMBentukCst;
   final comboMBentukCstKey =
@@ -120,9 +121,10 @@ class MRekanGeneralCmpCrudFormPageFormState
                         if (fieldRekanNamaController.text.trim().isEmpty) {
                           if (formName.isNotEmpty) {
                             fieldRekanNamaController.text = formName;
-                          } else if (fallbackName.isNotEmpty) {
-                            fieldRekanNamaController.text = fallbackName;
                           }
+                          // else if (fallbackName.isNotEmpty) {
+                          //   fieldRekanNamaController.text = fallbackName;
+                          // }
                         }
 
                         // if (fieldNamaBadanUsahaController.text.trim().isEmpty) {
@@ -298,8 +300,26 @@ class MRekanGeneralCmpCrudFormPageFormState
                             const SizedBox(height: vPadding),
                             AppButton.primary(
                               text: "Simpan Perubahan",
-                              onPressed: onSaveForm,
-                            ),
+                              isLoading: isSaving,
+                              backgroundColor: isSaving ? secondaryBlackColor : primaryColor,
+                              onPressed: isSaving
+                                  ? null
+                                  : () async {
+                                setState(() {
+                                  isSaving = true;
+                                });
+
+                                onSaveForm();
+
+                                await Future.delayed(const Duration(seconds: 2));
+
+                                if (mounted) {
+                                  setState(() {
+                                    isSaving = false;
+                                  });
+                                }
+                              },
+                            )
                           ],
                         ),
                       );

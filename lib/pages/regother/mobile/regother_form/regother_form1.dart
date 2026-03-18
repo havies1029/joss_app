@@ -42,6 +42,8 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   late Regother1CrudBloc regother1CrudBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  bool _isKonfirmasiLoading = false;
+
   ComboRMatauangModel? fieldComboRMatauang;
   ComboMCobApp1Model? fieldComboMCobApp1;
   final comboRMatauangKey =
@@ -120,8 +122,27 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                     const SizedBox(height: 25),
                     AppButton.primary(
                       text: "Konfirmasi",
-                      onPressed: onSaveForm,
-                    ),
+                      isLoading: _isKonfirmasiLoading,
+                      backgroundColor:
+                      _isKonfirmasiLoading ? secondaryBlackColor : primaryColor,
+                      onPressed: _isKonfirmasiLoading
+                          ? null
+                          : () async {
+                        setState(() {
+                          _isKonfirmasiLoading = true;
+                        });
+
+                        onSaveForm();
+
+                        await Future.delayed(const Duration(seconds: 2));
+
+                        if (mounted) {
+                          setState(() {
+                            _isKonfirmasiLoading = false;
+                          });
+                        }
+                      },
+                    )
                   ],
                 ),
               ),

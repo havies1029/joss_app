@@ -1,43 +1,46 @@
-import 'package:joss_app/models/combobox/combomjabatan_model.dart';
-
 class MRekanPicCrudModel {
 	bool? isDefault;
 	String? mrekanpicId;
 	String? picEmail;
 	String? picHp;
 	String? picNama;
-	String? mjabatanId;
-	ComboMJabatanModel? comboMJabatan;
 
-	MRekanPicCrudModel({this.isDefault, this.mrekanpicId, 
-		this.picEmail, this.picHp, 
-		this.picNama, this.mjabatanId, this.comboMJabatan});
+	String? jabatanNama;
+	String? alamat1;
+	String? alamat2; // optional
+
+	MRekanPicCrudModel({
+		this.isDefault,
+		this.mrekanpicId,
+		this.picEmail,
+		this.picHp,
+		this.picNama,
+		this.jabatanNama,
+		this.alamat1,
+		this.alamat2,
+	});
 
 	factory MRekanPicCrudModel.fromJson(Map<String, dynamic> data) {
-		ComboMJabatanModel? comboMJabatan;
-		if (data['comboMJabatan'] != null) {
-			comboMJabatan = ComboMJabatanModel.fromJson(data['comboMJabatan']);
-		}
-
 		return MRekanPicCrudModel(
-			isDefault: data['isDefault']??false,
-			mrekanpicId: data['mrekanpicId']??'',
-			picEmail: data['picEmail']??'',
-			picHp: data['picHp']??'',
-			picNama: data['picNama']??'',
-			mjabatanId: data['mjabatanId']??'',
-			comboMJabatan: comboMJabatan
+			isDefault: data['isDefault'] ?? false,
+			mrekanpicId: data['mrekanpicId'] ?? '',
+			picEmail: data['picEmail'] ?? '',
+			picHp: data['picHp'] ?? '',
+			picNama: data['picNama'] ?? '',
+			jabatanNama: data['jabatanNama'] ?? '',
+			alamat1: data['alamat1'] ?? '',
+			alamat2: data['alamat2'], // optional
 		);
-
 	}
 
-	Map<String, dynamic> toJson() =>
-		{'isDefault': isDefault,
+	Map<String, dynamic> toJson() => {
+		'isDefault': isDefault,
 		'mrekanpicId': mrekanpicId,
 		'picEmail': picEmail,
 		'picHp': picHp,
 		'picNama': picNama,
-		'mjabatanId': mjabatanId,
-		'comboMJabatan': comboMJabatan?.toJson()};
-
+		'jabatanNama': jabatanNama,
+		'alamat1': alamat1,
+		'alamat2': alamat2,
+	};
 }

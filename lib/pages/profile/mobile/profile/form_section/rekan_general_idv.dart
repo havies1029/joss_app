@@ -32,6 +32,7 @@ class MRekanGeneralIdvCrudFormPageFormState
     extends State<MRekanGeneralIdvCrudFormPage> {
   late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   final _formKey = GlobalKey<FormState>();
+  bool isSaving = false;
 
   late Future<List<ComboMJnskelModel>> _futureJenisKelamin =
   ComboMJnskelRepository().getComboMJnskel();
@@ -294,8 +295,26 @@ class MRekanGeneralIdvCrudFormPageFormState
                             const SizedBox(height: vPadding),
                             AppButton.primary(
                               text: "Simpan Perubahan",
-                              onPressed: onSaveForm,
-                            ),
+                              isLoading: isSaving,
+                              backgroundColor: isSaving ? secondaryBlackColor : primaryColor,
+                              onPressed: isSaving
+                                  ? null
+                                  : () async {
+                                setState(() {
+                                  isSaving = true;
+                                });
+
+                                onSaveForm();
+
+                                await Future.delayed(const Duration(seconds: 2));
+
+                                if (mounted) {
+                                  setState(() {
+                                    isSaving = false;
+                                  });
+                                }
+                              },
+                            )
                           ],
                         ),
                       );

@@ -37,15 +37,19 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
   bool _saving = false;
 
+  MRekanPicCrudModel? _initialRecord;
+  bool _payloadInjected = false;
+
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
 
+  final _id = TextEditingController();
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
-  final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
+  final _jabatanNama = TextEditingController();
+  final _alamat = TextEditingController();
 
-  ComboMJabatanModel? _jabatan;
   bool _isDefault = false;
   bool _showErrors = false;
 
@@ -83,6 +87,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _nama.dispose();
     _email.dispose();
     _hp.dispose();
+    _jabatanNama.dispose();
+    _alamat.dispose();
     super.dispose();
   }
 
@@ -122,7 +128,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
-  void _save() {
+  Future<void> _save() async {
     final valid = _formKey.currentState?.validate() ?? false;
     if (!valid) {
       if (!_showErrors) {
@@ -143,15 +149,11 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       return;
     }
 
-    setState(() => _saving = true);
-
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
-    final idJabatan = (mjnsclientId == '10')
+    final jabatanNama = (mjnsclientId == '10')
         ? ''
-        : (_jabatan?.mjabatanId.trim().isEmpty ?? true)
-        ? ''
-        : _jabatan!.mjabatanId.trim();
+        : _jabatanNama.text.trim();
 
     final hpNormalized = _toNormalizedPhone62(_hp.text.trim());
 
@@ -160,30 +162,65 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       picNama: _nama.text.trim(),
       picEmail: _email.text.trim().toLowerCase(),
       picHp: hpNormalized,
-      mjabatanId: idJabatan,
+      jabatanNama: jabatanNama,
+      alamat1: _alamat.text.trim(),
+      alamat2: '',
       isDefault: _isDefault,
     );
 
+    if (_initialRecord != null && _isSameRecord(_initialRecord!, record)) {
+      final picId = widget.mrekanpicId.trim();
+      final cobRepo = RekanPicCobCariRepository();
+
+      final listCheckbox = selectedCobItems
+          .map(
+            (e) => RekanPicCobCariCheckboxModel(
+          mcobId: e.mcobId,
+          isChecked: e.isChecked,
+        ),
+      )
+          .toList();
+
+      final cobResult = await cobRepo.rekanPicCobUpdateList(
+        picId,
+        listCheckbox,
+      );
+
+      if (!mounted) return;
+
+      setState(() => _saving = false);
+
+      if (cobResult.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PIC & ${listCheckbox.length} COB berhasil disimpan!'),
+          ),
+        );
+        listBloc.add(FetchMRekanPicListEvent());
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('PIC tersimpan, tapi gagal update COB.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _saving = true);
     crudBloc.add(MRekanPicCrudUbahEvent(record: record));
   }
 
   void _injectPayload(MRekanPicCrudModel record) {
+    _id.text = (record.mrekanpicId ?? '').trim();
     _nama.text = (record.picNama ?? '').trim();
     _email.text = (record.picEmail ?? '').trim();
     _hp.text = _toPhoneFieldValue((record.picHp ?? '').trim());
+    _jabatanNama.text = (record.jabatanNama ?? '').trim();
+    _alamat.text = (record.alamat1 ?? '').trim();
     _isDefault = record.isDefault ?? false;
-
-    _jabatan = record.comboMJabatan ??
-        ((record.mjabatanId ?? '').trim().isNotEmpty
-            ? ComboMJabatanModel(
-          mjabatanId: (record.mjabatanId ?? '').trim(),
-          jabatanDesc: record.comboMJabatan?.jabatanDesc ?? '',
-        )
-            : null);
-
-    if (_jabatan != null) {
-      _comboKey.currentState?.changeSelectedItem(_jabatan);
-    }
 
     setState(() {});
   }
@@ -202,8 +239,15 @@ class _EditPicWidgetState extends State<EditPicWidget> {
               prev.isSaved != curr.isSaved ||
                   prev.hasFailure != curr.hasFailure ||
                   prev.isLoaded != curr.isLoaded ||
-                  prev.record != curr.record,
+                  prev.record != curr.record ||
+                  prev.isSaving != curr.isSaving ||
+                  prev.message != curr.message,
               listener: (context, state) async {
+                if (state.isSaving) {
+                  setState(() => _saving = true);
+                  return;
+                }
+
                 if (state.isSaved == true) {
                   try {
                     final picId = (widget.mrekanpicId).trim();
@@ -241,9 +285,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                         ),
                       );
 
-                      listBloc.add(
-                          FetchMRekanPicListEvent());
-
+                      listBloc.add(FetchMRekanPicListEvent());
                       Navigator.pop(context, true);
                     } else {
                       setState(() {
@@ -275,14 +317,33 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                   }
                 }
 
-                if (state.isLoaded == true && state.record != null) {
+                if (!_payloadInjected &&
+                    state.isLoaded == true &&
+                    state.record != null) {
                   _injectPayload(state.record!);
+
+                  _initialRecord = MRekanPicCrudModel(
+                    mrekanpicId: (state.record!.mrekanpicId ?? '').trim(),
+                    picNama: (state.record!.picNama ?? '').trim(),
+                    picEmail: (state.record!.picEmail ?? '').trim().toLowerCase(),
+                    picHp: _toNormalizedPhone62((state.record!.picHp ?? '').trim()),
+                    jabatanNama: (state.record!.jabatanNama ?? '').trim(),
+                    alamat1: (state.record!.alamat1 ?? '').trim(),
+                    alamat2: (state.record!.alamat2 ?? '').trim(),
+                    isDefault: state.record!.isDefault ?? false,
+                  );
+
+                  _payloadInjected = true;
                 }
 
                 if (state.hasFailure == true) {
                   setState(() => _saving = false);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    errorSnackBar('Gagal menyimpan perubahan. Coba lagi.'),
+                    errorSnackBar(
+                      (state.message ?? '').trim().isNotEmpty
+                          ? state.message!
+                          : 'Gagal menyimpan perubahan. Coba lagi.',
+                    ),
                   );
                 }
               },
@@ -352,6 +413,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       buildFieldRekanNama(),
                                       const SizedBox(height: vPadding),
 
+                                      buildFieldAlamat(),
+                                      const SizedBox(height: vPadding),
+
                                       buildFieldEmail(),
                                       const SizedBox(height: vPadding),
 
@@ -359,7 +423,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       const SizedBox(height: vPadding),
 
                                       if (mjnsclientId != '10') ...[
-                                        buildFieldJabatan(),
+                                        buildFieldJabatanNama(),
                                         const SizedBox(height: vPadding),
                                       ],
 
@@ -571,6 +635,31 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
+  bool _isSameRecord(MRekanPicCrudModel a, MRekanPicCrudModel b) {
+    return (a.mrekanpicId ?? '').trim() == (b.mrekanpicId ?? '').trim() &&
+        (a.picNama ?? '').trim() == (b.picNama ?? '').trim() &&
+        (a.picEmail ?? '').trim().toLowerCase() ==
+            (b.picEmail ?? '').trim().toLowerCase() &&
+        (a.picHp ?? '').trim() == (b.picHp ?? '').trim() &&
+        (a.jabatanNama ?? '').trim() == (b.jabatanNama ?? '').trim() &&
+        (a.alamat1 ?? '').trim() == (b.alamat1 ?? '').trim() &&
+        (a.isDefault ?? false) == (b.isDefault ?? false);
+  }
+
+  // Widget buildFieldRekanPicId() {
+  //   return appTextField(
+  //     label: 'E PIC',
+  //     controller: _nama,
+  //     keyboardType: TextInputType.text,
+  //     validator: (value) {
+  //       if (value == null || value.isEmpty) {
+  //         return kNameNullError;
+  //       }
+  //       return null;
+  //     },
+  //   );
+  // }
+
   Widget buildFieldRekanNama() {
     return appTextField(
       label: 'Nama PIC',
@@ -579,6 +668,36 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       validator: (value) {
         if (value == null || value.isEmpty) {
           return kNameNullError;
+        }
+        return null;
+      },
+    );
+  }
+
+
+  Widget buildFieldJabatanNama() {
+    return appTextField(
+      label: 'Jabatan',
+      controller: _jabatanNama,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Jabatan wajib diisi";
+        }
+        return null;
+      },
+    );
+  }
+
+
+  Widget buildFieldAlamat() {
+    return appTextField(
+      label: 'Alamat',
+      controller: _alamat,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Alamat wajib diisi";
         }
         return null;
       },
@@ -631,37 +750,6 @@ class _EditPicWidgetState extends State<EditPicWidget> {
           return res.error ?? 'Nomor HP tidak valid';
         }
 
-        return null;
-      },
-    );
-  }
-
-  Widget buildFieldJabatan() {
-    return ReusableComboBox<ComboMJabatanModel>(
-      hintText: "Jabatan",
-      comboKey: _comboKey,
-      initItem: _jabatan,
-      dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
-      displayText: (i) => i.jabatanDesc,
-      compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
-      onChangedCallback: (value) {
-        if (value != null) {
-          removeError(error: kStringNullError);
-          setState(() {
-            _jabatan = value;
-          });
-          crudBloc.add(ComboMJabatanChangedEvent(comboMJabatan: value));
-        }
-      },
-      onSaveCallback: (value) {
-        if (value != null) {
-          _jabatan = value;
-        }
-      },
-      validatorCallback: (value) {
-        if (value == null) {
-          return kStringNullError;
-        }
         return null;
       },
     );

@@ -35,6 +35,7 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
         isSaved: false,
         hasFailure: false,
         savedId: null,
+        message: null,
       ),
     );
 
@@ -47,6 +48,7 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
           isSaved: returnData.success,
           hasFailure: !returnData.success,
           savedId: returnData.success ? returnData.data.toString() : null,
+          message: returnData.success ? null : returnData.data?.toString(),
         ),
       );
     } catch (e) {
@@ -56,12 +58,11 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
           isSaved: false,
           hasFailure: true,
           savedId: null,
+          message: 'Terjadi kesalahan saat menyimpan data PIC.',
         ),
       );
     }
   }
-
-
 
   Future<void> onUbahMRekanPicCrud(
       MRekanPicCrudUbahEvent event,
@@ -71,6 +72,7 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
       isSaving: true,
       isSaved: false,
       hasFailure: false,
+      message: null,
     ));
 
     try {
@@ -80,6 +82,7 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
         isSaving: false,
         isSaved: result,
         hasFailure: !result,
+        message: result ? null : 'Gagal menyimpan perubahan data PIC.',
       ));
 
       if (result) {
@@ -92,6 +95,7 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
         isSaving: false,
         isSaved: false,
         hasFailure: true,
+        message: 'Terjadi kesalahan saat mengubah data PIC.',
       ));
     }
   }
@@ -123,7 +127,6 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
       isSaved: false,
       hasFailure: false,
       record: record,
-      comboMJabatan: record.comboMJabatan,
     ));
   }
 
