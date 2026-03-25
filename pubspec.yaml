@@ -24,8 +24,7 @@ dependencies:
   docx_template: ^0.4.0
   dropdown_search: ^6.0.1  
   equatable: ^2.0.3
-#  flex_color_scheme: 8.4.0
-  flex_color_scheme: 8.0.2
+  flex_color_scheme: 8.4.0
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4  
   file_picker: ^8.0.0+1
@@ -292,19 +291,6 @@ flutter:
     - assets/icons/placeholder_icon.svg
     - assets/images/logo_va/
     - assets/images/logo_va/logo_BNC.png
-    - assets/icons/email.svg
-    - assets/icons/telepon.svg
-    - assets/icons/belipolis_no_file.svg
-    - assets/icons/place_holder_2.svg
-    - assets/icons/info.svg
-    - assets/icons/syarat_1.svg
-    - assets/icons/syarat_2.svg
-    - assets/icons/syarat_3.svg
-    - assets/icons/syarat_4.svg
-    - assets/icons/syarat_5.png
-    - assets/icons/syarat_6.svg
-    - assets/icons/logo_pic.svg
-    - assets/icons/iconamoon_check-light.svg
 
   fonts:
     - family: Delm-Regular
