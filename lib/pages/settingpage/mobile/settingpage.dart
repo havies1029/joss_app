@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/common/loading_indicator.dart';
+import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
@@ -369,6 +370,8 @@ class _SettingsPageState extends State<SettingsPage> {
     if (shouldLogout == true) {
       context.read<AuthenticationBloc>().add(LoggedOut());
     }
+
+    ChatInitService.I.dispose();
   }
 
   @override
