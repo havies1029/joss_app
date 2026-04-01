@@ -833,6 +833,12 @@ class _AppState extends State<_App> {
                 return homeWidget;
               }
 
+              ChatInitService.I.ensureInit(
+                userId: user.username ?? "UserIdNotFound",
+                displayName: user.userType == 'C' ? user.nama ?? "UserNameNotFound" : user.email ?? "GuestEmailNotFound",
+              );
+
+              /*
               if ((user.userType).toUpperCase() == 'C') {
                 return BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
                   listenWhen: (prev, curr) =>
@@ -880,6 +886,7 @@ class _AppState extends State<_App> {
                   }
                 });
               }
+              */
 
               return homeWidget;
             }
