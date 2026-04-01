@@ -108,6 +108,7 @@ const Color pBlue = Color(0xFF377BFC);
 const Color sBlue = Color(0xFF0088FF);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
+const Color tGreen = Color(0xFF8bbb4e);
 const Color successGreen = Color(0xFF4BB34B);
 const Color greenforPayment = Color(0xFF12C127);
 const Color sGreen = Color(0xFF27C840);
@@ -181,6 +182,7 @@ const String kStringProvinsiError = "Provinsi wajib diisi.";
 const String kStringKotaError = "Kota wajib diisi.";
 const String kStringKodeposError = "Kode Pos wajib diisi.";
 const String kString0 = "Harus lebih dari 0.";
+
 
 enum ListStatus { initial, success, failure, loadingMore }
 
@@ -285,3 +287,11 @@ enum StatusType {
     return null;
   }
 }
+
+const singlePopPages = [
+  "calmv_page",
+  "calpar_page",
+  "regisnonpolis_page",
+  "regispolis_page",
+  "regother_page",
+];

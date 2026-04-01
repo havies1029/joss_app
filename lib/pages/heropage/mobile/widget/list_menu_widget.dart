@@ -10,6 +10,7 @@ import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
+import '../../../tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
@@ -365,7 +366,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -385,7 +386,7 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimnilaicrudFormPage(klaim1Id: '',)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentProcess(viewMode: '', recordId: '',)));
         break;
 
       case 'Klaim':

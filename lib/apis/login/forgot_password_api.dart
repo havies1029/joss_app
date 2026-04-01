@@ -30,7 +30,6 @@ class ForgotPasswordApi {
 		return returnData;
 	}
 
-
   Future<ReturnDataAPI> validasiOtpAPI(RequestOtpModel record) async {
 		String endpoint =
 			"${AppData.prefixEndPoint}/api/requestotp/validasiotp";

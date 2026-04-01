@@ -8,6 +8,7 @@ import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/daftar_cob_klaim
 import '../../klaimbatal/mobile/klaimbatalcrud_form.dart';
 import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
 import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
+import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page_remake.dart';
 import '../../perbaruiklaimpar/mobile/perbaruiklaimpar_page.dart';
 
 class FabActionKlaim extends StatelessWidget {
@@ -93,7 +94,7 @@ class FabActionKlaim extends StatelessWidget {
               case ActionType.perbaruiKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
                 selected!.cobId == "10002"
-                    ? PerbaruiKlaimMvPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama)
+                    ? PerbaruiKlaimMvPageRemake(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama)
                     : PerbaruiKlaimParPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama, cobGroupId: selected.cobId),
                 ));
               case ActionType.lacakKlaim:

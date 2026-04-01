@@ -232,9 +232,9 @@ class _AppDateFieldState extends State<AppDateField> {
   Widget build(BuildContext context) {
     final bool isEnabled = widget.enabled;
 
-    final Color bgColor = isEnabled ? formGrey : formGrey;
-    final Color borderColor = isEnabled ? sGrey : sGrey;
-    final Color textColor = isEnabled ? primaryLightColor : sGrey;
+    // Samakan pola disabled dengan appTextField
+    final Color bgColor = isEnabled ? formGrey : sGrey;
+    final Color borderColor = sGrey;
     final Color iconColor = isEnabled ? primaryLightColor : sGrey;
 
     Widget field = TextFormField(
@@ -249,9 +249,9 @@ class _AppDateFieldState extends State<AppDateField> {
       style: bodyTextStyle(context),
       decoration: InputDecoration(
         labelText: widget.label,
-        labelStyle: inputTextStyle(context).copyWith(
-          color: isEnabled ? primaryColor : sGrey,
-        ),
+        labelStyle: isEnabled
+            ? inputTextStyle(context)
+            : bodyTextStyle(context),
         hintText: 'Pilih ${widget.label}',
         hintStyle: inputTextStyle(context, color: sGrey),
         filled: true,
@@ -266,12 +266,15 @@ class _AppDateFieldState extends State<AppDateField> {
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: BorderSide(color: borderColor),
         ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+          borderSide: BorderSide(color: borderColor),
+        ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: primaryColor),
         ),
 
-        // ERROR
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
           borderSide: const BorderSide(color: Colors.red),

@@ -21,7 +21,7 @@ DropdownSearch<ComboRKonstruksiojkModel> buildFieldComboRKonstruksiojk({
 			),
 		),
 			items: (filter, infiniteScrollProps) async {
-				return ComboRKonstruksiojkRepository().getComboRKonstruksiojk();
+				return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(filter);
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: false)),
 			popupProps: const PopupPropsMultiSelection.modalBottomSheet(

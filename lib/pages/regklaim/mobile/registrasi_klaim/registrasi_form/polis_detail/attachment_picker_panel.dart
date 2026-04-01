@@ -152,7 +152,7 @@ class _ThumbCard extends StatefulWidget {
 }
 
 class _ThumbCardState extends State<_ThumbCard> {
-  static const double _size = 146;
+  static const double _size = 126;
 
   @override
   Widget build(BuildContext context) {

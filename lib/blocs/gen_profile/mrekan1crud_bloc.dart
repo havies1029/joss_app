@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekan1crud_model.dart';
 import 'package:joss_app/repositories/gen_profile/mrekan1crud_repository.dart';
@@ -16,11 +17,21 @@ class MRekan1CrudBloc extends Bloc<MRekan1CrudEvents, MRekan1CrudState> {
 	}
 
 	Future<void> onLihatMRekan1Crud(
-		MRekan1CrudLihatEvent event, Emitter<MRekan1CrudState> emit) async {
+			MRekan1CrudLihatEvent event,
+			Emitter<MRekan1CrudState> emit,
+			) async {
 		emit(state.copyWith(isLoading: true, isLoaded: false));
-		MRekan1CrudModel record = await repository.mRekan1CrudLihat();
 
-		emit(state.copyWith(isLoading: false, isLoaded: true, record: record, isSetujuTC: record.isSetujuTC));
+		final record = await repository.mRekan1CrudLihat();
+
+		final newState = state.copyWith(
+			isLoading: false,
+			isLoaded: true,
+			record: record,
+			isSetujuTC: record.isSetujuTC,
+		);
+
+		emit(newState);
 	}
 
 	Future<void> onSetujuTC(

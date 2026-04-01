@@ -11,6 +11,7 @@ import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
+import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
 
@@ -42,7 +43,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   late AuthenticationBloc authenticationBloc;
 
   late final RegUserModel? record;
-
 
   @override
   void initState() {
@@ -254,22 +254,29 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     onSaveCallback: (value) => fieldComboJnsClient = value,
   );
 
+  void handleBack() {
+    if (singlePopPages.contains(widget.requestFrom)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.of(context, rootNavigator: true).pop();
+
+      authenticationBloc.add(
+        LoggedIn(user: AppData.user),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var email = AppData.user.email ?? "";
     final isEmail = EmailValidator.validate(email.trim());
     lastLoginBy = isEmail ? "email" : "hp";
 
-    void _handleBack() {
-      Navigator.of(context, rootNavigator: true).pop();
-      authenticationBloc.add(LoggedIn(user: AppData.user));
-    }
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        _handleBack();
+        handleBack();
       },
       child: BlocConsumer<RegUserBloc, RegUserState>(
         listener: (context, state) {
@@ -277,6 +284,21 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
             final msg = state.errors.first;
             ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
             return;
+          }
+
+          if (!state.hasFailure &&
+              state.isSaved &&
+              singlePopPages.contains(widget.requestFrom) && !state.isOtpClient) {
+            debugPrint("popupclient1dipanggil cou");
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PopupClientWidget(
+                  sentTo: state.sentTo,
+                  sentVia: state.sentVia,
+                ),
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -317,7 +339,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                             child: Padding(
                               padding: const EdgeInsets.only(left: 4),
                               child: TextButton.icon(
-                                onPressed: _handleBack,
+                                onPressed: handleBack,
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,
                                   minimumSize: const Size(0, 0),

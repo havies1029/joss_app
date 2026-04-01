@@ -2,10 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:joss_app/common/loading_indicator.dart';
-
 import '../../../blocs/authentication/authentication_bloc.dart';
+import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
@@ -19,12 +18,11 @@ import '../../profile/mobile/profile/form_section/rekan_pic_widget.dart';
 import '../widgets/kebijakan_privasi_page.dart';
 import '../widgets/syarat_ketentuan_page.dart';
 import '../widgets/ubah_password_popup.dart';
-
 import '../../base/base_background_firstpage.dart';
 import '../../../common/constants.dart';
 
 const List<String> scopes = <String>['email'];
-//fix all about settingpage
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -51,14 +49,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
 
-      final mjnsclientId =
-          context.read<RegUserBloc>().state.record?.jnsClientId;
+      final mjenisClient =
+          context.read<MRekan1CrudBloc>().state.record?.mjnsclientId ?? '';
 
       context.read<MRekanContactCrudBloc>()
           .add(MRekanContactCrudLihatEvent());
 
-      /// load sesuai jenis client
-      if (mjnsclientId == '10') {
+      if (mjenisClient == '10') {
         context.read<MRekanGeneralIdvCrudBloc>()
             .add(MRekanGeneralIdvCrudLihatEvent());
       } else {
@@ -162,7 +159,6 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// NAMA
                   Text(
                     nama,
                     style: headingStyle(context, fontSize: 22),
@@ -170,7 +166,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                   const SizedBox(height: 6),
 
-                  /// SUBTITLE
                   if (subtitle != null && subtitle.trim().isNotEmpty)
                     Text(
                       subtitle,
@@ -181,8 +176,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                   const SizedBox(height: 8),
 
-                  /// EMAIL
-                  /// EMAIL
                   if (email != null)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -196,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 8), // gap email
+                        const SizedBox(width: 8), //
                         Expanded(
                           child: Text(
                             email,
@@ -209,7 +202,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                   const SizedBox(height: 6),
 
-                  /// TELEPON
                   if (telepon != null)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -223,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 9), // gap telepon
+                        const SizedBox(width: 9),
                         Expanded(
                           child: Text(
                             telepon.startsWith('+') ? telepon : '+$telepon',
@@ -373,8 +365,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final mjnsclientId =
-    context.select((RegUserBloc b) => b.state.record?.jnsClientId);
+    final mjenisClient = context.select(
+          (MRekan1CrudBloc b) => b.state.record?.mjnsclientId ?? '',
+    );
 
     return Scaffold(
       backgroundColor: secondaryBlackColor,
@@ -383,7 +376,6 @@ class _SettingsPageState extends State<SettingsPage> {
           child: MultiBlocListener(
             listeners: [
 
-              /// CONTACT DATA
               BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
                 listener: (context, state) {
                   final rec = state.record;
@@ -399,7 +391,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
 
-              /// INDIVIDUAL CLIENT
               BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
                 listener: (context, state) {
                   final rec = state.record;
@@ -413,7 +404,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
 
-              /// COMPANY CLIENT
               BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
                 listener: (context, state) {
                   final rec = state.record;
@@ -506,36 +496,34 @@ class _SettingsPageState extends State<SettingsPage> {
                                 );
                               },
                             );
-                          }
-
-                          else if (userType == 'U') {
+                          }else {
                             return _buildProfileCard(
                               context: context,
-                              nama: AppData.user.nama ?? "Pengguna Baru",
+                              // nama: AppData.user.email ?? "Pengguna Baru",
+                              nama: "Pengguna Baru",
                               foto: null,
                             );
                           }
-
-                          else {
-
-                            final fallbackEmail =
-                            authState is AuthenticationAuthenticated
-                                ? (authState.user.email?.trim() ?? 'Guest User')
-                                : 'Guest User';
-
-                            return _buildProfileCard(
-                              context: context,
-                              nama: fallbackEmail,
-                              foto: null,
-                              subtitle: "Nasabah",
-                            );
-                          }
+                          //
+                          // else {
+                          //
+                          //   final fallbackEmail =
+                          //   authState is AuthenticationAuthenticated
+                          //       ? (authState.user.email?.trim() ?? 'Guest User')
+                          //       : 'Guest User';
+                          //
+                          //   return _buildProfileCard(
+                          //     context: context,
+                          //     nama: fallbackEmail,
+                          //     foto: null,
+                          //     subtitle: "Nasabah",
+                          //   );
+                          // }
                         },
                       ),
 
                       const SizedBox(height: hPadding),
 
-                      /// ================= AKUN =================
                       BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, authState) {
 
@@ -571,7 +559,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                                 const SizedBox(height: vPadding),
 
-                                /// INFORMASI
                                 _buildSectionTitle(context, 'Informasi'),
 
                                 _buildCardContainer(
@@ -582,7 +569,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       title: 'Informasi Klien',
                                       onTap: () async {
 
-                                        if (mjnsclientId == '10') {
+                                        if (mjenisClient  == '10') {
                                           await Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -668,7 +655,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       const SizedBox(height: vPadding),
 
-                      /// ================= SYARAT =================
                       _buildSectionTitle(context, 'Syarat dan Ketentuan'),
 
                       _buildCardContainer(
@@ -706,7 +692,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       const SizedBox(height: vPadding),
 
-                      /// ================= LAINNYA =================
                       _buildSectionTitle(context, 'Lainnya'),
 
                       _buildCardContainer(
@@ -738,7 +723,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       const SizedBox(height: vPadding),
 
-                      /// ================= LOGOUT =================
                       _buildSectionTitle(context, 'Keluar'),
 
                       _buildCardContainer(
@@ -772,7 +756,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // 🔹 Helper kecil untuk section title
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -783,7 +766,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // 🔹 Helper untuk card container
   Widget _buildCardContainer({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(

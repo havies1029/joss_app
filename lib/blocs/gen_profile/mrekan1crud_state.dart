@@ -44,6 +44,6 @@ class MRekan1CrudState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, 
-    hasFailure, isSetujuTC, isDataGroup1Changed];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved,
+    hasFailure, isSetujuTC, isDataGroup1Changed, record];
 }

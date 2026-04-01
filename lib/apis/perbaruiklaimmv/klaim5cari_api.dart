@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/perbaruiklaimmv/klaim5cari_model.dart';
@@ -12,6 +13,11 @@ class Klaim5cariAPI {
       Map<String, String> queryParams = {'klaim1Id': klaim1Id};
       var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
 
+      // 🔥 REQUEST
+      debugPrint("=== REQUEST GET KLAIM5 ===");
+      debugPrint("URI: $uri");
+      debugPrint("PARAMS: $queryParams");
+
       final http.Response response = await http.get(
         uri,
         headers: <String, String>{
@@ -21,6 +27,11 @@ class Klaim5cariAPI {
         },
       );
 
+      // 🔥 RESPONSE
+      debugPrint("=== RESPONSE GET KLAIM5 ===");
+      debugPrint("STATUS: ${response.statusCode}");
+      debugPrint("BODY: ${response.body}");
+
       // 1) cek status code
       if (response.statusCode != 200) {
         throw Exception(
@@ -28,29 +39,23 @@ class Klaim5cariAPI {
         );
       }
 
-      // 2) decode JSON
       final decoded = json.decode(response.body);
 
-      // 3) pastikan bentuknya List
       if (decoded is! List) {
         throw Exception(
           "Response JSON bukan List. Tipe: ${decoded.runtimeType} | body: ${_short(response.body)}",
         );
       }
 
-      // 4) mapping ke model (aman)
       return decoded
           .whereType<Map<String, dynamic>>()
           .map<Klaim5cariModel>((e) => Klaim5cariModel.fromJson(e))
           .toList();
     } on FormatException catch (e) {
-      // error parsing JSON
       throw Exception("Parse JSON gagal: ${e.message}");
     } on http.ClientException catch (e) {
-      // error network dari package http
       throw Exception("HTTP Client error: $e");
     } catch (e) {
-      // error lain (mapping null, dll)
       throw Exception("Failed to load data: $e");
     }
   }

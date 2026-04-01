@@ -182,6 +182,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
             fileName: fileName,
             data: data,
             format: "excel",
+            reportTitle: "Klaim",
           );
         }
       } else {
@@ -193,6 +194,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
             fileName: fileName,
             data: data,
             format: "pdf",
+            reportTitle: "Klaim",
           );
         }
       }

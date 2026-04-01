@@ -75,50 +75,58 @@ class _ReusableComboBoxState<T> extends State<ReusableComboBox<T>> {
   // }
   @override
   Widget build(BuildContext context) {
+    final bool isEnabled = widget.isEnabled;
+
     return DropdownSearch<T>(
       key: widget.comboKey,
-      enabled: widget.isEnabled,
+      enabled: isEnabled,
       selectedItem: widget.initItem,
       decoratorProps: DropDownDecoratorProps(
         baseStyle: bodyTextStyle(context),
         decoration: InputDecoration(
           labelText: widget.hintText,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          labelStyle: inputTextStyle(context),
+          labelStyle: isEnabled
+              ? inputTextStyle(context)
+              : bodyTextStyle(context),
           hintText: 'Pilih ${widget.hintText}',
-          hintStyle: bodyTextStyle(context).copyWith(color: hintGrey),
-          prefixIcon:
-              widget.prefixIcon != null ? Icon(widget.prefixIcon, color: primaryColor) : null,
+          hintStyle: inputTextStyle(context, color: sGrey),
+          prefixIcon: widget.prefixIcon != null
+              ? Icon(
+            widget.prefixIcon,
+            color: isEnabled ? primaryColor : sGrey,
+          )
+              : null,
           filled: true,
-          fillColor: formGrey,
+          fillColor: isEnabled ? formGrey : sGrey,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(cardBorderRadius),
             borderSide: BorderSide(color: sGrey),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+            borderSide: BorderSide(color: sGrey),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(cardBorderRadius),
             borderSide: BorderSide(color: sGrey),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(cardBorderRadius),
             borderSide: BorderSide(color: primaryColor),
           ),
-
-          // ERROR
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(cardBorderRadius),
             borderSide: BorderSide(color: Colors.red),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(cardBorderRadius),
             borderSide: BorderSide(color: Colors.red),
           ),
-
           errorStyle: bodyTextStyle(context).copyWith(
             color: Colors.red,
             fontSize: 12,
           ),
-
           errorText: (widget.errorText != null && widget.errorText!.trim().isNotEmpty)
               ? widget.errorText
               : null,

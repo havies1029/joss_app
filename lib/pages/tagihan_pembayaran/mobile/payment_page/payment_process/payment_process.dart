@@ -254,11 +254,18 @@ class PaymentProcessFormState extends State<PaymentProcess> {
             final bankTitle = (state.record?.bankNama ?? '').trim();
             final title = bankTitle.isNotEmpty ? bankTitle : "Pembayaran";
 
-            return BaseBackgroundSidePage(
-              title: title,
-              onBack: () async => _handleExit(context),
-              child: Container(
-                color: secondaryBlackColor,
+            return Scaffold(
+              backgroundColor: secondaryBlackColor,
+              appBar: AppBar(
+                backgroundColor: secondaryBlackColor,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => _handleExit(context),
+                ),
+                title: Text(title),
+              ),
+              body: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 child: SingleChildScrollView(
                   child: Form(

@@ -14,8 +14,8 @@ class KlaimmvdoccrudRepository {
 	Future<bool> klaimmvdoccrudUbah(KlaimmvdoccrudModel record) async {
 		return await api.klaimmvdoccrudUbahAPI(record);
 	}
-	Future<bool> klaimmvdoccrudHapus(String klaim1Id, String mjenisdocId, String jenisDocLain) async {
-		return await api.klaimmvdoccrudHapusAPI(klaim1Id, mjenisdocId, jenisDocLain);
+	Future<bool> klaimmvdoccrudHapus(String klaim5Id, String mjenisdocId, String jenisDocLain) async {
+		return await api.klaimmvdoccrudHapusAPI(klaim5Id, mjenisdocId, jenisDocLain);
 	}
 	Future<KlaimmvdoccrudModel?> klaimmvdoccrudLihat(String klaim5Id) async {
 		return await api.klaimmvdoccrudLihatAPI(klaim5Id);

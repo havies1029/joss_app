@@ -10,6 +10,10 @@ import 'package:joss_app/models/combobox/combominsurer_model.dart';
 import 'package:joss_app/models/combobox/combommvjnscover_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
+import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
+import '../../../blocs/gen_regmv/polis_tanggal_state.dart';
+
 
 class KlaimmvpoliscrudFormPage extends StatefulWidget {
 	final String viewMode;
@@ -33,8 +37,8 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 	final comboMMvjnscoverKey = GlobalKey<DropdownSearchState<ComboMMvjnscoverModel>>();
 	var fieldNoChasisController = TextEditingController();
 	var fieldNoPlatController = TextEditingController();
-	var fieldPolisAkhirController = TextEditingController(text: DateTime.now().toIso8601String());
-	var fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
+	// var fieldPolisAkhirController = TextEditingController(text: DateTime.now().toIso8601String());
+	// var fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
 	var fieldPolisNoController = TextEditingController();
 	var fieldSppa1IdController = TextEditingController();
 	var isPolisJps = false;
@@ -61,7 +65,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 											children: [
 												Flexible(child: buildFieldPolisMulai()),
 												const SizedBox(width: 8),
-												Flexible(child: buildFieldPolisAkhir()),
+												Flexible(child: buildFieldPolisBerakhir()),
 											],
 										),
 										const SizedBox(height: hPadding),
@@ -97,10 +101,13 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 						fieldLaporAsuransiController.text = state.record!.laporAsuransi.toIso8601String();
 						fieldNoChasisController.text = state.record!.noChasis;
 						fieldNoPlatController.text = state.record!.noPlat;
-						fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
-						fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
+						// fieldPolisAkhirController.text = state.record!.polisAkhir.toIso8601String();
+						// fieldPolisMulaiController.text = state.record!.polisMulai.toIso8601String();
 						fieldPolisNoController.text = state.record!.polisNo;
 						fieldSppa1IdController.text = state.record!.sppa1Id;
+						final mulai = state.record!.polisMulai;
+
+						context.read<PolisTanggalBloc>().add(PolisMulaiChanged(mulai));
 					}
 					fieldComboMInsurer = state.comboMInsurer;
 					fieldComboMMvjnscover = state.comboMMvjnscover;
@@ -120,6 +127,15 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 			klaimmvpoliscrudBloc.add(
 					KlaimmvpoliscrudLihatEvent(recordId: widget.recordId));
 		}
+
+		WidgetsBinding.instance.addPostFrameCallback((_) {
+			final now = DateTime.now();
+			final today = DateTime(now.year, now.month, now.day);
+
+			context.read<PolisTanggalBloc>().add(
+				PolisMulaiChanged(today),
+			);
+		});
 	}
 
 	Widget buildFieldInsuredNama(){
@@ -332,7 +348,7 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 
 	Widget buildFieldNoChasis(){
 		return appTextField(
-			label: 'No Chassis',
+			label: 'No Rangka',
 			controller: fieldNoChasisController,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
@@ -373,51 +389,97 @@ class KlaimmvpoliscrudFormPageFormState extends State<KlaimmvpoliscrudFormPage> 
 		);
 	}
 
-	Widget buildFieldPolisAkhir(){
-		return AppDateField(
-			enabled: isPolisJps ? false : true,
-			initialValue: DateTime.tryParse(fieldPolisAkhirController.text),
-			onChanged: (value) {
-				if (value != null) {
-					removeError(error: "Polis Akhir tidak boleh kosong");
-					fieldPolisAkhirController.text = value.toIso8601String();
-					klaimmvpoliscrudBloc.add(FieldPolisAkhirChangedEvent(polisAkhir: value));
-				}
+	// Widget buildFieldPolisAkhir(){
+	// 	return AppDateField(
+	// 		enabled: isPolisJps ? false : true,
+	// 		initialValue: DateTime.tryParse(fieldPolisAkhirController.text),
+	// 		onChanged: (value) {
+	// 			if (value != null) {
+	// 				removeError(error: "Polis Akhir tidak boleh kosong");
+	// 				fieldPolisAkhirController.text = value.toIso8601String();
+	// 				klaimmvpoliscrudBloc.add(FieldPolisAkhirChangedEvent(polisAkhir: value));
+	// 			}
+	// 		},
+	// 		validator: (value) {
+	// 			if (value == null) {
+	// 				addError(error: "Polis Akhir tidak boleh kosong");
+	// 				return "";
+	// 			}
+	// 			return null;
+	// 		},
+	// 		label: 'Sampai',
+	// 		firstDate: DateTime(2000),
+	// 		lastDate: DateTime(2100),
+	// 	);
+	// }
+	//
+	// Widget buildFieldPolisMulai(){
+	// 	return AppDateField(
+	// 		enabled: isPolisJps ? false : true,
+	// 		initialValue: DateTime.tryParse(fieldPolisMulaiController.text),
+	// 		onChanged: (value) {
+	// 			if (value != null) {
+	// 				removeError(error: "Polis Mulai tidak boleh kosong");
+	// 				fieldPolisMulaiController.text = value.toIso8601String();
+	// 				klaimmvpoliscrudBloc.add(FieldPolisMulaiChangedEvent(polisMulai: value));
+	// 			}
+	// 		},
+	// 		validator: (value) {
+	// 			if (value == null) {
+	// 				addError(error: "Polis Mulai tidak boleh kosong");
+	// 				return "";
+	// 			}
+	// 			return null;
+	// 		},
+	// 		label: 'Dari',
+	// 		firstDate: DateTime(2000),
+	// 		lastDate: DateTime(2100),
+	// 	);
+	// }
+
+	Widget buildFieldPolisMulai() {
+		return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
+			buildWhen: (prev, curr) => prev.mulai != curr.mulai,
+			builder: (context, state) {
+				final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+				return AppDateField(
+					label: 'Tanggal Mulai',
+					initialValue: state.mulai,
+					firstDate: today,
+					lastDate: DateTime(2100),
+					enabled: isPolisJps ? false : true,
+					validator: (_) => null,
+					onChanged: (dt) {
+						if (dt == null) return;
+						context.read<PolisTanggalBloc>().add(PolisMulaiChanged(dt));
+						removeError(error: "Polis Mulai tidak boleh kosong");
+						klaimmvpoliscrudBloc.add(FieldPolisMulaiChangedEvent(polisMulai: dt));
+					},
+				);
 			},
-			validator: (value) {
-				if (value == null) {
-					addError(error: "Polis Akhir tidak boleh kosong");
-					return "";
-				}
-				return null;
-			},
-			label: 'Sampai',
-			firstDate: DateTime(2000),
-			lastDate: DateTime(2100),
 		);
 	}
 
-	Widget buildFieldPolisMulai(){
-		return AppDateField(
-			enabled: isPolisJps ? false : true,
-			initialValue: DateTime.tryParse(fieldPolisMulaiController.text),
-			onChanged: (value) {
-				if (value != null) {
-					removeError(error: "Polis Mulai tidak boleh kosong");
-					fieldPolisMulaiController.text = value.toIso8601String();
-					klaimmvpoliscrudBloc.add(FieldPolisMulaiChangedEvent(polisMulai: value));
-				}
+	Widget buildFieldPolisBerakhir() {
+		return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
+			buildWhen: (prev, curr) => prev.berakhir != curr.berakhir,
+			builder: (context, state) {
+				return AppDateField(
+					key: ValueKey(state.berakhir.toIso8601String()),
+					label: 'Tanggal Berakhir',
+					enabled: isPolisJps ? false : true,
+					initialValue: state.berakhir,
+					firstDate: DateTime(2000),
+					lastDate: DateTime(2100),
+					validator: (_) => null,
+					onChanged: (dt) {
+						if (dt == null) return;
+						removeError(error: "Polis Akhir tidak boleh kosong");
+						klaimmvpoliscrudBloc.add(FieldPolisAkhirChangedEvent(polisAkhir: dt));
+					},
+				);
 			},
-			validator: (value) {
-				if (value == null) {
-					addError(error: "Polis Mulai tidak boleh kosong");
-					return "";
-				}
-				return null;
-			},
-			label: 'Dari',
-			firstDate: DateTime(2000),
-			lastDate: DateTime(2100),
 		);
 	}
 

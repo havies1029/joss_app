@@ -1,7 +1,6 @@
 part of 'klaimparklaimcrud_bloc.dart';
 
 class KlaimparklaimcrudState extends Equatable {
-
 	final KlaimparklaimcrudModel? record;
 	final bool isLoading;
 	final bool isLoaded;
@@ -9,19 +8,22 @@ class KlaimparklaimcrudState extends Equatable {
 	final bool isSaved;
 	final bool hasFailure;
 	final ComboMJenisrugiModel? comboMJenisrugi;
-  final bool isDirty;
-  final bool isComplete;
-	const KlaimparklaimcrudState(
-		{this.record,
+	final bool isDirty;
+	final bool isComplete;
+	final bool isValid;
+
+	const KlaimparklaimcrudState({
+		this.record,
 		this.isLoading = false,
 		this.isLoaded = false,
 		this.isSaving = false,
 		this.isSaved = false,
 		this.hasFailure = false,
 		this.comboMJenisrugi,
-    this.isDirty = false,
-    this.isComplete = false,
-});
+		this.isDirty = false,
+		this.isComplete = false,
+		this.isValid = false,
+	});
 
 	KlaimparklaimcrudState copyWith({
 		KlaimparklaimcrudModel? record,
@@ -31,9 +33,10 @@ class KlaimparklaimcrudState extends Equatable {
 		bool? isSaved,
 		bool? hasFailure,
 		ComboMJenisrugiModel? comboMJenisrugi,
-    bool? isDirty,
-    bool? isComplete,
-	}){
+		bool? isDirty,
+		bool? isComplete,
+		bool? isValid,
+	}) {
 		return KlaimparklaimcrudState(
 			record: record ?? this.record,
 			isLoading: isLoading ?? this.isLoading,
@@ -41,12 +44,24 @@ class KlaimparklaimcrudState extends Equatable {
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMJenisrugi: comboMJenisrugi?? this.comboMJenisrugi,
-      isDirty: isDirty ?? this.isDirty,
-      isComplete: isComplete ?? this.isComplete,
+			comboMJenisrugi: comboMJenisrugi ?? this.comboMJenisrugi,
+			isDirty: isDirty ?? this.isDirty,
+			isComplete: isComplete ?? this.isComplete,
+			isValid: isValid ?? this.isValid,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? '', comboMJenisrugi ?? '', isDirty, isComplete];
+	List<Object> get props => [
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		record ?? '',
+		comboMJenisrugi ?? '',
+		isDirty,
+		isComplete,
+		isValid,
+	];
 }

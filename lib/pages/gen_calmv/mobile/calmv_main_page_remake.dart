@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 import 'package:string_validator/string_validator.dart';
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_calmv/calmv1crud_bloc.dart';
@@ -13,6 +14,7 @@ import '../../../blocs/gen_calmv/calmv_flow_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../models/combobox/combommvgrupojk_model.dart';
@@ -64,8 +66,10 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Calmv3FormModel? form3Record;
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
-  late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
- 
+  late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  late RegUserBloc regUserBloc;
+  late AuthenticationBloc authenticationBloc;
+
   //form1
   final fieldCoverBulanController = TextEditingController();
   final fieldHargaController = TextEditingController();
@@ -112,6 +116,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     super.initState();
     mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+    regUserBloc = context.read<RegUserBloc>();
+    authenticationBloc = context.read<AuthenticationBloc>();
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
@@ -271,88 +277,112 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: "Kendaraan",
-      blocListeners: [
-        BlocListener<Calmv1ListBloc, Calmv1ListState>(
-          listenWhen: (prev, curr) {
-            return prev.processMessage != curr.processMessage &&
-                (curr.processMessage).isNotEmpty;
-          },
-          listener: (context, state) {
-            final calmv1Id = context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
-            context.read<Calmv1ListBloc>().add(ClearProcessMessageEvent());
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RegmvFormMainRemake(regmv1Id: state.processMessage, calmv1Id: calmv1Id,),
-              ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        if (regUserBloc.state.requestFrom.isNotEmpty){
+          debugPrint("authenticationBloc LoggedIn Active");
+          authenticationBloc.add(
+            LoggedIn(user: AppData.user),
+          );
+          regUserBloc.add(ClearRequestFromEvent());
+        }
+        Navigator.pop(context);
+      },
+      child: BaseBackgroundSidePage(
+        title: "Kendaraan",
+        onBack: () async {
+          if (regUserBloc.state.requestFrom.isNotEmpty){
+            authenticationBloc.add(
+              LoggedIn(user: AppData.user),
             );
-            if (calmv1Id.isNotEmpty) {
-              context.read<Calmv1CrudBloc>().add(Calmv1CrudLihatEvent(recordId: calmv1Id));
-            }
-          },
-        ),
-
-        BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                calmv1Id = state.record!.calmv1Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform1(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Calmv2FormBloc, Calmv2FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                calmv2Id = state.record!.calmv2Id;
-                appSnackBar(message: calmv2Id??"");
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform2(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Calmv3FormBloc, Calmv3FormState>(
-          listener: (context, state) {
-            if (state.record != null) {
-              if (state.isLoaded) {
+            regUserBloc.add(ClearRequestFromEvent());
+          }
+          Navigator.pop(context);
+        },
+        blocListeners: [
+          BlocListener<Calmv1ListBloc, Calmv1ListState>(
+            listenWhen: (prev, curr) {
+              return prev.processMessage != curr.processMessage &&
+                  (curr.processMessage).isNotEmpty;
+            },
+            listener: (context, state) {
+              final calmv1Id =
+                  context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
+              context.read<Calmv1ListBloc>().add(ClearProcessMessageEvent());
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegmvFormMainRemake(
+                    regmv1Id: state.processMessage,
+                    calmv1Id: calmv1Id,
+                  ),
+                ),
+              );
+              if (calmv1Id.isNotEmpty) {
+                context
+                    .read<Calmv1CrudBloc>()
+                    .add(Calmv1CrudLihatEvent(recordId: calmv1Id));
+              }
+            },
+          ),
+          BlocListener<Calmv1CrudBloc, Calmv1CrudState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
-                  calmv3Id = state.record!.calmv3Id;
+                  calmv1Id = state.record!.calmv1Id;
                 });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform1(state.record!);
+              }
+            },
+          ),
+          BlocListener<Calmv2FormBloc, Calmv2FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  calmv2Id = state.record!.calmv2Id;
+                  appSnackBar(message: calmv2Id ?? "");
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform2(state.record!);
+              }
+            },
+          ),
+          BlocListener<Calmv3FormBloc, Calmv3FormState>(
+            listener: (context, state) {
+              if (state.record != null) {
+                if (state.isLoaded) {
+                  setState(() {
+                    calmv3Id = state.record!.calmv3Id;
+                  });
 
-                _payloadform3(state.record!);
+                  _payloadform3(state.record!);
 
-                if (state.record!.calmv3Id.isNotEmpty) {
-                  openForm3();
+                  if (state.record!.calmv3Id.isNotEmpty) {
+                    openForm3();
+                  }
+                }
+
+                if (state.isSaved) {
+                  setState(() {
+                    calmv3Id = state.record!.calmv3Id;
+                  });
+
+                  if (state.record!.calmv3Id.isNotEmpty) {
+                    openForm3();
+                  }
                 }
               }
-
-              // kalau ada flow lain yang memang pakai isSaved
-              if (state.isSaved) {
-                setState(() {
-                  calmv3Id = state.record!.calmv3Id;
-                });
-
-                if (state.record!.calmv3Id.isNotEmpty) {
-                  openForm3();
-                }
-              }
-            }
-          },
-        ),
-
-      ],
-
-      child: _buildForm(),
+            },
+          ),
+        ],
+        child: _buildForm(),
+      ),
     );
   }
 
@@ -794,6 +824,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
     context.read<CalmvFlowBloc>().add(CalmvFlowStartEvent());
   }
+  bool hasLeadingZero(String raw) {
+    return raw.length > 1 && raw.startsWith('0');
+  }
 
   bool validateForm1() {
     clearErrsByPrefix('form1.');
@@ -832,9 +865,16 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     } else {
       final clean = hargaRaw.replaceAll(",", "");
       final angka = double.tryParse(clean);
+
       if (angka == null || angka <= 0) {
         setErr('form1.hargaKendaraan', "Harga harus lebih dari 0");
         ok = false;
+      } else {
+        fieldHargaController.text = angka.toInt().toString();
+      }
+
+      if (hasLeadingZero(clean)) {
+        setErr('form1.hargaKendaraan', "Format tidak disarankan (diawali 0)");
       }
     }
 
@@ -886,6 +926,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       return true;
     }
 
+    void warnLeadingZero(TextEditingController c, String key) {
+      final raw = cleanNum(c.text);
+      if (hasLeadingZero(raw)) {
+        setErr(key, "Format tidak disarankan (diawali 0)");
+      }
+    }
+
     final tpl = parseOrDefaultZero(fieldTplController);
     final pad = parseOrDefaultZero(fieldPadController);
     final pap = parseOrDefaultZero(fieldPapController);
@@ -914,6 +961,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       }
     }
 
+    warnLeadingZero(fieldTplController, 'form2.tpl');
+    warnLeadingZero(fieldPadController, 'form2.pad');
+    warnLeadingZero(fieldPapController, 'form2.pap');
+    warnLeadingZero(fieldPllController, 'form2.pll');
+
     return ok;
   }
 
@@ -926,15 +978,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
       if (user.userType == "C"){
         if (mjenisClient == "10") {
-          final mRekanNama1 =
-              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
-          debugPrint("MREKANNAMA! = $mRekanNama1");
+          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
-          if (mRekanNama1.isEmpty) {
+          if (!idvState.isDataComplete) {
             showDialog(
               context: context,
-              barrierDismissible: true, // klik luar = close
-              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
@@ -944,7 +994,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                      builder: (_) => MRekanGeneralIdvPopUpPage(),
                     ),
                   );
                 },
@@ -954,14 +1004,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           }
         }
         else if (mjenisClient == "20") {
-          final mRekanNama2 =
-              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
-          if (mRekanNama2.isEmpty) {
+          if (!cmpState.isDataComplete) {
             showDialog(
               context: context,
-              barrierDismissible: true, // klik luar = close
-              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
@@ -971,7 +1020,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                      builder: (_) => MRekanGeneralCmpPopUpPage(),
                     ),
                   );
                 },

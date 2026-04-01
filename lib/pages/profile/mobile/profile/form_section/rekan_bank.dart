@@ -63,7 +63,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     mRekanBankCrudBloc.add(
       MRekanBankCrudLihatEvent(),
     );
-
   }
 
   @override
@@ -191,13 +190,13 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   }
 
   void _injectPayload(MRekanBankCrudModel record) {
-    fieldMrekan1IdController.text = record.mrekan1Id;
-    fieldRekNamaController.text = record.rekNama;
-    fieldRekNoController.text = record.rekNo;
-    fieldComboMBank = record.comboMBank;
-    existingMrekanBankId = record.mrekanbankId;
-
-    setState(() {});
+    setState(() {
+      fieldMrekan1IdController.text = record.mrekan1Id;
+      fieldRekNamaController.text = record.rekNama;
+      fieldRekNoController.text = record.rekNo;
+      fieldComboMBank = record.comboMBank;
+      existingMrekanBankId = record.mrekanbankId;
+    });
   }
 
 
@@ -211,6 +210,9 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       compareItems: (a, b) => a.mbankId == b.mbankId,
       onChangedCallback: (value) {
         if (value != null) {
+          setState(() {
+            fieldComboMBank = value;
+          });
           removeError(error: kStringNullError);
           mRekanBankCrudBloc.add(ComboMBankChangedEvent(comboMBank: value));
         }
@@ -276,7 +278,6 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       }
 
     } else {
-      debugPrint("[onSaveForm] Validasi form gagal.");
     }
   }
 

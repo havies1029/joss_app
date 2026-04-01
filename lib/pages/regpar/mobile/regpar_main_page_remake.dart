@@ -649,6 +649,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
   }
 
+  bool _isLanjutkanLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -733,9 +735,23 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     );
   }
 
+  bool isAllFormComplete() {
+    final done = [
+      isForm1Complete(),
+      isForm2Complete(),
+      isForm3Complete(),
+      isForm4Complete(),
+      isForm6Complete(),
+      isForm5Complete(),
+    ].where((x) => x).length;
+
+    return done == RegparSection.values.length;
+  }
+
   Widget _buildForm() {
     final bool hasForm5Record =
         context.read<Regpar5FormBloc>().state.record != null;
+    final bool canShowLanjutkan = isAllFormComplete();
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: SingleChildScrollView(
@@ -1062,7 +1078,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,
                               formatNumber: true,
-
                             ),
                             HitungPremiRow(
                               label: "TOTAL PREMI",
@@ -1093,24 +1108,50 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
                   const SizedBox(height: hPadding),
 
-                  if (hasForm5Record) ...[
+                  if (canShowLanjutkan) ...[
                     AppButton.iconRight(
                       text: "Lanjutkan",
                       icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KonfirmasiRegParPage(
-                              recordId: regpar1Id ?? '',
-                              viewMode: 'ubah',
+                      isLoading: _isLanjutkanLoading,
+                      onPressed: _isLanjutkanLoading
+                          ? null
+                          : () async {
+                        setState(() {
+                          _isLanjutkanLoading = true;
+                        });
+
+                        try {
+
+                          draftForm1ToBloc(context);
+                          draftForm2ToBloc(context);
+                          draftForm3ToBloc(context);
+                          draftForm4ToBloc(context);
+
+                          context.read<RegparFlowBloc>().add(RegparFlowStartEvent());
+
+                          await Future.delayed(const Duration(seconds: 2));
+
+                          if (!mounted) return;
+
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KonfirmasiRegParPage(
+                                recordId: regpar1Id ?? '',
+                                viewMode: 'ubah',
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isLanjutkanLoading = false;
+                            });
+                          }
+                        }
                       },
                     ),
                   ],
-
                   const SizedBox(height: 25),
                 ],
               ),
@@ -1333,6 +1374,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       ttgAlamat: fieldTtgAlamatController.text ?? "",
     );
 
+    debugPrint("[draftForm1ToBloc] record => ${record.toJson()}");
+
     context.read<Regpar1CrudBloc>().add(
       Regpar1DraftEvent(record: record),
     );
@@ -1346,17 +1389,21 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       polisAkhir: polis.berakhir,
       regpar2Id: regpar1Id ?? "",
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,
-      rokupasiId: fieldComboROkupasi?.rokupasiId, regpar1Id: widget.regpar1Id!, objectAlamat: fieldObjectAlamatController.text ?? '',
+      rokupasiId: fieldComboROkupasi?.rokupasiId,
+      regpar1Id: widget.regpar1Id!,
+      objectAlamat: fieldObjectAlamatController.text ?? '',
       objectPropinsiId: fieldComboMPropinsi?.mpropinsiId,
       objectKotaId: fieldComboMKota?.mkotaId,
       objectKecamatanId: fieldComboMKecamatan?.mkecamatanId,
       objectKelurahanId: fieldComboMKelurahan?.mkelurahanId,
     );
 
+    debugPrint("[draftForm2ToBloc] record => ${record.toJson()}");
+
     context.read<Regpar2FormBloc>().add(Regpar2DraftEvent(record: record));
   }
 
-  void draftForm3ToBloc(BuildContext context){
+  void draftForm3ToBloc(BuildContext context) {
     final record = Regpar3FormModel(
       regpar1Id: regpar1Id ?? "",
       isEq: toBoolean(fieldIsEqController.text),
@@ -1369,10 +1416,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       regpar3Id: regpar1Id ?? "",
     );
+
+    debugPrint("[draftForm3ToBloc] record => ${record.toJson()}");
+
     context.read<Regpar3FormBloc>().add(Regpar3DraftEvent(record: record));
   }
 
-  void draftForm4ToBloc(BuildContext context){
+  void draftForm4ToBloc(BuildContext context) {
     final record = Regpar4FormModel(
       regpar1Id: regpar1Id ?? "",
       currId: fieldComboRMatauang?.rmatauangKode,
@@ -1382,6 +1432,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       siOther: double.parse(fieldSiOtherController.text.replaceAll(',', '')),
       siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
     );
+
+    debugPrint("[draftForm4ToBloc] record => ${record.toJson()}");
+
     context.read<Regpar4FormBloc>().add(Regpar4DraftEvent(record: record));
   }
 
@@ -1400,7 +1453,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           _isHitungPremiLoading = true;
         });
 
-        onHitungPremi();
+        await onHitungPremi();
 
         await Future.delayed(const Duration(seconds: 2));
 
@@ -1585,6 +1638,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     return ok;
   }
 
+  bool hasLeadingZero(String raw) {
+    return raw.length > 1 && raw.startsWith('0');
+  }
+
   bool validateForm4() {
     clearErrsByPrefix('form4.');
     bool ok = true;
@@ -1617,15 +1674,38 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         return false;
       }
 
+      if (hasLeadingZero(clean)) {
+        setErr(key, "Format tidak disarankan (diawali 0)");
+      }
+
       return true; // >= 0 OK
     }
 
     // SI fields (required, >= 0)
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siBuilding', controller: fieldSiBuildingController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siContent', controller: fieldSiContentController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siMachinery', controller: fieldSiMachineryController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siOther', controller: fieldSiOtherController)) ok = false;
-    if (!validateMoneyNonNegativeRequired(key: 'form4.siStock', controller: fieldSiStockController)) ok = false;
+    if (!validateMoneyNonNegativeRequired(
+      key: 'form4.siBuilding',
+      controller: fieldSiBuildingController,
+    )) ok = false;
+
+    if (!validateMoneyNonNegativeRequired(
+      key: 'form4.siContent',
+      controller: fieldSiContentController,
+    )) ok = false;
+
+    if (!validateMoneyNonNegativeRequired(
+      key: 'form4.siMachinery',
+      controller: fieldSiMachineryController,
+    )) ok = false;
+
+    if (!validateMoneyNonNegativeRequired(
+      key: 'form4.siOther',
+      controller: fieldSiOtherController,
+    )) ok = false;
+
+    if (!validateMoneyNonNegativeRequired(
+      key: 'form4.siStock',
+      controller: fieldSiStockController,
+    )) ok = false;
 
     if (!ok) {
       openSection(RegparSection.form4);
@@ -1633,8 +1713,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     return ok;
   }
-
-
 
   //form1
   Widget buildFieldTtgNama() => appTextField(
@@ -1707,7 +1785,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   ComboRKonstruksiojkModel? previousKonstruksi;
-  final konstruksiKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
 
   String getKonstruksiSubtitle(String kelasNama) {
     switch (kelasNama) {
@@ -1724,10 +1801,27 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   Widget buildFieldRkonstruksiojkId() => ReusableComboBox<ComboRKonstruksiojkModel>(
     hintText: "Kelas Konstruksi",
-    comboKey: konstruksiKey,
+    comboKey: comboRKonstruksiojkKey,
     maxHeight: 200,
     initItem: fieldComboRKonstruksiojk,
-    dataLoader: () => ComboRKonstruksiojkRepository().getComboRKonstruksiojk(),
+
+    dataLoader: () {
+      final okupasiId = fieldComboROkupasi?.rokupasiId;
+      final payload = (okupasiId == null || okupasiId.isEmpty) ? "" : "$okupasiId|";
+      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(payload);
+    },
+
+    dataLoaderWithFilter: (q) {
+      final okupasiId = fieldComboROkupasi?.rokupasiId;
+      if (okupasiId == null || okupasiId.isEmpty) {
+        return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
+      }
+
+      final queryUser = (q ?? "").trim();
+      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("$okupasiId|$queryUser");
+    },
+
+    serverSearchMinChars: 2,
     displayText: (i) => i.kelasNama,
     compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
 
@@ -1759,15 +1853,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: bodyTextStyle(context, fontSize: 15)
-                      .copyWith(color: hintGrey),
+                  style: bodyTextStyle(context, fontSize: 15).copyWith(color: hintGrey),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
                 Text(
                   "Apakah Anda yakin ingin memilih kelas ini?",
-                  style: bodyTextStyle(context, fontSize: 15)
-                      .copyWith(color: hintGrey),
+                  style: bodyTextStyle(context, fontSize: 15).copyWith(color: hintGrey),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 13),
@@ -1800,14 +1892,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           fieldComboRKonstruksiojk = item;
           previousKonstruksi = item;
           clearErr('form2.kelasKonstruksi');
-
-          // comboROkupasiKey.currentState?.clear();
-          // fieldComboROkupasi = null;
-          // clearErr('form2.okupasi');
         });
       } else {
         setState(() {
-          konstruksiKey.currentState?.clear();
+          comboRKonstruksiojkKey.currentState?.clear();
           fieldComboRKonstruksiojk = previousKonstruksi;
         });
       }
@@ -1820,24 +1908,33 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     hintText: "Okupasi",
     comboKey: comboROkupasiKey,
     initItem: fieldComboROkupasi,
-    dataLoader: () => ComboROkupasiRepository()
-        .getComboROkupasi(""),
+    dataLoader: () => ComboROkupasiRepository().getComboROkupasi(""),
     displayText: (i) => i.okupasiDesc,
     compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
     validatorCallback: (_) => err('form2.okupasi'),
     errorText: err('form2.okupasi'),
     onChangedCallback: (v) {
-      fieldComboROkupasi = v;
-      if (v != null) {
+      setState(() {
+        fieldComboROkupasi = v;
         clearErr('form2.okupasi');
-        regpar2formbloc?.add(ComboROkupasiChangedEvent(comboROkupasi: v));
+
+        fieldComboRKonstruksiojk = null;
+        previousKonstruksi = null;
+        comboRKonstruksiojkKey.currentState?.clear();
+        clearErr('form2.kelasKonstruksi');
+      });
+
+      if (v != null) {
+        regpar2formbloc?.add(
+          ComboROkupasiChangedEvent(comboROkupasi: v),
+        );
       }
     },
     onSaveCallback: (value) => fieldComboROkupasi = value,
   );
 
   Widget buildFieldObjectAlamat() => appTextField(
-    label: "Alamat Rumah",
+    label: "Alamat lokasi Risiko",
     controller: fieldObjectAlamatController,
     keyboardType: TextInputType.text,
     inputFormatters: [
@@ -2036,13 +2133,19 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     errorText: err('form3.wilayah'),
 
     onChangedCallback: (v) {
-      fieldComboMWilayah = v;
+      setState(() {
+        fieldComboMWilayah = v;
+        if (v != null) {
+          clearErr('form3.wilayah');
+          fieldComboMKabZonaGempa = null;
+          comboMKabZonaGempaKey.currentState?.clear();
+          clearErr('form3.zonaGempa');
+        }
+      });
       if (v != null) {
-        clearErr('form3.wilayah');
-        fieldComboMKabZonaGempa = null;
-        regpar3formbloc?.add(ComboMWilayahChangedEvent(comboMWilayah: v));
-        comboMKabZonaGempaKey.currentState?.clear();
-        clearErr('form3.zonaGempa');
+        regpar3formbloc?.add(
+          ComboMWilayahChangedEvent(comboMWilayah: v),
+        );
       }
     },
     onSaveCallback: (value) => fieldComboMWilayah = value,
@@ -2051,6 +2154,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
     hintText: "Zona gempa Bumi",
     initItem: fieldComboMKabZonaGempa,
+    comboKey: comboMKabZonaGempaKey,
     dataLoader: () {
       final wid = fieldComboMWilayah?.mwilayahId;
       final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";

@@ -9,6 +9,7 @@ class MRekanGeneralIdvCrudState extends Equatable {
   final bool hasFailure;
   final ComboMPekerjaanModel? comboMPekerjaan;
   final ComboMJnskelModel? comboMJnskel;
+  final bool isDataComplete;
 
   const MRekanGeneralIdvCrudState({
     this.record,
@@ -19,6 +20,7 @@ class MRekanGeneralIdvCrudState extends Equatable {
     this.hasFailure = false,
     this.comboMPekerjaan,
     this.comboMJnskel,
+    this.isDataComplete = false,
   });
 
   static const _unset = Object();
@@ -32,6 +34,7 @@ class MRekanGeneralIdvCrudState extends Equatable {
     bool? hasFailure,
     Object? comboMPekerjaan = _unset,
     Object? comboMJnskel = _unset,
+    bool? isDataComplete,
   }) {
     return MRekanGeneralIdvCrudState(
       record: record == _unset ? this.record : record as MRekanGeneralIdvCrudModel?,
@@ -46,6 +49,7 @@ class MRekanGeneralIdvCrudState extends Equatable {
       comboMJnskel: comboMJnskel == _unset
           ? this.comboMJnskel
           : comboMJnskel as ComboMJnskelModel?,
+      isDataComplete: isDataComplete ?? this.isDataComplete,
     );
   }
 
@@ -59,5 +63,6 @@ class MRekanGeneralIdvCrudState extends Equatable {
     hasFailure,
     comboMPekerjaan,
     comboMJnskel,
+    isDataComplete,
   ];
 }

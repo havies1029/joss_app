@@ -13,6 +13,8 @@ import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../common/loading_indicator.dart';
+
 class Klaim5cariListWidget extends StatefulWidget {
   final String klaim1Id;
 	const Klaim5cariListWidget({super.key, required this.klaim1Id});
@@ -46,6 +48,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
 			builder: (context, state) {
 
 		  if (state.status == ListStatus.success) {
+        context.read<Klaim5cariBloc>().add(Klaim5ValidateDocumentsEvent());
 
       return state.items.isNotEmpty
         ? Column(
@@ -94,26 +97,11 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
           ],
         )
         : const Center(
-          child: Padding(
-            padding: EdgeInsets.only(top: 80.0),
-            child: Text(
-              'No Data Available!!',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 12.0,
-                fontWeight: FontWeight.bold),
-            ),
-          ),
+          child: LoadingIndicator(),
         );
       } else {
 			return const Center(
-					child: Text(
-						'No Data Available!!',
-						style: TextStyle(
-							color: Colors.red,
-							fontSize: 12.0,
-							fontWeight: FontWeight.bold),
-					),
+					child: LoadingIndicator(),
 				);
 			}
 			}, buildWhen: (previous, current) {
@@ -263,6 +251,10 @@ Future<void> _pickFile(Klaim5cariModel it) async {
   bloc.add(
     Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
   );
+
+  bloc.add(
+    Klaim5ValidateDocumentsEvent(),
+  );
 }
 
 Future<void> pickNewFileDokLain(String klaim1Id, String jenisDocLain) async {
@@ -302,6 +294,10 @@ Future<void> pickNewFileDokLain(String klaim1Id, String jenisDocLain) async {
   bloc.add(
     Klaim5UploadRequestedEvent(mjenisdocId: '', klaim5Id: '', jenisDocLain: jenisDocLain),
   );
+
+  bloc.add(
+    Klaim5ValidateDocumentsEvent(),
+  );
 }
 
 
@@ -334,37 +330,154 @@ Future<void> _pickPhoto(Klaim5cariModel it) async {
   bloc.add(
     Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
   );
-}
-
-Future<void> _deleteFile(Klaim5cariModel it) async {
-  
-  final bloc = context.read<Klaim5cariBloc>();
-  final confirm = await showDialog<bool>(
-    context: context,
-    barrierDismissible: false, // optional: biar harus pilih tombol
-    builder: (dialogContext) => AlertDialog(
-      title: const Text("Hapus Dokumen"),
-      content: const Text("Apakah Anda yakin ingin menghapus file ini?"),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: const Text("Batal"),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.of(dialogContext).pop(true),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child: const Text("Hapus"),
-        ),
-      ],
-    ),
-  );
-
-  if (confirm != true) return;
 
   bloc.add(
-    Klaim5DeleteRequestedEvent(mjenisdocId: it.mjenisdocId, klaim1Id: it.klaim1Id, jenisDocLain: it.jenisDocLain),
+    Klaim5ValidateDocumentsEvent(),
   );
 }
+
+
+  Future<bool?> showLogoutConfirmDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Hapus Dokumen",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Apakah Anda yakin ingin menghapus file ini?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(dialogContext, false),
+                            child: Text(
+                              "Batal",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(dialogContext, true),
+                            child: Text(
+                              "Iya, Keluar",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+
+  Future<void> _deleteFile(Klaim5cariModel it) async {
+    final bloc = context.read<Klaim5cariBloc>();
+
+    final confirm = await showLogoutConfirmDialog(context);
+
+    if (!context.mounted) return;
+    if (confirm != true) return;
+
+    bloc.add(
+      Klaim5DeleteRequestedEvent(
+        mjenisdocId: it.mjenisdocId,
+        klaim5Id: it.klaim5Id,
+        jenisDocLain: it.jenisDocLain,
+      ),
+    );
+
+    bloc.add(
+      Klaim5ValidateDocumentsEvent(),
+    );
+  }
 
 
 Future<void> _preview(Klaim5cariModel it) async {

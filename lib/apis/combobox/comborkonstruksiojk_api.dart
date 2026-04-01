@@ -5,10 +5,12 @@ import 'package:joss_app/models/combobox/comborkonstruksiojk_model.dart';
 
 class ComboRKonstruksiojkAPI {
 
-	Future<List<ComboRKonstruksiojkModel>> getComboRKonstruksiojkAPI() async {
-		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/rkonstruksiojkcombobox/getlist";
+	Future<List<ComboRKonstruksiojkModel>> getComboRKonstruksiojkAPI(String filter) async {
+		Map<String, String> queryParams = {"rokupasi_id": filter};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint);
+		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/rkonstruksiojkcombobox/getlist/params/okupasi";
+
+		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',

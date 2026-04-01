@@ -250,6 +250,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
           fileName: fileName,
           data: data,
           format: format == ExportFormat.excel ? "excel" : "pdf",
+          reportTitle: "Klaim",
         );
       }
       if (context.mounted) {

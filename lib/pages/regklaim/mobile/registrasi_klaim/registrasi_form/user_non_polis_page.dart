@@ -63,6 +63,24 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  bool _insuranceInitialized = false;
+
+  Future<void> _initDefaultInsurance() async {
+    if (!_isAutoInsurance || _insuranceInitialized) return;
+
+    final data = await ComboMInsuranceRepository().getComboMInsurance("");
+    final filtered = _filterInsurance(data);
+
+    if (!mounted) return;
+
+    if (filtered.isNotEmpty) {
+      setState(() {
+        fieldComboMInsurance = filtered.first;
+        _insuranceInitialized = true;
+      });
+      clearErr('form1.kategoryInsurance');
+    }
+  }
 
   @override
   void initState() {
@@ -101,6 +119,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
       }
     });
+
+    _initDefaultInsurance();
   }
 
   @override
@@ -275,14 +295,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
       if (user.userType == "C"){
         if (mjenisClient == "10") {
-          final mRekanNama1 =
-              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
+          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
-          if (mRekanNama1.isEmpty) {
+          if (!idvState.isDataComplete) {
             showDialog(
               context: context,
-              barrierDismissible: true, // klik luar = close
-              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
@@ -292,7 +311,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                      builder: (_) => MRekanGeneralIdvPopUpPage(),
                     ),
                   );
                 },
@@ -302,14 +321,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
           }
         }
         else if (mjenisClient == "20") {
-          final mRekanNama2 =
-              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
-          if (mRekanNama2.isEmpty) {
+          if (!cmpState.isDataComplete) {
             showDialog(
               context: context,
-              barrierDismissible: true, // klik luar = close
-              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
@@ -319,7 +337,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                      builder: (_) => MRekanGeneralCmpPopUpPage(),
                     ),
                   );
                 },
@@ -414,9 +432,16 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         .toList();
   }
 
+  bool get _isAutoInsurance =>
+      widget.cobKlaimId == '10001' || widget.cobKlaimId == '10002';
+
   Widget buildFieldMinsuranceId() => ReusableComboBox<ComboMInsuranceModel>(
+    key: ValueKey(
+      '${widget.cobKlaimId}_${fieldComboMInsurance?.minsuranceId ?? 'empty'}',
+    ),
     hintText: "Kategori Asuransi",
     initItem: fieldComboMInsurance,
+    isEnabled: !_isAutoInsurance,
     dataLoader: () async {
       final data = await ComboMInsuranceRepository().getComboMInsurance("");
       return _filterInsurance(data);

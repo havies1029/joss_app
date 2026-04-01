@@ -93,9 +93,6 @@ class Regpar5FormAPI {
 	}
 
 	Future<Regpar5FormModel> regpar5FormHitungPremiAPI(String regpar1Id) async {
-		debugPrint('[PAR API] HITUNG PREMI CALLED');
-		debugPrint('[PAR API] regpar1Id = $regpar1Id');
-
 		final String endpoint =
 				"${AppData.prefixEndPoint}/api/regpar/regpar5form/hitungpremi";
 
@@ -110,7 +107,8 @@ class Regpar5FormAPI {
 			queryParams,
 		);
 
-		debugPrint('[PAR API] URI = $uri');
+		// 🔥 DEBUG REQUEST
+		debugPrint("REQUEST => $uri");
 
 		final response = await http.get(
 			uri,
@@ -120,23 +118,16 @@ class Regpar5FormAPI {
 			},
 		);
 
-		debugPrint('[PAR API] STATUS = ${response.statusCode}');
-		debugPrint('[PAR API] BODY = ${response.body}');
+		// 🔥 DEBUG RESPONSE
+		debugPrint("RESPONSE BODY => ${response.body}");
 
 		if (response.statusCode == 200) {
 			final json = jsonDecode(response.body);
-			debugPrint('[PAR API] JSON = $json');
-
-			final model = Regpar5FormModel.fromJson(json);
-			debugPrint('[PAR API] MODEL = ${model.toJson()}');
-
-			return model;
+			return Regpar5FormModel.fromJson(json);
 		} else {
 			throw Exception(
 				'Hitung premi gagal: ${response.statusCode} ${response.body}',
 			);
 		}
 	}
-
-
 }

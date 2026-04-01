@@ -12,6 +12,7 @@ import 'package:joss_app/models/combobox/combombidang_model.dart';
 
 import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/image_uploader.dart';
 import '../../../../../../repositories/combobox/combombentukcst_repository.dart';
@@ -19,11 +20,9 @@ import '../../../../../../repositories/combobox/combombidang_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
 
 class MRekanGeneralCmpPopUpPage extends StatefulWidget {
-  final bool popTwice;
 
   const MRekanGeneralCmpPopUpPage({
     super.key,
-    this.popTwice = true,
   });
 
   @override
@@ -34,6 +33,7 @@ class MRekanGeneralCmpPopUpPage extends StatefulWidget {
 class MRekanGeneralCmpPopUpPageFormState
     extends State<MRekanGeneralCmpPopUpPage> {
   late final MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
+  late RegUserBloc regUserBloc;
 
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
@@ -56,8 +56,8 @@ class MRekanGeneralCmpPopUpPageFormState
   void initState() {
     super.initState();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
-
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudResetStatusEvent());
+    regUserBloc = context.read<RegUserBloc>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
@@ -73,30 +73,38 @@ class MRekanGeneralCmpPopUpPageFormState
   }
 
   void _handleClose() {
-    if (widget.popTwice) {
-      Navigator.pop(context);
-      Navigator.pop(context);
+    // if (widget.popTwice) {
+    //   Navigator.pop(context);
+    //   Navigator.pop(context);
+    // } else {
+    //   Navigator.pop(context);
+    // }
+    final navigator = Navigator.of(context);
+    if (regUserBloc.state.requestFrom.isNotEmpty) {
+      navigator.pop();
+      navigator.pop();
+      navigator.pop();
+      navigator.pop();
+      regUserBloc.add(ClearRequestFromEvent());
     } else {
-      Navigator.pop(context);
+      navigator.pop();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return BaseBackgroundSidePage(
-      title: 'Informasi Perusahaan',
-      onBack: _handleClose,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return PopScope(
-            canPop: false,
-            onPopInvoked: (didPop) {
-              if (didPop) return;
-              _handleClose();
-            },
-            child: Container(
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        _handleClose();
+      },
+      child: BaseBackgroundSidePage(
+        title: 'Informasi Perusahaan',
+        onBack: _handleClose,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
               width: double.infinity,
               height: constraints.maxHeight,
               color: secondaryBlackColor,
@@ -165,9 +173,11 @@ class MRekanGeneralCmpPopUpPageFormState
                             fieldIdKlienController.text = idKlien ?? "";
                           }
 
-                          fieldComboMBentukCst ??= rec?.comboMBentukCst ?? state.comboMBentukCst;
+                          fieldComboMBentukCst ??=
+                              rec?.comboMBentukCst ?? state.comboMBentukCst;
 
-                          fieldComboMBidang ??= rec?.comboMBidang ?? state.comboMBidang;
+                          fieldComboMBidang ??=
+                              rec?.comboMBidang ?? state.comboMBidang;
 
                           setState(() {});
                           _isFirstLoad = false;
@@ -238,7 +248,8 @@ class MRekanGeneralCmpPopUpPageFormState
                                             bottom: 0,
                                             right: 0,
                                             child: Container(
-                                              padding: const EdgeInsets.all(2),
+                                              padding:
+                                              const EdgeInsets.all(2),
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
@@ -343,9 +354,9 @@ class MRekanGeneralCmpPopUpPageFormState
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -7,21 +7,27 @@ import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../helper/indo_phone_result.dart';
+
 
 class KlaimparklaimcrudFormPage extends StatefulWidget {
 	final String cobGroupId;
 	final String viewMode;
 	final String recordId;
-
-	const KlaimparklaimcrudFormPage({super.key, required this.viewMode, required this.recordId, required this.cobGroupId});
-
+	final GlobalKey<FormState> formKey;
+	const KlaimparklaimcrudFormPage({
+		super.key,
+		required this.viewMode,
+		required this.recordId,
+		required this.cobGroupId,
+		required this.formKey,
+	});
 	@override
 	KlaimparklaimcrudFormPageFormState createState() => KlaimparklaimcrudFormPageFormState();
 }
 
 class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage> {
 	late KlaimparklaimcrudBloc klaimparklaimcrudBloc;
-	final _formKey = GlobalKey<FormState>();
 	final List<String> errors = [];
 	var fieldDolController = TextEditingController(text: DateTime.now().toIso8601String());
 	var fieldKeteranganController = TextEditingController();
@@ -52,7 +58,7 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 			builder: (context, state) {
 				return SingleChildScrollView(
 					child: Form(
-							key: _formKey,
+							key: widget.formKey,
 							child: Column(
 								children: [
 									if (widget.cobGroupId == "10003") ...[
@@ -102,7 +108,7 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 						fieldPicEmailController.text = state.record!.picEmail;
 						fieldPicJabatanController.text = state.record!.picJabatan;
 						fieldPicNamaController.text = state.record!.picNama;
-						fieldPicTelpController.text = state.record!.picTelp;
+						fieldPicTelpController.text = IndoPhoneHelper.toDisplay(state.record!.picTelp);
 						isPolisJps = state.record!.isPolisJps;
 						fieldCobNamaController.text = state.record!.cobNama;
 					}
@@ -135,7 +141,6 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 					fieldDolController.text = value.toIso8601String();
 					klaimparklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
 				}
-
 			},
 			validator: (value) {
 				if (value == null) {
@@ -301,6 +306,7 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 		return appTextField(
 			label: 'Email',
 			controller: fieldPicEmailController,
+			keyboardType: TextInputType.emailAddress,
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
@@ -308,9 +314,12 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 				klaimparklaimcrudBloc.add(FieldPicEmailChangedEvent(picEmail: value));
 			},
 			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
+				final email = value?.trim() ?? "";
+				if (email.isEmpty) {
+					return kEmailNullError;
+				}
+				if (!emailValidatorRegExp.hasMatch(email)) {
+					return "Format email tidak valid";
 				}
 				return null;
 			},
@@ -361,17 +370,30 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 		return appTextField(
 			label: 'No Telp PIC',
 			controller: fieldPicTelpController,
+			keyboardType: TextInputType.phone,
+			prefix: Text(
+				"+62 | ",
+				style: inputTextStyle(context, color: primaryLightColor),
+			),
 			onChanged: (value) {
 				if (value.isNotEmpty) {
 					removeError(error: kStringNullError);
 				}
 				klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(picTelp: value));
 			},
-			validator: (value) {
-				if (value == null || value.isEmpty) {
-					addError(error: kStringNullError);
-					return "";
+			validator: (v) {
+				final telp = v?.trim() ?? "";
+
+				if (telp.isEmpty) {
+					return kPhoneNumberNullError;
 				}
+
+				final res = IndoPhoneHelper.normalize(telp);
+
+				if (!res.isValid) {
+					return res.error ?? "Nomor HP tidak valid";
+				}
+
 				return null;
 			},
 		);

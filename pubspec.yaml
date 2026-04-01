@@ -305,6 +305,7 @@ flutter:
     - assets/icons/syarat_6.svg
     - assets/icons/logo_pic.svg
     - assets/icons/iconamoon_check-light.svg
+    - assets/icons/logo_kebijakan.svg
 
   fonts:
     - family: Delm-Regular

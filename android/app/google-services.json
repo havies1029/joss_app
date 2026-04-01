@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:771608260840:android:07b927b86f808f1532595d",
         "android_client_info": {
-          "package_name": "id.co.jayaproteksindo.jossapp"
+          "package_name": "id.co.jayaproteksindo.proteksiplus"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "771608260840-h5ervqq9r8icn04vsn1tnli3vo9e7ns1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "id.co.jayaproteksindo.jossapp",
+            "package_name": "id.co.jayaproteksindo.proteksiplus",
             "certificate_hash": "458608362630527b654f3e1835bdc44f7bbe6354"
           }
         },

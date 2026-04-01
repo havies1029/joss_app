@@ -10,6 +10,8 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/reguser/reguser_model.dart';
 import 'package:joss_app/repositories/reguser/reguser_repository.dart';
 
+import '../../common/constants.dart';
+
 part 'reguser_event.dart';
 part 'reguser_state.dart';
 
@@ -25,6 +27,17 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<ValidasiPinHPEvent>(onValidasiPinHP);
     on<SetIsEmailEvent>(_onSetIsEmail);
     on<ResendOtpEvent>(onResendOtp);
+    on<ClearRequestFromEvent>(_onClearRequestFrom);
+  }
+
+  void _onClearRequestFrom(
+      ClearRequestFromEvent event,
+      Emitter<RegUserState> emit,
+      ) {
+    emit(state.copyWith(
+      requestFrom: '',
+      isOtpClient: false,
+    ));
   }
 
   void _onSetIsEmail(SetIsEmailEvent event, Emitter<RegUserState> emit) {
@@ -32,32 +45,52 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
   }
 
   Future<void> onTambahRegUser(
-      RegUserTambahEvent event, Emitter<RegUserState> emit) async {
-
-    debugPrint("onTambahRegUser requestFrom (event) : ${event.requestFrom}");
+      RegUserTambahEvent event,
+      Emitter<RegUserState> emit,
+      ) async {
     ReturnDataAPI returnData;
     bool hasFailure = true;
-    emit(state.copyWith(isSaving: true, isSaved: false, requestFrom: event.requestFrom));
+
+    emit(
+      state.copyWith(
+        isSaving: true,
+        isSaved: false,
+        requestFrom: event.requestFrom,
+      ),
+    );
+
     returnData = await repository.regUserTambah(event.record);
+
     final String dataString = returnData.data.toString();
     List<String> info = dataString.split(';');
     event.record.reguserId = info.isNotEmpty ? info[0] : '';
+
     hasFailure = !returnData.success;
+
     List<String> errors = [];
     if (hasFailure) {
       errors.add(returnData.data);
     }
-    emit(state.copyWith(
+
+    emit(
+      state.copyWith(
         isSaving: false,
         isSaved: true,
         record: event.record,
         errors: errors,
-        hasFailure: hasFailure));
-    debugPrint("onTambahRegUser requestFrom (state after emit) : ${event.requestFrom}");
+        hasFailure: hasFailure,
+        sentTo: event.pinSentTo,
+        sentVia: event.pinSentVia,
+      ),
+    );
 
-    if (!hasFailure) {
-      authenticationBloc
-          .add(RequirePinHPVerification(sentTo: event.pinSentTo, sentVia: event.pinSentVia));
+    if (!hasFailure && !singlePopPages.contains(event.requestFrom)) {
+      authenticationBloc.add(
+        RequirePinHPVerification(
+          sentTo: event.pinSentTo,
+          sentVia: event.pinSentVia,
+        ),
+      );
     }
   }
 
@@ -102,6 +135,10 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       errors: errors,
     ));
     if (!hasFailure) {
+      emit(state.copyWith(
+        isOtpClient: true,
+      ));
+
       authenticationBloc.add(PhonePinVerified());
 
       String tokeninfo = returnData.data;
@@ -124,7 +161,6 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       userRepository.persistToken(userToken: user.token ?? "");
 
       authenticationBloc.add(UserRoleChanged(user: user, authenticatedFrom: state.requestFrom));
-
     }
     else {
       // authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));

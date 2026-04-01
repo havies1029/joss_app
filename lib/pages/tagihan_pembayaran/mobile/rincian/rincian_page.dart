@@ -331,6 +331,7 @@ class _RincianPageState extends State<RincianPage> {
             fileName: fileName,
             data: data,
             format: "excel",
+            reportTitle: "Pembayaran",
           );
         }
       } else {
@@ -342,6 +343,7 @@ class _RincianPageState extends State<RincianPage> {
             fileName: fileName,
             data: data,
             format: "pdf",
+            reportTitle: "Pembayaran",
           );
         }
       }
@@ -414,6 +416,7 @@ class _RincianPageState extends State<RincianPage> {
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
         data: exportData,
+        reportTitle: "Pembayaran",
       );
 
       if (!context.mounted) return;

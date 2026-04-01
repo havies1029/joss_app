@@ -214,9 +214,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => MRekanGeneralIdvPopUpPage(
-                                            popTwice: false,
-                                          ),
+                                          builder: (_) => MRekanGeneralIdvPopUpPage(),
                                         ),
                                       );
                                     },
@@ -250,9 +248,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => MRekanGeneralCmpPopUpPage(
-                                            popTwice: false,
-                                          ),
+                                          builder: (_) => MRekanGeneralCmpPopUpPage(),
                                         ),
                                       );
                                     },

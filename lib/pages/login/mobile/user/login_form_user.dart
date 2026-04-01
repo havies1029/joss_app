@@ -167,11 +167,30 @@ class _LoginFormUserState extends State<LoginFormUser>
           },
         ),
         BlocListener<EmailVerificationBloc, EmailVerificationState>(
-          listenWhen: (previous, current) => previous.hasFailure != current.hasFailure || previous.errors != current.errors,
+          listenWhen: (previous, current) =>
+          previous.hasFailure != current.hasFailure ||
+              previous.errors != current.errors ||
+              previous.successMessage != current.successMessage,
           listener: (context, state) {
-            if (state.hasFailure) {
+
+            if (state.successMessage.isNotEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(state.errors.isNotEmpty ? state.errors.join("\n") : "Terjadi kesalahan saat verifikasi email/telepon."),
+                successSnackBar(state.successMessage),
+              );
+              return;
+            }
+
+            if (state.hasFailure) {
+              final errorText = state.errors
+                  .where((e) => e.trim().isNotEmpty)
+                  .join("\n");
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  errorText.isNotEmpty
+                      ? errorText
+                      : "Terjadi kesalahan saat verifikasi email/telepon.",
+                ),
               );
             }
           },

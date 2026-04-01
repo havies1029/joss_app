@@ -16,6 +16,8 @@ import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import '../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../common/app_data.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
@@ -52,8 +54,9 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   var fieldTsiController = TextEditingController();
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
-  late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
-
+  late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  late RegUserBloc regUserBloc;
+  late AuthenticationBloc authenticationBloc;
 
   @override
   void initState() {
@@ -61,6 +64,8 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     _loadDefaultCurrency();
     mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+    regUserBloc = context.read<RegUserBloc>();
+    authenticationBloc = context.read<AuthenticationBloc>();
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
@@ -88,93 +93,114 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       fieldComboRMatauang = idrCurrency;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     regother1CrudBloc = BlocProvider.of<Regother1CrudBloc>(context);
-    return BlocConsumer<Regother1CrudBloc, Regother1CrudState>(
-      builder: (context, state) {
-        return BaseBackgroundSidePage(
-          title: 'Lainnya',
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              color: secondaryBlackColor,
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        "Pilih jenis asuransi yang ingin Anda beli. Sesuaikan dengan kebutuhan perlindungan Anda.",
-                        style: bodyTextStyle(context),
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        if (regUserBloc.state.requestFrom.isNotEmpty){
+          authenticationBloc.add(
+            LoggedIn(user: AppData.user),
+          );
+          regUserBloc.add(ClearRequestFromEvent());
+        }
+        Navigator.pop(context);
+      },
+      child: BlocConsumer<Regother1CrudBloc, Regother1CrudState>(
+        builder: (context, state) {
+          return BaseBackgroundSidePage(
+            title: 'Lainnya',
+            onBack: () async {
+              if (regUserBloc.state.requestFrom.isNotEmpty){
+                authenticationBloc.add(
+                  LoggedIn(user: AppData.user),
+                );
+                regUserBloc.add(ClearRequestFromEvent());
+              }
+              Navigator.pop(context);
+            },
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Container(
+                color: secondaryBlackColor,
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          "Pilih jenis asuransi yang ingin Anda beli. Sesuaikan dengan kebutuhan perlindungan Anda.",
+                          style: bodyTextStyle(context),
+                        ),
                       ),
-                    ),
-                    // buildFieldCurrId(),
-                    // const SizedBox(height: 12),
-                    buildFieldMcobId(),
-                    const SizedBox(height: 12),
-                    buildFieldTsi(),
-                    const SizedBox(height: 12),
-                    buildFieldRemark(),
-                    const SizedBox(height: 25),
-                    AppButton.primary(
-                      text: "Konfirmasi",
-                      isLoading: _isKonfirmasiLoading,
-                      backgroundColor:
-                      _isKonfirmasiLoading ? secondaryBlackColor : primaryColor,
-                      onPressed: _isKonfirmasiLoading
-                          ? null
-                          : () async {
-                        setState(() {
-                          _isKonfirmasiLoading = true;
-                        });
-
-                        onSaveForm();
-
-                        await Future.delayed(const Duration(seconds: 2));
-
-                        if (mounted) {
+                      buildFieldMcobId(),
+                      const SizedBox(height: 12),
+                      buildFieldTsi(),
+                      const SizedBox(height: 12),
+                      buildFieldRemark(),
+                      const SizedBox(height: 25),
+                      AppButton.primary(
+                        text: "Konfirmasi",
+                        isLoading: _isKonfirmasiLoading,
+                        backgroundColor:
+                        _isKonfirmasiLoading ? secondaryBlackColor : primaryColor,
+                        onPressed: _isKonfirmasiLoading
+                            ? null
+                            : () async {
                           setState(() {
-                            _isKonfirmasiLoading = false;
+                            _isKonfirmasiLoading = true;
                           });
-                        }
-                      },
-                    )
-                  ],
+
+                          onSaveForm();
+
+                          await Future.delayed(const Duration(seconds: 2));
+
+                          if (mounted) {
+                            setState(() {
+                              _isKonfirmasiLoading = false;
+                            });
+                          }
+                        },
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-      listener: (context, state) {
-        if (state.isLoaded && state.record != null) {
-          setState(() {
-            fieldRemarkController.text = state.record!.remark;
-            fieldTsiController.text =
-                NumberFormat("#,###").format(state.record!.tsi);
-
-            fieldComboRMatauang = state.comboRMatauang;
-            fieldComboMCobApp1 = state.comboMCobApp1;
-          });
-        }
-
-        if (state.isSaved ) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RegotherSucess(
-                display: "Berhasil dikirim!",
-                purpose: "O",
-              ),
-            ),
           );
-          _resetForm();
-        }
-      },
+        },
+        listener: (context, state) {
+          if (state.isLoaded && state.record != null) {
+            setState(() {
+              fieldRemarkController.text = state.record!.remark;
+              fieldTsiController.text =
+                  NumberFormat("#,###").format(state.record!.tsi);
+
+              fieldComboRMatauang = state.comboRMatauang;
+              fieldComboMCobApp1 = state.comboMCobApp1;
+            });
+          }
+
+          if (state.isSaved) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RegotherSucess(
+                  display: "Berhasil dikirim!",
+                  purpose: "O",
+                ),
+              ),
+            );
+            _resetForm();
+          }
+        },
+      ),
     );
   }
 
@@ -330,11 +356,9 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
             context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
 
         if (mjenisClient == "10") {
-          final mRekanNama =
-              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ??
-                  "";
+          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
-          if (mRekanNama.trim().isEmpty) {
+          if (!idvState.isDataComplete) {
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -348,9 +372,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const MRekanGeneralIdvPopUpPage(
-                        popTwice: false,
-                      ),
+                      builder: (_) => const MRekanGeneralIdvPopUpPage(),
                     ),
                   );
                 },
@@ -359,11 +381,9 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
             return;
           }
         } else if (mjenisClient == "20") {
-          final mRekanNama =
-              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ??
-                  "";
+          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
-          if (mRekanNama.trim().isEmpty) {
+          if (!cmpState.isDataComplete) {
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -377,9 +397,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const MRekanGeneralCmpPopUpPage(
-                        popTwice: false,
-                      ),
+                      builder: (_) => const MRekanGeneralCmpPopUpPage(),
                     ),
                   );
                 },

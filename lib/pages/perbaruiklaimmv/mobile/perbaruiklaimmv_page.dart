@@ -1,3 +1,4 @@
+/*
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
 import 'package:joss_app/blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
@@ -43,9 +44,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(  
+        BlocListener<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
           listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved && curr.isSaved, 
+            prev.isSaved != curr.isSaved && curr.isSaved,
           listener: (context, state) {
             if (!state.hasFailure && state.saveFrom == "button") {
                 Navigator.of(context).push(
@@ -55,8 +56,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       description: "Data Klaim berhasil diperbarui.",
                       displayButton: "Tutup",
                       onButtonPressed: () {
-                        Navigator.of(context).pop(); 
-                        Navigator.of(context).pop(); 
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
@@ -66,7 +67,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         ),
         BlocListener<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
           listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved && curr.isSaved, 
+            prev.isSaved != curr.isSaved && curr.isSaved,
           listener: (context, state) {
             if (!state.hasFailure && state.saveFrom == "button") {
 
@@ -77,8 +78,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       description: "Data Klaim berhasil diperbarui.",
                       displayButton: "Tutup",
                       onButtonPressed: () {
-                        Navigator.of(context).pop(); 
-                        Navigator.of(context).pop(); 
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
@@ -88,7 +89,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         ),
         BlocListener<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
           listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved && curr.isSaved, 
+            prev.isSaved != curr.isSaved && curr.isSaved,
           listener: (context, state) {
             if (!state.hasFailure && state.saveFrom == "button") {
 
@@ -99,8 +100,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       description: "Data Klaim berhasil diperbarui.",
                       displayButton: "Tutup",
                       onButtonPressed: () {
-                        Navigator.of(context).pop(); 
-                        Navigator.of(context).pop(); 
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
@@ -108,7 +109,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
               }
           },
         ),
-      ], 
+      ],
       child: BaseBackgroundSidePage(
         title: widget.cobGroupNama,
         child: Container(
@@ -120,16 +121,16 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
               return Column(
                 children: [
                   const SizedBox(height: hPadding * 1.5),
-      
+
                   FormSectionHeader(
                     iconPath: "assets/icons/kendaraan.svg",
                     title: "Polis Kendaraan",
                     subtitle:
                     "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                   ),
-      
+
                   const SizedBox(height: hPadding * 1.5),
-      
+
                   // progress (contoh: hitung completion dari tiap bloc)
                   BlocBuilder<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
                     builder: (_, polis) => BlocBuilder<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
@@ -140,9 +141,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                             klaim.isComplete,
                             beng.isComplete,
                           ].where((x) => x).length;
-                          
+
                           final progress = done / 3.0;
-                          
+
                           return Row(
                             children: [
                               Expanded(
@@ -160,9 +161,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       ),
                     ),
                   ),
-      
+
                   const SizedBox(height: hPadding * 1.5),
-      
+
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -172,7 +173,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                             isOpen: acc.openedIndex == 0,
                             onTap: () {
                               if (acc.openedIndex == 1) {
-      
+
                                 final isFormKlaimValid = klaimFormKey.currentState?.validate() ?? false;
                                 if (!isFormKlaimValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -180,7 +181,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                                 if (!klaimState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -189,9 +190,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
+
                               if (acc.openedIndex == 4) {
-      
+
                                 final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
                                 if (!isFormBengkelValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -199,7 +200,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
                                 if (!bengkelState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -208,7 +209,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
+
                               context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 0));
                             },
                             child: KlaimmvpoliscrudFormPage(recordId: widget.klaim1Id, viewMode: "ubah", formKey: polisFormKey),
@@ -225,7 +226,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final polisState = context.read<KlaimmvpoliscrudBloc>().state;
                                 if (!polisState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -234,10 +235,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return; // tahan pindah
                                 }
                               }
-      
-      
+
+
                               if (acc.openedIndex == 4) {
-      
+
                                 final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
                                 if (!isFormBengkelValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -245,7 +246,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
                                 if (!bengkelState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -254,7 +255,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
+
                               context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 1));
                             },
                             child: KlaimmvklaimcrudFormPage(recordId:  widget.klaim1Id, viewMode: "ubah", formKey: klaimFormKey),
@@ -263,7 +264,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                             title: 'Dokumen Klaim',
                             isOpen: acc.openedIndex == 2,
                             onTap: () {
-      
+
                               if (acc.openedIndex == 0) {
                                 final isFormPolisValid = polisFormKey.currentState?.validate() ?? false;
                                 if (!isFormPolisValid) {
@@ -272,7 +273,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final polisState = context.read<KlaimmvpoliscrudBloc>().state;
                                 if (!polisState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -281,9 +282,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return; // tahan pindahv
                                 }
                               }
-      
+
                               if (acc.openedIndex == 1) {
-      
+
                                 final isFormKlaimValid = klaimFormKey.currentState?.validate() ?? false;
                                 if (!isFormKlaimValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -291,7 +292,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                                 if (!klaimState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -300,10 +301,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
-      
+
+
                               if (acc.openedIndex == 4) {
-      
+
                                 final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
                                 if (!isFormBengkelValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -311,7 +312,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
                                 if (!bengkelState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -320,7 +321,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
+
                               context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 2));
                             },
                             child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
@@ -329,7 +330,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                             title: 'Kesimpulan Status Klaim',
                             isOpen: acc.openedIndex == 3,
                             onTap: () {
-      
+
                               if (acc.openedIndex == 0) {
                                 final isFormPolisValid = polisFormKey.currentState?.validate() ?? false;
                                 if (!isFormPolisValid) {
@@ -338,7 +339,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final polisState = context.read<KlaimmvpoliscrudBloc>().state;
                                 if (!polisState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -347,9 +348,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return; // tahan pindah
                                 }
                               }
-      
+
                               if (acc.openedIndex == 1) {
-      
+
                                 final isFormKlaimValid = klaimFormKey.currentState?.validate() ?? false;
                                 if (!isFormKlaimValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -357,7 +358,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                                 if (!klaimState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -366,10 +367,10 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
-      
+
+
                               if (acc.openedIndex == 4) {
-      
+
                                 final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
                                 if (!isFormBengkelValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -377,7 +378,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
                                 if (!bengkelState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -386,8 +387,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
-      
+
+
                               context.read<KlaimmvaccordionBloc>().add(KlaimmvaccordionToggleEvent(index: 3));
                             },
                             child:
@@ -397,7 +398,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                             title: 'Bengkel yang dipilih',
                             isOpen: acc.openedIndex == 4,
                             onTap: () {
-      
+
                               if (acc.openedIndex == 0) {
                                 final isFormPolisValid = polisFormKey.currentState?.validate() ?? false;
                                 if (!isFormPolisValid) {
@@ -406,7 +407,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final polisState = context.read<KlaimmvpoliscrudBloc>().state;
                                 if (!polisState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -415,9 +416,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return; // tahan pindah
                                 }
                               }
-      
+
                               if (acc.openedIndex == 1) {
-      
+
                                 final isFormKlaimValid = klaimFormKey.currentState?.validate() ?? false;
                                 if (!isFormKlaimValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -425,7 +426,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-      
+
                                 final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                                 if (!klaimState.isValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -434,8 +435,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   return;
                                 }
                               }
-      
-      
+
+
                               context
                                 .read<KlaimmvaccordionBloc>()
                                 .add(KlaimmvaccordionToggleEvent(index: 4));
@@ -595,4 +596,4 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
       ),
     );
   }
-}
+}*/

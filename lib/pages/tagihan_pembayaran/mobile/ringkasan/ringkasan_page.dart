@@ -303,6 +303,7 @@ class RingkasanPageState extends State<RingkasanPage> {
             fileName: fileName,
             data: data,
             format: "excel",
+            reportTitle: "Pembayaran",
           );
         }
       } else {
@@ -314,6 +315,7 @@ class RingkasanPageState extends State<RingkasanPage> {
             fileName: fileName,
             data: data,
             format: "pdf",
+            reportTitle: "Pembayaran",
           );
         }
       }
@@ -360,6 +362,7 @@ class RingkasanPageState extends State<RingkasanPage> {
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
         data: allItems,
+        reportTitle: "Pembayaran",
       );
 
       if (!context.mounted) return;

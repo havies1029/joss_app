@@ -44,17 +44,17 @@ class Klaim5LocalFileSetEvent extends Klaim5cariEvents {
 
 class Klaim5DeleteRequestedEvent extends Klaim5cariEvents {
   final String mjenisdocId;
-  final String klaim1Id;
+  final String klaim5Id; // ganti ini
   final String jenisDocLain;
 
   const Klaim5DeleteRequestedEvent({
     required this.mjenisdocId,
-    required this.klaim1Id,
+    required this.klaim5Id,
     required this.jenisDocLain,
   });
 
   @override
-  List<Object> get props => [mjenisdocId, klaim1Id, jenisDocLain];
+  List<Object> get props => [mjenisdocId, klaim5Id, jenisDocLain];
 }
 
 class Klaim5UploadRequestedEvent extends Klaim5cariEvents {
@@ -71,3 +71,5 @@ class Klaim5UploadRequestedEvent extends Klaim5cariEvents {
   @override
   List<Object> get props => [mjenisdocId, klaim5Id, jenisDocLain];
 }
+
+class Klaim5ValidateDocumentsEvent extends Klaim5cariEvents {}

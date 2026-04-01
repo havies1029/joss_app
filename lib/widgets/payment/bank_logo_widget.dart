@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../common/constants.dart';
 
 String? _getLocalLogoPath(String? iconId) {
@@ -30,7 +31,7 @@ String? _getLocalLogoPath(String? iconId) {
     case 'permata':
       return 'assets/images/logo_va/logo_Permata.png';
     default:
-      return 'assets/images/logo_va/logo_BNC.png';
+      return null;
   }
 }
 
@@ -52,10 +53,32 @@ Widget buildBankLogo(String? iconId, String? iconUrl, {double size = 36}) {
       width: size,
       height: size,
       fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) =>
-          Icon(Icons.account_balance, size: size, color: sGrey),
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return _placeholder(size);
+      },
+      errorBuilder: (_, __, ___) => _placeholder(size),
     );
   }
 
-  return Icon(Icons.account_balance, size: size, color: sGrey);
+  return _placeholder(size);
+}
+
+Widget _placeholder(double size) {
+  return Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      color: primaryColor,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Center(
+      child: SvgPicture.asset(
+        'assets/icons/place_holder_2.svg',
+        width: size * 0.6,
+        height: size * 0.6,
+        fit: BoxFit.contain,
+      ),
+    ),
+  );
 }

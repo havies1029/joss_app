@@ -427,23 +427,23 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         const SizedBox(height: vPadding),
                                       ],
 
-                                      CheckboxListTile(
-                                        value: _isDefault,
-                                        onChanged: (v) => setState(
-                                              () => _isDefault = v ?? false,
-                                        ),
-                                        title: Text(
-                                          'Jadikan sebagai PIC default',
-                                          style: bodyTextStyle(context),
-                                        ),
-                                        dense: true,
-                                        activeColor: primaryColor,
-                                        controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-
-                                      const SizedBox(height: vPadding),
+                                      // CheckboxListTile(
+                                      //   value: _isDefault,
+                                      //   onChanged: (v) => setState(
+                                      //         () => _isDefault = v ?? false,
+                                      //   ),
+                                      //   title: Text(
+                                      //     'Jadikan sebagai PIC default',
+                                      //     style: bodyTextStyle(context),
+                                      //   ),
+                                      //   dense: true,
+                                      //   activeColor: primaryColor,
+                                      //   controlAffinity:
+                                      //   ListTileControlAffinity.leading,
+                                      //   contentPadding: EdgeInsets.zero,
+                                      // ),
+                                      //
+                                      // const SizedBox(height: vPadding),
 
                                       GestureDetector(
                                         onTap: _openCobPicker,

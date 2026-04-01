@@ -737,6 +737,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
           fileName: fileName,
           data: cleanedRows,
           format: exportFormat,
+          reportTitle: "Polis",
         );
       }
 
@@ -783,6 +784,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
         data: cleanedRows,
+        reportTitle: "Polis",
       );
 
       if (!context.mounted) return;

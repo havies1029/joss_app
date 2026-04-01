@@ -294,23 +294,23 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                       if (mjnsclientId != '10') buildFieldJabatanNama(),
                                       const SizedBox(height: vPadding),
 
-                                      CheckboxListTile(
-                                        value: _isDefault,
-                                        onChanged: (v) => setState(
-                                              () => _isDefault = v ?? false,
-                                        ),
-                                        title: Text(
-                                          'Jadikan sebagai PIC default',
-                                          style: bodyTextStyle(context),
-                                        ),
-                                        dense: true,
-                                        activeColor: primaryColor,
-                                        controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-
-                                      const SizedBox(height: hPadding),
+                                      // CheckboxListTile(
+                                      //   value: _isDefault,
+                                      //   onChanged: (v) => setState(
+                                      //         () => _isDefault = v ?? false,
+                                      //   ),
+                                      //   title: Text(
+                                      //     'Jadikan sebagai PIC default',
+                                      //     style: bodyTextStyle(context),
+                                      //   ),
+                                      //   dense: true,
+                                      //   activeColor: primaryColor,
+                                      //   controlAffinity:
+                                      //   ListTileControlAffinity.leading,
+                                      //   contentPadding: EdgeInsets.zero,
+                                      // ),
+                                      //
+                                      // const SizedBox(height: hPadding),
 
                                       GestureDetector(
                                         onTap: _openCobPicker,

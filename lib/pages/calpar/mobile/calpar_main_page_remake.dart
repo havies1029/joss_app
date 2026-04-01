@@ -15,6 +15,8 @@ import '../../../blocs/calpar/calpar_flow_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import '../../../blocs/reguser/reguser_bloc.dart';
+import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../models/calpar/calpar1crud_model.dart';
@@ -77,6 +79,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Calpar3FormBloc? calpar3formBloc;
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  late RegUserBloc regUserBloc;
+  late AuthenticationBloc authenticationBloc;
 
   bool _lockCheckboxes = true;
 
@@ -179,6 +183,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   final fieldIsRsmdccController = TextEditingController();
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
+  final comboMKabZonaGempaKey = GlobalKey<DropdownSearchState<ComboMKabZonaGempaModel>>();
+
   final ComboMWilayah = GlobalKey<DropdownSearchState<ComboMWilayahModel>>();
   ComboMWilayahModel? fieldComboMWilayah;
   //form3
@@ -201,6 +207,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     super.initState();
     mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+    regUserBloc = context.read<RegUserBloc>();
+    authenticationBloc = context.read<AuthenticationBloc>();
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
@@ -406,100 +414,124 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: "Properti",
-      blocListeners: [
-        BlocListener<Calpar1ListBloc, Calpar1ListState>(
-          listenWhen: (prev, curr) {
-            return prev.processMessage != curr.processMessage &&
-                (curr.processMessage).isNotEmpty;
-          },
-          listener: (context, state) {
-            final calpar1 = context.read<Calpar1CrudBloc>().state.record?.calpar1Id ?? "";
-            context.read<Calpar1ListBloc>().add(ClearProcessMessageEvent());
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RegparFormMainRemake(regpar1Id: state.processMessage, calpar1Id: calpar1Id,),
-              ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        if (regUserBloc.state.requestFrom.isNotEmpty){
+          authenticationBloc.add(
+            LoggedIn(user: AppData.user),
+          );
+          regUserBloc.add(ClearRequestFromEvent());
+        }
+        Navigator.pop(context);
+      },
+      child: BaseBackgroundSidePage(
+        title: "Properti",
+        onBack: () async {
+          if (regUserBloc.state.requestFrom.isNotEmpty){
+            authenticationBloc.add(
+              LoggedIn(user: AppData.user),
             );
+            regUserBloc.add(ClearRequestFromEvent());
+          }
+          Navigator.pop(context);
+        },
+        blocListeners: [
+          BlocListener<Calpar1ListBloc, Calpar1ListState>(
+            listenWhen: (prev, curr) {
+              return prev.processMessage != curr.processMessage &&
+                  (curr.processMessage).isNotEmpty;
+            },
+            listener: (context, state) {
+              final calpar1 =
+                  context.read<Calpar1CrudBloc>().state.record?.calpar1Id ?? "";
+              context.read<Calpar1ListBloc>().add(ClearProcessMessageEvent());
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegparFormMainRemake(
+                    regpar1Id: state.processMessage,
+                    calpar1Id: calpar1Id,
+                  ),
+                ),
+              );
 
-            if (calpar1.isNotEmpty) {
-              context.read<Calpar1CrudBloc>().add(Calpar1CrudLihatEvent(recordId: calpar1));
-            }
-          },
-        ),
-
-        BlocListener<Calpar1CrudBloc, Calpar1CrudState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                calpar1Id = state.record!.calpar1Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform1(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Calpar2FormBloc, Calpar2FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                calpar2Id = state.record!.calpar2Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform2(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Calpar3FormBloc, Calpar3FormState>(
-          listener: (context, state) {
-            if (state.isSaved && !state.hasFailure && state.record != null) {
-              setState(() {
-                calpar3Id = state.record!.calpar3Id;
-              });
-            }
-            if (state.isLoaded && !state.hasFailure && state.record != null) {
-              _payloadform3(state.record!);
-            }
-          },
-        ),
-
-        BlocListener<Calpar4FormBloc, Calpar4FormState>(
-          listener: (context, state) {
-            if (state.record != null) {
-              if (state.isLoaded) {
+              if (calpar1.isNotEmpty) {
+                context
+                    .read<Calpar1CrudBloc>()
+                    .add(Calpar1CrudLihatEvent(recordId: calpar1));
+              }
+            },
+          ),
+          BlocListener<Calpar1CrudBloc, Calpar1CrudState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
-                  calpar4Id = state.record!.calpar4Id;
+                  calpar1Id = state.record!.calpar1Id;
                 });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform1(state.record!);
+              }
+            },
+          ),
+          BlocListener<Calpar2FormBloc, Calpar2FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  calpar2Id = state.record!.calpar2Id;
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform2(state.record!);
+              }
+            },
+          ),
+          BlocListener<Calpar3FormBloc, Calpar3FormState>(
+            listener: (context, state) {
+              if (state.isSaved && !state.hasFailure && state.record != null) {
+                setState(() {
+                  calpar3Id = state.record!.calpar3Id;
+                });
+              }
+              if (state.isLoaded && !state.hasFailure && state.record != null) {
+                _payloadform3(state.record!);
+              }
+            },
+          ),
+          BlocListener<Calpar4FormBloc, Calpar4FormState>(
+            listener: (context, state) {
+              if (state.record != null) {
+                if (state.isLoaded) {
+                  setState(() {
+                    calpar4Id = state.record!.calpar4Id;
+                  });
 
-                _payloadform4(state.record!);
+                  _payloadform4(state.record!);
 
-                if (state.record!.calpar4Id.isNotEmpty) {
-                  openForm4();
+                  if (state.record!.calpar4Id.isNotEmpty) {
+                    openForm4();
+                  }
+                }
+
+                // kalau ada flow lain yang memang pakai isSaved
+                if (state.isSaved) {
+                  setState(() {
+                    calpar4Id = state.record!.calpar4Id;
+                  });
+
+                  if (state.record!.calpar4Id.isNotEmpty) {
+                    openForm4();
+                  }
                 }
               }
-
-              // kalau ada flow lain yang memang pakai isSaved
-              if (state.isSaved) {
-                setState(() {
-                  calpar4Id = state.record!.calpar4Id;
-                });
-
-                if (state.record!.calpar4Id.isNotEmpty) {
-                  openForm4();
-                }
-              }
-            }
-          },
-        ),
-
-      ],
-      child: _buildForm(),
+            },
+          ),
+        ],
+        child: _buildForm(),
+      ),
     );
   }
 
@@ -901,7 +933,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       return;
     }
 
-
     if (context
         .read<AuthenticationBloc>()
         .state is AuthenticationAuthenticated) {
@@ -910,14 +941,13 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           .state as AuthenticationAuthenticated).user;
       if (user.userType == "C") {
         if (mjenisClient == "10") {
-          final mRekanNama1 =
-              context.read<MRekanGeneralIdvCrudBloc>().state.record?.rekanNama ?? "";
+          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
-          if (mRekanNama1.isEmpty) {
+          if (!idvState.isDataComplete) {
             showDialog(
               context: context,
-              barrierDismissible: true, // klik luar = close
-              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
@@ -927,7 +957,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MRekanGeneralIdvPopUpPage(popTwice: false,),
+                      builder: (_) => MRekanGeneralIdvPopUpPage(),
                     ),
                   );
                 },
@@ -937,14 +967,13 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           }
         }
         else if (mjenisClient == "20") {
-          final mRekanNama2 =
-              context.read<MRekanGeneralCmpCrudBloc>().state.record?.rekanNama ?? "";
+          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
-          if (mRekanNama2.isEmpty) {
+          if (!cmpState.isDataComplete) {
             showDialog(
               context: context,
-              barrierDismissible: true, // klik luar = close
-              barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.6),
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
@@ -954,7 +983,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MRekanGeneralCmpPopUpPage(popTwice: false,),
+                      builder: (_) => MRekanGeneralCmpPopUpPage(),
                     ),
                   );
                 },
@@ -1138,6 +1167,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     return ok;
   }
+  bool hasLeadingZero(String raw) {
+    return raw.length > 1 && raw.startsWith('0');
+  }
 
   bool validateForm2() {
     clearErrsByPrefix('form2.');
@@ -1150,7 +1182,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         return 0;
       }
       final clean = raw.replaceAll(",", "");
-      return double.tryParse(clean) ?? double.nan; // nan untuk tandain invalid
+      return double.tryParse(clean) ?? double.nan;
     }
 
     bool optionalPositiveNumAutoZero(TextEditingController c, String key) {
@@ -1164,6 +1196,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       if (angka < 0) {
         setErr(key, kString0);
         return false;
+      }
+
+      final clean = c.text.trim().replaceAll(",", "");
+      if (hasLeadingZero(clean)) {
+        setErr(key, "Format tidak disarankan (diawali 0)");
       }
 
       return true;
@@ -1182,13 +1219,17 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     if (ok) {
       final vMachinery = parseOrZeroAutoFill(fieldSiMachineryController);
-      final vBuilding  = parseOrZeroAutoFill(fieldSiBuildingController);
-      final vContent   = parseOrZeroAutoFill(fieldSiContentController);
-      final vStock     = parseOrZeroAutoFill(fieldSiStockController);
-      final vOther     = parseOrZeroAutoFill(fieldSiOtherController);
+      final vBuilding = parseOrZeroAutoFill(fieldSiBuildingController);
+      final vContent = parseOrZeroAutoFill(fieldSiContentController);
+      final vStock = parseOrZeroAutoFill(fieldSiStockController);
+      final vOther = parseOrZeroAutoFill(fieldSiOtherController);
 
       final anyGreaterThanZero =
-          vMachinery > 0 || vBuilding > 0 || vContent > 0 || vStock > 0 || vOther > 0;
+          vMachinery > 0 ||
+              vBuilding > 0 ||
+              vContent > 0 ||
+              vStock > 0 ||
+              vOther > 0;
 
       if (!anyGreaterThanZero) {
         setErr('form2.siMachinery', 'Minimal salah satu nilai harus lebih dari 0');
@@ -1263,8 +1304,22 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         comboKey: konstruksiKey,
         maxHeight: 200,
         initItem: fieldComboRKonstruksiojk,
-        dataLoader: () =>
-            ComboRKonstruksiojkRepository().getComboRKonstruksiojk(),
+        dataLoader: () {
+          final okupasiId = fieldComboROkupasi?.rokupasiId;
+          final payload = (okupasiId == null || okupasiId.isEmpty) ? "" : "$okupasiId|";
+          return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(payload);
+        },
+        dataLoaderWithFilter: (q) {
+          final okupasiId = fieldComboROkupasi?.rokupasiId;
+          if (okupasiId == null || okupasiId.isEmpty) {
+            return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
+          }
+
+          final queryUser = (q ?? "").trim();
+          return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("$okupasiId|$queryUser");
+        },
+
+        serverSearchMinChars: 2,
         displayText: (i) => i.kelasNama,
         compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
@@ -1280,25 +1335,32 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             builder: (_) => Dialog(
               backgroundColor: formGrey,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(item.kelasNama,
-                        style: bodyTextStyle(context),
-                        textAlign: TextAlign.center),
+                    Text(
+                      item.kelasNama,
+                      style: bodyTextStyle(context),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 2),
-                    Text(subtitle,
-                        style: bodyTextStyle(context, fontSize: 15)
-                            .copyWith(color: hintGrey),
-                        textAlign: TextAlign.center),
+                    Text(
+                      subtitle,
+                      style: bodyTextStyle(context, fontSize: 15)
+                          .copyWith(color: hintGrey),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 10),
-                    Text("Apakah Anda yakin ingin memilih kelas ini?",
-                        style: bodyTextStyle(context, fontSize: 15)
-                            .copyWith(color: hintGrey),
-                        textAlign: TextAlign.center),
+                    Text(
+                      "Apakah Anda yakin ingin memilih kelas ini?",
+                      style: bodyTextStyle(context, fontSize: 15)
+                          .copyWith(color: hintGrey),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 13),
                     Row(
                       children: [
@@ -1306,16 +1368,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                           child: AppButton.primary(
                             text: "Tidak",
                             backgroundColor: sGrey,
-                            onPressed: () =>
-                                Navigator.pop(context, false),
+                            onPressed: () => Navigator.pop(context, false),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: AppButton.primary(
                             text: "Iya",
-                            onPressed: () =>
-                                Navigator.pop(context, true),
+                            onPressed: () => Navigator.pop(context, true),
                           ),
                         ),
                       ],
@@ -1355,13 +1415,20 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         errorText: err('form1.rokupasiId'),
 
         onChangedCallback: (v) {
-          fieldComboROkupasi = v;
-          if (v != null) clearErr('form1.rokupasiId');
+          setState(() {
+            fieldComboROkupasi = v;
+
+            clearErr('form1.rokupasiId');
+
+            fieldComboRKonstruksiojk = null;
+            previousKonstruksi = null;
+            konstruksiKey.currentState?.clear();
+            clearErr('form1.rkonstruksiojkId');
+          });
         },
 
         onSaveCallback: (value) => fieldComboROkupasi = value,
       );
-
   //form1
 
   //form2
@@ -1540,14 +1607,21 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     validatorCallback: (v) => v == null ? kStringNullError : null,
     errorText: err('form3.mwilayahId'),
     onChangedCallback: (v) {
-      fieldComboMWilayah = v;
+      setState(() {
+        fieldComboMWilayah = v;
+
+        clearErr('form3.mwilayahId');
+
+        fieldComboMKabZonaGempa = null;
+        comboMKabZonaGempaKey.currentState?.clear();
+        clearErr('form3.zonaGempa');
+      });
 
       if (v != null) {
-        clearErr('form3.mwilayahId');
-        calpar3formBloc?.add(ComboMWilayahChangedEvent(comboMWilayah: v));
-        ComboMWilayah.currentState?.clear();
+        calpar3formBloc?.add(
+          ComboMWilayahChangedEvent(comboMWilayah: v),
+        );
       }
-
     },
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
@@ -1555,6 +1629,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
     hintText: "Zona Gempa Bumi",
     initItem: fieldComboMKabZonaGempa,
+    comboKey: comboMKabZonaGempaKey,
     dataLoader: () {
       final wid = fieldComboMWilayah?.mwilayahId;
       final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";

@@ -56,12 +56,19 @@ class EmailVerificationBloc
     ReturnDataAPI returnData;
     bool hasFailure = true;
 
-    emit(state.copyWith(isLoading: true, isLoaded: false, hasFailure: false));
+    emit(state.copyWith(
+      isLoading: true,
+      isLoaded: false,
+      hasFailure: false,
+      errors: [],
+      successMessage: '',
+    ));
 
     returnData = await repository.emailVerificationTambah(event.record);
     hasFailure = !returnData.success;
 
     List<String> errors = [];
+    String successMessage = '';
 
     EmailVerificationModel? record = hasFailure ? null : event.record;
 
@@ -69,14 +76,12 @@ class EmailVerificationBloc
       final infoData = returnData.data.split(";");
 
       if ((infoData[0] == '1') || (infoData[0] == '3')) {
-        // Token token = Token.split(event.record.email, infoData[1]);
         Token token = Token.split(infoData[2], infoData[1]);
 
         UserRepository userRepository = UserRepository();
 
         User user = User(
           id: 0,
-          // username: event.record.email,
           username: infoData[2],
           email: event.record.email,
           token: token.token,
@@ -91,10 +96,15 @@ class EmailVerificationBloc
         }
 
         authenticationBloc.add(
-          UserAuthenticated(user: user, authenticatedFrom: "email_verification"),
+          UserAuthenticated(
+            user: user,
+            authenticatedFrom: "email_verification",
+          ),
         );
       } else if (infoData[0] == '2') {
-        record = event.record.copyWith(requestId: infoData.length > 1 ? infoData[1] : '');
+        record = event.record.copyWith(
+          requestId: infoData.length > 1 ? infoData[1] : '',
+        );
 
         authenticationBloc.add(
           RequirePinEmailVerification(email: event.record.email),
@@ -103,30 +113,33 @@ class EmailVerificationBloc
     } else if (returnData.data.isNotEmpty) {
       final infoData = returnData.data.split(";");
       final errorMsg = infoData.length > 1
-        ? infoData[1]
-        : returnData.data;
+          ? infoData[1]
+          : returnData.data;
+
       if (infoData[0] == '9') {
+        hasFailure = false;
+        successMessage = errorMsg;
+
         authenticationBloc.add(
           RequireLoginClient(
             requiredFrom: "bloc_email_verification",
             errorMsg: errorMsg,
           ),
         );
-      }
-      else {
+      } else {
         errors.add(errorMsg);
       }
     }
 
     emit(state.copyWith(
+      record: record,
       isLoading: false,
       isLoaded: true,
       hasFailure: hasFailure,
-      record: record,
       errors: errors,
+      successMessage: successMessage,
     ));
   }
-
   Future<void> onValidasiPinEmail(
       ValidasiPinEmailEvent event, Emitter<EmailVerificationState> emit) async {
     ReturnDataAPI returnData;

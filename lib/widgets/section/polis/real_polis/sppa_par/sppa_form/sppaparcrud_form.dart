@@ -923,7 +923,7 @@ class SppaparFormPageState extends State<SppaparFormPage> {
 			comboKey: comboRKonstruksiojkKey,
 			initItem: fieldComboRKonstruksiojk,
 			dataLoader: () async {
-				return ComboRKonstruksiojkRepository().getComboRKonstruksiojk();
+				return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(fieldComboROkupasi?.rokupasiId ?? "");
 			},
 			displayText: (item) => item.kelasNama,
 			compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,

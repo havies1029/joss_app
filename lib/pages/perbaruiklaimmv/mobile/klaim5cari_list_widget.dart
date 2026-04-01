@@ -97,16 +97,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                     ],
                   )
                 : const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 80.0),
-                      child: Text(
-                        'No Data Available!!',
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    child: LoadingIndicator(),
                   );
           } else {
             return Center(
@@ -382,7 +373,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
     bloc.add(
       Klaim5DeleteRequestedEvent(
           mjenisdocId: it.mjenisdocId,
-          klaim1Id: it.klaim1Id,
+          klaim5Id: it.klaim5Id,
           jenisDocLain: it.jenisDocLain),
     );
   }

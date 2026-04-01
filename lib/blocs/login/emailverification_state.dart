@@ -14,7 +14,8 @@ class EmailVerificationState extends Equatable {
   final String email;
   final String telepon;
   final bool isResendOtpSuccess;
-  
+  final String successMessage;
+
   const EmailVerificationState({
     this.record,
     this.isLoading = false,
@@ -29,6 +30,7 @@ class EmailVerificationState extends Equatable {
     this.email = '',
     this.telepon = '',
     this.isResendOtpSuccess = false,
+    this.successMessage = '',
   });
 
   EmailVerificationState copyWith({
@@ -46,6 +48,7 @@ class EmailVerificationState extends Equatable {
     String? email,
     String? telepon,
     bool? isResendOtpSuccess,
+    String? successMessage,
   }) {
     return EmailVerificationState(
       record: record ?? this.record,
@@ -61,6 +64,7 @@ class EmailVerificationState extends Equatable {
       email: email ?? this.email,
       telepon: telepon ?? this.telepon,
       isResendOtpSuccess: isResendOtpSuccess ?? this.isResendOtpSuccess,
+      successMessage: successMessage ?? this.successMessage,
     );
   }
 
@@ -79,5 +83,6 @@ class EmailVerificationState extends Equatable {
     email,
     telepon,
     isResendOtpSuccess,
+    successMessage,
   ];
 }

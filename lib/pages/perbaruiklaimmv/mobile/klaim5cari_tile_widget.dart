@@ -12,18 +12,16 @@ class Klaim5cariTileWidget extends StatelessWidget {
   final String jenisNama;
   final String klaim5Id;
 
-  // ===== file info (optional) =====
-  final String? localPath;     // path file yg dipilih dari device
-  final String? fileUrl;       // url dari server (kalau sudah upload)
-  final String? fileName;      // nama file
-  final int? fileSizeBytes;    // ukuran (bytes)
-  final String? mime;          // "image/jpeg", "application/pdf", ...
+  final String? localPath;
+  final String? fileUrl;
+  final String? fileName;
+  final int? fileSizeBytes;
+  final String? mime;
 
-  // ===== actions =====
   final VoidCallback? onPickFile;
   final VoidCallback? onPickPhoto;
   final VoidCallback? onDelete;
-  final VoidCallback? onPreview; // tap ke thumbnail / card
+  final VoidCallback? onPreview;
 
   const Klaim5cariTileWidget({
     super.key,
@@ -419,7 +417,7 @@ class _PdfThumbImage extends StatelessWidget {
             child: const SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: LoadingIndicator(),
             ),
           );
         }

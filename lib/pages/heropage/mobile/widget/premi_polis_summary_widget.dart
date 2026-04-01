@@ -1,17 +1,21 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
+
 import '../../../../blocs/dashboard/sumdash_bloc.dart';
 
 class PremiPolisSummaryWidget extends StatefulWidget {
   final String userType;
+  final String mjnsclientId;
   final VoidCallback? onDetailTap;
 
   const PremiPolisSummaryWidget({
     super.key,
     required this.userType,
+    required this.mjnsclientId,
     this.onDetailTap,
   });
 
@@ -22,13 +26,14 @@ class PremiPolisSummaryWidget extends StatefulWidget {
 class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
   bool _isPremiumVisible = false;
 
-  String _getStarsText(amount) => '*' * amount.length;
+  String _getStarsText(String amount) => '*' * amount.length;
 
   @override
   Widget build(BuildContext context) {
-    final String mjnsclientId = AppData.user.cstType;
+    final bool shouldShow =
+        widget.userType == 'C' && widget.mjnsclientId == '10';
 
-    if (widget.userType != 'C' || mjnsclientId != '10') {
+    if (!shouldShow) {
       return const SizedBox.shrink();
     }
 
@@ -77,7 +82,6 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ===== PREMI =====
             Expanded(
               flex: 4,
               child: Padding(
@@ -93,7 +97,6 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                       'Premi',
                       style: bodyTextStyle(context, fontSize: 16),
                     ),
-
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -103,9 +106,7 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                             fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                         ),
-
                         const SizedBox(width: 4),
-
                         IntrinsicWidth(
                           child: isLoading
                               ? const SizedBox(
@@ -116,17 +117,26 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                               : AnimatedSwitcher(
                             duration: const Duration(milliseconds: 350),
                             transitionBuilder: (child, animation) =>
-                                FadeTransition(opacity: animation, child: child),
-                            child: (amount.isEmpty)
-                                ? const SizedBox(height: 22) // placeholder supaya ruang tetap ada
+                                FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                ),
+                            child: amount.isEmpty
+                                ? const SizedBox(
+                              key: ValueKey('empty'),
+                              height: 22,
+                            )
                                 : (_isPremiumVisible
                                 ? Text(
                               amount,
                               key: const ValueKey('visible'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: headingStyle(context).copyWith(
-                                fontFeatures: const [FontFeature.tabularFigures()],
+                              style:
+                              headingStyle(context).copyWith(
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures()
+                                ],
                               ),
                             )
                                 : Text(
@@ -134,22 +144,26 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                               key: const ValueKey('stars'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: headingStyle(context).copyWith(
-                                fontFeatures: const [FontFeature.tabularFigures()],
+                              style:
+                              headingStyle(context).copyWith(
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures()
+                                ],
                               ),
                             )),
                           ),
                         ),
-
                         if (!isLoading) ...[
                           const SizedBox(width: 4),
                           SizedBox(
                             width: 20,
                             height: 20,
                             child: GestureDetector(
-                              onTap: () => setState(() {
-                                _isPremiumVisible = !_isPremiumVisible;
-                              }),
+                              onTap: () {
+                                setState(() {
+                                  _isPremiumVisible = !_isPremiumVisible;
+                                });
+                              },
                               child: Icon(
                                 _isPremiumVisible
                                     ? Icons.visibility
@@ -161,16 +175,12 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                           ),
                         ],
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
-
-            // Divider
             Container(width: 1, color: sGrey),
-
-            // ===== POLIS =====
             Expanded(
               flex: 1,
               child: Column(
@@ -182,7 +192,6 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                     style: bodyTextStyle(context, fontSize: 16),
                   ),
                   const SizedBox(height: 2),
-
                   isLoading
                       ? const SizedBox(
                     width: 18,
@@ -204,8 +213,8 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
   }
 
   String _formatCurrency(String curr, double value) {
-    // Format simple tanpa package intl (biar aman dulu)
-    final formatted = value.toStringAsFixed(0)
+    final formatted = value
+        .toStringAsFixed(0)
         .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.');
 
     return '$curr $formatted';

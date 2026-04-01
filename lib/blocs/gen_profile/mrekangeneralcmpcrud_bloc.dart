@@ -59,11 +59,17 @@ class MRekanGeneralCmpCrudBloc
       isLoading: true,
       isLoaded: false,
       record: null,
+      isDataComplete: false,
     ));
 
     try {
       final MRekanGeneralCmpCrudModel record =
       await repository.mRekanGeneralCmpCrudLihat();
+
+      final isComplete =
+          record.rekanNama!.trim().isNotEmpty &&
+              (record.mbentukcstId?.trim().isNotEmpty ?? false) &&
+              (record.mbidangId?.trim().isNotEmpty ?? false);
 
       emit(state.copyWith(
         isLoading: false,
@@ -71,6 +77,7 @@ class MRekanGeneralCmpCrudBloc
         record: record,
         comboMBentukCst: record.comboMBentukCst,
         comboMBidang: record.comboMBidang,
+        isDataComplete: isComplete,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -79,6 +86,7 @@ class MRekanGeneralCmpCrudBloc
         record: null,
         comboMBentukCst: null,
         comboMBidang: null,
+        isDataComplete: false,
       ));
     }
   }

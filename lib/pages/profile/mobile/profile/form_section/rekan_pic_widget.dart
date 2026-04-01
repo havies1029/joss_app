@@ -38,6 +38,24 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     });
   }
 
+  String _displayStatus(String? status) {
+    final normalized = _normalizedStatus(status);
+
+    if (normalized == 'belum kirim' || normalized == 'belum aksep') {
+      return 'Belum aktif';
+    }
+
+    if (normalized == 'sudah aksep') {
+      return 'Aktif';
+    }
+
+    if (normalized == 'tidak aktif') {
+      return 'Tidak Aktif';
+    }
+
+    return status?.trim().isNotEmpty == true ? status!.trim() : '-';
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -207,6 +225,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
 
   Widget _picCardFromItem(MRekanPicListModel it, int index) {
     final id = it.mrekanpicId.trim();
+    final isTidakAktif = _normalizedStatus(it.statusPic) == 'tidak aktif';
+    final isDefault = it.isDefault;
 
     final labelStyle =
     bodyTextStyle(context, fontSize: 16).copyWith(color: cardGrey);
@@ -226,52 +246,100 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
           children: [
             Row(
               children: [
-                AppButton.icon(
-                  icon: SvgPicture.asset(
-                    'assets/icons/edit_icon_polis.svg',
-                    width: 15,
-                    height: 15,
-                  ),
-                  onPressed: () => _goEditById(id),
-                  backgroundColor: const Color(0xFFFFC20A),
-                  squareSize: 30,
-                  borderRadius: 8,
-                ),
-                const SizedBox(width: 6),
-                AppButton.icon(
-                  icon: SvgPicture.asset(
-                    'assets/icons/hapus.svg',
-                    width: 15,
-                    height: 15,
-                    colorFilter: const ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+                if (!isTidakAktif) ...[
+                  AppButton.icon(
+                    icon: SvgPicture.asset(
+                      'assets/icons/edit_icon_polis.svg',
+                      width: 15,
+                      height: 15,
                     ),
+                    onPressed: () => _goEditById(id),
+                    backgroundColor: const Color(0xFFFFC20A),
+                    squareSize: 30,
+                    borderRadius: 8,
                   ),
-                  onPressed: () => _confirmDelete(id),
-                  backgroundColor: const Color(0xFFF63434),
-                  squareSize: 30,
-                  borderRadius: 8,
-                ),
+                  const SizedBox(width: 6),
+                  if (!isDefault) ...[
+                    const SizedBox(width: 6),
+                    AppButton.icon(
+                      icon: SvgPicture.asset(
+                        'assets/icons/hapus.svg',
+                        width: 15,
+                        height: 15,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      onPressed: () => _confirmDelete(id),
+                      backgroundColor: const Color(0xFFF63434),
+                      squareSize: 30,
+                      borderRadius: 8,
+                    ),
+                  ],
+                ],
                 const Spacer(),
-                _buildPicStatusAction(it),
+                if (!isTidakAktif) _buildPicStatusAction(it),
               ],
+            ),
+
+            if (!isTidakAktif) ...[
+              const SizedBox(height: 8),
+              Divider(color: sGrey),
+              const SizedBox(height: 8),
+            ],
+
+            _cardRow(
+              'PIC:',
+              '${index + 1}',
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'Email:',
+              it.picEmail.isEmpty ? '-' : it.picEmail,
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'Nama:',
+              it.picNama.isEmpty ? '-' : it.picNama,
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'Alamat:',
+              it.alamat1.isEmpty ? '-' : it.alamat1,
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'No Telp:',
+              it.picHp.isEmpty ? '-' : it.picHp,
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'Jabatan:',
+              it.jabatanNama.isEmpty ? '-' : it.jabatanNama,
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'Status:',
+              _displayStatus(it.statusPic),
+              labelStyle,
+              valueStyle,
             ),
             const SizedBox(height: 8),
             Divider(color: sGrey),
             const SizedBox(height: 8),
-            _cardRow('Email:', it.picEmail.isEmpty ? '-' : it.picEmail, labelStyle, valueStyle),
-            _cardRow('Nama:', it.picNama.isEmpty ? '-' : it.picNama, labelStyle, valueStyle),
-            _cardRow('Alamat:', it.alamat1.isEmpty ? '-' : it.alamat1, labelStyle, valueStyle),
-            _cardRow('No Telp:', it.picHp.isEmpty ? '-' : it.picHp, labelStyle, valueStyle),
-            _cardRow('Jabatan:', it.jabatanNama.isEmpty ? '-' : it.jabatanNama, labelStyle, valueStyle),
-            _cardRow('Status:', it.statusPic!.isEmpty ? '-' : it.statusPic ?? "-", labelStyle, valueStyle),
-            const SizedBox(height: 8),
-            Divider(color: sGrey),
-            const SizedBox(height: 8),
             Text(
-              'Polis yang tidak bisa diakses:',
-              style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16)),
+              'Polis yang bisa diakses:',
+              style: bodyTextStyle(
+                context,
+                fontSize: getResponsiveFont(context, 16),
+              ),
             ),
             const SizedBox(height: 6),
             _cobListSection(cobItems: _parseCobItems(it.listCob)),
@@ -280,6 +348,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
       ),
     );
   }
+
   List<String> _parseCobItems(String listCob) {
     return listCob
         .split(',')
@@ -343,6 +412,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     // }
   }
 
+
+
   Future<void> _confirmDelete(String recordId) async {
     final id = recordId.trim();
     if (id.isEmpty) return;
@@ -403,6 +474,10 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     }
 
     if (status == 'sudah aksep') {
+      return const SizedBox.shrink();
+    }
+
+    if (status == 'tidak aktif') {
       return const SizedBox.shrink();
     }
 

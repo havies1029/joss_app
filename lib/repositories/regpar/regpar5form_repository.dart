@@ -20,18 +20,10 @@ class Regpar5FormRepository {
 		return await api.regpar5FormLihatAPI(regpar1Id);
 	}
 	Future<Regpar5FormModel> regpar5FormHitungPremi(String regpar5Id) async {
-		debugPrint("🔵 [REGPAR5] Wrapper → regpar5FormHitungPremi dipanggil");
-		debugPrint("Input regpar5Id : $regpar5Id");
-
 		try {
 			final result = await api.regpar5FormHitungPremiAPI(regpar5Id);
-
-			// Debug hasil dari API
-			debugPrint("🟢 [REGPAR5] Wrapper → API Result : $result");
-
 			return result;
 		} catch (e) {
-			debugPrint("🔴 [REGPAR5] Wrapper → Exception: $e");
 			rethrow; // biar error tetap naik ke caller
 		}
 	}

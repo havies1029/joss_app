@@ -118,7 +118,7 @@ class SimulparFormBangunanPageState extends State<SimulparFormBangunanPage> {
       comboKey: comboRKonstruksiojkKey,
       initItem: fieldComboRKonstruksiojk,
       dataLoader:
-          () => ComboRKonstruksiojkRepository().getComboRKonstruksiojk(),
+          () => ComboRKonstruksiojkRepository().getComboRKonstruksiojk(fieldComboROkupasi?.rokupasiId ?? ""),
       displayText: (item) => item.kelasNama,
       compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
       onChangedCallback: (value) {

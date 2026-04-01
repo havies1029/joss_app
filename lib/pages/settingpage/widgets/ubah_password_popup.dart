@@ -23,7 +23,7 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
   bool _showOld = false;
   bool _showNew = false;
   bool _showConfirm = false;
-
+  bool isSaving = false;
   bool _hasStartedTypingNewPassword = false;
   bool _hasStartedTypingConfirmPassword = false;
 
@@ -137,27 +137,28 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
     return BlocConsumer<ChangePasswordBloc, ChangePasswordState>(
       listener: (context, state) {
         if (state.isSaved) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.hasFailure
-                    ? "Password lama salah."
-                    : "Password berhasil diubah.",
-              ),
-              backgroundColor: state.hasFailure ? Colors.red : primaryColor,
-            ),
-          );
-          if (!state.hasFailure) Navigator.of(context).pop();
+          final messenger = ScaffoldMessenger.of(context);
 
-          _oldPasswordController.clear();
-          _newPasswordController.clear();
-          _confirmPasswordController.clear();
+          if (state.hasFailure) {
+            messenger.showSnackBar(
+              errorSnackBar("Password lama salah."),
+            );
+          } else {
+            messenger.showSnackBar(
+              successSnackBar("Password berhasil diubah."),
+            );
 
-          // Reset validation states
-          setState(() {
-            _hasStartedTypingNewPassword = false;
-            _hasStartedTypingConfirmPassword = false;
-          });
+            Navigator.of(context).pop();
+
+            _oldPasswordController.clear();
+            _newPasswordController.clear();
+            _confirmPasswordController.clear();
+
+            setState(() {
+              _hasStartedTypingNewPassword = false;
+              _hasStartedTypingConfirmPassword = false;
+            });
+          }
         }
       },
       builder: (context, state) {
@@ -307,11 +308,27 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
                       // BUTTON SIMPAN
                       AppButton.primary(
                         text: "Simpan Perubahan",
-                        onPressed: _submit,
                         width: double.infinity,
-                        isLoading: false,
-                      ),
+                        isLoading: isSaving,
+                        onPressed: isSaving
+                            ? null
+                            : () async {
+                          setState(() {
+                            isSaving = true;
+                          });
 
+                          try {
+                            _submit();
+                            await Future.delayed(const Duration(seconds: 2));
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                isSaving = false;
+                              });
+                            }
+                          }
+                        },
+                      ),
                       const SizedBox(height: 10),
                      
                     ],

@@ -54,7 +54,9 @@ class PropertyCobTable extends StatefulWidget {
 }
 
 class _PropertyCobTableState extends State<PropertyCobTable> {
-  String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
+
   late final ScrollController hController;
   late final ScrollController vController;
 

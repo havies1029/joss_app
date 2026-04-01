@@ -1,4 +1,5 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaim5upload_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvdoccrud_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -17,29 +18,58 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     on<Klaim5LocalFileSetEvent>(onKlaim5LocalFileSet);
     on<Klaim5DeleteRequestedEvent>(onKlaim5DeleteRequested);
     on<Klaim5UploadRequestedEvent>(onKlaim5UploadRequested);
+    on<Klaim5ValidateDocumentsEvent>(onValidateDocuments);
 	}
 
-Future<void> onRefreshKlaim5cari(
-		RefreshKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
-	emit(const Klaim5cariState());
-  emit(state.copyWith(klaim1Id: event.klaim1Id));
-	add(FetchKlaim5cariEvent());
-}
+  Future<void> onValidateDocuments(
+      Klaim5ValidateDocumentsEvent event,
+      Emitter<Klaim5cariState> emit,
+      ) async {
+    final List<String> emptyIds = [];
 
-Future<void> onFetchKlaim5cari(
-		FetchKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
-	if (state.hasReachedMax) return;
+    for (final e in state.items) {
+      final hasLocal = (e.localPath ?? '').isNotEmpty;
+      final hasUrl = (e.fileUrl ?? '').isNotEmpty;
+      final hasFile = hasLocal || hasUrl;
 
-	Klaim5cariRepository repo = Klaim5cariRepository();
-	if (state.status == ListStatus.initial) {
-		List<Klaim5cariModel> items = await repo.getKlaim5cari(state.klaim1Id);
-		return emit(state.copyWith(
-			items: items,
-			hasReachedMax: true,
-			status: ListStatus.success,
-			));
-	  }
+      if (!hasFile) {
+        if (e.klaim5Id.isNotEmpty) {
+          emptyIds.add(e.klaim5Id);
+        } else if (e.mjenisdocId.isNotEmpty) {
+          emptyIds.add(e.mjenisdocId);
+        } else {
+          emptyIds.add(e.jenisDocLain);
+        }
+      }
+    }
+
+    emit(state.copyWith(
+      emptyDocumentIds: emptyIds,
+      isComplete: emptyIds.isEmpty,
+    ));
   }
+
+  Future<void> onRefreshKlaim5cari(
+      RefreshKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
+    emit(const Klaim5cariState());
+    emit(state.copyWith(klaim1Id: event.klaim1Id));
+    add(FetchKlaim5cariEvent());
+  }
+
+  Future<void> onFetchKlaim5cari(
+      FetchKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
+    if (state.hasReachedMax) return;
+
+    Klaim5cariRepository repo = Klaim5cariRepository();
+    if (state.status == ListStatus.initial) {
+      List<Klaim5cariModel> items = await repo.getKlaim5cari(state.klaim1Id);
+      return emit(state.copyWith(
+        items: items,
+        hasReachedMax: true,
+        status: ListStatus.success,
+        ));
+      }
+    }
 
   Future<void> onKlaim5LocalFileSet(
     Klaim5LocalFileSetEvent event, Emitter<Klaim5cariState> emit) async {
@@ -93,8 +123,8 @@ Future<void> onFetchKlaim5cari(
       newItems.add(newItem);
     }
 
-  emit(state.copyWith(items: newItems));
-}
+    emit(state.copyWith(items: newItems));
+  }
 
   Future<void> onKlaim5DeleteRequested(
     Klaim5DeleteRequestedEvent event, Emitter<Klaim5cariState> emit) async {
@@ -111,7 +141,10 @@ Future<void> onFetchKlaim5cari(
     // tentukan aksi: clear atau remove
     final bool shouldClear = oldItem.mjenisdocId.isNotEmpty;
 
+    debugPrint("debuga1");
     if (shouldClear) {
+      debugPrint("debuga2");
+
       // 1A) CLEAR (seperti sekarang)
       final clearedItem = oldItem.copyWith(
         localPath: '',
@@ -132,21 +165,24 @@ Future<void> onFetchKlaim5cari(
     }
 
     // 2) Hapus di server jika klaim1Id ada
-    if (oldItem.klaim1Id.isNotEmpty) {
+    if (event.klaim5Id.isNotEmpty) {
+      debugPrint("debuga3");
+
       final repository = KlaimmvdoccrudRepository();
-      final success = await repository.klaimmvdoccrudHapus(oldItem.klaim1Id, oldItem.mjenisdocId, oldItem.jenisDocLain);
+      final success = await repository.klaimmvdoccrudHapus(
+        event.klaim5Id,
+        event.mjenisdocId,
+        event.jenisDocLain,
+      );
 
       if (!success) {
-        // revert kalau gagal
         final revertItems = List<Klaim5cariModel>.from(state.items);
 
         if (shouldClear) {
-          // state.items saat ini sudah versi "cleared", jadi balikin oldItem di idx
           if (idx < revertItems.length) {
             revertItems[idx] = oldItem;
           }
         } else {
-          // state.items saat ini sudah versi "removed", insert balik di index semula
           revertItems.insert(idx, oldItem);
         }
 

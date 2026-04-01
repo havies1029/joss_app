@@ -70,3 +70,7 @@ class ResendOtpEvent extends RegUserEvents {
   @override
   List<Object> get props => [reguserId];
 }
+
+class ClearRequestFromEvent extends RegUserEvents {
+	const ClearRequestFromEvent();
+}

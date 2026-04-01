@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 
 class Klaim5TambahDokumenForm extends StatefulWidget {
   final Future<bool> Function(String judul)? onPickFileDokLain;
@@ -189,7 +190,7 @@ class _FormButton extends StatelessWidget {
             ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: LoadingIndicator(),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,

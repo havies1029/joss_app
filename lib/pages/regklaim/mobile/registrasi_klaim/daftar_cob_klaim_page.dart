@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../blocs/reguser/reguser_bloc.dart';
+import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
 import '../../../../widgets/apptheme/header_card.dart';
 import '../../../base/base_background_firstpage.dart';
 import '../../../base/base_background_sidepage.dart';
 import 'button_klaim/button_cob_klaim.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 enum DaftarCobKlaimType { page, menu }
 
 class DaftarCobKlaimWidget extends StatefulWidget {
@@ -28,6 +31,15 @@ class DaftarCobKlaimWidget extends StatefulWidget {
 
 class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late RegUserBloc regUserBloc;
+  late AuthenticationBloc authenticationBloc;
+
+  @override
+  void initState(){
+    super.initState();
+    regUserBloc = context.read<RegUserBloc>();
+    authenticationBloc = context.read<AuthenticationBloc>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +49,36 @@ class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
   }
 
   Widget _buildAsPage(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: 'Lapor Klaim',
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(vertical: hPadding),
-        child: _buildContent(context),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        if (regUserBloc.state.requestFrom.isNotEmpty){
+          authenticationBloc.add(
+            LoggedIn(user: AppData.user),
+          );
+          regUserBloc.add(ClearRequestFromEvent());
+        }
+        Navigator.pop(context);
+      },
+      child: BaseBackgroundSidePage(
+        title: 'Lapor Klaim',
+        onBack: () async {
+          if (regUserBloc.state.requestFrom.isNotEmpty){
+            authenticationBloc.add(
+              LoggedIn(user: AppData.user),
+            );
+            regUserBloc.add(ClearRequestFromEvent());
+            Navigator.pop(context);
+          }
+          Navigator.pop(context);
+        },
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(vertical: hPadding),
+          child: _buildContent(context),
+        ),
       ),
     );
   }

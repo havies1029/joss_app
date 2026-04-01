@@ -34,56 +34,57 @@ class HeroCardWidget extends StatefulWidget {
 }
 
 class _HeroCardWidgetState extends State<HeroCardWidget> {
-
-  String? mjenisClient;
-
-  @override
-  void initState() {
-    super.initState();
-
-    mjenisClient =
-        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
-
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(cardBorderRadius * 2),
-        gradient: primaryBlackGradient,
-      ),
-      child: Container(
-        margin: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-          color: secondaryBlackColor,
-          borderRadius: BorderRadius.circular(cardBorderRadius * 2 - 1.5),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
+    final bloc = context.read<MRekan1CrudBloc>();
 
-            HeroHeaderWidget(
-              userName: widget.userName,
-              imageBytes: widget.imageBytes,
-              userImage: widget.userImage,
-              userType: widget.userType,
+    return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
+      builder: (context, state) {
+        final String mjenisClient = state.record?.mjnsclientId ?? '';
+
+        final bool shouldShowPremi =
+            widget.userType == 'C' && mjenisClient == '10';
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: hPadding + 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(cardBorderRadius * 2),
+            gradient: primaryBlackGradient,
+          ),
+          child: Container(
+            margin: const EdgeInsets.all(1),
+            decoration: BoxDecoration(
+              color: secondaryBlackColor,
+              borderRadius:
+              BorderRadius.circular(cardBorderRadius * 2 - 1.5),
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
 
-            const SizedBox(height: 16),
+                HeroHeaderWidget(
+                  userName: widget.userName,
+                  imageBytes: widget.imageBytes,
+                  userImage: widget.userImage,
+                  userType: widget.userType,
+                ),
 
-            if (mjenisClient == "10")
-              PremiPolisSummaryWidget(
-                userType: widget.userType,
-                onDetailTap: widget.onDetailTap,
-              ),
+                const SizedBox(height: 16),
 
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
+                if (shouldShowPremi)
+                  PremiPolisSummaryWidget(
+                    userType: widget.userType,
+                    onDetailTap: widget.onDetailTap,
+                    mjnsclientId: mjenisClient,
+                  ),
+
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

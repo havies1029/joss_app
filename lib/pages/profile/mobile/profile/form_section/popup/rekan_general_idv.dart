@@ -13,6 +13,7 @@ import 'package:joss_app/models/combobox/combomjnskel_model.dart';
 
 import '../../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../../blocs/profile/profile_download_foto_bloc.dart';
+import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/app_data.dart';
 import '../../../../../../common/loading_indicator.dart';
 import '../../../../../../helper/image_uploader.dart';
@@ -21,11 +22,9 @@ import '../../../../../../repositories/combobox/combompekerjaan_repository.dart'
 import '../../../../../base/base_background_sidepage.dart';
 
 class MRekanGeneralIdvPopUpPage extends StatefulWidget {
-  final bool popTwice;
 
   const MRekanGeneralIdvPopUpPage({
     super.key,
-    this.popTwice = true,
   });
 
   @override
@@ -36,6 +35,8 @@ class MRekanGeneralIdvPopUpPage extends StatefulWidget {
 class MRekanGeneralIdvPopUpPageFormState
     extends State<MRekanGeneralIdvPopUpPage> {
   late final MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  late RegUserBloc regUserBloc;
+
   final _formKey = GlobalKey<FormState>();
 
   late Future<List<ComboMJnskelModel>> _futureJenisKelamin =
@@ -60,8 +61,8 @@ class MRekanGeneralIdvPopUpPageFormState
   void initState() {
     super.initState();
     mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
-
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudResetStatusEvent());
+    regUserBloc = context.read<RegUserBloc>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
@@ -76,25 +77,34 @@ class MRekanGeneralIdvPopUpPageFormState
   }
 
   void _handleClose() {
-    if (widget.popTwice) {
-      Navigator.pop(context);
-      Navigator.pop(context);
+    // if (widget.popTwice) {
+    //   Navigator.pop(context);
+    //   Navigator.pop(context);
+    // } else {
+    //   Navigator.pop(context);
+    // }
+    final navigator = Navigator.of(context);
+    if (regUserBloc.state.requestFrom.isNotEmpty) {
+      navigator.pop();
+      navigator.pop();
+      navigator.pop();
+      navigator.pop();
+      regUserBloc.add(ClearRequestFromEvent());
     } else {
-      Navigator.pop(context);
+      navigator.pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BaseBackgroundSidePage(
-      title: 'Informasi Klien',
-      onBack: _handleClose,
-      child: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          if (didPop) return;
-          _handleClose();
-        },
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        _handleClose();
+      },
+      child: BaseBackgroundSidePage(
+        title: 'Informasi Klien',
+        onBack: _handleClose,
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Container(

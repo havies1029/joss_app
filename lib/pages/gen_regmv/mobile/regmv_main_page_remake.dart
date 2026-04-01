@@ -638,20 +638,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
   }
 
+  bool _isLanjutkanLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // penting: cegah pop otomatis dari back fisik/gesture
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        // kalau canPop=false, didPop biasanya false.
-        // tapi tetap aman kalau suatu saat route sudah ke-pop.
         if (didPop) return;
 
         await _handleExit(context);
       },
       child: BaseBackgroundSidePage(
         onBack: () async {
-          await _handleExit(context); // tombol back di BaseBackground → sama
+          await _handleExit(context);
         },
         title: "Kendaraan",
         blocListeners: [
@@ -707,9 +707,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     );
   }
 
+  bool isAllFormComplete() {
+    return isForm1Complete() &&
+        isForm2Complete() &&
+        isForm3Complete() &&
+        isForm4Complete() &&
+        isForm5Complete() &&
+        isForm6Complete() &&
+        isForm7Complete();
+  }
+
   Widget _buildForm() {
     final bool hasForm6Record =
         context.read<Regmv6FormBloc>().state.record != null;
+    final bool canShowLanjutkan = isAllFormComplete();
     return Scaffold(
       backgroundColor: secondaryBlackColor,
       body: SingleChildScrollView(
@@ -1141,7 +1152,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,
                               formatNumber: true,
-
                             ),
                             HitungPremiRow(
                               label: "TOTAL PREMI",
@@ -1172,20 +1182,46 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   const SizedBox(height: hPadding),
 
-                  if (hasForm6Record) ...[
+                  if (canShowLanjutkan) ...[
                     AppButton.iconRight(
                       text: "Lanjutkan",
                       icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KonfirmasiRegMvPage(
-                              recordId: regmv1Id ?? '',
-                              viewMode: 'ubah',
+                      isLoading: _isLanjutkanLoading,
+                      onPressed: _isLanjutkanLoading
+                          ? null
+                          : () async {
+                        setState(() {
+                          _isLanjutkanLoading = true;
+                        });
+
+                        try {
+
+                          draftForm1ToBloc(context);
+                          draftForm2ToBloc(context);
+                          draftForm3ToBloc(context);
+
+                          context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
+
+                          await Future.delayed(const Duration(seconds: 2));
+
+                          if (!mounted) return;
+
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KonfirmasiRegMvPage(
+                                recordId: regmv1Id ?? '',
+                                viewMode: 'ubah',
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isLanjutkanLoading = false;
+                            });
+                          }
+                        }
                       },
                     ),
                   ],
@@ -1458,12 +1494,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   void draftForm2ToBloc(BuildContext context) {
     final polis = context.read<PolisTanggalBloc>().state;
 
-    // DEBUG nilai dari bloc tanggal
-    debugPrint("=== DEBUG POLIS TANGGAL ===");
-    debugPrint("polis.mulai    : ${polis.mulai}");
-    debugPrint("polis.berakhir : ${polis.berakhir}");
-    debugPrint("==========================");
-
     final record = Regmv2FormModel(
       isAw: toBoolean(fieldIsAwController.text),
       currId: fieldComboRMatauang?.rmatauangKode,
@@ -1682,60 +1712,74 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     return ok;
   }
 
+  bool hasLeadingZero(String raw) {
+    return raw.length > 1 && raw.startsWith('0');
+  }
+
   bool validateForm2() {
     clearErrsByPrefix('form2.');
     bool ok = true;
 
-    // NOTE: Polis Mulai & Polis Berakhir sementara DISKIP dulu
-
-    // Mata Uang (required)
     if (fieldComboRMatauang == null) {
       setErr('form2.mataUang', kStringNullError);
       ok = false;
     }
 
-    // Jenis Cover (required)
     if (fieldComboMMvjnscover == null) {
       setErr('form2.jenisCover', kStringNullError);
       ok = false;
     }
 
-    // Jumlah Penumpang (required)
     if (selectedPassengerCount.trim().isEmpty) {
       setErr('form2.passengerCount', kStringNullError);
       ok = false;
     }
 
-    // TPL (optional, >= 0)
     final tplRaw = fieldTplController.text.trim();
     if (tplRaw.isNotEmpty) {
       final clean = tplRaw.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
+      if (angka == null) {
+        setErr('form2.tpl', "Format tidak valid");
+        ok = false;
+      } else if (angka < 0) {
         setErr('form2.tpl', "Tidak boleh minus");
         ok = false;
       }
+      if (hasLeadingZero(clean)) {
+        setErr('form2.tpl', "Format tidak disarankan (diawali 0)");
+      }
     }
 
-    // PAD (optional, >= 0)
     final padRaw = fieldPadController.text.trim();
     if (padRaw.isNotEmpty) {
       final clean = padRaw.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
+      if (angka == null) {
+        setErr('form2.pad', "Format tidak valid");
+        ok = false;
+      } else if (angka < 0) {
         setErr('form2.pad', "Tidak boleh minus");
         ok = false;
       }
+      if (hasLeadingZero(clean)) {
+        setErr('form2.pad', "Format tidak disarankan (diawali 0)");
+      }
     }
 
-    // PAP (optional, >= 0)
     final papRaw = fieldPapController.text.trim();
     if (papRaw.isNotEmpty) {
       final clean = papRaw.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
+      if (angka == null) {
+        setErr('form2.pap', "Format tidak valid");
+        ok = false;
+      } else if (angka < 0) {
         setErr('form2.pap', "Tidak boleh minus");
         ok = false;
+      }
+      if (hasLeadingZero(clean)) {
+        setErr('form2.pap', "Format tidak disarankan (diawali 0)");
       }
     }
 
@@ -1744,13 +1788,18 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     if (pllRaw.isNotEmpty) {
       final clean = pllRaw.replaceAll(",", "");
       final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) {
+      if (angka == null) {
+        setErr('form2.pll', "Format tidak valid");
+        ok = false;
+      } else if (angka < 0) {
         setErr('form2.pll', "Tidak boleh minus");
         ok = false;
       }
+      if (hasLeadingZero(clean)) {
+        setErr('form2.pll', "Format tidak disarankan (diawali 0)");
+      }
     }
 
-    // Kalau gagal, buka panel form2
     if (!ok) {
       setState(() => expanded[1] = true);
     }

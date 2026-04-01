@@ -214,6 +214,7 @@ class KlaimRingkasanMainPage extends StatefulWidget {
           fileName: fileName,
           data: rows,
           format: exportFormat,
+          reportTitle: "Klaim",
         );
       }
       if (context.mounted) {
@@ -255,6 +256,7 @@ class KlaimRingkasanMainPage extends StatefulWidget {
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
         data: rows,
+        reportTitle: "Klaim",
       );
 
       if (!context.mounted) return;

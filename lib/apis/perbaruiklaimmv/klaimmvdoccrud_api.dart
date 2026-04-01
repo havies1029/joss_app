@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -54,27 +55,47 @@ class KlaimmvdoccrudAPI {
 		}
 		return returnData.success;
 	}
-	Future<bool> klaimmvdoccrudHapusAPI(String klaim1Id, String mjenisdocId, String jenisDocLain) async {
+
+	Future<bool> klaimmvdoccrudHapusAPI(String klaim5Id, String mjenisdocId, String jenisDocLain) async {
 		String hapusEndpoint = "${AppData.prefixEndPoint}/api/perbaruiklaimmv/klaimmvdoccrud/delete";
 		Map<String, String> queryParams = {
-			'klaim1Id': klaim1Id,
+			'klaim5Id': klaim5Id,
 			'mjenisdocId': mjenisdocId,
 			'jenisDocLain': jenisDocLain,
 			'modul_id': 'klaimmvdoccrudHapusAPI'};
+
 		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
+
+		// 🔥 REQUEST LOG
+		debugPrint("=== REQUEST DELETE ===");
+		debugPrint("URI: $uri");
+		debugPrint("PARAMS: $queryParams");
+
 		final http.Response response =
-			await http.get(uri, headers: <String, String>{
+		await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
 			'Accept': 'application/json; odata=verbos',
 			'Authorization': 'Bearer ${AppData.userToken}'
 		});
 
+		// 🔥 RESPONSE LOG
+		debugPrint("=== RESPONSE DELETE ===");
+		debugPrint("STATUS: ${response.statusCode}");
+		debugPrint("BODY: ${response.body}");
+
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+
+			// 🔥 PARSED RESULT
+			debugPrint("SUCCESS: ${returnData.success}");
+			debugPrint("ROWCOUNT: ${returnData.rowcount}");
 		} else {
+			debugPrint("❌ ERROR STATUS CODE: ${response.statusCode}");
+
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
+
 		return returnData.success;
 	}
 	Future<KlaimmvdoccrudModel?> klaimmvdoccrudLihatAPI(String klaim5Id) async {

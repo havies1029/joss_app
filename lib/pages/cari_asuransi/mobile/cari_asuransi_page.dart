@@ -32,7 +32,7 @@ class CariAsuransiWidget extends StatelessWidget {
   // Build sebagai Page (BaseBackgroundSidePage)
   Widget _buildAsPage(BuildContext context) {
     return BaseBackgroundSidePage(
-      title: "Cari Asuransi",
+      title: "Beli Polis",
       child: Container(
 
         child: SingleChildScrollView(
@@ -79,7 +79,7 @@ class CariAsuransiWidget extends StatelessWidget {
         children: [
           HeaderCard(
             iconPath: "assets/icons/menu_cari_asuransi.svg",
-            title: "Cari Asuransi",
+            title: "Beli Polis",
             subtitle:
             "Pilih jenis asuransi dan hitung premi langsung di sini.",
           ),

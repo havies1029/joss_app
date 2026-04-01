@@ -305,10 +305,6 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                       return AppButton.primary(
                         text: state.isLoading ? "Memproses..." : "Kirim",
                         onPressed: state.isLoading ? null : _submit,
-                        width: double.infinity,
-                        backgroundColor: const Color(0xFFF28A2E),
-                        textStyle: headingStyle(context, fontSize: 16)
-                            .copyWith(color: Colors.white),
                         isLoading: state.isLoading,
                       );
                     },

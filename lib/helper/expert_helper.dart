@@ -25,6 +25,27 @@ enum CategoryType {
 }
 
 class ExportHelper {
+  static String _getReportGroupTitle(CategoryType category) {
+    switch (category) {
+      case CategoryType.ringkasan:
+      case CategoryType.properti:
+      case CategoryType.kendaraan:
+      case CategoryType.kesehatan:
+      case CategoryType.marineKargo:
+      case CategoryType.Angkutan:
+      case CategoryType.hull:
+      case CategoryType.sdm:
+      case CategoryType.lain_lain:
+        return 'polis';
+
+      case CategoryType.rincian:
+      case CategoryType.klaimrasio:
+      case CategoryType.klaim:
+      case CategoryType.klaimrincian:
+        return 'klaim';
+    }
+  }
+
   static Future<void> export(String format, List<Map<String, dynamic>> data, CategoryType category) async {
     final categoryName = category.name;
     switch (format.toLowerCase()) {
@@ -32,7 +53,7 @@ class ExportHelper {
         await _exportToExcel(data, categoryName);
         break;
       case 'pdf':
-        await _exportToPdf(data, categoryName);
+        await _exportToPdf(data, category);
         break;
     }
   }
@@ -72,136 +93,92 @@ class ExportHelper {
     }
   }
 
-  static Future<void> _exportToPdf(List<Map<String, dynamic>> data, String categoryName) async {
+  static Future<void> _exportToPdf(
+      List<Map<String, dynamic>> data,
+      CategoryType category,
+      ) async {
     if (data.isEmpty || !(await _ensurePermission())) return;
 
     final pdf = pw.Document();
     final headers = data.first.keys.toList();
     final now = DateTime.now();
-    final formattedDate = '${now.day}/${now.month}/${now.year} ${now.hour}:${now.minute}';
+    final formattedDate =
+        '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}';
 
-    // Modern color palette
-    final primaryColor = PdfColor.fromHex('#2563eb'); // Blue
-    final headerBg = PdfColor.fromHex('#1e40af'); // Dark blue
-    final evenRowBg = PdfColor.fromHex('#f8fafc'); // Light gray
-    final borderColor = PdfColor.fromHex('#e2e8f0'); // Border gray
+    final reportGroup = _getReportGroupTitle(category);
+
+    final borderColor = PdfColor.fromHex('#d1d5db');
+    final headerBg = PdfColor.fromHex('#1e3a8a');
+    final evenRowBg = PdfColor.fromHex('#f8fafc');
+    final textColor = PdfColor.fromHex('#111827');
+    final subTextColor = PdfColor.fromHex('#4b5563');
+
+    final logoImage = pw.MemoryImage(
+      File('assets/images/logo.png').readAsBytesSync(),
+    );
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
+        margin: const pw.EdgeInsets.all(24),
         build: (context) => [
-          // Header Section
+          // HEADER ATAS
           pw.Container(
-            padding: const pw.EdgeInsets.only(bottom: 20),
-            decoration: pw.BoxDecoration(
-              border: pw.Border(
-                bottom: pw.BorderSide(color: primaryColor, width: 3),
-              ),
-            ),
-            child: pw.Column(
+            padding: const pw.EdgeInsets.only(bottom: 16),
+            child: pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text(
-                          'Laporan Data',
-                          style: pw.TextStyle(
-                            fontSize: 24,
-                            fontWeight: pw.FontWeight.bold,
-                            color: headerBg,
-                          ),
-                        ),
-                        pw.SizedBox(height: 4),
-                        pw.Text(
-                          _formatCategoryName(categoryName),
-                          style: pw.TextStyle(
-                            fontSize: 14,
-                            color: PdfColor.fromHex('#64748b'),
-                          ),
-                        ),
-                      ],
+                    pw.Text(
+                      'Laporan data $reportGroup',
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        fontWeight: pw.FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.end,
-                      children: [
-                        pw.Text(
-                          'Tanggal Export',
-                          style: pw.TextStyle(
-                            fontSize: 10,
-                            color: PdfColor.fromHex('#94a3b8'),
-                          ),
-                        ),
-                        pw.Text(
-                          formattedDate,
-                          style: pw.TextStyle(
-                            fontSize: 11,
-                            fontWeight: pw.FontWeight.bold,
-                            color: PdfColor.fromHex('#475569'),
-                          ),
-                        ),
-                      ],
+                    pw.SizedBox(height: 6),
+                    pw.Text(
+                      'Tanggal dibuat : $formattedDate',
+                      style: pw.TextStyle(
+                        fontSize: 12,
+                        color: subTextColor,
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          pw.SizedBox(height: 24),
-
-          // Stats Section
-          pw.Container(
-            padding: const pw.EdgeInsets.all(16),
-            decoration: pw.BoxDecoration(
-              color: PdfColor.fromHex('#eff6ff'),
-              borderRadius: pw.BorderRadius.circular(8),
-              border: pw.Border.all(color: PdfColor.fromHex('#bfdbfe')),
-            ),
-            child: pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.start,
-              children: [
-                pw.Icon(
-                  pw.IconData(0xe85d), // document icon
-                  size: 20,
-                  color: primaryColor,
-                ),
-                pw.SizedBox(width: 10),
-                pw.Text(
-                  'Total Records: ${data.length}',
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                    fontWeight: pw.FontWeight.bold,
-                    color: headerBg,
-                  ),
+                pw.Container(
+                  height: 42,
+                  width: 42,
+                  child: pw.Image(logoImage, fit: pw.BoxFit.contain),
                 ),
               ],
             ),
           ),
-          pw.SizedBox(height: 20),
 
-          // Modern Table
+          pw.SizedBox(height: 16),
+
+          // TABEL
           pw.Table(
             border: pw.TableBorder(
               horizontalInside: pw.BorderSide(color: borderColor, width: 0.5),
               verticalInside: pw.BorderSide(color: borderColor, width: 0.5),
               left: pw.BorderSide(color: borderColor, width: 1),
               right: pw.BorderSide(color: borderColor, width: 1),
-              top: pw.BorderSide(color: headerBg, width: 2),
+              top: pw.BorderSide(color: borderColor, width: 1),
               bottom: pw.BorderSide(color: borderColor, width: 1),
             ),
             columnWidths: _getColumnWidths(headers),
             children: [
-              // Header Row
               pw.TableRow(
                 decoration: pw.BoxDecoration(color: headerBg),
                 children: headers.map((header) {
                   return pw.Container(
                     padding: const pw.EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: 10,
                       vertical: 10,
                     ),
                     child: pw.Text(
@@ -210,14 +187,11 @@ class ExportHelper {
                         fontSize: 10,
                         fontWeight: pw.FontWeight.bold,
                         color: PdfColors.white,
-                        letterSpacing: 0.3,
                       ),
-                      textAlign: pw.TextAlign.left,
                     ),
                   );
                 }).toList(),
               ),
-              // Data Rows
               ...data.asMap().entries.map((entry) {
                 final index = entry.key;
                 final row = entry.value;
@@ -230,17 +204,15 @@ class ExportHelper {
                   children: headers.map((header) {
                     return pw.Container(
                       padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: 10,
                         vertical: 8,
                       ),
                       child: pw.Text(
                         row[header]?.toString() ?? '-',
                         style: pw.TextStyle(
                           fontSize: 9,
-                          color: PdfColor.fromHex('#334155'),
-                          lineSpacing: 1.3,
+                          color: textColor,
                         ),
-                        textAlign: pw.TextAlign.left,
                       ),
                     );
                   }).toList(),
@@ -250,28 +222,16 @@ class ExportHelper {
           ),
         ],
         footer: (context) => pw.Container(
-          margin: const pw.EdgeInsets.only(top: 20),
-          padding: const pw.EdgeInsets.only(top: 10),
-          decoration: pw.BoxDecoration(
-            border: pw.Border(
-              top: pw.BorderSide(color: borderColor, width: 1),
-            ),
-          ),
+          margin: const pw.EdgeInsets.only(top: 16),
+          padding: const pw.EdgeInsets.only(top: 8),
           child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
-              pw.Text(
-                'Generated by Export System',
-                style: pw.TextStyle(
-                  fontSize: 8,
-                  color: PdfColor.fromHex('#94a3b8'),
-                ),
-              ),
               pw.Text(
                 'Halaman ${context.pageNumber} dari ${context.pagesCount}',
                 style: pw.TextStyle(
                   fontSize: 8,
-                  color: PdfColor.fromHex('#94a3b8'),
+                  color: PdfColor.fromHex('#6b7280'),
                 ),
               ),
             ],
@@ -281,7 +241,7 @@ class ExportHelper {
     );
 
     final pdfBytes = await pdf.save();
-    final filename = 'Data_${categoryName}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    final filename = 'Data_${category.name}_${DateTime.now().millisecondsSinceEpoch}.pdf';
 
     if (kIsWeb) {
       await FileSaver.instance.saveFile(

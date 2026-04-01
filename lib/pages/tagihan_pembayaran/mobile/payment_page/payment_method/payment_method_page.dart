@@ -351,6 +351,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: AppButton.primary(
                           text: busy ? "Memproses..." : "Lanjutkan",
+                          isLoading: busy,
                           onPressed: busy ? null : _onLanjutkanPressed,
                         ),
                       );

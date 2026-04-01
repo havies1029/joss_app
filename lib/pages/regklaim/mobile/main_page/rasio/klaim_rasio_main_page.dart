@@ -181,6 +181,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
             fileName: fileName,
             data: data,
             format: "excel",
+            reportTitle: "Klaim",
           );
         }
       } else {
@@ -192,6 +193,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
             fileName: fileName,
             data: data,
             format: "pdf",
+            reportTitle: "Klaim",
           );
         }
       }
@@ -249,6 +251,7 @@ class _KlaimRasioMainPageState extends State<KlaimRasioMainPage> {
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
         data: data,
+        reportTitle: "Klaim",
       );
 
       if (!context.mounted) return;

@@ -13,6 +13,9 @@ class RegUserState extends Equatable {
 	final List<String> errors;
 	final bool isEmail;
   final bool isResendOtp;
+	final String sentTo;
+	final String sentVia;
+	final bool isOtpClient;
 
 	const RegUserState(
 		{this.record,
@@ -26,6 +29,9 @@ class RegUserState extends Equatable {
     this.errors = const [],
 		this.isEmail = false,
     this.isResendOtp = false,
+		this.sentTo = '',
+		this.sentVia = '',
+		this.isOtpClient = false,
 });
 
 	RegUserState copyWith({
@@ -40,6 +46,9 @@ class RegUserState extends Equatable {
     List<String>? errors,
 		bool? isEmail,
     bool? isResendOtp,
+		String? sentTo,
+		String? sentVia,
+		bool? isOtpClient,
 	}){
 		return RegUserState(
 			record: record ?? this.record,
@@ -53,10 +62,13 @@ class RegUserState extends Equatable {
       errors: errors ?? this.errors,
 			isEmail: isEmail ?? this.isEmail,
       isResendOtp: isResendOtp ?? this.isResendOtp,
+			sentTo: sentTo ?? this.sentTo,
+			sentVia: sentVia ?? this.sentVia,
+			isOtpClient: isOtpClient ?? this.isOtpClient,
 		);
 	}
 
 	@override
 	List<Object> get props => [isEmail, isLoading, isLoaded, isSaving, isSaved, hasFailure,
-    verificationFailed, requestFrom, errors, isResendOtp];
+    verificationFailed, requestFrom, errors, isResendOtp, sentTo, sentVia, isOtpClient,];
 }

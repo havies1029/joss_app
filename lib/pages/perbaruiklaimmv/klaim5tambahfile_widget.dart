@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/constants.dart';
 
 class Klaim5TambahDokumenForm extends StatefulWidget {
   final Future<bool> Function(String judul)? onPickFileDokLain;
@@ -11,7 +12,8 @@ class Klaim5TambahDokumenForm extends StatefulWidget {
   });
 
   @override
-  State<Klaim5TambahDokumenForm> createState() => _Klaim5TambahDokumenFormState();
+  State<Klaim5TambahDokumenForm> createState() =>
+      _Klaim5TambahDokumenFormState();
 }
 
 class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
@@ -21,15 +23,17 @@ class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
   String? _errorText;
   bool _isLoading = false;
 
-  bool get _isValid => _controller.text.trim().isNotEmpty && !_isLoading;
+  bool get _isValid => !_isLoading;
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(() {
-      setState(() {
-        _errorText = null;
-      });
+      if (_errorText != null) {
+        setState(() {
+          _errorText = null;
+        });
+      }
     });
   }
 
@@ -44,7 +48,9 @@ class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
     final judul = _controller.text.trim();
 
     if (judul.isEmpty) {
-      setState(() => _errorText = 'Judul dokumen wajib diisi');
+      setState(() {
+        _errorText = 'Judul dokumen wajib diisi';
+      });
       _focusNode.requestFocus();
       return;
     }
@@ -53,12 +59,22 @@ class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
 
     setState(() => _isLoading = true);
 
-    final success = await action(judul);
+    try {
+      final success = await action(judul);
 
-    setState(() => _isLoading = false);
+      if (!mounted) return;
 
-    if (success) {
-      _controller.clear();
+      setState(() => _isLoading = false);
+
+      if (success) {
+        _controller.clear();
+        setState(() {
+          _errorText = null;
+        });
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
     }
   }
 
@@ -77,50 +93,63 @@ class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Tambah Dokumen',
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
+              color: primaryLightColor,
+              fontSize: getResponsiveFont(context, 18),
             ),
           ),
-          const SizedBox(height: 10),
-
           Text(
             'Judul Dokumen :',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.80),
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+              color: cardGrey,
+              fontSize: getResponsiveFont(context, 13),
             ),
           ),
           const SizedBox(height: 8),
-
           TextField(
             controller: _controller,
             focusNode: _focusNode,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: 'Masukan Judul Dokumen',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.45)),
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.45),
+              ),
               errorText: _errorText,
               filled: true,
               fillColor: const Color(0xFF3A3A3A),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 14,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide(color: border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.25)),
+                borderSide: BorderSide(
+                  color: Colors.white.withOpacity(0.25),
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(
+                  color: Colors.redAccent,
+                ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(
+                  color: Colors.redAccent,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
-
           const SizedBox(height: 14),
-
           Row(
             children: [
               Expanded(
@@ -173,24 +202,65 @@ class _FormButton extends StatelessWidget {
     required this.onTap,
   });
 
+  bool _isOverflow(
+      String text,
+      double maxWidth,
+      TextStyle style,
+      BuildContext context,
+      ) {
+    if (maxWidth <= 0) return true;
+
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: Directionality.of(context),
+    )..layout(maxWidth: maxWidth);
+
+    return textPainter.didExceedMaxLines;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final textStyle = TextStyle(
+      color: fg,
+      fontSize: 13,
+      fontWeight: FontWeight.w800,
+    );
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        // kalau tombol sempit, icon disembunyikan
-        final showIcon = constraints.maxWidth > 140;
+        final maxWidth = constraints.maxWidth;
+
+        const iconWidth = 18.0;
+        const iconSpacing = 6.0;
+        const horizontalPadding = 24.0; // 12 kiri + 12 kanan
+
+        final textMaxWidthWhenIconShown =
+            maxWidth - (horizontalPadding + iconWidth + iconSpacing);
+
+        final overflowWithIcon = _isOverflow(
+          label,
+          textMaxWidthWhenIconShown,
+          textStyle,
+          context,
+        );
+
+        final showIcon = !overflowWithIcon;
 
         return SizedBox(
-          height: 46,
+          height: 42,
           child: ElevatedButton(
             onPressed: isEnabled ? onTap : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: bg,
               disabledBackgroundColor: bg.withOpacity(0.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
+              disabledForegroundColor: fg.withOpacity(0.7),
+              foregroundColor: fg,
               elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: isLoading
                 ? const SizedBox(
@@ -205,15 +275,16 @@ class _FormButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (showIcon) ...[
-                  Icon(icon, size: 18, color: fg),
-                  const SizedBox(width: 8),
+                  Icon(icon, color: fg, size: 18),
+                  const SizedBox(width: 6),
                 ],
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: fg,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: textStyle,
                   ),
                 ),
               ],

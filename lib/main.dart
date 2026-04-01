@@ -185,6 +185,7 @@ import 'blocs/perbaruiklaimmv/klaimmvklaimcrud_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvpoliscrud_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvstatuscari_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
+import 'blocs/perbaruiklaimpar/klaimpar_tanggal_bloc.dart';
 import 'blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
 import 'blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'blocs/regendors/regendorscari_bloc.dart';
@@ -597,6 +598,9 @@ Future<void> main() async {
         // PolisTanggal
         BlocProvider(create: (_) => PolisTanggalBloc()),
 
+        // Klaim Tanggal
+        BlocProvider(create: (_) => KlaimParTanggalBloc()),
+
         // Regrenew / Regreaktif
         BlocProvider(create: (_) => RegrenewCariBloc()),
         BlocProvider(create: (_) => Regrenew1FormBloc(repository: Regrenew1FormRepository())),
@@ -751,13 +755,6 @@ class _AppState extends State<_App> {
                 final mjenisClient =
                     context.read<RegUserBloc>().state.record?.jnsClientId;
                 if (nav == null) return;
-                const singlePopPages = [
-                  "calmv_page",
-                  "regisnonpolis_page",
-                  "regispolis_page",
-                  "calpar_page",
-                  "regother_page",
-                ];
                 if (singlePopPages.contains(state.authenticatedFrom)) {
                   if (mjenisClient == '10') {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -793,6 +790,12 @@ class _AppState extends State<_App> {
         theme: FlexThemeData.light(
           scheme: FlexScheme.mandyRed,
           fontFamily: 'Delm-Regular',
+        ).copyWith(
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: primaryColor,
+            selectionColor: primaryColor.withOpacity(0.3),
+            selectionHandleColor: primaryColor,
+          ),
         ),
         darkTheme: FlexThemeData.dark(
           scheme: FlexScheme.mandyRed,
@@ -800,6 +803,12 @@ class _AppState extends State<_App> {
           colorScheme: const ColorScheme.dark(
             primary: primaryBlackColor,
             secondary: primaryLightColor,
+          ),
+        ).copyWith(
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: primaryColor,
+            selectionColor: primaryColor.withOpacity(0.3),
+            selectionHandleColor: primaryColor,
           ),
         ),
         themeMode: ThemeMode.light,

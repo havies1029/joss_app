@@ -277,6 +277,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
           fileName: fileName,
           data: data,
           format: format == ExportFormat.excel ? "excel" : "pdf",
+          reportTitle: "Klaim",
         );
       }
       if (context.mounted) {
@@ -318,6 +319,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
         data: data,
+        reportTitle: "Klaim",
       );
 
       if (!context.mounted) return;
