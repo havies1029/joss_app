@@ -260,7 +260,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     final isEmail = EmailValidator.validate(email.trim());
     lastLoginBy = isEmail ? "email" : "hp";
 
-    void _handleBack() {
+    void handleBack() {
       Navigator.of(context, rootNavigator: true).pop();
       authenticationBloc.add(LoggedIn(user: AppData.user));
     }
@@ -269,7 +269,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        _handleBack();
+        handleBack();
       },
       child: BlocConsumer<RegUserBloc, RegUserState>(
         listener: (context, state) {
@@ -317,7 +317,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                             child: Padding(
                               padding: const EdgeInsets.only(left: 4),
                               child: TextButton.icon(
-                                onPressed: _handleBack,
+                                onPressed: handleBack,
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,
                                   minimumSize: const Size(0, 0),

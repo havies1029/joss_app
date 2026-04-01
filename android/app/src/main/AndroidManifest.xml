@@ -19,7 +19,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="id.co.jayaproteksindo.jossapp.MainActivity"
+            android:name="id.co.jayaproteksindo.proteksiplus.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""

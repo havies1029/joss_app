@@ -23,12 +23,12 @@ dependencies {
 }
 
 android {
-    namespace = "id.co.jayaproteksindo.jossapp"
+    namespace = "id.co.jayaproteksindo.proteksiplus"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "id.co.jayaproteksindo.jossapp"
+        applicationId = "id.co.jayaproteksindo.proteksiplus"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = 1

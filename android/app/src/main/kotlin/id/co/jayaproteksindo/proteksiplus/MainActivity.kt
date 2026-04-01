@@ -1,4 +1,4 @@
-package id.co.jayaproteksindo.jossapp
+package id.co.jayaproteksindo.proteksiplus
 
 import io.flutter.embedding.android.FlutterActivity
 

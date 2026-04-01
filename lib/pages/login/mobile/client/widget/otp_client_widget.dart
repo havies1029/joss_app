@@ -7,7 +7,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:pinput/pinput.dart';
 
-import '../../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/indo_phone_result.dart';
