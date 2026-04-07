@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'package:pinput/pinput.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/indo_phone_result.dart';
@@ -292,6 +293,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
           messenger.showSnackBar(
             successSnackBar("Verifikasi OTP berhasil"),
           );
+            context.read<ProfileDownloadFotoBloc>().add(RefreshSecureImage());
         }
       },
       child: Scaffold(

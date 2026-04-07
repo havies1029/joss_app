@@ -924,6 +924,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   Future<void> onLanjutkanPressed() async {
+    // await Future.delayed(const Duration(seconds: 2));
+
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
     if (context
@@ -944,6 +946,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
           if (!idvState.isDataComplete) {
+            debugPrint("MRekanGeneralIdvPopUpPage : calpar_page");
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -1004,7 +1007,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           builder: (context) => RegisterClientPopUp(
             header: 'Data Klien Belum Terdaftar!',
             description:
-            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
             buttonText: 'Daftar Klien',
             onPressed: () {
               Navigator.push(
@@ -1016,6 +1019,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             },
           ),
         );
+
+        debugPrint("RegisterClient : calpar_page");
       }
     }
   }

@@ -29,12 +29,10 @@ class InvbayarvaFormBloc
     on<_VaPollingTick>(_onVaTick);
     on<_StatusPollingTick>(_onStatusTick);
   }
-
-  // ================= START =================
-
   void _onStartPolling(
       InvbayarvaPollingStarted event,
-      Emitter<InvbayarvaFormState> emit) {
+      Emitter<InvbayarvaFormState> emit,
+      ) {
     _stopAllTimers();
 
     _vaAttempt = 0;
@@ -43,37 +41,38 @@ class InvbayarvaFormBloc
     emit(state.copyWith(
       isPollingVa: true,
       isPollingStatus: false,
+      isInitialLoading: true,
     ));
 
-    // VA polling
     _vaTimer = Timer.periodic(event.interval, (_) {
       _vaAttempt++;
       add(_VaPollingTick(invoiceId: event.invoiceId));
     });
 
-    // trigger first immediately
     add(_VaPollingTick(invoiceId: event.invoiceId));
   }
 
-  // ================= VA POLLING =================
-
-  Future<void> _onVaTick(_VaPollingTick event, Emitter<InvbayarvaFormState> emit) async {
+  Future<void> _onVaTick(
+      _VaPollingTick event,
+      Emitter<InvbayarvaFormState> emit,
+      ) async {
     if (!state.isPollingVa) return;
 
     try {
       final record =
-          await infoVArepository.invbayarvaFormLihat(event.invoiceId);
+      await infoVArepository.invbayarvaFormLihat(event.invoiceId);
 
-      emit(state.copyWith(record: record));
+      emit(state.copyWith(
+        record: record,
+        isInitialLoading: false,
+      ));
 
       final va = (record.vaNo).trim();
 
       if (va.isNotEmpty) {
-        // Stop VA timer
         _vaTimer?.cancel();
         _vaTimer = null;
 
-        // Prevent double status timer
         _statusTimer?.cancel();
         _statusTimer = null;
 
@@ -84,10 +83,12 @@ class InvbayarvaFormBloc
 
         _startStatusPolling(event.invoiceId);
       }
-    } catch (_) {}
+    } catch (_) {
+      emit(state.copyWith(
+        isInitialLoading: false,
+      ));
+    }
   }
-
-  // ================= STATUS POLLING =================
 
   Future<void> _onStatusTick(_StatusPollingTick event,Emitter<InvbayarvaFormState> emit,) async {
     if (!state.isPollingStatus) return;
@@ -119,16 +120,16 @@ class InvbayarvaFormBloc
 
   }
 
-  // ================= STOP =================
-
   void _onStopPolling(
       InvbayarvaPollingStopped event,
-      Emitter<InvbayarvaFormState> emit) {
+      Emitter<InvbayarvaFormState> emit,
+      ) {
     _stopAllTimers();
 
     emit(state.copyWith(
       isPollingVa: false,
       isPollingStatus: false,
+      isInitialLoading: false,
     ));
   }
 

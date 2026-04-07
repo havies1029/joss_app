@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -79,23 +80,49 @@ class KlaimparklaimcrudAPI {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/read";
 		Map<String, String> queryParams = {'klaim1Id': klaim1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		try{
-			final http.Response response =
-				await http.get(uri, headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			});
+
+		debugPrint("===== [API CALL] klaimparklaimcrudLihatAPI =====");
+		debugPrint("URL       : $uri");
+		debugPrint("klaim1Id  : $klaim1Id");
+
+		try {
+			final http.Response response = await http.get(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+			);
+
+			debugPrint("----- [RESPONSE] -----");
+			debugPrint("Status Code : ${response.statusCode}");
+			debugPrint("Body Raw    : ${response.body}");
 
 			if (response.statusCode == 200) {
-				var returnData = KlaimparklaimcrudModel.fromJson(jsonDecode(response.body));
+				final json = jsonDecode(response.body);
+
+				debugPrint("Parsed JSON : $json");
+
+				var returnData = KlaimparklaimcrudModel.fromJson(json);
+
+				debugPrint("Parsed Model (laporAsuransi): ${returnData.laporAsuransi}");
+				debugPrint("Parsed Model (isPolisJps)   : ${returnData.isPolisJps}");
+
 				return returnData;
 			}
+
 			if (response.statusCode == 404) {
+				debugPrint("Result: DATA NOT FOUND (404)");
 				return null;
 			}
+
+			debugPrint("ERROR RESPONSE: ${response.body}");
 			throw HttpException('HTTP ${response.statusCode}: ${response.body}');
-		} catch (e) {
+		} catch (e, stack) {
+			debugPrint("!!!!! ERROR klaimparklaimcrudLihatAPI !!!!!");
+			debugPrint("Error : $e");
+			debugPrint("Stack : $stack");
 			throw Exception("Failed to load data: $e");
 		}
 	}

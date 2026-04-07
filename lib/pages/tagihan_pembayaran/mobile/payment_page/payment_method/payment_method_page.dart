@@ -34,6 +34,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   void initState() {
     super.initState();
     _scrollCtrl = ScrollController();
+
+    context.read<PaymentMethodCariBloc>().add(PaymentResetSelectedEvent());
     context.read<PaymentMethodCariBloc>().add(PaymentMethodCariLoadEvent());
   }
 

@@ -13,27 +13,54 @@ class ProfileDownloadFotoBloc
   ProfileDownloadFotoBloc({required this.repository})
       : super(ProfileDownloadFotoInitial()) {
     on<LoadSecureImage>(_onLoadSecureImage);
-
-    // NEW: untuk optimistic preview
+    on<RefreshSecureImage>(_onRefreshSecureImage);
+    on<ClearAndLoadSecureImage>(_onClearAndLoadSecureImage);
     on<SetLocalPreviewImage>(_onSetLocalPreviewImage);
+    on<ClearSecureImage>(_onClearSecureImage);
   }
 
-  void _onSetLocalPreviewImage(
-      SetLocalPreviewImage event,
+  void _onClearSecureImage(
+      ClearSecureImage event,
       Emitter<ProfileDownloadFotoState> emit,
       ) {
-    emit(ProfileDownloadFotoLoaded(event.imageBytes));
+    emit(ProfileDownloadFotoInitial());
   }
 
   Future<void> _onLoadSecureImage(
-      LoadSecureImage event, Emitter<ProfileDownloadFotoState> emit) async {
-    debugPrint("_onLoadSecureImage");
+      LoadSecureImage event,
+      Emitter<ProfileDownloadFotoState> emit,
+      ) async {
+
+    emit(ProfileDownloadFotoInitial());
+    emit(ProfileDownloadFotoLoading());
+
+    try {
+      final bytes = await repository.getUserProfileFotoImageBytes();
+      debugPrint("Bytes null: ${bytes == null}");
+      debugPrint("Bytes length: ${bytes?.length ?? 0}");
+
+      if (bytes != null && bytes.isNotEmpty) {
+        emit(ProfileDownloadFotoLoaded(bytes));
+      } else {
+        emit(ProfileDownloadFotoError("Gagal load gambar."));
+      }
+    } catch (e) {
+      debugPrint("Error clear and load: $e");
+      emit(ProfileDownloadFotoError(e.toString()));
+    }
+  }
+
+  Future<void> _onRefreshSecureImage(
+      RefreshSecureImage event,
+      Emitter<ProfileDownloadFotoState> emit,
+      ) async {
+    debugPrint("_onRefreshSecureImage");
 
     emit(ProfileDownloadFotoLoading());
 
     try {
       final bytes = await repository.getUserProfileFotoImageBytes();
-      if (bytes != null) {
+      if (bytes != null && bytes.isNotEmpty) {
         emit(ProfileDownloadFotoLoaded(bytes));
       } else {
         emit(ProfileDownloadFotoError("Gagal load gambar."));
@@ -41,5 +68,41 @@ class ProfileDownloadFotoBloc
     } catch (e) {
       emit(ProfileDownloadFotoError(e.toString()));
     }
+  }
+
+  Future<void> _onClearAndLoadSecureImage(
+      ClearAndLoadSecureImage event,
+      Emitter<ProfileDownloadFotoState> emit,
+      ) async {
+    debugPrint("_onClearAndLoadSecureImage");
+    debugPrint("Clear state lama -> loading -> fetch ulang");
+
+    emit(ProfileDownloadFotoInitial());
+    emit(ProfileDownloadFotoLoading());
+
+    try {
+      final bytes = await repository.getUserProfileFotoImageBytes();
+      debugPrint("Bytes null: ${bytes == null}");
+      debugPrint("Bytes length: ${bytes?.length ?? 0}");
+
+      if (bytes != null && bytes.isNotEmpty) {
+        emit(ProfileDownloadFotoLoaded(bytes));
+      } else {
+        emit(ProfileDownloadFotoError("Gagal load gambar."));
+      }
+    } catch (e) {
+      debugPrint("Error clear and load: $e");
+      emit(ProfileDownloadFotoError(e.toString()));
+    }
+  }
+
+  void _onSetLocalPreviewImage(
+      SetLocalPreviewImage event,
+      Emitter<ProfileDownloadFotoState> emit,
+      ) {
+    debugPrint("_onSetLocalPreviewImage");
+    debugPrint("Preview bytes length: ${event.imageBytes.length}");
+
+    emit(ProfileDownloadFotoLoaded(event.imageBytes));
   }
 }

@@ -95,10 +95,8 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             if (state.isProcessed) {
               if (state.paymentStatus == "20") {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
-                    ),
+                  successSnackBar(
+                    'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
                   ),
                 );
                 final curr = (state.curr.isEmpty)
@@ -108,7 +106,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               } else if (state.paymentStatus == "30") {
                 //refreshData();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Silakan lakukan pembayaran.')),
+                  successSnackBar('Silakan lakukan pembayaran.'),
                 );
                 Navigator.push(
                   context,
@@ -121,17 +119,24 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                 );
               } else if (state.paymentStatus == "40") {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Proses pembayaran Berhasil.')),
+                  successSnackBar('Proses pembayaran Berhasil.'),
                 );
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PaymentSuccess(display: "Pembayaran berhasil!", description: "Selamat! Perlindungan kendaraan Anda resmi dimulai.", displayButton: "Kembali",)),
+                  MaterialPageRoute(
+                    builder: (context) => PaymentSuccess(
+                      display: "Pembayaran berhasil!",
+                      description:
+                      "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
+                      displayButton: "Kembali",
+                    ),
+                  ),
                 );
               } else if (state.paymentStatus == "91") {
                 //refreshData();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Proses pembayaran gagal. Silakan coba lagi.'),
+                  errorSnackBar(
+                    'Proses pembayaran gagal. Silakan coba lagi.',
                   ),
                 );
               }

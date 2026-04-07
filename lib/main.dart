@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
+import 'package:joss_app/blocs/hakakses/hakaksescrud_bloc.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
@@ -29,10 +30,10 @@ import 'package:joss_app/repositories/regpar/regpar6form_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar6picker_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_download_fotoobject_repository.dart';
 import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository.dart';
+import 'package:joss_app/repositories/hakakses/hakaksescrud_repository.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/helper/app_prefs.dart';
@@ -42,6 +43,7 @@ import 'package:joss_app/pages/login/mobile/client/widget/otp_client_widget.dart
 import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/otp_user_widget.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
+
 
 // APIs
 import 'apis/payment/paymentdn_api.dart';
@@ -649,7 +651,11 @@ Future<void> main() async {
         //hero page premi
         BlocProvider(create: (context) => SumdashBloc(repository: SumdashRepository())),
         //forgot password
-         BlocProvider(create: (context) => ForgotPasswordBloc(repository: ForgotPasswordRepository())),
+        BlocProvider(create: (context) => ForgotPasswordBloc(repository: ForgotPasswordRepository())),
+
+        //hakases list cob
+        BlocProvider(create: (_) => HakaksesCrudBloc(repository: HakaksesCrudRepository())),
+
       ],
       child: MultiBlocListener(
         listeners: [
@@ -670,14 +676,20 @@ Future<void> main() async {
 
               if (s.user.userType == 'C') {
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
-                debugPrint('[Auth→Rekan] Trigger MRekan1CrudLihatEvent()');
+                context.read<HakaksesCrudBloc>().add(HakaksesCrudLihatEvent());
               }
 
+              // final fotoState = context.read<ProfileDownloadFotoBloc>().state;
+              // if (fotoState is! ProfileDownloadFotoLoading &&
+              //     fotoState is! ProfileDownloadFotoLoaded) {
+              //   context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
+              // }
+
               final fotoState = context.read<ProfileDownloadFotoBloc>().state;
-              if (fotoState is! ProfileDownloadFotoLoading &&
-                  fotoState is! ProfileDownloadFotoLoaded) {
+
+              if (fotoState is ProfileDownloadFotoInitial) {
+                context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
                 context.read<ProfileDownloadFotoBloc>().add(LoadSecureImage());
-                debugPrint('[Foto] LoadSecureImage() dipanggil');
               }
             },
           ),

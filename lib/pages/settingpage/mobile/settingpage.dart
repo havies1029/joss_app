@@ -20,6 +20,7 @@ import '../widgets/syarat_ketentuan_page.dart';
 import '../widgets/ubah_password_popup.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../../common/constants.dart';
+import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 
 const List<String> scopes = <String>['email'];
 
@@ -361,6 +362,8 @@ class _SettingsPageState extends State<SettingsPage> {
     if (shouldLogout == true) {
       context.read<AuthenticationBloc>().add(LoggedOut());
     }
+
+    ChatInitService.I.dispose();
   }
 
   @override
@@ -586,9 +589,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                             ),
                                           );
                                         }
-
-                                        context.read<ProfileDownloadFotoBloc>()
-                                            .add(LoadSecureImage());
                                       },
                                     ),
 

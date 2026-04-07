@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
-import '../../../../../blocs/dashboard/sumdash_bloc.dart';
-import '../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
-import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../../../../blocs/dashboard/sumdash_bloc.dart';
+import '../../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
+import '../../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:confetti/confetti.dart';
 
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';

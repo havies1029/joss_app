@@ -8,11 +8,8 @@ abstract class HakaksesCrudEvents extends Equatable {
 }
 
 class HakaksesCrudLihatEvent extends HakaksesCrudEvents {
-	final String recordId;
-	const HakaksesCrudLihatEvent({required this.recordId});
+	const HakaksesCrudLihatEvent();
 
 	@override
-	List<Object> get props => [recordId];
+	List<Object> get props => [];
 }
-
-

@@ -2034,7 +2034,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     controller: fieldTtgAlamatController,
     keyboardType: TextInputType.text,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,.]")),
+      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
     ],
     errorText: err('form1.alamatTertanggung'),
     validator: (_) => err('form1.alamatTertanggung'),

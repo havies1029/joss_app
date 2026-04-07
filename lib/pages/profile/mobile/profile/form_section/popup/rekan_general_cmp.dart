@@ -80,8 +80,10 @@ class MRekanGeneralCmpPopUpPageFormState
     //   Navigator.pop(context);
     // }
     final navigator = Navigator.of(context);
+    debugPrint("reguserbloc requestform : ${regUserBloc.state.requestFrom}");
+
     if (regUserBloc.state.requestFrom.isNotEmpty) {
-      navigator.pop();
+      debugPrint("navigator4x");
       navigator.pop();
       navigator.pop();
       navigator.pop();
@@ -90,11 +92,13 @@ class MRekanGeneralCmpPopUpPageFormState
       navigator.pop();
     }
   }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
     return PopScope(
+      canPop: false,
       onPopInvoked: (didPop) {
         if (didPop) return;
         _handleClose();
@@ -119,172 +123,160 @@ class MRekanGeneralCmpPopUpPageFormState
                       horizontal: 15,
                       vertical: 20,
                     ),
-                    child: BlocConsumer<MRekanGeneralCmpCrudBloc,
-                        MRekanGeneralCmpCrudState>(
-                      listenWhen: (prev, curr) =>
-                      prev.isLoaded != curr.isLoaded ||
-                          prev.isSaved != curr.isSaved,
-                      listener: (context, state) {
-                        if (state.isLoaded && _isFirstLoad) {
-                          final rec = state.record;
+                    child: MultiBlocListener(
+                      listeners: [
+                        BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                          listenWhen: (prev, curr) =>
+                          prev.isLoaded != curr.isLoaded,
+                          listener: (context, state) {
+                            if (state.isLoaded && _isFirstLoad) {
+                              final rec = state.record;
 
-                          final formName = (rec?.rekanNama ?? '').trim();
+                              final formName = (rec?.rekanNama ?? '').trim();
 
-                          final fallbackName = (context
-                              .read<MRekan1CrudBloc>()
-                              .state
-                              .record
-                              ?.rekanNama ??
-                              '')
-                              .trim();
+                              final fallbackName = (context
+                                  .read<MRekan1CrudBloc>()
+                                  .state
+                                  .record
+                                  ?.rekanNama ??
+                                  '')
+                                  .trim();
 
-                          final mjenisClient = context
-                              .read<MRekan1CrudBloc>()
-                              .state
-                              .record
-                              ?.mjnsclientId;
+                              final idKlien = context
+                                  .read<MRekan1CrudBloc>()
+                                  .state
+                                  .record
+                                  ?.mrekan1Id;
 
-                          final idKlien = context
-                              .read<MRekan1CrudBloc>()
-                              .state
-                              .record
-                              ?.mrekan1Id;
+                              if (fieldRekanNamaController.text.trim().isEmpty) {
+                                if (formName.isNotEmpty) {
+                                  fieldRekanNamaController.text = formName;
+                                } else if (fallbackName.isNotEmpty) {
+                                  fieldRekanNamaController.text = fallbackName;
+                                }
+                              }
 
-                          if (fieldRekanNamaController.text.trim().isEmpty) {
-                            if (formName.isNotEmpty) {
-                              fieldRekanNamaController.text = formName;
-                            } else if (fallbackName.isNotEmpty) {
-                              fieldRekanNamaController.text = fallbackName;
+                              fieldNamaBadanUsahaController.text = "Perusahaan";
+
+                              if (fieldIdKlienController.text.trim().isEmpty) {
+                                fieldIdKlienController.text = idKlien ?? "";
+                              }
+
+                              fieldComboMBentukCst ??=
+                                  rec?.comboMBentukCst ?? state.comboMBentukCst;
+
+                              fieldComboMBidang ??=
+                                  rec?.comboMBidang ?? state.comboMBidang;
+
+                              setState(() {});
+                              _isFirstLoad = false;
                             }
-                          }
+                          },
+                        ),
 
-                          // if (fieldNamaBadanUsahaController.text
-                          //     .trim()
-                          //     .isEmpty) {
-                          //   if (mjenisClient == '10') {
-                          //     fieldNamaBadanUsahaController.text = "Individu";
-                          //   } else if (mjenisClient == '20') {
-                          //     fieldNamaBadanUsahaController.text = "Perusahaan";
-                          //   }
-                          // }
-                          fieldNamaBadanUsahaController.text = "Perusahaan";
+                        BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                          listenWhen: (prev, curr) =>
+                          prev.isSaved != curr.isSaved,
+                          listener: (context, state) {
+                            if (!state.isSaved) return;
 
-                          if (fieldIdKlienController.text.trim().isEmpty) {
-                            fieldIdKlienController.text = idKlien ?? "";
-                          }
+                            if (!state.hasFailure) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                successSnackBar("Data berhasil disimpan!"),
+                              );
 
-                          fieldComboMBentukCst ??=
-                              rec?.comboMBentukCst ?? state.comboMBentukCst;
+                              mRekanGeneralCmpCrudBloc.add(
+                                MRekanGeneralCmpCrudResetStatusEvent(),
+                              );
 
-                          fieldComboMBidang ??=
-                              rec?.comboMBidang ?? state.comboMBidang;
+                              mRekanGeneralCmpCrudBloc.add(
+                                MRekanGeneralCmpCrudLihatEvent(),
+                              );
 
-                          setState(() {});
-                          _isFirstLoad = false;
-                        }
+                              _handleClose();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                errorSnackBar("Data gagal disimpan!"),
+                              );
 
-                        if (state.isSaved) {
-                          if (!state.hasFailure) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              successSnackBar("Data berhasil disimpan!"),
-                            );
+                              mRekanGeneralCmpCrudBloc.add(
+                                MRekanGeneralCmpCrudResetStatusEvent(),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                      child: BlocBuilder<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                        builder: (context, state) {
+                          return Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+                                  buildWhen: (prev, curr) =>
+                                  prev.runtimeType != curr.runtimeType ||
+                                      curr is ProfileDownloadFotoLoaded,
+                                  builder: (context, state) {
+                                    final Uint8List? imageBytes =
+                                    state is ProfileDownloadFotoLoaded
+                                        ? state.imageBytes
+                                        : null;
 
-                            context
-                                .read<MRekanGeneralCmpCrudBloc>()
-                                .add(MRekanGeneralCmpCrudResetStatusEvent());
-
-                            _handleClose();
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              errorSnackBar("Data gagal disimpan!"),
-                            );
-
-                            context
-                                .read<MRekanGeneralCmpCrudBloc>()
-                                .add(MRekanGeneralCmpCrudResetStatusEvent());
-                          }
-                        }
-                      },
-                      builder: (context, state) {
-                        return Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              BlocBuilder<ProfileDownloadFotoBloc,
-                                  ProfileDownloadFotoState>(
-                                buildWhen: (prev, curr) =>
-                                prev.runtimeType != curr.runtimeType ||
-                                    curr is ProfileDownloadFotoLoaded,
-                                builder: (context, state) {
-                                  final Uint8List? imageBytes =
-                                  state is ProfileDownloadFotoLoaded
-                                      ? state.imageBytes
-                                      : null;
-
-                                  return Center(
-                                    child: InkResponse(
-                                      onTap: () =>
-                                          ImageUploader.pickAndUpload(context),
-                                      containedInkWell: true,
-                                      customBorder: const CircleBorder(),
-                                      child: Stack(
-                                        alignment: Alignment.bottomRight,
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 50,
-                                            backgroundColor: secondaryBlackColor,
-                                            backgroundImage:
-                                            (imageBytes != null &&
-                                                imageBytes.isNotEmpty)
-                                                ? MemoryImage(imageBytes)
-                                                : null,
-                                            child: (imageBytes == null ||
-                                                imageBytes.isEmpty)
-                                                ? _avatarFallback()
-                                                : null,
-                                          ),
-                                          Positioned(
-                                            bottom: 0,
-                                            right: 0,
-                                            child: Container(
-                                              padding:
-                                              const EdgeInsets.all(2),
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                    color: sGrey, width: 1),
-                                                color: pGrey,
-                                              ),
-                                              child: CircleAvatar(
-                                                radius: 16,
-                                                backgroundColor:
-                                                Colors.transparent,
-                                                child: Center(
-                                                  child: SizedBox(
-                                                    width: 22,
-                                                    height: 22,
-                                                    child: ShaderMask(
-                                                      shaderCallback:
-                                                          (Rect bounds) {
-                                                        return const LinearGradient(
-                                                          begin: Alignment
-                                                              .centerLeft,
-                                                          end: Alignment
-                                                              .centerRight,
-                                                          colors: [
-                                                            Color(0xFFFCCF6F),
-                                                            Color(0xFFEF7A28),
-                                                          ],
-                                                        ).createShader(bounds);
-                                                      },
-                                                      child: SvgPicture.asset(
-                                                        "assets/icons/camera.svg",
-                                                        width: 22,
-                                                        colorFilter:
-                                                        const ColorFilter.mode(
-                                                          Colors.white,
-                                                          BlendMode.srcIn,
+                                    return Center(
+                                      child: InkResponse(
+                                        onTap: () => ImageUploader.pickAndUpload(context),
+                                        containedInkWell: true,
+                                        customBorder: const CircleBorder(),
+                                        child: Stack(
+                                          alignment: Alignment.bottomRight,
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 50,
+                                              backgroundColor: secondaryBlackColor,
+                                              backgroundImage:
+                                              (imageBytes != null && imageBytes.isNotEmpty)
+                                                  ? MemoryImage(imageBytes)
+                                                  : null,
+                                              child: (imageBytes == null || imageBytes.isEmpty)
+                                                  ? _avatarFallback()
+                                                  : null,
+                                            ),
+                                            Positioned(
+                                              bottom: 0,
+                                              right: 0,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(2),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(color: sGrey, width: 1),
+                                                  color: pGrey,
+                                                ),
+                                                child: CircleAvatar(
+                                                  radius: 16,
+                                                  backgroundColor: Colors.transparent,
+                                                  child: Center(
+                                                    child: SizedBox(
+                                                      width: 22,
+                                                      height: 22,
+                                                      child: ShaderMask(
+                                                        shaderCallback: (Rect bounds) {
+                                                          return const LinearGradient(
+                                                            begin: Alignment.centerLeft,
+                                                            end: Alignment.centerRight,
+                                                            colors: [
+                                                              Color(0xFFFCCF6F),
+                                                              Color(0xFFEF7A28),
+                                                            ],
+                                                          ).createShader(bounds);
+                                                        },
+                                                        child: SvgPicture.asset(
+                                                          "assets/icons/camera.svg",
+                                                          width: 22,
+                                                          colorFilter: const ColorFilter.mode(
+                                                            Colors.white,
+                                                            BlendMode.srcIn,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -292,64 +284,62 @@ class MRekanGeneralCmpPopUpPageFormState
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: vPadding),
-                              Text(
-                                "Informasi Perusahaan",
-                                style: headingStyle(
-                                  context,
-                                  fontSize: getResponsiveFont(context, 22),
-                                ).copyWith(color: Colors.white),
-                              ),
-                              Text(
-                                "Lengkapi identitas dasar Anda dengan benar.",
-                                style: bodyTextStyle(
-                                  context,
-                                  fontSize: getResponsiveFont(context, 16),
-                                ).copyWith(color: hintGrey),
-                              ),
-                              const SizedBox(height: vPadding),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 15,
+                                    );
+                                  },
                                 ),
-                                decoration: BoxDecoration(
-                                  color: pGrey,
-                                  border: Border.all(color: sGrey),
-                                  borderRadius: BorderRadius.circular(
-                                    cardBorderRadius,
+                                const SizedBox(height: vPadding),
+                                Text(
+                                  "Informasi Perusahaan",
+                                  style: headingStyle(
+                                    context,
+                                    fontSize: getResponsiveFont(context, 22),
+                                  ).copyWith(color: Colors.white),
+                                ),
+                                Text(
+                                  "Lengkapi identitas dasar Anda dengan benar.",
+                                  style: bodyTextStyle(
+                                    context,
+                                    fontSize: getResponsiveFont(context, 16),
+                                  ).copyWith(color: hintGrey),
+                                ),
+                                const SizedBox(height: vPadding),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 15,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: pGrey,
+                                    border: Border.all(color: sGrey),
+                                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      buildFieldIdKlien(),
+                                      const SizedBox(height: vPadding),
+                                      buildFieldJenisKlien(),
+                                      const SizedBox(height: vPadding),
+                                      buildFieldNamaPerusahaan(),
+                                      const SizedBox(height: vPadding),
+                                      buildFieldBentukPerusahaan(),
+                                      const SizedBox(height: vPadding),
+                                      buildFieldBidangUsaha(),
+                                    ],
                                   ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    buildFieldIdKlien(),
-                                    const SizedBox(height: vPadding),
-                                    buildFieldJenisKlien(),
-                                    const SizedBox(height: vPadding),
-                                    buildFieldNamaPerusahaan(),
-                                    const SizedBox(height: vPadding),
-                                    buildFieldBentukPerusahaan(),
-                                    const SizedBox(height: vPadding),
-                                    buildFieldBidangUsaha(),
-                                  ],
+                                const SizedBox(height: vPadding),
+                                AppButton.primary(
+                                  text: state.isSaving ? "Menyimpan..." : "Simpan Perubahan",
+                                  onPressed: state.isSaving ? null : onSaveForm,
                                 ),
-                              ),
-                              const SizedBox(height: vPadding),
-                              AppButton.primary(
-                                text: "Simpan Perubahan",
-                                onPressed: onSaveForm,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

@@ -8,7 +8,6 @@ import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/daftar_cob_klaim
 import '../../klaimbatal/mobile/klaimbatalcrud_form.dart';
 import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
 import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
-import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page_remake.dart';
 import '../../perbaruiklaimpar/mobile/perbaruiklaimpar_page.dart';
 
 class FabActionKlaim extends StatelessWidget {

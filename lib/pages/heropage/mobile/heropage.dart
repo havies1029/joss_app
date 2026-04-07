@@ -139,8 +139,6 @@ class _HeroPageState extends State<HeroPage> {
     );
   }
 
-
-  /// Helper untuk bangun HeroPage UI
   Widget _buildHeroContent(
       BuildContext context, {
         required String displayName,

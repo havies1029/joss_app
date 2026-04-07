@@ -127,27 +127,25 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
   }
 
   Future<void> onKlaim5DeleteRequested(
-    Klaim5DeleteRequestedEvent event, Emitter<Klaim5cariState> emit) async {
+      Klaim5DeleteRequestedEvent event,
+      Emitter<Klaim5cariState> emit,
+      ) async {
     final idx = state.items.indexWhere((x) =>
-        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+
     if (idx < 0) return;
 
     final oldItem = state.items[idx];
-
-    // snapshot list
     final newItems = List<Klaim5cariModel>.from(state.items);
 
-    // tentukan aksi: clear atau remove
     final bool shouldClear = oldItem.mjenisdocId.isNotEmpty;
 
-    debugPrint("debuga1");
+    // ===== OPTIMISTIC UPDATE =====
     if (shouldClear) {
-      debugPrint("debuga2");
-
-      // 1A) CLEAR (seperti sekarang)
       final clearedItem = oldItem.copyWith(
         localPath: '',
+        fileUrl: '',
         fileName: '',
         mimeType: '',
         fileSizeBytes: 0,
@@ -157,18 +155,16 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       );
 
       newItems[idx] = clearedItem;
-      emit(state.copyWith(items: newItems));
     } else {
-      // 1B) REMOVE dari list
       newItems.removeAt(idx);
-      emit(state.copyWith(items: newItems));
     }
 
-    // 2) Hapus di server jika klaim1Id ada
-    if (event.klaim5Id.isNotEmpty) {
-      debugPrint("debuga3");
+    emit(state.copyWith(items: newItems));
 
+    // ===== SERVER DELETE =====
+    if (event.klaim5Id.isNotEmpty) {
       final repository = KlaimmvdoccrudRepository();
+
       final success = await repository.klaimmvdoccrudHapus(
         event.klaim5Id,
         event.mjenisdocId,
@@ -176,6 +172,7 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       );
 
       if (!success) {
+        // ===== ROLLBACK =====
         final revertItems = List<Klaim5cariModel>.from(state.items);
 
         if (shouldClear) {
@@ -187,10 +184,11 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
         }
 
         emit(state.copyWith(items: revertItems));
+      } else {
+        add(RefreshKlaim5cariEvent(klaim1Id: state.klaim1Id));
       }
     }
   }
-
 
   Future<void> onKlaim5UploadRequested(Klaim5UploadRequestedEvent event, Emitter<Klaim5cariState> emit) async {
     final idx = state.items.indexWhere((x) =>

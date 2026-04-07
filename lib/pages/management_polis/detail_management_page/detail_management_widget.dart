@@ -519,7 +519,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
               getStatusText: (x) => _getStatusText!(x),
               activeTextColor: primaryLightColor,
               normalTextColor: hintGrey,
-              activeDotColor: primaryColor,
+              activeDotColor: hintGrey,
               normalDotColor: hintGrey, index: index,
             );
           }),

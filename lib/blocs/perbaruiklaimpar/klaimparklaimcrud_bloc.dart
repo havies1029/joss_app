@@ -280,7 +280,7 @@ class KlaimparklaimcrudBloc
       KlaimparklaimcrudAutoSaveEvent event,
       Emitter<KlaimparklaimcrudState> emit,
       ) async {
-    if (!state.isDirty || state.record == null || !state.isValid) return;
+    if (!state.isDirty || state.record == null) return;
 
     emit(state.copyWith(isSaving: true, isSaved: false));
 

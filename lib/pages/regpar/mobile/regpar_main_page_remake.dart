@@ -970,7 +970,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                             );
                           },
                         ),
-                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
@@ -1734,7 +1733,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldTtgAlamatController,
     keyboardType: TextInputType.text,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
     ],
     errorText: err('form1.alamatTertanggung'),
     validator: (_) => err('form1.alamatTertanggung'),
@@ -1938,7 +1937,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldObjectAlamatController,
     keyboardType: TextInputType.text,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
     ],
 
     // error-map pattern
@@ -2186,7 +2185,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     hintText: "Mata Uang",
     initItem: fieldComboRMatauang,
     dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-    displayText: (item) => item.rmatauangNama,
+    displayText: (item) => item.rmatauangSimbol,
     compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
 
     // error-map pattern

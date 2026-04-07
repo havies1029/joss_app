@@ -168,6 +168,7 @@ class _HomeTabWidgetState extends State<HomeTabWidget> {
 
     if (shouldLogout == true) {
       context.read<AuthenticationBloc>().add(LoggedOut());
+      context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
     }
   }
 

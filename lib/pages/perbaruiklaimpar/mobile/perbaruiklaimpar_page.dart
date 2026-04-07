@@ -8,8 +8,8 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
-import '../../perbaruiklaimmv/klaim5cari_list.dart';
-import '../perbaruisuccess_page.dart';
+import '../../perbaruiklaimmv/mobile/klaim5cari_list.dart';
+import 'perbaruisuccess_page.dart';
 import 'klaimparaccordioncard.dart';
 import 'klaimparklaimcrud_form.dart';
 

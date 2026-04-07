@@ -106,8 +106,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
         setErr('form1.telepon', kStringNullError);
         ok = false;
       } else {
-        if (!RegExp(r'^\d+$').hasMatch(telp)) {
-          setErr('form1.telepon', "Format tidak valid");
+        final phoneRes = IndoPhoneHelper.normalize(telp);
+        if (!phoneRes.isValid) {
+          setErr('form1.telepon', phoneRes.error ?? "Format tidak valid");
           ok = false;
         }
       }
@@ -279,6 +280,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
         handleBack();
       },
       child: BlocConsumer<RegUserBloc, RegUserState>(
+        listenWhen: (previous, current) {
+          return previous.isSaved != current.isSaved ||
+              previous.hasFailure != current.hasFailure ||
+              previous.isOtpClient != current.isOtpClient ||
+              previous.isRegisterSuccess != current.isRegisterSuccess;
+        },
         listener: (context, state) {
           if (state.hasFailure && state.errors.isNotEmpty) {
             final msg = state.errors.first;
@@ -288,7 +295,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
           if (!state.hasFailure &&
               state.isSaved &&
-              singlePopPages.contains(widget.requestFrom) && !state.isOtpClient) {
+              state.isRegisterSuccess &&
+              singlePopPages.contains(widget.requestFrom) &&
+              !state.isOtpClient) {
             debugPrint("popupclient1dipanggil cou");
 
             Navigator.of(context).push(

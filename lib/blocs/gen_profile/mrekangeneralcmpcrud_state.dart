@@ -10,6 +10,7 @@ class MRekanGeneralCmpCrudState extends Equatable {
 	final ComboMBentukCstModel? comboMBentukCst;
 	final ComboMBidangModel? comboMBidang;
 	final bool isDataComplete;
+	final bool hasInitializedOnce;
 
 	const MRekanGeneralCmpCrudState({
 		this.record,
@@ -21,6 +22,7 @@ class MRekanGeneralCmpCrudState extends Equatable {
 		this.comboMBentukCst,
 		this.comboMBidang,
 		this.isDataComplete = false,
+		this.hasInitializedOnce = false,
 	});
 
 	static const _unset = Object();
@@ -35,6 +37,7 @@ class MRekanGeneralCmpCrudState extends Equatable {
 		Object? comboMBentukCst = _unset,
 		Object? comboMBidang = _unset,
 		bool? isDataComplete,
+		bool? hasInitializedOnce,
 	}) {
 		return MRekanGeneralCmpCrudState(
 			record: record == _unset ? this.record : record as MRekanGeneralCmpCrudModel?,
@@ -50,6 +53,7 @@ class MRekanGeneralCmpCrudState extends Equatable {
 					? this.comboMBidang
 					: comboMBidang as ComboMBidangModel?,
 			isDataComplete: isDataComplete ?? this.isDataComplete,
+				hasInitializedOnce: hasInitializedOnce ?? this.hasInitializedOnce,
 		);
 	}
 
@@ -64,5 +68,6 @@ class MRekanGeneralCmpCrudState extends Equatable {
 		comboMBentukCst,
 		comboMBidang,
 		isDataComplete,
+		hasInitializedOnce,
 	];
 }

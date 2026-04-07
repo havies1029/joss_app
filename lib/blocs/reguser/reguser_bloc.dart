@@ -37,6 +37,13 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     emit(state.copyWith(
       requestFrom: '',
       isOtpClient: false,
+      isRegisterSuccess: false,
+      isSaved: false,
+      hasFailure: false,
+      verificationFailed: false,
+      errors: const [],
+      sentTo: '',
+      sentVia: '',
     ));
   }
 
@@ -56,6 +63,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         isSaving: true,
         isSaved: false,
         requestFrom: event.requestFrom,
+        isRegisterSuccess: false,
       ),
     );
 
@@ -81,6 +89,8 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         hasFailure: hasFailure,
         sentTo: event.pinSentTo,
         sentVia: event.pinSentVia,
+        isRegisterSuccess: !hasFailure,
+        isOtpClient: false,
       ),
     );
 
@@ -116,35 +126,55 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     RegUserModel record = await repository.regUserLihat(event.recordId);
     emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
   }
-
   Future<void> onValidasiPinHP(
-      ValidasiPinHPEvent event, Emitter<RegUserState> emit) async {
+      ValidasiPinHPEvent event,
+      Emitter<RegUserState> emit,
+      ) async {
+    debugPrint("OTP START - requestFrom before emit: ${state.requestFrom}");
 
-    emit(state.copyWith(isSaving: true, isSaved: false));
-    ReturnDataAPI returnData = await repository.validasiPinHP(event.record, state.requestFrom);
-    bool hasFailure = !returnData.success;
-    List<String> errors = [];
+    emit(state.copyWith(
+      isSaving: true,
+      isSaved: false,
+      isRegisterSuccess: false,
+      verificationFailed: false,
+      errors: const [],
+    ));
+
+    debugPrint("OTP START - requestFrom after first emit: ${state.requestFrom}");
+
+    ReturnDataAPI returnData =
+    await repository.validasiPinHP(event.record, state.requestFrom);
+
+    final bool hasFailure = !returnData.success;
+    final List<String> errors = [];
+
     if (hasFailure) {
       errors.add(returnData.data);
     }
+
     emit(state.copyWith(
       isSaving: false,
       isSaved: true,
       hasFailure: hasFailure,
       verificationFailed: hasFailure,
       errors: errors,
+      isOtpClient: !hasFailure,
+      isRegisterSuccess: false,
     ));
+
+    debugPrint("OTP END - requestFrom after success/fail emit: ${state.requestFrom}");
+
     if (!hasFailure) {
-      emit(state.copyWith(
-        isOtpClient: true,
-      ));
+      debugPrint("OTP SUCCESS - requestFrom before UserRoleChanged: ${state.requestFrom}");
 
       authenticationBloc.add(PhonePinVerified());
 
       String tokeninfo = returnData.data;
       List<String> info = tokeninfo.split(";");
       String username = info[8];
+
       Token token = Token.split(username, tokeninfo);
+
       User user = User(
         id: 0,
         token: token.token,
@@ -152,7 +182,8 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         nama: info[2],
         email: info[5],
         userCabang: info[1],
-        userType: "C",);
+        userType: "C",
+      );
 
       AppData.user = user;
       AppData.userToken = user.token!;
@@ -160,10 +191,12 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
       UserRepository userRepository = UserRepository();
       userRepository.persistToken(userToken: user.token ?? "");
 
-      authenticationBloc.add(UserRoleChanged(user: user, authenticatedFrom: state.requestFrom));
-    }
-    else {
-      // authenticationBloc.add(RequirePinHPVerification(sentTo: event.sentTo, sentVia: event.sentVia));
+      authenticationBloc.add(
+        UserRoleChanged(
+          user: user,
+          authenticatedFrom: state.requestFrom,
+        ),
+      );
     }
   }
 

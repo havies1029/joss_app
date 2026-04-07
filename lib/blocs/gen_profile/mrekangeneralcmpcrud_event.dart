@@ -34,3 +34,5 @@ class ComboMBidangChangedEvent extends MRekanGeneralCmpCrudEvents {
 }
 
 class MRekanGeneralCmpCrudResetStatusEvent extends MRekanGeneralCmpCrudEvents {}
+
+class MRekanGeneralCmpCrudInitOnceEvent extends MRekanGeneralCmpCrudEvents {}

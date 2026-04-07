@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../../blocs/dashboard/sumdash_bloc.dart';
 import '../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
+import '../../../../../common/loading_indicator.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
@@ -220,7 +221,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -240,8 +240,10 @@ class PaymentProcessFormState extends State<PaymentProcess> {
               fieldVaNoController.text = (r.vaNo).toString();
               fieldCurrController.text = (r.curr).toString();
               final formatter = NumberFormat('#,###', 'id_ID');
-              fieldTotalBayarController.text = formatter.format(r.totalBayar);
-              fieldBatasBayarController.text = (r.batasBayar).toString();
+              fieldTotalBayarController.text =
+                  formatter.format(r.totalBayar);
+              fieldBatasBayarController.text =
+                  (r.batasBayar).toString();
             },
           ),
         ],
@@ -251,28 +253,32 @@ class PaymentProcessFormState extends State<PaymentProcess> {
               prev.isPollingVa != curr.isPollingVa ||
               prev.isPollingStatus != curr.isPollingStatus,
           builder: (context, state) {
-            final bankTitle = (state.record?.bankNama ?? '').trim();
-            final title = bankTitle.isNotEmpty ? bankTitle : "Pembayaran";
+            if (state.isInitialLoading) {
+              return Scaffold(
+                backgroundColor: secondaryBlackColor,
+                body: const Stack(
+                  children: [
+                    Positioned.fill(
+                      child: LoadingIndicator(),
+                    ),
+                  ],
+                ),
+              );
+            }
 
             return Scaffold(
               backgroundColor: secondaryBlackColor,
-              appBar: AppBar(
-                backgroundColor: secondaryBlackColor,
-                elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => _handleExit(context),
-                ),
-                title: Text(title),
-              ),
               body: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: vPadding * 1.5,
+                ),
                 child: SingleChildScrollView(
                   child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        const SizedBox(height: 10),
+                        const SizedBox(height: hPadding),
 
                         Container(
                           padding: const EdgeInsets.all(2),
@@ -292,17 +298,17 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                           ),
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: hPadding),
 
                         _buildPaymentStatus(state),
 
-                        const SizedBox(height: 6),
+                        const SizedBox(height: hPadding),
                         buildFieldTotalBayar(),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: hPadding),
                         buildFieldVaNo(),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: hPadding),
                         buildFieldBatasBayar(),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: hPadding),
                         buildInstruksiPembayaran(state),
                         const SizedBox(height: hPadding),
 
@@ -323,8 +329,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       ),
     );
   }
-
-  // ================== STATUS WIDGET ==================
 
   Widget _buildPaymentStatus(InvbayarvaFormState state) {
     final r = state.record;

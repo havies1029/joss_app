@@ -109,7 +109,7 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 						fieldPicJabatanController.text = state.record!.picJabatan;
 						fieldPicNamaController.text = state.record!.picNama;
 						fieldPicTelpController.text = IndoPhoneHelper.toDisplay(state.record!.picTelp);
-						isPolisJps = state.record!.isPolisJps;
+						isPolisJps = state.record?.isPolisJps ?? false;
 						fieldCobNamaController.text = state.record!.cobNama;
 					}
 					fieldComboMJenisrugi = state.comboMJenisrugi;
@@ -176,17 +176,20 @@ class KlaimparklaimcrudFormPageFormState extends State<KlaimparklaimcrudFormPage
 		);
 	}
 
-	Widget buildFieldLaporAsuransi(){
+	Widget buildFieldLaporAsuransi() {
 		return AppDateField(
 			label: 'Tanggal ke Asuransi',
 			firstDate: DateTime(2000),
 			lastDate: DateTime(2100),
+			enabled: isPolisJps ? false : true,
 			initialValue: DateTime.tryParse(fieldLaporAsuransiController.text),
 			onChanged: (value) {
 				if (value != null) {
 					removeError(error: kStringNullError);
 					fieldLaporAsuransiController.text = value.toIso8601String();
-					klaimparklaimcrudBloc.add(FieldLaporAsuransiChangedEvent(laporAsuransi: value));
+					klaimparklaimcrudBloc.add(
+						FieldLaporAsuransiChangedEvent(laporAsuransi: value),
+					);
 				}
 			},
 			validator: (value) {

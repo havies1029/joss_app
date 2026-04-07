@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:joss_app/blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../../../blocs/gen_invite/invite_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekanpiclist_bloc.dart';
@@ -27,7 +28,6 @@ class RekanPicWidgetPage extends StatefulWidget {
 
 class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
   late MRekanPicListBloc listBloc;
-
   @override
   void initState() {
     super.initState();
@@ -129,6 +129,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                   final total = state.items.length;
 
                   Widget header() {
+                    final isAdmin =
+                        context.read<HakaksesCrudBloc>().state.record?.isAdmin ?? false;
+
                     return Row(
                       children: [
                         Text(
@@ -136,26 +139,27 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                           style: bodyTextStyle(context, fontSize: 16),
                         ),
                         const Spacer(),
-                        SizedBox(
-                          width: 120,
-                          height: 30,
-                          child: AppButton.iconLeft(
-                            text: 'Tambah PIC',
-                            textStyle: bodyTextStyle(context, fontSize: 16),
-                            icon: const Icon(Icons.add, size: 16),
-                            onPressed: () {
-                              Navigator.push<bool>(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => TambahPicWidget(),
-                                ),
-                              );
-                              context.read<RekanPicCobCariBloc>().add(
-                                const ResetSelectedCOBRekanPicCobEvent(),
-                              );
-                            },
+                        if (isAdmin)
+                          SizedBox(
+                            width: 120,
+                            height: 30,
+                            child: AppButton.iconLeft(
+                              text: 'Tambah PIC',
+                              textStyle: bodyTextStyle(context, fontSize: 16),
+                              icon: const Icon(Icons.add, size: 16),
+                              onPressed: () {
+                                Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TambahPicWidget(),
+                                  ),
+                                );
+                                context.read<RekanPicCobCariBloc>().add(
+                                  const ResetSelectedCOBRekanPicCobEvent(),
+                                );
+                              },
+                            ),
                           ),
-                        ),
                       ],
                     );
                   }
@@ -224,6 +228,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
   }
 
   Widget _picCardFromItem(MRekanPicListModel it, int index) {
+    final isAdmin =
+        context.read<HakaksesCrudBloc>().state.record?.isAdmin ?? false;
+
     final id = it.mrekanpicId.trim();
     final isTidakAktif = _normalizedStatus(it.statusPic) == 'tidak aktif';
     final isDefault = it.isDefault;
@@ -232,6 +239,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     bodyTextStyle(context, fontSize: 16).copyWith(color: cardGrey);
     final valueStyle =
     bodyTextStyle(context, fontSize: 16).copyWith(color: primaryLightColor);
+
+    final showActionSection = isAdmin && !isTidakAktif;
 
     return Card(
       color: formGrey,
@@ -244,9 +253,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                if (!isTidakAktif) ...[
+            if (showActionSection) ...[
+              Row(
+                children: [
                   AppButton.icon(
                     icon: SvgPicture.asset(
                       'assets/icons/edit_icon_polis.svg',
@@ -258,9 +267,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                     squareSize: 30,
                     borderRadius: 8,
                   ),
-                  const SizedBox(width: 6),
                   if (!isDefault) ...[
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 12),
                     AppButton.icon(
                       icon: SvgPicture.asset(
                         'assets/icons/hapus.svg',
@@ -277,13 +285,10 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                       borderRadius: 8,
                     ),
                   ],
+                  const Spacer(),
+                  _buildPicStatusAction(it),
                 ],
-                const Spacer(),
-                if (!isTidakAktif) _buildPicStatusAction(it),
-              ],
-            ),
-
-            if (!isTidakAktif) ...[
+              ),
               const SizedBox(height: 8),
               Divider(color: sGrey),
               const SizedBox(height: 8),

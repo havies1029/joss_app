@@ -343,6 +343,9 @@ class MRekanGeneralCmpCrudFormPageFormState
 
   void loadData() {
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
+
+    // context.read<ProfileDownloadFotoBloc>()
+    //     .add(LoadSecureImage());
   }
 
   Widget buildFieldBentukPerusahaan() {

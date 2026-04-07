@@ -7,12 +7,15 @@ import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
 import '../../../klaimlacak/mobile/klaimnilaicrud_form.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
+import '../../../perbaruiklaimmv/mobile/klaimmvpoliscrud_form.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
+import '../../../tagihan_pembayaran/mobile/payment_page/payment_method/payment_method_page.dart';
 import '../../../tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
+import 'package:joss_app/pages/perbaruiklaimmv/mobile/klaim5cari_list.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String userType;
@@ -265,24 +268,16 @@ class ListMenuWidget extends StatelessWidget {
             final fontSize = titleStyle.fontSize ?? 14;
             final lineHeight = fontSize * (titleStyle.height ?? 1.2);
 
-            // target slot: 2 baris + padding kecil
             final desiredTitleHeight = (lineHeight * 2) + 6;
 
-            // hitung tinggi fixed di atas & bawah
             const iconSize = 68.0;
-            const topMargin = 15.0;     // margin top icon container
-            const gapAfterIcon = 8.0;   // SizedBox(height: 8)
+            const topMargin = 15.0;
+            const gapAfterIcon = 8.0;
             final bottomGap = hPadding.toDouble();
 
             final fixedHeights = iconSize + topMargin + gapAfterIcon + bottomGap;
-
-            // sisa ruang untuk title + ruang bawah
             final remaining = (c.maxHeight - fixedHeights).clamp(0.0, double.infinity);
-
-            // title tidak boleh lebih tinggi dari remaining
             final titleHeight = desiredTitleHeight.clamp(0.0, remaining);
-
-            // sisa setelah title jadi "ruang bawah" saja
             final bottomFill = (remaining - titleHeight).clamp(0.0, double.infinity);
 
             return Column(
@@ -366,12 +361,14 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
 
   void handleMenuTap(BuildContext context, String title) async {
+
+    final polisFormKey = GlobalKey<FormState>();
     switch (title) {
       case 'Cari Asuransi':
         Navigator.push(context, MaterialPageRoute(builder: (_) => CariAsuransiWidget.page()));
@@ -386,7 +383,26 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentProcess(viewMode: '', recordId: '',)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: hPadding * 1.5,
+                    vertical: vPadding,
+                  ),
+                  child: KlaimmvpoliscrudFormPage(
+                    viewMode: '',
+                    recordId: '',
+                    formKey: polisFormKey,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
         break;
 
       case 'Klaim':

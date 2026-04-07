@@ -21,16 +21,24 @@ class IndoPhoneHelper {
   static IndoPhoneResult normalize(String rawInput) {
     final digits = _clean(rawInput);
 
-    if (digits.length <= 8 || digits.length > 13) {
-      return IndoPhoneResult.fail('Nomor harus 9–13 digit');
+    if (digits.isEmpty) {
+      return IndoPhoneResult.fail('Nomor tidak boleh kosong');
     }
 
     String normalized;
 
     if (digits.startsWith('62')) {
+      // HARUS 628
+      if (!digits.startsWith('628')) {
+        return IndoPhoneResult.fail('Nomor HP harus diawali 628');
+      }
       normalized = digits;
     }
     else if (digits.startsWith('0')) {
+      // HARUS 08
+      if (!digits.startsWith('08')) {
+        return IndoPhoneResult.fail('Nomor HP harus diawali 08');
+      }
       normalized = '62${digits.substring(1)}';
     }
     else if (digits.startsWith('8')) {
@@ -38,12 +46,12 @@ class IndoPhoneHelper {
     }
     else {
       return IndoPhoneResult.fail(
-        'Nomor harus diawali 62, 0, atau 8',
+        'Awalan nomor tidak valid (harus 62, 0, atau 8)',
       );
     }
 
-    if (!normalized.startsWith('628')) {
-      return IndoPhoneResult.fail('Harus nomor HP Indonesia');
+    if (normalized.length < 10 || normalized.length > 14) {
+      return IndoPhoneResult.fail('Panjang nomor tidak valid');
     }
 
     return IndoPhoneResult.success(normalized);

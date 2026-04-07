@@ -107,7 +107,14 @@ class _RincianTablePageState extends State<RincianTablePage> {
     final wPeriode = _columnWidthFromLongest(context, periodeValues, min: 170, max: 260);
     final wCurr = _columnWidthFromLongest(context, currValues, min: 60, max: 90, padding: 16);
     final wPremi = _columnWidthFromLongest(context, premiValues, min: 110, max: 160);
-
+    final agingValues = details.map((d) => d.aging.toString());
+    final wAging = _columnWidthFromLongest(
+      context,
+      agingValues,
+      min: 60,
+      max: 90,
+      padding: 16,
+    );
     return {
       0: FixedColumnWidth(selectW),
       1: const FixedColumnWidth(50),
@@ -115,6 +122,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
       3: FixedColumnWidth(wPeriode),
       4: FixedColumnWidth(wCurr),
       5: FixedColumnWidth(wPremi),
+      6: FixedColumnWidth(wAging),
     };
   }
 
@@ -213,8 +221,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
                         "NO",
                         "NO POLIS",
                         "PERIODE POLIS",
-                        "CURR",
+                        "MATA UANG",
                         "PREMI",
+                        "AGING",
                       ]),
                       ...details.asMap().entries.map(
                             (e) => _detailRowWithCheckbox(
@@ -274,16 +283,19 @@ class _RincianTablePageState extends State<RincianTablePage> {
             3: const FlexColumnWidth(3),
             4: const FlexColumnWidth(1.5),
             5: const FlexColumnWidth(2),
+            6: const FlexColumnWidth(1.2),
           },
           children: [
             _tableHeader(context, [
-               "",
+              "",
               "NO",
               "NO POLIS",
               "PERIODE POLIS",
-              "CURR",
+              "MATA UANG",
               "PREMI",
+              "AGING",
             ]),
+
             ...details.asMap().entries.map(
                   (e) => _detailRowWithCheckbox(
                 e.value,
@@ -430,6 +442,11 @@ class _RincianTablePageState extends State<RincianTablePage> {
           label: "Total Premi",
           value: "${d.currSimbol} ${formatNum(d.dnOs)}",
         ),
+
+        DetailItem(
+          label: "AGING",
+          value: d.aging.toString(),
+        ),
       ],
     );
   }
@@ -525,6 +542,15 @@ class _RincianTablePageState extends State<RincianTablePage> {
           data: d,
           child: Text(
             formatNum(d.dnOs),
+            style: TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _tapCell(
+          context: context,
+          data: d,
+          child: Text(
+            d.aging.toString(),
             style: TextStyle(color: primaryLightColor),
           ),
         ),

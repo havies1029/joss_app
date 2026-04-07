@@ -353,11 +353,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         }
       }
       else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Only Client user can perform this action.'),
-          ),
-        );
         showDialog(
           context: context,
           barrierDismissible: true, // klik luar = close

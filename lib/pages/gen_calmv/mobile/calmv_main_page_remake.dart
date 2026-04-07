@@ -971,6 +971,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
 
   Future<void> onLanjutkanPressed() async {
+    // await Future.delayed(const Duration(seconds: 2));
+
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
     if (context.read<Calmv1ListBloc>().state.isProcessing) return;
@@ -1041,7 +1043,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           builder: (context) => RegisterClientPopUp(
             header: 'Data Klien Belum Terdaftar!',
             description:
-            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
+            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
             buttonText: 'Daftar Klien',
             onPressed: () {
               Navigator.push(

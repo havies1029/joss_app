@@ -339,6 +339,9 @@ class MRekanGeneralIdvCrudFormPageFormState
   void loadData() {
     mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
     _futureJenisKelamin = ComboMJnskelRepository().getComboMJnskel();
+
+    // context.read<ProfileDownloadFotoBloc>()
+    //     .add(LoadSecureImage());
   }
 
   Widget buildFieldPekerjaan() {

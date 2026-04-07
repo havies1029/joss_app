@@ -36,8 +36,6 @@ class HeroCardWidget extends StatefulWidget {
 class _HeroCardWidgetState extends State<HeroCardWidget> {
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<MRekan1CrudBloc>();
-
     return BlocBuilder<MRekan1CrudBloc, MRekan1CrudState>(
       builder: (context, state) {
         final String mjenisClient = state.record?.mjnsclientId ?? '';
@@ -65,7 +63,6 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
 
                 HeroHeaderWidget(
                   userName: widget.userName,
-                  imageBytes: widget.imageBytes,
                   userImage: widget.userImage,
                   userType: widget.userType,
                 ),

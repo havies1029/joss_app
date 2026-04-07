@@ -101,6 +101,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                           1: IntrinsicColumnWidth(), // NO POLIS
                           2: IntrinsicColumnWidth(), // PERIODE POLIS
                           3: IntrinsicColumnWidth(), // PREMI
+                          4: IntrinsicColumnWidth(), // AGING
                         },
                         children: [
                           _headerRow(),
@@ -139,6 +140,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                   1: FlexColumnWidth(2),
                   2: FlexColumnWidth(2),
                   3: FlexColumnWidth(2),
+                  4: FlexColumnWidth(1),
                 },
                 children: [
                   _headerRow(),
@@ -182,6 +184,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
         _headerCell("NO POLIS"),
         _headerCell("PERIODE POLIS"),
         _headerCell("PREMI"),
+        _headerCell("AGING"),
       ],
     );
   }
@@ -210,6 +213,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
         _cellText(polisNo, compact: compact),
         _cellText(periode, compact: compact),
         _cellText(premi, compact: compact),
+        _cellCenter(d.aging.toString()),
       ],
     );
   }
@@ -282,6 +286,7 @@ List<Historybayar2CariModel> _dummyItems() {
       sppa1Id: "SPPA-$i",
       periodeAkhir: DateTime.now(),
       periodeMulai: DateTime.now(),
+      aging: 0,
     );
   });
 }

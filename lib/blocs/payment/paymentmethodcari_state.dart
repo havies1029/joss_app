@@ -16,19 +16,23 @@ class PaymentMethodCariState extends Equatable {
     this.selectedMethodId,
   });
 
+  static const _unset = Object();
+
   PaymentMethodCariState copyWith({
     bool? isLoading,
     bool? isLoaded,
     bool? hasError,
     List<PaymentCategory>? categories,
-    String? selectedMethodId,
+    Object? selectedMethodId = _unset,
   }) {
     return PaymentMethodCariState(
       isLoading: isLoading ?? this.isLoading,
       isLoaded: isLoaded ?? this.isLoaded,
       hasError: hasError ?? this.hasError,
       categories: categories ?? this.categories,
-      selectedMethodId: selectedMethodId ?? this.selectedMethodId,
+      selectedMethodId: selectedMethodId == _unset
+          ? this.selectedMethodId
+          : selectedMethodId as String?,
     );
   }
 
@@ -66,9 +70,12 @@ class PaymentMethodCariState extends Equatable {
     return null;
   }
 
-
-
   @override
-  List<Object?> get props => [isLoading, isLoaded, hasError, categories, selectedMethodId];
+  List<Object?> get props => [
+    isLoading,
+    isLoaded,
+    hasError,
+    categories,
+    selectedMethodId,
+  ];
 }
-
