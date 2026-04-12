@@ -10,6 +10,7 @@ import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../common/constants.dart';
+import '../../../../helper/pdf_open_helper.dart';
 
 enum RiwayatFilter { semua, menunggu, selesai }
 
@@ -55,15 +56,22 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               prev.downloadPath != curr.downloadPath &&
               curr.downloadPath.isNotEmpty &&
               !curr.isDownloading,
-          listener: (context, state) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => InvoicePreviewFromBase64Page(
-                  base64Pdf: state.downloadPath,
-                ),
-              ),
-            );
+          listener: (context, state) async {
+            try {
+              await PdfOpenHelper().openBase64Pdf(
+                base64Pdf: state.downloadPath,
+              );
+            } catch (e) {
+              debugPrint('Gagal buka PDF: $e');
+            }
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (_) => InvoicePreviewFromBase64Page(
+            //       base64Pdf: state.downloadPath,
+            //     ),
+            //   ),
+            // );
           },
         ),
         BlocListener<DnRekap2invBloc, DnRekap2invState>(

@@ -1,11 +1,16 @@
+/*
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/loading_indicator.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class InvoicePreviewFromBase64Page extends StatefulWidget {
-  final String base64Pdf; // idealnya ini INV base64, bukan JSON
+  final String base64Pdf;
 
   const InvoicePreviewFromBase64Page({
     super.key,
@@ -13,21 +18,23 @@ class InvoicePreviewFromBase64Page extends StatefulWidget {
   });
 
   @override
-  State<InvoicePreviewFromBase64Page> createState() => _InvoicePreviewFromBase64PageState();
+  State<InvoicePreviewFromBase64Page> createState() =>
+      _InvoicePreviewFromBase64PageState();
 }
 
-class _InvoicePreviewFromBase64PageState extends State<InvoicePreviewFromBase64Page> {
-  PdfControllerPinch? _controller;
+class _InvoicePreviewFromBase64PageState
+    extends State<InvoicePreviewFromBase64Page> {
   String? _error;
   bool _loading = true;
+  bool _opened = false;
 
   @override
   void initState() {
     super.initState();
-    _initPdf();
+    _openPdfExternally();
   }
 
-  Future<void> _initPdf() async {
+  Future<void> _openPdfExternally() async {
     try {
       String raw = widget.base64Pdf.trim();
 
@@ -46,15 +53,38 @@ class _InvoicePreviewFromBase64PageState extends State<InvoicePreviewFromBase64P
       }
 
       // jaga-jaga ada prefix data URL
-      raw = raw.replaceFirst(RegExp(r'^data:application\/pdf;base64,'), '');
+      raw = raw.replaceFirst(
+        RegExp(r'^data:application\/pdf;base64,'),
+        '',
+      );
+
       // hilangin whitespace/newline
       raw = raw.replaceAll(RegExp(r'\s+'), '');
 
       final Uint8List bytes = base64Decode(raw);
 
-      _controller = PdfControllerPinch(
-        document: PdfDocument.openData(bytes),
-      );
+      final directory = Platform.isIOS
+          ? await getApplicationDocumentsDirectory()
+          : await getExternalStorageDirectory();
+
+      if (directory == null) {
+        throw Exception("Directory tidak ditemukan");
+      }
+
+      final fileName =
+          'invoice_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final filePath = join(directory.path, fileName);
+
+      final file = File(filePath);
+      await file.writeAsBytes(bytes, flush: true);
+
+      final result = await OpenFilex.open(file.path);
+
+      if (result.type != ResultType.done) {
+        throw Exception(result.message);
+      }
+
+      _opened = true;
     } catch (e) {
       _error = "Gagal buka invoice: $e";
     } finally {
@@ -65,20 +95,20 @@ class _InvoicePreviewFromBase64PageState extends State<InvoicePreviewFromBase64P
   }
 
   @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Invoice Preview')),
+      appBar: AppBar(title: const Text('Open Invoice')),
       body: _loading
           ? const Center(child: LoadingIndicator())
-          : (_error != null
+          : _error != null
           ? Center(child: Text(_error!))
-          : PdfViewPinch(controller: _controller!)),
+          : Center(
+        child: Text(
+          _opened
+              ? 'PDF berhasil dibuka di aplikasi lain.'
+              : 'Menyiapkan PDF...',
+        ),
+      ),
     );
   }
-}
+}*/

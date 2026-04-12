@@ -51,7 +51,7 @@ class MRekanGeneralIdvCrudFormPageFormState
   GlobalKey<DropdownSearchState<ComboMJnskelModel>>();
 
   bool _isFirstLoad = true;
-
+  bool _isTapLocked = false;
   @override
   void initState() {
     super.initState();
@@ -179,25 +179,38 @@ class MRekanGeneralIdvCrudFormPageFormState
 
                                 return Center(
                                   child: InkResponse(
-                                    onTap: () =>
-                                        ImageUploader.pickAndUpload(context),
+                                    onTap: _isTapLocked
+                                        ? null
+                                        : () async {
+                                      setState(() => _isTapLocked = true);
+
+                                      try {
+                                        await ImageUploader.pickAndUpload(context);
+                                      } finally {
+                                        await Future.delayed(const Duration(seconds: 2));
+                                        if (mounted) {
+                                          setState(() => _isTapLocked = false);
+                                        }
+                                      }
+                                    },
                                     containedInkWell: true,
                                     customBorder: const CircleBorder(),
                                     child: Stack(
                                       alignment: Alignment.bottomRight,
                                       children: [
-                                        CircleAvatar(
-                                          radius: 50,
-                                          backgroundColor: secondaryBlackColor,
-                                          backgroundImage:
-                                          (imageBytes != null &&
-                                              imageBytes.isNotEmpty)
-                                              ? MemoryImage(imageBytes)
-                                              : null,
-                                          child: (imageBytes == null ||
-                                              imageBytes.isEmpty)
-                                              ? _avatarFallback()
-                                              : null,
+                                        Opacity(
+                                          opacity: _isTapLocked ? 0.6 : 1.0, // optional UX feedback
+                                          child: CircleAvatar(
+                                            radius: 50,
+                                            backgroundColor: secondaryBlackColor,
+                                            backgroundImage:
+                                            (imageBytes != null && imageBytes.isNotEmpty)
+                                                ? MemoryImage(imageBytes)
+                                                : null,
+                                            child: (imageBytes == null || imageBytes.isEmpty)
+                                                ? _avatarFallback()
+                                                : null,
+                                          ),
                                         ),
                                         Positioned(
                                           bottom: 0,
@@ -206,26 +219,21 @@ class MRekanGeneralIdvCrudFormPageFormState
                                             padding: const EdgeInsets.all(2),
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              border: Border.all(
-                                                  color: sGrey, width: 1),
+                                              border: Border.all(color: sGrey, width: 1),
                                               color: pGrey,
                                             ),
                                             child: CircleAvatar(
                                               radius: 16,
-                                              backgroundColor:
-                                              Colors.transparent,
+                                              backgroundColor: Colors.transparent,
                                               child: Center(
                                                 child: SizedBox(
                                                   width: 22,
                                                   height: 22,
                                                   child: ShaderMask(
-                                                    shaderCallback:
-                                                        (Rect bounds) {
+                                                    shaderCallback: (Rect bounds) {
                                                       return const LinearGradient(
-                                                        begin: Alignment
-                                                            .centerLeft,
-                                                        end: Alignment
-                                                            .centerRight,
+                                                        begin: Alignment.centerLeft,
+                                                        end: Alignment.centerRight,
                                                         colors: [
                                                           Color(0xFFFCCF6F),
                                                           Color(0xFFEF7A28),
@@ -235,8 +243,7 @@ class MRekanGeneralIdvCrudFormPageFormState
                                                     child: SvgPicture.asset(
                                                       "assets/icons/camera.svg",
                                                       width: 22,
-                                                      colorFilter:
-                                                      const ColorFilter.mode(
+                                                      colorFilter: const ColorFilter.mode(
                                                         Colors.white,
                                                         BlendMode.srcIn,
                                                       ),

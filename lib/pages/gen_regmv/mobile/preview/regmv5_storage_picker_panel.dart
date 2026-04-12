@@ -133,7 +133,7 @@ class Regmv5StoragePickerPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "Unggah Foto Mobil",
+            "Unggah Foto Kendaraan",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: getResponsiveFont(context, 16),
@@ -143,7 +143,7 @@ class Regmv5StoragePickerPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "Pastikan foto Mobil terlihat jelas dan tidak buram untuk memudahkan proses verifikasi.",
+            "Pastikan foto Kendaraan terlihat jelas dan tidak buram untuk memudahkan proses verifikasi.",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: getResponsiveFont(context, 14),

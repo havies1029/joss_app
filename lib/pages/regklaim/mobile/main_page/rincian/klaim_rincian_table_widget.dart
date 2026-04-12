@@ -274,7 +274,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           padding: const EdgeInsets.all(6),
           child: Center(
             child: Text(
-              d.nourut.toString(),
+              (index + 1).toString(),
               style: TextStyle(color: primaryLightColor),
             ),
           ),

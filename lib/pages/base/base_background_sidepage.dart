@@ -10,6 +10,7 @@ class BaseBackgroundSidePage extends StatelessWidget {
   final String backgroundAsset;
   final String title;
   final VoidCallback? onBack;
+  final bool showBackButton;
 
   final List<BlocListener>? blocListeners;
 
@@ -21,13 +22,13 @@ class BaseBackgroundSidePage extends StatelessWidget {
     this.fadeHeight = 300,
     this.backgroundAsset = "assets/images/background_gradient.png",
     this.blocListeners,
+    this.showBackButton = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final Widget page = Scaffold(
       backgroundColor: secondaryBlackColor,
-
       bottomNavigationBar: Container(
         height: 46,
         width: double.infinity,
@@ -41,7 +42,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
           ).copyWith(fontStyle: FontStyle.italic),
         ),
       ),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -52,13 +52,14 @@ class BaseBackgroundSidePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: hPadding * 2),
               child: Stack(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: onBack ?? () => Navigator.pop(context),
-                      child: SvgPicture.asset("assets/icons/arrow_back.svg"),
+                  if (showBackButton)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onTap: onBack ?? () => Navigator.pop(context),
+                        child: SvgPicture.asset("assets/icons/arrow_back.svg"),
+                      ),
                     ),
-                  ),
                   Center(
                     child: Text(
                       title,

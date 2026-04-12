@@ -9,7 +9,6 @@ import 'package:path/path.dart' as p;
 class Klaim5UploadFileApi {
   final _base = AppData.apiDomain;
   final Dio _dio = Dio();
-
   Future<bool> uploadFileApi(String klaim1Id, Klaim5cariModel item) async {
     String uploadFileEndpoint = "api/perbaruiklaimmv/klaimmvdoccrud/uploadfile";
     String uploadFileURL = _base + uploadFileEndpoint;
@@ -24,7 +23,13 @@ class Klaim5UploadFileApi {
     _dio.options.headers = headers;
 
     try {
-      // Step 1: Upload file
+      // ✅ REQUEST DEBUG
+      debugPrint("=== REQUEST ===");
+      debugPrint("URL: $uploadFileURL");
+      debugPrint("Headers: $headers");
+      debugPrint("Query: klaim1Id=$klaim1Id");
+      debugPrint("Body: klaim5Id=${item.klaim5Id}, mjenisdocId=${item.mjenisdocId}");
+
       final uploadResponse = await _dio.post(
         uploadFileURL,
         queryParameters: {
@@ -37,19 +42,27 @@ class Klaim5UploadFileApi {
           'file': await MultipartFile.fromFile(
             file.path,
             filename: p.basename(file.path),
-            contentType: DioMediaType.parse(item.mimeType??"application/octet-stream"),
+            contentType: DioMediaType.parse(item.mimeType ?? "application/octet-stream"),
           ),
         }),
       );
 
-      if (uploadResponse.statusCode == 200) {            
+      // ✅ RESPONSE DEBUG
+      debugPrint("=== RESPONSE ===");
+      debugPrint("Status: ${uploadResponse.statusCode}");
+      debugPrint("Data: ${uploadResponse.data}");
+
+      if (uploadResponse.statusCode == 200) {
         return true;
       } else {
         return false;
       }
-      } catch (e) {
-        debugPrint("Error uploading file: ${e.toString()}");
-        throw Exception('Gagal mengambil file: ${e.toString()}');
-      }
+    } catch (e) {
+      // ❌ ERROR DEBUG
+      debugPrint("=== ERROR ===");
+      debugPrint(e.toString());
+
+      throw Exception('Gagal mengambil file: ${e.toString()}');
     }
+  }
   }

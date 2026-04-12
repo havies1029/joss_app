@@ -965,7 +965,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   Form5Page(
                     context: context,
-                    title: "Foto Mobil",
+                    title: "Foto Kendaraan",
                     isExpanded: expanded[4],
                     onToggle: (v) => setState(() => expanded[4] = v),
                     onRefresh: () {
@@ -2103,7 +2103,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     hintText: "Mata Uang",
     initItem: fieldComboRMatauang,
     dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-    displayText: (item) => item.rmatauangNama,
+    displayText: (item) => item.rmatauangSimbol,
     compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
     validatorCallback: (_) => err('form2.mataUang'),
     errorText: err('form2.mataUang'),

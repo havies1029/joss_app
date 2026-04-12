@@ -11,7 +11,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_inappwebview_windows
   pdfx
   permission_handler_windows
-  printing
   share_plus
   url_launcher_windows
 )

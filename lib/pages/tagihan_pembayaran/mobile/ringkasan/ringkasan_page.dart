@@ -223,10 +223,10 @@ class RingkasanPageState extends State<RingkasanPage> {
   void _showExportDialog(BuildContext context) {
     final state = dnrekapcobCariBloc.state;
 
-    if (state.selectedIds.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+    if (state.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        infoSnackBar("Tidak ada data untuk diunduh"),
+      );
       return;
     }
 
@@ -248,39 +248,38 @@ class RingkasanPageState extends State<RingkasanPage> {
                 button1Text: "Excel",
                 button2Text: "PDF",
                 onExportSelected: (format) async {
-                  final selectedItems =
-                      state.items
-                          .where((e) => state.selectedIds.contains(e.cobId))
-                          .map((e) => e.toExportMap())
-                          .toList();
+                  final allItems = state.items
+                      .map((e) => e.toExportMap())
+                      .toList();
 
-                  if (selectedItems.isEmpty) {
+                  if (allItems.isEmpty) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar("Tidak ada data yang dipilih"),
+                      errorSnackBar("Tidak ada data untuk diunduh"),
                     );
                     return;
                   }
 
                   Navigator.pop(context);
-                  await _exportData(context, format, selectedItems);
+                  await _exportData(context, format, allItems);
                 },
               ),
             ),
           ),
         );
       },
-      transitionBuilder:
-          (context, animation, secondaryAnimation, child) => FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(
-              scale: CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutBack,
-              ),
-              child: child,
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
             ),
+            child: child,
           ),
+        );
+      },
     );
   }
 

@@ -499,6 +499,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       userNama: fieldNameController.text.trim(),
     );
 
+    context.read<RegUserBloc>().add(ClearRequestFromEvent());
+
     context.read<RegUserBloc>().add(
       RegUserTambahEvent(
         record: record,

@@ -65,6 +65,7 @@ class _HeroCardWidgetState extends State<HeroCardWidget> {
                   userName: widget.userName,
                   userImage: widget.userImage,
                   userType: widget.userType,
+                  imageBytes: widget.imageBytes,
                 ),
 
                 const SizedBox(height: 16),

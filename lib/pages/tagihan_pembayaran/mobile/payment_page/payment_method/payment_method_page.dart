@@ -201,170 +201,193 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        await _handleExit(context);
-      },
-      child: BaseBackgroundSidePage(
-        onBack: () async => _handleExit(context),
-        title: "Metode Pembayaran",
-        child: Container(
-          color: secondaryBlackColor,
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          child: Column(
-            children: [
-              // ======= CONTENT (SCROLL AREA) =======
-              Expanded(
-                child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      return const Center(child: LoadingIndicator());
-                    }
+    return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
+      builder: (context, dnState) {
+        final busy = dnState.isProcessing;
 
-                    if (state.hasError) {
-                      return const Center(
-                        child: Text("Gagal memuat metode pembayaran"),
-                      );
-                    }
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            await _handleExit(context);
+          },
+          child: BaseBackgroundSidePage(
+            onBack: () {
+              if (busy) return;
+              _handleExit(context);
+            },
+            title: "Metode Pembayaran",
+            child: Stack(
+              children: [
+                Container(
+                  color: secondaryBlackColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
+                          builder: (context, state) {
+                            if (state.isLoading) {
+                              return const Center(child: LoadingIndicator());
+                            }
 
-                    final categories = [...state.categories]
-                      ..sort(
-                            (a, b) =>
-                            (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0),
-                      );
+                            if (state.hasError) {
+                              return const Center(
+                                child: Text("Gagal memuat metode pembayaran"),
+                              );
+                            }
 
-                    return ScrollbarTheme(
-                      data: ScrollbarThemeData(
-                        thumbVisibility: WidgetStateProperty.all(false),
-                        trackVisibility: WidgetStateProperty.all(false),
-                        thickness: WidgetStateProperty.all(5),
-                        radius: const Radius.circular(cardBorderRadius),
-                        thumbColor: WidgetStateProperty.all(
-                          scrollBar.withOpacity(0.1),
-                        ),
-                      ),
-                      child: Scrollbar(
-                        controller: _scrollCtrl,
-                        child: SingleChildScrollView(
-                          controller: _scrollCtrl,
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: pGrey,
-                                  borderRadius: BorderRadius.circular(
-                                    cardBorderRadius,
-                                  ),
-                                  border: Border.all(color: sGrey),
-                                ),
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Total Pembayaran:",
-                                      style: inputTextStyle(context),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "${widget.curr} ${NumberFormat("#,###").format(widget.totalBayar)}",
-                                      style: headingStyle(context),
-                                    ),
-                                  ],
+                            final categories = [...state.categories]
+                              ..sort(
+                                    (a, b) =>
+                                    (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0),
+                              );
+
+                            return ScrollbarTheme(
+                              data: ScrollbarThemeData(
+                                thumbVisibility: WidgetStateProperty.all(false),
+                                trackVisibility: WidgetStateProperty.all(false),
+                                thickness: WidgetStateProperty.all(5),
+                                radius: const Radius.circular(cardBorderRadius),
+                                thumbColor: WidgetStateProperty.all(
+                                  scrollBar.withOpacity(0.1),
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: pGrey,
-                                  borderRadius: BorderRadius.circular(
-                                    cardBorderRadius,
-                                  ),
-                                  border: Border.all(color: sGrey),
-                                ),
-                                child: ListView.separated(
-                                  shrinkWrap: true,
-                                  physics:
-                                  const NeverScrollableScrollPhysics(),
-                                  padding: EdgeInsets.zero,
-                                  itemCount: categories.length,
-                                  separatorBuilder: (_, __) => Divider(
-                                    height: 1,
-                                    color: sGrey.withOpacity(0.5),
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    final cat = categories[index];
+                              child: Scrollbar(
+                                controller: _scrollCtrl,
+                                child: SingleChildScrollView(
+                                  controller: _scrollCtrl,
+                                  physics: const BouncingScrollPhysics(),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: pGrey,
+                                          borderRadius: BorderRadius.circular(
+                                            cardBorderRadius,
+                                          ),
+                                          border: Border.all(color: sGrey),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Total Pembayaran:",
+                                              style: inputTextStyle(context),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              "${widget.curr} ${NumberFormat("#,###").format(widget.totalBayar)}",
+                                              style: headingStyle(context),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: pGrey,
+                                          borderRadius: BorderRadius.circular(
+                                            cardBorderRadius,
+                                          ),
+                                          border: Border.all(color: sGrey),
+                                        ),
+                                        child: ListView.separated(
+                                          shrinkWrap: true,
+                                          physics:
+                                          const NeverScrollableScrollPhysics(),
+                                          padding: EdgeInsets.zero,
+                                          itemCount: categories.length,
+                                          separatorBuilder: (_, __) => Divider(
+                                            height: 1,
+                                            color: sGrey.withOpacity(0.5),
+                                          ),
+                                          itemBuilder: (context, index) {
+                                            final cat = categories[index];
+                                            final icon = _categoryIconBySortOrder(
+                                              cat.sortOrder,
+                                            );
 
-                                    final icon = _categoryIconBySortOrder(
-                                      cat.sortOrder,
-                                    );
+                                            return PaymentList(
+                                              iconPath: icon,
+                                              categoryName: cat.categoryName,
+                                              items: cat.items,
+                                              isExpanded: _expandedIndex == index,
+                                              onTapHeader: () {
+                                                if (busy) return;
 
-                                    return PaymentList(
-                                      iconPath: icon,
-                                      categoryName: cat.categoryName,
-                                      items: cat.items,
-                                      isExpanded: _expandedIndex == index,
-                                      onTapHeader: () {
-                                        if (_expandedIndex != index) {
-                                          context
-                                              .read<PaymentMethodCariBloc>()
-                                              .add(PaymentResetSelectedEvent());
-                                        }
-                                        setState(() {
-                                          _expandedIndex =
-                                          _expandedIndex == index
-                                              ? null
-                                              : index;
-                                        });
-                                      },
-                                    );
-                                  },
+                                                if (_expandedIndex != index) {
+                                                  context
+                                                      .read<PaymentMethodCariBloc>()
+                                                      .add(
+                                                    PaymentResetSelectedEvent(),
+                                                  );
+                                                }
+
+                                                setState(() {
+                                                  _expandedIndex =
+                                                  _expandedIndex == index
+                                                      ? null
+                                                      : index;
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ),
-                    );
-                  },
+
+                      BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
+                        builder: (context, state) {
+                          if (state.selectedMethodId == null) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: AppButton.primary(
+                              text: "Lanjutkan",
+                              onPressed: busy ? null : _onLanjutkanPressed,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
-                builder: (context, state) {
-                  if (state.selectedMethodId == null) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
-                    builder: (context, dnState) {
-                      final busy = dnState.isProcessing;
-
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: AppButton.primary(
-                          text: busy ? "Memproses..." : "Lanjutkan",
-                          isLoading: busy,
-                          onPressed: busy ? null : _onLanjutkanPressed,
+                if (busy)
+                  Positioned.fill(
+                    child: AbsorbPointer(
+                      absorbing: true,
+                      child: Container(
+                        color: Colors.black.withOpacity(0.35),
+                        child: const Center(
+                          child: LoadingIndicator(),
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

@@ -3,14 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/blocs/payment/dnsppacari_bloc.dart';
 import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
-import 'package:joss_app/blocs/payment/dnrekapcobcari_bloc.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/models/payment/dnsppacari_model.dart';
 
 import 'ringkasan_detail_table_list.dart';
-// import 'package:joss_app/pages/payment/mobile/ringkasan/detail/ringkasan_detail_table_list.dart';
 
 class RingkasanDetailTableWidget extends StatefulWidget {
-  const RingkasanDetailTableWidget({super.key});
+  final String listcobId;
+
+  const RingkasanDetailTableWidget({
+    super.key,
+    required this.listcobId,
+  });
 
   @override
   RingkasanDetailTableWidgetState createState() =>
@@ -20,7 +24,6 @@ class RingkasanDetailTableWidget extends StatefulWidget {
 class RingkasanDetailTableWidgetState
     extends State<RingkasanDetailTableWidget> {
   late DnsppaCariBloc dnsppaCariBloc;
-  List<DnsppaCariModel> dnsppaCari = [];
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -29,7 +32,11 @@ class RingkasanDetailTableWidgetState
     _scrollController.addListener(_onScroll);
   }
 
-  late String? curr;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    dnsppaCariBloc = context.read<DnsppaCariBloc>();
+  }
 
   @override
   void dispose() {
@@ -41,35 +48,32 @@ class RingkasanDetailTableWidgetState
 
   @override
   Widget build(BuildContext context) {
-    dnsppaCariBloc = BlocProvider.of<DnsppaCariBloc>(context);
-
     return BlocConsumer<DnsppaCariBloc, DnsppaCariState>(
+      listener: (context, state) {},
       builder: (context, state) {
-        if (state.status == ListStatus.success) {
-          if (state.items.isEmpty) {
-            return const Center(child: Text("No Data Available!!"));
-          }
-          final items = state.items;
-          final curr = items.isNotEmpty ? items.first.currSimbol : "";
-
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: RingkasanDetailTableList(
-                    items: state.items,
-                  ),
-                ),
-              ),
-              _buildBottomButton(context, curr: curr),
-            ],
-          );
+        if (state.status != ListStatus.success) {
+          return const Center(child: LoadingIndicator());
         }
 
-        return const Center(child: CircularProgressIndicator());
+        if (state.items.isEmpty) {
+          return const Center(child: Text("No Data Available!!"));
+        }
+
+        final List<DnsppaCariModel> items = state.items;
+        final String curr = items.first.currSimbol;
+
+        return Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: RingkasanDetailTableList(items: items),
+              ),
+            ),
+            _buildBottomButton(context, curr: curr),
+          ],
+        );
       },
-      listener: (context, state) {},
     );
   }
 
@@ -77,18 +81,18 @@ class RingkasanDetailTableWidgetState
     return AppButton.primary(
       text: "Lanjut Pembayaran",
       onPressed: () {
-        final dnrekapcobCariBloc = context.read<DnrekapcobCariBloc>();
+        final listCob = widget.listcobId.trim();
 
-        if (dnrekapcobCariBloc.state.selectedIds.isEmpty) {
+        if (listCob.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            infoSnackBar("Pilih minimal satu COB terlebih dahulu"),
+            infoSnackBar("Data COB tidak ditemukan"),
           );
           return;
         }
 
         context.read<DnRekap2invBloc>().add(
           DnToInvByListCobProcessEvent(
-            listCob: dnrekapcobCariBloc.state.selectedIds.join(";"),
+            listCob: listCob,
             curr: curr,
           ),
         );
@@ -98,7 +102,8 @@ class RingkasanDetailTableWidgetState
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    if (_scrollController.position.pixels ==
+
+    if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent) {
       dnsppaCariBloc.add(FetchDnsppaCariEvent());
     }

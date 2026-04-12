@@ -95,8 +95,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
                   return true;
                 },
                 onPickPhoto: (judul) async {
-                  // TODO: panggil camera
-                  // final judul = _judulCtrl.text.trim();
+                  await pickNewPhotoDokLain(widget.klaim1Id, judul);
                   return true;
                 },
               ),
@@ -221,6 +220,50 @@ Future<void> showPreviewDialog({
   }
 }
 
+  Future<void> pickNewPhotoDokLain(String klaim1Id, String jenisDocLain) async {
+    final bloc = context.read<Klaim5cariBloc>();
+    final picker = ImagePicker();
+
+    try {
+      final photo = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+
+      if (photo == null) return;
+
+      final path = photo.path;
+      final mime = lookupMimeType(path);
+
+      bloc.add(
+        Klaim5LocalFileSetEvent(
+          klaim1Id: klaim1Id,
+          mjenisdocId: '',
+          klaim5Id: '',
+          localPath: path,
+          fileName: path.split('/').last,
+          mimeType: mime,
+          fileSizeBytes: await photo.length(),
+          jenisDocLain: jenisDocLain,
+        ),
+      );
+
+      bloc.add(
+        Klaim5UploadRequestedEvent(
+          mjenisdocId: '',
+          klaim5Id: '',
+          jenisDocLain: jenisDocLain,
+        ),
+      );
+
+      bloc.add(Klaim5ValidateDocumentsEvent());
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengambil foto: $e')),
+      );
+    }
+  }
 
 Future<void> _pickFile(Klaim5cariModel it) async {
   final bloc = context.read<Klaim5cariBloc>();

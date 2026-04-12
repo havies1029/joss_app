@@ -4,19 +4,22 @@ import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/user_polis_page.dart';
 
 import '../../../../blocs/regklaim/polissourcecari_bloc.dart';
+import '../../../../models/regklaim/sppapoliscari_model.dart';
 import 'button_klaim/button_polis_source.dart';
 
 class BasePolisPage extends StatelessWidget {
   final String cobKlaimId;
   final String cobKlaimNama;
+  final SppapoliscariModel? selectedPolis;
+  final ValueChanged<SppapoliscariModel?> onPolisChanged;
 
   const BasePolisPage({
     super.key,
     required this.cobKlaimId,
     required this.cobKlaimNama,
+    required this.selectedPolis,
+    required this.onPolisChanged,
   });
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +32,8 @@ class BasePolisPage extends StatelessWidget {
             content = UserPolisPage(
               cobKlaimId: cobKlaimId,
               cobKlaimNama: cobKlaimNama,
+              selectedPolis: selectedPolis,
+              onPolisChanged: onPolisChanged,
             );
             break;
 

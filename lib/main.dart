@@ -1,10 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
+//import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
 import 'package:joss_app/blocs/hakakses/hakaksescrud_bloc.dart';
 import 'package:joss_app/pages/profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
@@ -32,7 +31,6 @@ import 'package:joss_app/repositories/regpar/regpar_download_fotoobject_reposito
 import 'package:joss_app/repositories/regpar/regpar_upload_fotoobject_repository.dart';
 import 'package:joss_app/repositories/hakakses/hakaksescrud_repository.dart';
 import 'package:mobile_chat_flutter/presentation/mobile_chat_screen.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
@@ -61,7 +59,6 @@ import 'package:joss_app/repositories/gen_profile/mrekanbankcrud_repository.dart
 import 'package:joss_app/repositories/gen_profile/mrekangeneralidvcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekangeneralcmpcrud_repository.dart';
 import 'package:joss_app/repositories/gen_profile/mrekanpiccrud_repository.dart';
-import 'package:joss_app/repositories/gen_profile/mrekanpiclist_repository.dart';
 
 import 'package:joss_app/repositories/gen_calmv/calmv1crud_repository.dart';
 import 'package:joss_app/repositories/gen_calmv/calmv2form_repository.dart';
@@ -307,6 +304,7 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
 
+  /*
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
         ? HydratedStorageDirectory.web
@@ -314,6 +312,7 @@ Future<void> main() async {
       (await getApplicationDocumentsDirectory()).path,
     ),
   );
+  */
 
   final userRepository = UserRepository();
   final prefs = await SharedPreferences.getInstance();

@@ -177,7 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                   const SizedBox(height: 8),
 
-                  if (email != null)
+                  if (email != null && email.trim().isNotEmpty)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -190,7 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 8), //
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             email,
@@ -200,10 +200,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ],
                     ),
-
                   const SizedBox(height: 6),
 
-                  if (telepon != null)
+                  if (telepon != null && telepon.trim().isNotEmpty)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [

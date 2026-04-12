@@ -94,6 +94,7 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			searchText: event.searchText,
 			statusId: event.statusId,
 			queryKey: newKey,
+			isFetching: false,
 			// items: state.items  // tetap biar ga kedip
 		));
 
@@ -121,7 +122,10 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			);
 
 			// kalau query berubah saat nunggu -> buang hasil
-			if (state.queryKey != keyAtRequest) return;
+			if (state.queryKey != keyAtRequest) {
+				emit(state.copyWith(isFetching: false));
+				return;
+			}
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
 			List<String> first5IdsFrom(List<AsethullCariModel> list) {

@@ -50,10 +50,33 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
   }
 
   Future<void> onRefreshKlaim5cari(
-      RefreshKlaim5cariEvent event, Emitter<Klaim5cariState> emit) async {
-    emit(const Klaim5cariState());
-    emit(state.copyWith(klaim1Id: event.klaim1Id));
-    add(FetchKlaim5cariEvent());
+      RefreshKlaim5cariEvent event,
+      Emitter<Klaim5cariState> emit,
+      ) async {
+    final repo = Klaim5cariRepository();
+
+    emit(state.copyWith(
+      isRefreshing: true,
+      klaim1Id: event.klaim1Id,
+    ));
+
+    try {
+      final items = await repo.getKlaim5cari(event.klaim1Id);
+
+      emit(state.copyWith(
+        klaim1Id: event.klaim1Id,
+        items: items,
+        status: ListStatus.success,
+        hasReachedMax: true,
+        isRefreshing: false,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        klaim1Id: event.klaim1Id,
+        errorMessage: e.toString(),
+        isRefreshing: false,
+      ));
+    }
   }
 
   Future<void> onFetchKlaim5cari(
@@ -130,20 +153,89 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       Klaim5DeleteRequestedEvent event,
       Emitter<Klaim5cariState> emit,
       ) async {
-    final idx = state.items.indexWhere((x) =>
+    debugPrint('=== onKlaim5DeleteRequested START ===');
+    debugPrint('event.klaim5Id     : ${event.klaim5Id}');
+    debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
+    debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
+    debugPrint('state.klaim1Id     : ${state.klaim1Id}');
+    debugPrint('state.items.length : ${state.items.length}');
+
+    int idx = state.items.indexWhere((x) =>
     ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
 
-    if (idx < 0) return;
+    if (idx < 0) {
+      debugPrint('DELETE ABORT: item tidak ditemukan di state');
+      return;
+    }
 
     final oldItem = state.items[idx];
-    final newItems = List<Klaim5cariModel>.from(state.items);
+    debugPrint('oldItem.klaim5Id   : ${oldItem.klaim5Id}');
+    debugPrint('oldItem.fileName   : ${oldItem.fileName}');
+    debugPrint('oldItem.fileUrl    : ${oldItem.fileUrl}');
+    debugPrint('oldItem.localPath  : ${oldItem.localPath}');
 
+    String klaim5Id = event.klaim5Id;
     final bool shouldClear = oldItem.mjenisdocId.isNotEmpty;
 
-    // ===== OPTIMISTIC UPDATE =====
+    // kalau klaim5Id kosong, refresh diam-diam dulu buat ambil id terbaru
+    if (klaim5Id.isEmpty) {
+      debugPrint('klaim5Id kosong, silent refresh dulu...');
+
+      emit(state.copyWith(
+        isRefreshing: true,
+        klaim1Id: state.klaim1Id,
+      ));
+
+      try {
+        final repo = Klaim5cariRepository();
+        final freshItems = await repo.getKlaim5cari(state.klaim1Id);
+
+        emit(state.copyWith(
+          items: freshItems,
+          klaim1Id: state.klaim1Id,
+          status: ListStatus.success,
+          hasReachedMax: true,
+          isRefreshing: false,
+        ));
+
+        idx = freshItems.indexWhere((x) =>
+        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+            ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+
+        if (idx >= 0) {
+          klaim5Id = freshItems[idx].klaim5Id;
+          debugPrint('klaim5Id hasil refresh: $klaim5Id');
+        } else {
+          debugPrint('Item tidak ditemukan setelah refresh');
+        }
+      } catch (e) {
+        emit(state.copyWith(isRefreshing: false));
+        debugPrint('silent refresh gagal: $e');
+      }
+    }
+
+    if (klaim5Id.isEmpty) {
+      debugPrint('DELETE ABORT: klaim5Id masih kosong setelah refresh');
+      return;
+    }
+
+    // cari lagi index berdasarkan state terbaru
+    idx = state.items.indexWhere((x) =>
+    ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+        ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+
+    if (idx < 0) {
+      debugPrint('DELETE ABORT: item tidak ditemukan setelah refresh');
+      return;
+    }
+
+    final currentItem = state.items[idx];
+    final newItems = List<Klaim5cariModel>.from(state.items);
+
+    // optimistic update
     if (shouldClear) {
-      final clearedItem = oldItem.copyWith(
+      newItems[idx] = currentItem.copyWith(
         localPath: '',
         fileUrl: '',
         fileName: '',
@@ -153,40 +245,82 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
         uploadStatus: 'deleted',
         clearError: true,
       );
-
-      newItems[idx] = clearedItem;
     } else {
       newItems.removeAt(idx);
     }
 
     emit(state.copyWith(items: newItems));
+    debugPrint('Optimistic delete applied');
 
-    // ===== SERVER DELETE =====
-    if (event.klaim5Id.isNotEmpty) {
+    // delete ke server
+    try {
       final repository = KlaimmvdoccrudRepository();
 
+      debugPrint('CALL DELETE SERVER => klaim5Id: $klaim5Id');
       final success = await repository.klaimmvdoccrudHapus(
-        event.klaim5Id,
+        klaim5Id,
         event.mjenisdocId,
         event.jenisDocLain,
       );
 
+      debugPrint('DELETE SERVER RESULT: $success');
+
       if (!success) {
-        // ===== ROLLBACK =====
-        final revertItems = List<Klaim5cariModel>.from(state.items);
+        final rollbackItems = List<Klaim5cariModel>.from(state.items);
+
+        final restoreIdx = rollbackItems.indexWhere((x) =>
+        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+            ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
 
         if (shouldClear) {
-          if (idx < revertItems.length) {
-            revertItems[idx] = oldItem;
+          if (restoreIdx >= 0) {
+            rollbackItems[restoreIdx] = oldItem;
           }
         } else {
-          revertItems.insert(idx, oldItem);
+          rollbackItems.insert(idx, oldItem);
         }
 
-        emit(state.copyWith(items: revertItems));
-      } else {
-        add(RefreshKlaim5cariEvent(klaim1Id: state.klaim1Id));
+        emit(state.copyWith(items: rollbackItems));
+        debugPrint('Rollback karena delete server gagal');
+        return;
       }
+
+      // refresh akhir, tetap silent
+      emit(state.copyWith(isRefreshing: true));
+
+      final repo = Klaim5cariRepository();
+      final latestItems = await repo.getKlaim5cari(state.klaim1Id);
+
+      emit(state.copyWith(
+        items: latestItems,
+        klaim1Id: state.klaim1Id,
+        status: ListStatus.success,
+        hasReachedMax: true,
+        isRefreshing: false,
+      ));
+
+      debugPrint('=== onKlaim5DeleteRequested DONE ===');
+    } catch (e) {
+      debugPrint('DELETE ERROR: $e');
+
+      final rollbackItems = List<Klaim5cariModel>.from(state.items);
+
+      final restoreIdx = rollbackItems.indexWhere((x) =>
+      ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+          ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+
+      if (shouldClear) {
+        if (restoreIdx >= 0) {
+          rollbackItems[restoreIdx] = oldItem;
+        }
+      } else {
+        rollbackItems.insert(idx, oldItem);
+      }
+
+      emit(state.copyWith(
+        items: rollbackItems,
+        isRefreshing: false,
+      ));
     }
   }
 

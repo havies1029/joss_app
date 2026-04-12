@@ -29,7 +29,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.771608260840-22bv9eu6qeo020q5srphp5o5s3vq5fa1</string>
+				<string>com.googleusercontent.apps.771608260840-2p34irildamfn10g7i3ghati0qma87tb</string>
 			</array>
 		</dict>
 	</array>
@@ -85,5 +85,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

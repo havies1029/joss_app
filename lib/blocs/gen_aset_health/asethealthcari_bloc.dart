@@ -89,7 +89,6 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			RefreshAsetHealthCariEvent event,
 			Emitter<AsetHealthCariState> emit,
 			) async {
-		// ✅ Fix C: jangan emit(const State()) supaya UI nggak kedip kosong
 		final newKey = buildKey(search: event.searchText, statusId: event.statusId);
 
 		emit(state.copyWith(
@@ -99,6 +98,7 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			searchText: event.searchText,
 			statusId: event.statusId,
 			queryKey: newKey,
+			isFetching: false,
 			// items: state.items  // tetap biar ga kedip
 		));
 		add(FetchAsetHealthCariEvent());
@@ -125,7 +125,10 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 			);
 
 			// kalau query berubah saat nunggu -> buang hasil
-			if (state.queryKey != keyAtRequest) return;
+			if (state.queryKey != keyAtRequest) {
+				emit(state.copyWith(isFetching: false));
+				return;
+			}
 
 			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
 			List<String> first5IdsFrom(List<AsetHealthCariModel> list) {

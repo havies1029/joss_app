@@ -7,18 +7,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:771608260840:android:07b927b86f808f1532595d",
+        "mobilesdk_app_id": "1:771608260840:android:fb0c0dad4a7a890332595d",
         "android_client_info": {
           "package_name": "id.co.jayaproteksindo.proteksiplus"
         }
       },
       "oauth_client": [
         {
-          "client_id": "771608260840-h5ervqq9r8icn04vsn1tnli3vo9e7ns1.apps.googleusercontent.com",
+          "client_id": "771608260840-k6hvmc0809v8f1s7mufc2ncgj63465km.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "id.co.jayaproteksindo.proteksiplus",
-            "certificate_hash": "458608362630527b654f3e1835bdc44f7bbe6354"
+            "certificate_hash": "2fc3b1022ef0132410991d0b81c369da98c7b5df"
           }
         },
         {

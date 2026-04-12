@@ -108,6 +108,7 @@ const Color pBlue = Color(0xFF377BFC);
 const Color sBlue = Color(0xFF0088FF);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
+const Color pGreen2 = Color(0xFF91C050);
 const Color tGreen = Color(0xFF8bbb4e);
 const Color successGreen = Color(0xFF4BB34B);
 const Color greenforPayment = Color(0xFF12C127);

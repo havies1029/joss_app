@@ -5,7 +5,6 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/gen_profile/rekanpiccobcari_model.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/repositories/gen_profile/rekanpiccobcari_repository.dart';
-import 'package:joss_app/widgets/list_extension.dart';
 
 part 'rekanpiccobcari_event.dart';
 part 'rekanpiccobcari_state.dart';

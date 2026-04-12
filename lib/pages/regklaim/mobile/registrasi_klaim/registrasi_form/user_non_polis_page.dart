@@ -65,6 +65,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   bool _insuranceInitialized = false;
 
+
+  Color get _submitButtonColor {
+    if (widget.cobKlaimId == '10002') return pBlue;
+    if (widget.cobKlaimId == '10001') return pGreen2;
+    return sGrey;
+  }
+
   Future<void> _initDefaultInsurance() async {
     if (!_isAutoInsurance || _insuranceInitialized) return;
 
@@ -198,7 +205,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Masukan Data Polis",
+                      "Cari Data Polis",
                       style: TextStyle(
                         color: primaryLightColor,
                         fontSize: getResponsiveFont(context, 18),
@@ -232,10 +239,10 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               SizedBox(
                 width: double.infinity,
                 child: AppButton.primary(
-                  text: "Simpan",
+                  text: "Masukan Data Polis",
                   isLoading: _isCariPolisLoading,
                   backgroundColor:
-                  _isCariPolisLoading ? secondaryBlackColor : primaryColor,
+                  _isCariPolisLoading ? secondaryBlackColor : _submitButtonColor,
                   onPressed: _isCariPolisLoading
                       ? null
                       : () async {
@@ -525,7 +532,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     maxLines: 4,
     keyboardType: TextInputType.text,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
     ],
     errorText: err('form1.alamatTertanggung'),
     validator: (_) => err('form1.alamatTertanggung'),

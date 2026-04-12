@@ -126,19 +126,60 @@ class _RincianTablePageState extends State<RincianTablePage> {
     };
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   final width = MediaQuery.of(context).size.width;
+  //   final bool isNarrow = width < 900;
+  //
+  //   return ListView.builder(
+  //     itemCount: widget.headers.length,
+  //     padding: EdgeInsets.symmetric(
+  //       horizontal: hPadding * 1.5,
+  //     ),
+  //     itemBuilder: (context, index) {
+  //       final header = widget.headers[index];
+  //       final filteredDetails = _filteredDetails(header.details);
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           _buildHeaderTitle(context, header),
+  //           const SizedBox(height: hPadding),
+  //
+  //           isNarrow
+  //               ? _buildDetailTableCompact(filteredDetails)
+  //               : _buildDetailTableNormal(filteredDetails),
+  //
+  //           if (widget.showFooter) ...[
+  //             _buildFooterTable(header.footers),
+  //             const SizedBox(height: vPadding),
+  //           ],
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
+    final visibleHeaders = widget.readOnly
+        ? widget.headers.where((header) {
+      final filteredDetails = _filteredDetails(header.details);
+      return filteredDetails.isNotEmpty;
+    }).toList()
+        : widget.headers;
+
     return ListView.builder(
-      itemCount: widget.headers.length,
+      itemCount: visibleHeaders.length,
       padding: EdgeInsets.symmetric(
         horizontal: hPadding * 1.5,
       ),
       itemBuilder: (context, index) {
-        final header = widget.headers[index];
+        final header = visibleHeaders[index];
         final filteredDetails = _filteredDetails(header.details);
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

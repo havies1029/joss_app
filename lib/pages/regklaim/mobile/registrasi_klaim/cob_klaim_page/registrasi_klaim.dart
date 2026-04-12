@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import '../../../../../blocs/regklaim/polissourcecari_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../models/regklaim/sppapoliscari_model.dart';
 import '../../../../../widgets/apptheme/header_card_polis.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../base_polis_page.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../registrasi_form/polis_detail/user_polis_detail.dart';
+
 class RegistrasiKlaim extends StatefulWidget {
   final String cobKlaimId;
   final String cobKlaimNama;
@@ -24,6 +29,9 @@ class RegistrasiKlaim extends StatefulWidget {
 
 class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  SppapoliscariModel? _selectedPolis;
+  bool _isCariPolisLoading = false;
 
   String get _iconPath {
     final name = widget.cobKlaimNama.trim().toLowerCase();
@@ -47,10 +55,143 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mjenisClient == "10") {
         mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
-      }else if (mjenisClient == "20"){
+      } else if (mjenisClient == "20") {
         mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
       }
     });
+  }
+
+  Future<void> showPolisRequiredDialog(BuildContext context) {
+    return showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: Icon(
+                      Icons.error_outline,
+                      color: primaryLightColor,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Data Belum Lengkap",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Silakan pilih nomor polis terlebih dahulu sebelum melanjutkan.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: sGrey,
+                        foregroundColor: primaryLightColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        "Kembali",
+                        style: TextStyle(
+                          fontSize: getResponsiveFont(context, 16),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleCariPressed() async {
+    if (_selectedPolis == null) {
+      await showPolisRequiredDialog(context);
+      return;
+    }
+
+    setState(() {
+      _isCariPolisLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserPolisDetail(
+          cobKlaimId: widget.cobKlaimId,
+          cobKlaimNama: widget.cobKlaimNama,
+          sppa1Id: _selectedPolis!.sppaId,
+        ),
+      ),
+    );
+
+    if (mounted) {
+      setState(() {
+        _isCariPolisLoading = false;
+      });
+    }
   }
 
   @override
@@ -60,40 +201,70 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
         title: widget.cobKlaimNama,
         child: Scaffold(
           backgroundColor: secondaryBlackColor,
+
           body: Form(
-            // key: _formKey,
+            key: _formKey,
             child: SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: vPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5,
-                      vertical: vPadding,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                  vertical: vPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FormSectionHeader(
+                      iconPath: _iconPath,
+                      title: _headerTitle,
+                      subtitle:
+                      "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        FormSectionHeader(
-                          iconPath: _iconPath,
-                          title: _headerTitle,
-                          subtitle:
-                          "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
-                        ),
-                        const SizedBox(height: vPadding),
+                    const SizedBox(height: vPadding),
 
-                        // same for all COB types
-                        BasePolisPage(
-                          cobKlaimId: widget.cobKlaimId,
-                          cobKlaimNama: widget.cobKlaimNama,
-                        ),
-                      ],
+                    BasePolisPage(
+                      cobKlaimId: widget.cobKlaimId,
+                      cobKlaimNama: widget.cobKlaimNama,
+                      selectedPolis: _selectedPolis,
+                      onPolisChanged: (value) {
+                        setState(() {
+                          _selectedPolis = value;
+                        });
+                      },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+          ),
+
+          bottomNavigationBar: BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
+            builder: (context, state) {
+              if (state.selectedPolissourceId != "10") {
+                return const SizedBox.shrink();
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: SafeArea(
+                  child: AppButton.iconLeft(
+                    text: "Cari",
+                    icon: SvgPicture.asset(
+                      "assets/icons/zoom1.svg",
+                      width: 18,
+                      height: 18,
+                    ),
+                    isLoading: _isCariPolisLoading,
+                    backgroundColor: pBlue,
+                    onPressed: _isCariPolisLoading
+                        ? null
+                        : () async {
+                      await _handleCariPressed();
+                    },
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

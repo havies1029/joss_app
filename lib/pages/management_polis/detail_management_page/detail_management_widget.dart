@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/models/regother/regother3cari_model.dart';
 import 'package:joss_app/models/regreaktif/regreaktif2cari_model.dart';
 import 'package:joss_app/models/regrenewal/regrenewal2cari_model.dart';
@@ -310,7 +311,8 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
         body: SafeArea(
           child: BaseBackgroundSidePage(
             onBack: goToManagementPolis,
-            title: 'Detail Management Polis',
+            title: 'Detail Managemen Polis',
+            showBackButton: false,
             child: Container(
               width: double.infinity,
               height: double.infinity,
@@ -407,7 +409,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                       child: SingleChildScrollView(
                         padding: EdgeInsets.symmetric(
                           horizontal: hPadding * 1.5,
-                          vertical: hPadding,
+                          // vertical: hPadding,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,8 +462,8 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     if (_loading) {
       return const Center(
         child: Padding(
-          padding: EdgeInsets.all(16),
-          child: CircularProgressIndicator(),
+          padding: EdgeInsets.all(hPadding * 1.5),
+          child: LoadingIndicator(),
         ),
       );
     }

@@ -70,6 +70,7 @@ class _RincianPageState extends State<RincianPage> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<DnRekap2invBloc, DnRekap2invState>(

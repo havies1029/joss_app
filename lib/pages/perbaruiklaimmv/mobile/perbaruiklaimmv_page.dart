@@ -36,20 +36,24 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
   bool _validatePolis(
       BuildContext context,
       GlobalKey<FormState> polisFormKey,
+      GlobalKey<KlaimmvpoliscrudFormPageFormState> polisPageKey,
       ) {
-    final isFormPolisValid = polisFormKey.currentState?.validate() ?? false;
+    final isFormPolisValid = polisPageKey.currentState?.validateForm() ?? false;
+
+    polisFormKey.currentState?.validate();
+
     if (!isFormPolisValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data Polis belum valid")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Data Polis belum valid"));
       return false;
     }
 
     final polisState = context.read<KlaimmvpoliscrudBloc>().state;
     if (!polisState.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data Polis belum valid")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Data Polis belum valid"));
       return false;
     }
 
@@ -59,20 +63,24 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
   bool _validateKlaim(
       BuildContext context,
       GlobalKey<FormState> klaimFormKey,
+      GlobalKey<KlaimmvklaimcrudFormPageFormState> klaimPageKey,
       ) {
-    final isFormKlaimValid = klaimFormKey.currentState?.validate() ?? false;
+    final isFormKlaimValid = klaimPageKey.currentState?.validateForm() ?? false;
+
+    klaimFormKey.currentState?.validate();
+
     if (!isFormKlaimValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data Klaim belum valid")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Data Klaim belum valid"));
       return false;
     }
 
     final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
     if (!klaimState.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data Klaim belum valid")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Data Klaim belum valid"));
       return false;
     }
 
@@ -82,20 +90,25 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
   bool _validateBengkel(
       BuildContext context,
       GlobalKey<FormState> bengkelFormKey,
+      GlobalKey<KlaimmvbengkelcrudFormPageFormState> bengkelPageKey,
       ) {
-    final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
+    final isFormBengkelValid =
+        bengkelPageKey.currentState?.validateForm() ?? false;
+
+    bengkelFormKey.currentState?.validate();
+
     if (!isFormBengkelValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data Bengkel belum valid")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Data Bengkel belum valid"));
       return false;
     }
 
     final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
     if (!bengkelState.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data Bengkel belum valid")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Data Bengkel belum valid"));
       return false;
     }
 
@@ -111,9 +124,9 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
   bool _validateDokumen(BuildContext context, {required bool isDokumenIncomplete}) {
     if (isDokumenIncomplete) {
       _openAccordion(context, 2);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Dokumen klaim belum lengkap")),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(successSnackBar("Dokumen klaim belum lengkap"));
       return false;
     }
 
@@ -129,6 +142,11 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
     final polisFormKey = GlobalKey<FormState>();
     final klaimFormKey = GlobalKey<FormState>();
     final bengkelFormKey = GlobalKey<FormState>();
+
+    final klaimPageKey = GlobalKey<KlaimmvklaimcrudFormPageFormState>();
+    final bengkelPageKey = GlobalKey<KlaimmvbengkelcrudFormPageFormState>();
+    final GlobalKey<KlaimmvpoliscrudFormPageFormState> polisPageKey =
+    GlobalKey<KlaimmvpoliscrudFormPageFormState>();
 
     klaim5cariBloc = context.read<Klaim5cariBloc>();
 
@@ -273,13 +291,13 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                     isOpen: acc.openedIndex == 0,
                                     onTap: () {
                                       if (acc.openedIndex == 1) {
-                                        if (!_validateKlaim(context, klaimFormKey)) {
+                                        if (!_validateKlaim(context, klaimFormKey,klaimPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 4) {
-                                        if (!_validateBengkel(context, bengkelFormKey)) {
+                                        if (!_validateBengkel(context, bengkelFormKey,bengkelPageKey)) {
                                           return;
                                         }
                                       }
@@ -287,6 +305,7 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                       _openAccordion(context, 0);
                                     },
                                     child: KlaimmvpoliscrudFormPage(
+                                      key: polisPageKey,
                                       recordId: widget.klaim1Id,
                                       viewMode: "ubah",
                                       formKey: polisFormKey,
@@ -297,13 +316,13 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                     isOpen: acc.openedIndex == 1,
                                     onTap: () {
                                       if (acc.openedIndex == 0) {
-                                        if (!_validatePolis(context, polisFormKey)) {
+                                        if (!_validatePolis(context, polisFormKey,polisPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 4) {
-                                        if (!_validateBengkel(context, bengkelFormKey)) {
+                                        if (!_validateBengkel(context, bengkelFormKey,bengkelPageKey)) {
                                           return;
                                         }
                                       }
@@ -314,6 +333,7 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                       recordId: widget.klaim1Id,
                                       viewMode: "ubah",
                                       formKey: klaimFormKey,
+                                      key: klaimPageKey,
                                     ),
                                   ),
                                   Klaimmvaccordioncard(
@@ -321,19 +341,19 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                     isOpen: acc.openedIndex == 2,
                                     onTap: () {
                                       if (acc.openedIndex == 0) {
-                                        if (!_validatePolis(context, polisFormKey)) {
+                                        if (!_validatePolis(context, polisFormKey,polisPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 1) {
-                                        if (!_validateKlaim(context, klaimFormKey)) {
+                                        if (!_validateKlaim(context, klaimFormKey,klaimPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 4) {
-                                        if (!_validateBengkel(context, bengkelFormKey)) {
+                                        if (!_validateBengkel(context, bengkelFormKey,bengkelPageKey)) {
                                           return;
                                         }
                                       }
@@ -354,19 +374,19 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                     isOpen: acc.openedIndex == 3,
                                     onTap: () {
                                       if (acc.openedIndex == 0) {
-                                        if (!_validatePolis(context, polisFormKey)) {
+                                        if (!_validatePolis(context, polisFormKey,polisPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 1) {
-                                        if (!_validateKlaim(context, klaimFormKey)) {
+                                        if (!_validateKlaim(context, klaimFormKey, klaimPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 4) {
-                                        if (!_validateBengkel(context, bengkelFormKey)) {
+                                        if (!_validateBengkel(context, bengkelFormKey, bengkelPageKey)) {
                                           return;
                                         }
                                       }
@@ -382,13 +402,13 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                     isOpen: acc.openedIndex == 4,
                                     onTap: () {
                                       if (acc.openedIndex == 0) {
-                                        if (!_validatePolis(context, polisFormKey)) {
+                                        if (!_validatePolis(context, polisFormKey,polisPageKey)) {
                                           return;
                                         }
                                       }
 
                                       if (acc.openedIndex == 1) {
-                                        if (!_validateKlaim(context, klaimFormKey)) {
+                                        if (!_validateKlaim(context, klaimFormKey,klaimPageKey)) {
                                           return;
                                         }
                                       }
@@ -399,6 +419,7 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                       recordId: widget.klaim1Id,
                                       viewMode: "ubah",
                                       formKey: bengkelFormKey,
+                                      key: bengkelPageKey,
                                     ),
                                   ),
                                 ],
@@ -431,68 +452,47 @@ class PerbaruiKlaimMvPageRemakeState extends State<PerbaruiKlaimMvPageRemake> {
                                     );
                                     break;
                                 }
-
-                                final isFormPolisValid =
-                                    polisFormKey.currentState?.validate() ?? false;
-                                if (!isFormPolisValid) {
-                                  _openAccordion(context, 0);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Data Polis belum valid")),
-                                  );
-                                  return;
-                                }
-
-                                final polisState = context.read<KlaimmvpoliscrudBloc>().state;
-                                if (!polisState.isValid) {
-                                  _openAccordion(context, 0);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Data Polis belum valid")),
-                                  );
-                                  return;
-                                }
-
                                 final isFormKlaimValid =
-                                    klaimFormKey.currentState?.validate() ?? false;
+                                    klaimPageKey.currentState?.validateForm() ?? false;
+
+                                klaimFormKey.currentState?.validate();
+
                                 if (!isFormKlaimValid) {
                                   _openAccordion(context, 1);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Data Klaim belum valid")),
-                                  );
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(successSnackBar("Data Klaim belum valid"));
                                   return;
                                 }
 
                                 final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                                 if (!klaimState.isValid) {
                                   _openAccordion(context, 1);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Data Klaim belum valid")),
-                                  );
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(successSnackBar("Data Klaim belum valid"));
                                   return;
                                 }
 
                                 final isFormBengkelValid =
-                                    bengkelFormKey.currentState?.validate() ?? false;
+                                    bengkelPageKey.currentState?.validateForm() ?? false;
+
+                                bengkelFormKey.currentState?.validate();
+
                                 if (!isFormBengkelValid) {
                                   _openAccordion(context, 4);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Data Bengkel belum valid")),
-                                  );
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(successSnackBar("Data Bengkel belum valid"));
                                   return;
                                 }
 
                                 final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
                                 if (!bengkelState.isValid) {
                                   _openAccordion(context, 4);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Data Bengkel belum valid")),
-                                  );
-                                  return;
-                                }
-
-                                if (!_validateDokumen(
-                                  context,
-                                  isDokumenIncomplete: isDokumenIncomplete,
-                                )) {
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(successSnackBar("Data Bengkel belum valid"));
                                   return;
                                 }
 

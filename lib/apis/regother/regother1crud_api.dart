@@ -15,11 +15,6 @@ class Regother1CrudAPI {
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		debugPrint("========== API REQUEST ==========");
-		debugPrint("URL: $uri");
-		debugPrint("BODY: ${jsonEncode(record.toJson())}");
-		debugPrint("TOKEN: ${AppData.userToken}");
-
 		ReturnDataAPI returnData;
 
 		try {
@@ -32,11 +27,6 @@ class Regother1CrudAPI {
 				},
 				body: jsonEncode(record.toJson()),
 			);
-
-			debugPrint("========== API RESPONSE ==========");
-			debugPrint("STATUS CODE: ${response.statusCode}");
-			debugPrint("BODY: ${response.body}");
-
 			if (response.statusCode == 200) {
 				returnData =
 						ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -45,10 +35,6 @@ class Regother1CrudAPI {
 				returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 			}
 		} catch (e, stack) {
-			debugPrint("========== API EXCEPTION ==========");
-			debugPrint("ERROR: $e");
-			debugPrint("STACK: $stack");
-
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
 

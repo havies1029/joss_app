@@ -10,6 +10,7 @@ import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
+import '../../../../../helper/pdf_open_helper.dart';
 import '../../../../../models/payment/historybayarcari_model.dart';
 import '../invoice_preview_page.dart';
 import 'riwayat_table_widget_remake.dart';
@@ -89,20 +90,27 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
               child: BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
                 buildWhen: (p, c) =>
                 p.selectedItem != c.selectedItem ||
-                    p.isDownloading != c.isDownloading, // <-- penting: supaya loading ke-render
+                    p.isDownloading != c.isDownloading,
                 listenWhen: (prev, curr) =>
                 prev.downloadPath != curr.downloadPath &&
                     curr.downloadPath.isNotEmpty &&
                     !curr.isDownloading,
-                listener: (context, state) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => InvoicePreviewFromBase64Page(
-                        base64Pdf: state.downloadPath,
-                      ),
-                    ),
-                  );
+                listener: (context, state) async {
+                  try {
+                    await PdfOpenHelper().openBase64Pdf(
+                      base64Pdf: state.downloadPath,
+                    );
+                  } catch (e) {
+                    debugPrint('Gagal buka PDF: $e');
+                  }
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (_) => InvoicePreviewFromBase64Page(
+                  //       base64Pdf: state.downloadPath,
+                  //     ),
+                  //   ),
+                  // );
                 },
                 builder: (context, state) {
                   final selected = state.selectedItem;

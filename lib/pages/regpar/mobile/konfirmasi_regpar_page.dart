@@ -121,6 +121,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     ),
                   ),
                 );
+
+                debugPrint("invoiceId ${state.invoiceId}");
                 return;
               }
 

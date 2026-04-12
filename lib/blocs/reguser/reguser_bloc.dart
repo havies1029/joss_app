@@ -126,6 +126,7 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     RegUserModel record = await repository.regUserLihat(event.recordId);
     emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
   }
+
   Future<void> onValidasiPinHP(
       ValidasiPinHPEvent event,
       Emitter<RegUserState> emit,
@@ -163,7 +164,6 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     ));
 
     debugPrint("OTP END - requestFrom after success/fail emit: ${state.requestFrom}");
-
     if (!hasFailure) {
       debugPrint("OTP SUCCESS - requestFrom before UserRoleChanged: ${state.requestFrom}");
 
@@ -180,10 +180,21 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         token: token.token,
         username: username,
         nama: info[2],
+        hp: info[4],
         email: info[5],
         userCabang: info[1],
         userType: "C",
       );
+
+      debugPrint("USER DEBUG BEFORE SEND:");
+      debugPrint("id: ${user.id}");
+      debugPrint("token: ${user.token}");
+      debugPrint("username: ${user.username}");
+      debugPrint("nama: ${user.nama}");
+      debugPrint("email: ${user.email}");
+      debugPrint("userCabang: ${user.userCabang}");
+      debugPrint("userType: ${user.userType}");
+      debugPrint("authenticatedFrom: ${state.requestFrom}");
 
       AppData.user = user;
       AppData.userToken = user.token!;

@@ -31,12 +31,15 @@ class PerbaruiKlaimParPage extends StatefulWidget {
 
 class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   final GlobalKey<FormState> klaimFormKey = GlobalKey<FormState>();
+  final GlobalKey<KlaimparklaimcrudFormPageFormState> klaimPageKey =
+  GlobalKey<KlaimparklaimcrudFormPageFormState>();
 
   void _showMessage(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(successSnackBar(message));
   }
 
   void _openAccordion(int index) {
@@ -72,9 +75,23 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   bool _validateDokumenState() {
     final dokState = context.read<Klaim5cariBloc>().state;
 
+    debugPrint('=== VALIDATE DOKUMEN START ===');
+    debugPrint('items length: ${dokState.items.length}');
+    debugPrint('isComplete: ${dokState.isComplete}');
+
+    for (int i = 0; i < dokState.items.length; i++) {
+      final x = dokState.items[i];
+      debugPrint(
+        'item[$i] fileName=${x.fileName} | fileUrl=${x.fileUrl}',
+      );
+    }
+
     final hasValidDoc = dokState.items.any(
           (x) => (x.fileUrl?.isNotEmpty ?? false) || (x.fileName?.isNotEmpty ?? false),
     );
+
+    debugPrint('hasValidDoc: $hasValidDoc');
+    debugPrint('=== VALIDATE DOKUMEN END ===');
 
     if (!hasValidDoc) {
       _openAccordion(1);
@@ -101,7 +118,10 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   }
 
   bool _validateKlaimForm() {
-    final formOk = klaimFormKey.currentState?.validate() ?? false;
+    final formOk = klaimPageKey.currentState?.validateForm() ?? false;
+
+    klaimFormKey.currentState?.validate();
+
     if (!formOk) {
       _openAccordion(0);
       _showMessage('Form data klaim belum valid');
@@ -120,13 +140,11 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   Future<void> _handleAccordionTap(int index, KlaimparaccordionState acc) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    // Data Klaim selalu boleh dibuka
     if (index == 0) {
       _openAccordion(0);
       return;
     }
 
-    // Dokumen Klaim butuh Data Klaim valid
     if (index == 1) {
       await _autoSaveSection(acc.openedIndex);
 
@@ -141,7 +159,6 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   Future<void> _handlePerbarui(KlaimparaccordionState acc) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    // Save section aktif dulu kalau perlu
     await _autoSaveSection(acc.openedIndex);
 
     final klaimOk = _validateKlaimFull();
@@ -154,14 +171,14 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
       MaterialPageRoute(
         builder: (context) => PerbaruiSuccessPage(
           display: "Klaim Berhasil Diperbarui",
-          description:
-          "Data klaim telah berhasil diperbarui.",
+          description: "Data klaim telah berhasil diperbarui.",
           displayButton: "Kembali",
         ),
       ),
     );
     _showMessage('Semua data sudah valid dan siap diperbarui');
   }
+
   @override
   Widget build(BuildContext context) {
     final iconPath =
@@ -186,7 +203,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                 children: [
                   const SizedBox(height: hPadding * 1.5),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: FormSectionHeader(
                       iconPath: iconPath,
                       title: "Polis ${widget.cobGroupNama}",
@@ -199,6 +216,16 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                     builder: (_, klaim) {
                       return BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
                         builder: (_, dok) {
+                          debugPrint(
+                            'BUILD DOKUMEN: items=${dok.items.length}, isComplete=${dok.isComplete}',
+                          );
+                          for (int i = 0; i < dok.items.length; i++) {
+                            final x = dok.items[i];
+                            debugPrint(
+                              'BUILD item[$i] fileName=${x.fileName} fileUrl=${x.fileUrl}',
+                            );
+                          }
+
                           final done = [
                             klaim.isComplete,
                             dok.isComplete,
@@ -234,6 +261,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                           isOpen: acc.openedIndex == 0,
                           onTap: () => _handleAccordionTap(0, acc),
                           child: KlaimparklaimcrudFormPage(
+                            key: klaimPageKey,
                             recordId: widget.klaim1Id,
                             viewMode: "ubah",
                             cobGroupId: widget.cobGroupId,

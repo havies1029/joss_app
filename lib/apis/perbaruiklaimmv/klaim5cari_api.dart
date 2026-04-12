@@ -13,11 +13,6 @@ class Klaim5cariAPI {
       Map<String, String> queryParams = {'klaim1Id': klaim1Id};
       var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
 
-      // 🔥 REQUEST
-      debugPrint("=== REQUEST GET KLAIM5 ===");
-      debugPrint("URI: $uri");
-      debugPrint("PARAMS: $queryParams");
-
       final http.Response response = await http.get(
         uri,
         headers: <String, String>{
@@ -27,12 +22,6 @@ class Klaim5cariAPI {
         },
       );
 
-      // 🔥 RESPONSE
-      debugPrint("=== RESPONSE GET KLAIM5 ===");
-      debugPrint("STATUS: ${response.statusCode}");
-      debugPrint("BODY: ${response.body}");
-
-      // 1) cek status code
       if (response.statusCode != 200) {
         throw Exception(
           "HTTP ${response.statusCode} ${response.reasonPhrase} | body: ${_short(response.body)}",

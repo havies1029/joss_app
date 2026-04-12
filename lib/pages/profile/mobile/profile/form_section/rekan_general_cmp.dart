@@ -46,7 +46,7 @@ class MRekanGeneralCmpCrudFormPageFormState
   final fieldIdKlienController = TextEditingController();
 
   bool _isFirstLoad = true;
-
+  bool _isTapLocked = false;
   @override
   void initState() {
     super.initState();
@@ -182,8 +182,20 @@ class MRekanGeneralCmpCrudFormPageFormState
                                     : null;
                                 return Center(
                                   child: InkResponse(
-                                    onTap: () =>
-                                        ImageUploader.pickAndUpload(context),
+                                    onTap: _isTapLocked
+                                        ? null
+                                        : () async {
+                                      setState(() => _isTapLocked = true);
+
+                                      try {
+                                        await ImageUploader.pickAndUpload(context);
+                                      } finally {
+                                        await Future.delayed(const Duration(seconds: 2));
+                                        if (mounted) {
+                                          setState(() => _isTapLocked = false);
+                                        }
+                                      }
+                                    },
                                     containedInkWell: true,
                                     customBorder: const CircleBorder(),
                                     child: Stack(
@@ -193,12 +205,10 @@ class MRekanGeneralCmpCrudFormPageFormState
                                           radius: 50,
                                           backgroundColor: secondaryBlackColor,
                                           backgroundImage:
-                                          (imageBytes != null &&
-                                              imageBytes.isNotEmpty)
+                                          (imageBytes != null && imageBytes.isNotEmpty)
                                               ? MemoryImage(imageBytes)
                                               : null,
-                                          child: (imageBytes == null ||
-                                              imageBytes.isEmpty)
+                                          child: (imageBytes == null || imageBytes.isEmpty)
                                               ? _avatarFallback()
                                               : null,
                                         ),
@@ -209,26 +219,21 @@ class MRekanGeneralCmpCrudFormPageFormState
                                             padding: const EdgeInsets.all(2),
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              border: Border.all(
-                                                  color: sGrey, width: 1),
+                                              border: Border.all(color: sGrey, width: 1),
                                               color: pGrey,
                                             ),
                                             child: CircleAvatar(
                                               radius: 16,
-                                              backgroundColor:
-                                              Colors.transparent,
+                                              backgroundColor: Colors.transparent,
                                               child: Center(
                                                 child: SizedBox(
                                                   width: 22,
                                                   height: 22,
                                                   child: ShaderMask(
-                                                    shaderCallback:
-                                                        (Rect bounds) {
+                                                    shaderCallback: (Rect bounds) {
                                                       return const LinearGradient(
-                                                        begin: Alignment
-                                                            .centerLeft,
-                                                        end: Alignment
-                                                            .centerRight,
+                                                        begin: Alignment.centerLeft,
+                                                        end: Alignment.centerRight,
                                                         colors: [
                                                           Color(0xFFFCCF6F),
                                                           Color(0xFFEF7A28),
@@ -238,8 +243,7 @@ class MRekanGeneralCmpCrudFormPageFormState
                                                     child: SvgPicture.asset(
                                                       "assets/icons/camera.svg",
                                                       width: 22,
-                                                      colorFilter:
-                                                      const ColorFilter.mode(
+                                                      colorFilter: const ColorFilter.mode(
                                                         Colors.white,
                                                         BlendMode.srcIn,
                                                       ),

@@ -1,12 +1,10 @@
 
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/loading_indicator.dart';
-import '../../../../../../blocs/gen_invite/invite_bloc.dart';
 import '../../../../../../blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../../blocs/gen_profile/mrekanpiclist_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';

@@ -4,16 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/regklaim/sppapoliscari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/regklaim/sppapoliscari_model.dart';
-import 'polis_detail/user_polis_detail.dart';
 
 class UserPolisPage extends StatefulWidget {
   final String cobKlaimId;
   final String cobKlaimNama;
+  final SppapoliscariModel? selectedPolis;
+  final ValueChanged<SppapoliscariModel?> onPolisChanged;
 
   const UserPolisPage({
     super.key,
     required this.cobKlaimId,
     required this.cobKlaimNama,
+    required this.selectedPolis,
+    required this.onPolisChanged,
   });
 
   @override
@@ -21,23 +24,25 @@ class UserPolisPage extends StatefulWidget {
 }
 
 class _UserPolisPageState extends State<UserPolisPage> {
-  SppapoliscariModel? fieldSppaPolis;
   bool _didLoadSppa = false;
 
   @override
   void didUpdateWidget(covariant UserPolisPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // if COB changes, reload SPPA list + reset selection
+
     if (oldWidget.cobKlaimId != widget.cobKlaimId) {
       _didLoadSppa = false;
-      fieldSppaPolis = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        widget.onPolisChanged(null);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical:  vPadding),
+      padding: const EdgeInsets.symmetric(vertical: vPadding),
       child: Container(
         decoration: BoxDecoration(
           color: pGrey,
@@ -50,19 +55,15 @@ class _UserPolisPageState extends State<UserPolisPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Title
             Text(
-              "Masukkan Data Polis",
+              "Cari Data Polis",
               style: TextStyle(
                 color: primaryLightColor,
                 fontSize: getResponsiveFont(context, 18),
                 fontWeight: FontWeight.w500,
               ),
             ),
-
             const SizedBox(height: hPadding),
-
-            // Combo / Search Polis
             buildComboSppaPolis(
               cobKlaimId: widget.cobKlaimId,
             ),
@@ -93,33 +94,18 @@ class _UserPolisPageState extends State<UserPolisPage> {
             'sppa_${cobKlaimId}_${state.status}_${state.items.length}',
           ),
           hintText: "No. Polis",
-          initItem: fieldSppaPolis,
+          initItem: widget.selectedPolis,
           dataLoader: () async => state.items,
           displayText: (i) => i.sppaId,
           compareItems: (a, b) => a.sppaId == b.sppaId,
           onChangedCallback: (v) {
-            if (v == null) return;
-
-            setState(() {
-              fieldSppaPolis = v;
-            });
-            final sppaId = v.sppaId;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserPolisDetail(
-                  cobKlaimId: widget.cobKlaimId,
-                  cobKlaimNama: widget.cobKlaimNama,
-                  sppa1Id: sppaId,
-                ),
-              ),
-            );
+            widget.onPolisChanged(v);
           },
-
-          onSaveCallback: (value) => fieldSppaPolis = value,
+          onSaveCallback: (value) {
+            widget.onPolisChanged(value);
+          },
         );
       },
     );
   }
-
 }
