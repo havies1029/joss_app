@@ -16,17 +16,15 @@ class NotifeventcariState extends Equatable {
 		this.isLoadingMore = false,
 	});
 
-  static const _sentinel = Object();
-
 	NotifeventcariState copyWith({
-		Object? items = _sentinel,
+		List<NotifeventcariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
 		int? hal,
 		bool? isLoadingMore,
 	}) {
 		return NotifeventcariState(
-			items: identical(items, _sentinel) ? this.items : items as List<NotifeventcariModel>,
+			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
 			hal: hal ?? this.hal,
@@ -35,5 +33,5 @@ class NotifeventcariState extends Equatable {
 	}
 
 	@override
-	List<Object?> get props => [status, items, hasReachedMax, hal, isLoadingMore];
+	List<Object> get props => [status, items, hasReachedMax, hal, isLoadingMore];
 }

@@ -16,38 +16,36 @@ class GroupcobCariState extends Equatable {
     this.selectedStatusId = '',
     this.searchText = '', 
     this.selectedIds = const [],
-    this.selectedId = '',
-    this.selectedKlaimRecord,
-  });
+			this.selectedId = '',
+			this.selectedKlaimRecord,
+		});
 
 	const GroupcobCariState.success(List<GroupcobCariModel> items)
 			: this(status: ListStatus.success, items: items);
 
 	const GroupcobCariState.failure() : this(status: ListStatus.failure);
 
-  static const _sentinel = Object();
-
 	GroupcobCariState copyWith(
-		{Object? items = _sentinel,
+		{List<GroupcobCariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
     String? selectedStatusId,
     String? searchText,
     List<String>? selectedIds,
     String? selectedId,
-		Object? selectedKlaimRecord = _sentinel,
+			KlaimdetailCariModel? selectedKlaimRecord,
 		}){
 		return GroupcobCariState(
-			items: identical(items, _sentinel) ? this.items : items as List<GroupcobCariModel>,
+			items: items ?? this.items,
 			status: status ?? this.status,
       selectedStatusId: selectedStatusId ?? this.selectedStatusId,
       searchText: searchText ?? this.searchText,
       selectedIds: selectedIds ?? this.selectedIds,
       selectedId: selectedId ?? this.selectedId,
-			selectedKlaimRecord: identical(selectedKlaimRecord, _sentinel) ? this.selectedKlaimRecord : selectedKlaimRecord as KlaimdetailCariModel?,
+			selectedKlaimRecord: selectedKlaimRecord ?? this.selectedKlaimRecord,
 			);
 	}
 
 	@override
-	List<Object?> get props => [status, items, selectedStatusId, searchText, selectedIds, selectedId, selectedKlaimRecord];
+	List<Object> get props => [status, items, selectedStatusId, searchText, selectedIds, selectedId, selectedKlaimRecord ?? ''];
 }

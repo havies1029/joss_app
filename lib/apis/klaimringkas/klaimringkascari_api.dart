@@ -21,7 +21,7 @@ class KlaimringkasCariAPI{
 				.map<KlaimringkasCariModel>((json) => KlaimringkasCariModel.fromJson(json))
 				.toList();
 		} else {
-			throw Exception("Failed to load data");
+			throw Exception("Failed to load data klaim ringkasan");
 		}
 	}
 }
