@@ -31,38 +31,54 @@ class SppamvCrudState extends Equatable {
 		this.comboMWarna,
 });
 
+  static const _sentinel = Object();
+
 	SppamvCrudState copyWith({
-		SppamvCrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboRMatauangModel? comboRMatauang,
-		ComboMMvmerkModel? comboMMvmerk,
-		ComboMMvtipeModel? comboMMvtipe,
-		ComboMMvjnscoverModel? comboMMvjnscover,
-		ComboMWilayahModel? comboMWilayah,
-		ComboMMvgrupOjkModel? comboMMvgrupOjk,
-		ComboMWarnaModel? comboMWarna,
+		Object? comboRMatauang = _sentinel,
+		Object? comboMMvmerk = _sentinel,
+		Object? comboMMvtipe = _sentinel,
+		Object? comboMMvjnscover = _sentinel,
+		Object? comboMWilayah = _sentinel,
+		Object? comboMMvgrupOjk = _sentinel,
+		Object? comboMWarna = _sentinel,
 	}){
 		return SppamvCrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as SppamvCrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboRMatauang: comboRMatauang?? this.comboRMatauang,
-			comboMMvmerk: comboMMvmerk?? this.comboMMvmerk,
-			comboMMvtipe: comboMMvtipe?? this.comboMMvtipe,
-			comboMMvjnscover: comboMMvjnscover?? this.comboMMvjnscover,
-			comboMWilayah: comboMWilayah?? this.comboMWilayah,
-			comboMMvgrupOjk: comboMMvgrupOjk?? this.comboMMvgrupOjk,
-			comboMWarna: comboMWarna?? this.comboMWarna,
+			comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
+			comboMMvmerk: identical(comboMMvmerk, _sentinel) ? this.comboMMvmerk : comboMMvmerk as ComboMMvmerkModel?,
+			comboMMvtipe: identical(comboMMvtipe, _sentinel) ? this.comboMMvtipe : comboMMvtipe as ComboMMvtipeModel?,
+			comboMMvjnscover: identical(comboMMvjnscover, _sentinel) ? this.comboMMvjnscover : comboMMvjnscover as ComboMMvjnscoverModel?,
+			comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+			comboMMvgrupOjk: identical(comboMMvgrupOjk, _sentinel) ? this.comboMMvgrupOjk : comboMMvgrupOjk as ComboMMvgrupOjkModel?,
+			comboMWarna: identical(comboMWarna, _sentinel) ? this.comboMWarna : comboMWarna as ComboMWarnaModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		record,
+		comboRMatauang,
+		comboMMvmerk,
+		comboMMvtipe,
+		comboMMvjnscover,
+		comboMWilayah,
+		comboMMvgrupOjk,
+		comboMWarna,
+	];
 }

@@ -25,32 +25,34 @@ class MRekanGeneralState extends Equatable {
 		this.comboMBidang,
 });
 
+  static const _sentinel = Object();
+
 	MRekanGeneralState copyWith({
-		MRekanGeneralModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMTitleModel? comboMTitle,
-		ComboMTipeCstModel? comboMTipeCst,
-		ComboMBentukCstModel? comboMBentukCst,
-		ComboMBidangModel? comboMBidang,
+		Object? comboMTitle = _sentinel,
+		Object? comboMTipeCst = _sentinel,
+		Object? comboMBentukCst = _sentinel,
+		Object? comboMBidang = _sentinel,
 	}){
 		return MRekanGeneralState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as MRekanGeneralModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMTitle: comboMTitle?? this.comboMTitle,
-			comboMTipeCst: comboMTipeCst?? this.comboMTipeCst,
-			comboMBentukCst: comboMBentukCst?? this.comboMBentukCst,
-			comboMBidang: comboMBidang?? this.comboMBidang,
+			comboMTitle: identical(comboMTitle, _sentinel) ? this.comboMTitle : comboMTitle as ComboMTitleModel?,
+			comboMTipeCst: identical(comboMTipeCst, _sentinel) ? this.comboMTipeCst : comboMTipeCst as ComboMTipeCstModel?,
+			comboMBentukCst: identical(comboMBentukCst, _sentinel) ? this.comboMBentukCst : comboMBentukCst as ComboMBentukCstModel?,
+			comboMBidang: identical(comboMBidang, _sentinel) ? this.comboMBidang : comboMBidang as ComboMBidangModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? '', comboMTitle ?? '', comboMTipeCst ?? '', comboMBentukCst ?? '', comboMBidang ?? ''];
 }

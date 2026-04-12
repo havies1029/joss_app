@@ -19,26 +19,28 @@ class Klaim2CrudState extends Equatable {
 		this.comboMStsclaim,
 });
 
+  static const _sentinel = Object();
+
 	Klaim2CrudState copyWith({
-		Klaim2CrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMStsclaimModel? comboMStsclaim,
+		Object? comboMStsclaim = _sentinel,
 	}){
 		return Klaim2CrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Klaim2CrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMStsclaim: comboMStsclaim?? this.comboMStsclaim,
+			comboMStsclaim: identical(comboMStsclaim, _sentinel) ? this.comboMStsclaim : comboMStsclaim as ComboMStsclaimModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, comboMStsclaim];
 }

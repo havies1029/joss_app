@@ -40,8 +40,10 @@ class SimulparCrudState extends Equatable {
     this.errors,
   });
 
+  static const _sentinel = Object();
+
   SimulparCrudState copyWith({
-    SimulparCrudModel? record,
+    Object? record = _sentinel,
     bool? isLoading,
     bool? isLoaded,
     bool? isSaving,
@@ -50,18 +52,18 @@ class SimulparCrudState extends Equatable {
     bool? isGroupFieldRateChanged,
     bool? isGroupFieldPremiChanged,
     bool? isGroupFieldSiChanged,
-    ComboROkupasiModel? comboROkupasi,
-    ComboRKonstruksiojkModel? comboRKonstruksiojk,
-    ComboMBiindemnityOjkModel? comboMBiindemnityOjk,
-    ComboMKabZonaGempaModel? comboMKabZonaGempa,
-    ComboMZonaGempaModel? comboMZonaGempa,
-    ComboMWilayahModel? comboMWilayah,
-    ComboMTarifojkBanjirParModel? comboMTarifojkBanjirPar,
-    ComboRMatauangModel? comboRMatauang,
+    Object? comboROkupasi = _sentinel,
+    Object? comboRKonstruksiojk = _sentinel,
+    Object? comboMBiindemnityOjk = _sentinel,
+    Object? comboMKabZonaGempa = _sentinel,
+    Object? comboMZonaGempa = _sentinel,
+    Object? comboMWilayah = _sentinel,
+    Object? comboMTarifojkBanjirPar = _sentinel,
+    Object? comboRMatauang = _sentinel,
     List<String>? errors,
   }) {
     return SimulparCrudState(
-      record: record ?? this.record,
+      record: identical(record, _sentinel) ? this.record : record as SimulparCrudModel?,
       isLoading: isLoading ?? this.isLoading,
       isLoaded: isLoaded ?? this.isLoaded,
       isSaving: isSaving ?? this.isSaving,
@@ -72,21 +74,20 @@ class SimulparCrudState extends Equatable {
       isGroupFieldPremiChanged:
           isGroupFieldPremiChanged ?? this.isGroupFieldPremiChanged,
       isGroupFieldSiChanged: isGroupFieldSiChanged ?? this.isGroupFieldSiChanged,
-      comboROkupasi: comboROkupasi ?? this.comboROkupasi,
-      comboRKonstruksiojk: comboRKonstruksiojk ?? this.comboRKonstruksiojk,
-      comboMBiindemnityOjk: comboMBiindemnityOjk ?? this.comboMBiindemnityOjk,
-      comboMKabZonaGempa: comboMKabZonaGempa ?? this.comboMKabZonaGempa,
-      comboMZonaGempa: comboMZonaGempa ?? this.comboMZonaGempa,
-      comboMWilayah: comboMWilayah ?? this.comboMWilayah,
-      comboMTarifojkBanjirPar:
-          comboMTarifojkBanjirPar ?? this.comboMTarifojkBanjirPar,
-      comboRMatauang: comboRMatauang ?? this.comboRMatauang,
+      comboROkupasi: identical(comboROkupasi, _sentinel) ? this.comboROkupasi : comboROkupasi as ComboROkupasiModel?,
+      comboRKonstruksiojk: identical(comboRKonstruksiojk, _sentinel) ? this.comboRKonstruksiojk : comboRKonstruksiojk as ComboRKonstruksiojkModel?,
+      comboMBiindemnityOjk: identical(comboMBiindemnityOjk, _sentinel) ? this.comboMBiindemnityOjk : comboMBiindemnityOjk as ComboMBiindemnityOjkModel?,
+      comboMKabZonaGempa: identical(comboMKabZonaGempa, _sentinel) ? this.comboMKabZonaGempa : comboMKabZonaGempa as ComboMKabZonaGempaModel?,
+      comboMZonaGempa: identical(comboMZonaGempa, _sentinel) ? this.comboMZonaGempa : comboMZonaGempa as ComboMZonaGempaModel?,
+      comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+      comboMTarifojkBanjirPar: identical(comboMTarifojkBanjirPar, _sentinel) ? this.comboMTarifojkBanjirPar : comboMTarifojkBanjirPar as ComboMTarifojkBanjirParModel?,
+      comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
       errors: errors ?? this.errors,
     );
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         isLoading,
         isLoaded,
         isSaving,
@@ -94,6 +95,16 @@ class SimulparCrudState extends Equatable {
         hasFailure,
         isGroupFieldRateChanged,
         isGroupFieldPremiChanged,
-        isGroupFieldSiChanged
+        isGroupFieldSiChanged,
+        record ?? '',
+        comboROkupasi ?? '',
+        comboRKonstruksiojk ?? '',
+        comboMBiindemnityOjk ?? '',
+        comboMKabZonaGempa ?? '',
+        comboMZonaGempa ?? '',
+        comboMWilayah ?? '',
+        comboMTarifojkBanjirPar ?? '',
+        comboRMatauang ?? '',
+        errors ?? ''
       ];
 }

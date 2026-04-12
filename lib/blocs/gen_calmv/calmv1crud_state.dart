@@ -34,34 +34,36 @@ class Calmv1CrudState extends Equatable {
 		this.isValid = false,
 });
 
+  static const _sentinel = Object();
+
 	Calmv1CrudState copyWith({
-		Calmv1CrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMMvjnscoverModel? comboMMvjnscover,
-		ComboMWilayahModel? comboMWilayah,
-		ComboMMvgrupOjkModel? comboMMvgrupOjk,
-		ComboMMvpakaiModel? comboMMvpakaiModel,
-		ComboRMatauangModel? comboRMatauangModel,
+		Object? comboMMvjnscover = _sentinel,
+		Object? comboMWilayah = _sentinel,
+		Object? comboMMvgrupOjk = _sentinel,
+		Object? comboMMvpakaiModel = _sentinel,
+		Object? comboRMatauangModel = _sentinel,
 		bool? isComplete,
 		bool? isDirty,
 		bool? isValid,
 	}){
 		return Calmv1CrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calmv1CrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMMvjnscover: comboMMvjnscover?? this.comboMMvjnscover,
-			comboMWilayah: comboMWilayah?? this.comboMWilayah,
-			comboMMvgrupOjk: comboMMvgrupOjk?? this.comboMMvgrupOjk,
-			comboMMvpakaiModel: comboMMvpakaiModel?? this.comboMMvpakaiModel,
-			comboRMatauangModel: comboRMatauangModel?? this.comboRMatauangModel,
+			comboMMvjnscover: identical(comboMMvjnscover, _sentinel) ? this.comboMMvjnscover : comboMMvjnscover as ComboMMvjnscoverModel?,
+			comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+			comboMMvgrupOjk: identical(comboMMvgrupOjk, _sentinel) ? this.comboMMvgrupOjk : comboMMvgrupOjk as ComboMMvgrupOjkModel?,
+			comboMMvpakaiModel: identical(comboMMvpakaiModel, _sentinel) ? this.comboMMvpakaiModel : comboMMvpakaiModel as ComboMMvpakaiModel?,
+			comboRMatauangModel: identical(comboRMatauangModel, _sentinel) ? this.comboRMatauangModel : comboRMatauangModel as ComboRMatauangModel?,
 			isComplete: isComplete ?? this.isComplete,
 			isDirty: isDirty ?? this.isDirty,
 			isValid: isValid ?? this.isValid,
@@ -69,8 +71,8 @@ class Calmv1CrudState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [
-		record??"",
+	List<Object?> get props => [
+		record,
 		isLoading,
 		isLoaded,
 		isSaving,
@@ -78,6 +80,11 @@ class Calmv1CrudState extends Equatable {
 		hasFailure,
 		isComplete,
 		isDirty,
-		isValid
+		isValid,
+		comboMMvjnscover,
+		comboMWilayah,
+		comboMMvgrupOjk,
+		comboMMvpakaiModel,
+		comboRMatauangModel,
 	];
 }

@@ -23,27 +23,29 @@ class Calpar1CrudState extends Equatable {
 		this.comboMJnscoverPar,
 });
 
+  static const _sentinel = Object();
+
 	Calpar1CrudState copyWith({
-		Calpar1CrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboROkupasiModel? comboROkupasi,
-		ComboRKonstruksiojkModel? comboRKonstruksiojk,
-		ComboMJnscoverParModel? comboMJnscoverPar,
+		Object? comboROkupasi = _sentinel,
+		Object? comboRKonstruksiojk = _sentinel,
+		Object? comboMJnscoverPar = _sentinel,
 	}){
 		return Calpar1CrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calpar1CrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboROkupasi: comboROkupasi?? this.comboROkupasi,
-			comboRKonstruksiojk: comboRKonstruksiojk?? this.comboRKonstruksiojk,
-			comboMJnscoverPar: comboMJnscoverPar?? this.comboMJnscoverPar,
+			comboROkupasi: identical(comboROkupasi, _sentinel) ? this.comboROkupasi : comboROkupasi as ComboROkupasiModel?,
+			comboRKonstruksiojk: identical(comboRKonstruksiojk, _sentinel) ? this.comboRKonstruksiojk : comboRKonstruksiojk as ComboRKonstruksiojkModel?,
+			comboMJnscoverPar: identical(comboMJnscoverPar, _sentinel) ? this.comboMJnscoverPar : comboMJnscoverPar as ComboMJnscoverParModel?,
 		);
 	}
 

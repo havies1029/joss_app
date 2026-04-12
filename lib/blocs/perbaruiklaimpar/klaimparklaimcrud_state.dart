@@ -23,30 +23,32 @@ class KlaimparklaimcrudState extends Equatable {
     this.isComplete = false,
 });
 
+  static const _sentinel = Object();
+
 	KlaimparklaimcrudState copyWith({
-		KlaimparklaimcrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMJenisrugiModel? comboMJenisrugi,
+		Object? comboMJenisrugi = _sentinel,
     bool? isDirty,
     bool? isComplete,
 	}){
 		return KlaimparklaimcrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as KlaimparklaimcrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMJenisrugi: comboMJenisrugi?? this.comboMJenisrugi,
+			comboMJenisrugi: identical(comboMJenisrugi, _sentinel) ? this.comboMJenisrugi : comboMJenisrugi as ComboMJenisrugiModel?,
       isDirty: isDirty ?? this.isDirty,
       isComplete: isComplete ?? this.isComplete,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? '', comboMJenisrugi ?? '', isDirty, isComplete];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? '', comboMJenisrugi ?? '', isDirty, isComplete];
 }

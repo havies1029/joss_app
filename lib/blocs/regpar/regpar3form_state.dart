@@ -23,30 +23,32 @@ class Regpar3FormState extends Equatable {
 				this.comboMKabZonaGempa,
 			});
 
+  static const _sentinel = Object();
+
 	Regpar3FormState copyWith({
-		Regpar3FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMJnscoverParModel? comboMJnscoverPar,
-		ComboMWilayahModel? comboMWilayah,
-		ComboMKabZonaGempaModel? comboMKabZonaGempa,
+		Object? comboMJnscoverPar = _sentinel,
+		Object? comboMWilayah = _sentinel,
+		Object? comboMKabZonaGempa = _sentinel,
 	}){
 		return Regpar3FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Regpar3FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMJnscoverPar: comboMJnscoverPar?? this.comboMJnscoverPar,
-			comboMWilayah: comboMWilayah?? this.comboMWilayah,
-			comboMKabZonaGempa: comboMKabZonaGempa?? this.comboMKabZonaGempa,
+			comboMJnscoverPar: identical(comboMJnscoverPar, _sentinel) ? this.comboMJnscoverPar : comboMJnscoverPar as ComboMJnscoverParModel?,
+			comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+			comboMKabZonaGempa: identical(comboMKabZonaGempa, _sentinel) ? this.comboMKabZonaGempa : comboMKabZonaGempa as ComboMKabZonaGempaModel?,
 		);
 	}
 
 	@override
-	List<Object?> get props => [record, isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [record ?? '', isLoading, isLoaded, isSaving, isSaved, hasFailure, comboMJnscoverPar ?? '', comboMWilayah ?? '', comboMKabZonaGempa ?? ''];
 }

@@ -24,30 +24,32 @@ class Regklaim1CrudState extends Equatable {
     this.viewMode = 'tambah',
 });
 
+  static const _sentinel = Object();
+
 	Regklaim1CrudState copyWith({
-		Regklaim1CrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMInsuranceModel? comboMInsurance,
+		Object? comboMInsurance = _sentinel,
     String? regklaim1Id,
     String? viewMode,
 	}){
 		return Regklaim1CrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Regklaim1CrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMInsurance: comboMInsurance?? this.comboMInsurance,
+			comboMInsurance: identical(comboMInsurance, _sentinel) ? this.comboMInsurance : comboMInsurance as ComboMInsuranceModel?,
       regklaim1Id: regklaim1Id ?? this.regklaim1Id,
       viewMode: viewMode ?? this.viewMode,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, regklaim1Id, viewMode];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? '', comboMInsurance ?? '', regklaim1Id, viewMode];
 }

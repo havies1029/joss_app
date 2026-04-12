@@ -19,26 +19,28 @@ class Regpar4FormState extends Equatable {
 		this.comboRMatauang,
 });
 
+  static const _sentinel = Object();
+
 	Regpar4FormState copyWith({
-		Regpar4FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboRMatauangModel? comboRMatauang,
+		Object? comboRMatauang = _sentinel,
 	}){
 		return Regpar4FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Regpar4FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboRMatauang: comboRMatauang?? this.comboRMatauang,
+			comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
 		);
 	}
 
 	@override
-	List<Object?> get props => [record, isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [record ?? '', isLoading, isLoaded, isSaving, isSaved, hasFailure, comboRMatauang ?? ''];
 }

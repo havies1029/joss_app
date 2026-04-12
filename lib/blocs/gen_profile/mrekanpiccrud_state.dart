@@ -23,25 +23,27 @@ class MRekanPicCrudState extends Equatable {
 				this.savedId,
 			});
 
+  static const _sentinel = Object();
+
 	MRekanPicCrudState copyWith({
-		MRekanPicCrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
 		String? savedId,
-		ComboMJabatanModel? comboMJabatan,
+		Object? comboMJabatan = _sentinel,
 		bool? isFieldIsDefaultChanged
 	}){
 		return MRekanPicCrudState(
-				record: record ?? this.record,
+				record: identical(record, _sentinel) ? this.record : record as MRekanPicCrudModel?,
 				isLoading: isLoading ?? this.isLoading,
 				isLoaded: isLoaded ?? this.isLoaded,
 				isSaving: isSaving ?? this.isSaving,
 				isSaved: isSaved ?? this.isSaved,
 				hasFailure: hasFailure ?? this.hasFailure,
-				comboMJabatan: comboMJabatan?? this.comboMJabatan,
+				comboMJabatan: identical(comboMJabatan, _sentinel) ? this.comboMJabatan : comboMJabatan as ComboMJabatanModel?,
 				savedId: savedId ?? this.savedId,
 				isFieldIsDefaultChanged: isFieldIsDefaultChanged ?? this.isFieldIsDefaultChanged
 		);

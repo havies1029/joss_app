@@ -17,8 +17,10 @@ class Calmv3FormState extends Equatable {
 		this.hasFailure = false,
 });
 
+  static const _sentinel = Object();
+
 	Calmv3FormState copyWith({
-		Calmv3FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
@@ -26,7 +28,7 @@ class Calmv3FormState extends Equatable {
 		bool? hasFailure,
 	}){
 		return Calmv3FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calmv3FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,

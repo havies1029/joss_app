@@ -33,16 +33,18 @@ class SimulmvCrudState extends Equatable {
     this.isFieldOpsiChanged = false
   });
 
+  static const _sentinel = Object();
+
   SimulmvCrudState copyWith({
-    SimulmvCrudModel? record,
+    Object? record = _sentinel,
     bool? isLoading,
     bool? isLoaded,
     bool? isSaving,
     bool? isSaved,
     bool? hasFailure,
-    ComboMMvjnscoverModel? comboMMvjnscover,
-    ComboMWilayahModel? comboMWilayah,
-    ComboMMvgrupOjkModel? comboMMvgrupOjk,
+    Object? comboMMvjnscover = _sentinel,
+    Object? comboMWilayah = _sentinel,
+    Object? comboMMvgrupOjk = _sentinel,
     bool? isCalculating,
     bool? isCalculated,
     List<String>? errors,
@@ -50,15 +52,15 @@ class SimulmvCrudState extends Equatable {
     bool? isFieldOpsiChanged,
   }) {
     return SimulmvCrudState(
-        record: record ?? this.record,
+        record: identical(record, _sentinel) ? this.record : record as SimulmvCrudModel?,
         isLoading: isLoading ?? this.isLoading,
         isLoaded: isLoaded ?? this.isLoaded,
         isSaving: isSaving ?? this.isSaving,
         isSaved: isSaved ?? this.isSaved,
         hasFailure: hasFailure ?? this.hasFailure,
-        comboMMvjnscover: comboMMvjnscover ?? this.comboMMvjnscover,
-        comboMWilayah: comboMWilayah ?? this.comboMWilayah,
-        comboMMvgrupOjk: comboMMvgrupOjk ?? this.comboMMvgrupOjk,
+        comboMMvjnscover: identical(comboMMvjnscover, _sentinel) ? this.comboMMvjnscover : comboMMvjnscover as ComboMMvjnscoverModel?,
+        comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+        comboMMvgrupOjk: identical(comboMMvgrupOjk, _sentinel) ? this.comboMMvgrupOjk : comboMMvgrupOjk as ComboMMvgrupOjkModel?,
         isCalculating: isCalculating ?? this.isCalculating,
         isCalculated: isCalculated ?? this.isCalculated,
         errors: errors ?? this.errors,
@@ -67,7 +69,7 @@ class SimulmvCrudState extends Equatable {
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         isLoading,
         isLoaded,
         isSaving,
@@ -76,6 +78,11 @@ class SimulmvCrudState extends Equatable {
         isCalculating,
         isCalculated,
         isFieldCascoChanged,
-        isFieldOpsiChanged
+        isFieldOpsiChanged,
+        record ?? '',
+        comboMMvjnscover ?? '',
+        comboMWilayah ?? '',
+        comboMMvgrupOjk ?? '',
+        errors ?? ''
       ];
 }

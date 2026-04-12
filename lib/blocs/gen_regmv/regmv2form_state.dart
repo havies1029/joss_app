@@ -21,25 +21,27 @@ class Regmv2FormState extends Equatable {
 		this.comboRMatauang,
 });
 
+  static const _sentinel = Object();
+
 	Regmv2FormState copyWith({
-		Regmv2FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMMvjnscoverModel? comboMMvjnscover,
-		ComboRMatauangModel? comboRMatauang,
+		Object? comboMMvjnscover = _sentinel,
+		Object? comboRMatauang = _sentinel,
 	}){
 		return Regmv2FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Regmv2FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMMvjnscover: comboMMvjnscover?? this.comboMMvjnscover,
-			comboRMatauang: comboRMatauang?? this.comboRMatauang,
+			comboMMvjnscover: identical(comboMMvjnscover, _sentinel) ? this.comboMMvjnscover : comboMMvjnscover as ComboMMvjnscoverModel?,
+			comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
 		);
 	}
 

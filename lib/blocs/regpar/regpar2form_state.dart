@@ -29,36 +29,38 @@ class Regpar2FormState extends Equatable {
 				this.comboMKelurahan,
 			});
 
+  static const _sentinel = Object();
+
 	Regpar2FormState copyWith({
-		Regpar2FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboROkupasiModel? comboROkupasi,
-		ComboRKonstruksiojkModel? comboRKonstruksiojk,
-		ComboMPropinsiModel? comboMPropinsi,
-		ComboMKotaModel? comboMKota,
-		ComboMKecamatanModel? comboMKecamatan,
-		ComboMKelurahanModel? comboMKelurahan,
+		Object? comboROkupasi = _sentinel,
+		Object? comboRKonstruksiojk = _sentinel,
+		Object? comboMPropinsi = _sentinel,
+		Object? comboMKota = _sentinel,
+		Object? comboMKecamatan = _sentinel,
+		Object? comboMKelurahan = _sentinel,
 	}){
 		return Regpar2FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Regpar2FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboROkupasi: comboROkupasi?? this.comboROkupasi,
-			comboRKonstruksiojk: comboRKonstruksiojk?? this.comboRKonstruksiojk,
-			comboMPropinsi: comboMPropinsi?? this.comboMPropinsi,
-			comboMKota: comboMKota?? this.comboMKota,
-			comboMKecamatan: comboMKecamatan?? this.comboMKecamatan,
-			comboMKelurahan: comboMKelurahan?? this.comboMKelurahan,
+			comboROkupasi: identical(comboROkupasi, _sentinel) ? this.comboROkupasi : comboROkupasi as ComboROkupasiModel?,
+			comboRKonstruksiojk: identical(comboRKonstruksiojk, _sentinel) ? this.comboRKonstruksiojk : comboRKonstruksiojk as ComboRKonstruksiojkModel?,
+			comboMPropinsi: identical(comboMPropinsi, _sentinel) ? this.comboMPropinsi : comboMPropinsi as ComboMPropinsiModel?,
+			comboMKota: identical(comboMKota, _sentinel) ? this.comboMKota : comboMKota as ComboMKotaModel?,
+			comboMKecamatan: identical(comboMKecamatan, _sentinel) ? this.comboMKecamatan : comboMKecamatan as ComboMKecamatanModel?,
+			comboMKelurahan: identical(comboMKelurahan, _sentinel) ? this.comboMKelurahan : comboMKelurahan as ComboMKelurahanModel?,
 		);
 	}
 
 	@override
-	List<Object?> get props => [record, isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [record ?? '', isLoading, isLoaded, isSaving, isSaved, hasFailure, comboROkupasi ?? '', comboRKonstruksiojk ?? '', comboMPropinsi ?? '', comboMKota ?? '', comboMKecamatan ?? '', comboMKelurahan ?? ''];
 }

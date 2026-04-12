@@ -33,40 +33,57 @@ class SppaparCrudState extends Equatable {
 		this.comboRKodepos,
 });
 
+  static const _sentinel = Object();
+
 	SppaparCrudState copyWith({
-		SppaparCrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboRMatauangModel? comboRMatauang,
-		ComboROkupasiModel? comboROkupasi,
-		ComboRKonstruksiojkModel? comboRKonstruksiojk,
-		ComboMBiindemnityOjkModel? comboMBiindemnityOjk,
-		ComboMKabZonaGempaModel? comboMKabZonaGempa,
-		ComboMWilayahModel? comboMWilayah,
-		ComboMTarifojkBanjirParModel? comboMTarifojkBanjirPar,
-		ComboRKodeposModel? comboRKodepos,
+		Object? comboRMatauang = _sentinel,
+		Object? comboROkupasi = _sentinel,
+		Object? comboRKonstruksiojk = _sentinel,
+		Object? comboMBiindemnityOjk = _sentinel,
+		Object? comboMKabZonaGempa = _sentinel,
+		Object? comboMWilayah = _sentinel,
+		Object? comboMTarifojkBanjirPar = _sentinel,
+		Object? comboRKodepos = _sentinel,
 	}){
 		return SppaparCrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as SppaparCrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboRMatauang: comboRMatauang?? this.comboRMatauang,
-			comboROkupasi: comboROkupasi?? this.comboROkupasi,
-			comboRKonstruksiojk: comboRKonstruksiojk?? this.comboRKonstruksiojk,
-			comboMBiindemnityOjk: comboMBiindemnityOjk?? this.comboMBiindemnityOjk,
-			comboMKabZonaGempa: comboMKabZonaGempa?? this.comboMKabZonaGempa,
-			comboMWilayah: comboMWilayah?? this.comboMWilayah,
-			comboMTarifojkBanjirPar: comboMTarifojkBanjirPar?? this.comboMTarifojkBanjirPar,
-			comboRKodepos: comboRKodepos?? this.comboRKodepos,
+			comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
+			comboROkupasi: identical(comboROkupasi, _sentinel) ? this.comboROkupasi : comboROkupasi as ComboROkupasiModel?,
+			comboRKonstruksiojk: identical(comboRKonstruksiojk, _sentinel) ? this.comboRKonstruksiojk : comboRKonstruksiojk as ComboRKonstruksiojkModel?,
+			comboMBiindemnityOjk: identical(comboMBiindemnityOjk, _sentinel) ? this.comboMBiindemnityOjk : comboMBiindemnityOjk as ComboMBiindemnityOjkModel?,
+			comboMKabZonaGempa: identical(comboMKabZonaGempa, _sentinel) ? this.comboMKabZonaGempa : comboMKabZonaGempa as ComboMKabZonaGempaModel?,
+			comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+			comboMTarifojkBanjirPar: identical(comboMTarifojkBanjirPar, _sentinel) ? this.comboMTarifojkBanjirPar : comboMTarifojkBanjirPar as ComboMTarifojkBanjirParModel?,
+			comboRKodepos: identical(comboRKodepos, _sentinel) ? this.comboRKodepos : comboRKodepos as ComboRKodeposModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		record,
+		comboRMatauang,
+		comboROkupasi,
+		comboRKonstruksiojk,
+		comboMBiindemnityOjk,
+		comboMKabZonaGempa,
+		comboMWilayah,
+		comboMTarifojkBanjirPar,
+		comboRKodepos,
+	];
 }
