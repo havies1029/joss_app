@@ -1,11 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
-
-import '../../../common/loading_indicator.dart';
 
 class Klaim5cariTileWidget extends StatelessWidget {
   final String mjenisdocId;
@@ -77,10 +74,10 @@ class Klaim5cariTileWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: border),
         ),
-        child: hasFile
-            ? Row(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ===== thumbnail kiri =====
             _Thumb(
               localPath: localPath,
               fileUrl: fileUrl,
@@ -89,11 +86,12 @@ class Klaim5cariTileWidget extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // ===== kanan: info + buttons (normal state) =====
+            // ===== kanan: info + buttons =====
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // title row + (opsional) status check
                   Row(
                     children: [
                       Expanded(
@@ -106,40 +104,31 @@ class Klaim5cariTileWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        width: 18,
-                        height: 18,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF22C55E),
-                          shape: BoxShape.circle,
+                      if (hasFile)
+                        Container(
+                          width: 18,
+                          height: 18,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF22C55E),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.check, size: 13, color: Colors.white),
                         ),
-                        child: const Icon(
-                          Icons.check,
-                          size: 13,
-                          color: Colors.white,
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
 
                   Text(
-                    fileName ?? _inferName(localPath, fileUrl) ?? '',
+                    displayName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 12),
                   ),
-                  if (fileSizeBytes != null) ...[
+                  if (displaySize != null) ...[
                     const SizedBox(height: 2),
                     Text(
-                      'Ukuran: ${_formatBytes(fileSizeBytes!)}',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.55),
-                        fontSize: 11.5,
-                      ),
+                      'Ukuran: $displaySize',
+                      style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11.5),
                     ),
                   ],
 
@@ -149,7 +138,9 @@ class Klaim5cariTileWidget extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _DocButton(
-                          label: 'Ganti File',
+                          label: hasFile
+                            ? 'Ganti File'
+                            : 'Ambil File',
                           icon: Icons.insert_drive_file_outlined,
                           bg: const Color(0xFF4A4A4A),
                           fg: Colors.white,
@@ -157,53 +148,30 @@ class Klaim5cariTileWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
+
+                      // kalau sudah ada file: tampilkan Hapus (merah)
+                      // kalau belum ada file: tampilkan Ambil Foto (oranye)
                       Expanded(
-                        child: _DocButton(
-                          label: 'Hapus',
-                          icon: Icons.delete_outline,
-                          bg: const Color(0xFFEF4444),
-                          fg: Colors.white,
-                          onTap: onDelete,
-                        ),
+                        child: hasFile
+                            ? _DocButton(
+                                label: 'Hapus',
+                                icon: Icons.delete_outline,
+                                bg: const Color(0xFFEF4444),
+                                fg: Colors.white,
+                                onTap: onDelete,
+                              )
+                            : _DocButton(
+                                label: 'Ambil Foto',
+                                icon: Icons.photo_camera_outlined,
+                                bg: const Color(0xFFF28C28),
+                                fg: Colors.white,
+                                onTap: onPickPhoto,
+                              ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
-          ],
-        )
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _EmptyUploadInfo(
-              title: jenisNama.isNotEmpty ? 'Unggah $jenisNama' : 'Unggah Dokumen',
-              description:
-              'Pastikan foto terlihat jelas dan tidak buram untuk memudahkan proses verifikasi.',
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _DocButton(
-                    label: 'Ambil File',
-                    icon: Icons.insert_drive_file_outlined,
-                    bg: const Color(0xFF4A4A4A),
-                    fg: Colors.white,
-                    onTap: onPickFile,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _DocButton(
-                    label: 'Ambil Foto',
-                    icon: Icons.photo_camera_outlined,
-                    bg: const Color(0xFFF28C28),
-                    fg: Colors.white,
-                    onTap: onPickPhoto,
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -269,7 +237,7 @@ class _Thumb extends StatelessWidget {
         loadingBuilder: (ctx, child, progress) {
           if (progress == null) return child;
           return const Center(
-            child: SizedBox(width: 16, height: 16, child: LoadingIndicator()),
+            child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
           );
         },
       );
@@ -409,7 +377,6 @@ class _DocButton extends StatelessWidget {
   }
 }
 
-
 class _PdfThumbImage extends StatelessWidget {
   final String path;
   final double width;
@@ -461,59 +428,6 @@ class _PdfThumbImage extends StatelessWidget {
           fit: BoxFit.cover,
         );
       },
-    );
-  }
-}
-
-class _EmptyUploadInfo extends StatelessWidget {
-  final String title;
-  final String description;
-
-  const _EmptyUploadInfo({
-    required this.title,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                "assets/icons/upload_simbol.svg",
-                width: 26,
-                height: 26,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.6),
-              height: 1.35,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

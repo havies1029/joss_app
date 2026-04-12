@@ -93,7 +93,7 @@ class FabActionKlaim extends StatelessWidget {
               case ActionType.perbaruiKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
                 selected!.cobId == "10002"
-                    ? PerbaruiKlaimMvPageRemake(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama)
+                    ? PerbaruiKlaimMvPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama)
                     : PerbaruiKlaimParPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama, cobGroupId: selected.cobId),
                 ));
               case ActionType.lacakKlaim:
