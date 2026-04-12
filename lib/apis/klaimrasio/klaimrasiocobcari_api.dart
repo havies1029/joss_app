@@ -22,7 +22,7 @@ class KlaimrasiocobCariAPI{
 
       return KlaimrasiocariModel.fromJson(jsonData);
 		} else {
-			throw Exception("Failed to load data");
+			throw Exception("Failed to load data claim rasio");
 		}
 	}
 }

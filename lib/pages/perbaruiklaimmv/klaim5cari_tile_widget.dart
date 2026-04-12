@@ -309,11 +309,13 @@ class _DocButton extends StatelessWidget {
   });
 
   bool _isOverflow(String text, double maxWidth, TextStyle style) {
+    final safeWidth = maxWidth.clamp(0.0, double.infinity);
+
     final textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       maxLines: 1,
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: maxWidth);
+    )..layout(maxWidth: safeWidth);
 
     return textPainter.didExceedMaxLines;
   }
@@ -321,7 +323,7 @@ class _DocButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle =
-    TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w800);
+        TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w800);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -332,11 +334,10 @@ class _DocButton extends StatelessWidget {
         const horizontalPadding = 24.0;
 
         final iconSpace = iconWidth + iconSpacing + horizontalPadding;
+        final textWidth = (maxWidth - iconSpace).clamp(0.0, double.infinity);
 
-        final overflowWithIcon =
-        _isOverflow(label, maxWidth - iconSpace, textStyle);
-
-        final showIcon = !overflowWithIcon;
+        final overflowWithIcon = _isOverflow(label, textWidth, textStyle);
+        final showIcon = !overflowWithIcon && maxWidth > iconSpace;
 
         return SizedBox(
           height: 42,

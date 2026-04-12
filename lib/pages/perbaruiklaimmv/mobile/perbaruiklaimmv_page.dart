@@ -13,7 +13,6 @@ import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
 // import 'klaim5cari_list.dart';
 import '../../../blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
-import '../../tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 import 'klaimmvaccordioncard.dart';
 import 'klaimmvbengkelcrud_form.dart';
 import 'klaimmvklaimcrud_form.dart';
@@ -32,80 +31,58 @@ class PerbaruiKlaimMvPage extends StatefulWidget {
 
 class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
+  bool _submitInProgress = false;
+  bool _successShown = false;
+
+  final GlobalKey<FormState> polisFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> klaimFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> bengkelFormKey = GlobalKey<FormState>();
+
+
   @override
   Widget build(BuildContext context) {
     var klaimmvpoliscrudBloc = BlocProvider.of<KlaimmvpoliscrudBloc>(context);
     var klaimmvklaimcrudBloc = BlocProvider.of<KlaimmvklaimcrudBloc>(context);
     var klaimmvbengkelcrudBloc = BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
-    final polisFormKey = GlobalKey<FormState>();
-    final klaimFormKey = GlobalKey<FormState>();
-    final bengkelFormKey = GlobalKey<FormState>();
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(  
-          listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved && curr.isSaved, 
+        BlocListener<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
           listener: (context, state) {
-            if (!state.hasFailure && state.saveFrom == "button") {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PerbaruiSuksesWidget(
-                      display: "Berhasil!",
-                      description: "Data Klaim berhasil diperbarui.",
-                      displayButton: "Tutup",
-                      onButtonPressed: () {
-                        Navigator.of(context).pop(); 
-                        Navigator.of(context).pop(); 
-                      },
-                    ),
-                  ),
-                );
-              }
+            if (_submitInProgress && state.hasFailure) {
+              _submitInProgress = false;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Gagal menyimpan Data Polis')),
+              );
+              return;
+            }
+            _checkSubmitCompleted(context);
           },
         ),
+
         BlocListener<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
-          listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved && curr.isSaved, 
           listener: (context, state) {
-            if (!state.hasFailure && state.saveFrom == "button") {
-
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PerbaruiSuksesWidget(
-                      display: "Berhasil!",
-                      description: "Data Klaim berhasil diperbarui.",
-                      displayButton: "Tutup",
-                      onButtonPressed: () {
-                        Navigator.of(context).pop(); 
-                        Navigator.of(context).pop(); 
-                      },
-                    ),
-                  ),
-                );
-              }
+            if (_submitInProgress && state.hasFailure) {
+              _submitInProgress = false;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Gagal menyimpan Data Klaim')),
+              );
+              return;
+            }
+            _checkSubmitCompleted(context);
           },
         ),
-        BlocListener<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
-          listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved && curr.isSaved, 
-          listener: (context, state) {
-            if (!state.hasFailure && state.saveFrom == "button") {
 
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PerbaruiSuksesWidget(
-                      display: "Berhasil!",
-                      description: "Data Klaim berhasil diperbarui.",
-                      displayButton: "Tutup",
-                      onButtonPressed: () {
-                        Navigator.of(context).pop(); 
-                        Navigator.of(context).pop(); 
-                      },
-                    ),
-                  ),
-                );
-              }
+        BlocListener<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
+          listener: (context, state) {
+            if (_submitInProgress && state.hasFailure) {
+              _submitInProgress = false;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Gagal menyimpan Data Bengkel')),
+              );
+              return;
+            }
+            _checkSubmitCompleted(context);
           },
         ),
       ], 
@@ -233,11 +210,9 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   );
                                   return; // tahan pindah
                                 }
-                              }
+                              }      
       
-      
-                              if (acc.openedIndex == 4) {
-      
+                              if (acc.openedIndex == 4) {      
                                 final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
                                 if (!isFormBengkelValid) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -449,94 +424,124 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                   ),
 
                   AppButton.primary(
-                    onPressed: () {
+                    onPressed: () async {
+                      if (_submitInProgress) return;
+
                       debugPrint('=== BUTTON PERBARUI CLICKED ===');
-                      debugPrint('openedIndex: ${acc.openedIndex}');
 
-                      switch (acc.openedIndex) {
-                        case 0:
-                          debugPrint('trigger -> save polis from button');
-                          klaimmvpoliscrudBloc.add(
-                            KlaimmvPolisAutoSaveEvent(saveFrom: "button"),
-                          );
-                          break;
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      await Future.delayed(const Duration(milliseconds: 50));
 
-                        case 1:
-                          debugPrint('trigger -> save klaim from button');
-                          klaimmvklaimcrudBloc.add(
-                            KlaimmvklaimAutoSaveEvent(saveFrom: "button"),
-                          );
-                          break;
+                      if (!mounted) return;
 
-                        case 2:
-                        case 3:
-                        case 4:
-                          debugPrint('trigger -> final check before finish');
+                      final isFormPolisValid = polisFormKey.currentState?.validate() ?? false;
+                      final isFormKlaimValid = klaimFormKey.currentState?.validate() ?? false;
+                      final isFormBengkelValid = bengkelFormKey.currentState?.validate() ?? false;
 
-                          final polisState = context.read<KlaimmvpoliscrudBloc>().state;
-                          final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
-                          final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
-                          final dokState = context.read<Klaim5cariBloc>().state;
-
-                          final hasValidDoc = dokState.items.any(
-                                (x) => (x.fileUrl?.isNotEmpty ?? false) || (x.fileName?.isNotEmpty ?? false),
-                          );
-
-                          final allDone =
-                              !polisState.isDirty &&
-                                  !polisState.hasFailure &&
-                                  !klaimState.isDirty &&
-                                  !klaimState.hasFailure;
-
-                          debugPrint('polisState.isDirty: ${polisState.isDirty}');
-                          debugPrint('polisState.hasFailure: ${polisState.hasFailure}');
-                          debugPrint('klaimState.isDirty: ${klaimState.isDirty}');
-                          debugPrint('klaimState.hasFailure: ${klaimState.hasFailure}');
-                          debugPrint('bengkelState.isDirty: ${bengkelState.isDirty}');
-                          debugPrint('bengkelState.hasFailure: ${bengkelState.hasFailure}');
-                          debugPrint('dok items count: ${dokState.items.length}');
-                          debugPrint('hasValidDoc: $hasValidDoc');
-                          debugPrint('allDone: $allDone');
-
-                          if (allDone) {
-                            debugPrint('SEMUA STEP SUDAH SELESAI -> lanjut');
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentSuccess(
-                                  display: "Klaim Berhasil Diperbarui",
-                                  description: "Data klaim telah berhasil diperbarui.",
-                                  displayButton: "Kembali",
-                                  onButtonPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => KlaimMainPage(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          } else {
-                            debugPrint('BELUM SEMUA DATA LENGKAP');
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Lengkapi dan simpan semua data terlebih dahulu'),
-                              ),
-                            );
-                          }
-                          break;
-
-                        default:
-                          debugPrint(
-                            'trigger -> tidak ada handler untuk openedIndex: ${acc.openedIndex}',
-                          );
+                      if (!isFormPolisValid) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Data Polis belum valid')),
+                        );
+                        return;
                       }
 
-                      debugPrint('=== BUTTON PERBARUI END ===');
+                      if (!isFormKlaimValid) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Data Klaim belum valid')),
+                        );
+                        return;
+                      }
+
+                      if (!isFormBengkelValid) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Data Bengkel belum valid')),
+                        );
+                        return;
+                      }
+
+                      final polisState = context.read<KlaimmvpoliscrudBloc>().state;
+                      final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
+                      final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
+                      final dokState = context.read<Klaim5cariBloc>().state;
+
+                      final hasValidDoc = dokState.items.any(
+                        (x) => (x.fileUrl?.isNotEmpty ?? false) || (x.fileName?.isNotEmpty ?? false),
+                      );
+
+                      final allValid =
+                          polisState.isValid &&
+                          !polisState.hasFailure &&
+                          klaimState.isValid &&
+                          !klaimState.hasFailure &&
+                          bengkelState.isValid &&
+                          !bengkelState.hasFailure &&
+                          hasValidDoc;
+
+                      if (!hasValidDoc) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Dokumen klaim belum lengkap')),
+                        );
+                        return;
+                      }
+
+                      if (!allValid) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Lengkapi dan simpan semua data terlebih dahulu'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final dirtyCount = [
+                        polisState.isDirty,
+                        klaimState.isDirty,
+                        bengkelState.isDirty,
+                      ].where((e) => e).length;
+
+                      if (dirtyCount == 0) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => PerbaruiSuksesWidget(
+                              display: "Klaim Berhasil Diperbarui",
+                              description: "Data klaim telah berhasil diperbarui.",
+                              displayButton: "Kembali",
+                              onButtonPressed: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (_) => const KlaimMainPage(),
+                                  ),
+                                  (route) => route.isFirst,
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
+                      setState(() {
+                        _submitInProgress = true;
+                        _successShown = false;
+                      });
+
+                      if (polisState.isDirty) {
+                        context.read<KlaimmvpoliscrudBloc>().add(
+                          KlaimmvPolisAutoSaveEvent(saveFrom: "button"),
+                        );
+                      }
+
+                      if (klaimState.isDirty) {
+                        context.read<KlaimmvklaimcrudBloc>().add(
+                          KlaimmvklaimAutoSaveEvent(saveFrom: "button"),
+                        );
+                      }
+
+                      if (bengkelState.isDirty) {
+                        context.read<KlaimmvbengkelcrudBloc>().add(
+                          KlaimmvbengkelAutoSaveEvent(saveFrom: "button"),
+                        );
+                      }
                     },
                     text: 'Perbarui',
                     textStyle: headingStyle(context, fontSize: 18),
@@ -591,6 +596,48 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
               debugPrint('=== ACCORDION LISTENER END ===');
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  void _checkSubmitCompleted(BuildContext context) {
+    if (!_submitInProgress || _successShown) return;
+
+    final polisState = context.read<KlaimmvpoliscrudBloc>().state;
+    final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
+    final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
+
+    final allDone =
+        !polisState.isSaving &&
+        !klaimState.isSaving &&
+        !bengkelState.isSaving &&
+        !polisState.isDirty &&
+        !klaimState.isDirty &&
+        !bengkelState.isDirty &&
+        !polisState.hasFailure &&
+        !klaimState.hasFailure &&
+        !bengkelState.hasFailure;
+
+    if (!allDone) return;
+
+    _successShown = true;
+    _submitInProgress = false;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PerbaruiSuksesWidget(
+          display: "Klaim Berhasil Diperbarui",
+          description: "Data klaim telah berhasil diperbarui.",
+          displayButton: "Kembali",
+          onButtonPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => const KlaimMainPage(),
+              ),
+              (route) => route.isFirst,
+            );
+          },
         ),
       ),
     );

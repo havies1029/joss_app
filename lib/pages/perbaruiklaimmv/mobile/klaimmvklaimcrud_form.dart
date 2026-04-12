@@ -108,14 +108,14 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 
 	Widget buildFieldDol(){
 		return AppDateField(
-			label: 'Date Of Accident',
+			label: 'Tanggal Kejadian',
 			firstDate: DateTime(2000),
 			lastDate: DateTime(2100),
 			initialValue: DateTime.tryParse(fieldDolController.text),
 			onChanged: (value) {
 				if (value != null) {
           klaimmvklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
-          removeError(error: "Date Of Accident tidak boleh kosong");
+          removeError(error: "Tanggal Kejadian tidak boleh kosong");
 				}
 			},
       validator: (value) {
