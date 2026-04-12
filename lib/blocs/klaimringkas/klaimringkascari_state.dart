@@ -16,12 +16,14 @@ class KlaimringkasCariState extends Equatable {
 
 	const KlaimringkasCariState.failure() : this(status: ListStatus.failure);
 
+  static const _sentinel = Object();
+
 	KlaimringkasCariState copyWith(
-		{List<KlaimringkasCariModel>? items,
+		{Object? items = _sentinel,
 		ListStatus? status,
     String? selectedStatusId}) {
 		return KlaimringkasCariState(
-			items: items ?? this.items,   
+			items: identical(items, _sentinel) ? this.items : items as List<KlaimringkasCariModel>,
 			status: status ?? this.status,
       selectedStatusId: selectedStatusId ?? this.selectedStatusId,
     );

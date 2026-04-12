@@ -29,36 +29,51 @@ class Regmv3FormState extends Equatable {
 				this.comboMMvpakai,
 			});
 
+  static const _sentinel = Object();
+
 	Regmv3FormState copyWith({
-		Regmv3FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMWilayahModel? comboMWilayah,
-		ComboMMvmerkModel? comboMMvmerk,
-		ComboMMvtipeModel? comboMMvtipe,
-		ComboMMvmodelModel? comboMMvmodel,
-		ComboMWarnaModel? comboMWarna,
-		ComboMMvpakaiModel? comboMMvpakai,
+		Object? comboMWilayah = _sentinel,
+		Object? comboMMvmerk = _sentinel,
+		Object? comboMMvtipe = _sentinel,
+		Object? comboMMvmodel = _sentinel,
+		Object? comboMWarna = _sentinel,
+		Object? comboMMvpakai = _sentinel,
 	}){
 		return Regmv3FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Regmv3FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMWilayah: comboMWilayah?? this.comboMWilayah,
-			comboMMvmerk: comboMMvmerk?? this.comboMMvmerk,
-			comboMMvtipe: comboMMvtipe?? this.comboMMvtipe,
-			comboMMvmodel: comboMMvmodel?? this.comboMMvmodel,
-			comboMWarna: comboMWarna?? this.comboMWarna,
-			comboMMvpakai: comboMMvpakai?? this.comboMMvpakai,
+			comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+			comboMMvmerk: identical(comboMMvmerk, _sentinel) ? this.comboMMvmerk : comboMMvmerk as ComboMMvmerkModel?,
+			comboMMvtipe: identical(comboMMvtipe, _sentinel) ? this.comboMMvtipe : comboMMvtipe as ComboMMvtipeModel?,
+			comboMMvmodel: identical(comboMMvmodel, _sentinel) ? this.comboMMvmodel : comboMMvmodel as ComboMMvmodelModel?,
+			comboMWarna: identical(comboMWarna, _sentinel) ? this.comboMWarna : comboMWarna as ComboMWarnaModel?,
+			comboMMvpakai: identical(comboMMvpakai, _sentinel) ? this.comboMMvpakai : comboMMvpakai as ComboMMvpakaiModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? ''];
+	List<Object?> get props => [
+		isLoading,
+		isLoaded,
+		isSaving,
+		isSaved,
+		hasFailure,
+		record,
+		comboMWilayah,
+		comboMMvmerk,
+		comboMMvtipe,
+		comboMMvmodel,
+		comboMWarna,
+		comboMMvpakai,
+	];
 }

@@ -22,8 +22,10 @@ class LogtrscariState extends Equatable {
 	const LogtrscariState.failure()
 			: this(status: ListStatus.failure);
 
+  static const _sentinel = Object();
+
 	LogtrscariState copyWith({
-		List<LogtrscariModel>? items,
+		Object? items = _sentinel,
 		bool? hasReachedMax,
 		ListStatus? status,
 		String? groupLogId,
@@ -31,7 +33,7 @@ class LogtrscariState extends Equatable {
 		bool? isLoadingMore,
 	}) {
 		return LogtrscariState(
-			items: items ?? this.items,
+			items: identical(items, _sentinel) ? this.items : items as List<LogtrscariModel>,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
 			groupLogId: groupLogId ?? this.groupLogId,
@@ -41,5 +43,5 @@ class LogtrscariState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, groupLogId, hal, isLoadingMore];
+	List<Object?> get props => [status, items, hasReachedMax, groupLogId, hal, isLoadingMore];
 }

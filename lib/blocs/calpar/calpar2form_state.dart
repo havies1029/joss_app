@@ -24,27 +24,29 @@ class Calpar2FormState extends Equatable {
 		this.comboMBiindemnityOjk,
 });
 
+  static const _sentinel = Object();
+
 	Calpar2FormState copyWith({
-		Calpar2FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ReturnDataAPI? returnData,
-		ComboRMatauangModel? comboRMatauang,
-		ComboMBiindemnityOjkModel? comboMBiindemnityOjk,
+		Object? returnData = _sentinel,
+		Object? comboRMatauang = _sentinel,
+		Object? comboMBiindemnityOjk = _sentinel,
 	}){
 		return Calpar2FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calpar2FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			returnData: returnData ?? this.returnData,
-			comboRMatauang: comboRMatauang?? this.comboRMatauang,
-			comboMBiindemnityOjk: comboMBiindemnityOjk?? this.comboMBiindemnityOjk,
+			returnData: identical(returnData, _sentinel) ? this.returnData : returnData as ReturnDataAPI?,
+			comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
+			comboMBiindemnityOjk: identical(comboMBiindemnityOjk, _sentinel) ? this.comboMBiindemnityOjk : comboMBiindemnityOjk as ComboMBiindemnityOjkModel?,
 		);
 	}
 

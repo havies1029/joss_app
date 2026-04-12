@@ -27,29 +27,31 @@ class Regother1CrudState extends Equatable {
 				this.namaCob = '',
 			});
 
+  static const _sentinel = Object();
+
 	Regother1CrudState copyWith({
-		Regother1CrudModel? record,
-		Regother1CrudModel? selectedItem,
+		Object? record = _sentinel,
+		Object? selectedItem = _sentinel,
 		String? selectedCOBId,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMCobApp1Model? comboMCobApp1,
-		ComboRMatauangModel? comboRMatauang,
+		Object? comboMCobApp1 = _sentinel,
+		Object? comboRMatauang = _sentinel,
 		String? namaCob,
 	}){
 		return Regother1CrudState(
-			record: record ?? this.record,
-			selectedItem: selectedItem ?? this.selectedItem,
+			record: identical(record, _sentinel) ? this.record : record as Regother1CrudModel?,
+			selectedItem: identical(selectedItem, _sentinel) ? this.selectedItem : selectedItem as Regother1CrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMCobApp1: comboMCobApp1?? this.comboMCobApp1,
-			comboRMatauang: comboRMatauang?? this.comboRMatauang,
+			comboMCobApp1: identical(comboMCobApp1, _sentinel) ? this.comboMCobApp1 : comboMCobApp1 as ComboMCobApp1Model?,
+			comboRMatauang: identical(comboRMatauang, _sentinel) ? this.comboRMatauang : comboRMatauang as ComboRMatauangModel?,
 			selectedCOBId: selectedCOBId ?? this.selectedCOBId,
 			namaCob: namaCob ?? this.namaCob,
 		);
@@ -68,7 +70,6 @@ class Regother1CrudState extends Equatable {
 		);
 	}
 
-
 	@override
-	List<Object?> get props => [record, selectedItem, isLoading, isLoaded, isSaving, isSaved, hasFailure, selectedCOBId, namaCob];
+	List<Object?> get props => [record ?? '', selectedItem ?? '', isLoading, isLoaded, isSaving, isSaved, hasFailure, selectedCOBId, namaCob, comboMCobApp1 ?? '', comboRMatauang ?? ''];
 }

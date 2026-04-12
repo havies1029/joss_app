@@ -26,26 +26,28 @@ class Calmv2FormState extends Equatable {
 		this.isValid = false,
 });
 
+  static const _sentinel = Object();
+
 	Calmv2FormState copyWith({
-		Calmv2FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ReturnDataAPI? returnData,
+		Object? returnData = _sentinel,
 		bool? isComplete,
 		bool? isDirty,
 		bool? isValid,
 	}){
 		return Calmv2FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calmv2FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			returnData: returnData ?? this.returnData,
+			returnData: identical(returnData, _sentinel) ? this.returnData : returnData as ReturnDataAPI?,
 			isComplete: isComplete ?? this.isComplete,
 			isDirty: isDirty ?? this.isDirty,
 			isValid: isValid ?? this.isValid,
@@ -63,7 +65,7 @@ class Calmv2FormState extends Equatable {
 		returnData,
 		isComplete,
 		isDirty,
-		isValid
+		isValid,    
 	];
 
 

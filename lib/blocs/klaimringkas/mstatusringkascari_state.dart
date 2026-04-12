@@ -18,14 +18,16 @@ class MstatusringkasCariState extends Equatable {
 
 	const MstatusringkasCariState.failure() : this(status: ListStatus.failure);
 
+  static const _sentinel = Object();
+
 	MstatusringkasCariState copyWith(
-		{List<MstatusringkasCariModel>? items,
+		{Object? items = _sentinel,
 		bool? hasReachedMax,
 		ListStatus? status,
     String? selectedStatusId
 		}){
 		return MstatusringkasCariState(
-			items: items ?? this.items,
+			items: identical(items, _sentinel) ? this.items : items as List<MstatusringkasCariModel>,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
       selectedStatusId: selectedStatusId ?? this.selectedStatusId
@@ -33,5 +35,5 @@ class MstatusringkasCariState extends Equatable {
 	}
 
 	@override
-	List<Object> get props => [status, items, hasReachedMax, selectedStatusId];
+	List<Object?> get props => [status, items, hasReachedMax, selectedStatusId];
 }

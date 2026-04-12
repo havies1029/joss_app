@@ -95,7 +95,7 @@ class KlaimparklaimcrudBloc
       record: record,
       comboMJenisrugi: record?.comboMJenisrugi,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -119,7 +119,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -136,7 +136,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -153,7 +153,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -170,7 +170,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -187,7 +187,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -204,7 +204,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -221,7 +221,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -238,7 +238,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -255,7 +255,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 
@@ -272,7 +272,7 @@ class KlaimparklaimcrudBloc
       record: record,
       isDirty: true,
       isComplete: _isComplete(record),
-      isValid: _isValid(record),
+    
     ));
   }
 

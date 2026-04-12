@@ -27,29 +27,31 @@ class Calpar3FormState extends Equatable {
 		this.comboMKabZonaGempa,
 	});
 
+  static const _sentinel = Object();
+
 	Calpar3FormState copyWith({
-		Calpar3FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ReturnDataAPI? returnData,
-		ComboMJnscoverParModel? comboMJnscoverPar,
-		ComboMWilayahModel? comboMWilayah,
-		ComboMKabZonaGempaModel? comboMKabZonaGempa,
+		Object? returnData = _sentinel,
+		Object? comboMJnscoverPar = _sentinel,
+		Object? comboMWilayah = _sentinel,
+		Object? comboMKabZonaGempa = _sentinel,
 	}) {
 		return Calpar3FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calpar3FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			returnData: returnData ?? this.returnData,
-			comboMJnscoverPar: comboMJnscoverPar ?? this.comboMJnscoverPar,
-			comboMWilayah: comboMWilayah ?? this.comboMWilayah,
-			comboMKabZonaGempa: comboMKabZonaGempa ?? this.comboMKabZonaGempa,
+			returnData: identical(returnData, _sentinel) ? this.returnData : returnData as ReturnDataAPI?,
+			comboMJnscoverPar: identical(comboMJnscoverPar, _sentinel) ? this.comboMJnscoverPar : comboMJnscoverPar as ComboMJnscoverParModel?,
+			comboMWilayah: identical(comboMWilayah, _sentinel) ? this.comboMWilayah : comboMWilayah as ComboMWilayahModel?,
+			comboMKabZonaGempa: identical(comboMKabZonaGempa, _sentinel) ? this.comboMKabZonaGempa : comboMKabZonaGempa as ComboMKabZonaGempaModel?,
 		);
 	}
 

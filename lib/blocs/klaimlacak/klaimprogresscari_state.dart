@@ -32,23 +32,25 @@ class KlaimprogresscariState extends Equatable {
 		);
 	}
 
+  static const _sentinel = Object();
+
 	KlaimprogresscariState copyWith({
-		List<KlaimprogresscariModel>? items,
-		KlaimProgressNilaiKlaimModel? nilaiKlaim,
-		List<KlaimProgressJadwalBayarModel>? jadwalBayar,
+		Object? items = _sentinel,
+		Object? nilaiKlaim = _sentinel,
+		Object? jadwalBayar = _sentinel,
 		bool? hasReachedMax,
 		ListStatus? status,
 		String? klaim1Id,
-		KlaimProgressInfoModel? klaimProgressInfo,
+		Object? klaimProgressInfo = _sentinel,
 	}) {
 		return KlaimprogresscariState(
-			items: items ?? this.items,
+			items: identical(items, _sentinel) ? this.items : items as List<KlaimprogresscariModel>,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
 			klaim1Id: klaim1Id ?? this.klaim1Id,
-			nilaiKlaim: nilaiKlaim ?? this.nilaiKlaim,
-			jadwalBayar: jadwalBayar ?? this.jadwalBayar,
-			klaimProgressInfo: klaimProgressInfo ?? this.klaimProgressInfo,
+			nilaiKlaim: identical(nilaiKlaim, _sentinel) ? this.nilaiKlaim : nilaiKlaim as KlaimProgressNilaiKlaimModel?,
+			jadwalBayar: identical(jadwalBayar, _sentinel) ? this.jadwalBayar : jadwalBayar as List<KlaimProgressJadwalBayarModel>,
+			klaimProgressInfo: identical(klaimProgressInfo, _sentinel) ? this.klaimProgressInfo : klaimProgressInfo as KlaimProgressInfoModel?,
 		);
 	}
 

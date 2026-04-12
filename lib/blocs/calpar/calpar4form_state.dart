@@ -21,8 +21,10 @@ class Calpar4FormState extends Equatable {
 		this.isCalculated = false,
 });
 
+  static const _sentinel = Object();
+
 	Calpar4FormState copyWith({
-		Calpar4FormModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
@@ -32,7 +34,7 @@ class Calpar4FormState extends Equatable {
 		bool? isCalculated,
 	}){
 		return Calpar4FormState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as Calpar4FormModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,

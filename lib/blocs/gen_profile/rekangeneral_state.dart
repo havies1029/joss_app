@@ -27,34 +27,36 @@ class RekanGeneralState extends Equatable {
 		this.comboMJnskel,
 });
 
+  static const _sentinel = Object();
+
 	RekanGeneralState copyWith({
-		RekanGeneralModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMTitleModel? comboMTitle,
-		ComboMTipeCstModel? comboMTipeCst,
-		ComboMBentukCstModel? comboMBentukCst,
-		ComboMBidangModel? comboMBidang,
-		ComboMJnskelModel? comboMJnskel,
+		Object? comboMTitle = _sentinel,
+		Object? comboMTipeCst = _sentinel,
+		Object? comboMBentukCst = _sentinel,
+		Object? comboMBidang = _sentinel,
+		Object? comboMJnskel = _sentinel,
 	}){
 		return RekanGeneralState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as RekanGeneralModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMTitle: comboMTitle?? this.comboMTitle,
-			comboMTipeCst: comboMTipeCst?? this.comboMTipeCst,
-			comboMBentukCst: comboMBentukCst?? this.comboMBentukCst,
-			comboMBidang: comboMBidang?? this.comboMBidang,
-			comboMJnskel: comboMJnskel?? this.comboMJnskel,
+			comboMTitle: identical(comboMTitle, _sentinel) ? this.comboMTitle : comboMTitle as ComboMTitleModel?,
+			comboMTipeCst: identical(comboMTipeCst, _sentinel) ? this.comboMTipeCst : comboMTipeCst as ComboMTipeCstModel?,
+			comboMBentukCst: identical(comboMBentukCst, _sentinel) ? this.comboMBentukCst : comboMBentukCst as ComboMBentukCstModel?,
+			comboMBidang: identical(comboMBidang, _sentinel) ? this.comboMBidang : comboMBidang as ComboMBidangModel?,
+			comboMJnskel: identical(comboMJnskel, _sentinel) ? this.comboMJnskel : comboMJnskel as ComboMJnskelModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, comboMTitle, comboMTipeCst, comboMBentukCst, comboMBidang, comboMJnskel];
 }

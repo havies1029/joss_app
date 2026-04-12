@@ -19,26 +19,28 @@ class RekanBankState extends Equatable {
 		this.comboMBank,
 });
 
+  static const _sentinel = Object();
+
 	RekanBankState copyWith({
-		RekanBankModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMBankModel? comboMBank,
+		Object? comboMBank = _sentinel,
 	}){
 		return RekanBankState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as RekanBankModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMBank: comboMBank?? this.comboMBank,
+			comboMBank: identical(comboMBank, _sentinel) ? this.comboMBank : comboMBank as ComboMBankModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, record ?? '', comboMBank ?? ''];
 }

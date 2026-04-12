@@ -57,11 +57,11 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
       return false;
     }
 
-    if (!klaimState.isValid) {
-      _openAccordion(0);
-      _showMessage('Data klaim belum valid');
-      return false;
-    }
+    // if (!klaimState.isValid) {
+    //   _openAccordion(0);
+    //   _showMessage('Data klaim belum valid');
+    //   return false;
+    // }
 
     if (klaimState.hasFailure) {
       _openAccordion(0);

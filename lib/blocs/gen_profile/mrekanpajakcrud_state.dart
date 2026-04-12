@@ -23,30 +23,32 @@ class MRekanPajakCrudState extends Equatable {
 		this.comboRKodepos,
 });
 
+  static const _sentinel = Object();
+
 	MRekanPajakCrudState copyWith({
-		MRekanPajakCrudModel? record,
+		Object? record = _sentinel,
 		bool? isLoading,
 		bool? isLoaded,
 		bool? isSaving,
 		bool? isSaved,
 		bool? hasFailure,
-		ComboMPropinsiModel? comboMPropinsi,
-		ComboMKotaModel? comboMKota,
-		ComboRKodeposModel? comboRKodepos,
+		Object? comboMPropinsi = _sentinel,
+		Object? comboMKota = _sentinel,
+		Object? comboRKodepos = _sentinel,
 	}){
 		return MRekanPajakCrudState(
-			record: record ?? this.record,
+			record: identical(record, _sentinel) ? this.record : record as MRekanPajakCrudModel?,
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
 			isSaved: isSaved ?? this.isSaved,
 			hasFailure: hasFailure ?? this.hasFailure,
-			comboMPropinsi: comboMPropinsi?? this.comboMPropinsi,
-			comboMKota: comboMKota?? this.comboMKota,
-			comboRKodepos: comboRKodepos?? this.comboRKodepos,
+			comboMPropinsi: identical(comboMPropinsi, _sentinel) ? this.comboMPropinsi : comboMPropinsi as ComboMPropinsiModel?,
+			comboMKota: identical(comboMKota, _sentinel) ? this.comboMKota : comboMKota as ComboMKotaModel?,
+			comboRKodepos: identical(comboRKodepos, _sentinel) ? this.comboRKodepos : comboRKodepos as ComboRKodeposModel?,
 		);
 	}
 
 	@override
-	List<Object> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure];
+	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved, hasFailure, comboMPropinsi, comboMKota, comboRKodepos];
 }
