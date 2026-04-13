@@ -18,16 +18,14 @@ class MstatusringkasCariState extends Equatable {
 
 	const MstatusringkasCariState.failure() : this(status: ListStatus.failure);
 
-  static const _sentinel = Object();
-
 	MstatusringkasCariState copyWith(
-		{Object? items = _sentinel,
+		{List<MstatusringkasCariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
     String? selectedStatusId
 		}){
 		return MstatusringkasCariState(
-			items: identical(items, _sentinel) ? this.items : items as List<MstatusringkasCariModel>,
+			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
       selectedStatusId: selectedStatusId ?? this.selectedStatusId

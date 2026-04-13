@@ -2158,13 +2158,13 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     dataLoader: () {
       final wid = fieldComboMWilayah?.mwilayahId;
       final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(payload);
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(payload, "");
     },
     dataLoaderWithFilter: (q) {
       final wid = fieldComboMWilayah?.mwilayahId;
-      if (wid == null || wid.isEmpty) return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("");
+      if (wid == null || wid.isEmpty) return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("", "");
       final queryUser = (q ?? "").trim();
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("$wid|$queryUser");
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("$wid|$queryUser", queryUser);
     },
     serverSearchMinChars: 2,
     displayText: (i) => i.kabupaten,

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/widgets/apptheme/dropdown2.dart';
 import 'package:string_validator/string_validator.dart';
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/calpar/calpar1crud_bloc.dart';
@@ -1304,27 +1305,18 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   );
 
   Widget buildFieldRkonstruksiojkId() =>
-      ReusableComboBox<ComboRKonstruksiojkModel>(
+      ReusableComboBoxV2<ComboRKonstruksiojkModel>(
         hintText: "Konstruksi",
         comboKey: konstruksiKey,
         maxHeight: 200,
         initItem: fieldComboRKonstruksiojk,
-        dataLoader: () {
-          final okupasiId = fieldComboROkupasi?.rokupasiId;
-          final payload = (okupasiId == null || okupasiId.isEmpty) ? "" : "$okupasiId|";
-          return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(payload);
+        enableSearch: false,
+        params: {
+          "rokupasiId": fieldComboROkupasi?.rokupasiId,
         },
-        dataLoaderWithFilter: (q) {
-          final okupasiId = fieldComboROkupasi?.rokupasiId;
-          if (okupasiId == null || okupasiId.isEmpty) {
-            return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
-          }
-
-          final queryUser = (q ?? "").trim();
-          return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("$okupasiId|$queryUser");
+        loader: (q) {          
+          return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(q.get<String>("rokupasiId")??"");
         },
-
-        serverSearchMinChars: 2,
         displayText: (i) => i.kelasNama,
         compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
@@ -1410,15 +1402,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       );
 
   Widget buildFieldRokupasiId() =>
-      ReusableComboBox<ComboROkupasiModel>(
+      ReusableComboBoxV2<ComboROkupasiModel>(
         hintText: "Okupasi",
         initItem: fieldComboROkupasi,
-        dataLoader: () => ComboROkupasiRepository().getComboROkupasi(""),
+        loader: (q) => ComboROkupasiRepository().getComboROkupasi(q.searchText),
         displayText: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
         compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
         errorText: err('form1.rokupasiId'),
-
         onChangedCallback: (v) {
           setState(() {
             fieldComboROkupasi = v;
@@ -1606,6 +1597,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     hintText: "Wilayah",
     initItem: fieldComboMWilayah,
     maxHeight: 150,
+    enableSearch: false,
     dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
     displayText: (i) => i.wilayahNama,
     compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
@@ -1631,22 +1623,16 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     onSaveCallback: (value) => fieldComboMWilayah = value,
   );
 
-  Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
+  Widget buildFieldKab2zonagempaId() => ReusableComboBoxV2<ComboMKabZonaGempaModel>(
     hintText: "Zona Gempa Bumi",
     initItem: fieldComboMKabZonaGempa,
     comboKey: comboMKabZonaGempaKey,
-    dataLoader: () {
-      final wid = fieldComboMWilayah?.mwilayahId;
-      final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(payload);
+    params: {
+      "mwilayahId": fieldComboMWilayah?.mwilayahId ?? "",
     },
-    dataLoaderWithFilter: (q) {
-      final wid = fieldComboMWilayah?.mwilayahId;
-      if (wid == null || wid.isEmpty) return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("");
-      final queryUser = (q ?? "").trim();
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("$wid|$queryUser");
+    loader: (query) {
+      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(query.params["mwilayahId"] ?? "", query.searchText);
     },
-    serverSearchMinChars: 2,
     displayText: (i) => i.kabupaten,
     compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
     validatorCallback: (v) => v == null ? kStringNullError : null,
@@ -1655,7 +1641,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       fieldComboMKabZonaGempa = v;
       if (v != null) clearErr('form3.kab2zonagempaId');
     },
-    onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
+    onSaveCallback: (value) => fieldComboMKabZonaGempa = value, 
   );
 
   //form3
