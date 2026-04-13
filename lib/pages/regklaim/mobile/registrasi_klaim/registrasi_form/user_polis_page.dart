@@ -88,15 +88,16 @@ class _UserPolisPageState extends State<UserPolisPage> {
             );
           });
         }
-
         return ReusableComboBox<SppapoliscariModel>(
           key: ValueKey(
             'sppa_${cobKlaimId}_${state.status}_${state.items.length}',
           ),
           hintText: "No. Polis",
           initItem: widget.selectedPolis,
-          dataLoader: () async => state.items,
-          displayText: (i) => i.sppaId,
+          dataLoader: () async {
+            return state.items;
+          },
+          displayText: (i) => i.sppaNoRef,
           compareItems: (a, b) => a.sppaId == b.sppaId,
           onChangedCallback: (v) {
             widget.onPolisChanged(v);

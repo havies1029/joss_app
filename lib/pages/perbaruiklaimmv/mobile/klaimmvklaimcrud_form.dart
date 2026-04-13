@@ -9,29 +9,60 @@ import 'package:joss_app/widgets/combobox/combormatauang_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:joss_app/widgets/form_error.dart';
-
 
 class KlaimmvklaimcrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
 	final GlobalKey<FormState> formKey;
 
-	const KlaimmvklaimcrudFormPage({super.key, required this.viewMode, required this.recordId, required this.formKey});
+	const KlaimmvklaimcrudFormPage({
+		super.key,
+		required this.viewMode,
+		required this.recordId,
+		required this.formKey,
+	});
 
 	@override
-	KlaimmvklaimcrudFormPageFormState createState() => KlaimmvklaimcrudFormPageFormState();
+	KlaimmvklaimcrudFormPageFormState createState() =>
+			KlaimmvklaimcrudFormPageFormState();
 }
 
-class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> {
+class KlaimmvklaimcrudFormPageFormState
+		extends State<KlaimmvklaimcrudFormPage> {
 	late KlaimmvklaimcrudBloc klaimmvklaimcrudBloc;
-	final List<String> errors = [];
+
 	ComboRMatauangModel? fieldComboRMatauang;
-	final comboRMatauangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
-	var fieldDolController = TextEditingController(text: DateTime.now().toIso8601String());
-	var fieldKlaimAmountController = TextEditingController();
-	var fieldKlaimBayarController = TextEditingController();
-	var fieldKronologisController = TextEditingController();
+	final comboRMatauangKey =
+	GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
+
+	final fieldDolController =
+	TextEditingController(text: DateTime.now().toIso8601String());
+	final fieldKlaimAmountController = TextEditingController();
+	final fieldKlaimBayarController = TextEditingController();
+	final fieldKronologisController = TextEditingController();
+
+	final Map<String, String?> fieldErrors = {};
+
+	String? err(String key) => fieldErrors[key];
+
+	void setErr(String key, String? msg) {
+		setState(() {
+			fieldErrors[key] = msg;
+		});
+	}
+
+	void clearErr(String key) {
+		if (!fieldErrors.containsKey(key)) return;
+		setState(() {
+			fieldErrors.remove(key);
+		});
+	}
+
+	void clearErrsByPrefix(String prefix) {
+		setState(() {
+			fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
+		});
+	}
 
 	@override
 	void initState() {
@@ -42,59 +73,111 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 	}
 
 	@override
+	void dispose() {
+		fieldDolController.dispose();
+		fieldKlaimAmountController.dispose();
+		fieldKlaimBayarController.dispose();
+		fieldKronologisController.dispose();
+		super.dispose();
+	}
+
+	bool runFullValidation() {
+		final ok = validateForm();
+		widget.formKey.currentState?.validate();
+		return ok;
+	}
+
+	bool validateForm() {
+		final newErrors = <String, String?>{};
+		bool ok = true;
+
+		// final dol = DateTime.tryParse(fieldDolController.text.trim());
+		// if (dol == null) {
+		// 	newErrors['form.dol'] = 'Tanggal Kejadian tidak boleh kosong';
+		// 	ok = false;
+		// }
+
+		final amount = parseAmount(fieldKlaimAmountController.text);
+		if (amount <= 0) {
+			newErrors['form.klaimAmount'] = 'Nilai Tagihan harus lebih besar dari 0';
+			ok = false;
+		}
+
+		final kronologis = fieldKronologisController.text.trim();
+		if (kronologis.isEmpty) {
+			newErrors['form.kronologis'] = 'Kronologis Kejadian tidak boleh kosong';
+			ok = false;
+		}
+
+		setState(() {
+			fieldErrors
+				..removeWhere((k, _) => k.startsWith('form.'))
+				..addAll(newErrors);
+		});
+
+		return ok;
+	}
+
+	@override
 	Widget build(BuildContext context) {
 		klaimmvklaimcrudBloc = BlocProvider.of<KlaimmvklaimcrudBloc>(context);
+
 		return BlocConsumer<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
 			builder: (context, state) {
 				return SingleChildScrollView(
-					child:  Form(
-							key: widget.formKey,
-							child: Column(
-								children: [
-									buildFieldDol(),
-									const SizedBox(height: hPadding),
-									buildFieldKronologis(),
-									const SizedBox(height: hPadding),
-									buildFieldKlaimAmount(),
-									const SizedBox(height: hPadding),
-									buildFieldKlaimBayar(),
-									const SizedBox(height: 25),
-									FormError(
-										errors: errors,
-									),							
-								],
-							)),
+					child: Form(
+						key: widget.formKey,
+						child: Column(
+							children: [
+								buildFieldDol(),
+								const SizedBox(height: hPadding),
+								buildFieldKronologis(),
+								const SizedBox(height: hPadding),
+								buildFieldKlaimAmount(),
+								const SizedBox(height: hPadding),
+								buildFieldKlaimBayar(),
+								const SizedBox(height: hPadding),
+							],
+						),
+					),
 				);
-				},
-				listener: (context, state) {
-					if (state.isLoaded) {
-						if (state.record != null){
+			},
+			listener: (context, state) {
+				if (state.isLoaded) {
+					setState(() {
+						if (state.record != null) {
 							fieldDolController.text = state.record!.dol.toIso8601String();
-							fieldKlaimAmountController.text = NumberFormat("#,###").format(state.record!.klaimAmount);
-							fieldKlaimBayarController.text = NumberFormat("#,###").format(state.record!.klaimBayar);
+							fieldKlaimAmountController.text =
+									NumberFormat("#,###").format(state.record!.klaimAmount);
+							fieldKlaimBayarController.text =
+									NumberFormat("#,###").format(state.record!.klaimBayar);
 							fieldKronologisController.text = state.record!.kronologis;
 						}
 						fieldComboRMatauang = state.comboRMatauang;
-					}
-				},
-			);
-		}
+					});
+				}
+			},
+		);
+	}
+
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-		klaimmvklaimcrudBloc.add(
-			KlaimmvklaimcrudLihatEvent(recordId: widget.recordId));
+			klaimmvklaimcrudBloc.add(
+				KlaimmvklaimcrudLihatEvent(recordId: widget.recordId),
+			);
 		}
 	}
 
-	Widget buildFieldCurrId(){
+	Widget buildFieldCurrId() {
 		return buildFieldComboRMatauang(
 			comboKey: comboRMatauangKey,
 			labelText: 'currId',
 			initItem: fieldComboRMatauang,
 			onChangedCallback: (value) {
 				if (value != null) {
-					
-					klaimmvklaimcrudBloc.add(ComboRMatauangChangedEvent(comboRMatauang: value));
+					klaimmvklaimcrudBloc.add(
+						ComboRMatauangChangedEvent(comboRMatauang: value),
+					);
 				}
 			},
 			onSaveCallback: (value) {
@@ -102,53 +185,35 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 					fieldComboRMatauang = value;
 				}
 			},
-			
 		);
 	}
 
-	Widget buildFieldDol(){
+	Widget buildFieldDol() {
 		return AppDateField(
 			label: 'Tanggal Kejadian',
 			firstDate: DateTime(2000),
 			lastDate: DateTime(2100),
 			initialValue: DateTime.tryParse(fieldDolController.text),
+			validator: (_) => err('form.dol'),
 			onChanged: (value) {
-				if (value != null) {
-          klaimmvklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
-          removeError(error: "Tanggal Kejadian tidak boleh kosong");
+				if (value == null) {
+					fieldDolController.clear();
+					setErr('form.dol', 'Tanggal Kejadian tidak boleh kosong');
+					return;
 				}
+
+				clearErr('form.dol');
+				fieldDolController.text = value.toIso8601String();
+				klaimmvklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
 			},
-      validator: (value) {
-        if (value == null) {
-          addError(error: "Date Of Accident tidak boleh kosong");
-          return "";
-        }
-        return null;
-      },
 		);
 	}
-
-	// Widget buildFieldKlaimAmount(){
-	// 	return TextFormField(
-	// 		keyboardType: TextInputType.number,
-	// 		inputFormatters: [ThousandsSeparatorInputFormatter()],
-	// 		controller: fieldKlaimAmountController,
-	// 		decoration: const InputDecoration(
-	// 			labelText: "klaimAmount",
-	// 			floatingLabelBehavior: FloatingLabelBehavior.always,
-	// 		),
-	// 		onChanged: (value) {
-	// 			final amount = parseAmount(value);
-  //       klaimmvklaimcrudBloc.add(FieldKlaimAmountChangedEvent(klaimAmount: amount));
-	// 		},
-	// 		textAlign: TextAlign.right,
-	// 	);
-	// }
 
 	Widget buildFieldKlaimAmount() {
 		return AppCurrencyAmountField(
 			label: "Nilai Tagihan",
 			currency: fieldComboRMatauang,
+			errorText: err('form.klaimAmount'),
 			onCurrencyChanged: (v) {
 				setState(() => fieldComboRMatauang = v);
 				if (v != null) {
@@ -163,87 +228,60 @@ class KlaimmvklaimcrudFormPageFormState extends State<KlaimmvklaimcrudFormPage> 
 				klaimmvklaimcrudBloc.add(
 					FieldKlaimAmountChangedEvent(klaimAmount: amount),
 				);
-        if (amount > 0) {
-          removeError(error: "Nilai Tagihan harus lebih besar dari 0");
-        } else {
-          addError(error: "Nilai Tagihan harus lebih besar dari 0");
-        }
+
+				if (amount > 0) {
+					clearErr('form.klaimAmount');
+				}
 			},
-			validator: (v) {
-				final amount = parseAmount(v ?? "");
-        if (amount <= 0) {
-          addError(error: "Nilai Tagihan harus lebih besar dari 0");
-          return "";
-        }
-				return null;
-			},
+			validator: (_) => err('form.klaimAmount'),
 		);
 	}
 
-	Widget buildFieldKlaimBayar(){
+	Widget buildFieldKlaimBayar() {
 		return appTextField(
 			label: 'Nilai Terbayar',
-      enabled: false,
+			enabled: false,
 			keyboardType: TextInputType.number,
 			inputFormatters: [ThousandsSeparatorInputFormatter()],
 			controller: fieldKlaimBayarController,
 		);
 	}
 
-	Widget buildFieldKronologis(){
+	Widget buildFieldKronologis() {
 		return appTextField(
 			label: 'Kronologis Kejadian',
 			keyboardType: TextInputType.multiline,
 			maxLines: 10,
 			controller: fieldKronologisController,
+			errorText: err('form.kronologis'),
+			validator: (_) => err('form.kronologis'),
 			onChanged: (value) {
-				if (value.isNotEmpty) {
-          removeError(error: "Kronologis Kejadian tidak boleh kosong");
-				  klaimmvklaimcrudBloc.add(FieldKronologisChangedEvent(kronologis: value));
+				klaimmvklaimcrudBloc.add(
+					FieldKronologisChangedEvent(kronologis: value),
+				);
+
+				if (value.trim().isNotEmpty) {
+					clearErr('form.kronologis');
 				}
 			},
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          addError(error: "Kronologis Kejadian tidak boleh kosong");
-          return "";
-        }
-        return null;
-      },
 		);
 	}
 
-  double parseAmount(String s) {
-    final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), '');
-    if (cleaned.isEmpty) return 0;
-    return double.tryParse(cleaned) ?? 0;
-  }
-
-void addError({required String error}) {
-		if (!errors.contains(error)){
-			setState(() {
-				errors.add(error);
-			});
-		}
+	double parseAmount(String s) {
+		final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), '');
+		if (cleaned.isEmpty) return 0;
+		return double.tryParse(cleaned) ?? 0;
 	}
-
-	void removeError({required String error}) {
-		if (errors.contains(error)){
-			setState(() {
-				errors.remove(error);
-			});
-		}
-	}
-
 }
 
 class AppCurrencyAmountField extends StatelessWidget {
 	final String label;
 	final ComboRMatauangModel? currency;
 	final ValueChanged<ComboRMatauangModel?> onCurrencyChanged;
-
 	final TextEditingController amountController;
 	final ValueChanged<String> onAmountChanged;
 	final FormFieldValidator<String>? validator;
+	final String? errorText;
 
 	const AppCurrencyAmountField({
 		super.key,
@@ -253,6 +291,7 @@ class AppCurrencyAmountField extends StatelessWidget {
 		required this.amountController,
 		required this.onAmountChanged,
 		this.validator,
+		this.errorText,
 	});
 
 	@override
@@ -262,13 +301,14 @@ class AppCurrencyAmountField extends StatelessWidget {
 			children: [
 				Text(label, style: inputTextStyle(context)),
 				const SizedBox(height: 6),
-
 				Container(
 					height: 50,
 					decoration: BoxDecoration(
 						color: formGrey,
 						borderRadius: BorderRadius.circular(cardBorderRadius),
-						border: Border.all(color: sGrey),
+						border: Border.all(
+							color: errorText != null ? Colors.red : sGrey,
+						),
 					),
 					child: Row(
 						children: [
@@ -280,7 +320,8 @@ class AppCurrencyAmountField extends StatelessWidget {
 										hintText: "",
 										initItem: currency,
 										displayText: (m) => m.rmatauangSimbol,
-										compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+										compareItems: (a, b) =>
+										a.rmatauangKode == b.rmatauangKode,
 										dataLoader: () =>
 												ComboRMatauangRepository().getComboRMatauang(),
 										enableSearch: false,
@@ -290,9 +331,7 @@ class AppCurrencyAmountField extends StatelessWidget {
 									),
 								),
 							),
-
 							Container(width: 1, height: 30, color: sGrey),
-
 							Expanded(
 								child: TextFormField(
 									controller: amountController,
@@ -317,8 +356,17 @@ class AppCurrencyAmountField extends StatelessWidget {
 						],
 					),
 				),
+				if (errorText != null) ...[
+					const SizedBox(height: 6),
+					Text(
+						errorText!,
+						style: const TextStyle(
+							color: Colors.red,
+							fontSize: 12,
+						),
+					),
+				],
 			],
 		);
 	}
-
 }

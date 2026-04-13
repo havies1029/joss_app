@@ -68,6 +68,12 @@ class KlaimmvbengkelcrudFormPageFormState
 		});
 	}
 
+	bool runFullValidation() {
+		final ok = validateForm();
+		widget.formKey.currentState?.validate();
+		return ok;
+	}
+
 	bool validateForm() {
 		clearErrsByPrefix('form.');
 

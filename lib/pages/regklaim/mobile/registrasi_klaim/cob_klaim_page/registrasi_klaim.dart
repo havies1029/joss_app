@@ -38,6 +38,17 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
     return "assets/icons/$name.svg";
   }
 
+  Color get _buttonColor {
+    switch (widget.cobKlaimId) {
+      case "10001":
+        return pGreen;
+      case "10002":
+        return pBlue;
+      default:
+        return sGrey;
+    }
+  }
+
   String get _headerTitle => "Klaim ${widget.cobKlaimNama}";
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
@@ -255,7 +266,7 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                       height: 18,
                     ),
                     isLoading: _isCariPolisLoading,
-                    backgroundColor: pBlue,
+                    backgroundColor: _buttonColor,
                     onPressed: _isCariPolisLoading
                         ? null
                         : () async {

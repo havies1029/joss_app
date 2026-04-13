@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/repositories/combobox/combomjenisrugi_repository.dart';
@@ -158,6 +159,12 @@ class KlaimparklaimcrudFormPageFormState
 		return ok;
 	}
 
+	bool runFullValidation() {
+		final ok = validateForm();
+		widget.formKey.currentState?.validate();
+		return ok;
+	}
+
 	@override
 	void initState() {
 		super.initState();
@@ -219,7 +226,7 @@ class KlaimparklaimcrudFormPageFormState
 								buildFieldPenyebab(),
 								const SizedBox(height: hPadding),
 								buildFieldKeterangan(),
-								const SizedBox(height: 25),
+								const SizedBox(height: hPadding),
 							],
 						),
 					),
@@ -394,12 +401,12 @@ class KlaimparklaimcrudFormPageFormState
 			onChanged: (value) {
 				final email = value.trim();
 
-				if (email.isNotEmpty) {
-					if (emailValidatorRegExp.hasMatch(email)) {
-						clearErr('form.picEmail');
-					} else {
-						setErr('form.picEmail', 'Format email tidak valid');
-					}
+				if (email.isEmpty) {
+					clearErr('form.picEmail');
+				} else if (emailValidatorRegExp.hasMatch(email)) {
+					clearErr('form.picEmail');
+				} else {
+					setErr('form.picEmail', 'Format email tidak valid');
 				}
 
 				klaimparklaimcrudBloc.add(
@@ -431,6 +438,11 @@ class KlaimparklaimcrudFormPageFormState
 			label: 'PIC Tertanggung',
 			controller: fieldPicNamaController,
 			errorText: err('form.picNama'),
+			inputFormatters: [
+				FilteringTextInputFormatter.allow(
+					RegExp(r"[a-zA-Z0-9 .,'-]"),
+				),
+			],
 			validator: (_) => err('form.picNama'),
 			onChanged: (value) {
 				if (value.trim().isNotEmpty) {
@@ -457,7 +469,9 @@ class KlaimparklaimcrudFormPageFormState
 			onChanged: (value) {
 				final telp = value.trim();
 
-				if (telp.isNotEmpty) {
+				if (telp.isEmpty) {
+					clearErr('form.picTelp');
+				} else {
 					final res = IndoPhoneHelper.normalize(telp);
 					if (res.isValid) {
 						clearErr('form.picTelp');

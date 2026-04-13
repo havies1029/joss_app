@@ -827,7 +827,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                         ),
                         const SizedBox(height: hPadding,),
                         buildFieldRokupasiId(),
-                        buildFieldRkonstruksiojkId(),
                         const SizedBox(height: hPadding),
                         buildFieldRkonstruksiojkId(),
                         const SizedBox(height: hPadding),

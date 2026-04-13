@@ -12,6 +12,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_state.dart';
+import '../../../common/rangka_no_formatter.dart';
 
 class KlaimmvpoliscrudFormPage extends StatefulWidget {
 	final String viewMode;
@@ -89,6 +90,12 @@ class KlaimmvpoliscrudFormPageFormState
 		fieldPolisNoController.dispose();
 		fieldSppa1IdController.dispose();
 		super.dispose();
+	}
+
+	bool runFullValidation() {
+		final ok = validateForm();
+		widget.formKey.currentState?.validate();
+		return ok;
 	}
 
 	bool validateForm() {
@@ -208,7 +215,7 @@ class KlaimmvpoliscrudFormPageFormState
 									const SizedBox(height: hPadding),
 									buildFieldSppa1Id(),
 								],
-								const SizedBox(height: 15),
+								const SizedBox(height: hPadding),
 							],
 						),
 					),
@@ -343,6 +350,9 @@ class KlaimmvpoliscrudFormPageFormState
 		return appTextField(
 			label: 'No Rangka',
 			controller: fieldNoChasisController,
+			inputFormatters: [
+				RangkaNoFormatter(),
+			],
 			errorText: err('form.noChasis'),
 			validator: (_) => err('form.noChasis'),
 			onChanged: (value) {

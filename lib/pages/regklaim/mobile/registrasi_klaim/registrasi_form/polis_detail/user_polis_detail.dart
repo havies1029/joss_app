@@ -133,9 +133,6 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
             body: Form(
               child: Column(
                 children: [
-                  // =====================
-                  // CONTENT (SCROLLABLE)
-                  // =====================
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.only(bottom: vPadding),

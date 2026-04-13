@@ -143,17 +143,17 @@ class RingkasanPageState extends State<RingkasanPage> {
                         alignment: Alignment.topCenter,
                         child: RingkasanTablePage(
                           items: state.items,
-                          selectedIds: state.selectedIds,
-                          onSelect: (id) {
-                            context
-                                .read<DnrekapcobCariBloc>()
-                                .add(ToggleSelectItemEvent(id));
-                          },
-                          onUnselect: (id) {
-                            context
-                                .read<DnrekapcobCariBloc>()
-                                .add(ToggleSelectItemEvent(id));
-                          },
+                          // selectedIds: state.selectedIds,
+                          // onSelect: (id) {
+                          //   context
+                          //       .read<DnrekapcobCariBloc>()
+                          //       .add(ToggleSelectItemEvent(id));
+                          // },
+                          // onUnselect: (id) {
+                          //   context
+                          //       .read<DnrekapcobCariBloc>()
+                          //       .add(ToggleSelectItemEvent(id));
+                          // },
                         ),
                       );
                     },
@@ -173,16 +173,16 @@ class RingkasanPageState extends State<RingkasanPage> {
             ),
 
             // ===== FLOATING BAYAR BUTTON =====
-            BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
-              builder: (context, state) {
-                final hasSelection = state.selectedIds.isNotEmpty;
-
-                return BayarButton(
-                  isEnabled: hasSelection,
-                  onTap: hasSelection ? onViewListOutstandingPolis : null,
-                );
-              },
-            ),
+            // BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+            //   builder: (context, state) {
+            //     final hasSelection = state.selectedIds.isNotEmpty;
+            //
+            //     return BayarButton(
+            //       isEnabled: hasSelection,
+            //       onTap: hasSelection ? onViewListOutstandingPolis : null,
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

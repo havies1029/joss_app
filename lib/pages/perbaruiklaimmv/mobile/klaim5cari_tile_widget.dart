@@ -150,7 +150,15 @@ class Klaim5cariTileWidget extends StatelessWidget {
                       Expanded(
                         child: _DocButton(
                           label: 'Ganti File',
-                          icon: Icons.insert_drive_file_outlined,
+                          icon: SvgPicture.asset(
+                            "assets/icons/gallery_img.svg",
+                            width: 18,
+                            height: 18,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                           bg: const Color(0xFF4A4A4A),
                           fg: Colors.white,
                           onTap: onPickFile,
@@ -160,7 +168,15 @@ class Klaim5cariTileWidget extends StatelessWidget {
                       Expanded(
                         child: _DocButton(
                           label: 'Hapus',
-                          icon: Icons.delete_outline,
+                          icon: SvgPicture.asset(
+                            "assets/icons/gallery_img.svg",
+                            width: 18,
+                            height: 18,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                           bg: const Color(0xFFEF4444),
                           fg: Colors.white,
                           onTap: onDelete,
@@ -187,7 +203,15 @@ class Klaim5cariTileWidget extends StatelessWidget {
                 Expanded(
                   child: _DocButton(
                     label: 'Ambil File',
-                    icon: Icons.insert_drive_file_outlined,
+                    icon: SvgPicture.asset(
+                      "assets/icons/gallery_img.svg",
+                      width: 18,
+                      height: 18,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     bg: const Color(0xFF4A4A4A),
                     fg: Colors.white,
                     onTap: onPickFile,
@@ -197,7 +221,15 @@ class Klaim5cariTileWidget extends StatelessWidget {
                 Expanded(
                   child: _DocButton(
                     label: 'Ambil Foto',
-                    icon: Icons.photo_camera_outlined,
+                    icon: SvgPicture.asset(
+                      "assets/icons/photo_img.svg",
+                      width: 18,
+                      height: 18,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     bg: const Color(0xFFF28C28),
                     fg: Colors.white,
                     onTap: onPickPhoto,
@@ -324,17 +356,16 @@ class _FileIconPlaceholder extends StatelessWidget {
     );
   }
 }
-
 class _DocButton extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final Widget? icon; // ✅ sekarang bisa SvgPicture / Icon / apapun
   final Color bg;
   final Color fg;
   final VoidCallback? onTap;
 
   const _DocButton({
     required this.label,
-    required this.icon,
+    this.icon,
     required this.bg,
     required this.fg,
     required this.onTap,
@@ -354,8 +385,11 @@ class _DocButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle =
-        TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w800);
+    final textStyle = TextStyle(
+      color: fg,
+      fontSize: 13,
+      fontWeight: FontWeight.w800,
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -365,11 +399,18 @@ class _DocButton extends StatelessWidget {
         const iconSpacing = 6.0;
         const horizontalPadding = 24.0;
 
-        final iconSpace = iconWidth + iconSpacing + horizontalPadding;
-        final textWidth = (maxWidth - iconSpace).clamp(0.0, double.infinity);
+        final iconSpace = icon != null
+            ? iconWidth + iconSpacing + horizontalPadding
+            : horizontalPadding;
 
-        final overflowWithIcon = _isOverflow(label, textWidth, textStyle);
-        final showIcon = !overflowWithIcon && maxWidth > iconSpace;
+        final textWidth =
+        (maxWidth - iconSpace).clamp(0.0, double.infinity);
+
+        final overflowWithIcon =
+        _isOverflow(label, textWidth, textStyle);
+
+        final showIcon =
+            icon != null && !overflowWithIcon && maxWidth > iconSpace;
 
         return SizedBox(
           height: 42,
@@ -389,7 +430,7 @@ class _DocButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (showIcon) ...[
-                  Icon(icon, color: fg, size: 18),
+                  icon!, // ✅ langsung pakai widget
                   const SizedBox(width: 6),
                 ],
                 Flexible(
@@ -408,7 +449,6 @@ class _DocButton extends StatelessWidget {
     );
   }
 }
-
 
 class _PdfThumbImage extends StatelessWidget {
   final String path;

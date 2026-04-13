@@ -39,7 +39,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(successSnackBar(message));
+      ..showSnackBar(errorSnackBar(message));
   }
 
   void _openAccordion(int index) {
@@ -90,15 +90,11 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
           (x) => (x.fileUrl?.isNotEmpty ?? false) || (x.fileName?.isNotEmpty ?? false),
     );
 
-    debugPrint('hasValidDoc: $hasValidDoc');
-    debugPrint('=== VALIDATE DOKUMEN END ===');
-
-    if (!hasValidDoc) {
+    if (dokState.emptyDocumentIds.isNotEmpty) {
       _openAccordion(1);
       _showMessage('Dokumen klaim belum lengkap');
       return false;
     }
-
     return true;
   }
 
@@ -118,9 +114,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   }
 
   bool _validateKlaimForm() {
-    final formOk = klaimPageKey.currentState?.validateForm() ?? false;
-
-    klaimFormKey.currentState?.validate();
+    final formOk = klaimPageKey.currentState?.runFullValidation() ?? false;
 
     if (!formOk) {
       _openAccordion(0);
@@ -131,10 +125,44 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   }
 
   bool _validateKlaimFull() {
-    final formOk = _validateKlaimForm();
-    if (!formOk) return false;
+    if (!_validateKlaimForm()) return false;
+    if (!_validateKlaimState()) return false;
+    return true;
+  }
 
-    return _validateKlaimState();
+  bool _validateKlaimUI() {
+    final ok = klaimPageKey.currentState?.runFullValidation() ?? false;
+
+    if (!ok) {
+      _openAccordion(0);
+      _showMessage('Form data klaim belum valid');
+      return false;
+    }
+    return true;
+  }
+
+  bool _validateKlaimBloc() {
+    final state = context.read<KlaimparklaimcrudBloc>().state;
+
+    if (!state.isComplete) {
+      _openAccordion(0);
+      _showMessage('Data klaim belum lengkap');
+      return false;
+    }
+
+    if (state.hasFailure) {
+      _openAccordion(0);
+      _showMessage('Penyimpanan data klaim sebelumnya gagal');
+      return false;
+    }
+
+    return true;
+  }
+
+  bool _validateKlaim() {
+    if (!_validateKlaimUI()) return false;
+    if (!_validateKlaimBloc()) return false;
+    return true;
   }
 
   Future<void> _handleAccordionTap(int index, KlaimparaccordionState acc) async {
@@ -148,7 +176,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
     if (index == 1) {
       await _autoSaveSection(acc.openedIndex);
 
-      final klaimOk = _validateKlaimFull();
+      final klaimOk = _validateKlaim();
       if (!klaimOk) return;
 
       _openAccordion(1);
@@ -161,7 +189,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
 
     await _autoSaveSection(acc.openedIndex);
 
-    final klaimOk = _validateKlaimFull();
+    final klaimOk = _validateKlaim();
     if (!klaimOk) return;
 
     final dokOk = _validateDokumenState();
@@ -176,7 +204,9 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
         ),
       ),
     );
-    _showMessage('Semua data sudah valid dan siap diperbarui');
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(successSnackBar('Semua data sudah valid dan siap diperbarui'));
   }
 
   @override
@@ -216,14 +246,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                     builder: (_, klaim) {
                       return BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
                         builder: (_, dok) {
-                          debugPrint(
-                            'BUILD DOKUMEN: items=${dok.items.length}, isComplete=${dok.isComplete}',
-                          );
                           for (int i = 0; i < dok.items.length; i++) {
                             final x = dok.items[i];
-                            debugPrint(
-                              'BUILD item[$i] fileName=${x.fileName} fileUrl=${x.fileUrl}',
-                            );
                           }
 
                           final done = [
