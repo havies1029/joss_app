@@ -1349,8 +1349,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Widget buildFieldRokupasiId() =>
       ReusableComboBox<ComboROkupasiModel>(
         hintText: "Okupasi",
-        initItem: fieldComboROkupasi,
+        initItem: fieldComboROkupasi,        
         dataLoader: () => ComboROkupasiRepository().getComboROkupasi(""),
+        dataLoaderWithFilter: (q) => ComboROkupasiRepository().getComboROkupasi(q),
         displayText: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
         compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
