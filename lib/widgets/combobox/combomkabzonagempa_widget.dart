@@ -21,7 +21,7 @@ DropdownSearch<ComboMKabZonaGempaModel> buildFieldComboMKabZonaGempa({
 			),
 		),
 			items: (filter, infiniteScrollProps) async {
-				return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(filter);
+				return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(filter, "");
 			},
 			suffixProps: const DropdownSuffixProps(clearButtonProps: ClearButtonProps(isVisible: true)),
 			popupProps: const PopupPropsMultiSelection.modalBottomSheet(

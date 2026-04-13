@@ -5,9 +5,9 @@ import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
 
 class ComboMKabZonaGempaAPI {
 
-	Future<List<ComboMKabZonaGempaModel>> getComboMKabZonaGempaAPI(String filter) async {
+	Future<List<ComboMKabZonaGempaModel>> getComboMKabZonaGempaAPI(String wilayahId, String searchText) async {
 		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/mkabzonagempacombobox/getlist";
-    Map<String, String> queryParams = {"filter": filter};
+    Map<String, String> queryParams = {"wilayahId": wilayahId, "searchText": searchText};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',

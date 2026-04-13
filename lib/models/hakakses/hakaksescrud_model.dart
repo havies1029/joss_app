@@ -10,7 +10,8 @@ class HakaksesCrudModel {
   factory HakaksesCrudModel.fromJson(Map<String, dynamic> data) {
     return HakaksesCrudModel(
         isAdmin: data['is_admin'] ?? false,
-        excludeCOB: data['exclude_cob']);
+        excludeCOB: data['exclude_cob'] as String,
+        );
   }
 
   Map<String, dynamic> toJson() => {       

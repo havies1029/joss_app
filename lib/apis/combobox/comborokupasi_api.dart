@@ -10,7 +10,7 @@ class ComboROkupasiAPI {
 		String urlGetComboEndPoint = "${AppData.prefixEndPoint}/api/rokupasicombobox/getlist";
 		Map<String, String> queryParams = {"filter": filter};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
+		var uri= AppData.uriHtpp(AppData.httpAuthority, urlGetComboEndPoint, queryParams);
 
 		final headers = <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
