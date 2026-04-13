@@ -220,6 +220,7 @@ class RingkasanPageState extends State<RingkasanPage> {
   }
 
   ///Export dialog
+  /// Export dialog
   void _showExportDialog(BuildContext context) {
     final state = dnrekapcobCariBloc.state;
 
@@ -236,34 +237,32 @@ class RingkasanPageState extends State<RingkasanPage> {
       barrierLabel: "Tutup",
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return BlocProvider.value(
-          value: dnrekapcobCariBloc,
-          child: Material(
-            color: Colors.transparent,
-            child: Center(
-              child: PopupWidget(
-                title: "Pilih format file untuk diunduh",
-                subtitle: "Tersedia Excel dan PDF",
-                button1Text: "Excel",
-                button2Text: "PDF",
-                onExportSelected: (format) async {
-                  final allItems = state.items
-                      .map((e) => e.toExportMap())
-                      .toList();
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: IntrinsicHeight(
+            child: PopupWidget(
+              title: "Pilih format file untuk diunduh",
+              subtitle: "Tersedia Excel dan PDF",
+              button1Text: "Excel",
+              button2Text: "PDF",
+              onExportSelected: (format) async {
+                final allItems = state.items
+                    .map((e) => e.toExportMap())
+                    .toList();
 
-                  if (allItems.isEmpty) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar("Tidak ada data untuk diunduh"),
-                    );
-                    return;
-                  }
+                if (allItems.isEmpty) {
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    errorSnackBar("Tidak ada data untuk diunduh"),
+                  );
+                  return;
+                }
 
-                  Navigator.pop(context);
-                  await _exportData(context, format, allItems);
-                },
-              ),
+                Navigator.pop(dialogContext);
+                await _exportData(context, format, allItems);
+              },
             ),
           ),
         );

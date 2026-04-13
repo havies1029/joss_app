@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../common/constants.dart';
-import '../../base/base_background_sidepage.dart';
 import '../../base/base_background_firstpage.dart';
+import '../../base/base_background_sidepage.dart';
 import '../../calpar/mobile/calpar_main_page_remake.dart';
 import '../../gen_calmv/mobile/calmv_main_page_remake.dart';
 import '../../regother/mobile/regother_form/regother_form1.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum CariAsuransiType { page, menu }
 
 class CariAsuransiWidget extends StatelessWidget {
   final CariAsuransiType type;
 
-  const CariAsuransiWidget({super.key, this.type = CariAsuransiType.page});
+  const CariAsuransiWidget({
+    super.key,
+    this.type = CariAsuransiType.page,
+  });
 
   const CariAsuransiWidget.page({super.key})
       : type = CariAsuransiType.page;
@@ -25,12 +28,16 @@ class CariAsuransiWidget extends StatelessWidget {
   const CariAsuransiWidget.menu({super.key})
       : type = CariAsuransiType.menu;
 
+  static const String cobProperti = '10001';
+  static const String cobKendaraan = '10002';
+  static const String cobLainnya = '10003';
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder< AuthenticationBloc, AuthenticationState>(
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
       builder: (context, authState) {
         final userType = authState is AuthenticationAuthenticated
-            ? (authState.user.userType).toUpperCase()
+            ? authState.user.userType.toUpperCase()
             : '';
 
         return type == CariAsuransiType.page
@@ -46,13 +53,13 @@ class CariAsuransiWidget extends StatelessWidget {
       }) {
     return BaseBackgroundSidePage(
       title: "Beli Polis",
-      child: Container(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: hPadding),
-          child: _buildContent(
-            context,
-            userType: userType,
-          ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: hPadding),
+        child: _buildContent(
+          context,
+          userType: userType,
+          title: "Beli Polis",
+          subtitle: "Pilih jenis asuransi dan hitung premi langsung di sini.",
         ),
       ),
     );
@@ -66,24 +73,24 @@ class CariAsuransiWidget extends StatelessWidget {
       body: BaseBackgroundFirstPage(
         child: SafeArea(
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: secondaryBlackColor,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
             ),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: hPadding),
-                  _buildContentAsMenu(
-                    context,
-                    userType: userType,
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.only(top: hPadding),
+                child: _buildContent(
+                  context,
+                  userType: userType,
+                  title: "Cari Asuransi",
+                  subtitle:
+                  "Pilih jenis asuransi dan hitung premi langsung di sini.",
+                ),
               ),
             ),
           ),
@@ -95,6 +102,8 @@ class CariAsuransiWidget extends StatelessWidget {
   Widget _buildContent(
       BuildContext context, {
         required String userType,
+        required String title,
+        required String subtitle,
       }) {
     return Container(
       constraints: BoxConstraints(
@@ -105,39 +114,10 @@ class CariAsuransiWidget extends StatelessWidget {
         children: [
           HeaderCard(
             iconPath: "assets/icons/menu_cari_asuransi.svg",
-            title: "Beli Polis",
-            subtitle: "Pilih jenis asuransi dan hitung premi langsung di sini.",
+            title: title,
+            subtitle: subtitle,
           ),
-          SizedBox(height: hPadding),
-          Container(
-            color: secondaryBlackColor,
-            child: _buildKategoriSection(
-              context,
-              userType: userType,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContentAsMenu(
-      BuildContext context, {
-        required String userType,
-      }) {
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeaderCard(
-            iconPath: "assets/icons/menu_cari_asuransi.svg",
-            title: "Cari Asuransi",
-            subtitle: "Pilih jenis asuransi dan hitung premi langsung di sini.",
-          ),
-          SizedBox(height: hPadding),
+          const SizedBox(height: hPadding),
           Container(
             color: secondaryBlackColor,
             child: _buildKategoriSection(
@@ -152,11 +132,25 @@ class CariAsuransiWidget extends StatelessWidget {
 
   Set<String> _parseExcludeCob(String? raw) {
     if (raw == null || raw.trim().isEmpty) return <String>{};
+
     return raw
         .split(',')
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .toSet();
+  }
+
+  bool _isClient(String userType) {
+    return userType.toUpperCase() == 'C';
+  }
+
+  bool _hasCobAccess({
+    required String userType,
+    required Set<String> excludedCobSet,
+    required String cobId,
+  }) {
+    if (!_isClient(userType)) return true;
+    return !excludedCobSet.contains(cobId);
   }
 
   Future<void> showAccessDeniedDialog(BuildContext context) {
@@ -266,19 +260,27 @@ class CariAsuransiWidget extends StatelessWidget {
       }) {
     final excludeCOB =
         context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
+    final excludedCobSet = _parseExcludeCob(excludeCOB);
 
-    final cobSet = _parseExcludeCob(excludeCOB);
+    final kendaraanHasAccess = _hasCobAccess(
+      userType: userType,
+      excludedCobSet: excludedCobSet,
+      cobId: cobKendaraan,
+    );
 
-    final isPropertiExcluded = cobSet.contains('10002');
-    final isKendaraanExcluded = cobSet.contains('10003');
-
-    final isClient = userType.toUpperCase() == 'C';
+    final propertiHasAccess = _hasCobAccess(
+      userType: userType,
+      excludedCobSet: excludedCobSet,
+      cobId: cobProperti,
+    );
 
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.symmetric(vertical: hPadding),
-          decoration: BoxDecoration(color: secondaryBlackColor),
+          padding: const EdgeInsets.symmetric(vertical: hPadding),
+          decoration: const BoxDecoration(
+            color: secondaryBlackColor,
+          ),
           child: Column(
             children: [
               const SizedBox(height: hPadding),
@@ -295,11 +297,13 @@ class CariAsuransiWidget extends StatelessWidget {
           ),
         ),
         Container(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: hPadding,
             horizontal: hPadding * 1.5,
           ),
-          decoration: BoxDecoration(color: secondaryBlackColor),
+          decoration: const BoxDecoration(
+            color: secondaryBlackColor,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -309,12 +313,12 @@ class CariAsuransiWidget extends StatelessWidget {
                     child: _buildRestrictedCategory(
                       context: context,
                       userType: userType,
-                      hasAccess: !isClient || !isKendaraanExcluded,
+                      hasAccess: kendaraanHasAccess,
                       child: _buildCategory(
                         context,
-                        "assets/icons/kendaraan.svg",
-                        "Kendaraan",
-                        const CalmvMainPageRemake(),
+                        svgPath: "assets/icons/kendaraan.svg",
+                        label: "Kendaraan",
+                        targetPage: const CalmvMainPageRemake(),
                       ),
                     ),
                   ),
@@ -323,12 +327,12 @@ class CariAsuransiWidget extends StatelessWidget {
                     child: _buildRestrictedCategory(
                       context: context,
                       userType: userType,
-                      hasAccess: !isClient || !isPropertiExcluded,
+                      hasAccess: propertiHasAccess,
                       child: _buildCategory(
                         context,
-                        "assets/icons/properti.svg",
-                        "Properti",
-                        const CalparMainPageRemake(),
+                        svgPath: "assets/icons/properti.svg",
+                        label: "Properti",
+                        targetPage: const CalparMainPageRemake(),
                       ),
                     ),
                   ),
@@ -337,9 +341,9 @@ class CariAsuransiWidget extends StatelessWidget {
               const SizedBox(height: 12),
               _buildCategory(
                 context,
-                "null",
-                "Lainnya",
-                const Regother1CrudFormPage(
+                svgPath: null,
+                label: "Lainnya",
+                targetPage: const Regother1CrudFormPage(
                   viewMode: 'tambah',
                   recordId: '',
                 ),
@@ -357,21 +361,13 @@ class CariAsuransiWidget extends StatelessWidget {
     required bool hasAccess,
     required Widget child,
   }) {
-    final isClient = userType.toUpperCase() == 'C';
-
-    if (!isClient) {
-      return child;
-    }
-
-    if (hasAccess) {
+    if (!_isClient(userType) || hasAccess) {
       return child;
     }
 
     return InkWell(
       borderRadius: BorderRadius.circular(cardBorderRadius),
-      onTap: () {
-        showAccessDeniedDialog(context);
-      },
+      onTap: () => showAccessDeniedDialog(context),
       child: Stack(
         children: [
           Opacity(
@@ -381,7 +377,7 @@ class CariAsuransiWidget extends StatelessWidget {
                 0.2126, 0.7152, 0.0722, 0, 0,
                 0.2126, 0.7152, 0.0722, 0, 0,
                 0.2126, 0.7152, 0.0722, 0, 0,
-                0,      0,      0,      1, 0,
+                0, 0, 0, 1, 0,
               ]),
               child: AbsorbPointer(
                 absorbing: true,
@@ -403,14 +399,15 @@ class CariAsuransiWidget extends StatelessWidget {
   }
 
   Widget _buildCategory(
-      BuildContext context,
-      String svgPath,
-      String label,
-      Widget? targetPage,
-      ) {
-    final bool hasIcon = svgPath != "null" && svgPath.trim().isNotEmpty;
+      BuildContext context, {
+        required String? svgPath,
+        required String label,
+        required Widget? targetPage,
+      }) {
+    final hasIcon = svgPath != null && svgPath.trim().isNotEmpty;
 
     return InkWell(
+      borderRadius: BorderRadius.circular(cardBorderRadius),
       onTap: targetPage == null
           ? null
           : () {
@@ -419,7 +416,6 @@ class CariAsuransiWidget extends StatelessWidget {
           MaterialPageRoute(builder: (_) => targetPage),
         );
       },
-      borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -427,13 +423,21 @@ class CariAsuransiWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(cardBorderRadius),
           border: Border.all(color: sGrey),
         ),
-
         child: hasIcon
             ? Row(
           children: [
-            SvgPicture.asset(svgPath, width: 40, height: 40),
+            SvgPicture.asset(
+              svgPath,
+              width: 40,
+              height: 40,
+            ),
             const SizedBox(width: 10),
-            Expanded(child: Text(label, style: bodyTextStyle(context))),
+            Expanded(
+              child: Text(
+                label,
+                style: bodyTextStyle(context),
+              ),
+            ),
           ],
         )
             : Center(

@@ -33,11 +33,9 @@ const List<String> scopes = <String>[
   'email',
 ];
 
-/// Device/Platform Utils
 bool get pIsMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);
 bool get pIsWeb => kIsWeb;
 
-/// Device/Platform Utils
 bool isMobile(BuildContext ctx) => MediaQuery.of(ctx).size.width < 650;
 bool isTablet(BuildContext ctx) =>
     MediaQuery.of(ctx).size.width >= 650 &&
