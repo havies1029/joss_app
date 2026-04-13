@@ -1908,6 +1908,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     comboKey: comboROkupasiKey,
     initItem: fieldComboROkupasi,
     dataLoader: () => ComboROkupasiRepository().getComboROkupasi(""),
+    dataLoaderWithFilter: (filter) => ComboROkupasiRepository().getComboROkupasi(filter),
     displayText: (i) => i.okupasiDesc,
     compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
     validatorCallback: (_) => err('form2.okupasi'),
