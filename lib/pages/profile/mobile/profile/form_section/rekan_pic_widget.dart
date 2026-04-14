@@ -34,6 +34,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       listBloc.add(FetchMRekanPicListEvent());
+      context.read<HakaksesCrudBloc>().add(HakaksesCrudLihatEvent());
     });
   }
 

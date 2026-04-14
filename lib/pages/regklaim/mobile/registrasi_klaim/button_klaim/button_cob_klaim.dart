@@ -250,8 +250,10 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
               final isSelected =
                   state.selectedItem?.mcobklaim1Id == item.mcobklaim1Id;
 
-              final hasAccess =
-                  userType != 'C' || !cobSet.contains(item.mcobklaim1Id);
+              // final hasAccess =
+              //     userType != 'C' || !cobSet.contains(item.mcobklaim1Id);
+
+              final hasAccess = true;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: hPadding),

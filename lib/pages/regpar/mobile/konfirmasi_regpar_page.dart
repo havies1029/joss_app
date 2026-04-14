@@ -43,7 +43,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   late Regpar1ListBloc regpar1listBloc;
   final TextEditingController _searchController = TextEditingController();
   String? globalMataUang;
-
+  bool isSubmitting = false;
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
         .format(value);
@@ -291,12 +291,24 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: AppButton.primary(
-                      text: "Lanjutkan",
-                      onPressed: () {
+                      text: "Simpan",
+                      isLoading: isSubmitting,
+                      onPressed: isSubmitting
+                          ? null
+                          : () async {
+                        setState(() => isSubmitting = true);
+
                         context.read<DnRekap2invBloc>().add(
-                            RegPar2InvoiceEvent(regpar1Id: widget.recordId ?? ""));
+                          RegPar2InvoiceEvent(
+                            regpar1Id: widget.recordId ?? "",
+                          ),
+                        );
+
+                        await Future.delayed(const Duration(seconds: 2));
+
+                        setState(() => isSubmitting = false);
                       },
-                    ),
+                    )
                   ),
 
                 ],

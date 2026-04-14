@@ -144,13 +144,21 @@ class CariAsuransiWidget extends StatelessWidget {
     return userType.toUpperCase() == 'C';
   }
 
+  // bool _hasCobAccess({
+  //   required String userType,
+  //   required Set<String> excludedCobSet,
+  //   required String cobId,
+  // }) {
+  //   if (!_isClient(userType)) return true;
+  //   return !excludedCobSet.contains(cobId);
+  // }
+
   bool _hasCobAccess({
     required String userType,
     required Set<String> excludedCobSet,
     required String cobId,
   }) {
-    if (!_isClient(userType)) return true;
-    return !excludedCobSet.contains(cobId);
+    return true;
   }
 
   Future<void> showAccessDeniedDialog(BuildContext context) {
@@ -258,10 +266,10 @@ class CariAsuransiWidget extends StatelessWidget {
       BuildContext context, {
         required String userType,
       }) {
-    final excludeCOB =
-        context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
-    final excludedCobSet = _parseExcludeCob(excludeCOB);
-
+    // final excludeCOB =
+    //     context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
+    // final excludedCobSet = _parseExcludeCob(excludeCOB);
+    final excludedCobSet = <String>{};
     final kendaraanHasAccess = _hasCobAccess(
       userType: userType,
       excludedCobSet: excludedCobSet,

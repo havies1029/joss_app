@@ -97,15 +97,33 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
   Future<void> onKlaim5LocalFileSet(
     Klaim5LocalFileSetEvent event, Emitter<Klaim5cariState> emit) async {
     // cari existing item
+
+    debugPrint('=== onKlaim5LocalFileSet START ===');
+    debugPrint('event.klaim1Id     : ${event.klaim1Id}');
+    debugPrint('event.klaim5Id     : ${event.klaim5Id}');
+    debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
+    debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
+    debugPrint('state.items.length : ${state.items.length}');
+
+    for (var i = 0; i < state.items.length; i++) {
+      final x = state.items[i];
+      debugPrint(
+          '[ITEM $i] klaim5Id=${x.klaim5Id} | mjenisdocId=${x.mjenisdocId} | '
+              'jenisDocLain=${x.jenisDocLain} | jenisNama=${x.jenisNama} | '
+              'fileName=${x.fileName} | localPath=${x.localPath} | fileUrl=${x.fileUrl}'
+      );
+    }
+
     final idx = state.items.indexWhere((x) =>
         ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
-
+    debugPrint('MATCHED IDX: $idx');
     // copy list dulu
     final newItems = List<Klaim5cariModel>.from(state.items);
 
     if (idx >= 0) {
       // ==== UPDATE ITEM YANG SUDAH ADA ====
+      debugPrint('ACTION: UPDATE EXISTING ITEM');
       final oldItem = state.items[idx];
 
       final newItem = oldItem.copyWith(
@@ -122,7 +140,7 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     }
     else {
       // ==== INSERT ITEM BARU (IDX TIDAK KETEMU) ====
-
+      debugPrint('ACTION: ADD NEW ITEM');
       final newItem = Klaim5cariModel(
         klaim1Id: event.klaim1Id,
         jenisDocLain: event.jenisDocLain,            
@@ -325,6 +343,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
   }
 
   Future<void> onKlaim5UploadRequested(Klaim5UploadRequestedEvent event, Emitter<Klaim5cariState> emit) async {
+    debugPrint('=== onKlaim5UploadRequested START ===');
+    debugPrint('event.klaim5Id     : ${event.klaim5Id}');
+    debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
+    debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
+    debugPrint('state.items.length : ${state.items.length}');
+
     final idx = state.items.indexWhere((x) =>
         ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
@@ -332,7 +356,7 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
 
     final item = state.items[idx];
     if (item.localPath == '') return;
-
+    debugPrint('UPLOAD MATCHED IDX: $idx');
     final newItems = List<Klaim5cariModel>.from(state.items);
 
     // set status uploading

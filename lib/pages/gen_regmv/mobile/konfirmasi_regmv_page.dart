@@ -37,7 +37,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   late Regmv1ListBloc regmv1ListBloc;
   //final TextEditingController _searchController = TextEditingController();
   String? globalMataUang;
-
+  bool isSubmitting = false;
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -305,13 +305,24 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: AppButton.primary(
                       text: "Lanjutkan",
-                      onPressed: () {
+                      isLoading: isSubmitting,
+                      onPressed: isSubmitting
+                          ? null
+                          : () async {
+                        setState(() => isSubmitting = true);
+
                         context.read<DnRekap2invBloc>().add(
-                            RegMv2InvoiceEvent(regmv1Id: widget.recordId ?? ""));
+                          RegMv2InvoiceEvent(
+                            regmv1Id: widget.recordId ?? "",
+                          ),
+                        );
+
+                        await Future.delayed(const Duration(seconds: 2));
+
+                        setState(() => isSubmitting = false);
                       },
                     ),
                   ),
-
                 ],
               ),
             ),

@@ -286,6 +286,17 @@ Future<void> _pickFile(Klaim5cariModel it) async {
   if (path == null) return;
 
   final mime = lookupMimeType(path);
+
+  debugPrint('=== _pickFile START ===');
+  debugPrint('it.klaim1Id      : ${it.klaim1Id}');
+  debugPrint('it.klaim5Id      : ${it.klaim5Id}');
+  debugPrint('it.mjenisdocId   : ${it.mjenisdocId}');
+  debugPrint('it.jenisDocLain  : ${it.jenisDocLain}');
+  debugPrint('it.jenisNama     : ${it.jenisNama}');
+  debugPrint('picked path      : $path');
+  debugPrint('picked file.name : ${file.name}');
+  debugPrint('picked file.size : ${file.size}');
+
   bloc.add(
     Klaim5LocalFileSetEvent(
       klaim1Id: it.klaim1Id,
@@ -295,11 +306,16 @@ Future<void> _pickFile(Klaim5cariModel it) async {
       fileName: file.name,
       mimeType: mime,
       fileSizeBytes: file.size,
+      jenisDocLain: it.jenisDocLain,
     ),
   );
 
   bloc.add(
-    Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
+    Klaim5UploadRequestedEvent(
+      mjenisdocId: it.mjenisdocId,
+      klaim5Id: it.klaim5Id,
+      jenisDocLain: it.jenisDocLain,
+    ),
   );
 
   bloc.add(
@@ -328,6 +344,14 @@ Future<void> pickNewFileDokLain(String klaim1Id, String jenisDocLain) async {
   if (path == null) return;
 
   final mime = lookupMimeType(path);
+
+  debugPrint('=== pickNewFileDokLain START ===');
+  debugPrint('klaim1Id        : $klaim1Id');
+  debugPrint('jenisDocLain    : $jenisDocLain');
+  debugPrint('picked path     : $path');
+  debugPrint('picked file.name: ${file.name}');
+  debugPrint('picked file.size: ${file.size}');
+
   bloc.add(
     Klaim5LocalFileSetEvent(
       klaim1Id: klaim1Id,
@@ -365,6 +389,15 @@ Future<void> _pickPhoto(Klaim5cariModel it) async {
   final path = photo.path;
   final mime = lookupMimeType(path);
 
+  debugPrint('=== _pickPhoto START ===');
+  debugPrint('it.klaim1Id      : ${it.klaim1Id}');
+  debugPrint('it.klaim5Id      : ${it.klaim5Id}');
+  debugPrint('it.mjenisdocId   : ${it.mjenisdocId}');
+  debugPrint('it.jenisDocLain  : ${it.jenisDocLain}');
+  debugPrint('it.jenisNama     : ${it.jenisNama}');
+  debugPrint('picked path      : $path');
+  debugPrint('picked file.size : ${await photo.length()}');
+
   bloc.add(
     Klaim5LocalFileSetEvent(
       klaim1Id: it.klaim1Id,
@@ -374,11 +407,12 @@ Future<void> _pickPhoto(Klaim5cariModel it) async {
       fileName: path.split('/').last,
       mimeType: mime,
       fileSizeBytes: await photo.length(),
+      jenisDocLain: it.jenisDocLain,
     ),
   );
 
   bloc.add(
-    Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id, jenisDocLain: ''),
+    Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id,  jenisDocLain: it.jenisDocLain,),
   );
 
   bloc.add(

@@ -12,20 +12,15 @@ class Klaim5cariTileWidget extends StatelessWidget {
   final String jenisDocLain;
   final String jenisNama;
   final String klaim5Id;
-
-  // ===== file info (optional) =====
-  final String? localPath;     // path file yg dipilih dari device
-  final String? fileUrl;       // url dari server (kalau sudah upload)
-  final String? fileName;      // nama file
-  final int? fileSizeBytes;    // ukuran (bytes)
-  final String? mime;          // "image/jpeg", "application/pdf", ...
-
-  // ===== actions =====
+  final String? localPath;
+  final String? fileUrl;
+  final String? fileName;
+  final int? fileSizeBytes;
+  final String? mime;
   final VoidCallback? onPickFile;
   final VoidCallback? onPickPhoto;
   final VoidCallback? onDelete;
-  final VoidCallback? onPreview; // tap ke thumbnail / card
-
+  final VoidCallback? onPreview;
   const Klaim5cariTileWidget({
     super.key,
     required this.mjenisdocId,
@@ -89,7 +84,6 @@ class Klaim5cariTileWidget extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // ===== kanan: info + buttons (normal state) =====
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +116,6 @@ class Klaim5cariTileWidget extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-
                   Text(
                     fileName ?? _inferName(localPath, fileUrl) ?? '',
                     maxLines: 1,
@@ -306,7 +299,6 @@ class _Thumb extends StatelessWidget {
         },
       );
     } else {
-      // PDF dari URL: kalau belum download -> minimal tampil icon PDF
       child = _FileIconPlaceholder(isPdf: isPdf, isImage: isImage);
     }
 
