@@ -98,6 +98,7 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			cobId: event.cobId,
 			statusId: event.statusId,
 			queryKey: newKey,
+      isFetching: false,
 			// items: state.items  // tetap biar ga kedip
 		));
 

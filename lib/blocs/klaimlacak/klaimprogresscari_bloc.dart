@@ -44,10 +44,10 @@ class KlaimprogresscariBloc
 			final result = await repo.getKlaimprogresscari(state.klaim1Id);
 
 			emit(state.copyWith(
-				items: result.listProgress,
-				nilaiKlaim: result.nilaiKlaim,
-				jadwalBayar: result.jadwalBayar,
-				klaimProgressInfo: result.klaimProgressInfo,
+				items: result?.listProgress ?? [],
+				nilaiKlaim: result?.nilaiKlaim,
+				jadwalBayar: result?.jadwalBayar,
+				klaimProgressInfo: result?.klaimProgressInfo,
 				hasReachedMax: true, // karena kamu memang cuma fetch sekali
 				status: ListStatus.success,
 			));

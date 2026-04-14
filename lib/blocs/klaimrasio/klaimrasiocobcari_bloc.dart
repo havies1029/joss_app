@@ -26,7 +26,7 @@ Future<void> onFetchKlaimrasiocobCari(
 
 	KlaimrasiocobCariRepository repo = KlaimrasiocobCariRepository();
 	if (state.status == ListStatus.initial) {
-		KlaimrasiocariModel klaimRasio = await repo.getKlaimrasiocobCari(state.searchText);
+		KlaimrasiocariModel? klaimRasio = await repo.getKlaimrasiocobCari(state.searchText);
 		return emit(state.copyWith(
 			klaimRasio: klaimRasio,
 			hasReachedMax: false,

@@ -1,11 +1,11 @@
-import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/klaimrasio/klaimrasiocari_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:joss_app/helper/object_map_helper.dart';
 
 
 class KlaimrasiocobCariAPI{
-	Future<KlaimrasiocariModel> getKlaimrasiocobCariAPI(String searchText) async {
+	Future<KlaimrasiocariModel?> getKlaimrasiocobCariAPI(String searchText) async {
 		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/klaimrasio/klaimrasiocobcari/getlist";
 
 		Map<String, String> queryParams = {"searchText": searchText};
@@ -17,8 +17,9 @@ class KlaimrasiocobCariAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final Map<String, dynamic> jsonData =
-          json.decode(response.body) as Map<String, dynamic>;
+      
+      final jsonData = ObjectMapHelper().decodeJsonMapOrNull(response.body);
+      if (jsonData == null) return null;
 
       return KlaimrasiocariModel.fromJson(jsonData);
 		} else {

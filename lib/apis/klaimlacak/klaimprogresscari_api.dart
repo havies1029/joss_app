@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:joss_app/helper/object_map_helper.dart';
 import 'package:joss_app/models/klaimlacak/klaimprogresscari_model.dart';
 
 class KlaimprogresscariAPI{
-	Future<KlaimprogressCariResultModel> getKlaimprogresscariAPI(String klaim1Id) async {
+	Future<KlaimprogressCariResultModel?> getKlaimprogresscariAPI(String klaim1Id) async {
 		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/klaimlacak/klaimprogresscari/getlist";
 
     Map<String, String> queryParams = {"klaim1Id": klaim1Id};
@@ -16,12 +17,11 @@ class KlaimprogresscariAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final decoded = jsonDecode(response.body);
-			if (decoded is! Map<String, dynamic>) {
-				throw Exception('Unexpected JSON type: ${decoded.runtimeType}');
-			}
 
-      var result = KlaimprogressCariResultModel.fromJson(decoded);
+      final jsonData = ObjectMapHelper().decodeJsonMapOrNull(response.body);
+      if (jsonData == null) return null;
+
+      var result = KlaimprogressCariResultModel.fromJson(jsonData);
 
 			return result;
 		} else {

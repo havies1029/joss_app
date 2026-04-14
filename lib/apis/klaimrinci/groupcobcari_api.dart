@@ -16,7 +16,9 @@ class GroupcobCariAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
+      final decoded = json.decode(response.body);
+      if (decoded == null) return [];
+			final parsed = (decoded as List).cast<Map<String, dynamic>>();
 			return parsed
 				.map<GroupcobCariModel>((json) => GroupcobCariModel.fromJson(json))
 				.toList();
