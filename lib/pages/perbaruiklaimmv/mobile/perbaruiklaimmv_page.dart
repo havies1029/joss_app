@@ -332,6 +332,16 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       final isFormKlaimValid = _validateKlaim(context);
                       if (!isFormKlaimValid) return;
 
+                      final dokState = context.read<Klaim5cariBloc>().state;
+                      final isDokumenComplete = dokState.isComplete;
+
+                      if (!isDokumenComplete) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          errorSnackBar("Dokumen Klaim belum valid"),
+                        );
+                        return;
+                      }
+
                       final isFormBengkelValid = _validateBengkel(context);
                       if (!isFormBengkelValid) return;
 
@@ -349,6 +359,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                         return;
                       }
 
+                      if (dokState.emptyDocumentIds.isNotEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          errorSnackBar("Dokumen klaim belum lengkap"),
+                        );
+                        return;
+                      }
+
                       if (!isFormBengkelValid) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Data Bengkel belum valid"),
@@ -359,15 +376,6 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       final polisState = context.read<KlaimmvpoliscrudBloc>().state;
                       final klaimState = context.read<KlaimmvklaimcrudBloc>().state;
                       final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
-                      final dokState = context.read<Klaim5cariBloc>().state;
-                      final isDokumenComplete = dokState.isComplete;
-
-                      if (!isDokumenComplete) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          errorSnackBar("Dokumen Klaim belum valid"),
-                        );
-                        return;
-                      }
 
                       final allValid =
                           polisState.isValid &&
@@ -376,13 +384,6 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                               !klaimState.hasFailure &&
                               bengkelState.isValid &&
                               !bengkelState.hasFailure;
-
-                      if (dokState.emptyDocumentIds.isNotEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          errorSnackBar("Dokumen klaim belum lengkap"),
-                        );
-                        return;
-                      }
 
                       if (!allValid) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -409,7 +410,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                                   MaterialPageRoute(
                                     builder: (_) => const KlaimMainPage(),
                                   ),
-                                  (route) => route.isFirst,
+                                      (route) => route.isFirst,
                                 );
                               },
                             ),
