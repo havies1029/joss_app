@@ -342,6 +342,34 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     }
   }
 
+  int _findItemIndex(
+      List<Klaim5cariModel> items, {
+        required String klaim5Id,
+        required String mjenisdocId,
+        required String jenisDocLain,
+      }) {
+    if (klaim5Id.isNotEmpty) {
+      final idx = items.indexWhere((x) => x.klaim5Id == klaim5Id);
+      if (idx >= 0) return idx;
+    }
+
+    if (mjenisdocId.isNotEmpty) {
+      final idx = items.indexWhere(
+            (x) => x.mjenisdocId == mjenisdocId && x.jenisDocLain.isEmpty,
+      );
+      if (idx >= 0) return idx;
+    }
+
+    if (jenisDocLain.isNotEmpty) {
+      final idx = items.indexWhere(
+            (x) => x.jenisDocLain == jenisDocLain && x.mjenisdocId.isEmpty,
+      );
+      if (idx >= 0) return idx;
+    }
+
+    return -1;
+  }
+
   Future<void> onKlaim5UploadRequested(Klaim5UploadRequestedEvent event, Emitter<Klaim5cariState> emit) async {
     debugPrint('=== onKlaim5UploadRequested START ===');
     debugPrint('event.klaim5Id     : ${event.klaim5Id}');

@@ -136,11 +136,11 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
 
   String _iconPath(String id) {
     switch (id) {
-      case "10001":
-        return "assets/icons/properti.svg";
       case "10002":
-        return "assets/icons/kendaraan.svg";
+        return "assets/icons/properti.svg";
       case "10003":
+        return "assets/icons/kendaraan.svg";
+      case "10004":
         return "assets/icons/lainnya.svg";
       default:
         return "assets/icons/lainnya.svg";
@@ -250,10 +250,8 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
               final isSelected =
                   state.selectedItem?.mcobklaim1Id == item.mcobklaim1Id;
 
-              // final hasAccess =
-              //     userType != 'C' || !cobSet.contains(item.mcobklaim1Id);
-
-              final hasAccess = true;
+              final hasAccess =
+                  userType != 'C' || !cobSet.contains(item.mcobklaim1Id);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: hPadding),

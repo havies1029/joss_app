@@ -28,8 +28,8 @@ class CariAsuransiWidget extends StatelessWidget {
   const CariAsuransiWidget.menu({super.key})
       : type = CariAsuransiType.menu;
 
-  static const String cobProperti = '10001';
-  static const String cobKendaraan = '10002';
+  static const String cobProperti = '10002';
+  static const String cobKendaraan = '10003';
   static const String cobLainnya = '10003';
 
   @override
@@ -144,21 +144,13 @@ class CariAsuransiWidget extends StatelessWidget {
     return userType.toUpperCase() == 'C';
   }
 
-  // bool _hasCobAccess({
-  //   required String userType,
-  //   required Set<String> excludedCobSet,
-  //   required String cobId,
-  // }) {
-  //   if (!_isClient(userType)) return true;
-  //   return !excludedCobSet.contains(cobId);
-  // }
-
   bool _hasCobAccess({
     required String userType,
     required Set<String> excludedCobSet,
     required String cobId,
   }) {
-    return true;
+    if (!_isClient(userType)) return true;
+    return !excludedCobSet.contains(cobId);
   }
 
   Future<void> showAccessDeniedDialog(BuildContext context) {
@@ -266,10 +258,10 @@ class CariAsuransiWidget extends StatelessWidget {
       BuildContext context, {
         required String userType,
       }) {
-    // final excludeCOB =
-    //     context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
-    // final excludedCobSet = _parseExcludeCob(excludeCOB);
-    final excludedCobSet = <String>{};
+    final excludeCOB =
+        context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
+    final excludedCobSet = _parseExcludeCob(excludeCOB);
+
     final kendaraanHasAccess = _hasCobAccess(
       userType: userType,
       excludedCobSet: excludedCobSet,
