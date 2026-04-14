@@ -12,7 +12,6 @@ import '../../../../../common/constants.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../helper/pdf_open_helper.dart';
 import '../../../../../models/payment/historybayarcari_model.dart';
-import '../invoice_preview_page.dart';
 import 'riwayat_table_widget_remake.dart';
 
 class RiwayatDetailTablePageRemake extends StatefulWidget {

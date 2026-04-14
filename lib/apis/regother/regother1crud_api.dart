@@ -34,7 +34,7 @@ class Regother1CrudAPI {
 				debugPrint("API ERROR STATUS: ${response.statusCode}");
 				returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 			}
-		} catch (e, stack) {
+		} catch (e) {
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
 

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:http/http.dart' as http;

@@ -5,17 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
-import '../../../klaimlacak/mobile/klaimnilaicrud_form.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../perbaruiklaimmv/mobile/klaimmvpoliscrud_form.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
 import '../../../regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
-import '../../../tagihan_pembayaran/mobile/payment_page/payment_method/payment_method_page.dart';
-import '../../../tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import '../../../tagihan_pembayaran/tagihan_pembayaran_page.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
-import 'package:joss_app/pages/perbaruiklaimmv/mobile/klaim5cari_list.dart';
 
 class ListMenuWidget extends StatelessWidget {
   final String userType;
