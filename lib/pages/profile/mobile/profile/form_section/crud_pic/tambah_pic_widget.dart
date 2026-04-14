@@ -75,11 +75,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
     final selectedCobItems = cobBloc.state.selectedItems;
     if (selectedCobItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.'),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'));
       return;
     }
 
@@ -141,17 +137,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
               setState(() {
                 _saving = false;
               });
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    (state.message ?? '').trim().isNotEmpty
-                        ? state.message!
-                        : 'Gagal menyimpan data PIC.',
-                  ),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Gagal menyimpan data PIC.'));
               return;
             }
 
@@ -190,13 +176,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                   setState(() {
                     _saving = false;
                   });
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('PIC tersimpan, tapi gagal update COB.'),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
                 }
               } catch (e) {
                 if (!context.mounted) return;
@@ -204,17 +184,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                 setState(() {
                   _saving = false;
                 });
-
-                debugPrint('💥 [ERROR] Gagal kirim selected COB: $e');
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'PIC tersimpan, tapi terjadi error saat update COB.',
-                    ),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi terjadi error saat update COB.'));
               }
             }
           },
@@ -343,7 +313,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                                 CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Akses',
+                                                    'COB yang bisa diakses:',
                                                     style: bodyTextStyle(context)
                                                         .copyWith(
                                                       color: Colors.white70,

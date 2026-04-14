@@ -34,7 +34,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       listBloc.add(FetchMRekanPicListEvent());
-      context.read<HakaksesCrudBloc>().add(HakaksesCrudLihatEvent());
     });
   }
 
@@ -340,7 +339,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
             Divider(color: sGrey),
             const SizedBox(height: 8),
             Text(
-              'Polis yang bisa diakses:',
+              'COB yang bisa diakses:',
               style: bodyTextStyle(
                 context,
                 fontSize: getResponsiveFont(context, 16),

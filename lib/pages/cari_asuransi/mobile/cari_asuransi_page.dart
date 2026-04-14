@@ -30,7 +30,7 @@ class CariAsuransiWidget extends StatelessWidget {
 
   static const String cobProperti = '10002';
   static const String cobKendaraan = '10003';
-  static const String cobLainnya = '10003';
+  static const String cobLainnya = '10004';
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +259,7 @@ class CariAsuransiWidget extends StatelessWidget {
         required String userType,
       }) {
     final excludeCOB =
-        context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
+        context.watch<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
     final excludedCobSet = _parseExcludeCob(excludeCOB);
 
     final kendaraanHasAccess = _hasCobAccess(

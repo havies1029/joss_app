@@ -136,14 +136,27 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
 
   String _iconPath(String id) {
     switch (id) {
-      case "10002":
+      case "10001":
         return "assets/icons/properti.svg";
-      case "10003":
+      case "10002":
         return "assets/icons/kendaraan.svg";
-      case "10004":
+      case "10003":
         return "assets/icons/lainnya.svg";
       default:
         return "assets/icons/lainnya.svg";
+    }
+  }
+
+  String mapUiToAccessCob(String uiId) {
+    switch (uiId) {
+      case '10001':
+        return '10002'; // properti
+      case '10002':
+        return '10003'; // kendaraan
+      case '10003':
+        return '10004'; // lainnya
+      default:
+        return uiId;
     }
   }
 
@@ -212,76 +225,84 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CobklaimcariBloc, CobklaimcariState>(
-      builder: (context, state) {
-        final authState = context.watch<AuthenticationBloc>().state;
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, authState) {
         final userType = authState is AuthenticationAuthenticated
             ? (authState.user.userType).toUpperCase()
             : '';
 
-        final excludeCOB =
-            context.read<HakaksesCrudBloc>().state.record?.excludeCOB ?? '';
-        final cobSet = _parseExcludeCob(excludeCOB);
+        return BlocBuilder<HakaksesCrudBloc, HakaksesCrudState>(
+          builder: (context, hakaksesState) {
+            final excludeCOB = hakaksesState.record?.excludeCOB ?? '';
+            final cobSet = _parseExcludeCob(excludeCOB);
 
-        if (state.status == ListStatus.initial) {
-          return const SizedBox(
-            height: 44,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: LoadingIndicator(),
-            ),
-          );
-        }
+            return BlocBuilder<CobklaimcariBloc, CobklaimcariState>(
+              builder: (context, state) {
+                if (state.status == ListStatus.initial) {
+                  return const SizedBox(
+                    height: 44,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: LoadingIndicator(),
+                    ),
+                  );
+                }
 
-        if (state.status == ListStatus.failure) {
-          return const Text(
-            "Gagal memuat data",
-            style: TextStyle(color: Colors.red),
-          );
-        }
+                if (state.status == ListStatus.failure) {
+                  return const Text(
+                    "Gagal memuat data",
+                    style: TextStyle(color: sGrey),
+                  );
+                }
 
-        if (state.status == ListStatus.success) {
-          final items = state.items;
+                if (state.status == ListStatus.success) {
+                  final items = state.items;
 
-          if (items.isEmpty) return const SizedBox.shrink();
+                  if (items.isEmpty) return const SizedBox.shrink();
 
-          return Column(
-            children: items.map((item) {
-              final isSelected =
-                  state.selectedItem?.mcobklaim1Id == item.mcobklaim1Id;
+                  return Column(
+                    children: items.map((item) {
+                      final isSelected =
+                          state.selectedItem?.mcobklaim1Id == item.mcobklaim1Id;
 
-              final hasAccess =
-                  userType != 'C' || !cobSet.contains(item.mcobklaim1Id);
+                      final accessCobId = mapUiToAccessCob(item.mcobklaim1Id);
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: hPadding),
-                child: _buildRestrictedTile(
-                  context: context,
-                  userType: userType,
-                  hasAccess: hasAccess,
-                  child: _CobKlaimTile(
-                    item: item,
-                    iconPath: _iconPath(item.mcobklaim1Id),
-                    isSelected: isSelected,
-                    onTap: () {
-                      context.read<CobklaimcariBloc>().add(
-                        CobklaimcariItemSelectedEvent(selectedItem: item),
+                      final hasAccess =
+                          userType != 'C' || !cobSet.contains(accessCobId);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: hPadding),
+                        child: _buildRestrictedTile(
+                          context: context,
+                          userType: userType,
+                          hasAccess: hasAccess,
+                          child: _CobKlaimTile(
+                            item: item,
+                            iconPath: _iconPath(item.mcobklaim1Id),
+                            isSelected: isSelected,
+                            onTap: () {
+                              context.read<CobklaimcariBloc>().add(
+                                CobklaimcariItemSelectedEvent(selectedItem: item),
+                              );
+
+                              _navigateByCob(
+                                context,
+                                item.mcobklaim1Id,
+                                item.cobNama,
+                              );
+                            },
+                          ),
+                        ),
                       );
+                    }).toList(),
+                  );
+                }
 
-                      _navigateByCob(
-                        context,
-                        item.mcobklaim1Id,
-                        item.cobNama,
-                      );
-                    },
-                  ),
-                ),
-              );
-            }).toList(),
-          );
-        }
-
-        return const SizedBox.shrink();
+                return const SizedBox.shrink();
+              },
+            );
+          },
+        );
       },
     );
   }

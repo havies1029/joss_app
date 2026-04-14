@@ -298,8 +298,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
               state.isRegisterSuccess &&
               singlePopPages.contains(widget.requestFrom) &&
               !state.isOtpClient) {
-            debugPrint("popupclient1dipanggil cou");
-
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => PopupClientWidget(

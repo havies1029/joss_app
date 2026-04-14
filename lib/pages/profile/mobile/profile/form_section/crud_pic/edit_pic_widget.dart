@@ -8,6 +8,7 @@ import 'package:joss_app/common/loading_indicator.dart';
 import '../../../../../../blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import '../../../../../../blocs/gen_profile/mrekanpiclist_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
+import '../../../../../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/indo_phone_result.dart';
@@ -54,6 +55,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   late final MRekanPicCrudBloc crudBloc;
   late final RekanPicCobCariBloc cobBloc;
   late MRekanPicListBloc listBloc;
+  late HakaksesCrudBloc hakaksesCrudBloc;
 
   @override
   void initState() {
@@ -61,7 +63,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     listBloc = context.read<MRekanPicListBloc>();
     cobBloc = context.read<RekanPicCobCariBloc>();
     crudBloc = context.read<MRekanPicCrudBloc>();
-
+    hakaksesCrudBloc = context.read<HakaksesCrudBloc>();
     Future.delayed(const Duration(milliseconds: 300), () {
       loadData();
     });
@@ -139,11 +141,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     final selectedCobItems = cobBloc.state.selectedItems;
     if (selectedCobItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih minimal 1 COB sebelum menyimpan.'),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'));
       return;
     }
 
@@ -189,20 +187,12 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       setState(() => _saving = false);
 
       if (cobResult.success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('PIC & ${listCheckbox.length} COB berhasil disimpan!'),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar('PIC & ${listCheckbox.length} COB berhasil disimpan!'));
         listBloc.add(FetchMRekanPicListEvent());
+        hakaksesCrudBloc.add(HakaksesCrudLihatEvent());
         Navigator.pop(context, true);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PIC tersimpan, tapi gagal update COB.'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
       }
       return;
     }
@@ -275,13 +265,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                         _saving = false;
                       });
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'PIC & ${listCheckbox.length} COB berhasil disimpan!',
-                          ),
-                        ),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(successSnackBar('PIC & ${listCheckbox.length} COB berhasil disimpan!'));
+
 
                       listBloc.add(FetchMRekanPicListEvent());
                       Navigator.pop(context, true);
@@ -290,12 +275,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                         _saving = false;
                       });
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('PIC tersimpan, tapi gagal update COB.'),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
                     }
                   } catch (e) {
                     if (!context.mounted) return;
@@ -303,15 +283,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                     setState(() {
                       _saving = false;
                     });
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'PIC tersimpan, tapi terjadi error saat update COB.',
-                        ),
-                        backgroundColor: Colors.orange,
-                      ),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi terjadi error saat update COB.'));
                   }
                 }
 
@@ -474,7 +446,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                 CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Akses',
+                                                    'COB yang bisa diakses:',
                                                     style: bodyTextStyle(context)
                                                         .copyWith(
                                                       color: Colors.white70,
@@ -566,54 +538,27 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       Row(
                                         children: [
                                           Expanded(
-                                            child: TextButton(
+                                            child: AppButton.primary(
+                                              text: "Batal",
+                                              backgroundColor: sGrey.withOpacity(0.25),
+                                              textColor: primaryLightColor,
                                               onPressed: _saving
                                                   ? null
                                                   : () => Navigator.pop(context, false),
-                                              style: TextButton.styleFrom(
-                                                padding: const EdgeInsets.symmetric(
-                                                  vertical: 12,
-                                                ),
-                                                backgroundColor: sGrey.withOpacity(0.25),
-                                                foregroundColor: primaryLightColor,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                    cardBorderRadius,
-                                                  ),
-                                                ),
-                                              ),
-                                              child: const Text('Batal'),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
                                           Expanded(
-                                            child: TextButton(
+                                            child: AppButton.primary(
+                                              text: "Simpan",
+                                              isLoading: _saving,
+                                              backgroundColor:
+                                              _saving ? secondaryBlackColor : primaryColor,
                                               onPressed: _saving ? null : _save,
-                                              style: TextButton.styleFrom(
-                                                padding: const EdgeInsets.symmetric(
-                                                  vertical: 12,
-                                                ),
-                                                backgroundColor: primaryColor,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                    cardBorderRadius,
-                                                  ),
-                                                ),
-                                              ),
-                                              child: _saving
-                                                  ? const SizedBox(
-                                                width: 18,
-                                                height: 18,
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                ),
-                                              )
-                                                  : const Text('Simpan'),
                                             ),
                                           ),
                                         ],
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),

@@ -134,14 +134,11 @@ class _ComproContactDialogState extends State<ComproContactDialog> {
     if (_formKey.currentState!.validate()) {
       String input = _controller.text.trim();
 
-      // 🔹 Pastikan tidak double prefix
       if (input.startsWith('0')) {
-        input = '62${input.substring(1)}'; // ganti 0 di depan jadi 62
+        input = '62${input.substring(1)}';
       } else if (!input.startsWith('62')) {
-        input = '62$input'; // tambahkan 62 kalau belum ada
+        input = '62$input';
       }
-
-      debugPrint("📞 Nomor yang dikirim: $input");
 
       final bloc = context.read<ReqComproBloc>();
       final record = ReqComproModel(
@@ -168,16 +165,12 @@ class _ComproContactDialogState extends State<ComproContactDialog> {
             ),
           );
         } else if (state.isSaved && !state.hasFailure) {
-          Navigator.pop(context); // Tutup loading
-          Navigator.pop(context); // Tutup dialog
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Permintaan Company Profile berhasil dikirim!')),
-          );
+          Navigator.pop(context);
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(successSnackBar('Permintaan Company Profile berhasil dikirim!'));
         } else if (state.isSaved && state.hasFailure) {
-          Navigator.pop(context); // Tutup loading
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gagal mengirim permintaan. Coba lagi.')),
-          );
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Gagal mengirim permintaan. Coba lagi.'));
         }
       },
       child: Dialog(

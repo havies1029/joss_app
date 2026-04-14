@@ -22,11 +22,6 @@ class RekanPicCobCariAPI {
 		var uri = AppData.uriHtpp(
 				AppData.httpAuthority, urlGetListEndPoint, queryParams);
 
-		/// ================= REQUEST =================
-		debugPrint("===== REQUEST GET PIC COB =====");
-		debugPrint("URL : $uri");
-		debugPrint("PARAMS : $queryParams");
-
 		try {
 
 			final http.Response response = await http.get(
@@ -37,11 +32,6 @@ class RekanPicCobCariAPI {
 					'Authorization': 'Bearer ${AppData.userToken}'
 				},
 			);
-
-			/// ================= RESPONSE =================
-			debugPrint("===== RESPONSE GET PIC COB =====");
-			debugPrint("STATUS : ${response.statusCode}");
-			debugPrint("BODY : ${response.body}");
 
 			if (response.statusCode == 200) {
 				final parsed =
@@ -56,11 +46,6 @@ class RekanPicCobCariAPI {
 			}
 
 		} catch (e) {
-
-			/// ================= ERROR =================
-			debugPrint("===== ERROR GET PIC COB =====");
-			debugPrint(e.toString());
-
 			rethrow;
 		}
 	}
@@ -90,11 +75,6 @@ class RekanPicCobCariAPI {
 			};
 		}).toList();
 
-		/// ================= REQUEST =================
-		debugPrint("===== REQUEST UPDATE COB =====");
-		debugPrint("URL : $uri");
-		debugPrint("BODY : ${jsonEncode(fixedList)}");
-
 		try {
 
 			final response = await http.post(
@@ -106,11 +86,6 @@ class RekanPicCobCariAPI {
 				},
 				body: jsonEncode(fixedList),
 			);
-
-			/// ================= RESPONSE =================
-			debugPrint("===== RESPONSE UPDATE COB =====");
-			debugPrint("STATUS : ${response.statusCode}");
-			debugPrint("BODY : ${response.body}");
 
 			ReturnDataAPI returnData;
 
@@ -124,11 +99,6 @@ class RekanPicCobCariAPI {
 			return returnData;
 
 		} catch (e) {
-
-			/// ================= ERROR =================
-			debugPrint("===== ERROR UPDATE COB =====");
-			debugPrint(e.toString());
-
 			rethrow;
 		}
 	}
