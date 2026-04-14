@@ -48,7 +48,7 @@ class MRekanPicCrudBloc extends Bloc<MRekanPicCrudEvents, MRekanPicCrudState> {
           isSaved: returnData.success,
           hasFailure: !returnData.success,
           savedId: returnData.success ? returnData.data.toString() : null,
-          message: returnData.success ? null : returnData.data?.toString(),
+          message: returnData.success ? null : returnData.data.toString(),
         ),
       );
     } catch (e) {

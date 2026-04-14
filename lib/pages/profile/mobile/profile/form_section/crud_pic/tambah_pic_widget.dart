@@ -1,4 +1,3 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,8 +5,6 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekanpiccrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanpiccrud_model.dart';
-import 'package:joss_app/repositories/combobox/combomjabatan_repository.dart';
-import 'package:joss_app/models/combobox/combomjabatan_model.dart';
 
 import '../../../../../../blocs/gen_profile/mrekanpiclist_bloc.dart';
 import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
@@ -39,7 +36,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   final _jabatanNama = TextEditingController();
   final _alamat1 = TextEditingController();
 
-  bool _isDefault = false;
+  final bool _isDefault = false;
   bool _saving = false;
   bool _showErrors = false;
   late MRekanPicListBloc listBloc;

@@ -1683,27 +1683,37 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     if (!validateMoneyNonNegativeRequired(
       key: 'form4.siBuilding',
       controller: fieldSiBuildingController,
-    )) ok = false;
+    )) {
+      ok = false;
+    }
 
     if (!validateMoneyNonNegativeRequired(
       key: 'form4.siContent',
       controller: fieldSiContentController,
-    )) ok = false;
+    )) {
+      ok = false;
+    }
 
     if (!validateMoneyNonNegativeRequired(
       key: 'form4.siMachinery',
       controller: fieldSiMachineryController,
-    )) ok = false;
+    )) {
+      ok = false;
+    }
 
     if (!validateMoneyNonNegativeRequired(
       key: 'form4.siOther',
       controller: fieldSiOtherController,
-    )) ok = false;
+    )) {
+      ok = false;
+    }
 
     if (!validateMoneyNonNegativeRequired(
       key: 'form4.siStock',
       controller: fieldSiStockController,
-    )) ok = false;
+    )) {
+      ok = false;
+    }
 
     if (!ok) {
       openSection(RegparSection.form4);

@@ -4,7 +4,6 @@ import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_method/payment_method_page.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
-import 'package:joss_app/pages/tagihan_pembayaran/mobile/riwayat/invoice_preview_page.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/riwayat/riwayat_table_page_remake.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 

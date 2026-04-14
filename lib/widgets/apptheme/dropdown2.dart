@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
-import 'package:joss_app/models/combobox/combomkabzonagempa_model.dart';
 
 class ComboQuery {
   final String searchText;

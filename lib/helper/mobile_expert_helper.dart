@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
@@ -527,7 +526,7 @@ class MobileDownloadHelper {
   //   return isHeader ? pw.Alignment.centerLeft : pw.Alignment.centerLeft;
   // }
 
-  static pw.Alignment _getCellAlignment(String header, {bool isHeader = false}) {
+  static pw.Alignment _getCellAlignment(String header) {
     final h = header.trim().toLowerCase();
 
     if (h == 'no') {

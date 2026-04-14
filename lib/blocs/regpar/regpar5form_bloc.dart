@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/regpar/regpar5form_model.dart';
