@@ -15,7 +15,9 @@ class MstatusringkasCariAPI{
 		});
 
 		if (response.statusCode == 200) {
-			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
+      final decoded = json.decode(response.body);
+      if (decoded == null) return [];
+			final parsed = (decoded as List).cast<Map<String, dynamic>>();
 			return parsed
 				.map<MstatusringkasCariModel>((json) => MstatusringkasCariModel.fromJson(json))
 				.toList();

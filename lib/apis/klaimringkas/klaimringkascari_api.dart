@@ -15,11 +15,13 @@ class KlaimringkasCariAPI{
 			'Authorization': 'Bearer ${AppData.userToken}'
 		});
 
-		if (response.statusCode == 200) {
-			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
-			return parsed
-				.map<KlaimringkasCariModel>((json) => KlaimringkasCariModel.fromJson(json))
-				.toList();
+	if (response.statusCode == 200) {      
+      final decoded = json.decode(response.body);
+      if (decoded == null) return [];
+      return (decoded as List)
+          .cast<Map<String, dynamic>>()
+          .map<KlaimringkasCariModel>((json) => KlaimringkasCariModel.fromJson(json))
+          .toList();
 		} else {
 			throw Exception("Failed to load data");
 		}
