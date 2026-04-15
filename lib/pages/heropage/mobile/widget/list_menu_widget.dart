@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page.dart';
+import '../../../cari_asuransi/mobile/cari_asuransi_page2.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../perbaruiklaimmv/mobile/klaimmvpoliscrud_form.dart';
 import '../../../register/mobile/client/register_client_page.dart';
@@ -367,7 +368,7 @@ class ListMenuWidget extends StatelessWidget {
     final polisFormKey = GlobalKey<FormState>();
     switch (title) {
       case 'Cari Asuransi':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => CariAsuransiWidget.page()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CariAsuransiWidget2.page()));
         break;
 
       case 'Lapor Klaim':

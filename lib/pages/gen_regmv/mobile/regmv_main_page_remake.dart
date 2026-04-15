@@ -1154,7 +1154,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "TOTAL PREMI",
+                              // label: "TOTAL PREMI",
+                              label: "TOTAL TAGIHAN",
                               controller: fieldPremiNetController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
@@ -1162,7 +1163,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                           ],
-
                         ),
                         // buildFieldPremiNet(),
                         // const SizedBox(height: hPadding),

@@ -16,6 +16,7 @@ import '../../profile/mobile/profile/form_section/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/rekan_general_idv.dart';
 import '../../profile/mobile/profile/form_section/rekan_pic_widget.dart';
 import '../widgets/kebijakan_privasi_page.dart';
+import '../widgets/settings_profile_card_widget.dart';
 import '../widgets/syarat_ketentuan_page.dart';
 import '../widgets/ubah_password_popup.dart';
 import '../../base/base_background_firstpage.dart';
@@ -65,173 +66,6 @@ class _SettingsPageState extends State<SettingsPage> {
       }
 
     });
-  }
-
-  Widget _buildAvatar(
-      Uint8List? bytes,
-      String initials, {
-        bool isLoading = false,
-      }) {
-    final hasPhoto = bytes != null && bytes.isNotEmpty;
-
-    return CircleAvatar(
-      radius: 23,
-      backgroundColor: Colors.transparent,
-      child: ClipOval(
-        child: isLoading
-            ? const SizedBox(
-          width: 46,
-          height: 46,
-          child: Center(
-            child: SizedBox(
-              width: 18,
-              height: 18,
-              child: LoadingIndicator(),
-            ),
-          ),
-        )
-            : hasPhoto
-            ? Image.memory(
-          bytes,
-          fit: BoxFit.cover,
-          width: 46,
-          height: 46,
-          gaplessPlayback: true,
-          filterQuality: FilterQuality.medium,
-          errorBuilder: (_, __, ___) => _placeholderAvatar(),
-        )
-            : _placeholderAvatar(),
-      ),
-    );
-  }
-
-  Widget _placeholderAvatar() => SvgPicture.asset(
-    'assets/icons/place_holder_2.svg',
-    width: 46,
-    height: 46,
-    fit: BoxFit.cover,
-  );
-
-  String _initialsFromName(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    final first = parts.isNotEmpty ? parts.first[0] : '';
-    final last = parts.length > 1 ? parts.last[0] : '';
-    return (first + last).toUpperCase();
-  }
-
-  Widget _buildProfileCard({
-    required BuildContext context,
-    required String nama,
-    String? email,
-    String? telepon,
-    Uint8List? foto,
-    String? subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(1),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            primaryColor,
-            primaryColor.withOpacity(0.6),
-            primaryColor.withOpacity(0.4),
-            primaryColor.withOpacity(0.2),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.5, 0.75, 0.9, 1.0],
-        ),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(hPadding + 6),
-        decoration: BoxDecoration(
-          color: pGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius - 1.5),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildAvatar(foto, _initialsFromName(nama)),
-            const SizedBox(width: 16),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    nama,
-                    style: headingStyle(context, fontSize: 22),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  if (subtitle != null && subtitle.trim().isNotEmpty)
-                    Text(
-                      subtitle,
-                      style: bodyTextStyle(context).copyWith(
-                        color: primaryLightColor,
-                      ),
-                    ),
-
-                  const SizedBox(height: 8),
-
-                  if (email != null && email.trim().isNotEmpty)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          "assets/icons/email.svg",
-                          width: 16,
-                          height: 16,
-                          colorFilter: const ColorFilter.mode(
-                            primaryLightColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            email,
-                            style: bodyTextStyle(context, fontSize: 16),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 6),
-
-                  if (telepon != null && telepon.trim().isNotEmpty)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          "assets/icons/telepon.svg",
-                          width: 16,
-                          height: 16,
-                          colorFilter: const ColorFilter.mode(
-                            primaryLightColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        const SizedBox(width: 9),
-                        Expanded(
-                          child: Text(
-                            telepon.startsWith('+') ? telepon : '+$telepon',
-                            style: bodyTextStyle(context, fontSize: 16),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Future<bool?> showLogoutConfirmDialog(BuildContext context) {
@@ -440,87 +274,25 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, authState) {
-
                           final userType =
                           authState is AuthenticationAuthenticated
                               ? (authState.user.userType ?? '').toUpperCase()
                               : '';
 
                           if (userType == 'C') {
-
-                            return BlocBuilder<
-                                ProfileDownloadFotoBloc,
-                                ProfileDownloadFotoState>(
-                              buildWhen: (prev, curr) =>
-                              curr is ProfileDownloadFotoLoaded ||
-                                  curr is ProfileDownloadFotoLoading ||
-                                  prev.runtimeType != curr.runtimeType,
-
-                              builder: (context, fotoState) {
-
-                                if (fotoState is ProfileDownloadFotoLoading) {
-                                  return _buildProfileCard(
-                                    context: context,
-                                    nama: profileNama ?? AppData.user.nama ?? "",
-                                    email: profileEmail ?? AppData.user.email,
-                                    telepon: profileTelepon ?? AppData.user.hp,
-                                    foto: null,
-                                    subtitle: "Klien JPS",
-                                  );
-                                }
-
-                                if (fotoState is ProfileDownloadFotoLoaded) {
-
-                                  final foto = fotoState.imageBytes.isNotEmpty
-                                      ? fotoState.imageBytes
-                                      : null;
-
-                                  return _buildProfileCard(
-                                    context: context,
-                                    nama: profileNama ?? AppData.user.nama ?? "",
-                                    email: profileEmail ?? AppData.user.email,
-                                    telepon: profileTelepon ?? AppData.user.hp,
-                                    foto: foto,
-                                    subtitle: "Klien JPS",
-                                  );
-                                }
-
-                                return _buildProfileCard(
-                                  context: context,
-                                  nama: profileNama ?? AppData.user.nama ?? "",
-                                  email: profileEmail ?? AppData.user.email,
-                                  telepon: profileTelepon ?? AppData.user.hp,
-                                  foto: null,
-                                  subtitle: "Klien JPS",
-                                );
-                              },
+                            return SettingsProfileCardWidget(
+                              nama: profileNama ?? AppData.user.nama ?? "",
+                              email: profileEmail ?? AppData.user.email,
+                              telepon: profileTelepon ?? AppData.user.hp,
+                              subtitle: "Klien JPS",
                             );
-                          }else {
-                            return _buildProfileCard(
-                              context: context,
-                              // nama: AppData.user.email ?? "Pengguna Baru",
+                          } else {
+                            return const SettingsProfileCardWidget(
                               nama: "Pengguna Baru",
-                              foto: null,
                             );
                           }
-                          //
-                          // else {
-                          //
-                          //   final fallbackEmail =
-                          //   authState is AuthenticationAuthenticated
-                          //       ? (authState.user.email?.trim() ?? 'Guest User')
-                          //       : 'Guest User';
-                          //
-                          //   return _buildProfileCard(
-                          //     context: context,
-                          //     nama: fallbackEmail,
-                          //     foto: null,
-                          //     subtitle: "Nasabah",
-                          //   );
-                          // }
                         },
                       ),
 
@@ -528,20 +300,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, authState) {
-
                           final userType =
                           authState is AuthenticationAuthenticated
                               ? authState.user.userType
                               : '';
 
                           if (userType == 'C') {
-
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-
                                 _buildSectionTitle(context, 'Akun'),
-
                                 _buildCardContainer(
                                   children: [
                                     _buildMenuItem(
@@ -565,13 +333,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
                                 _buildCardContainer(
                                   children: [
-
                                     _buildMenuItem(
                                       svgAsset: 'assets/icons/informasi_klien.svg',
                                       title: 'Informasi Klien',
                                       onTap: () async {
-
-                                        if (mjenisClient  == '10') {
+                                        if (mjenisClient == '10') {
                                           await Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -590,9 +356,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         }
                                       },
                                     ),
-
                                     sDivider,
-
                                     _buildMenuItem(
                                       svgAsset: 'assets/icons/location.svg',
                                       title: 'Kontak & Alamat',
@@ -600,15 +364,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) =>
-                                            const MRekanContactCrudFormPage(),
+                                            builder: (_) => const MRekanContactCrudFormPage(),
                                           ),
                                         );
                                       },
                                     ),
-
                                     sDivider,
-
                                     _buildMenuItem(
                                       svgAsset: 'assets/icons/bank.svg',
                                       title: 'Rekening Bank',
@@ -616,8 +377,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) =>
-                                            const MRekanBankCrudFormPage(
+                                            builder: (_) => const MRekanBankCrudFormPage(
                                               viewMode: 'tambah',
                                               recordId: '',
                                             ),
@@ -625,9 +385,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         );
                                       },
                                     ),
-
                                     sDivider,
-
                                     _buildMenuItem(
                                       svgAsset: 'assets/icons/group.svg',
                                       title: 'Akses & Anggota',
@@ -636,8 +394,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) =>
-                                            const RekanPicWidgetPage(),
+                                            builder: (_) => const RekanPicWidgetPage(),
                                           ),
                                         );
                                       },
@@ -658,7 +415,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       _buildCardContainer(
                         children: [
-
                           _buildMenuItem(
                             svgAsset: 'assets/icons/sk.svg',
                             title: 'Syarat dan Ketentuan',
@@ -671,9 +427,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               );
                             },
                           ),
-
                           sDivider,
-
                           _buildMenuItem(
                             svgAsset: 'assets/icons/shield.svg',
                             title: 'Kebijakan dan Privasi',
@@ -695,7 +449,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       _buildCardContainer(
                         children: [
-
                           _buildSwitchItem(
                             svgAsset: 'assets/icons/notification.svg',
                             title: 'Email Notifikasi',
@@ -707,9 +460,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               );
                             },
                           ),
-
                           sDivider,
-
                           _buildMenuItem(
                             svgAsset: 'assets/icons/bantuan.svg',
                             title: 'Bantuan',
@@ -739,7 +490,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
 
-                      const SizedBox(height: hPadding,),
+                      const SizedBox(height: hPadding),
 
                       _buildSectionTitle(context, 'v1.0.1'),
 

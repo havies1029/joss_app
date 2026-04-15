@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/dashboard/sumdash_bloc.dart';
@@ -6,7 +5,6 @@ import 'package:joss_app/pages/heropage/mobile/widget/detail_premi.dart';
 
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
-import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
 import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
@@ -25,7 +23,6 @@ class HeroPage extends StatefulWidget {
 }
 
 class _HeroPageState extends State<HeroPage> {
-
   @override
   void initState() {
     super.initState();
@@ -62,28 +59,15 @@ class _HeroPageState extends State<HeroPage> {
                               prev.record?.rekanNama != curr.record?.rekanNama,
                               builder: (context, rekanState) {
                                 final nama = rekanState.record?.rekanNama.trim();
-                                final displayName =
-                                (nama != null && nama.isNotEmpty) ? nama : AppData.user.nama ?? "Klien Baru";
+                                final displayName = (nama != null && nama.isNotEmpty)
+                                    ? nama
+                                    : AppData.user.nama ?? "Klien Baru";
 
-                                return BlocBuilder<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-                                  buildWhen: (prev, curr) =>
-                                  curr is ProfileDownloadFotoLoaded ||
-                                      (prev is ProfileDownloadFotoLoaded &&
-                                          curr is! ProfileDownloadFotoLoaded),
-                                  builder: (context, fotoState) {
-                                    final bytes = (fotoState is ProfileDownloadFotoLoaded &&
-                                        fotoState.imageBytes.isNotEmpty)
-                                        ? fotoState.imageBytes
-                                        : null;
-
-                                    return _buildHeroContent(
-                                      context,
-                                      displayName: displayName,
-                                      userType: userType,
-                                      bytes: bytes,
-                                      screenHeight: screenHeight,
-                                    );
-                                  },
+                                return _buildHeroContent(
+                                  context,
+                                  displayName: displayName,
+                                  userType: userType,
+                                  screenHeight: screenHeight,
                                 );
                               },
                             );
@@ -95,24 +79,26 @@ class _HeroPageState extends State<HeroPage> {
                                   prev.record?.userNama != curr.record?.userNama,
                               builder: (context, regState) {
                                 final email = (regState.record?.email ?? '').trim();
-                                final personalNama = (regState.record?.personalNama ?? '').trim();
-                                final userNama = (regState.record?.userNama ?? '').trim();
+                                final personalNama =
+                                (regState.record?.personalNama ?? '').trim();
+                                final userNama =
+                                (regState.record?.userNama ?? '').trim();
 
                                 final displayName = email.isNotEmpty
                                     ? email
-                                    : (personalNama.isNotEmpty ? personalNama : (userNama.isNotEmpty ? userNama : 'New User'));
+                                    : (personalNama.isNotEmpty
+                                    ? personalNama
+                                    : (userNama.isNotEmpty ? userNama : 'New User'));
 
                                 return _buildHeroContent(
                                   context,
                                   displayName: displayName,
                                   userType: userType,
-                                  bytes: null,
                                   screenHeight: screenHeight,
                                 );
                               },
                             );
                           } else {
-                            // 🔹 userType kosong / tidak dikenal
                             final fallbackEmail =
                             authState is AuthenticationAuthenticated
                                 ? (authState.user.email?.trim() ?? 'Guest User')
@@ -122,7 +108,6 @@ class _HeroPageState extends State<HeroPage> {
                               context,
                               displayName: fallbackEmail,
                               userType: userType.isEmpty ? '(Unknown)' : userType,
-                              bytes: null,
                               screenHeight: screenHeight,
                             );
                           }
@@ -143,7 +128,6 @@ class _HeroPageState extends State<HeroPage> {
       BuildContext context, {
         required String displayName,
         required String userType,
-        Uint8List? bytes,
         required double screenHeight,
       }) {
     return Column(
@@ -152,7 +136,6 @@ class _HeroPageState extends State<HeroPage> {
       children: [
         HeroCardWidget(
           userName: displayName,
-          imageBytes: bytes,
           premiumAmount: userType == 'C' ? '10.500.000.000' : '0',
           polisCount: userType == 'C' ? 21 : 0,
           onDetailTap: () {
@@ -169,7 +152,6 @@ class _HeroPageState extends State<HeroPage> {
         ListMenuWidget(userType: userType),
         const SizedBox(height: vPadding - 3),
         const CarouselMenuWidget(),
-
         (userType == 'C')
             ? Column(
           children: [

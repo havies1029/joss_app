@@ -161,28 +161,29 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     final merkValues = details.map((d) => d.merk);
     final nopolValues = details.map((d) => d.noPolisi);
 
-    // periode isinya format sama, aman fixed/cap
     const periodeWidth = 170.0;
 
     final nilaiValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
     final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
+    final polisValues = details.map((d) => d.polisNo);
 
-    // caps (min/max) -> silakan kamu tweak sesuai selera
     final wTertanggung = _columnWidthFromLongest(context, tertanggungValues, min: 140, max: 200);
     final wMerk = _columnWidthFromLongest(context, merkValues, min: 110, max: 160);
     final wNoPol = _columnWidthFromLongest(context, nopolValues, min: 120, max: 170);
     final wNilai = _columnWidthFromLongest(context, nilaiValues, min: 150, max: 190);
     final wPremi = _columnWidthFromLongest(context, premiValues, min: 120, max: 160);
+    final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 170);
 
     return {
-      0: FixedColumnWidth(selectCol),     // radio
-      1: const FixedColumnWidth(50),      // No
-      2: FixedColumnWidth(wTertanggung),  // Tertanggung
-      3: const FixedColumnWidth(periodeWidth), // Periode
-      4: FixedColumnWidth(wMerk),         // Merk
-      5: FixedColumnWidth(wNoPol),        // Nomor Polisi
-      6: FixedColumnWidth(wNilai),        // Nilai Pertanggungan
-      7: FixedColumnWidth(wPremi),        // Premi
+      0: FixedColumnWidth(selectCol),
+      1: const FixedColumnWidth(50),
+      2: FixedColumnWidth(wPolis),
+      3: const FixedColumnWidth(periodeWidth),
+      4: FixedColumnWidth(wMerk),
+      5: FixedColumnWidth(wNoPol),
+      6: FixedColumnWidth(wTertanggung),
+      7: FixedColumnWidth(wNilai),
+      8: FixedColumnWidth(wPremi),
     };
   }
 
@@ -315,12 +316,13 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           columnWidths: {
             0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
             1: const FlexColumnWidth(1.0),
-            2: const FlexColumnWidth(2.4),
+            2: const FlexColumnWidth(2.0),
             3: const FlexColumnWidth(2.0),
             4: const FlexColumnWidth(2.0),
             5: const FlexColumnWidth(2.4),
-            6: const FlexColumnWidth(1.9),
-            7: const FlexColumnWidth(1.6),
+            6: const FlexColumnWidth(2.4),
+            7: const FlexColumnWidth(1.9),
+            8: const FlexColumnWidth(1.6),
           },
           children: [
             _tableHeader(context),
@@ -349,6 +351,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         const SizedBox(),
         ...[
           "No",
+          "Polis No",
           "Tertanggung",
           "Periode",
           "Merk Kendaraan",
@@ -379,7 +382,6 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       }) {
     final isSelected = widget.selectedItem == d;
 
-    // “mentok max width => jadi baris”
     final maxLinesTertanggung = compact ? 2 : 1;
     final maxLinesMerk = compact ? 2 : 1;
     final maxLinesNoPol = compact ? 2 : 1;
@@ -420,6 +422,12 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         _textCell(d.nomor.toString(), center: true, softWrap: false),
 
         _textCell(
+          d.polisNo,
+          maxLines: compact ? 2 : 1,
+          softWrap: true,
+        ),
+
+        _textCell(
           d.tertanggung,
           maxLines: maxLinesTertanggung,
           softWrap: true,
@@ -428,10 +436,9 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         _textCell(
           "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} - "
               "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
-          maxLines: compact ? 2 : 1, // 2 biar kalau sempit dia wrap natural
+          maxLines: compact ? 2 : 1,
           softWrap: true,
         ),
-
 
         _textCell(
           d.merk,
