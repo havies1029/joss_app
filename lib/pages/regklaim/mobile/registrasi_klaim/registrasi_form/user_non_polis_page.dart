@@ -278,11 +278,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     if (!ok) return;
 
     if (attachState.items.isEmpty) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text("Lampiran wajib diisi minimal 1 file/foto")),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Lampiran wajib diisi minimal 1 file/foto'));
       return;
     }
 
