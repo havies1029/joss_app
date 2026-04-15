@@ -1078,7 +1078,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
-                              label: "TOTAL PREMI",
+                              label: "TOTAL TAGIHAN",
                               controller: fieldPremiTotalController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
