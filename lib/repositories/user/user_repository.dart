@@ -14,6 +14,9 @@ class UserRepository {
     String? email,
     String? password,
   }) async {
+
+    //debugPrint('REPO -> authenticate START: $email');
+
     UserLogin userLogin = UserLogin(email: email, password: password);
     LoginApi loginApi = LoginApi();
     User user = await loginApi.validateUserLoginAPI(userLogin);

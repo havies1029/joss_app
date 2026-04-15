@@ -14,27 +14,17 @@ class LoginApi {
     String tokenEndpoint = "api/login/apilogin";
     final tokenURL = _base + tokenEndpoint;
     UserInfo userinfo = UserInfo(userLogin: userLogin);
-    debugPrint("validateUserLogin #10");
-    try {
-      await http.post(Uri.parse(tokenURL),
-          headers: <String, String>{
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json; odata=verbos',
-            'Accept': 'application/json; odata=verbos'
-          },
-          body: jsonEncode(userinfo.toJson()));
-    } catch (e) {
-      debugPrint("error : ${e.toString()}");
-    }
 
     final http.Response response = await http.post(Uri.parse(tokenURL),
         headers: <String, String>{
           'Content-Type': 'application/json; odata=verbos',
-          'Accept': 'application/json; odata=verbos'
+          'Accept': 'application/json; odata=verbos',
         },
         body: jsonEncode(userinfo.toJson()));
 
+
     if (response.statusCode == 200) {
+      
       String tokeninfo = jsonDecode(response.body);
       List<String> info = tokeninfo.split(";");
       String username = info[8];
@@ -53,9 +43,12 @@ class LoginApi {
             cstType: info[6],);
         return user;
       } on Exception {
+        //debugPrint("Error : ${e.toString()}");
         rethrow;
       }
     } else {
+      //debugPrint("validateUserLogin #25");
+      //debugPrint(jsonDecode(response.body));
       throw Exception(json.decode(response.body));
     }
   }
