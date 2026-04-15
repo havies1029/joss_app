@@ -574,7 +574,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("${item.urutan}. ", style: bodyTextStyle(context)),
+                  Text("${item.nomor} ", style: bodyTextStyle(context)),
                   Expanded(
                     child: Text(item.tahapDesc, style: bodyTextStyle(context)),
                   ),
