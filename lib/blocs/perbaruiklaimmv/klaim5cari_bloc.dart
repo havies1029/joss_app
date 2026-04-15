@@ -98,12 +98,12 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     Klaim5LocalFileSetEvent event, Emitter<Klaim5cariState> emit) async {
     // cari existing item
 
-    debugPrint('=== onKlaim5LocalFileSet START ===');
-    debugPrint('event.klaim1Id     : ${event.klaim1Id}');
-    debugPrint('event.klaim5Id     : ${event.klaim5Id}');
-    debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
-    debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
-    debugPrint('state.items.length : ${state.items.length}');
+    // debugPrint('=== onKlaim5LocalFileSet START ===');
+    // debugPrint('event.klaim1Id     : ${event.klaim1Id}');
+    // debugPrint('event.klaim5Id     : ${event.klaim5Id}');
+    // debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
+    // debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
+    // debugPrint('state.items.length : ${state.items.length}');
 
     for (var i = 0; i < state.items.length; i++) {
       final x = state.items[i];
@@ -114,9 +114,15 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       );
     }
 
-    final idx = state.items.indexWhere((x) =>
-        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-        ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+    // final idx = state.items.indexWhere((x) =>
+    //     ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+    //     ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+    final idx = _findItemIndex(
+      state.items,
+      klaim5Id: event.klaim5Id,
+      mjenisdocId: event.mjenisdocId,
+      jenisDocLain: event.jenisDocLain,
+    );
     debugPrint('MATCHED IDX: $idx');
     // copy list dulu
     final newItems = List<Klaim5cariModel>.from(state.items);
@@ -171,34 +177,34 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
       Klaim5DeleteRequestedEvent event,
       Emitter<Klaim5cariState> emit,
       ) async {
-    debugPrint('=== onKlaim5DeleteRequested START ===');
-    debugPrint('event.klaim5Id     : ${event.klaim5Id}');
-    debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
-    debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
-    debugPrint('state.klaim1Id     : ${state.klaim1Id}');
-    debugPrint('state.items.length : ${state.items.length}');
+    // debugPrint('=== onKlaim5DeleteRequested START ===');
+    // debugPrint('event.klaim5Id     : ${event.klaim5Id}');
+    // debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
+    // debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
+    // debugPrint('state.klaim1Id     : ${state.klaim1Id}');
+    // debugPrint('state.items.length : ${state.items.length}');
 
     int idx = state.items.indexWhere((x) =>
     ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
 
     if (idx < 0) {
-      debugPrint('DELETE ABORT: item tidak ditemukan di state');
+      // debugPrint('DELETE ABORT: item tidak ditemukan di state');
       return;
     }
 
     final oldItem = state.items[idx];
-    debugPrint('oldItem.klaim5Id   : ${oldItem.klaim5Id}');
-    debugPrint('oldItem.fileName   : ${oldItem.fileName}');
-    debugPrint('oldItem.fileUrl    : ${oldItem.fileUrl}');
-    debugPrint('oldItem.localPath  : ${oldItem.localPath}');
+    // debugPrint('oldItem.klaim5Id   : ${oldItem.klaim5Id}');
+    // debugPrint('oldItem.fileName   : ${oldItem.fileName}');
+    // debugPrint('oldItem.fileUrl    : ${oldItem.fileUrl}');
+    // debugPrint('oldItem.localPath  : ${oldItem.localPath}');
 
     String klaim5Id = event.klaim5Id;
     final bool shouldClear = oldItem.mjenisdocId.isNotEmpty;
 
     // kalau klaim5Id kosong, refresh diam-diam dulu buat ambil id terbaru
     if (klaim5Id.isEmpty) {
-      debugPrint('klaim5Id kosong, silent refresh dulu...');
+      // debugPrint('klaim5Id kosong, silent refresh dulu...');
 
       emit(state.copyWith(
         isRefreshing: true,
@@ -223,18 +229,18 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
 
         if (idx >= 0) {
           klaim5Id = freshItems[idx].klaim5Id;
-          debugPrint('klaim5Id hasil refresh: $klaim5Id');
+          // debugPrint('klaim5Id hasil refresh: $klaim5Id');
         } else {
-          debugPrint('Item tidak ditemukan setelah refresh');
+          // debugPrint('Item tidak ditemukan setelah refresh');
         }
       } catch (e) {
         emit(state.copyWith(isRefreshing: false));
-        debugPrint('silent refresh gagal: $e');
+        // debugPrint('silent refresh gagal: $e');
       }
     }
 
     if (klaim5Id.isEmpty) {
-      debugPrint('DELETE ABORT: klaim5Id masih kosong setelah refresh');
+      // debugPrint('DELETE ABORT: klaim5Id masih kosong setelah refresh');
       return;
     }
 
@@ -244,7 +250,7 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
         ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
 
     if (idx < 0) {
-      debugPrint('DELETE ABORT: item tidak ditemukan setelah refresh');
+      // debugPrint('DELETE ABORT: item tidak ditemukan setelah refresh');
       return;
     }
 
@@ -268,20 +274,20 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
     }
 
     emit(state.copyWith(items: newItems));
-    debugPrint('Optimistic delete applied');
+    // debugPrint('Optimistic delete applied');
 
     // delete ke server
     try {
       final repository = KlaimmvdoccrudRepository();
 
-      debugPrint('CALL DELETE SERVER => klaim5Id: $klaim5Id');
+      // debugPrint('CALL DELETE SERVER => klaim5Id: $klaim5Id');
       final success = await repository.klaimmvdoccrudHapus(
         klaim5Id,
         event.mjenisdocId,
         event.jenisDocLain,
       );
 
-      debugPrint('DELETE SERVER RESULT: $success');
+      // debugPrint('DELETE SERVER RESULT: $success');
 
       if (!success) {
         final rollbackItems = List<Klaim5cariModel>.from(state.items);
@@ -299,7 +305,7 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
         }
 
         emit(state.copyWith(items: rollbackItems));
-        debugPrint('Rollback karena delete server gagal');
+        // debugPrint('Rollback karena delete server gagal');
         return;
       }
 
@@ -317,9 +323,9 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
         isRefreshing: false,
       ));
 
-      debugPrint('=== onKlaim5DeleteRequested DONE ===');
+      // debugPrint('=== onKlaim5DeleteRequested DONE ===');
     } catch (e) {
-      debugPrint('DELETE ERROR: $e');
+      // debugPrint('DELETE ERROR: $e');
 
       final rollbackItems = List<Klaim5cariModel>.from(state.items);
 
@@ -371,20 +377,29 @@ class Klaim5cariBloc extends Bloc<Klaim5cariEvents, Klaim5cariState> {
   }
 
   Future<void> onKlaim5UploadRequested(Klaim5UploadRequestedEvent event, Emitter<Klaim5cariState> emit) async {
-    debugPrint('=== onKlaim5UploadRequested START ===');
-    debugPrint('event.klaim5Id     : ${event.klaim5Id}');
-    debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
-    debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
-    debugPrint('state.items.length : ${state.items.length}');
+    // debugPrint('=== onKlaim5UploadRequested START ===');
+    // debugPrint('event.klaim5Id     : ${event.klaim5Id}');
+    // debugPrint('event.mjenisdocId  : ${event.mjenisdocId}');
+    // debugPrint('event.jenisDocLain : ${event.jenisDocLain}');
+    // debugPrint('state.items.length : ${state.items.length}');
 
-    final idx = state.items.indexWhere((x) =>
-        ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
-        ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+    // final idx = state.items.indexWhere((x) =>
+    //     ((x.mjenisdocId == event.mjenisdocId) && x.jenisDocLain.isEmpty) ||
+    //     ((x.jenisDocLain == event.jenisDocLain) && x.mjenisdocId.isEmpty));
+
+    final idx = _findItemIndex(
+      state.items,
+      klaim5Id: event.klaim5Id,
+      mjenisdocId: event.mjenisdocId,
+      jenisDocLain: event.jenisDocLain,
+    );
+
+
     if (idx < 0) return;
 
     final item = state.items[idx];
     if (item.localPath == '') return;
-    debugPrint('UPLOAD MATCHED IDX: $idx');
+    // debugPrint('UPLOAD MATCHED IDX: $idx');
     final newItems = List<Klaim5cariModel>.from(state.items);
 
     // set status uploading

@@ -15,45 +15,16 @@ class LoginApi {
     final tokenURL = _base + tokenEndpoint;
     UserInfo userinfo = UserInfo(userLogin: userLogin);
 
-    debugPrint("validateUserLogin #10");
-
-    //debugPrint(tokenURL);
-    //debugPrint(jsonEncode(userinfo.toJson()));
-
-    try {
-      await http.post(Uri.parse(tokenURL),
-          headers: <String, String>{
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json; odata=verbos',
-            'Accept': 'application/json; odata=verbos'
-          },
-          //body: jsonEncode(userLogin.toDatabaseJson()),
-
-          body: jsonEncode(userinfo.toJson()));
-    } catch (e) {
-      debugPrint("error : ${e.toString()}");
-    }
-
     final http.Response response = await http.post(Uri.parse(tokenURL),
         headers: <String, String>{
           'Content-Type': 'application/json; odata=verbos',
-          'Accept': 'application/json; odata=verbos'
+          'Accept': 'application/json; odata=verbos',
         },
-        //body: jsonEncode(userLogin.toDatabaseJson()),
-
         body: jsonEncode(userinfo.toJson()));
 
-    //debugPrint("validateUserLogin #12");
-
-    //debugPrint("response.statusCode : ${response.statusCode}");
-
-    //debugPrint("validateUserLogin #20");
 
     if (response.statusCode == 200) {
-      //debugPrint("Berhasil Login #30");
-
-      //debugPrint(jsonDecode(response.body));
-
+      
       String tokeninfo = jsonDecode(response.body);
       List<String> info = tokeninfo.split(";");
       String username = info[8];

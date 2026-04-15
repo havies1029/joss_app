@@ -171,6 +171,7 @@ class _LoginFormClientState extends State<LoginFormClient>
   }
 
   void onLoginButtonPressed() {
+    debugPrint('UI -> onLoginButtonPressed');
     BlocProvider.of<LoginBloc>(context).add(
       LoginButtonPressed(
         email: _usernameController.text,
@@ -179,46 +180,6 @@ class _LoginFormClientState extends State<LoginFormClient>
       ),
     );
   }
-
-  // void _handleGmailRegisterForMobile(BuildContext context) async {
-  //   try {
-  //     GoogleSignInAccount? user;
-  //
-  //     if (kIsWeb) {
-  //       user = await _googleSignIn.signIn();
-  //     } else {
-  //       user = await _googleSignIn.signInSilently();
-  //       user ??= await _googleSignIn.signIn();
-  //     }
-  //
-  //     // debugPrint('[GMAIL] Google Sign-In result: ${user?.email}');
-  //
-  //     if (user != null && context.mounted) {
-  //       // 🔒 Simpan email & display name ke AuthLocalCubit
-  //       final authLocalCubit = context.read<AuthLocalCubit>();
-  //       authLocalCubit.setLastLoginEmail(user.email);
-  //       authLocalCubit.setGoogleDisplayName(user.displayName);
-  //
-  //       // ⛳ Kirim ke EmailVerificationBloc
-  //       context.read<EmailVerificationBloc>().add(
-  //         EmailVerificationTambahEvent(
-  //           record: EmailVerificationModel(
-  //             email: user.email,
-  //             requestFrom: 'google',
-  //           ),
-  //         ),
-  //       );
-  //     }
-  //
-  //   } catch (e) {
-  //     debugPrint('[GMAIL] ERROR: $e');
-  //     if (context.mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Login Google gagal: $e')),
-  //       );
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
