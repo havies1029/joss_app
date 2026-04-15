@@ -672,6 +672,7 @@ Future<void> main() async {
             listenWhen: (_, curr) => curr is AuthenticationAuthenticated,
             listener: (context, state) {
               final s = state as AuthenticationAuthenticated;
+              context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
 
               if (s.user.userType == 'C') {
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());

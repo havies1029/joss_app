@@ -1053,7 +1053,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                         HitungPremiWidget(
                           rows: [
                             HitungPremiRow(
-                              label: "Komprehensif:",
+                              label: "${fieldComboMMvjnscover?.coverName ?? '-'}:",
                               controller: fieldRateDasarController,
                               layoutType: HitungPremiLayoutType.horizontal,
                               // showValueBorder: true,

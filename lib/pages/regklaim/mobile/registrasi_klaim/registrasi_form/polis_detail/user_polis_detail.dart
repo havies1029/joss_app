@@ -8,6 +8,7 @@ import '../../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../../blocs/regklaim/sppaheader_bloc.dart';
+import '../../../../../../blocs/regklaim/sppapoliscari_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../models/regklaim/sppadetail_model.dart';
 import '../../../../../../models/regklaim/sppaheader_model.dart';
@@ -41,7 +42,7 @@ class UserPolisDetail extends StatefulWidget {
 
 class _UserPolisDetailState extends State<UserPolisDetail> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  late Regklaim1CrudBloc regklaim1formBloc;
   String get _iconPath {
     final name = widget.cobKlaimNama.trim().toLowerCase();
     return "assets/icons/$name.svg";
@@ -63,10 +64,8 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
     super.initState();
     regklaim1crudbloc = context.read<Regklaim1CrudBloc>();
     sppaHeaderBloc = context.read<SppaHeaderBloc>();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      context.read<SppaHeaderBloc>()
-          .add(SppaHeaderLihatEvent(recordId: widget.sppa1Id));
-    });
+    sppaHeaderBloc.add(SppaHeaderResetEvent());
+    sppaHeaderBloc.add(SppaHeaderLihatEvent(recordId: widget.sppa1Id));
   }
 
   @override

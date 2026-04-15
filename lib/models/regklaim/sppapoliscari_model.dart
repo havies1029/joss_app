@@ -1,7 +1,7 @@
 class SppapoliscariModel {
 	String polisNo;
 	String sppaId;
-	String sppaNoRef; // ✅ tambahin ini
+	String sppaNoRef;
 
 	SppapoliscariModel({
 		required this.polisNo,

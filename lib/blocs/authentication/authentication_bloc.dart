@@ -89,11 +89,7 @@ class AuthenticationBloc
 
   Future<void> _onLoggedIn(
       LoggedIn event, Emitter<AuthenticationState> emit) async {
-    debugPrint("_onLoggedIn dari Form Login Client");
-
     emit(AuthenticationLoading());
-
-    //emit(AuthenticationClientAuthenticated(user: event.user));
     emit(AuthenticationAuthenticated(
         user: event.user, authenticatedFrom: "login_client"));
   }

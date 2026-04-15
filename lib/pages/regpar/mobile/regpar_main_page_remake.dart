@@ -1815,8 +1815,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     dataLoader: () {
       final okupasiId = fieldComboROkupasi?.rokupasiId;
-      final payload = (okupasiId == null || okupasiId.isEmpty) ? "" : "$okupasiId|";
-      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(payload);
+      if (okupasiId == null || okupasiId.isEmpty) {
+        return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
+      }
+      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(okupasiId);
     },
 
     dataLoaderWithFilter: (q) {
@@ -1824,9 +1826,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       if (okupasiId == null || okupasiId.isEmpty) {
         return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
       }
-
-      final queryUser = (q ?? "").trim();
-      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("$okupasiId|$queryUser");
+      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(okupasiId);
     },
 
     serverSearchMinChars: 2,
@@ -1853,11 +1853,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  item.kelasNama,
-                  style: bodyTextStyle(context),
-                  textAlign: TextAlign.center,
-                ),
+                Text(item.kelasNama, style: bodyTextStyle(context), textAlign: TextAlign.center),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,

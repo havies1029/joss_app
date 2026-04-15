@@ -15,3 +15,7 @@ class SppaHeaderLihatEvent extends SppaHeaderEvents {
 	List<Object> get props => [recordId];
 }
 
+
+class SppaHeaderResetEvent extends SppaHeaderEvents {
+	const SppaHeaderResetEvent();
+}

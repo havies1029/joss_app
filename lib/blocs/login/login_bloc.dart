@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
@@ -28,7 +29,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   void _clearEmailVerificationState() {
     emailVerificationBloc.add(const FieldEmailVerificationChangedEvent(email: ''));
   }
-
   Future<void> _onLoginButtonPressed(
       LoginButtonPressed event,
       Emitter<LoginState> emit,
@@ -44,21 +44,26 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       AppData.user = user;
       AppData.userToken = user.token!;
+
       emit(LoginPreAuthenticate());
 
       if (event.rememberMe) {
-        userRepository.persistToken(userToken: user.token ?? "");
+        await userRepository.persistToken(userToken: user.token ?? "");
+      } else {
       }
 
       _clearEmailVerificationState();
 
+      debugPrint("Dispatch LoggedIn to AuthenticationBloc");
       authenticationBloc.add(LoggedIn(user: user));
+
       emit(LoginPostAuthenticate());
-    } catch (error) {
-      // _clearEmailVerificationState();
+    } catch (error, stackTrace) {
+      debugPrint("===== LOGIN ERROR =====");
+      debugPrint("Error: $error");
+      debugPrint("StackTrace: $stackTrace");
 
       emit(LoginFailure(error: "username atau password salah"));
     }
   }
-
 }
