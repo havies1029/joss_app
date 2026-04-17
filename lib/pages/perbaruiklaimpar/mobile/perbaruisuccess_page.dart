@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +36,8 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
   late ConfettiController _controllerLeft;
   late ConfettiController _controllerRight;
 
+  Timer? _redirectTimer;
+
   @override
   void initState() {
     super.initState();
@@ -43,23 +47,26 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
     _controllerLeft.play();
     _controllerRight.play();
 
-    Future.delayed(const Duration(seconds: 5), () {
+    _redirectTimer = Timer(const Duration(seconds: 5), () {
       if (!mounted) return;
-
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const KlaimMainPage()),
-            (route) => route.isFirst,
-      );
+      _goToMain();
     });
+  }
+
+  void _goToMain() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const KlaimMainPage()),
+          (route) => false,
+    );
   }
 
   @override
   void dispose() {
+    _redirectTimer?.cancel();
     _controllerLeft.dispose();
     _controllerRight.dispose();
     super.dispose();
   }
-
   void _defaultButtonAction() {
     context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
     // Navigator.popUntil(context, (route) => route.isFirst);
@@ -82,24 +89,29 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
               // Confetti kiri–atas
               Align(
                 alignment: const Alignment(-1, -1),
-                child: ConfettiWidget(
-                  confettiController: _controllerLeft,
-                  blastDirectionality: BlastDirectionality.explosive,
-                  emissionFrequency: 0.03,
-                  numberOfParticles: 32,
-                  shouldLoop: false,
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: ConfettiWidget(
+                    confettiController: _controllerLeft,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    emissionFrequency: 0.03,
+                    numberOfParticles: 32,
+                    shouldLoop: false,
+                  ),
                 ),
               ),
 
-              // Confetti kanan–atas
               Align(
                 alignment: const Alignment(1, -1),
-                child: ConfettiWidget(
-                  confettiController: _controllerRight,
-                  blastDirectionality: BlastDirectionality.explosive,
-                  emissionFrequency: 0.03,
-                  numberOfParticles: 32,
-                  shouldLoop: false,
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: ConfettiWidget(
+                    confettiController: _controllerRight,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    emissionFrequency: 0.03,
+                    numberOfParticles: 32,
+                    shouldLoop: false,
+                  ),
                 ),
               ),
 
@@ -134,9 +146,10 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
                         borderside: BorderSide(color: sGrey),
                         width: 245,
                         onPressed: () {
+                          Navigator.pop(context);
                           context.read<SumdashBloc>().add(SumdashLihatEvent());
                           context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
-                          onPressed.call();
+                          // onPressed.call();
                         },
                       ),
                     ],

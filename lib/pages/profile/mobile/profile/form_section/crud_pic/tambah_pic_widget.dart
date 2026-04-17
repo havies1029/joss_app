@@ -134,7 +134,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
               setState(() {
                 _saving = false;
               });
-              ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Gagal menyimpan data PIC.'));
+              // ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Gagal menyimpan data PIC.'));
               return;
             }
 

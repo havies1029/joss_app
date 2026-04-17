@@ -172,6 +172,8 @@ class _RincianTablePageState extends State<RincianTablePage> {
         : widget.headers;
 
     return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),//ini buat matiin scrol biar parent yang scroll,
+      shrinkWrap: true, //ini buat matiin scrol biar parent yang scroll,
       itemCount: visibleHeaders.length,
       padding: EdgeInsets.symmetric(
         horizontal: hPadding * 1.5,

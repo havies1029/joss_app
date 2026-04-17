@@ -191,12 +191,11 @@ class _RincianPageState extends State<RincianPage> {
 
                     const SizedBox(height: hPadding),
 
-                    // ===== CONTENT =====
                     Expanded(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: RincianTablePage(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            RincianTablePage(
                               headers: state.rincianSOA.headers,
                               selectedIds: state.selectedIds,
                               onSelect: (dn1Id) {
@@ -206,18 +205,16 @@ class _RincianPageState extends State<RincianPage> {
                                 dn2invBloc.add(UnselectDetailEvent(dn1Id));
                               },
                             ),
-                          ),
-                          const SizedBox(height: hPadding),
-                          RincianGrandTotalTableWidget(
-                            grandTotals: state.rincianSOA.grandtotal,
-                          ),
-                        ],
+                            RincianGrandTotalTableWidget(
+                              grandTotals: state.rincianSOA.grandtotal,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
 
-                // ===== FLOATING BAYAR BUTTON =====
                 BayarButton(
                   isEnabled: state.selectedIds.isNotEmpty,
                   onTap: state.selectedIds.isNotEmpty

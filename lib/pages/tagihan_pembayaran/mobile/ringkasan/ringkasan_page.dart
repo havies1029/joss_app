@@ -81,51 +81,52 @@ class RingkasanPageState extends State<RingkasanPage> {
         backgroundColor: secondaryBlackColor,
         body: Stack(
           children: [
-            // ===== MAIN CONTENT =====
             Column(
               children: [
+                const SizedBox(height: 8),
+
                 // ===== HEADER (PAKAI PADDING) =====
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: hPadding * 1.5,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: ListPageFilterBarUIWidget(
-                          searchController: _searchController,
-                          searchButton: buildSearchButton(),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      PolisButton(
-                        assetPath: "assets/icons/unduh.svg",
-                        bgColor: const Color(0xFFA1A1AA),
-                        borderColor: const Color(0xFFBCBCC7),
-                        onTap: () => _showExportDialog(context),
-                        iconSize: 16,
-                        height: 36,
-                        width: 36,
-                      ),
-                      const SizedBox(width: 8),
-                      PolisButton(
-                        assetPath: "assets/icons/bagikan.svg",
-                        bgColor: const Color(0xFF295EFF),
-                        borderColor: const Color(0xFF5D86FF),
-                        onTap: () => _onShare(context),
-                        iconSize: 16,
-                        height: 36,
-                        width: 36,
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   padding: EdgeInsets.symmetric(
+                //     horizontal: hPadding * 1.5,
+                //     vertical: 10,
+                //   ),
+                //   child:
+                //   Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Expanded(
+                //         child: ListPageFilterBarUIWidget(
+                //           searchController: _searchController,
+                //           searchButton: buildSearchButton(),
+                //         ),
+                //       ),
+                //       const SizedBox(width: 8),
+                //       PolisButton(
+                //         assetPath: "assets/icons/unduh.svg",
+                //         bgColor: const Color(0xFFA1A1AA),
+                //         borderColor: const Color(0xFFBCBCC7),
+                //         onTap: () => _showExportDialog(context),
+                //         iconSize: 16,
+                //         height: 36,
+                //         width: 36,
+                //       ),
+                //       const SizedBox(width: 8),
+                //       PolisButton(
+                //         assetPath: "assets/icons/bagikan.svg",
+                //         bgColor: const Color(0xFF295EFF),
+                //         borderColor: const Color(0xFF5D86FF),
+                //         onTap: () => _onShare(context),
+                //         iconSize: 16,
+                //         height: 36,
+                //         width: 36,
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
-                const SizedBox(height: hPadding),
+                // const SizedBox(height: hPadding),
 
-                // ===== TABLE (TANPA PADDING) =====
                 Expanded(
                   child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
                     builder: (context, state) {
@@ -161,7 +162,6 @@ class RingkasanPageState extends State<RingkasanPage> {
 
                 const SizedBox(height: hPadding),
 
-                // ===== INFO NOTE (PAKAI PADDING) =====
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                   child: buildInfoNote(context),
