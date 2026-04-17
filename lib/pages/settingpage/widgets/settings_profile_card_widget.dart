@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/common/loading_indicator.dart';
 
 import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../common/constants.dart';
