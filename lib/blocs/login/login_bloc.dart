@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
