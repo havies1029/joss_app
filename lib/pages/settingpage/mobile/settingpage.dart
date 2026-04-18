@@ -1,14 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:joss_app/common/loading_indicator.dart';
 import '../../../blocs/authentication/authentication_bloc.dart';
 import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
-import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../common/app_data.dart';
 import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
