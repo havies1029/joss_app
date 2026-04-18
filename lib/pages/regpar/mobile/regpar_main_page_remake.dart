@@ -1409,7 +1409,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       isOther: toBoolean(fieldIsOtherController.text),
       isRsmdcc: toBoolean(fieldIsRsmdccController.text),
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
-      kab2zonagempaId: fieldComboMKabZonaGempa?.mzonagempaId,
+      kab2zonagempaId: fieldComboMKabZonaGempa?.mkabzonagempaId,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       regpar3Id: regpar1Id ?? "",

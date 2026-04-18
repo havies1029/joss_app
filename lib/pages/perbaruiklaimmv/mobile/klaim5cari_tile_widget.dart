@@ -162,7 +162,7 @@ class Klaim5cariTileWidget extends StatelessWidget {
                         child: _DocButton(
                           label: 'Hapus',
                           icon: SvgPicture.asset(
-                            "assets/icons/gallery_img.svg",
+                            "assets/icons/delete_3.svg",
                             width: 18,
                             height: 18,
                             colorFilter: const ColorFilter.mode(
@@ -269,7 +269,7 @@ class _Thumb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const w = 86.0;
-    const h = 68.0;
+    const h = 112.0;
     final bg = const Color(0xFF1F1F1F);
     final border = Colors.white.withOpacity(0.10);
 

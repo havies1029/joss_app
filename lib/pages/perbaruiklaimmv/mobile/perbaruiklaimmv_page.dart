@@ -50,6 +50,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   bool _validatePolis(BuildContext context) {
     final ok = polisPageKey.currentState?.runFullValidation() ?? false;
     if (!ok) {
+      _openAccordion(0);
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar("Data Polis belum valid"),
       );
@@ -60,6 +61,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   bool _validateKlaim(BuildContext context) {
     final ok = klaimPageKey.currentState?.runFullValidation() ?? false;
     if (!ok) {
+      _openAccordion(1);
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar("Data Klaim belum valid"),
       );
@@ -70,6 +72,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   bool _validateBengkel(BuildContext context) {
     final ok = bengkelPageKey.currentState?.runFullValidation() ?? false;
     if (!ok) {
+      _openAccordion(4);
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar("Data Bengkel belum valid"),
       );
@@ -82,12 +85,19 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
     final ok = dokState.emptyDocumentIds.isEmpty;
 
     if (!ok) {
+      _openAccordion(2);
       ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar("Data Klaim belum valid"),
+        errorSnackBar("Dokumen klaim belum lengkap"),
       );
     }
 
     return ok;
+  }
+
+  void _openAccordion(int index) {
+    context.read<KlaimmvaccordionBloc>().add(
+      KlaimmvaccordionToggleEvent(index: index),
+    );
   }
 
   @override
@@ -327,15 +337,22 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       if (!mounted) return;
 
                       final isFormPolisValid = _validatePolis(context);
-                      if (!isFormPolisValid) return;
+                      if (!isFormPolisValid) {
+                        _openAccordion(0);
+                        return;
+                      }
 
                       final isFormKlaimValid = _validateKlaim(context);
-                      if (!isFormKlaimValid) return;
+                      if (!isFormKlaimValid) {
+                        _openAccordion(1);
+                        return;
+                      }
 
                       final dokState = context.read<Klaim5cariBloc>().state;
                       final isDokumenComplete = dokState.isComplete;
 
                       if (!isDokumenComplete) {
+                        _openAccordion(2);
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Dokumen Klaim belum valid"),
                         );
@@ -343,9 +360,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       }
 
                       final isFormBengkelValid = _validateBengkel(context);
-                      if (!isFormBengkelValid) return;
+                      if (!isFormBengkelValid) {
+                        _openAccordion(4);
+                        return;
+                      }
 
                       if (!isFormPolisValid) {
+                        _openAccordion(0);
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Data Polis belum valid"),
                         );
@@ -353,6 +374,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       }
 
                       if (!isFormKlaimValid) {
+                        _openAccordion(1);
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Data Klaim belum valid"),
                         );
@@ -360,6 +382,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       }
 
                       if (dokState.emptyDocumentIds.isNotEmpty) {
+                        _openAccordion(2);
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Dokumen klaim belum lengkap"),
                         );
@@ -367,6 +390,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       }
 
                       if (!isFormBengkelValid) {
+                        _openAccordion(4);
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Data Bengkel belum valid"),
                         );
@@ -386,6 +410,14 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                               !bengkelState.hasFailure;
 
                       if (!allValid) {
+                        if (!polisState.isValid || polisState.hasFailure) {
+                          _openAccordion(0);
+                        } else if (!klaimState.isValid || klaimState.hasFailure) {
+                          _openAccordion(1);
+                        } else if (!bengkelState.isValid || bengkelState.hasFailure) {
+                          _openAccordion(4);
+                        }
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           errorSnackBar("Lengkapi dan simpan semua data terlebih dahulu"),
                         );

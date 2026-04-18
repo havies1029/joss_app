@@ -149,7 +149,7 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
                           Navigator.pop(context);
                           context.read<SumdashBloc>().add(SumdashLihatEvent());
                           context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
-                          // onPressed.call();
+                          onPressed.call();
                         },
                       ),
                     ],
