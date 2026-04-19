@@ -98,6 +98,12 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                         }
 
                         if (state.isSaved) {
+                          if (mounted) {
+                            setState(() {
+                              isSaving = false;
+                            });
+                          }
+
                           if (!state.hasFailure) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               successSnackBar("Data berhasil disimpan!"),
@@ -108,7 +114,9 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
                             );
                           }
 
-                          context.read<MRekanBankCrudBloc>().add(MRekanBankCrudResetStatusEvent());
+                          context
+                              .read<MRekanBankCrudBloc>()
+                              .add(MRekanBankCrudResetStatusEvent());
                         }
                       },
                       child: _buildFormContent(context),
@@ -166,22 +174,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
             onPressed: isSaving
                 ? null
                 : () async {
-              setState(() {
-                isSaving = true;
-              });
-
-              try {
-                onSaveForm();
-
-                // loading palsu
-                await Future.delayed(const Duration(seconds: 2));
-              } finally {
-                if (mounted) {
-                  setState(() {
-                    isSaving = false;
-                  });
-                }
-              }
+              await onSaveForm();
             },
           )
         ],
@@ -194,11 +187,16 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
       fieldMrekan1IdController.text = record.mrekan1Id;
       fieldRekNamaController.text = record.rekNama;
       fieldRekNoController.text = record.rekNo;
-      fieldComboMBank = record.comboMBank;
-      existingMrekanBankId = record.mrekanbankId;
+
+      if (record.comboMBank != null) {
+        fieldComboMBank = record.comboMBank;
+      }
+
+      if (record.mrekanbankId != null && record.mrekanbankId!.isNotEmpty) {
+        existingMrekanBankId = record.mrekanbankId;
+      }
     });
   }
-
 
   Widget buildFieldNamaBank() {
     return ReusableComboBox<ComboMBankModel>(
@@ -260,25 +258,31 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     );
   }
 
-  void onSaveForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+  Future<void> onSaveForm() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-      final record = MRekanBankCrudModel(
-        mbankId: fieldComboMBank?.mbankId,
-        mrekan1Id: fieldMrekan1IdController.text,
-        mrekanbankId: existingMrekanBankId ?? '',
-        rekNama: fieldRekNamaController.text,
-        rekNo: fieldRekNoController.text,
-      );
+    _formKey.currentState!.save();
 
-      if (existingMrekanBankId != null && existingMrekanBankId!.isNotEmpty) {
-        mRekanBankCrudBloc.add(MRekanBankCrudUbahEvent(record: record));
-      } else {
-        mRekanBankCrudBloc.add(MRekanBankCrudTambahEvent(record: record));
-      }
+    if (mounted) {
+      setState(() {
+        isSaving = true;
+      });
+    }
 
+    final record = MRekanBankCrudModel(
+      mbankId: fieldComboMBank?.mbankId,
+      mrekan1Id: fieldMrekan1IdController.text,
+      mrekanbankId: existingMrekanBankId ?? '',
+      rekNama: fieldRekNamaController.text,
+      rekNo: fieldRekNoController.text,
+    );
+
+    if (existingMrekanBankId != null && existingMrekanBankId!.isNotEmpty) {
+      mRekanBankCrudBloc.add(MRekanBankCrudUbahEvent(record: record));
     } else {
+      mRekanBankCrudBloc.add(MRekanBankCrudTambahEvent(record: record));
     }
   }
 

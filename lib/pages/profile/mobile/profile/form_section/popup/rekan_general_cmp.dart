@@ -332,8 +332,13 @@ class MRekanGeneralCmpPopUpPageFormState
                                 ),
                                 const SizedBox(height: vPadding),
                                 AppButton.primary(
-                                  text: state.isSaving ? "Menyimpan..." : "Simpan Perubahan",
-                                  onPressed: state.isSaving ? null : onSaveForm,
+                                  text: "Simpan Perubahan",
+                                  isLoading: state.isSaving,
+                                  onPressed: state.isSaving
+                                      ? null
+                                      : () async {
+                                    await onSaveForm();
+                                  },
                                 ),
                               ],
                             ),
@@ -472,7 +477,7 @@ class MRekanGeneralCmpPopUpPageFormState
     );
   }
 
-  void onSaveForm() {
+  Future<void> onSaveForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 

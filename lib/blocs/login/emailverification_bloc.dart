@@ -140,6 +140,7 @@ class EmailVerificationBloc
       successMessage: successMessage,
     ));
   }
+
   Future<void> onValidasiPinEmail(
       ValidasiPinEmailEvent event, Emitter<EmailVerificationState> emit) async {
     ReturnDataAPI returnData;

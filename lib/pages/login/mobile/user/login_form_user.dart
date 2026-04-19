@@ -90,23 +90,17 @@ class _LoginFormUserState extends State<LoginFormUser>
       onPressed: isSigningIn
           ? null
           : () async {
-        if (_formKey.currentState!.validate()) {
+        if (!_formKey.currentState!.validate()) return;
+
+        if (mounted) {
           setState(() {
             isSigningIn = true;
           });
-
-          _animationController.forward(from: 0);
-
-          onRegisterButtonPressed(context);
-
-          await Future.delayed(const Duration(seconds: 2));
-
-          if (mounted) {
-            setState(() {
-              isSigningIn = false;
-            });
-          }
         }
+
+        _animationController.forward(from: 0);
+
+        onRegisterButtonPressed(context);
       },
     );
   }
@@ -170,8 +164,16 @@ class _LoginFormUserState extends State<LoginFormUser>
           listenWhen: (previous, current) =>
           previous.hasFailure != current.hasFailure ||
               previous.errors != current.errors ||
-              previous.successMessage != current.successMessage,
+              previous.successMessage != current.successMessage ||
+              previous.isLoaded != current.isLoaded,
           listener: (context, state) {
+            if (state.isLoaded && !state.hasFailure) {
+              if (mounted) {
+                setState(() {
+                  isSigningIn = false;
+                });
+              }
+            }
 
             if (state.successMessage.isNotEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(

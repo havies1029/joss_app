@@ -135,6 +135,12 @@ class MRekanContactCrudFormPageFormState
                       }
 
                       if (state.isSaved) {
+                        if (mounted) {
+                          setState(() {
+                            isSaving = false;
+                          });
+                        }
+
                         if (!state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan!"),
@@ -214,19 +220,7 @@ class MRekanContactCrudFormPageFormState
             onPressed: isSaving
                 ? null
                 : () async {
-              setState(() {
-                isSaving = true;
-              });
-
-              onSaveForm();
-
-              await Future.delayed(const Duration(seconds: 2));
-
-              if (mounted) {
-                setState(() {
-                  isSaving = false;
-                });
-              }
+              await onSaveForm();
             },
           )
         ],
@@ -361,7 +355,7 @@ class MRekanContactCrudFormPageFormState
     onSaveCallback: (value) => fieldComboRKodepos = value,
   );
 
-  void onSaveForm() {
+  Future<void> onSaveForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
@@ -370,6 +364,12 @@ class MRekanContactCrudFormPageFormState
     );
 
     final telpNormalized = phoneRes.phone62 ?? "";
+
+    if (mounted) {
+      setState(() {
+        isSaving = true;
+      });
+    }
 
     final currentRecord = mRekanContactCrudBloc.state.record;
 

@@ -5,7 +5,7 @@ import 'package:joss_app/widgets/apptheme/header_card.dart';
 
 import '../../../common/constants.dart';
 import '../../calpar/mobile/calpar_main_page_remake.dart';
-import '../../gen_calmv/mobile/calmv_main_page_remake.dart';
+import '../../calmv/mobile/calmv_main_page_remake.dart';
 import '../../regother/mobile/regother_form/regother_form1.dart';
 
 class BeliPolisPage extends StatelessWidget {

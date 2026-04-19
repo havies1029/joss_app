@@ -5,6 +5,7 @@ import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/repositories/user/user_repository.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../models/user/user_model.dart';
 import 'emailverification_bloc.dart';
 
 part 'login_event.dart';

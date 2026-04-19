@@ -141,7 +141,6 @@ class MRekanGeneralCmpCrudFormPageFormState
                         }
 
                         fieldComboMBentukCst ??= rec?.comboMBentukCst ?? state.comboMBentukCst;
-
                         fieldComboMBidang ??= rec?.comboMBidang ?? state.comboMBidang;
 
                         setState(() {});
@@ -149,6 +148,12 @@ class MRekanGeneralCmpCrudFormPageFormState
                       }
 
                       if (state.isSaved) {
+                        if (mounted) {
+                          setState(() {
+                            isSaving = false;
+                          });
+                        }
+
                         if (!state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan!"),
@@ -309,19 +314,7 @@ class MRekanGeneralCmpCrudFormPageFormState
                               onPressed: isSaving
                                   ? null
                                   : () async {
-                                setState(() {
-                                  isSaving = true;
-                                });
-
-                                onSaveForm();
-
-                                await Future.delayed(const Duration(seconds: 2));
-
-                                if (mounted) {
-                                  setState(() {
-                                    isSaving = false;
-                                  });
-                                }
+                                await onSaveForm();
                               },
                             )
                           ],
@@ -462,9 +455,15 @@ class MRekanGeneralCmpCrudFormPageFormState
     );
   }
 
-  void onSaveForm() {
+  Future<void> onSaveForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
+
+    if (mounted) {
+      setState(() {
+        isSaving = true;
+      });
+    }
 
     final record = MRekanGeneralCmpCrudModel(
       mbentukcstId: fieldComboMBentukCst?.mbentukcstId,

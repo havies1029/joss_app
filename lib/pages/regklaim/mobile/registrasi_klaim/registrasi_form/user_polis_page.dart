@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../../blocs/regklaim/sppapoliscari_bloc.dart';
+import 'package:joss_app/repositories/regklaim/sppapoliscari_repository.dart';
+import 'package:joss_app/widgets/apptheme/dropdown2.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/regklaim/sppapoliscari_model.dart';
 
@@ -24,20 +23,7 @@ class UserPolisPage extends StatefulWidget {
 }
 
 class _UserPolisPageState extends State<UserPolisPage> {
-  bool _didLoadSppa = false;
 
-  @override
-  void didUpdateWidget(covariant UserPolisPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.cobKlaimId != widget.cobKlaimId) {
-      _didLoadSppa = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        widget.onPolisChanged(null);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,49 +50,27 @@ class _UserPolisPageState extends State<UserPolisPage> {
               ),
             ),
             const SizedBox(height: hPadding),
-            buildComboSppaPolis(
-              cobKlaimId: widget.cobKlaimId,
-            ),
+            buildFieldComboSppaPolis(),
           ],
         ),
       ),
     );
   }
 
-  Widget buildComboSppaPolis({required String cobKlaimId}) {
-    return BlocBuilder<SppapoliscariBloc, SppapoliscariState>(
-      builder: (context, state) {
-        if (!_didLoadSppa && cobKlaimId.isNotEmpty) {
-          _didLoadSppa = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            context.read<SppapoliscariBloc>().add(
-              RefreshSppapoliscariEvent(
-                cobKlaimId: cobKlaimId,
-                searchText: "",
-              ),
-            );
-          });
-        }
-        return ReusableComboBox<SppapoliscariModel>(
-          key: ValueKey(
-            'sppa_${cobKlaimId}_${state.status}_${state.items.length}',
-          ),
-          hintText: "No. Polis",
-          initItem: widget.selectedPolis,
-          dataLoader: () async {
-            return state.items;
-          },
-          displayText: (i) => i.sppaNoRef,
-          compareItems: (a, b) => a.sppaId == b.sppaId,
-          onChangedCallback: (v) {
-            widget.onPolisChanged(v);
-          },
-          onSaveCallback: (value) {
-            widget.onPolisChanged(value);
-          },
-        );
-      },
-    );
-  }
+  Widget buildFieldComboSppaPolis() => ReusableComboBoxV2<SppapoliscariModel>(
+    hintText: "No. Polis",    
+    params: {
+      "cobKlaimId": widget.cobKlaimId,
+    },
+    loader: (query) {
+      return SppapoliscariRepository().getSppapoliscari(query.params["cobKlaimId"] ?? "", query.searchText, 0);
+    },
+    displayText: (i) => i.sppaNoRef,
+    compareItems: (a, b) => a.sppaId == b.sppaId,
+    onChangedCallback: (v) {
+      widget.onPolisChanged(v);
+    }, 
+    onSaveCallback: (SppapoliscariModel? p1) {  },
+  );
+
 }

@@ -719,16 +719,32 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
           BlocListener<Regpar5FormBloc, Regpar5FormState>(
             listenWhen: (prev, curr) =>
-                prev.isCalculated != curr.isCalculated && curr.isCalculated,
+            prev.isCalculated != curr.isCalculated ||
+                prev.hasFailure != curr.hasFailure,
             listener: (context, state) {
+              if (state.hasFailure) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                  });
+                }
+                return;
+              }
+
               final rec = state.record;
-              if (rec == null) return;
+              if (!state.isCalculated || rec == null) return;
+
+              if (mounted) {
+                setState(() {
+                  _isHitungPremiLoading = false;
+                  regpar5Id = rec.regpar5Id;
+                });
+              }
 
               _payloadform5(rec);
-              setState(() => regpar5Id = rec.regpar5Id);
               openPremiSection(recordId: regpar1Id);
             },
-          )
+          ),
         ],
         child: _buildForm(),
       ),
@@ -1437,6 +1453,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+
   Widget buildButtonHitungPremi() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
@@ -1447,19 +1464,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       onPressed: _isHitungPremiLoading
           ? null
           : () async {
-        setState(() {
-          _isHitungPremiLoading = true;
-        });
-
         await onHitungPremi();
-
-        await Future.delayed(const Duration(seconds: 2));
-
-        if (mounted) {
-          setState(() {
-            _isHitungPremiLoading = false;
-          });
-        }
       },
     ),
   );
@@ -1471,32 +1476,41 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       return;
     }
 
-    final ok2 = validateForm2();
-    if (!ok2) {
+    final okForm2 = validateForm2();
+    if (!okForm2) {
       openForm2(recordId: regpar1Id);
       return;
     }
 
-    final ok3 = validateForm3();
-    if (!ok3) {
+    final okForm3 = validateForm3();
+    if (!okForm3) {
       openForm3(recordId: regpar1Id);
       return;
     }
 
-    final ok4 = validateForm4();
-    if (!ok4) {
+    final okForm4 = validateForm4();
+    if (!okForm4) {
       openForm4(recordId: regpar1Id);
       return;
     }
 
     final form6State = context.read<RegparUploadFotoObjectBloc>().state;
+    final okForm6 = form6State.items.isNotEmpty;
 
-    final ok6 = form6State.items.isNotEmpty;
-
-    if (!ok6) {
-      setState(() => _showVal6 = true);
+    if (!okForm6) {
+      if (mounted) {
+        setState(() {
+          _showVal6 = true;
+        });
+      }
       openUploadFotoSection(recordId: regpar1Id);
       return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isHitungPremiLoading = true;
+      });
     }
 
     final localIds6 = form6State.items.map((e) => e.localId).toList();
@@ -1914,7 +1928,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     initItem: fieldComboROkupasi,
     dataLoader: () => ComboROkupasiRepository().getComboROkupasi(""),
     dataLoaderWithFilter: (filter) => ComboROkupasiRepository().getComboROkupasi(filter),
-    displayText: (i) => i.okupasiDesc,
+    displayText: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
     compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
     validatorCallback: (_) => err('form2.okupasi'),
     errorText: err('form2.okupasi'),

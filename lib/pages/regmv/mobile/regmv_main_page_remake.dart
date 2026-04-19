@@ -6,9 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
-import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv4_unified_preview_page.dart';
-import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv5_unified_preview_page.dart';
-import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv7_unified_preview_page.dart';
+import 'package:joss_app/pages/regmv/mobile/preview/regmv4_unified_preview_page.dart';
+import 'package:joss_app/pages/regmv/mobile/preview/regmv5_unified_preview_page.dart';
+import 'package:joss_app/pages/regmv/mobile/preview/regmv7_unified_preview_page.dart';
 import 'package:string_validator/string_validator.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
@@ -695,8 +695,26 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           ),
           BlocListener<Regmv6FormBloc, Regmv6FormState>(
             listener: (context, state) {
-              if (state.isCalculated && !state.hasFailure && state.record != null) {
-                _payloadform6(state.record!);
+              if (state.hasFailure) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                  });
+                }
+                return;
+              }
+
+              final record = state.record;
+              if (record == null) return;
+
+              if (state.isCalculated) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                  });
+                }
+
+                _payloadform6(record);
                 openSection(RegmvFormSection.form6);
               }
             },
@@ -1545,6 +1563,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+
   Widget buildButtonHitungPremi() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
@@ -1555,87 +1574,88 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       onPressed: _isHitungPremiLoading
           ? null
           : () async {
-        setState(() {
-          _isHitungPremiLoading = true;
-        });
-
-        onHitungPremi();
-
-        await Future.delayed(const Duration(seconds: 2));
-
-        if (mounted) {
-          setState(() {
-            _isHitungPremiLoading = false;
-          });
-        }
+        await onHitungPremi();
       },
     ),
   );
 
-  Future<void>  onHitungPremi() async {
+  Future<void> onHitungPremi() async {
     final okForm1 = validateForm1();
     if (!okForm1) {
       openForm1(recordId: regmv1Id);
       return;
     }
 
-    final ok2 = validateForm2();
-    if (!ok2) {
+    final okForm2 = validateForm2();
+    if (!okForm2) {
       openForm2(recordId: regmv1Id);
       return;
     }
 
-    final ok3 = validateForm3();
-    if (!ok3) {
+    final okForm3 = validateForm3();
+    if (!okForm3) {
       openForm3(recordId: regmv1Id);
       return;
     }
-
 
     final stnkState = context.read<RegmvUploadStnkBloc>().state;
     final mobilState = context.read<RegmvUploadFotoMobilBloc>().state;
     final accState = context.read<RegmvUploadFotoAccBloc>().state;
 
-    final ok4 = stnkState.items.isNotEmpty;
-    final ok5 = mobilState.items.isNotEmpty;
-    final ok7 = accState.items.isNotEmpty;
+    final okForm4 = stnkState.items.isNotEmpty;
+    final okForm5 = mobilState.items.isNotEmpty;
+    final okForm7 = accState.items.isNotEmpty;
 
-    if (!ok4 || !ok5 || !ok7) {
-      setState(() {
-        _showVal4 = !ok4;
-        _showVal5 = !ok5;
-        _showVal7 = !ok7;
-      });
+    if (!okForm4 || !okForm5 || !okForm7) {
+      if (mounted) {
+        setState(() {
+          _showVal4 = !okForm4;
+          _showVal5 = !okForm5;
+          _showVal7 = !okForm7;
+        });
+      }
 
-      if (!ok4) {
+      if (!okForm4) {
         openForm4(recordId: regmv1Id);
-      } else if (!ok5) {
+      } else if (!okForm5) {
         openForm5(recordId: regmv1Id);
-      } else if (!ok7) {
+      } else if (!okForm7) {
         openForm7(recordId: regmv1Id);
       }
 
       return;
     }
 
+    if (mounted) {
+      setState(() {
+        _isHitungPremiLoading = true;
+      });
+    }
+
     final localIds4 = stnkState.items.map((e) => e.localId).toList();
     final localIds5 = mobilState.items.map((e) => e.localId).toList();
     final localIds7 = accState.items.map((e) => e.localId).toList();
 
-    context.read<RegmvUploadStnkBloc>().add(Regmv4StorageUploadMany(
-      regmv1Id: regmv1Id!,
-      localIds: localIds4,
-    ));
+    context.read<RegmvUploadStnkBloc>().add(
+      Regmv4StorageUploadMany(
+        regmv1Id: regmv1Id!,
+        localIds: localIds4,
+      ),
+    );
 
-    context.read<RegmvUploadFotoMobilBloc>().add(Regmv5StorageUploadMany(
-      regmv1Id: regmv1Id!,
-      localIds: localIds5,
-    ));
+    context.read<RegmvUploadFotoMobilBloc>().add(
+      Regmv5StorageUploadMany(
+        regmv1Id: regmv1Id!,
+        localIds: localIds5,
+      ),
+    );
 
-    context.read<RegmvUploadFotoAccBloc>().add(Regmv7StorageUploadMany(
-      regmv1Id: regmv1Id!,
-      localIds: localIds7,
-    ));
+    context.read<RegmvUploadFotoAccBloc>().add(
+      Regmv7StorageUploadMany(
+        regmv1Id: regmv1Id!,
+        localIds: localIds7,
+      ),
+    );
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -1685,11 +1705,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     bool ok = true;
 
     // No SPPA (meskipun disabled, tetap wajib ada value)
-    final sppa = fieldCalmv1IdController.text.trim();
-    if (sppa.isEmpty) {
-      setErr('form1.noSppa', kStringNullError);
-      ok = false;
-    }
+    // final sppa = fieldCalmv1IdController.text.trim();
+    // if (sppa.isEmpty) {
+    //   setErr('form1.noSppa', kStringNullError);
+    //   ok = false;
+    // }
 
     // Nama Tertanggung
     final nama = fieldTtgNamaController.text.trim();
@@ -1904,14 +1924,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ok = false;
     }
 
-    // Aksesoris (required)
-    final aksesorisRaw = fieldAksesorisController.text.trim();
+    String aksesorisRaw = fieldAksesorisController.text.trim();
     if (aksesorisRaw.isEmpty) {
-      setErr('form3.aksesoris', kStringNullError);
-      ok = false;
+      aksesorisRaw = '';
+      fieldAksesorisController.text = aksesorisRaw;
     }
 
-    // Kalau gagal, buka panel form3 (index 2)
     if (!ok) {
       setState(() => expanded[2] = true);
     }
@@ -2482,7 +2500,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   );
 
   Widget _buildFieldAksesoris() => appTextField(
-    label: "Aksesoris",
+    label: "Aksesoris (opsional)",
     controller: fieldAksesorisController,
     keyboardType: TextInputType.text,
     inputFormatters: [

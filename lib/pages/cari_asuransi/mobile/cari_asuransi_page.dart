@@ -9,7 +9,7 @@ import '../../../common/constants.dart';
 import '../../base/base_background_firstpage.dart';
 import '../../base/base_background_sidepage.dart';
 import '../../calpar/mobile/calpar_main_page_remake.dart';
-import '../../gen_calmv/mobile/calmv_main_page_remake.dart';
+import '../../calmv/mobile/calmv_main_page_remake.dart';
 import '../../regother/mobile/regother_form/regother_form1.dart';
 
 enum CariAsuransiType { page, menu }

@@ -104,6 +104,10 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               }
 
               if (state.paymentStatus == "30") {
+                if (mounted) {
+                  setState(() => isSubmitting = false);
+                }
+
                 refreshData();
 
                 messenger.showSnackBar(
@@ -122,7 +126,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   ),
                 );
 
-                debugPrint("invoiceId ${state.invoiceId}");
                 return;
               }
 
@@ -289,26 +292,24 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
 
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                    child: AppButton.primary(
-                      text: "Simpan",
-                      isLoading: isSubmitting,
-                      onPressed: isSubmitting
-                          ? null
-                          : () async {
-                        setState(() => isSubmitting = true);
+                      padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                      child: AppButton.primary(
+                        text: "Lanjutkan",
+                        isLoading: isSubmitting,
+                        onPressed: isSubmitting
+                            ? null
+                            : () async {
+                          if (mounted) {
+                            setState(() => isSubmitting = true);
+                          }
 
-                        context.read<DnRekap2invBloc>().add(
-                          RegPar2InvoiceEvent(
-                            regpar1Id: widget.recordId ?? "",
-                          ),
-                        );
-
-                        await Future.delayed(const Duration(seconds: 2));
-
-                        setState(() => isSubmitting = false);
-                      },
-                    )
+                          context.read<DnRekap2invBloc>().add(
+                            RegPar2InvoiceEvent(
+                              regpar1Id: widget.recordId ?? "",
+                            ),
+                          );
+                        },
+                      )
                   ),
 
                 ],

@@ -104,10 +104,14 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     : state.curr;
                 onViewPaymentMethods(curr, state.totalBayar);
               } else if (state.paymentStatus == "30") {
-                //refreshData();
+                if (mounted) {
+                  setState(() => isSubmitting = false);
+                }
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   successSnackBar('Silakan lakukan pembayaran.'),
                 );
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -309,17 +313,15 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                       onPressed: isSubmitting
                           ? null
                           : () async {
-                        setState(() => isSubmitting = true);
+                        if (mounted) {
+                          setState(() => isSubmitting = true);
+                        }
 
                         context.read<DnRekap2invBloc>().add(
                           RegMv2InvoiceEvent(
                             regmv1Id: widget.recordId ?? "",
                           ),
                         );
-
-                        await Future.delayed(const Duration(seconds: 2));
-
-                        setState(() => isSubmitting = false);
                       },
                     ),
                   ),

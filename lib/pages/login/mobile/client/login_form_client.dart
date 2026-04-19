@@ -6,9 +6,11 @@ import 'package:joss_app/pages/login/mobile/client/forgot_password_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
+import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
 import '../../../../common/loading_indicator.dart';
 import '../../../../helper/indo_phone_result.dart';
+import '../../../../models/user/user_model.dart';
 
 class LoginFormClient extends StatefulWidget {
   const LoginFormClient({super.key});
@@ -149,29 +151,21 @@ class _LoginFormClientState extends State<LoginFormClient>
       onPressed: isSubmitting
           ? null
           : () async {
-        if (_formKey.currentState!.validate()) {
+        if (!_formKey.currentState!.validate()) return;
+
+        if (mounted) {
           setState(() {
             isSubmitting = true;
           });
-
-          _animationController.forward(from: 0);
-
-          onLoginButtonPressed();
-
-          await Future.delayed(const Duration(seconds: 2));
-
-          if (mounted) {
-            setState(() {
-              isSubmitting = false;
-            });
-          }
         }
+
+        _animationController.forward(from: 0);
+        onLoginButtonPressed();
       },
     );
   }
 
   void onLoginButtonPressed() {
-    debugPrint('UI -> onLoginButtonPressed');
     BlocProvider.of<LoginBloc>(context).add(
       LoginButtonPressed(
         email: _usernameController.text,
@@ -188,211 +182,197 @@ class _LoginFormClientState extends State<LoginFormClient>
         BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginFailure) {
+              if (mounted) {
+                setState(() {
+                  isSubmitting = false;
+                });
+              }
+
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar("Username atau Password Anda salah!"),
               );
+              return;
+            }
+
+            if (state is LoginPostAuthenticate) {
+              if (mounted) {
+                setState(() {
+                  isSubmitting = false;
+                });
+              }
             }
           },
         ),
       ],
-      child: BlocBuilder<LoginBloc, LoginState>(
-        builder: (context, state) {
-          return ((state is LoginInitial) || (state is LoginFailure))
-              ? Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // Header Section
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/images/logo.png',
-                              gaplessPlayback: true,
-                              height:
-                              isDesktop(context)
-                                  ? 56
-                                  : isTablet(context)
-                                  ? 48
-                                  : 42,
-                              width:
-                              isDesktop(context)
-                                  ? 180
-                                  : isTablet(context)
-                                  ? 140
-                                  : 120,
-                            ),
-                            SizedBox(height: hPadding,),
-                            WelcomeHeader(type: "login_client"),
-                          ],
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'assets/images/logo.png',
+                          gaplessPlayback: true,
+                          height: isDesktop(context)
+                              ? 56
+                              : isTablet(context)
+                              ? 48
+                              : 42,
+                          width: isDesktop(context)
+                              ? 180
+                              : isTablet(context)
+                              ? 140
+                              : 120,
+                        ),
+                        SizedBox(height: hPadding),
+                        WelcomeHeader(type: "login_client"),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: cardBorderGradient,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
                         ),
                       ),
-
-                      // Card Section
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: cardBorderGradient,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
+                      child: Container(
+                        margin: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: secondaryBlackColor,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: Card(
+                          color: secondaryBlackColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           child: Container(
-                            margin: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              color: secondaryBlackColor,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Card(
-                              color: secondaryBlackColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                padding: EdgeInsets.all(20),
-                                child: Column(
+                            width: double.infinity,
+                            height: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                _buildEmailField(0),
+                                const SizedBox(height: 10),
+                                _buildPasswordField(0),
+                                const SizedBox(height: 10),
+                                Row(
                                   children: [
-                                    _buildEmailField(0),
-                                    SizedBox(height: 10),
-                                    _buildPasswordField(0),
-                                    SizedBox(height: 10),
-                                    // Row dengan checkbox dan forgot password
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _rememberPassword =
-                                                !_rememberPassword;
-                                              });
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Checkbox(
-                                                  value: _rememberPassword,
-                                                  activeColor: primaryColor,
-                                                  checkColor: primaryLightColor,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(
-                                                      checkboxBorderRadius,
-                                                    ),
-                                                  ),
-                                                  onChanged:
-                                                      (value) => setState(
-                                                        () =>
-                                                    _rememberPassword =
-                                                        value ??
-                                                            false,
-                                                  ),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _rememberPassword = !_rememberPassword;
+                                          });
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Checkbox(
+                                              value: _rememberPassword,
+                                              activeColor: primaryColor,
+                                              checkColor: primaryLightColor,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                  checkboxBorderRadius,
                                                 ),
-                                                Flexible(
-                                                  child: Text(
-                                                    "Simpan Sesi Login",
-                                                    style: bodyTextStyle(
-                                                      context,
-                                                    ),
-                                                    overflow:
-                                                    TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
+                                              ),
+                                              onChanged: (value) => setState(
+                                                    () => _rememberPassword = value ?? false,
+                                              ),
                                             ),
-                                          ),
+                                            Flexible(
+                                              child: Text(
+                                                "Simpan Sesi Login",
+                                                style: bodyTextStyle(context),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        TextButton(
-                                          onPressed: () {
-                                            // Implementasi fungsi forgot password
-                                          },
-                                          child: HoverableText(
-                                            text: 'Lupa Kata Sandi',
-                                            onTap: () {
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                  builder: (_) => ForgotPasswordPage(
-                                                    initialEmail: _usernameController.text.trim(),
-                                                    onSubmit: (email) {
-                                                        // panggil bloc / api versi kamu sendiri
-                                                        // contoh: context.read<ForgotPasswordBloc>().add(...)
-                                                        return Future.value(true);
-                                                      },
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            styleBuilder:
-                                                (isHovering) =>
-                                                inputTextStyle(
-                                                  context,
-                                                  color:
-                                                  isHovering
-                                                      ? pBlue
-                                                      : primaryColor,
-                                                ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                    SizedBox(height: 10),
-                                    _buildSignInButton(),
-
-                                    SizedBox(height: vPadding,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Belum Punya Akun? ",
-                                          style: bodyTextStyle(context).copyWith(color: hintGrey),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: HoverableText(
+                                        text: 'Lupa Kata Sandi',
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (_) => ForgotPasswordPage(
+                                                initialEmail: _usernameController.text.trim(),
+                                                onSubmit: (email) {
+                                                  return Future.value(true);
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        styleBuilder: (isHovering) => inputTextStyle(
+                                          context,
+                                          color: isHovering ? pBlue : primaryColor,
                                         ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            _clearEmailStateAndController(); // ✅ kosongin dulu
-                                            context.read<EmailVerificationBloc>().add(
-                                              ClearEmailVerificationEvent(),
-                                            );
-                                            context.read<AuthenticationBloc>().add(RequireLoginUser());
-                                          },
-                                          child: Text(
-                                            "Masuk Sebagai Pengguna",
-                                            style: bodyTextStyle(context).copyWith(color: primaryColor),
-                                          ),
-                                        ),
-                                      ],
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-
-                                    SizedBox(height: 20),
                                   ],
                                 ),
-                              ),
+                                const SizedBox(height: 10),
+                                _buildSignInButton(),
+                                SizedBox(height: vPadding),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Belum Punya Akun? ",
+                                      style: bodyTextStyle(context).copyWith(color: hintGrey),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _clearEmailStateAndController();
+                                        context.read<EmailVerificationBloc>().add(
+                                          ClearEmailVerificationEvent(),
+                                        );
+                                        context.read<AuthenticationBloc>().add(
+                                          RequireLoginUser(),
+                                        );
+                                      },
+                                      child: Text(
+                                        "Masuk Sebagai Pengguna",
+                                        style: bodyTextStyle(context).copyWith(color: primaryColor),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                              ],
                             ),
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          )
-              : const Center(child: LoadingIndicator());
-        },
+          ),
+        ),
       ),
     );
   }

@@ -36,7 +36,7 @@ import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
-import '../../gen_regmv/mobile/regmv_main_page_remake.dart';
+import '../../regmv/mobile/regmv_main_page_remake.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
 import '../../register/mobile/client/register_client_page.dart';
@@ -355,27 +355,44 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           ),
           BlocListener<Calmv3FormBloc, Calmv3FormState>(
             listener: (context, state) {
-              if (state.record != null) {
-                if (state.isLoaded) {
+              if (state.hasFailure) {
+                if (mounted) {
                   setState(() {
-                    calmv3Id = state.record!.calmv3Id;
+                    _isHitungPremiLoading = false;
                   });
+                }
+                return;
+              }
 
-                  _payloadform3(state.record!);
+              final record = state.record;
+              if (record == null) return;
 
-                  if (state.record!.calmv3Id.isNotEmpty) {
-                    openForm3();
-                  }
+              if (state.isLoaded) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                    calmv3Id = record.calmv3Id;
+                  });
                 }
 
-                if (state.isSaved) {
-                  setState(() {
-                    calmv3Id = state.record!.calmv3Id;
-                  });
+                _payloadform3(record);
 
-                  if (state.record!.calmv3Id.isNotEmpty) {
-                    openForm3();
-                  }
+                if (record.calmv3Id.isNotEmpty) {
+                  openForm3();
+                }
+                return;
+              }
+
+              if (state.isSaved) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                    calmv3Id = record.calmv3Id;
+                  });
+                }
+
+                if (record.calmv3Id.isNotEmpty) {
+                  openForm3();
                 }
               }
             },
@@ -779,6 +796,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+
   Widget buildButtonHitungPremi() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
@@ -789,19 +807,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       onPressed: _isHitungPremiLoading
           ? null
           : () async {
-        setState(() {
-          _isHitungPremiLoading = true;
-        });
-
         await onHitungPremi();
-
-        await Future.delayed(const Duration(seconds: 2));
-
-        if (mounted) {
-          setState(() {
-            _isHitungPremiLoading = false;
-          });
-        }
       },
     ),
   );
@@ -819,11 +825,16 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       return;
     }
 
+    setState(() {
+      _isHitungPremiLoading = true;
+    });
+
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
 
     context.read<CalmvFlowBloc>().add(CalmvFlowStartEvent());
   }
+
   bool hasLeadingZero(String raw) {
     return raw.length > 1 && raw.startsWith('0');
   }
@@ -886,85 +897,106 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   }
 
   bool validateForm2() {
-    bool ok = true;
     clearErrsByPrefix('form2.');
-
-    // Passenger Count (required) - default 1 dari initState
-    if (selectedPassengerCount.trim().isEmpty) {
-      setErr('form2.passengerCount', kStringNullError);
-      ok = false;
-    }
+    bool ok = true;
 
     String cleanNum(String v) => v.replaceAll(",", "").trim();
 
-    double parseOrDefaultZero(TextEditingController controller) {
-      final raw = cleanNum(controller.text);
+    double parseOrZeroAutoFill(TextEditingController c) {
+      final raw = cleanNum(c.text);
 
       if (raw.isEmpty) {
-        controller.text = "0"; // auto default
+        c.text = "0";
         return 0;
       }
 
       return double.tryParse(raw) ?? double.nan;
     }
 
-    bool validateNonNegative({
+    bool optionalPositiveNumAutoZero({
+      required TextEditingController controller,
       required String key,
-      required double value,
     }) {
+      final value = parseOrZeroAutoFill(controller);
+
+      // ❌ format invalid
       if (value.isNaN) {
         setErr(key, "Format tidak valid");
         return false;
       }
 
+      // ❌ negative
       if (value < 0) {
         setErr(key, "Tidak boleh minus");
         return false;
       }
 
+      // ✅ clear error kalau valid
       clearErr(key);
+
+      // ⚠️ warning (jangan override error)
+      final raw = cleanNum(controller.text);
+      if (hasLeadingZero(raw)) {
+        // kalau lo belum punya setWarn, minimal jangan timpa error yang sudah ada
+        if (err(key) == null) {
+          setErr(key, "Format tidak disarankan (diawali 0)");
+        }
+      }
+
       return true;
     }
 
-    void warnLeadingZero(TextEditingController c, String key) {
-      final raw = cleanNum(c.text);
-      if (hasLeadingZero(raw)) {
-        setErr(key, "Format tidak disarankan (diawali 0)");
-      }
+    // Passenger Count
+    if (selectedPassengerCount.trim().isEmpty) {
+      setErr('form2.passengerCount', kStringNullError);
+      ok = false;
     }
 
-    final tpl = parseOrDefaultZero(fieldTplController);
-    final pad = parseOrDefaultZero(fieldPadController);
-    final pap = parseOrDefaultZero(fieldPapController);
-    final pll = parseOrDefaultZero(fieldPllController);
+    // Numeric fields
+    ok = optionalPositiveNumAutoZero(
+      controller: fieldTplController,
+      key: 'form2.tpl',
+    ) &&
+        ok;
 
-    final a = validateNonNegative(key: 'form2.tpl', value: tpl);
-    final b = validateNonNegative(key: 'form2.pad', value: pad);
-    final c = validateNonNegative(key: 'form2.pap', value: pap);
-    final d = validateNonNegative(key: 'form2.pll', value: pll);
+    ok = optionalPositiveNumAutoZero(
+      controller: fieldPadController,
+      key: 'form2.pad',
+    ) &&
+        ok;
 
-    ok = a && ok;
-    ok = b && ok;
-    ok = c && ok;
-    ok = d && ok;
+    ok = optionalPositiveNumAutoZero(
+      controller: fieldPapController,
+      key: 'form2.pap',
+    ) &&
+        ok;
+
+    ok = optionalPositiveNumAutoZero(
+      controller: fieldPllController,
+      key: 'form2.pll',
+    ) &&
+        ok;
 
     if (ok) {
-      final anyGreaterThanZero = tpl > 0 || pad > 0 || pap > 0 || pll > 0;
+      final tpl = parseOrZeroAutoFill(fieldTplController);
+      final pad = parseOrZeroAutoFill(fieldPadController);
+      final pap = parseOrZeroAutoFill(fieldPapController);
+      final pll = parseOrZeroAutoFill(fieldPllController);
+
+      final anyGreaterThanZero =
+          tpl > 0 || pad > 0 || pap > 0 || pll > 0;
 
       if (!anyGreaterThanZero) {
         const msg = "Minimal salah satu nilai harus lebih dari 0";
+
         setErr('form2.tpl', msg);
         setErr('form2.pad', msg);
         setErr('form2.pap', msg);
         setErr('form2.pll', msg);
+
         ok = false;
       }
     }
-
-    warnLeadingZero(fieldTplController, 'form2.tpl');
-    warnLeadingZero(fieldPadController, 'form2.pad');
-    warnLeadingZero(fieldPapController, 'form2.pap');
-    warnLeadingZero(fieldPllController, 'form2.pll');
 
     return ok;
   }

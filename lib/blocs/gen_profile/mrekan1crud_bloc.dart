@@ -19,7 +19,7 @@ class MRekan1CrudBloc extends Bloc<MRekan1CrudEvents, MRekan1CrudState> {
 			MRekan1CrudLihatEvent event,
 			Emitter<MRekan1CrudState> emit,
 			) async {
-		emit(state.copyWith(isLoading: true, isLoaded: false));
+		emit(state.copyWith(isLoading: true, isLoaded: false, clearRecord: true,));
 
 		final record = await repository.mRekan1CrudLihat();
 

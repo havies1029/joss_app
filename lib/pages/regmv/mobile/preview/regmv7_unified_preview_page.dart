@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv7_preview_page.dart';
-import 'package:joss_app/pages/gen_regmv/mobile/preview/regmv7_storage_picker_panel.dart';
+import 'package:joss_app/pages/regmv/mobile/preview/regmv7_preview_page.dart';
+import 'package:joss_app/pages/regmv/mobile/preview/regmv7_storage_picker_panel.dart';
 
 import '../../../../blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 

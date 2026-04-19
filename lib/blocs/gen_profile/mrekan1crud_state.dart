@@ -30,9 +30,10 @@ class MRekan1CrudState extends Equatable {
 		bool? hasFailure,
 		bool? isSetujuTC,
     bool? isDataGroup1Changed,
+		bool clearRecord = false,
 	}){
 		return MRekan1CrudState(
-			record: record ?? this.record,
+			record: clearRecord ? null : (record ?? this.record),
 			isLoading: isLoading ?? this.isLoading,
 			isLoaded: isLoaded ?? this.isLoaded,
 			isSaving: isSaving ?? this.isSaving,
@@ -45,5 +46,5 @@ class MRekan1CrudState extends Equatable {
 
 	@override
 	List<Object?> get props => [isLoading, isLoaded, isSaving, isSaved,
-    hasFailure, isSetujuTC, isDataGroup1Changed, record];
+    hasFailure, isSetujuTC, isDataGroup1Changed, record, ];
 }

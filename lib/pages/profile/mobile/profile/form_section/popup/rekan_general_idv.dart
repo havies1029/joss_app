@@ -174,7 +174,6 @@ class MRekanGeneralIdvPopUpPageFormState
                             }
                           },
                         ),
-
                         BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
                           listenWhen: (prev, curr) => prev.isSaved != curr.isSaved,
                           listener: (context, state) {
@@ -330,8 +329,13 @@ class MRekanGeneralIdvPopUpPageFormState
                                 ),
                                 const SizedBox(height: vPadding),
                                 AppButton.primary(
-                                  text: state.isSaving ? "Menyimpan..." : "Simpan Perubahan",
-                                  onPressed: state.isSaving ? null : onSaveForm,
+                                  text: "Simpan Perubahan",
+                                  isLoading: state.isSaving,
+                                  onPressed: state.isSaving
+                                      ? null
+                                      : () async {
+                                    await onSaveForm();
+                                  },
                                 ),
                               ],
                             ),
@@ -523,7 +527,7 @@ class MRekanGeneralIdvPopUpPageFormState
     );
   }
 
-  void onSaveForm() {
+  Future<void> onSaveForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 

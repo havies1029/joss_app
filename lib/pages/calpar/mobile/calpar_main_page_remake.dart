@@ -504,28 +504,44 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           ),
           BlocListener<Calpar4FormBloc, Calpar4FormState>(
             listener: (context, state) {
-              if (state.record != null) {
-                if (state.isLoaded) {
+              if (state.hasFailure) {
+                if (mounted) {
                   setState(() {
-                    calpar4Id = state.record!.calpar4Id;
+                    _isHitungPremiLoading = false;
                   });
+                }
+                return;
+              }
 
-                  _payloadform4(state.record!);
+              final record = state.record;
+              if (record == null) return;
 
-                  if (state.record!.calpar4Id.isNotEmpty) {
-                    openForm4();
-                  }
+              if (state.isLoaded) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                    calpar4Id = record.calpar4Id;
+                  });
                 }
 
-                // kalau ada flow lain yang memang pakai isSaved
-                if (state.isSaved) {
-                  setState(() {
-                    calpar4Id = state.record!.calpar4Id;
-                  });
+                _payloadform4(record);
 
-                  if (state.record!.calpar4Id.isNotEmpty) {
-                    openForm4();
-                  }
+                if (record.calpar4Id.isNotEmpty) {
+                  openForm4();
+                }
+                return;
+              }
+
+              if (state.isSaved) {
+                if (mounted) {
+                  setState(() {
+                    _isHitungPremiLoading = false;
+                    calpar4Id = record.calpar4Id;
+                  });
+                }
+
+                if (record.calpar4Id.isNotEmpty) {
+                  openForm4();
                 }
               }
             },
@@ -1075,6 +1091,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+
   Widget buildButtonHitungPremi() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 4),
     child: AppButton.primary(
@@ -1085,19 +1102,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       onPressed: _isHitungPremiLoading
           ? null
           : () async {
-        setState(() {
-          _isHitungPremiLoading = true;
-        });
-
-        onHitungPremi();
-
-        await Future.delayed(const Duration(seconds: 2));
-
-        if (mounted) {
-          setState(() {
-            _isHitungPremiLoading = false;
-          });
-        }
+        await onHitungPremi();
       },
     ),
   );
@@ -1109,16 +1114,22 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       return;
     }
 
-    final ok2 = validateForm2();
-    if (!ok2) {
+    final okForm2 = validateForm2();
+    if (!okForm2) {
       openForm2();
       return;
     }
 
-    final ok3 = validateForm3();
-    if (!ok3) {
+    final okForm3 = validateForm3();
+    if (!okForm3) {
       openForm3();
       return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isHitungPremiLoading = true;
+      });
     }
 
     draftForm1ToBloc(context);
@@ -1288,20 +1299,22 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
       ThousandsSeparatorInputFormatter(),
     ],
-    suffix: const Padding(
-      padding: EdgeInsets.only(right: 8),
-      child: Text("Bulan"),
+    suffixIcon: Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Center(
+        widthFactor: 1.0,
+        child: Text(
+          "Bulan",
+          style: TextStyle(
+            color: primaryLightColor,
+            fontSize: getResponsiveFont(context, 14),
+          ),
+        ),
+      ),
     ),
     errorText: err('form1.coverBulan'),
     validator: (_) => err('form1.coverBulan'),
     enabled: false,
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) {
-        clearErr('form1.coverBulan');
-      }
-    },
   );
 
   Widget buildFieldRkonstruksiojkId() =>

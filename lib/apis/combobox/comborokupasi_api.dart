@@ -18,18 +18,7 @@ class ComboROkupasiAPI {
 			'Authorization': 'Bearer ${AppData.userToken}'
 		};
 
-		debugPrint("=== REQUEST ===");
-		debugPrint("URL: $uri");
-		debugPrint("METHOD: GET");
-		debugPrint("HEADERS: $headers");
-		debugPrint("QUERY PARAMS: $queryParams");
-
 		final http.Response response = await http.get(uri, headers: headers);
-
-		debugPrint("=== RESPONSE ===");
-		debugPrint("STATUS: ${response.statusCode}");
-		debugPrint("BODY:");
-		debugPrint(response.body, wrapWidth: 1024);
 
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();

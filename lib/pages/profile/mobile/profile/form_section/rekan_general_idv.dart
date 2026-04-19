@@ -135,9 +135,7 @@ class MRekanGeneralIdvCrudFormPageFormState
 
                         fieldNamaBadanUsahaController.text = "Individu";
 
-
                         fieldComboMPekerjaan ??= rec.comboMPekerjaan;
-
                         fieldComboMJnskel ??= rec.comboMJnskel;
 
                         setState(() {});
@@ -145,6 +143,12 @@ class MRekanGeneralIdvCrudFormPageFormState
                       }
 
                       if (state.isSaved) {
+                        if (mounted) {
+                          setState(() {
+                            isSaving = false;
+                          });
+                        }
+
                         if (!state.hasFailure) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan!"),
@@ -307,19 +311,7 @@ class MRekanGeneralIdvCrudFormPageFormState
                               onPressed: isSaving
                                   ? null
                                   : () async {
-                                setState(() {
-                                  isSaving = true;
-                                });
-
-                                onSaveForm();
-
-                                await Future.delayed(const Duration(seconds: 2));
-
-                                if (mounted) {
-                                  setState(() {
-                                    isSaving = false;
-                                  });
-                                }
+                                await onSaveForm();
                               },
                             )
                           ],
@@ -513,9 +505,15 @@ class MRekanGeneralIdvCrudFormPageFormState
     );
   }
 
-  void onSaveForm() {
+  Future<void> onSaveForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
+
+    if (mounted) {
+      setState(() {
+        isSaving = true;
+      });
+    }
 
     final currentRecord = mRekanGeneralIdvCrudBloc.state.record;
 
