@@ -12,6 +12,7 @@ import '../../../../../blocs/dashboard/sumdash_bloc.dart';
 import '../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
+import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
 
 //micky 2026-02-27
@@ -236,41 +237,35 @@ class PaymentProcessFormState extends State<PaymentProcess> {
             listener: (context, state) {
               final r = state.record!;
 
-              fieldVaNoController.text = (r.vaNo).toString();
-              fieldCurrController.text = (r.curr).toString();
+              fieldVaNoController.text = r.vaNo.toString();
+              fieldCurrController.text = r.curr.toString();
+
               final formatter = NumberFormat('#,###', 'id_ID');
               fieldTotalBayarController.text =
                   formatter.format(r.totalBayar);
+
               fieldBatasBayarController.text =
-                  (r.batasBayar).toString();
+                  r.batasBayar.toString();
             },
           ),
         ],
         child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
-          buildWhen: (prev, curr) =>
-          prev.record != curr.record ||
-              prev.isPollingVa != curr.isPollingVa ||
-              prev.isPollingStatus != curr.isPollingStatus,
           builder: (context, state) {
             if (state.isInitialLoading) {
-              return Scaffold(
+              return const Scaffold(
                 backgroundColor: secondaryBlackColor,
-                body: const Stack(
-                  children: [
-                    Positioned.fill(
-                      child: LoadingIndicator(),
-                    ),
-                  ],
-                ),
+                body: Center(child: LoadingIndicator()),
               );
             }
-
-            return Scaffold(
-              backgroundColor: secondaryBlackColor,
-              body: Container(
+            final bankNama = state.record?.bankNama ?? "-";
+            return BaseBackgroundSidePage(
+              title: bankNama,
+              onBack: () => _handleExit(context),
+              child: Container(
+                color: secondaryBlackColor,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: vPadding * 1.5,
+                  horizontal: hPadding * 1.5,
+                  // vertical: vPadding * 1.5,
                 ),
                 child: SingleChildScrollView(
                   child: Form(
@@ -279,6 +274,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       children: [
                         const SizedBox(height: hPadding),
 
+                        // LOGO
                         Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(

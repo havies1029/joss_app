@@ -57,9 +57,6 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     );
   }
 
-  // ==============================
-  // BUILD
-  // ==============================
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(

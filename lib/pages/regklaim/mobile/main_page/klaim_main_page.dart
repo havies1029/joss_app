@@ -27,11 +27,9 @@ class KlaimMainPageState extends State<KlaimMainPage>
   final List<Map<String, dynamic>> tabItems = [
     {'label': 'Ringkasan', 'page': const KlaimRingkasanTab()},
     {
-      'label': 'Rincian',
-      'page': const KlaimRincianTab(),
+      'label': 'Rincian', 'page': const KlaimRincianTab(),
     },
     {'label': 'Rasio', 'page': const KlaimRasioTab()},
-
   ];
 
   @override
