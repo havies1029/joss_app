@@ -6,11 +6,8 @@ import 'package:joss_app/pages/login/mobile/client/forgot_password_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
-import '../../../../common/app_data.dart';
 import '../../../../common/constants.dart';
-import '../../../../common/loading_indicator.dart';
 import '../../../../helper/indo_phone_result.dart';
-import '../../../../models/user/user_model.dart';
 
 class LoginFormClient extends StatefulWidget {
   const LoginFormClient({super.key});

@@ -192,7 +192,7 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
         fieldComboMBank = record.comboMBank;
       }
 
-      if (record.mrekanbankId != null && record.mrekanbankId!.isNotEmpty) {
+      if (record.mrekanbankId.isNotEmpty) {
         existingMrekanBankId = record.mrekanbankId;
       }
     });
