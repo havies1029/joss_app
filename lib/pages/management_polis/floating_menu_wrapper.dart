@@ -28,15 +28,28 @@ class FloatingMenuWrapper extends StatelessWidget {
     );
     final executor = FabActionExecutor(policy);
 
-    return BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
-      listenWhen: (prev, curr) => prev.statusChangeTick != curr.statusChangeTick,
-      listener: (context, state) {
-        _clearSelectionFromState(context);
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
+          listenWhen: (prev, curr) =>
+              prev.selectedStatusId != curr.selectedStatusId,
+          listener: (context, state) {
+            _clearAllSelections(context);
+          },
+        ),
+        BlocListener<CobManPolBloc, CobManPolState>(
+          listenWhen: (prev, curr) => prev.selectedCOBId != curr.selectedCOBId,
+          listener: (context, state) {
+            _clearAllSelections(context);
+          },
+        ),
+      ],
       child: Builder(
         builder: (context) {
-          final cobId = context.select((CobManPolBloc b) => b.state.selectedCOBId);
-          final statusId = context.select((StatusAsetCariBloc b) => b.state.selectedStatusId);
+          final cobId =
+              context.select((CobManPolBloc b) => b.state.selectedCOBId);
+          final statusId =
+              context.select((StatusAsetCariBloc b) => b.state.selectedStatusId);
 
           final selectedItem = _selectedItemByCob(context, cobId);
 
@@ -47,18 +60,20 @@ class FloatingMenuWrapper extends StatelessWidget {
           );
 
           final selectedItems =
-          selectedItem == null ? const <dynamic>[] : <dynamic>[selectedItem];
+              selectedItem == null ? const <dynamic>[] : <dynamic>[selectedItem];
 
           return FloatingActionMenuWidget(
             availableActions: actions,
             selectedItems: selectedItems,
             onActionTap: (actionType, _) {
+              if (selectedItem == null) return;
+
               executor.run(
                 context: context,
                 actionType: actionType,
                 selectedItem: selectedItem,
                 onDone: () {
-                  _clearSelectionFromState(context);
+                  _clearAllSelections(context);
                   _refreshFromState(context);
                 },
               );
@@ -75,53 +90,36 @@ class FloatingMenuWrapper extends StatelessWidget {
       "10003" => context.select((AsetMvCariBloc b) => b.state.selectedItem),
       "10004" => context.select((AsethullCariBloc b) => b.state.selectedItem),
       "10005" => context.select((AsetHealthCariBloc b) => b.state.selectedItem),
-
-    // Selain 10002-10005 => Others/Kargo
       _ => context.select((AsetothersCariBloc b) => b.state.selectedItem),
     };
   }
 
-  void _clearSelectionFromState(BuildContext context) {
-    final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
+  void _clearAllSelections(BuildContext context) {
+    context.read<AsetParCariBloc>()
+      ..add(ClearSelectedItemEvent())
+      ..add(const ClearParSelectionEvent())
+      ..add(const ClearPolisParSelectionEvent())
+      ..add(const ClearPolisEqSelectionEvent());
 
-    if (cobId == "10002") {
-      final bloc = context.read<AsetParCariBloc>();
-      bloc.add(ClearSelectedItemEvent());
-      bloc.add(const ClearParSelectionEvent());
-      bloc.add(const ClearPolisParSelectionEvent());
-      bloc.add(const ClearPolisEqSelectionEvent());
-      return;
-    }
+    context.read<AsetMvCariBloc>()
+      ..add(ClearSelectedMvItemEvent())
+      ..add(const ClearMvSelectionEvent())
+      ..add(const ClearPolisMvSelectionEvent());
 
-    if (cobId == "10003") {
-      final bloc = context.read<AsetMvCariBloc>();
-      bloc.add(ClearSelectedMvItemEvent());
-      bloc.add(const ClearMvSelectionEvent());
-      bloc.add(const ClearPolisMvSelectionEvent());
-      return;
-    }
+    context.read<AsethullCariBloc>()
+      ..add(ClearSelectedHullItemEvent())
+      ..add(const ClearHullSelectionEvent())
+      ..add(const ClearPolisHullSelectionEvent());
 
-    if (cobId == "10004") {
-      final bloc = context.read<AsethullCariBloc>();
-      bloc.add(ClearSelectedHullItemEvent());
-      bloc.add(const ClearHullSelectionEvent());
-      bloc.add(const ClearPolisHullSelectionEvent());
-      return;
-    }
+    context.read<AsetHealthCariBloc>()
+      ..add(ClearSelectedHealthItemEvent())
+      ..add(const ClearHealthSelectionEvent())
+      ..add(const ClearPolisHealthSelectionEvent());
 
-    if (cobId == "10005") {
-      final bloc = context.read<AsetHealthCariBloc>();
-      bloc.add(ClearSelectedHealthItemEvent());
-      bloc.add(const ClearHealthSelectionEvent());
-      bloc.add(const ClearPolisHealthSelectionEvent());
-      return;
-    }
-
-    // Selain 10002-10005 => Others/Kargo
-    final bloc = context.read<AsetothersCariBloc>();
-    bloc.add(ClearSelectedOthersItemEvent());
-    bloc.add(const ClearOthersSelectionEvent());
-    bloc.add(const ClearPolisOthersSelectionEvent());
+    context.read<AsetothersCariBloc>()
+      ..add(ClearSelectedOthersItemEvent())
+      ..add(const ClearOthersSelectionEvent())
+      ..add(const ClearPolisOthersSelectionEvent());
   }
 
   void _refreshFromState(BuildContext context) {
@@ -161,12 +159,11 @@ class FloatingMenuWrapper extends StatelessWidget {
       return;
     }
 
-    // Selain 10002-10005 => Others/Kargo
     context.read<AsetothersCariBloc>().add(
       RefreshAsetothersCariEvent(
         statusId: statusId,
         searchText: searchText,
-        cobId: cobId, // tetap kirim cobId biar backend bisa bedain
+        cobId: cobId,
       ),
     );
   }

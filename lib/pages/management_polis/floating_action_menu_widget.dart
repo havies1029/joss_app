@@ -35,6 +35,24 @@ class ActionMenuItem {
     required this.borderColor,
     this.isEnabled = true,
   });
+
+  ActionMenuItem copyWith({
+    ActionType? type,
+    String? label,
+    String? iconAsset,
+    List<Color>? gradientColors,
+    Color? borderColor,
+    bool? isEnabled,
+  }) {
+    return ActionMenuItem(
+      type: type ?? this.type,
+      label: label ?? this.label,
+      iconAsset: iconAsset ?? this.iconAsset,
+      gradientColors: gradientColors ?? this.gradientColors,
+      borderColor: borderColor ?? this.borderColor,
+      isEnabled: isEnabled ?? this.isEnabled,
+    );
+  }
 }
 
 class FloatingActionMenuWidget extends StatefulWidget {
@@ -59,11 +77,16 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
   late AnimationController _animationController;
   late Animation<double> _rotateAnimation;
   late Animation<double> _scaleAnimation;
+
   bool _isExpanded = false;
+
+  bool get _hasEnabledAction =>
+      widget.availableActions.any((action) => action.isEnabled);
 
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -80,12 +103,29 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
   }
 
   @override
+  void didUpdateWidget(covariant FloatingActionMenuWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final actionsChanged = oldWidget.availableActions != widget.availableActions;
+    final selectionChanged = oldWidget.selectedItems.length != widget.selectedItems.length;
+
+    if (actionsChanged || selectionChanged) {
+      if (_isExpanded) {
+        _isExpanded = false;
+        _animationController.reverse();
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
   void _toggleMenu() {
+    if (widget.availableActions.isEmpty) return;
+
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
@@ -98,35 +138,39 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
 
   @override
   Widget build(BuildContext context) {
+    final mainFabColor = _isExpanded ? pGrey : primaryColor;
+    final mainFabBorderColor = _isExpanded ? sGrey : const Color(0xD4FF9144);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Expanded Action Buttons
-        Padding(padding: EdgeInsets.only(right: 6),child: AnimatedSize(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          child: _isExpanded
-              ? Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: widget.availableActions.reversed.map((action) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 7),
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: _buildActionButton(action),
-                ),
-              );
-            }).toList(),
-          )
-              : const SizedBox.shrink(),
-        ),),
+        Padding(
+          padding: const EdgeInsets.only(right: 6),
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            child: _isExpanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: widget.availableActions.reversed.map((action) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 7),
+                        child: ScaleTransition(
+                          scale: _scaleAnimation,
+                          child: _buildActionButton(action),
+                        ),
+                      );
+                    }).toList(),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ),
 
         if (_isExpanded) const SizedBox(height: 7),
 
-        // Main FAB Button
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: RotationTransition(
@@ -136,16 +180,19 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 shape: BoxShape.circle,
                 border: Border.all(
                   width: 0.8,
-                  color: _isExpanded ? sGrey : const Color(0xD4FF9144),
+                  color: mainFabBorderColor,
                 ),
               ),
               child: FloatingActionButton(
                 elevation: 0,
                 highlightElevation: 0,
-                backgroundColor: _isExpanded ? pGrey : primaryColor,
+                backgroundColor: mainFabColor,
                 onPressed: _toggleMenu,
                 shape: const CircleBorder(),
-                child: Icon(Icons.add, color: primaryLightColor),
+                child: Icon(
+                  _isExpanded ? Icons.close : Icons.add,
+                  color: primaryLightColor,
+                ),
               ),
             ),
           ),
@@ -157,88 +204,86 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
   Widget _buildActionButton(ActionMenuItem action) {
     final isDisabled = !action.isEnabled;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // label
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          decoration: BoxDecoration(
-            color: isDisabled ? const Color(0xFF404040) : labelLightColor,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Text(
-            action.label,
-            style: TextStyle(
-              color: isDisabled ? const Color(0xFF5D5D5D) : primaryLightColor,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
+    return Opacity(
+      opacity: isDisabled ? 0.55 : 1,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: isDisabled ? const Color(0xFF404040) : labelLightColor,
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Text(
+              action.label,
+              style: TextStyle(
+                color: isDisabled ? const Color(0xFF8A8A8A) : primaryLightColor,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        ),
-
-        const SizedBox(width: 4),
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: isDisabled
-                ? LinearGradient(
-              colors: [
-                const Color(0xFF404040),
-                const Color(0xFF404040),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            )
-                : LinearGradient(
-              colors: action.gradientColors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+          const SizedBox(width: 4),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: isDisabled
+                  ? const LinearGradient(
+                      colors: [Color(0xFF404040), Color(0xFF404040)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: action.gradientColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+              border: Border.all(
+                width: 0.8,
+                color: isDisabled ? const Color(0xFF5D5D5D) : action.borderColor,
+              ),
             ),
-            border: Border.all(
-              width: 0.8,
-              color: isDisabled ? const Color(0xFF5D5D5D) : action.borderColor,
-            ),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: isDisabled
-                  ? null
-                  : () {
-                _toggleMenu();
-                widget.onActionTap(action.type, widget.selectedItems);
-              },
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 45,
-                height: 45,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    width: 0.8,
-                    color: isDisabled
-                        ? const Color(0xFF5D5D5D)
-                        : action.borderColor,
+            child: Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: isDisabled
+                    ? null
+                    : () {
+                        _toggleMenu();
+                        widget.onActionTap(action.type, widget.selectedItems);
+                      },
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 0.8,
+                      color: isDisabled
+                          ? const Color(0xFF5D5D5D)
+                          : action.borderColor,
+                    ),
                   ),
-                ),
-                alignment: Alignment.center,
-                child: SvgPicture.asset(
-                  action.iconAsset,
-                  width: 20,
-                  height: 20,
-                  colorFilter: ColorFilter.mode(
-                    isDisabled ? const Color(0xFF5D5D5D) : Colors.white,
-                    BlendMode.srcIn,
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    action.iconAsset,
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      isDisabled ? const Color(0xFF8A8A8A) : Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

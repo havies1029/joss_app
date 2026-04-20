@@ -83,17 +83,14 @@ class FabActionPolicy {
     ActionType.lihatPolis,
   };
 
-  // =========================
-  // PARSE FLAG
-  // =========================
   bool _canReaktif(Object item) {
     final raw = _readBool(item, "isReaktif");
-    return raw == false; // false => boleh (enabled)
+    return raw == false;
   }
 
   bool _canRenewal(Object item) {
     final raw = _readBool(item, "isRenewal");
-    return raw == false; // false => boleh (enabled)
+    return raw == false;
   }
 
   bool? _readBool(Object item, String key) {
@@ -135,9 +132,6 @@ class FabActionPolicy {
   bool _canLacak(Object item) =>
       _prosesSource(item).isNotEmpty && _prosesId(item).isNotEmpty;
 
-  // =========================
-  // DEBUG HELPERS (RENEWAL)
-  // =========================
   void _dbg(String msg) => debugPrint(msg);
 
   void _dbgRenewal({
@@ -158,7 +152,7 @@ class FabActionPolicy {
     }
 
     final hasRenewalInMaster =
-    masterActions.any((a) => a.type == ActionType.perpanjangan);
+        masterActions.any((a) => a.type == ActionType.perpanjangan);
 
     _dbg("========== FAB RENEWAL DEBUG ==========");
     _dbg("cobId=$cobId | statusId=$statusId | selectedType=${selectedItem.runtimeType}");
@@ -175,9 +169,6 @@ class FabActionPolicy {
     _dbg("======================================");
   }
 
-  // =========================
-  // MAIN
-  // =========================
   List<ActionMenuItem> computeActions({
     required String cobId,
     required String statusId,
@@ -185,18 +176,18 @@ class FabActionPolicy {
   }) {
     final allowedByCob = cobAllowedMatrix[cobId] ?? othersCobAllowed;
 
-    // --- Case: belum pilih item ---
+    // belum pilih item => tampilkan menu sesuai COB, tapi semua disabled
     if (selectedItem == null) {
-      final res = masterActions
+      return masterActions
           .where((a) => allowedByCob.contains(a.type))
-          .map((a) => a.copyWith(isEnabled: alwaysEnabled.contains(a.type)))
+          .map(
+            (a) => a.copyWith(
+              isEnabled: a.type == ActionType.beliPolis,
+            ),
+          )
           .toList();
-
-      // _dbg("FAB DEBUG (selectedItem=null) cobId=$cobId | res=${res.map((e) => "${e.type}:${e.isEnabled}").toList()}");
-      return res;
     }
 
-    // --- Case: sudah pilih item ---
     final canReaktif = _canReaktif(selectedItem);
     final canRenewal = _canRenewal(selectedItem);
 
@@ -204,7 +195,8 @@ class FabActionPolicy {
         statusIdEnabledMatrix[statusId] ?? const <ActionType>{};
 
     final lacakAllowed =
-        allowedByStatus.contains(ActionType.lacakPolis) && _canLacak(selectedItem);
+        allowedByStatus.contains(ActionType.lacakPolis) &&
+            _canLacak(selectedItem);
 
     final allowedTypes = <ActionType>{
       ...alwaysEnabled,
@@ -221,10 +213,8 @@ class FabActionPolicy {
         _ => true,
       };
       return a.copyWith(isEnabled: enabled);
-    })
-        .toList();
+    }).toList();
 
-    // === DEBUG khusus renewal (perpanjangan) ===
     _dbgRenewal(
       cobId: cobId,
       statusId: statusId,
@@ -236,8 +226,8 @@ class FabActionPolicy {
       renewalFlag: canRenewal,
     );
 
-    // DOWNLOAD SECTION (biarkan seperti punyamu)
-    final downloadAllowedByStatus = allowedByStatus.contains(ActionType.unduhPolis);
+    final downloadAllowedByStatus =
+        allowedByStatus.contains(ActionType.unduhPolis);
 
     if (downloadAllowedByStatus) {
       if (cobId == "10002") {
@@ -295,7 +285,7 @@ class FabActionPolicy {
     required ActionType actionType,
   }) {
     final actions =
-    computeActions(cobId: cobId, statusId: statusId, selectedItem: selectedItem);
+        computeActions(cobId: cobId, statusId: statusId, selectedItem: selectedItem);
     final found = actions.where((a) => a.type == actionType).toList();
     if (found.isEmpty) return false;
     return found.first.isEnabled;

@@ -7,6 +7,7 @@ class RegUserModel {
   String telepon;
   String userNama;
   String jnsClientId;
+  String sendOtpVia;
 
   RegUserModel({
     required this.email,
@@ -17,6 +18,7 @@ class RegUserModel {
     required this.telepon,
     required this.userNama,
     required this.jnsClientId,
+    required this.sendOtpVia,
   });
 
   factory RegUserModel.fromJson(Map<String, dynamic> data) {
@@ -29,6 +31,7 @@ class RegUserModel {
       telepon: data['telepon'] ?? '',
       userNama: data['userNama'] ?? '',
       jnsClientId: data['jnsClientId'] ?? '',
+      sendOtpVia: data['sendOtpVia'] ?? '',
     );
   }
 
@@ -41,6 +44,7 @@ class RegUserModel {
         'telepon': telepon,
         'userNama': userNama,
         'jnsClientId': jnsClientId,
+        'sendOtpVia': sendOtpVia,
       };
 
   RegUserModel copyWith({
@@ -52,6 +56,7 @@ class RegUserModel {
     String? telepon,
     String? userNama,
     String? jnsClientId,
+    String? sendOtpVia,
   }) {
     return RegUserModel(
       email: email ?? this.email,
@@ -62,6 +67,7 @@ class RegUserModel {
       telepon: telepon ?? this.telepon,
       userNama: userNama ?? this.userNama,
       jnsClientId: jnsClientId ?? this.jnsClientId,
+      sendOtpVia: sendOtpVia ?? this.sendOtpVia,
     );
   }
 }

@@ -495,6 +495,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
       jnsClientId: fieldComboJnsClient!.mjnsclientId,
       email: email,
       userNama: fieldNameController.text.trim(),
+      sendOtpVia: fromEmail ? "hp" : "email",
     );
 
     context.read<RegUserBloc>().add(ClearRequestFromEvent());
