@@ -97,9 +97,12 @@ class _RincianTablePageState extends State<RincianTablePage> {
     final selectW = widget.readOnly ? 0.0 : 40.0;
 
     final noPolisValues = details.map((d) => d.noPolis);
+    final periodeValues = details.map((d) => formatPeriode(d.polisMulai, d.polisAkhir));
+    /*
     final periodeValues = details.map(
           (d) => "${d.polisMulai.toString().substring(0, 10)} → ${d.polisAkhir.toString().substring(0, 10)}",
     );
+    */
     final currValues = details.map((d) => d.currSimbol);
     final premiValues = details.map((d) => formatNum(d.dnOs));
 
@@ -559,12 +562,12 @@ class _RincianTablePageState extends State<RincianTablePage> {
           ),
         ),
 
+        //micky
         _tapCell(
           context: context,
           data: d,
           child: Text(
-            "${d.polisMulai.toString().substring(0, 10)} - "
-                "${d.polisAkhir.toString().substring(0, 10)}",
+            formatPeriode(d.polisMulai, d.polisAkhir),
             maxLines: compact ? 2 : null,
             overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
             style: TextStyle(color: primaryLightColor),
@@ -613,5 +616,18 @@ class _RincianTablePageState extends State<RincianTablePage> {
         child: child,
       ),
     );
+  }
+
+  String formatDateNullable(DateTime? value) {
+    if (value == null) return '-';
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  String formatPeriode(DateTime? mulai, DateTime? akhir) {
+    if (mulai == null && akhir == null) return '-';
+    return "${formatDateNullable(mulai)} - ${formatDateNullable(akhir)}";
   }
 }

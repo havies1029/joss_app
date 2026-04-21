@@ -25,7 +25,7 @@ dependencies {
 android {
     namespace = "id.co.jayaproteksindo.proteksiplus"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "id.co.jayaproteksindo.proteksiplus"
