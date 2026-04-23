@@ -66,7 +66,19 @@ class FloatingMenuWrapper extends StatelessWidget {
             availableActions: actions,
             selectedItems: selectedItems,
             onActionTap: (actionType, _) {
-              if (selectedItem == null) return;
+              debugPrint(
+                'WRAPPER onActionTap => actionType=$actionType, '
+                'selectedItemNull=${selectedItem == null}',
+              );
+
+              final needsSelectedItem = actionType != ActionType.beliPolis;
+
+              if (needsSelectedItem && selectedItem == null) {
+                debugPrint('WRAPPER blocked => selectedItem required');
+                return;
+              }
+
+              debugPrint('WRAPPER run executor => $actionType');
 
               executor.run(
                 context: context,
@@ -85,13 +97,30 @@ class FloatingMenuWrapper extends StatelessWidget {
   }
 
   dynamic _selectedItemByCob(BuildContext context, String cobId) {
-    return switch (cobId) {
-      "10002" => context.select((AsetParCariBloc b) => b.state.selectedItem),
-      "10003" => context.select((AsetMvCariBloc b) => b.state.selectedItem),
-      "10004" => context.select((AsethullCariBloc b) => b.state.selectedItem),
-      "10005" => context.select((AsetHealthCariBloc b) => b.state.selectedItem),
-      _ => context.select((AsetothersCariBloc b) => b.state.selectedItem),
-    };
+    switch (cobId) {
+      case "10001":
+        return null;
+
+      case "10002":
+        final s = context.select((AsetParCariBloc b) => b.state);
+        return s.selectedIds.isNotEmpty ? s.selectedItem : null;
+
+      case "10003":
+        final s = context.select((AsetMvCariBloc b) => b.state);
+        return s.selectedIds.isNotEmpty ? s.selectedItem : null;
+
+      case "10004":
+        final s = context.select((AsethullCariBloc b) => b.state);
+        return s.selectedIds.isNotEmpty ? s.selectedItem : null;
+
+      case "10005":
+        final s = context.select((AsetHealthCariBloc b) => b.state);
+        return s.selectedIds.isNotEmpty ? s.selectedItem : null;
+
+      default:
+        final s = context.select((AsetothersCariBloc b) => b.state);
+        return s.selectedIds.isNotEmpty ? s.selectedItem : null;
+    }
   }
 
   void _clearAllSelections(BuildContext context) {

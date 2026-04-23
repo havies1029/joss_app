@@ -2690,8 +2690,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         fieldComboMMvtipe != null &&
         fieldComboMMvmodel != null &&
         fieldComboMMvpakai != null &&
-        fieldComboMWarna != null &&
-        fieldAksesorisController.text.trim().isNotEmpty;
+        fieldComboMWarna != null ;
+        //&& fieldAksesorisController.text.trim().isNotEmpty;
   }
 
   bool isForm4Complete() => context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;

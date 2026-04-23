@@ -252,8 +252,19 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 onTap: isDisabled
                     ? null
                     : () {
+
+                        debugPrint(
+                          'FAB ITEM CLICK => type=${action.type}, '
+                          'label=${action.label}, '
+                          'enabled=${action.isEnabled}, '
+                          'selectedItems=${widget.selectedItems.length}',
+                        );
+
                         _toggleMenu();
                         widget.onActionTap(action.type, widget.selectedItems);
+
+                        debugPrint('FAB ITEM CLICK => callback sent to parent');
+
                       },
                 customBorder: const CircleBorder(),
                 child: Container(

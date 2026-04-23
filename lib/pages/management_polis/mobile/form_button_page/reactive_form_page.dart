@@ -66,6 +66,7 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
 
   dynamic _selectedItemByCob(BuildContext context, String cobId) {
     return switch (cobId) {
+      "10001" => null,
       "10002" => context.read<AsetParCariBloc>().state.selectedItem,
       "10003" => context.read<AsetMvCariBloc>().state.selectedItem,
       "10004" => context.read<AsethullCariBloc>().state.selectedItem,
