@@ -23,7 +23,6 @@ class _LiterasiPageState extends State<LiterasiPage> {
     },
     // {'label': 'Testimoni', 'page': const TestimoniPage()},
     {'label': 'Rating', 'page': const TestimoniPage2()},
-
   ];
 
   @override
