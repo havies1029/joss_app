@@ -18,55 +18,64 @@ class _KlaimRincianStatusWidgetState extends State<KlaimRincianStatusWidget> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      mstatusrinciCariBloc.add(RefreshMstatusrinciCariEvent());
-    });
+
+    mstatusrinciCariBloc = context.read<MstatusrinciCariBloc>();
+    mstatusrinciCariBloc.add(RefreshMstatusrinciCariEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    mstatusrinciCariBloc = BlocProvider.of<MstatusrinciCariBloc>(context);
-
     return BlocConsumer<MstatusrinciCariBloc, MstatusrinciCariState>(
       buildWhen: (previous, current) {
-        return (current.status == ListStatus.success) ||
-            (previous.selectedStatusId != current.selectedStatusId);
+        return current.status == ListStatus.success ||
+            previous.selectedStatusId != current.selectedStatusId;
       },
       listener: (context, state) {},
       builder: (context, state) {
-
-        if (state.status == ListStatus.success) {
-          return state.items.isNotEmpty
-              ? SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: state.items.map((item) {
-                final id = item.mgroupstatusclaimId;
-                final isSelected = (id == state.selectedStatusId);
-
-                return Row(
-                  children: [
-                    StatusChip(
-                      statusId: id,
-                      height: 30,
-                      label: item.groupNama,
-                      isSelected: isSelected,
-                      onTap: () {
-                        context.read<MstatusrinciCariBloc>()
-                            .add(SelectedIdChanged(id));
-                      },
-                    ), SizedBox(width: 8)
-                  ],
-                );
-              }).toList(),
-            ),
-          )
-              : const SizedBox.shrink();
+        if (state.status != ListStatus.success || state.items.isEmpty) {
+          return const SizedBox.shrink();
         }
-        return const SizedBox.shrink();
+
+        return SizedBox(
+          height: 40,
+          child: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: constraints.maxWidth,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: state.items.map((item) {
+                        final id = item.mgroupstatusclaimId;
+                        final isSelected = id == state.selectedStatusId;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: StatusChip(
+                            statusId: id,
+                            height: 30,
+                            label: item.groupNama,
+                            isSelected: isSelected,
+                            onTap: () {
+                              context.read<MstatusrinciCariBloc>().add(
+                                SelectedIdChanged(id),
+                              );
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
       },
     );
   }

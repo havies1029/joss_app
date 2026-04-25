@@ -103,12 +103,11 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
       },
     );
   }
-
   Widget _buildHeaderTitle(BuildContext context, GroupcobCariModel header) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
       child: Text(
-        header.cobNama,
+        'Klaim ${header.cobNama}',
         style: headingStyle(context, fontSize: 14),
       ),
     );
@@ -259,7 +258,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           child: CheckboxRadio(
             value: isSelected,
             onChanged: (checked) {
-              logSelectedRow(d, index);
+              // logSelectedRow(d, index);
               if (checked == true) {
                 groupcobCariBloc.add(SelectItemEvent(d.klaim1Id));
                 groupcobCariBloc.add(SelectKlaimRecordEvent(d));
@@ -301,7 +300,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           Padding(
             padding: const EdgeInsets.all(6),
             child: Text(
-              d.cobNama,
+              d.cobDesc,
               maxLines: compact ? 2 : null,
               overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
               style: TextStyle(color: primaryLightColor),

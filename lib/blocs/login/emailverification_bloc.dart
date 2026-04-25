@@ -126,7 +126,10 @@ class EmailVerificationBloc
             errorMsg: errorMsg,
           ),
         );
-      } else {
+      }  else if (infoData[0] == '10') {
+        errors.add(errorMsg);
+
+      }else {
         errors.add(errorMsg);
       }
     }

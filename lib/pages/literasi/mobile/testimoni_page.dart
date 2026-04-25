@@ -7,7 +7,7 @@ import '../widgets/testimoni_widget2.dart';
 
     @override
     Widget build(BuildContext context) {
-      return TestimonialWidget1(isPageMode: true);
+      return TestimonialWidget1(isPageMode: false);
     }
   }
 

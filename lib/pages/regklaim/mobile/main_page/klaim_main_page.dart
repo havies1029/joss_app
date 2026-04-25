@@ -29,7 +29,7 @@ class KlaimMainPageState extends State<KlaimMainPage>
     {
       'label': 'Rincian', 'page': const KlaimRincianTab(),
     },
-    {'label': 'Rasio', 'page': const KlaimRasioTab()},
+    // {'label': 'Rasio', 'page': const KlaimRasioTab()},
   ];
 
   @override

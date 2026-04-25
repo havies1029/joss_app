@@ -19,6 +19,7 @@ class KlaimnilaicrudFormPage extends StatefulWidget {
 
 class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
   late KlaimnilaicrudBloc klaimnilaicrudBloc;
+  late ReviewCariBloc reviewCariBloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
 
@@ -28,6 +29,13 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
   bool _didInit = false;
 
   @override
+  void initState(){
+    super.initState();
+    klaimnilaicrudBloc = context.read<KlaimnilaicrudBloc>();
+    reviewCariBloc = context.read<ReviewCariBloc>();
+}
+
+  @override
   void dispose() {
     fieldAlasanController.dispose();
     super.dispose();
@@ -35,7 +43,6 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    klaimnilaicrudBloc = BlocProvider.of<KlaimnilaicrudBloc>(context);
     const starOn = Color(0xFFFBBF24);
 
     return BlocConsumer<KlaimnilaicrudBloc, KlaimnilaicrudState>(
@@ -216,7 +223,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
       nilaiSuka: _nilaiSuka,
     );
 
-    context.read<ReviewCariBloc>().add(RefreshReviewCariEvent());
+    reviewCariBloc.add(RefreshReviewCariEvent());
     klaimnilaicrudBloc.add(KlaimnilaicrudTambahEvent(record: record));
     _dismissDialog();
   }
