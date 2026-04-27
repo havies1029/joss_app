@@ -18,6 +18,7 @@ import '../../../../../common/loading_indicator.dart';
 import '../../../../../helper/image_uploader.dart';
 import '../../../../../repositories/combobox/combomjnskel_repository.dart';
 import '../../../../../repositories/combobox/combompekerjaan_repository.dart';
+import '../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanGeneralIdvCrudFormPage extends StatefulWidget {
@@ -344,17 +345,20 @@ class MRekanGeneralIdvCrudFormPageFormState
   }
 
   Widget buildFieldPekerjaan() {
-    return ReusableComboBox<ComboMPekerjaanModel>(
+    return ReusableComboBoxV2<ComboMPekerjaanModel>(
       hintText: "Pekerjaan",
       comboKey: comboMPekerjaanKey,
       initItem: fieldComboMPekerjaan,
-      dataLoader: () => ComboMPekerjaanRepository().getComboMPekerjaan(),
+      loader: (q) => ComboMPekerjaanRepository().getComboMPekerjaan(),
+      clientSideSearch: true,
       displayText: (item) => item.kerjaNama,
       compareItems: (a, b) => a.mpekerjaanId == b.mpekerjaanId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(error: "Field ComboMPekerjaan tidak boleh kosong.");
-          fieldComboMPekerjaan = value;
+          setState(() {
+            removeError(error: "Field ComboMPekerjaan tidak boleh kosong.");
+            fieldComboMPekerjaan = value;
+          });
           mRekanGeneralIdvCrudBloc.add(
             ComboMPekerjaanChangedEvent(comboMPekerjaan: value),
           );

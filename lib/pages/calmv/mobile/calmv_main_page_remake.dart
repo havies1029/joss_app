@@ -32,6 +32,7 @@ import '../../../repositories/combobox/combommvpakai_repository.dart';
 import '../../../repositories/combobox/combomwilayah_repository.dart';
 import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
+import '../../../widgets/apptheme/dropdown2.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../widgets/hitung_premi_widget.dart';
@@ -1100,97 +1101,127 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   void openForm3Force() => openSection(2);
 
   //form1 field
-  Widget _buildComboMMvgrupOjk() => ReusableComboBox<ComboMMvgrupOjkModel>(
-    hintText: "Jenis Kendaraan",
-    initItem: fieldComboMMvgrupOjk,
-    dataLoader: () => ComboMMvgrupOjkRepository().getComboMMvgrupOjk(),
-    displayText: (i) => i.grupNama,
-    compareItems: (a, b) => a.mmvgrupojkId == b.mmvgrupojkId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form1.jenisKendaraan'),
-    onChangedCallback: (v) {
-      fieldComboMMvgrupOjk = v;
-      if (v != null) clearErr('form1.jenisKendaraan');
-    },
-    onSaveCallback: (value) => fieldComboMMvgrupOjk = value,
-  );
+  Widget _buildComboMMvgrupOjk() =>
+      ReusableComboBoxV2<ComboMMvgrupOjkModel>(
+        hintText: "Jenis Kendaraan",
+        initItem: fieldComboMMvgrupOjk,
+        loader: (q) => ComboMMvgrupOjkRepository().getComboMMvgrupOjk(),
+        displayText: (i) => i.grupNama,
+        compareItems: (a, b) => a.mmvgrupojkId == b.mmvgrupojkId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form1.jenisKendaraan'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvgrupOjk = v;
+            if (v != null) {
+              clearErr('form1.jenisKendaraan');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvgrupOjk = value,
+      );
 
-  Widget _buildComboMMvjnscover() => ReusableComboBox<ComboMMvjnscoverModel>(
-    hintText: "Jenis Cover",
-    initItem: fieldComboMMvjnscover,
-    dataLoader: () => ComboMMvjnscoverRepository().getComboMMvjnscover(),
-    displayText: (i) => i.coverName,
-    compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form1.jenisCover'),
-    onChangedCallback: (v) {
-      fieldComboMMvjnscover = v;
-      if (v != null) clearErr('form1.jenisCover');
-    },
-    onSaveCallback: (value) => fieldComboMMvjnscover = value,
-  );
+  Widget _buildComboMMvjnscover() =>
+      ReusableComboBoxV2<ComboMMvjnscoverModel>(
+        hintText: "Jenis Cover",
+        initItem: fieldComboMMvjnscover,
+        loader: (q) => ComboMMvjnscoverRepository().getComboMMvjnscover(),
+        clientSideSearch: true,
+        displayText: (i) => i.coverName,
+        compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form1.jenisCover'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvjnscover = v;
+            if (v != null) {
+              clearErr('form1.jenisCover');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvjnscover = value,
+      );
 
-  Widget _buildComboMWilayah() => ReusableComboBox<ComboMWilayahModel>(
-    hintText: "Wilayah",
-    initItem: fieldComboMWilayah,
-    dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
-    displayText: (i) => i.wilayahNama,
-    compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form1.wilayah'),
-    onChangedCallback: (v) {
-      fieldComboMWilayah = v;
-      if (v != null) clearErr('form1.wilayah');
-    },
-    onSaveCallback: (value) => fieldComboMWilayah = value,
-  );
+  Widget _buildComboMWilayah() =>
+      ReusableComboBoxV2<ComboMWilayahModel>(
+        hintText: "Wilayah",
+        initItem: fieldComboMWilayah,
+        loader: (q) => ComboMWilayahRepository().getComboMWilayah(),
+        clientSideSearch: true,
+        displayText: (i) => i.wilayahNama,
+        compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form1.wilayah'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMWilayah = v;
+            if (v != null) {
+              clearErr('form1.wilayah');
+            }
+          });
+        },
 
-  Widget _buildComboCurddId() => ReusableComboBox<ComboRMatauangModel>(
-    hintText: "Mata Uang",
-    initItem: fieldComboUang,
-    dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-    displayText: (item) => item.rmatauangSimbol,
-    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form1.mataUang'),
-    onChangedCallback: (v) {
-      fieldComboUang = v;
-      if (v != null) clearErr('form1.mataUang');
-    },
-    onSaveCallback: (value) => fieldComboUang = value,
-  );
+        onSaveCallback: (value) => fieldComboMWilayah = value,
+      );
 
-  Widget _buildFieldMmvpakaiId() => ReusableComboBox<ComboMMvpakaiModel>(
-    hintText: "Penggunaan",
-    initItem: fieldComboMMvpakai,
-    dataLoader: () => ComboMMvpakaiRepository().getComboMMvpakai(),
-    displayText: (item) => item.pakaiNama,
-    compareItems: (a, b) => a.mmvpakaiId == b.mmvpakaiId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form1.penggunaan'),
-    onChangedCallback: (v) {
-      fieldComboMMvpakai = v;
-      if (v != null) clearErr('form1.penggunaan');
-    },
-    onSaveCallback: (value) => fieldComboMMvpakai = value,
-  );
+  Widget _buildComboCurddId() =>
+      ReusableComboBoxV2<ComboRMatauangModel>(
+        hintText: "Mata Uang",
+        initItem: fieldComboUang,
+        loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+        clientSideSearch: true,
+        displayText: (item) => item.rmatauangSimbol,
+        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form1.mataUang'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboUang = v;
+
+            if (v != null) {
+              clearErr('form1.mataUang');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboUang = value,
+      );
+
+  Widget _buildFieldMmvpakaiId() =>
+      ReusableComboBoxV2<ComboMMvpakaiModel>(
+        hintText: "Penggunaan",
+        initItem: fieldComboMMvpakai,
+        loader: (q) => ComboMMvpakaiRepository().getComboMMvpakai(),
+        clientSideSearch: true,
+        displayText: (item) => item.pakaiNama,
+        compareItems: (a, b) => a.mmvpakaiId == b.mmvpakaiId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form1.penggunaan'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvpakai = v;
+
+            if (v != null) {
+              clearErr('form1.penggunaan');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvpakai = value,
+      );
 
   Widget buildFieldComboTahun() {
-    // Buat list tahun dari sekarang → 1980
     final yearNow = DateTime.now().year;
     final years = List<String>.generate(
       yearNow - 1980 + 1,
           (i) => (yearNow - i).toString(),
     );
 
-    return ReusableComboBox<String>(
+    return ReusableComboBoxV2<String>(
       hintText: "Tahun Pembuatan",
       initItem: selectedYearform1.isNotEmpty ? selectedYearform1 : null,
-      dataLoader: () async => years,
+      clientSideSearch: true,
+      loader: (q) async => years,
       displayText: (item) => item,
       compareItems: (a, b) => a == b,
-
-      // Validator
       validatorCallback: (value) {
         if (value == null || value.isEmpty) {
           return kStringNullError;
@@ -1199,8 +1230,13 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       },
       errorText: err('form1.tahun'),
       onChangedCallback: (v) {
-        selectedYearform1 = v ?? "";
-        if (v != null) clearErr('form1.tahun');
+        setState(() {
+          selectedYearform1 = v ?? "";
+
+          if (v != null) {
+            clearErr('form1.tahun');
+          }
+        });
       },
       onSaveCallback: (value) {
         selectedYearform1 = value ?? "";
@@ -1275,21 +1311,24 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Widget _buildFieldPassengerCountCombo() {
     final counts = List<String>.generate(7, (i) => (i + 1).toString());
 
-    return ReusableComboBox<String>(
+    return ReusableComboBoxV2<String>(
       hintText: "Jumlah Penumpang",
       initItem: selectedPassengerCount.isNotEmpty ? selectedPassengerCount : null,
-      dataLoader: () async => counts,
+      clientSideSearch: true,
+      loader: (q) async => counts,
       displayText: (item) => item,
       compareItems: (a, b) => a == b,
-
+      validatorCallback: (v) =>
+      v == null || v.isEmpty ? kStringNullError : null,
       errorText: err('form2.passengerCount'),
-      validatorCallback: (_) => err('form2.passengerCount'),
-
       onChangedCallback: (v) {
-        selectedPassengerCount = v ?? "";
-        if (selectedPassengerCount.isNotEmpty) clearErr('form2.passengerCount');
+        setState(() {
+          selectedPassengerCount = v ?? "";
+          if (selectedPassengerCount.isNotEmpty) {
+            clearErr('form2.passengerCount');
+          }
+        });
       },
-
       onSaveCallback: (value) {
         selectedPassengerCount = value ?? "";
       },

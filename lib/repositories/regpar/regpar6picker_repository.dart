@@ -47,26 +47,32 @@ class Regpar6PickerRepositoryImpl implements Regpar6PickerRepository {
       withData: false,
       type: FileType.custom,
       allowedExtensions: [
-        'pdf','jpg','jpeg','png','heic','txt',
-        'doc','docx','xls','xlsx','ppt','pptx',
-        'zip','rar','mp4','mov'
+        'jpg',
+        'jpeg',
+        'png',
+        'pdf',
+        'doc',
+        'docx',
       ],
     );
-
     if (result == null || result.files.isEmpty) return [];
-
     final items = <Regpar6UploadModel>[];
     for (final f in result.files) {
       final path = f.path;
       if (path == null) continue;
-
+      final ext = p.extension(path).toLowerCase();
+      const allowed = [
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.pdf',
+        '.doc',
+        '.docx',
+      ];
+      if (!allowed.contains(ext)) continue;
       final mime = lookupMimeType(path);
-      final isImage = (mime?.startsWith('image/') ?? false) ||
-          ['.jpg','.jpeg','.png','.heic']
-              .contains(p.extension(path).toLowerCase());
-
+      final isImage = ['.jpg', '.jpeg', '.png'].contains(ext);
       items.add(Regpar6UploadModel(
-        // localId: '',
         localId: _uuid.v4(),
         name: f.name,
         path: path,

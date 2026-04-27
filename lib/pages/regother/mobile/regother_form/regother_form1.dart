@@ -20,6 +20,7 @@ import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../common/app_data.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
+import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
@@ -542,24 +543,26 @@ class AppCurrencyField extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Padding(padding: EdgeInsets.all(5), child: SizedBox(
-                width: 100,
-                child: ReusableComboBox<ComboRMatauangModel>(
-                  hintText: "",
-                  initItem: currency,
-                  displayText: (m) => m.rmatauangSimbol,
-                  compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-                  dataLoader: () =>
-                      ComboRMatauangRepository().getComboRMatauang(),
-                  enableSearch: false,
-                  onChangedCallback: onCurrencyChanged,
-                  onSaveCallback: onCurrencyChanged,
-                  maxHeight: 200,
+              Padding(
+                padding: EdgeInsets.all(5),
+                child: SizedBox(
+                  width: 100,
+                  child: ReusableComboBoxV2<ComboRMatauangModel>(
+                    hintText: "",
+                    initItem: currency,
+                    loader: (q) =>
+                        ComboRMatauangRepository().getComboRMatauang(),
+                    clientSideSearch: true,
+                    displayText: (m) => m.rmatauangSimbol,
+                    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+                    enableSearch: false,
+                    onChangedCallback: onCurrencyChanged,
+                    onSaveCallback: onCurrencyChanged,
+                    maxHeight: 200,
+                  ),
                 ),
-              ),),
-
+              ),
               Container(width: 1, height: 30, color: sGrey),
-
               Expanded(
                 child: TextFormField(
                   controller: valueController,
@@ -568,7 +571,6 @@ class AppCurrencyField extends StatelessWidget {
                     FilteringTextInputFormatter.digitsOnly,
                     ThousandsSeparatorInputFormatter(),
                   ],
-
                   validator: validator,
                   cursorColor: primaryLightColor,
                   style: bodyTextStyle(context),

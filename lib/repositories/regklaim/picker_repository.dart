@@ -45,19 +45,39 @@ class PickerRepositoryImpl implements PickerRepository {
       allowMultiple: true,
       withData: false,
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'heic', 'txt', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', 'mp4', 'mov'],
+      allowedExtensions: [
+        'png',
+        'jpg',
+        'jpeg',
+        'pdf',
+        'doc',
+        'docx',
+      ],
     );
 
     if (result == null || result.files.isEmpty) return [];
 
     final items = <AttachmentItem>[];
+
     for (final f in result.files) {
       final path = f.path;
       if (path == null) continue;
 
+      final ext = p.extension(path).toLowerCase();
+
+      final allowed = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.pdf',
+        '.doc',
+        '.docx',
+      ];
+
+      if (!allowed.contains(ext)) continue;
+
       final mime = lookupMimeType(path);
-      final isImage = (mime?.startsWith('image/') ?? false) ||
-          ['.jpg', '.jpeg', '.png', '.heic'].contains(p.extension(path).toLowerCase());
+      final isImage = ['.png', '.jpg', '.jpeg'].contains(ext);
 
       items.add(AttachmentItem(
         localId: _uuid.v4(),
@@ -68,6 +88,7 @@ class PickerRepositoryImpl implements PickerRepository {
         isImage: isImage,
       ));
     }
+
     return items;
   }
 }

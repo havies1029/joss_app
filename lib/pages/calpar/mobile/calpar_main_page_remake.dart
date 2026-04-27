@@ -1334,7 +1334,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
         errorText: err('form1.rkonstruksiojkId'),
-
         onChangedCallback: (item) async {
           if (item == null) return;
 
@@ -1426,36 +1425,39 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         onChangedCallback: (v) {
           setState(() {
             fieldComboROkupasi = v;
-
             clearErr('form1.rokupasiId');
-
             fieldComboRKonstruksiojk = null;
             previousKonstruksi = null;
             konstruksiKey.currentState?.clear();
             clearErr('form1.rkonstruksiojkId');
           });
         },
-
         onSaveCallback: (value) => fieldComboROkupasi = value,
       );
   //form1
 
   //form2
 
-  Widget buildFieldRmatauangKode() => ReusableComboBox<ComboRMatauangModel>(
-    hintText: "Mata Uang",
-    initItem: fieldComboRMatauang,
-    dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-    displayText: (i) => i.rmatauangSimbol,
-    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form2.mataUang'),
-    onChangedCallback: (v) {
-      fieldComboRMatauang = v;
-      if (v != null) clearErr('form2.mataUang');
-    },
-    onSaveCallback: (value) => fieldComboRMatauang = value,
-  );
+  Widget buildFieldRmatauangKode() =>
+      ReusableComboBoxV2<ComboRMatauangModel>(
+        hintText: "Mata Uang",
+        initItem: fieldComboRMatauang,
+        loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+        clientSideSearch: true,
+        displayText: (i) => i.rmatauangSimbol,
+        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.mataUang'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboRMatauang = v;
+            if (v != null) {
+              clearErr('form2.mataUang');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboRMatauang = value,
+      );
 
   Widget buildFieldSiBuilding() => appTextField(
     label: "Bangunan",
@@ -1586,55 +1588,62 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
   );
 
-  Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
-    hintText: "Jenis Jaminan",
-    maxHeight: 200,
-    initItem: fieldComboMJnscoverPar,
-    dataLoader: () => ComboMJnscoverParRepository().getComboMJnscoverPar(),
-    displayText: (i) => i.jenisNama,
-    compareItems: (a, b) => a.mjnscoverparId == b.mjnscoverparId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.mjnscoverparId'),
-    onChangedCallback: (v) {
-      fieldComboMJnscoverPar = v;
-      if (v != null) {
-        clearErr('form3.mjnscoverparId');
-      }
+  Widget buildFieldMjnscoverparId() =>
+      ReusableComboBoxV2<ComboMJnscoverParModel>(
+        hintText: "Jenis Jaminan",
+        maxHeight: 200,
+        initItem: fieldComboMJnscoverPar,
+        loader: (q) => ComboMJnscoverParRepository().getComboMJnscoverPar(),
+        clientSideSearch: true,
+        displayText: (i) => i.jenisNama,
+        compareItems: (a, b) => a.mjnscoverparId == b.mjnscoverparId,
 
-      _applyCoverParRule(v?.mjnscoverparId);
-    },
-    onSaveCallback: (value) => fieldComboMJnscoverPar = value,
-  );
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.mjnscoverparId'),
 
-  Widget buildFieldMwilayahId() => ReusableComboBox<ComboMWilayahModel>(
-    hintText: "Wilayah",
-    initItem: fieldComboMWilayah,
-    maxHeight: 150,
-    enableSearch: false,
-    dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
-    displayText: (i) => i.wilayahNama,
-    compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.mwilayahId'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMWilayah = v;
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMJnscoverPar = v;
 
-        clearErr('form3.mwilayahId');
+            if (v != null) {
+              clearErr('form3.mjnscoverparId');
+            }
 
-        fieldComboMKabZonaGempa = null;
-        comboMKabZonaGempaKey.currentState?.clear();
-        clearErr('form3.zonaGempa');
-      });
+            _applyCoverParRule(v?.mjnscoverparId);
+          });
+        },
 
-      if (v != null) {
-        calpar3formBloc?.add(
-          ComboMWilayahChangedEvent(comboMWilayah: v),
-        );
-      }
-    },
-    onSaveCallback: (value) => fieldComboMWilayah = value,
-  );
+        onSaveCallback: (value) => fieldComboMJnscoverPar = value,
+      );
+
+  Widget buildFieldMwilayahId() =>
+      ReusableComboBoxV2<ComboMWilayahModel>(
+        hintText: "Wilayah",
+        initItem: fieldComboMWilayah,
+        maxHeight: 150,
+        enableSearch: false,
+        loader: (q) => ComboMWilayahRepository().getComboMWilayah(),
+        clientSideSearch: true,
+        displayText: (i) => i.wilayahNama,
+        compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.mwilayahId'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMWilayah = v;
+            clearErr('form3.mwilayahId');
+            fieldComboMKabZonaGempa = null;
+            comboMKabZonaGempaKey.currentState?.clear();
+            clearErr('form3.zonaGempa');
+          });
+          if (v != null) {
+            calpar3formBloc?.add(
+              ComboMWilayahChangedEvent(comboMWilayah: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboMWilayah = value,
+      );
 
   Widget buildFieldKab2zonagempaId() => ReusableComboBoxV2<ComboMKabZonaGempaModel>(
     hintText: "Zona Gempa Bumi",

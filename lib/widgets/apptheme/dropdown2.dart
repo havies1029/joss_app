@@ -50,6 +50,8 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
   /// kalau dependency berubah, widget akan clear cache
   final bool clearCacheOnDependencyChange;
 
+  final bool clientSideSearch;
+
   const ReusableComboBoxV2({
     super.key,
     required this.hintText,
@@ -72,7 +74,8 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
     this.searchDebounce = const Duration(milliseconds: 350),
     this.minSearchChars = 0,
     this.dependencyKey,
-    this.clearCacheOnDependencyChange = true, 
+    this.clearCacheOnDependencyChange = true,
+    this.clientSideSearch = false,
   });
 
   @override
@@ -118,6 +121,24 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     if (q.isNotEmpty && q.length < widget.minSearchChars) {
       _cachedItems = const [];
       return const [];
+    }
+
+    if (widget.clientSideSearch) {
+      final baseItems = _cachedItems ??
+          await widget.loader(
+            ComboQuery(searchText: '', params: widget.params),
+          );
+
+      final filteredItems = q.isEmpty
+          ? baseItems
+          : baseItems.where((item) {
+        final text = widget.displayText(item).toLowerCase();
+        final keyword = q.toLowerCase();
+        return text.contains(keyword);
+      }).toList();
+
+      _cachedItems = baseItems;
+      return filteredItems;
     }
 
     if (q.isEmpty) {

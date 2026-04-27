@@ -13,6 +13,7 @@ import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_state.dart';
 import '../../../common/rangka_no_formatter.dart';
+import '../../../widgets/apptheme/dropdown2.dart';
 
 class KlaimmvpoliscrudFormPage extends StatefulWidget {
 	final String viewMode;
@@ -286,30 +287,31 @@ class KlaimmvpoliscrudFormPageFormState
 	}
 
 	Widget buildFieldMinsurerId() {
-		return ReusableComboBox<ComboMInsurerModel>(
+		return ReusableComboBoxV2<ComboMInsurerModel>(
 			hintText: 'Asuransi',
 			comboKey: comboMInsurerKey,
 			initItem: fieldComboMInsurer,
 			isEnabled: !isPolisJps,
-			dataLoaderWithFilter: (filter) {
-				return ComboMInsurerRepository().getComboMInsurer(filter);
-			},
-			dataLoader: () {
-				return ComboMInsurerRepository().getComboMInsurer("");
+			loader: (q) {
+				return ComboMInsurerRepository().getComboMInsurer(q.searchText);
 			},
 			displayText: (item) => item.insurerNama,
 			compareItems: (item, selectedItem) =>
 			item.minsurerId == selectedItem.minsurerId,
 			errorText: err('form.minsurerId'),
-			validatorCallback: (_) => err('form.minsurerId'),
+			validatorCallback: (v) => v == null ? kStringNullError : null,
 			onChangedCallback: (value) {
 				if (isPolisJps) return;
-				fieldComboMInsurer = value;
-
+				setState(() {
+					fieldComboMInsurer = value;
+					if (value != null) {
+						clearErr('form.minsurerId');
+					}
+				});
 				if (value != null) {
-					clearErr('form.minsurerId');
-					klaimmvpoliscrudBloc
-							.add(ComboMInsurerChangedEvent(comboMInsurer: value));
+					klaimmvpoliscrudBloc.add(
+						ComboMInsurerChangedEvent(comboMInsurer: value),
+					);
 				}
 			},
 			onSaveCallback: (value) {
@@ -319,22 +321,26 @@ class KlaimmvpoliscrudFormPageFormState
 	}
 
 	Widget buildFieldMmvjnscoverId() {
-		return ReusableComboBox<ComboMMvjnscoverModel>(
+		return ReusableComboBoxV2<ComboMMvjnscoverModel>(
 			hintText: "Jenis Cover",
 			comboKey: comboMMvjnscoverKey,
 			isEnabled: !isPolisJps,
 			initItem: fieldComboMMvjnscover,
-			dataLoader: () => ComboMMvjnscoverRepository().getComboMMvjnscover(),
+			loader: (q) => ComboMMvjnscoverRepository().getComboMMvjnscover(),
+			clientSideSearch: true,
 			displayText: (i) => i.coverName,
 			compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
 			errorText: err('form.mmvjnscoverId'),
-			validatorCallback: (_) => err('form.mmvjnscoverId'),
+			validatorCallback: (v) => v == null ? kStringNullError : null,
 			onChangedCallback: (value) {
 				if (isPolisJps) return;
-				fieldComboMMvjnscover = value;
-
+				setState(() {
+					fieldComboMMvjnscover = value;
+					if (value != null) {
+						clearErr('form.mmvjnscoverId');
+					}
+				});
 				if (value != null) {
-					clearErr('form.mmvjnscoverId');
 					klaimmvpoliscrudBloc.add(
 						ComboMMvjnscoverChangedEvent(comboMMvjnscover: value),
 					);

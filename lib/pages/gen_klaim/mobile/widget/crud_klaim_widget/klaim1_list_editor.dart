@@ -14,6 +14,7 @@ import 'package:joss_app/blocs/gen_klaim/klaim1list_bloc.dart';
 
 import '../../../../../repositories/combobox/combomstsclaim_repository.dart';
 import '../../../../../repositories/combobox/combormatauang_repository.dart';
+import '../../../../../widgets/apptheme/dropdown2.dart';
 
 class Klaim1ListEditor extends StatefulWidget {
   final Map<String, bool> isSavingById;
@@ -234,11 +235,12 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                               //   onSaveCallback: (val) => ctrls.mStsclaim = val,
                               //   validatorCallback: (_) => null,
                               // ),
-                              ReusableComboBox<ComboMStsclaimModel>(
+                              ReusableComboBoxV2<ComboMStsclaimModel>(
                                 hintText: "Status",
                                 comboKey: ctrls.stsClaimKey,
                                 initItem: ctrls.mStsclaim,
-                                dataLoader: () => ComboMStsclaimRepository().getComboMStsclaim(),
+                                loader: (q) => ComboMStsclaimRepository().getComboMStsclaim(),
+                                clientSideSearch: true,
                                 displayText: (item) => item.statusNama,
                                 compareItems: (a, b) => a.mstsclaimId == b.mstsclaimId,
                                 isEnabled: false,
@@ -365,19 +367,20 @@ class _Klaim1ListEditorState extends State<Klaim1ListEditor> {
                       //   onSaveCallback: (val) => ctrls.rMatauang = val,
                       //   validatorCallback: (_) => null,
                       // ),
-                      ReusableComboBox<ComboRMatauangModel>(
+                      ReusableComboBoxV2<ComboRMatauangModel>(
                         hintText: "Mata Uang",
                         comboKey: ctrls.mataUangKey,
                         initItem: ctrls.rMatauang,
-                        dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
+                        loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+                        clientSideSearch: true,
                         displayText: (item) => item.rmatauangNama,
                         compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
                         isEnabled: false,
+                        showClearButton: false,
                         onChangedCallback: (val) {
                           setState(() => ctrls.rMatauang = val);
                           ffState.didChange(val);
                         },
-                        showClearButton: false,
                         onSaveCallback: (val) => ctrls.rMatauang = val,
                         validatorCallback: (value) {
                           if (value == null) {

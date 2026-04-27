@@ -4,8 +4,8 @@ import 'package:joss_app/models/combobox/combomjnsclient_model.dart';
 import 'package:joss_app/repositories/combobox/combomjnsclient_repository.dart';
 
 import '../../common/constants.dart';
+import '../apptheme/dropdown2.dart';
 
-/// 🔹 Wrapper khusus untuk Combo MJnsclient
 Widget buildFieldComboMJnsclient({
 	required String labelText,
 	GlobalKey<DropdownSearchState<ComboMJnsclientModel>>? comboKey,
@@ -14,7 +14,7 @@ Widget buildFieldComboMJnsclient({
 	required Function(ComboMJnsclientModel?) onSaveCallback,
 	String? Function(ComboMJnsclientModel?)? validatorCallback,
 }) {
-	return ReusableComboBox<ComboMJnsclientModel>(
+	return ReusableComboBoxV2<ComboMJnsclientModel>(
 		hintText: labelText,
 		comboKey: comboKey,
 		initItem: initItem,
@@ -22,15 +22,13 @@ Widget buildFieldComboMJnsclient({
 		onSaveCallback: onSaveCallback,
 		validatorCallback: validatorCallback,
 
-		// Loader data (API/Repo)
-		dataLoader: () async {
+		clientSideSearch: true,
+
+		loader: (q) async {
 			return await ComboMJnsclientRepository().getComboMJnsclient();
 		},
 
-		// Teks yang ditampilkan
 		displayText: (item) => item.jenisNama,
-
-		// Cara compare antar item
 		compareItems: (a, b) => a.mjnsclientId == b.mjnsclientId,
 	);
 }

@@ -9,6 +9,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../repositories/combobox/combombank_repository.dart';
+import '../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanBankCrudFormPage extends StatefulWidget {
@@ -199,12 +200,13 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
   }
 
   Widget buildFieldNamaBank() {
-    return ReusableComboBox<ComboMBankModel>(
+    return ReusableComboBoxV2<ComboMBankModel>(
       key: ValueKey(fieldComboMBank?.mbankId ?? 'empty_bank'),
       hintText: "Bank",
       comboKey: comboMBankKey,
       initItem: fieldComboMBank,
-      dataLoader: () => ComboMBankRepository().getComboMBank(),
+      loader: (q) => ComboMBankRepository().getComboMBank(),
+      clientSideSearch: true,
       displayText: (item) => item.bankNama,
       compareItems: (a, b) => a.mbankId == b.mbankId,
       onChangedCallback: (value) {
@@ -213,7 +215,9 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
             fieldComboMBank = value;
           });
           removeError(error: kStringNullError);
-          mRekanBankCrudBloc.add(ComboMBankChangedEvent(comboMBank: value));
+          mRekanBankCrudBloc.add(
+            ComboMBankChangedEvent(comboMBank: value),
+          );
         }
       },
       onSaveCallback: (value) {

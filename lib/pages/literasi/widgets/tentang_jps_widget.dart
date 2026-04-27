@@ -3,6 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 
+import '../../../blocs/gen_review/reviewcrud_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 class TentangCardWidget extends StatefulWidget {
   const TentangCardWidget({super.key});
 
@@ -97,16 +100,36 @@ class _TentangCardWidgetState extends State<TentangCardWidget> {
             ),
             const SizedBox(height: 6),
             // Rating
-            Row(
-              children: [
-                ...List.generate(
-                  4,
-                  (i) => const Icon(Icons.star, color: Colors.amber, size: 15),
-                ),
-                const Icon(Icons.star_half, color: Colors.amber, size: 15),
-                const SizedBox(width: 5),
-                Text("4.5/5.0", style: bodyTextStyle(context, fontSize: 14)),
-              ],
+            BlocBuilder<ReviewCrudBloc, ReviewCrudState>(
+              builder: (context, state) {
+                final data = state.item;
+
+                final nilai = data?.nilai ?? 0;
+                final skala = data?.skala ?? 5;
+
+                return Row(
+                  children: [
+                    ...List.generate(5, (i) {
+                      final starValue = i + 1;
+
+                      if (nilai >= starValue) {
+                        return const Icon(Icons.star, color: Colors.amber, size: 15);
+                      }
+
+                      if (nilai >= starValue - 0.5) {
+                        return const Icon(Icons.star_half, color: Colors.amber, size: 15);
+                      }
+
+                      return const Icon(Icons.star_border, color: Colors.amber, size: 15);
+                    }),
+                    const SizedBox(width: 5),
+                    Text(
+                      "${nilai.toStringAsFixed(1)}/${skala.toStringAsFixed(1)}",
+                      style: bodyTextStyle(context, fontSize: 14),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

@@ -8,6 +8,7 @@ import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../helper/indo_phone_result.dart';
+import '../../../widgets/apptheme/dropdown2.dart';
 
 class KlaimparklaimcrudFormPage extends StatefulWidget {
 	final String cobGroupId;
@@ -348,19 +349,25 @@ class KlaimparklaimcrudFormPageFormState
 	}
 
 	Widget buildFieldMjenisrugiId() {
-		return ReusableComboBox<ComboMJenisrugiModel>(
+		return ReusableComboBoxV2<ComboMJenisrugiModel>(
 			comboKey: comboMJenisrugiKey,
 			hintText: 'Jenis Kerugian',
 			initItem: fieldComboMJenisrugi,
-			dataLoader: () => ComboMJenisrugiRepository().getComboMJenisrugi(),
+			loader: (q) => ComboMJenisrugiRepository().getComboMJenisrugi(),
+			clientSideSearch: true,
 			displayText: (item) => item.rugiDesc,
 			compareItems: (a, b) => a.mjenisrugiId == b.mjenisrugiId,
 			errorText: err('form.mjenisrugiId'),
-			validatorCallback: (_) => err('form.mjenisrugiId'),
+			validatorCallback: (v) => v == null ? kStringNullError : null,
 			onChangedCallback: (value) {
-				fieldComboMJenisrugi = value;
+				setState(() {
+					fieldComboMJenisrugi = value;
+
+					if (value != null) {
+						clearErr('form.mjenisrugiId');
+					}
+				});
 				if (value != null) {
-					clearErr('form.mjenisrugiId');
 					klaimparklaimcrudBloc.add(
 						ComboMJenisrugiChangedEvent(comboMJenisrugi: value),
 					);

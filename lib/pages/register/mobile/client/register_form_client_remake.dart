@@ -11,6 +11,7 @@ import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
+import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
@@ -240,20 +241,26 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     },
   );
 
-  Widget buildFieldComboMJnsclient() => ReusableComboBox<ComboMJnsclientModel>(
-    hintText: "Jenis Klien",
-    initItem: fieldComboJnsClient,
-    dataLoader: () => ComboMJnsclientRepository().getComboMJnsclient(),
-    displayText: (i) => i.jenisNama,
-    compareItems: (a, b) => a.mjnsclientId == b.mjnsclientId,
-    validatorCallback: (_) => err('form1.jenisClient'),
-    errorText: err('form1.jenisClient'),
-    onChangedCallback: (v) {
-      fieldComboJnsClient = v;
-      if (v != null) clearErr('form1.jenisClient');
-    },
-    onSaveCallback: (value) => fieldComboJnsClient = value,
-  );
+  Widget buildFieldComboMJnsclient() =>
+      ReusableComboBoxV2<ComboMJnsclientModel>(
+        hintText: "Jenis Klien",
+        initItem: fieldComboJnsClient,
+        loader: (q) => ComboMJnsclientRepository().getComboMJnsclient(),
+        clientSideSearch: true,
+        displayText: (i) => i.jenisNama,
+        compareItems: (a, b) => a.mjnsclientId == b.mjnsclientId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form1.jenisClient'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboJnsClient = v;
+            if (v != null) {
+              clearErr('form1.jenisClient');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboJnsClient = value,
+      );
 
   void handleBack() {
     if (singlePopPages.contains(widget.requestFrom)) {

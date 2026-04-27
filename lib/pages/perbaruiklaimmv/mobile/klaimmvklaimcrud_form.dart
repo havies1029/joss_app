@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../widgets/apptheme/dropdown2.dart';
+
 class KlaimmvklaimcrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
@@ -316,14 +318,13 @@ class AppCurrencyAmountField extends StatelessWidget {
 								padding: const EdgeInsets.all(5),
 								child: SizedBox(
 									width: 100,
-									child: ReusableComboBox<ComboRMatauangModel>(
+									child: ReusableComboBoxV2<ComboRMatauangModel>(
 										hintText: "",
 										initItem: currency,
+										loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+										clientSideSearch: true,
 										displayText: (m) => m.rmatauangSimbol,
-										compareItems: (a, b) =>
-										a.rmatauangKode == b.rmatauangKode,
-										dataLoader: () =>
-												ComboRMatauangRepository().getComboRMatauang(),
+										compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
 										enableSearch: false,
 										onChangedCallback: onCurrencyChanged,
 										onSaveCallback: onCurrencyChanged,

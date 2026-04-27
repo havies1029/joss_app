@@ -12,6 +12,7 @@ import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv4picker_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv5picker_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv7picker_repository.dart';
+import 'package:joss_app/repositories/gen_review/reviewcrud_repository.dart';
 import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/login/forgot_password_repository.dart';
@@ -128,6 +129,7 @@ import 'blocs/gen_calmv/calmvaccordion_bloc.dart';
 import 'blocs/gen_dn1/dn1cari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
 import 'blocs/gen_promo/promo2cari_bloc.dart';
+import 'blocs/gen_review/reviewcrud_bloc.dart';
 import 'blocs/gen_trslog/trslogcari_bloc.dart';
 import 'blocs/klaimbatal/klaimbatalcrud_bloc.dart';
 import 'blocs/klaimlacak/klaimnilaicrud_bloc.dart';
@@ -419,6 +421,8 @@ Future<void> main() async {
         // Gallery / Review
         BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
         BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
+        BlocProvider(create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
+
         BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
 
         // Endors
@@ -654,6 +658,9 @@ Future<void> main() async {
 
         //hakases list cob
         BlocProvider(create: (_) => HakaksesCrudBloc(repository: HakaksesCrudRepository())),
+
+        //review
+        BlocProvider(create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
 
       ],
       child: MultiBlocListener(

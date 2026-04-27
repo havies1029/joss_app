@@ -11,6 +11,8 @@ import 'package:joss_app/models/combobox/combomjnsbengkel_model.dart';
 import 'package:joss_app/models/combobox/combomwilayahbengkel_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../widgets/apptheme/dropdown2.dart';
+
 class KlaimmvbengkelcrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
@@ -177,30 +179,35 @@ class KlaimmvbengkelcrudFormPageFormState
 	}
 
 	Widget buildFieldMbengkelId() {
-		return ReusableComboBox<ComboMBengkelModel>(
+		return ReusableComboBoxV2<ComboMBengkelModel>(
 			comboKey: comboMBengkelKey,
 			hintText: "Nama Bengkel",
 			initItem: fieldComboMBengkel,
-			dataLoader: () => ComboMBengkelRepository().getComboMBengkel(
+			params: {
+				"mwilayahbengkelId":
 				fieldComboMWilayahBengkel?.mwilayahbengkelId ?? '',
-				"",
-			),
-			dataLoaderWithFilter: (filter) => ComboMBengkelRepository()
-					.getComboMBengkel(
-				fieldComboMWilayahBengkel?.mwilayahbengkelId ?? '',
-				filter,
-			),
+			},
+			loader: (q) {
+				final wilayahId = q.get<String>("mwilayahbengkelId") ?? '';
+				return ComboMBengkelRepository().getComboMBengkel(
+					wilayahId,
+					q.searchText,
+				);
+			},
 			displayText: (item) => item.bengkelNama,
 			compareItems: (a, b) => a.mbengkelId == b.mbengkelId,
 			enableSearch: true,
 			showClearButton: false,
 			errorText: err('form.mbengkelId'),
-			validatorCallback: (_) => err('form.mbengkelId'),
+			validatorCallback: (v) => v == null ? kStringNullError : null,
 			onChangedCallback: (value) {
-				fieldComboMBengkel = value;
-
+				setState(() {
+					fieldComboMBengkel = value;
+					if (value != null) {
+						clearErr('form.mbengkelId');
+					}
+				});
 				if (value != null) {
-					clearErr('form.mbengkelId');
 					klaimmvbengkelcrudBloc.add(
 						ComboMBengkelChangedEvent(comboMBengkel: value),
 					);
@@ -213,37 +220,34 @@ class KlaimmvbengkelcrudFormPageFormState
 	}
 
 	Widget buildFieldMjnsbengkelId() {
-		return ReusableComboBox<ComboMJnsbengkelModel>(
+		return ReusableComboBoxV2<ComboMJnsbengkelModel>(
 			comboKey: comboMJnsbengkelKey,
 			hintText: "Jenis Bengkel",
 			initItem: fieldComboMJnsbengkel,
-			dataLoader: () => ComboMJnsbengkelRepository().getComboMJnsbengkel(),
+			loader: (q) => ComboMJnsbengkelRepository().getComboMJnsbengkel(),
+			clientSideSearch: true,
 			displayText: (item) => item.jenisNama,
 			compareItems: (a, b) => a.mjnsbengkelId == b.mjnsbengkelId,
 			errorText: err('form.mjnsbengkelId'),
-			validatorCallback: (_) => err('form.mjnsbengkelId'),
+			validatorCallback: (v) => v == null ? kStringNullError : null,
 			onChangedCallback: (value) {
-				fieldComboMJnsbengkel = value;
-
-				comboMBengkelKey.currentState?.clear();
-				comboMWilayahBengkelKey.currentState?.clear();
-
-				fieldComboMBengkel = null;
-				fieldComboMWilayahBengkel = null;
-				fieldNamaBengkelLainController.clear();
-
-				clearErr('form.mjnsbengkelId');
-				clearErr('form.mbengkelId');
-				clearErr('form.mwilayahbengkelId');
-				clearErr('form.namaBengkelLain');
-
+				setState(() {
+					fieldComboMJnsbengkel = value;
+					comboMBengkelKey.currentState?.clear();
+					comboMWilayahBengkelKey.currentState?.clear();
+					fieldComboMBengkel = null;
+					fieldComboMWilayahBengkel = null;
+					fieldNamaBengkelLainController.clear();
+					clearErr('form.mjnsbengkelId');
+					clearErr('form.mbengkelId');
+					clearErr('form.mwilayahbengkelId');
+					clearErr('form.namaBengkelLain');
+				});
 				if (value != null) {
 					klaimmvbengkelcrudBloc.add(
 						ComboMJnsbengkelChangedEvent(comboMJnsbengkel: value),
 					);
 				}
-
-				setState(() {});
 			},
 			onSaveCallback: (value) {
 				fieldComboMJnsbengkel = value;
@@ -252,29 +256,29 @@ class KlaimmvbengkelcrudFormPageFormState
 	}
 
 	Widget buildFieldMwilayahbengkelId() {
-		return ReusableComboBox<ComboMWilayahBengkelModel>(
+		return ReusableComboBoxV2<ComboMWilayahBengkelModel>(
 			comboKey: comboMWilayahBengkelKey,
 			hintText: "Wilayah Bengkel",
 			initItem: fieldComboMWilayahBengkel,
-			dataLoader: () =>
-					ComboMWilayahBengkelRepository().getComboMWilayahBengkel(""),
-			dataLoaderWithFilter: (filter) => ComboMWilayahBengkelRepository()
-					.getComboMWilayahBengkel(filter),
+			loader: (q) {
+				return ComboMWilayahBengkelRepository()
+						.getComboMWilayahBengkel(q.searchText);
+			},
 			displayText: (item) => item.wilayahNama,
 			compareItems: (a, b) =>
 			a.mwilayahbengkelId == b.mwilayahbengkelId,
 			enableSearch: true,
 			showClearButton: false,
 			errorText: err('form.mwilayahbengkelId'),
-			validatorCallback: (_) => err('form.mwilayahbengkelId'),
+			validatorCallback: (v) => v == null ? kStringNullError : null,
 			onChangedCallback: (value) {
-				fieldComboMWilayahBengkel = value;
-
-				comboMBengkelKey.currentState?.clear();
-				fieldComboMBengkel = null;
-				clearErr('form.mwilayahbengkelId');
-				clearErr('form.mbengkelId');
-
+				setState(() {
+					fieldComboMWilayahBengkel = value;
+					comboMBengkelKey.currentState?.clear();
+					fieldComboMBengkel = null;
+					clearErr('form.mwilayahbengkelId');
+					clearErr('form.mbengkelId');
+				});
 				if (value != null) {
 					klaimmvbengkelcrudBloc.add(
 						ComboMWilayahBengkelChangedEvent(
@@ -282,8 +286,6 @@ class KlaimmvbengkelcrudFormPageFormState
 						),
 					);
 				}
-
-				setState(() {});
 			},
 			onSaveCallback: (value) {
 				fieldComboMWilayahBengkel = value;

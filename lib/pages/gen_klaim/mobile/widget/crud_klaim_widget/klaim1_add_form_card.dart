@@ -358,6 +358,7 @@ import 'package:joss_app/models/combobox/combomstsclaim_model.dart';
 
 import '../../../../../common/thousand_separator_input_formatter.dart';
 import '../../../../../repositories/combobox/combormatauang_repository.dart';
+import '../../../../../widgets/apptheme/dropdown2.dart';
 
 class Klaim1AddFormCard extends StatefulWidget {
   final bool isSaving;
@@ -512,14 +513,14 @@ class _Klaim1AddFormCardState extends State<Klaim1AddFormCard> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ReusableComboBox<ComboRMatauangModel>(
+            ReusableComboBoxV2<ComboRMatauangModel>(
               hintText: "Mata Uang",
               comboKey: _mataUangKey,
               initItem: _rMatauang,
-              dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
+              loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+              clientSideSearch: true,
               displayText: (item) => item.rmatauangSimbol,
-              compareItems: (a, b) =>
-              a.rmatauangKode == b.rmatauangKode,
+              compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
               onChangedCallback: (val) {
                 setState(() => _rMatauang = val);
                 ffState.didChange(val);

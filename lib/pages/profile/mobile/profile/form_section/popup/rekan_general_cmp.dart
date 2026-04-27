@@ -17,6 +17,7 @@ import '../../../../../../common/constants.dart';
 import '../../../../../../helper/image_uploader.dart';
 import '../../../../../../repositories/combobox/combombentukcst_repository.dart';
 import '../../../../../../repositories/combobox/combombidang_repository.dart';
+import '../../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../../base/base_background_sidepage.dart';
 
 class MRekanGeneralCmpPopUpPage extends StatefulWidget {
@@ -382,19 +383,22 @@ class MRekanGeneralCmpPopUpPageFormState
       hint = "Bentuk Badan Perusahaan";
     }
 
-    return ReusableComboBox<ComboMBentukCstModel>(
+    return ReusableComboBoxV2<ComboMBentukCstModel>(
       hintText: "Bentuk Badan",
       enableSearch: false,
       comboKey: comboMBentukCstKey,
       initItem: fieldComboMBentukCst,
       maxHeight: 150,
-      dataLoader: () => ComboMBentukCstRepository().getComboMBentukCst(),
+      loader: (q) => ComboMBentukCstRepository().getComboMBentukCst(),
+      clientSideSearch: true,
       displayText: (item) => item.bentukNama,
       compareItems: (a, b) => a.mbentukcstId == b.mbentukcstId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(error: kStringNullError);
-          fieldComboMBentukCst = value;
+          setState(() {
+            removeError(error: kStringNullError);
+            fieldComboMBentukCst = value;
+          });
           mRekanGeneralCmpCrudBloc.add(
             ComboMBentukCstChangedEvent(comboMBentukCst: value),
           );
@@ -415,17 +419,20 @@ class MRekanGeneralCmpPopUpPageFormState
   }
 
   Widget buildFieldBidangUsaha() {
-    return ReusableComboBox<ComboMBidangModel>(
+    return ReusableComboBoxV2<ComboMBidangModel>(
       hintText: "Bisnis Utama",
       comboKey: comboMBidangKey,
       initItem: fieldComboMBidang,
-      dataLoader: () => ComboMBidangRepository().getComboMBidang(),
+      loader: (q) => ComboMBidangRepository().getComboMBidang(),
+      clientSideSearch: true,
       displayText: (item) => item.bidangNama,
       compareItems: (a, b) => a.mbidangId == b.mbidangId,
       onChangedCallback: (value) {
         if (value != null) {
-          removeError(error: kStringNullError);
-          fieldComboMBidang = value;
+          setState(() {
+            removeError(error: kStringNullError);
+            fieldComboMBidang = value;
+          });
           mRekanGeneralCmpCrudBloc.add(
             ComboMBidangChangedEvent(comboMBidang: value),
           );

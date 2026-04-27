@@ -15,6 +15,7 @@ import '../../../../../helper/indo_phone_result.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../../repositories/combobox/comborkodepos_repository.dart';
+import '../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../base/base_background_sidepage.dart';
 
 class MRekanContactCrudFormPage extends StatefulWidget {
@@ -290,70 +291,100 @@ class MRekanContactCrudFormPageFormState
     },
   );
 
-  Widget buildFieldMpropinsiId() => ReusableComboBox<ComboMPropinsiModel>(
-    hintText: "Provinsi",
-    comboKey: comboMPropinsiKey,
-    initItem: fieldComboMPropinsi,
-    dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
-    displayText: (item) => item.propinsiNama,
-    compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
-    validatorCallback: (v) => v == null ? kStringProvinsiError : null,
-    onChangedCallback: (v) {
-      fieldComboMPropinsi = v;
-      fieldComboMKota = null;
-      fieldComboRKodepos = null;
+  Widget buildFieldMpropinsiId() =>
+      ReusableComboBoxV2<ComboMPropinsiModel>(
+        hintText: "Provinsi",
+        comboKey: comboMPropinsiKey,
+        initItem: fieldComboMPropinsi,
 
-      comboMKotaKey.currentState?.clear();
-      comboRKodeposKey.currentState?.clear();
+        loader: (q) => ComboMPropinsiRepository().getComboMPropinsi(q.searchText),
 
-      setState(() {});
-    },
-    onSaveCallback: (value) => fieldComboMPropinsi = value,
-  );
+        displayText: (item) => item.propinsiNama,
+        compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
 
-  Widget buildFieldMkotaId() => ReusableComboBox<ComboMKotaModel>(
-    hintText: "Kota",
-    comboKey: comboMKotaKey,
-    initItem: fieldComboMKota,
-    dataLoader: () {
-      return ComboMKotaRepository().getComboMKota(
-        fieldComboMPropinsi?.mpropinsiId ?? "",
+        validatorCallback: (v) => v == null ? kStringProvinsiError : null,
+
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMPropinsi = v;
+            fieldComboMKota = null;
+            fieldComboRKodepos = null;
+
+            comboMKotaKey.currentState?.clear();
+            comboRKodeposKey.currentState?.clear();
+          });
+        },
+
+        onSaveCallback: (value) => fieldComboMPropinsi = value,
       );
-    },
-    displayText: (item) => item.kotaDesc,
-    compareItems: (a, b) => a.mkotaId == b.mkotaId,
-    validatorCallback: (v) => v == null ? kStringKotaError : null,
-    onChangedCallback: (v) {
-      if (v != null) {
-        comboRKodeposKey.currentState?.clear();
-        fieldComboRKodepos = null;
-      }
 
-      fieldComboMKota = v;
-      setState(() {});
-    },
-    onSaveCallback: (value) => fieldComboMKota = value,
-  );
+  Widget buildFieldMkotaId() =>
+      ReusableComboBoxV2<ComboMKotaModel>(
+        hintText: "Kota",
+        comboKey: comboMKotaKey,
+        initItem: fieldComboMKota,
 
-  Widget buildFieldRkodeposId() => ReusableComboBox<ComboRKodeposModel>(
-    hintText: "Kodepos (Opsional)",
-    comboKey: comboRKodeposKey,
-    initItem: fieldComboRKodepos,
-    dataLoader: () {
-      return ComboRKodeposRepository().getComboRKodepos(
-        fieldComboMKota?.mkotaId ?? "",
-        "",
+        params: {
+          "mpropinsiId": fieldComboMPropinsi?.mpropinsiId ?? "",
+        },
+
+        loader: (q) {
+          final mpropinsiId = q.get<String>("mpropinsiId") ?? "";
+
+          return ComboMKotaRepository().getComboMKota(mpropinsiId);
+        },
+
+        displayText: (item) => item.kotaDesc,
+        compareItems: (a, b) => a.mkotaId == b.mkotaId,
+
+        validatorCallback: (v) => v == null ? kStringKotaError : null,
+
+        onChangedCallback: (v) {
+          setState(() {
+            if (v != null) {
+              comboRKodeposKey.currentState?.clear();
+              fieldComboRKodepos = null;
+            }
+
+            fieldComboMKota = v;
+          });
+        },
+
+        onSaveCallback: (value) => fieldComboMKota = value,
       );
-    },
-    displayText: (item) => item.kodeposNo,
-    compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
-    validatorCallback: (v) => v == null ? kStringKodeposError : null,
-    onChangedCallback: (v) {
-      fieldComboRKodepos = v;
-      setState(() {});
-    },
-    onSaveCallback: (value) => fieldComboRKodepos = value,
-  );
+
+  Widget buildFieldRkodeposId() =>
+      ReusableComboBoxV2<ComboRKodeposModel>(
+        hintText: "Kodepos (Opsional)",
+        comboKey: comboRKodeposKey,
+        initItem: fieldComboRKodepos,
+
+        params: {
+          "mkotaId": fieldComboMKota?.mkotaId ?? "",
+        },
+
+        loader: (q) {
+          final mkotaId = q.get<String>("mkotaId") ?? "";
+
+          return ComboRKodeposRepository().getComboRKodepos(
+            mkotaId,
+            q.searchText,
+          );
+        },
+
+        displayText: (item) => item.kodeposNo,
+        compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
+
+        validatorCallback: (v) => v == null ? kStringKodeposError : null,
+
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboRKodepos = v;
+          });
+        },
+
+        onSaveCallback: (value) => fieldComboRKodepos = value,
+      );
 
   Future<void> onSaveForm() async {
     if (!_formKey.currentState!.validate()) return;

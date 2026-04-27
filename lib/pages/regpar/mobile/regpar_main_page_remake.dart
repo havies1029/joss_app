@@ -48,6 +48,7 @@ import '../../../repositories/combobox/comborkonstruksiojk_repository.dart';
 import '../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../repositories/combobox/comborokupasi_repository.dart';
 import '../../../widgets/apptheme/custom_progress_bar.dart';
+import '../../../widgets/apptheme/dropdown2.dart';
 import '../../../widgets/apptheme/header_card_polis.dart';
 import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
@@ -1821,136 +1822,128 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
   }
 
-  Widget buildFieldRkonstruksiojkId() => ReusableComboBox<ComboRKonstruksiojkModel>(
-    hintText: "Konstruksi",
-    comboKey: comboRKonstruksiojkKey,
-    maxHeight: 200,
-    initItem: fieldComboRKonstruksiojk,
-
-    dataLoader: () {
-      final okupasiId = fieldComboROkupasi?.rokupasiId;
-      if (okupasiId == null || okupasiId.isEmpty) {
-        return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
-      }
-      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(okupasiId);
-    },
-
-    dataLoaderWithFilter: (q) {
-      final okupasiId = fieldComboROkupasi?.rokupasiId;
-      if (okupasiId == null || okupasiId.isEmpty) {
-        return ComboRKonstruksiojkRepository().getComboRKonstruksiojk("");
-      }
-      return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(okupasiId);
-    },
-
-    serverSearchMinChars: 2,
-    displayText: (i) => i.kelasNama,
-    compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
-
-    validatorCallback: (_) => err('form2.kelasKonstruksi'),
-    errorText: err('form2.kelasKonstruksi'),
-
-    onChangedCallback: (item) async {
-      if (item == null) return;
-
-      final subtitle = getKonstruksiSubtitle(item.kelasNama);
-
-      final confirm = await showDialog<bool>(
-        context: context,
-        builder: (_) => Dialog(
-          backgroundColor: formGrey,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(item.kelasNama, style: bodyTextStyle(context), textAlign: TextAlign.center),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: bodyTextStyle(context, fontSize: 15).copyWith(color: hintGrey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  "Apakah Anda yakin ingin memilih kelas ini?",
-                  style: bodyTextStyle(context, fontSize: 15).copyWith(color: hintGrey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 13),
-                Row(
+  Widget buildFieldRkonstruksiojkId() =>
+      ReusableComboBoxV2<ComboRKonstruksiojkModel>(
+        hintText: "Konstruksi",
+        comboKey: comboRKonstruksiojkKey,
+        maxHeight: 200,
+        initItem: fieldComboRKonstruksiojk,
+        params: {
+          "rokupasiId": fieldComboROkupasi?.rokupasiId ?? "",
+        },
+        loader: (q) {
+          final okupasiId = q.get<String>("rokupasiId") ?? "";
+          return ComboRKonstruksiojkRepository()
+              .getComboRKonstruksiojk(okupasiId);
+        },
+        minSearchChars: 2,
+        displayText: (i) => i.kelasNama,
+        compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.kelasKonstruksi'),
+        onChangedCallback: (item) async {
+          if (item == null) return;
+          final oldKonstruksi = previousKonstruksi;
+          final subtitle = getKonstruksiSubtitle(item.kelasNama);
+          final confirm = await showDialog<bool>(
+            context: context,
+            builder: (_) => Dialog(
+              backgroundColor: formGrey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: AppButton.primary(
-                        text: "Tidak",
-                        backgroundColor: sGrey,
-                        onPressed: () => Navigator.pop(context, false),
-                      ),
+                    Text(
+                      item.kelasNama,
+                      style: bodyTextStyle(context),
+                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppButton.primary(
-                        text: "Iya",
-                        onPressed: () => Navigator.pop(context, true),
-                      ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: bodyTextStyle(context, fontSize: 15)
+                          .copyWith(color: hintGrey),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Apakah Anda yakin ingin memilih kelas ini?",
+                      style: bodyTextStyle(context, fontSize: 15)
+                          .copyWith(color: hintGrey),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 13),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppButton.primary(
+                            text: "Tidak",
+                            backgroundColor: sGrey,
+                            onPressed: () => Navigator.pop(context, false),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AppButton.primary(
+                            text: "Iya",
+                            onPressed: () => Navigator.pop(context, true),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+          if (confirm == true) {
+            setState(() {
+              fieldComboRKonstruksiojk = item;
+              previousKonstruksi = item;
+              clearErr('form2.kelasKonstruksi');
+            });
+          } else {
+            setState(() {
+              comboRKonstruksiojkKey.currentState?.clear();
+              fieldComboRKonstruksiojk = oldKonstruksi;
+            });
+          }
+        },
+        onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );
 
-      if (confirm == true) {
-        setState(() {
-          fieldComboRKonstruksiojk = item;
-          previousKonstruksi = item;
-          clearErr('form2.kelasKonstruksi');
-        });
-      } else {
-        setState(() {
-          comboRKonstruksiojkKey.currentState?.clear();
-          fieldComboRKonstruksiojk = previousKonstruksi;
-        });
-      }
-    },
+  Widget buildFieldRokupasiId() =>
+      ReusableComboBoxV2<ComboROkupasiModel>(
+        hintText: "Okupasi",
+        comboKey: comboROkupasiKey,
+        initItem: fieldComboROkupasi,
+        loader: (q) => ComboROkupasiRepository().getComboROkupasi(q.searchText),
+        displayText: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
+        compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.okupasi'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboROkupasi = v;
+            clearErr('form2.okupasi');
 
-    onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
-  );
-
-  Widget buildFieldRokupasiId() => ReusableComboBox<ComboROkupasiModel>(
-    hintText: "Okupasi",
-    comboKey: comboROkupasiKey,
-    initItem: fieldComboROkupasi,
-    dataLoader: () => ComboROkupasiRepository().getComboROkupasi(""),
-    dataLoaderWithFilter: (filter) => ComboROkupasiRepository().getComboROkupasi(filter),
-    displayText: (item) => '${item.kodeOjk} - ${item.okupasiDesc}',
-    compareItems: (a, b) => a.rokupasiId == b.rokupasiId,
-    validatorCallback: (_) => err('form2.okupasi'),
-    errorText: err('form2.okupasi'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboROkupasi = v;
-        clearErr('form2.okupasi');
-
-        fieldComboRKonstruksiojk = null;
-        previousKonstruksi = null;
-        comboRKonstruksiojkKey.currentState?.clear();
-        clearErr('form2.kelasKonstruksi');
-      });
-
-      if (v != null) {
-        regpar2formbloc?.add(
-          ComboROkupasiChangedEvent(comboROkupasi: v),
-        );
-      }
-    },
-    onSaveCallback: (value) => fieldComboROkupasi = value,
-  );
+            fieldComboRKonstruksiojk = null;
+            previousKonstruksi = null;
+            comboRKonstruksiojkKey.currentState?.clear();
+            clearErr('form2.kelasKonstruksi');
+          });
+          if (v != null) {
+            regpar2formbloc?.add(
+              ComboROkupasiChangedEvent(comboROkupasi: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboROkupasi = value,
+      );
 
   Widget buildFieldObjectAlamat() => appTextField(
     label: "Alamat lokasi Risiko",
@@ -1969,120 +1962,149 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     },
   );
 
-  Widget buildFieldObjectPropinsiId() => ReusableComboBox<ComboMPropinsiModel>(
-    hintText: "Provinsi",
-    comboKey: comboMPropinsiKey,
-    initItem: fieldComboMPropinsi,
-    dataLoader: () => ComboMPropinsiRepository().getComboMPropinsi(""),
-    displayText: (i) => i.propinsiNama,
-    compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
+  Widget buildFieldObjectPropinsiId() =>
+      ReusableComboBoxV2<ComboMPropinsiModel>(
+        hintText: "Provinsi",
+        comboKey: comboMPropinsiKey,
+        initItem: fieldComboMPropinsi,
+        loader: (q) => ComboMPropinsiRepository().getComboMPropinsi(q.searchText),
+        displayText: (i) => i.propinsiNama,
+        compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.provinsi'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMPropinsi = v;
+            if (v != null) {
+              clearErr('form2.provinsi');
+              comboMKotaKey.currentState?.clear();
+              comboMKecamatanKey.currentState?.clear();
+              comboMKelurahanKey.currentState?.clear();
+              fieldComboMKota = null;
+              fieldComboMKecamatan = null;
+              fieldComboMKelurahan = null;
+              clearErr('form2.kota');
+              clearErr('form2.kecamatan');
+              clearErr('form2.kelurahan');
+            }
+          });
+          if (v != null) {
+            regpar2formbloc?.add(
+              ComboMPropinsiChangedEvent(comboMPropinsi: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboMPropinsi = value,
+      );
 
-    validatorCallback: (_) => err('form2.provinsi'),
-    errorText: err('form2.provinsi'),
+  Widget buildFieldObjectKotaId() =>
+      ReusableComboBoxV2<ComboMKotaModel>(
+        hintText: "Kota",
+        comboKey: comboMKotaKey,
+        initItem: fieldComboMKota,
+        params: {
+          "mpropinsiId": fieldComboMPropinsi?.mpropinsiId ?? "",
+        },
+        loader: (q) {
+          final mpropinsiId = q.get<String>("mpropinsiId") ?? "";
+          return ComboMKotaRepository().getComboMKota(mpropinsiId);
+        },
+        displayText: (i) => i.kotaDesc,
+        compareItems: (a, b) => a.mkotaId == b.mkotaId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.kota'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMKota = v;
+            if (v != null) {
+              clearErr('form2.kota');
+              comboMKecamatanKey.currentState?.clear();
+              comboMKelurahanKey.currentState?.clear();
+              fieldComboMKecamatan = null;
+              fieldComboMKelurahan = null;
+              clearErr('form2.kecamatan');
+              clearErr('form2.kelurahan');
+            }
+          });
+          if (v != null) {
+            regpar2formbloc?.add(
+              ComboMKotaChangedEvent(comboMKota: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboMKota = value,
+      );
 
-    onChangedCallback: (v) {
-      fieldComboMPropinsi = v;
-      if (v != null) {
-        clearErr('form2.provinsi');
-        regpar2formbloc?.add(ComboMPropinsiChangedEvent(comboMPropinsi: v));
+  Widget buildFieldObjectKecamatanId() =>
+      ReusableComboBoxV2<ComboMKecamatanModel>(
+        hintText: "Kecamatan",
+        comboKey: comboMKecamatanKey,
+        initItem: fieldComboMKecamatan,
+        params: {
+          "mkotaId": fieldComboMKota?.mkotaId ?? "",
+        },
+        loader: (q) {
+          final mkotaId = q.get<String>("mkotaId") ?? "";
+          return ComboMKecamatanRepository().getComboMKecamatan(mkotaId);
+        },
+        displayText: (i) => i.kecamatanNama,
+        compareItems: (a, b) => a.mkecamatanId == b.mkecamatanId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.kecamatan'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMKecamatan = v;
+            if (v != null) {
+              clearErr('form2.kecamatan');
+              comboMKelurahanKey.currentState?.clear();
+              fieldComboMKelurahan = null;
+              clearErr('form2.kelurahan');
+            }
+          });
+          if (v != null) {
+            regpar2formbloc?.add(
+              ComboMKecamatanChangedEvent(comboMKecamatan: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboMKecamatan = value,
+      );
 
-        comboMKotaKey.currentState?.clear();
-        comboMKecamatanKey.currentState?.clear();
-        comboMKelurahanKey.currentState?.clear();
-
-        fieldComboMKota = null;
-        fieldComboMKecamatan = null;
-        fieldComboMKelurahan = null;
-
-        clearErr('form2.kota');
-        clearErr('form2.kecamatan');
-        clearErr('form2.kelurahan');
-      }
-    },
-    onSaveCallback: (value) => fieldComboMPropinsi = value,
-  );
-
-  Widget buildFieldObjectKotaId() => ReusableComboBox<ComboMKotaModel>(
-    hintText: "Kota",
-    comboKey: comboMKotaKey,
-    initItem: fieldComboMKota,
-    dataLoader: () => ComboMKotaRepository().getComboMKota(fieldComboMPropinsi?.mpropinsiId ?? ""),
-    displayText: (i) => i.kotaDesc,
-    compareItems: (a, b) => a.mkotaId == b.mkotaId,
-
-    validatorCallback: (_) => err('form2.kota'),
-    errorText: err('form2.kota'),
-
-    onChangedCallback: (v) {
-      fieldComboMKota = v;
-      if (v != null) {
-        clearErr('form2.kota');
-        regpar2formbloc?.add(ComboMKotaChangedEvent(comboMKota: v));
-
-        comboMKecamatanKey.currentState?.clear();
-        comboMKelurahanKey.currentState?.clear();
-
-        fieldComboMKecamatan = null;
-        fieldComboMKelurahan = null;
-
-        clearErr('form2.kecamatan');
-        clearErr('form2.kelurahan');
-      }
-    },
-    onSaveCallback: (value) => fieldComboMKota = value,
-  );
-
-  Widget buildFieldObjectKecamatanId() => ReusableComboBox<ComboMKecamatanModel>(
-    hintText: "Kecamatan",
-    comboKey: comboMKecamatanKey,
-    initItem: fieldComboMKecamatan,
-    dataLoader: () => ComboMKecamatanRepository().getComboMKecamatan(fieldComboMKota?.mkotaId ?? ""),
-    displayText: (i) => i.kecamatanNama,
-    compareItems: (a, b) => a.mkecamatanId == b.mkecamatanId,
-
-    validatorCallback: (_) => err('form2.kecamatan'),
-    errorText: err('form2.kecamatan'),
-
-    onChangedCallback: (v) {
-      fieldComboMKecamatan = v;
-      if (v != null) {
-        clearErr('form2.kecamatan');
-        regpar2formbloc?.add(ComboMKecamatanChangedEvent(comboMKecamatan: v));
-
-        comboMKelurahanKey.currentState?.clear();
-        fieldComboMKelurahan = null;
-
-        clearErr('form2.kelurahan');
-      }
-    },
-    onSaveCallback: (value) => fieldComboMKecamatan = value,
-  );
-
-  Widget buildFieldObjectKelurahanId() => ReusableComboBox<ComboMKelurahanModel>(
-    hintText: "Kelurahan",
-    comboKey: comboMKelurahanKey,
-    initItem: fieldComboMKelurahan,
-    dataLoader: () => ComboMKelurahanRepository().getComboMKelurahan(fieldComboMKecamatan?.mkecamatanId ?? ""),
-    displayText: (i) => i.kelurahanNama,
-    compareItems: (a, b) => a.mkelurahanId == b.mkelurahanId,
-
-    validatorCallback: (_) => err('form2.kelurahan'),
-    errorText: err('form2.kelurahan'),
-
-    onChangedCallback: (v) {
-      fieldComboMKelurahan = v;
-      if (v != null) {
-        clearErr('form2.kelurahan');
-        regpar2formbloc?.add(ComboMKelurahanChangedEvent(comboMKelurahan: v));
-      }
-    },
-    onSaveCallback: (value) => fieldComboMKelurahan = value,
-  );
+  Widget buildFieldObjectKelurahanId() =>
+      ReusableComboBoxV2<ComboMKelurahanModel>(
+        hintText: "Kelurahan",
+        comboKey: comboMKelurahanKey,
+        initItem: fieldComboMKelurahan,
+        params: {
+          "mkecamatanId": fieldComboMKecamatan?.mkecamatanId ?? "",
+        },
+        loader: (q) {
+          final mkecamatanId = q.get<String>("mkecamatanId") ?? "";
+          return ComboMKelurahanRepository().getComboMKelurahan(mkecamatanId);
+        },
+        displayText: (i) => i.kelurahanNama,
+        compareItems: (a, b) => a.mkelurahanId == b.mkelurahanId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.kelurahan'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMKelurahan = v;
+            if (v != null) {
+              clearErr('form2.kelurahan');
+            }
+          });
+          if (v != null) {
+            regpar2formbloc?.add(
+              ComboMKelurahanChangedEvent(comboMKelurahan: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboMKelurahan = value,
+      );
 
   //form2
 
   //form3
-
   Widget  buildFieldIsEq() => CheckboxWidget(
     rightLabel: "Gempa Bumi",
     initialValue: toBoolean(fieldIsEqController.text),
@@ -2123,102 +2145,106 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     enabled: !_lockCheckboxes,
   );
 
-  Widget buildFieldMjnscoverparId() => ReusableComboBox<ComboMJnscoverParModel>(
-    hintText: "Jenis Jaminan",
-    initItem: fieldComboMJnscoverPar,
-    dataLoader: () => ComboMJnscoverParRepository().getComboMJnscoverPar(),
-    displayText: (i) => i.jenisNama,
-    compareItems: (a, b) => a.mjnscoverparId == b.mjnscoverparId,
+  Widget buildFieldMjnscoverparId() =>
+      ReusableComboBoxV2<ComboMJnscoverParModel>(
+        hintText: "Jenis Jaminan",
+        initItem: fieldComboMJnscoverPar,
+        loader: (q) => ComboMJnscoverParRepository().getComboMJnscoverPar(),
+        clientSideSearch: true,
+        displayText: (i) => i.jenisNama,
+        compareItems: (a, b) => a.mjnscoverparId == b.mjnscoverparId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.jenisJaminan'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMJnscoverPar = v;
+            if (v != null) {
+              clearErr('form3.jenisJaminan');
+            }
+            _applyCoverParRule(v?.mjnscoverparId);
+          });
+        },
+        onSaveCallback: (value) => fieldComboMJnscoverPar = value,
+      );
 
-    validatorCallback: (_) => err('form3.jenisJaminan'),
-    errorText: err('form3.jenisJaminan'),
+  Widget buildFieldMwilayahId() =>
+      ReusableComboBoxV2<ComboMWilayahModel>(
+        hintText: "Wilayah",
+        initItem: fieldComboMWilayah,
+        loader: (q) => ComboMWilayahRepository().getComboMWilayah(),
+        clientSideSearch: true,
+        displayText: (i) => i.wilayahNama,
+        compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.wilayah'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMWilayah = v;
+            if (v != null) {
+              clearErr('form3.wilayah');
+              fieldComboMKabZonaGempa = null;
+              comboMKabZonaGempaKey.currentState?.clear();
+              clearErr('form3.zonaGempa');
+            }
+          });
+          if (v != null) {
+            regpar3formbloc?.add(
+              ComboMWilayahChangedEvent(comboMWilayah: v),
+            );
+          }
+        },
+        onSaveCallback: (value) => fieldComboMWilayah = value,
+      );
 
-    onChangedCallback: (v) {
-      fieldComboMJnscoverPar = v;
-      if (v != null) clearErr('form3.jenisJaminan');
-      _applyCoverParRule(v?.mjnscoverparId);
-    },
-    onSaveCallback: (value) => fieldComboMJnscoverPar = value,
-  );
-
-  Widget buildFieldMwilayahId() => ReusableComboBox<ComboMWilayahModel>(
-    hintText: "Wilayah",
-    initItem: fieldComboMWilayah,
-    dataLoader: () => ComboMWilayahRepository().getComboMWilayah(),
-    displayText: (i) => i.wilayahNama,
-    compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
-
-    validatorCallback: (_) => err('form3.wilayah'),
-    errorText: err('form3.wilayah'),
-
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMWilayah = v;
-        if (v != null) {
-          clearErr('form3.wilayah');
-          fieldComboMKabZonaGempa = null;
-          comboMKabZonaGempaKey.currentState?.clear();
-          clearErr('form3.zonaGempa');
-        }
-      });
-      if (v != null) {
-        regpar3formbloc?.add(
-          ComboMWilayahChangedEvent(comboMWilayah: v),
-        );
-      }
-    },
-    onSaveCallback: (value) => fieldComboMWilayah = value,
-  );
-
-  Widget buildFieldKab2zonagempaId() => ReusableComboBox<ComboMKabZonaGempaModel>(
-    hintText: "Zona gempa Bumi",
-    initItem: fieldComboMKabZonaGempa,
-    comboKey: comboMKabZonaGempaKey,
-    dataLoader: () {
-      final wid = fieldComboMWilayah?.mwilayahId;
-      final payload = (wid == null || wid.isEmpty) ? "" : "$wid|";
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(payload, "");
-    },
-    dataLoaderWithFilter: (q) {
-      final wid = fieldComboMWilayah?.mwilayahId;
-      if (wid == null || wid.isEmpty) return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("", "");
-      final queryUser = (q ?? "").trim();
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa("$wid|$queryUser", queryUser);
-    },
-    serverSearchMinChars: 2,
-    displayText: (i) => i.kabupaten,
-    compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
-    validatorCallback: (_) => err('form3.zonaGempa'),
-    errorText: err('form3.zonaGempa'),
-
-    onChangedCallback: (v) {
-      fieldComboMKabZonaGempa = v;
-      if (v != null) clearErr('form3.zonaGempa');
-    },
-    onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
-  );
-
+  Widget buildFieldKab2zonagempaId() =>
+      ReusableComboBoxV2<ComboMKabZonaGempaModel>(
+        hintText: "Zona Gempa Bumi",
+        initItem: fieldComboMKabZonaGempa,
+        comboKey: comboMKabZonaGempaKey,
+        params: {
+          "mwilayahId": fieldComboMWilayah?.mwilayahId ?? "",
+        },
+        loader: (query) {
+          return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(
+            query.params["mwilayahId"] ?? "",
+            query.searchText,
+          );
+        },
+        displayText: (i) => i.kabupaten,
+        compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.kab2zonagempaId'),
+        onChangedCallback: (v) {
+          fieldComboMKabZonaGempa = v;
+          if (v != null) {
+            clearErr('form3.kab2zonagempaId');
+          }
+        },
+        onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
+      );
   //form3
 
   //form4
-  Widget _buildComboCurddId() => ReusableComboBox<ComboRMatauangModel>(
-    hintText: "Mata Uang",
-    initItem: fieldComboRMatauang,
-    dataLoader: () => ComboRMatauangRepository().getComboRMatauang(),
-    displayText: (item) => item.rmatauangSimbol,
-    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-
-    // error-map pattern
-    validatorCallback: (_) => err('form4.mataUang'),
-    errorText: err('form4.mataUang'),
-
-    onChangedCallback: (v) {
-      fieldComboRMatauang = v;
-      if (v != null) clearErr('form4.mataUang');
-    },
-    onSaveCallback: (value) => fieldComboRMatauang = value,
-  );
-
+  Widget _buildComboCurddId() =>
+      ReusableComboBoxV2<ComboRMatauangModel>(
+        hintText: "Mata Uang",
+        initItem: fieldComboRMatauang,
+        loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+        clientSideSearch: true,
+        displayText: (item) => item.rmatauangSimbol,
+        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form4.mataUang'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboRMatauang = v;
+            if (v != null) {
+              clearErr('form4.mataUang');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboRMatauang = value,
+      );
 
   Widget buildFieldSiBuilding() => appTextField(
     label: "Bangunan",

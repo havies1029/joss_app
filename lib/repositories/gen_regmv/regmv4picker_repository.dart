@@ -47,9 +47,12 @@ class Regmv4PickerRepositoryImpl implements Regmv4PickerRepository {
       withData: false,
       type: FileType.custom,
       allowedExtensions: [
-        'pdf','jpg','jpeg','png','heic','txt',
-        'doc','docx','xls','xlsx','ppt','pptx',
-        'zip','rar','mp4','mov'
+        'png',
+        'jpg',
+        'jpeg',
+        'pdf',
+        'doc',
+        'docx',
       ],
     );
 
@@ -62,7 +65,7 @@ class Regmv4PickerRepositoryImpl implements Regmv4PickerRepository {
 
       final mime = lookupMimeType(path);
       final isImage = (mime?.startsWith('image/') ?? false) ||
-          ['.jpg', '.jpeg', '.png', '.heic']
+          ['.jpg', '.jpeg', '.png']
               .contains(p.extension(path).toLowerCase());
 
       items.add(Regmv4UploadModel(

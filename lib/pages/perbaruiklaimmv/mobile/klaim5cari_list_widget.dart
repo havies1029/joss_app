@@ -265,161 +265,156 @@ Future<void> showPreviewDialog({
     }
   }
 
-Future<void> _pickFile(Klaim5cariModel it) async {
-  final bloc = context.read<Klaim5cariBloc>();
-  final result = await FilePicker.platform.pickFiles(
-    allowMultiple: false,
-    type: FileType.custom,
-    allowedExtensions: [
-      'jpg', 'jpeg', 'png',
+  Future<void> _pickFile(Klaim5cariModel it) async {
+    final bloc = context.read<Klaim5cariBloc>();
+
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: [
+        'jpg',
+        'jpeg',
+        'png',
+        'pdf',
+        'doc',
+        'docx',
+      ],
+    );
+
+    if (result == null || result.files.isEmpty) return;
+
+    final file = result.files.first;
+    final path = file.path;
+    if (path == null) return;
+
+    final ext = path.split('.').last.toLowerCase();
+
+    const allowed = [
+      'jpg',
+      'jpeg',
+      'png',
       'pdf',
-      'doc', 'docx',
-      'xls', 'xlsx',
-      'txt'
-    ],
-  );
+      'doc',
+      'docx',
+    ];
 
-  if (result == null || result.files.isEmpty) return;
+    if (!allowed.contains(ext)) return;
 
-  final file = result.files.first;
-  final path = file.path;
-  if (path == null) return;
+    final mime = lookupMimeType(path);
 
-  final mime = lookupMimeType(path);
+    bloc.add(
+      Klaim5LocalFileSetEvent(
+        klaim1Id: it.klaim1Id,
+        mjenisdocId: it.mjenisdocId,
+        klaim5Id: it.klaim5Id,
+        localPath: path,
+        fileName: file.name,
+        mimeType: mime,
+        fileSizeBytes: file.size,
+        jenisDocLain: it.jenisDocLain,
+      ),
+    );
 
-  debugPrint('=== _pickFile START ===');
-  debugPrint('it.klaim1Id      : ${it.klaim1Id}');
-  debugPrint('it.klaim5Id      : ${it.klaim5Id}');
-  debugPrint('it.mjenisdocId   : ${it.mjenisdocId}');
-  debugPrint('it.jenisDocLain  : ${it.jenisDocLain}');
-  debugPrint('it.jenisNama     : ${it.jenisNama}');
-  debugPrint('picked path      : $path');
-  debugPrint('picked file.name : ${file.name}');
-  debugPrint('picked file.size : ${file.size}');
+    bloc.add(
+      Klaim5UploadRequestedEvent(
+        mjenisdocId: it.mjenisdocId,
+        klaim5Id: it.klaim5Id,
+        jenisDocLain: it.jenisDocLain,
+      ),
+    );
 
-  bloc.add(
-    Klaim5LocalFileSetEvent(
-      klaim1Id: it.klaim1Id,
-      mjenisdocId: it.mjenisdocId,
-      klaim5Id: it.klaim5Id,
-      localPath: path,
-      fileName: file.name,
-      mimeType: mime,
-      fileSizeBytes: file.size,
-      jenisDocLain: it.jenisDocLain,
-    ),
-  );
+    bloc.add(Klaim5ValidateDocumentsEvent());
+  }
 
-  bloc.add(
-    Klaim5UploadRequestedEvent(
-      mjenisdocId: it.mjenisdocId,
-      klaim5Id: it.klaim5Id,
-      jenisDocLain: it.jenisDocLain,
-    ),
-  );
+  Future<void> pickNewFileDokLain(String klaim1Id, String jenisDocLain) async {
+    final bloc = context.read<Klaim5cariBloc>();
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: [
+        'jpg', 'jpeg', 'png',
+        'pdf',
+        'doc', 'docx',
+        'xls', 'xlsx',
+        'txt'
+      ],
+    );
 
-  bloc.add(
-    Klaim5ValidateDocumentsEvent(),
-  );
-}
+    if (result == null || result.files.isEmpty) return;
 
-Future<void> pickNewFileDokLain(String klaim1Id, String jenisDocLain) async {
-  final bloc = context.read<Klaim5cariBloc>();
-  final result = await FilePicker.platform.pickFiles(
-    allowMultiple: false,
-    type: FileType.custom,
-    allowedExtensions: [
-      'jpg', 'jpeg', 'png',
-      'pdf',
-      'doc', 'docx',
-      'xls', 'xlsx',
-      'txt'
-    ],
-  );
+    final file = result.files.first;
+    final path = file.path;
+    if (path == null) return;
 
-  if (result == null || result.files.isEmpty) return;
+    final mime = lookupMimeType(path);
 
-  final file = result.files.first;
-  final path = file.path;
-  if (path == null) return;
+    bloc.add(
+      Klaim5LocalFileSetEvent(
+        klaim1Id: klaim1Id,
+        mjenisdocId: '',
+        klaim5Id: '',
+        localPath: path,
+        fileName: file.name,
+        mimeType: mime,
+        fileSizeBytes: file.size,
+        jenisDocLain: jenisDocLain,
+      ),
+    );
 
-  final mime = lookupMimeType(path);
+    bloc.add(
+      Klaim5UploadRequestedEvent(mjenisdocId: '', klaim5Id: '', jenisDocLain: jenisDocLain),
+    );
 
-  debugPrint('=== pickNewFileDokLain START ===');
-  debugPrint('klaim1Id        : $klaim1Id');
-  debugPrint('jenisDocLain    : $jenisDocLain');
-  debugPrint('picked path     : $path');
-  debugPrint('picked file.name: ${file.name}');
-  debugPrint('picked file.size: ${file.size}');
-
-  bloc.add(
-    Klaim5LocalFileSetEvent(
-      klaim1Id: klaim1Id,
-      mjenisdocId: '',
-      klaim5Id: '',
-      localPath: path,
-      fileName: file.name,
-      mimeType: mime,
-      fileSizeBytes: file.size,
-      jenisDocLain: jenisDocLain,
-    ),
-  );
-
-  bloc.add(
-    Klaim5UploadRequestedEvent(mjenisdocId: '', klaim5Id: '', jenisDocLain: jenisDocLain),
-  );
-
-  bloc.add(
-    Klaim5ValidateDocumentsEvent(),
-  );
-}
+    bloc.add(
+      Klaim5ValidateDocumentsEvent(),
+    );
+  }
 
 
-Future<void> _pickPhoto(Klaim5cariModel it) async {
-  final picker = ImagePicker();
+  Future<void> _pickPhoto(Klaim5cariModel it) async {
+    final picker = ImagePicker();
 
-  final bloc = context.read<Klaim5cariBloc>();
-  final photo = await picker.pickImage(
-    source: ImageSource.camera,
-    imageQuality: 85,
-  );
+    final bloc = context.read<Klaim5cariBloc>();
+    final photo = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 85,
+    );
 
-  if (photo == null) return;
+    if (photo == null) return;
 
-  final path = photo.path;
-  final mime = lookupMimeType(path);
+    final path = photo.path;
+    final mime = lookupMimeType(path);
 
-  debugPrint('=== _pickPhoto START ===');
-  debugPrint('it.klaim1Id      : ${it.klaim1Id}');
-  debugPrint('it.klaim5Id      : ${it.klaim5Id}');
-  debugPrint('it.mjenisdocId   : ${it.mjenisdocId}');
-  debugPrint('it.jenisDocLain  : ${it.jenisDocLain}');
-  debugPrint('it.jenisNama     : ${it.jenisNama}');
-  debugPrint('picked path      : $path');
-  debugPrint('picked file.size : ${await photo.length()}');
+    debugPrint('=== _pickPhoto START ===');
+    debugPrint('it.klaim1Id      : ${it.klaim1Id}');
+    debugPrint('it.klaim5Id      : ${it.klaim5Id}');
+    debugPrint('it.mjenisdocId   : ${it.mjenisdocId}');
+    debugPrint('it.jenisDocLain  : ${it.jenisDocLain}');
+    debugPrint('it.jenisNama     : ${it.jenisNama}');
+    debugPrint('picked path      : $path');
+    debugPrint('picked file.size : ${await photo.length()}');
 
-  bloc.add(
-    Klaim5LocalFileSetEvent(
-      klaim1Id: it.klaim1Id,
-      mjenisdocId: it.mjenisdocId,
-      klaim5Id: it.klaim5Id,
-      localPath: path,
-      fileName: path.split('/').last,
-      mimeType: mime,
-      fileSizeBytes: await photo.length(),
-      jenisDocLain: it.jenisDocLain,
-    ),
-  );
+    bloc.add(
+      Klaim5LocalFileSetEvent(
+        klaim1Id: it.klaim1Id,
+        mjenisdocId: it.mjenisdocId,
+        klaim5Id: it.klaim5Id,
+        localPath: path,
+        fileName: path.split('/').last,
+        mimeType: mime,
+        fileSizeBytes: await photo.length(),
+        jenisDocLain: it.jenisDocLain,
+      ),
+    );
 
-  bloc.add(
-    Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id,  jenisDocLain: it.jenisDocLain,),
-  );
+    bloc.add(
+      Klaim5UploadRequestedEvent(mjenisdocId: it.mjenisdocId, klaim5Id: it.klaim5Id,  jenisDocLain: it.jenisDocLain,),
+    );
 
-  bloc.add(
-    Klaim5ValidateDocumentsEvent(),
-  );
-}
-
+    bloc.add(
+      Klaim5ValidateDocumentsEvent(),
+    );
+  }
 
   Future<bool?> showLogoutConfirmDialog(BuildContext context) {
     return showGeneralDialog<bool>(
@@ -541,7 +536,6 @@ Future<void> _pickPhoto(Klaim5cariModel it) async {
     );
   }
 
-
   Future<void> _deleteFile(Klaim5cariModel it) async {
     final bloc = context.read<Klaim5cariBloc>();
 
@@ -564,50 +558,42 @@ Future<void> _pickPhoto(Klaim5cariModel it) async {
   }
 
 
-Future<void> _preview(Klaim5cariModel it) async {
-  // ignore: unnecessary_null_comparison
-  if (it.fileUrl == null && it.localPath == null) return;
+  Future<void> _preview(Klaim5cariModel it) async {
+    if (it.fileUrl == null && it.localPath == null) return;
 
-  final path = it.localPath ?? it.fileUrl ?? '';
+    final path = it.localPath ?? it.fileUrl ?? '';
 
-  final mime = lookupMimeType(path);
+    final mime = lookupMimeType(path);
 
-  // IMAGE
-  if (mime != null && mime.startsWith('image/')) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.black,
-        child: InteractiveViewer(
-          child: Image.file(File(path)),
+    if (mime != null && mime.startsWith('image/')) {
+      showDialog(
+        context: context,
+        builder: (_) => Dialog(
+          backgroundColor: Colors.black,
+          child: InteractiveViewer(
+            child: Image.file(File(path)),
+          ),
         ),
-      ),
-    );
-    return;
-  }
+      );
+      return;
+    }
 
-  // PDF
-  if (mime != null && mime.contains('pdf')) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text("Preview PDF")),
-          body: PdfView(
-            controller: PdfController(
-              document: PdfDocument.openFile(path),
+    if (mime != null && mime.contains('pdf')) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => Scaffold(
+            appBar: AppBar(title: const Text("Preview PDF")),
+            body: PdfView(
+              controller: PdfController(
+                document: PdfDocument.openFile(path),
+              ),
             ),
           ),
         ),
-      ),
-    );
-    return;
+      );
+      return;
+    }
+    await OpenFilex.open(path);
   }
-
-  // OTHER FILE (DOC/XLS/TXT)
-  await OpenFilex.open(path);
-}
-
-
-
 }

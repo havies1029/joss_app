@@ -231,15 +231,23 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
         context.read<HakaksesCrudBloc>().state.record?.isAdmin ?? false;
 
     final id = it.mrekanpicId.trim();
-    final isTidakAktif = _normalizedStatus(it.statusPic) == 'tidak aktif';
+    final status = _normalizedStatus(it.statusPic);
+
+    final isTidakAktif = status == 'tidak aktif';
+    final isSudahAksep = status == 'sudah aksep';
     final isDefault = it.isDefault;
+
+    // Filter utama: hak akses admin
+    // Filter kedua: status data + default PIC
+    final canShowActionSection = isAdmin && !isTidakAktif;
+    final canEdit = isAdmin && !isTidakAktif;
+    final canDelete = isAdmin && !isTidakAktif && !isDefault && !isSudahAksep;
+    final canShowStatusAction = isAdmin && !isTidakAktif;
 
     final labelStyle =
     bodyTextStyle(context, fontSize: 16).copyWith(color: cardGrey);
     final valueStyle =
     bodyTextStyle(context, fontSize: 16).copyWith(color: primaryLightColor);
-
-    final showActionSection = isAdmin && !isTidakAktif;
 
     return Card(
       color: formGrey,
@@ -252,21 +260,23 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (showActionSection) ...[
+            if (canShowActionSection) ...[
               Row(
                 children: [
-                  AppButton.icon(
-                    icon: SvgPicture.asset(
-                      'assets/icons/edit_icon_polis.svg',
-                      width: 15,
-                      height: 15,
+                  if (canEdit)
+                    AppButton.icon(
+                      icon: SvgPicture.asset(
+                        'assets/icons/edit_icon_polis.svg',
+                        width: 15,
+                        height: 15,
+                      ),
+                      onPressed: () => _goEditById(id),
+                      backgroundColor: const Color(0xFFFFC20A),
+                      squareSize: 30,
+                      borderRadius: 8,
                     ),
-                    onPressed: () => _goEditById(id),
-                    backgroundColor: const Color(0xFFFFC20A),
-                    squareSize: 30,
-                    borderRadius: 8,
-                  ),
-                  if (!isDefault) ...[
+
+                  if (canDelete) ...[
                     const SizedBox(width: 12),
                     AppButton.icon(
                       icon: SvgPicture.asset(
@@ -284,8 +294,10 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                       borderRadius: 8,
                     ),
                   ],
+
                   const Spacer(),
-                  _buildPicStatusAction(it),
+
+                  if (canShowStatusAction) _buildPicStatusAction(it),
                 ],
               ),
               const SizedBox(height: 8),
@@ -335,9 +347,11 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
               labelStyle,
               valueStyle,
             ),
+
             const SizedBox(height: 8),
             Divider(color: sGrey),
             const SizedBox(height: 8),
+
             Text(
               'COB yang bisa diakses:',
               style: bodyTextStyle(
@@ -416,26 +430,140 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     // }
   }
 
-
-
   Future<void> _confirmDelete(String recordId) async {
     final id = recordId.trim();
     if (id.isEmpty) return;
 
-    await showDialog<bool>(
+    final shouldDelete = await showGeneralDialog<bool>(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => ShowDialogHapusWidget(
-        recordId: id,
-        onHapusFunction: (deleteId) {
-          context.read<MRekanPicCrudBloc>().add(
-            MRekanPicCrudHapusEvent(recordId: deleteId),
-          );
-        },
-      ),
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Hapus Data?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Data PIC ini akan dihapus.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () =>
+                                Navigator.pop(dialogContext, false),
+                            child: Text(
+                              "Batal",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () =>
+                                Navigator.pop(dialogContext, true),
+                            child: Text(
+                              "Iya, Hapus",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
     );
-  }
 
+    if (!context.mounted) return;
+
+    if (shouldDelete == true) {
+      context.read<MRekanPicCrudBloc>().add(
+        MRekanPicCrudHapusEvent(recordId: id),
+      );
+    }
+  }
   String _normalizedStatus(String? status) {
     return (status ?? '').trim().toLowerCase();
   }
