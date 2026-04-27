@@ -1822,7 +1822,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   Widget buildFieldRkonstruksiojkId() => ReusableComboBox<ComboRKonstruksiojkModel>(
-    hintText: "Kelas Konstruksi",
+    hintText: "Konstruksi",
     comboKey: comboRKonstruksiojkKey,
     maxHeight: 200,
     initItem: fieldComboRKonstruksiojk,

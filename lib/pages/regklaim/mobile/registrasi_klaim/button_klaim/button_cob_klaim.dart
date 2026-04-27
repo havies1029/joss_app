@@ -264,12 +264,11 @@ class _ButtonCobKlaimWidgetState extends State<ButtonCobKlaimWidget> {
                     children: items.map((item) {
                       final isSelected =
                           state.selectedItem?.mcobklaim1Id == item.mcobklaim1Id;
-
                       final accessCobId = mapUiToAccessCob(item.mcobklaim1Id);
-
-                      final hasAccess =
-                          userType != 'C' || !cobSet.contains(accessCobId);
-
+                      final isLainnya = item.mcobklaim1Id == "10003";
+                      final hasAccess = isLainnya
+                          ? true
+                          : (userType != 'C' || !cobSet.contains(accessCobId));
                       return Padding(
                         padding: const EdgeInsets.only(bottom: hPadding),
                         child: _buildRestrictedTile(
