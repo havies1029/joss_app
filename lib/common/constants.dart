@@ -164,6 +164,7 @@ const LinearGradient greenGradient = LinearGradient(
 const double hPadding = 10.0;
 const double vPadding = 20.0;
 const double cardBorderRadius = 10.0;
+const double cardBorderRadius2 = 12.0;
 const double checkboxBorderRadius = 4.0;
 const double defaultElevation = 3.0;
 const double buttonHeight = 41.0;

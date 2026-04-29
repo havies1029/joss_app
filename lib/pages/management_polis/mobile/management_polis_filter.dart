@@ -60,6 +60,21 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     super.dispose();
   }
 
+  String _hintByCob(String cobId) {
+    switch (cobId) {
+      case "10002":
+        return "Cari tertanggung/lokasi/nopolis aset...";
+      case "10003":
+        return "Cari tertanggung/nopolin/merk...";
+      case "10004":
+        return "Cari nama kapal...";
+      case "10005":
+        return "Cari nama...";
+      default:
+        return "Cari...";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -96,63 +111,79 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      color: secondaryBlackColor,
-      padding: EdgeInsets.symmetric(
-        horizontal: hPadding * 1.5,
-        vertical: hPadding,
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(cardBorderRadius2),
+        topRight: Radius.circular(cardBorderRadius2),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const ButtonGroupCobAsetWidget(),
-          const SizedBox(height: hPadding),
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: hPadding * 1.5,
+          vertical: hPadding,
+        ),
+        decoration: const BoxDecoration(
+          color: secondaryBlackColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(cardBorderRadius2),
+            topRight: Radius.circular(cardBorderRadius2),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const ButtonGroupCobAsetWidget(),
+            const SizedBox(height: hPadding),
 
-          BlocSelector<CobManPolBloc, CobManPolState, String>(
-            selector: (state) => state.selectedCOBId,
-            builder: (context, selectedCobId) {
-              final hideSearch = selectedCobId == "10001";
+            BlocSelector<CobManPolBloc, CobManPolState, String>(
+              selector: (state) => state.selectedCOBId,
+              builder: (context, selectedCobId) {
+                final hideSearch = selectedCobId == "10001";
 
-              return Row(
-                mainAxisAlignment: hideSearch ? MainAxisAlignment.center : MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (!hideSearch) ...[
-                    Expanded(
-                      child: ListPageFilterBarUIWidget(
-                        searchController: _searchController,
-                        searchButton: buildSearchButton(),
+                return Row(
+                  mainAxisAlignment: hideSearch
+                      ? MainAxisAlignment.center
+                      : MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (!hideSearch) ...[
+                      Expanded(
+                        child: ListPageFilterBarUIWidget(
+                          searchController: _searchController,
+                          searchButton: buildSearchButton(),
+                          hintText: _hintByCob(selectedCobId),
+                        ),
                       ),
+                      const SizedBox(width: 8),
+                    ],
+                    PolisButton(
+                      assetPath: "assets/icons/unduh.svg",
+                      bgColor: bGrey,
+                      borderColor: bdGrey,
+                      onTap: () => _showExportDialog(context),
+                      iconSize: 16,
+                      height: 36,
+                      width: 36,
                     ),
                     const SizedBox(width: 8),
+                    PolisButton(
+                      assetPath: "assets/icons/bagikan.svg",
+                      bgColor: bBlue,
+                      borderColor: bdBlue,
+                      onTap: () => _onShare(context),
+                      iconSize: 16,
+                      height: 36,
+                      width: 36,
+                    ),
                   ],
-                  PolisButton(
-                    assetPath: "assets/icons/unduh.svg",
-                    bgColor: bGrey,
-                    borderColor: bdGrey,
-                    onTap: () => _showExportDialog(context),
-                    iconSize: 16,
-                    height: 36,
-                    width: 36,
-                  ),
-                  const SizedBox(width: 8),
-                  PolisButton(
-                    assetPath: "assets/icons/bagikan.svg",
-                    bgColor: bBlue,
-                    borderColor: bdBlue,
-                    onTap: () => _onShare(context),
-                    iconSize: 16,
-                    height: 36,
-                    width: 36,
-                  ),
-                ],
-              );
-            },
-          ),
+                );
+              },
+            ),
 
-          const SizedBox(height: hPadding),
-          const ButtonGroupStatusAsetWidget(),
-        ],
+            const SizedBox(height: hPadding),
+            const ButtonGroupStatusAsetWidget(),
+          ],
+        ),
       ),
     );
   }

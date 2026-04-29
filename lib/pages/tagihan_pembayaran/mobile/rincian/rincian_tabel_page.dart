@@ -6,6 +6,7 @@ import 'package:joss_app/models/payment/dnheadercob_model.dart';
 
 import '../../../../common/constants.dart';
 import '../../../../widgets/apptheme/dialog_detail_polis.dart';
+import '../../../../widgets/apptheme/nested_scrollable_table_shell.dart';
 
 class RincianTablePage extends StatefulWidget {
   final List<DnHeaderCobModel> headers;
@@ -212,6 +213,83 @@ class _RincianTablePageState extends State<RincianTablePage> {
     );
   }
 
+  // Widget _buildDetailTableCompact(List<DnDetailSppaModel> details) {
+  //   if (details.isEmpty) return const Text("Tidak ada detail polis");
+  //   final widths = _compactColumnWidths(context, details);
+  //   return StatefulBuilder(
+  //     builder: (context, setState) {
+  //       return ClipRRect(
+  //         borderRadius: widget.readOnly
+  //             ? BorderRadius.circular(cardBorderRadius)
+  //             : BorderRadius.only(
+  //           topLeft: Radius.circular(cardBorderRadius),
+  //           topRight: Radius.circular(cardBorderRadius),
+  //         ),
+  //         child: Container(
+  //           decoration: BoxDecoration(
+  //             color: formGrey,
+  //             borderRadius: BorderRadius.only(
+  //               topLeft: Radius.circular(cardBorderRadius),
+  //               topRight: Radius.circular(cardBorderRadius),
+  //             ),
+  //             border: const Border(
+  //               top: BorderSide(color: sGrey, width: 1),
+  //               left: BorderSide(color: sGrey, width: 1),
+  //               right: BorderSide(color: sGrey, width: 1),
+  //               bottom: BorderSide(color: sGrey, width: 0.5),
+  //             ),
+  //           ),
+  //           child: ScrollbarTheme(
+  //             data: ScrollbarThemeData(
+  //               thumbVisibility: WidgetStateProperty.all(false),
+  //               trackVisibility: WidgetStateProperty.all(false),
+  //               thickness: WidgetStateProperty.all(5),
+  //               radius: Radius.circular(cardBorderRadius),
+  //               thumbColor: WidgetStateProperty.all(
+  //                 scrollBar.withOpacity(0.25),
+  //               ),
+  //             ),
+  //             child: Scrollbar(
+  //               //controller: hController,
+  //               //thumbVisibility: true,
+  //               child: SingleChildScrollView(
+  //                 //controller: hController,
+  //                 scrollDirection: Axis.horizontal,
+  //                 child: Table(
+  //                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+  //                   border: const TableBorder(
+  //                     horizontalInside: BorderSide(color: sGrey, width: 1),
+  //                     verticalInside: BorderSide(color: sGrey, width: 1),
+  //                   ),
+  //                   columnWidths: widths,
+  //                   children: [
+  //                     _tableHeader(context, [
+  //                       "",
+  //                       "NO",
+  //                       "NO POLIS",
+  //                       "PERIODE POLIS",
+  //                       "MATA UANG",
+  //                       "PREMI",
+  //                       "AGING",
+  //                     ]),
+  //                     ...details.asMap().entries.map(
+  //                           (e) => _detailRowWithCheckbox(
+  //                         e.value,
+  //                         e.key,
+  //                         compact: true,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
   Widget _buildDetailTableCompact(List<DnDetailSppaModel> details) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
     final widths = _compactColumnWidths(context, details);
@@ -238,48 +316,36 @@ class _RincianTablePageState extends State<RincianTablePage> {
                 bottom: BorderSide(color: sGrey, width: 0.5),
               ),
             ),
-            child: ScrollbarTheme(
-              data: ScrollbarThemeData(
-                thumbVisibility: WidgetStateProperty.all(false),
-                trackVisibility: WidgetStateProperty.all(false),
-                thickness: WidgetStateProperty.all(5),
-                radius: Radius.circular(cardBorderRadius),
-                thumbColor: WidgetStateProperty.all(
-                  scrollBar.withOpacity(0.25),
-                ),
-              ),
-              child: Scrollbar(
-                //controller: hController,
-                //thumbVisibility: true,
-                child: SingleChildScrollView(
-                  //controller: hController,
-                  scrollDirection: Axis.horizontal,
-                  child: Table(
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    border: const TableBorder(
-                      horizontalInside: BorderSide(color: sGrey, width: 1),
-                      verticalInside: BorderSide(color: sGrey, width: 1),
-                    ),
-                    columnWidths: widths,
-                    children: [
-                      _tableHeader(context, [
-                        "",
-                        "NO",
-                        "NO POLIS",
-                        "PERIODE POLIS",
-                        "MATA UANG",
-                        "PREMI",
-                        "AGING",
-                      ]),
-                      ...details.asMap().entries.map(
-                            (e) => _detailRowWithCheckbox(
-                          e.value,
-                          e.key,
-                          compact: true,
-                        ),
-                      ),
-                    ],
+            child: NestedScrollableTableShell(
+              height: 48 * 8 * 0.8,
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Table(
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: const TableBorder(
+                    horizontalInside: BorderSide(color: sGrey, width: 1),
+                    verticalInside: BorderSide(color: sGrey, width: 1),
                   ),
+                  columnWidths: widths,
+                  children: [
+                    _tableHeader(context, [
+                      "",
+                      "NO",
+                      "NO POLIS",
+                      "PERIODE POLIS",
+                      "MATA UANG",
+                      "PREMI",
+                      "AGING",
+                    ]),
+                    ...details.asMap().entries.map(
+                          (e) => _detailRowWithCheckbox(
+                        e.value,
+                        e.key,
+                        compact: true,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

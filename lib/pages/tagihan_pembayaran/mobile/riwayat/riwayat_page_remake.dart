@@ -118,14 +118,14 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 searchController: _searchController,
                 onSearch: (value) {
                   refreshData();
-                },              ),
+                },
+               hintText: "Cari No Pembayaran...",
+              ),
               const SizedBox(height: 10),
 
-              // ✅ Filter bar di parent
               _buildFilterBarParent(),
               const SizedBox(height: 10),
 
-              // ✅ list/table
               buildList(),
             ],
           ),

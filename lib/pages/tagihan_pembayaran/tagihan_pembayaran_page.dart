@@ -57,7 +57,6 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondaryBlackColor,
       body: SafeArea(
         child: Stack(
           children: [
@@ -75,55 +74,55 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
                     ),
                     // BaseAssetWidget(),
                     SafeArea(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: secondaryBlackColor,
-
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(cardBorderRadius2),
+                          topRight: Radius.circular(cardBorderRadius2),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(tabItems.length, (i) {
-                            final isActive = i == selectedTab;
-                            return Expanded(
-                              child: GestureDetector(
-                                onTap: () => setState(() => selectedTab = i),
-                                child: Container(
-                                  height: 54,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color:
-                                        isActive ? primaryColor : unselectedColor,
-                                        width: 1.5,
+                        clipBehavior: Clip.antiAlias,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: const BoxDecoration(
+                            color: secondaryBlackColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(cardBorderRadius2),
+                              topRight: Radius.circular(cardBorderRadius2),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: List.generate(tabItems.length, (i) {
+                              final isActive = i == selectedTab;
+
+                              return Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => selectedTab = i),
+                                  child: Container(
+                                    height: 54,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: isActive ? primaryColor : unselectedColor,
+                                          width: 1.5,
+                                        ),
                                       ),
                                     ),
-                                    borderRadius:
-                                    i == 0
-                                        ? const BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                    )
-                                        : i == tabItems.length - 1
-                                        ? const BorderRadius.only(
-                                      topRight: Radius.circular(20),
-                                    )
-                                        : null,
-                                  ),
-                                  child: Text(
-                                    tabItems[i]['label'],
-                                    style: bodyTextStyle(context).copyWith(
-                                      color: isActive ? primaryColor : unselectedColor,
+                                    child: Text(
+                                      tabItems[i]['label'],
+                                      style: bodyTextStyle(context).copyWith(
+                                        color: isActive ? primaryColor : unselectedColor,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
+                              );
+                            }),
+                          ),
                         ),
                       ),
                     ),
-                    // Body content
                     Expanded(
                       child: IndexedStack(
                         index: selectedTab,

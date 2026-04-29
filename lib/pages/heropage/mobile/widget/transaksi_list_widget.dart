@@ -74,7 +74,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Transaksi',
+                    'Riwayat Transaksi',
                     style: headingStyle(context).copyWith(fontSize: 20),
                   ),
                 ),
@@ -141,7 +141,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                           width: double.infinity,
                           padding: const EdgeInsets.all(hPadding),
                           child: Text(
-                            "Transaksi Terbaru",
+                            "Riwayat Transaksi Terbaru",
                             style: bodyTextStyle(context, fontSize: 20),
                           ),
                         ),

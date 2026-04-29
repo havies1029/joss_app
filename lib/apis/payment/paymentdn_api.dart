@@ -129,25 +129,59 @@ class PaymentDnAPI{
 		}
 	}
 
-	Future<InvoiceStatusModel> invoice2PaymentViaVaAPI(String invoiceId, String methodId) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/invtobayarviava";
-		Map<String, String> queryParams = {'invoiceId': invoiceId, 'methodId': methodId, 'modulId': 'invoice2PaymentAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
+	Future<InvoiceStatusModel> invoice2PaymentViaVaAPI(
+			String invoiceId, String methodId) async {
+
+		String endpoint =
+				"${AppData.prefixEndPoint}/api/payment/invtobayarviava";
+
+		Map<String, String> queryParams = {
+			'invoiceId': invoiceId,
+			'methodId': methodId,
+			'modulId': 'invoice2PaymentAPI'
+		};
+
+		var uri = AppData.uriHtpp(
+				AppData.httpAuthority, endpoint, queryParams);
+
+		final headers = <String, String>{
+			'Content-Type': 'application/json; odata=verbose', // fix typo
+			'Accept': 'application/json; odata=verbose',
 			'Authorization': 'Bearer ${AppData.userToken}'
-		});
+		};
 
-		if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData =
-          json.decode(response.body) as Map<String, dynamic>;
+		try {
+			debugPrint("=== VA API REQUEST ===");
+			debugPrint("URL: $uri");
 
-      return InvoiceStatusModel.fromJson(jsonData);
-    } else {
-      throw Exception("Failed to load data");
-    }
+			final response = await http.get(uri, headers: headers);
+
+			debugPrint("=== VA API RESPONSE ===");
+			debugPrint("STATUS: ${response.statusCode}");
+			debugPrint("BODY: ${response.body}");
+
+			if (response.statusCode == 200) {
+				final decoded = json.decode(response.body);
+
+				if (decoded == null) {
+					throw Exception("API returned null body");
+				}
+
+				if (decoded is! Map<String, dynamic>) {
+					throw Exception("Invalid response format: ${decoded.runtimeType}");
+				}
+
+				return InvoiceStatusModel.fromJson(decoded);
+			} else {
+				throw Exception(
+						"Failed to load data (Status: ${response.statusCode})");
+			}
+		} catch (e, stackTrace) {
+			debugPrint("=== VA API EXCEPTION ===");
+			debugPrint("ERROR: $e");
+			debugPrint("STACKTRACE: $stackTrace");
+			rethrow;
+		}
 	}
 
 	Future<RincianSOAModel> getRincianSOACustomer(String searchText) async {

@@ -163,6 +163,7 @@ class _RincianPageState extends State<RincianPage> {
                                   GetRincianSOACustomerEvent(searchText: value),
                                 );
                               },
+                              hintText: "Cari No Polis...",
                             ),
                           ),
                           const SizedBox(width: 8),

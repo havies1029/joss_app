@@ -311,7 +311,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
         body: SafeArea(
           child: BaseBackgroundSidePage(
             onBack: goToManagementPolis,
-            title: 'Detail Managemen Polis',
+            title: 'Detail Manajemen Polis',
             showBackButton: false,
             child: Container(
               width: double.infinity,
@@ -442,7 +442,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                       hPadding * 1.5,
                       12,
                       hPadding * 1.5,
-                      12 + MediaQuery.of(context).padding.bottom,
+                      MediaQuery.of(context).padding.bottom, // hapus +12
                     ),
                     child: AppButton(
                       text: "Kembali ke Polis",

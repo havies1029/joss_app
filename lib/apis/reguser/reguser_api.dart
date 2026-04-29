@@ -1,32 +1,74 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/reguser/reguser_model.dart';
 
 class RegUserAPI {
-
 	Future<ReturnDataAPI> regUserTambahAPI(RegUserModel record) async {
-		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/reguser/create";
-		Map<String, String> queryParams = {"modul_id": "regUserTambahAPI"};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
+		String endpoint =
+				"${AppData.prefixEndPoint}/api/reguser/create";
+	
+		Map<String, String> queryParams = {
+			"modul_id": "regUserTambahAPI"
+		};
 
-		ReturnDataAPI returnData;
-		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
+		var uri = AppData.uriHtpp(
+				AppData.httpAuthority, endpoint, queryParams);
 
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		final headers = <String, String>{
+			'Content-Type': 'application/json; odata=verbose',
+			'Accept': 'application/json; odata=verbose',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		};
+
+		try {
+			/// ===== REQUEST DEBUG =====
+			debugPrint("=== REG USER CREATE REQUEST ===");
+			debugPrint("URL: $uri");
+			debugPrint("METHOD: POST");
+			debugPrint("HEADERS: $headers");
+			debugPrint("PARAMS: $queryParams");
+			debugPrint("BODY: ${jsonEncode(record.toJson())}");
+
+			final http.Response response = await http.post(
+				uri,
+				headers: headers,
+				body: jsonEncode(record.toJson()),
+			);
+
+			/// ===== RESPONSE DEBUG =====
+			debugPrint("=== REG USER CREATE RESPONSE ===");
+			debugPrint("STATUS: ${response.statusCode}");
+			debugPrint("BODY: ${response.body}");
+			debugPrint("BODY TYPE: ${response.body.runtimeType}");
+
+			if (response.statusCode == 200) {
+				final decoded = jsonDecode(response.body);
+
+				if (decoded == null) {
+					debugPrint("=== WARNING: RESPONSE NULL ===");
+					return ReturnDataAPI(success: false, data: "", rowcount: 0);
+				}
+
+				return ReturnDataAPI.fromDatabaseJson(decoded);
+			} else {
+				/// ===== ERROR RESPONSE =====
+				debugPrint("=== REG USER CREATE ERROR (NON-200) ===");
+				debugPrint("STATUS: ${response.statusCode}");
+				debugPrint("BODY: ${response.body}");
+
+				return ReturnDataAPI(success: false, data: "", rowcount: 0);
+			}
+		} catch (e, stackTrace) {
+			/// ===== EXCEPTION DEBUG =====
+			debugPrint("=== REG USER CREATE EXCEPTION ===");
+			debugPrint("ERROR: $e");
+			debugPrint("STACKTRACE: $stackTrace");
+
+			return ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
-		return returnData;
 	}
 
 	Future<bool> regUserUbahAPI(RegUserModel record) async {
