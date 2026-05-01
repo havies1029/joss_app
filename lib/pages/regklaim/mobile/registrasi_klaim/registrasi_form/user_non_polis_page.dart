@@ -25,6 +25,7 @@ import '../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../repositories/regklaim/upload_repository.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
+import '../../../../../widgets/apptheme/dropdown2.dart';
 import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../../profile/mobile/profile/form_section/popup/rekan_general_cmp.dart';
 import '../../../../profile/mobile/profile/form_section/popup/rekan_general_idv.dart';
@@ -213,7 +214,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                       ),
                     ),
                     const SizedBox(height: hPadding),
-
                     buildFieldMinsuranceId(),
                     const SizedBox(height: hPadding),
                     buildFieldPolisNo(),
@@ -230,7 +230,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                     const SizedBox(height: hPadding),
                     buildFieldLokasiResiko(),
                     const SizedBox(height: hPadding),
-
                     UploadSectionWidget(),
                   ],
                 ),
@@ -433,26 +432,47 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   bool get _isAutoInsurance =>
       widget.cobKlaimId == '10001' || widget.cobKlaimId == '10002';
 
-  Widget buildFieldMinsuranceId() => ReusableComboBox<ComboMInsuranceModel>(
-    key: ValueKey(
-      '${widget.cobKlaimId}_${fieldComboMInsurance?.minsuranceId ?? 'empty'}',
-    ),
+  Widget buildFieldMinsuranceId() => ReusableComboBoxV2<ComboMInsuranceModel>(
+    key: ValueKey('minsurance_${widget.cobKlaimId}'),
     hintText: "Kategori Asuransi",
+    comboKey: comboMInsuranceKey,
     initItem: fieldComboMInsurance,
     isEnabled: !_isAutoInsurance,
-    dataLoader: () async {
-      final data = await ComboMInsuranceRepository().getComboMInsurance("");
+
+    loader: (q) async {
+      final data = await ComboMInsuranceRepository().getComboMInsurance(
+        q.searchText,
+      );
       return _filterInsurance(data);
     },
+
+    clientSideSearch: true,
+
     displayText: (item) => item.insuranceName,
     compareItems: (a, b) => a.minsuranceId == b.minsuranceId,
-    validatorCallback: (_) => err('form1.kategoryInsurance'),
+
     errorText: err('form1.kategoryInsurance'),
-    onChangedCallback: (v) {
-      fieldComboMInsurance = v;
-      if (v != null) clearErr('form1.kategoryInsurance');
+
+    validatorCallback: (value) {
+      if (value == null) {
+        return kStringNullError;
+      }
+      return null;
     },
-    onSaveCallback: (value) => fieldComboMInsurance = value,
+
+    onChangedCallback: (v) {
+      setState(() {
+        fieldComboMInsurance = v;
+
+        if (v != null) {
+          clearErr('form1.kategoryInsurance');
+        }
+      });
+    },
+
+    onSaveCallback: (value) {
+      fieldComboMInsurance = value;
+    },
   );
 
   Widget buildFieldPolisNo() => appTextField(
