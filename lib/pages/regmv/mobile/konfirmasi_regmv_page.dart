@@ -14,6 +14,7 @@ import '../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../models/gen_regmv/regmv1crud_model.dart';
 import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
+import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../base/base_background_sidepage.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {
@@ -81,10 +82,163 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     );
   }
 
+  Future<bool?> showExitConfirmDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // SVG Warning Icon
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: SvgPicture.asset(
+                      "assets/icons/bi_exclamation-circle.svg",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Keluar halaman ini?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Anda memiliki data yang belum disimpan. Jika keluar dari halaman ini, seluruh data akan hilang.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sGrey,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              "Tidak",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: pSlowRed,
+                              foregroundColor: primaryLightColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(cardBorderRadius),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              "Iya, Keluar",
+                              style: TextStyle(
+                                fontSize: getResponsiveFont(context, 16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleExit(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      context.read<Regmv1CrudBloc>().add(
+        Regmv1CrudHapusEvent(recordId: widget.recordId ?? ""),
+      );
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Konfirmasi",
+      onBack: () async {
+        await _handleExit(context);
+      },
+      onHome: () async {
+        await _handleExit(context);
+      },
       blocListeners: [
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
           listenWhen: (previous, current) {
@@ -317,9 +471,24 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                           setState(() => isSubmitting = true);
                         }
 
-                        context.read<DnRekap2invBloc>().add(
-                          RegMv2InvoiceEvent(
-                            regmv1Id: widget.recordId ?? "",
+                        // context.read<DnRekap2invBloc>().add(
+                        //   RegMv2InvoiceEvent(
+                        //     regmv1Id: widget.recordId ?? "",
+                        //   ),
+                        // );
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierColor: Colors.black.withOpacity(0.6),
+                          builder: (dialogContext) => RegisterClientPopUp(
+                            showIcon: false,
+                            header: 'Fitur pembayaran belum tersedia.',
+                            description:
+                            'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                            buttonText: 'Mengerti',
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                            },
                           ),
                         );
                       },

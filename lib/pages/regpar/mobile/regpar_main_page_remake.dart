@@ -664,7 +664,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onBack: () async {
           await _handleExit(context);
         },
-        title: "Properti", // sesuaikan judulmu
+        onHome: () async {
+          await _handleExit(context);
+        },
+        title: "Properti",
         blocListeners: [
           BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
             listener: (context, state) {

@@ -38,21 +38,17 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
 
     final dotColor = active ? kategoriYellow : Color(0xFF4A4B4B);
     final lineColor = Color(0xFF4A4B4B);
-
     final headers = <String, String>{
       'Authorization': 'Bearer ${AppData.userToken}',
     };
-
     final title = item.progressNama.trim().isEmpty ? '(Tanpa Judul)' : item.progressNama.trim();
-    final dateText = DateFormat('dd MMM yyyy, HH:mm:ss').format(item.progressTgl);
-
+    final dateText = item.progressTgl != null
+        ? DateFormat('dd MMM yyyy, HH:mm:ss').format(item.progressTgl!)
+        : '';
     final trimmedUrl = item.fileUrl?.trim();
     final imageUrl = (trimmedUrl == null || trimmedUrl.isEmpty) ? null : trimmedUrl;
-
     final showNilaiKlaim = item.actioncode.trim().toLowerCase() == 'nilai_klaim';
-
     final showJadwalBayar = item.actioncode.trim().toLowerCase() == 'table_payment';
-
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,

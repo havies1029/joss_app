@@ -6,6 +6,7 @@ import 'package:joss_app/blocs/payment/dnrekap2inv_bloc.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/models/payment/dnsppacari_model.dart';
 
+import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import 'ringkasan_detail_table_list.dart';
 
 class RingkasanDetailTableWidget extends StatefulWidget {
@@ -90,10 +91,25 @@ class RingkasanDetailTableWidgetState
           return;
         }
 
-        context.read<DnRekap2invBloc>().add(
-          DnToInvByListCobProcessEvent(
-            listCob: listCob,
-            curr: curr,
+        // context.read<DnRekap2invBloc>().add(
+        //   DnToInvByListCobProcessEvent(
+        //     listCob: listCob,
+        //     curr: curr,
+        //   ),
+        // );
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          barrierColor: Colors.black.withOpacity(0.6),
+          builder: (dialogContext) => RegisterClientPopUp(
+            showIcon: false,
+            header: 'Fitur pembayaran belum tersedia.',
+            description:
+            'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+            buttonText: 'Mengerti',
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
           ),
         );
       },

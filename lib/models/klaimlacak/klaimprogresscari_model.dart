@@ -49,7 +49,7 @@ class KlaimprogresscariModel {
   final String klaimprogressId;
   final String progressNama;
   final String progressDesc;
-  final DateTime progressTgl;
+  final DateTime? progressTgl;
   final String? fileUrl;
   final String actioncode;
 
@@ -75,7 +75,7 @@ class KlaimprogresscariModel {
       klaimprogressId: (data['klaimprogressId'] ?? '').toString(),
       progressNama: (data['progressNama'] ?? '').toString(),
       progressDesc: (data['progressDesc'] ?? '').toString(),
-      progressTgl: DateTime.tryParse(data['progressTgl']?.toString() ?? '') ?? DateTime.now(),
+      progressTgl: DateTime.tryParse(data['progressTgl']?.toString() ?? ''),
       fileUrl: fullUrl,
       actioncode: (data['actioncode'] ?? '').toString(),
     );
@@ -85,7 +85,7 @@ class KlaimprogresscariModel {
         'klaimprogressId': klaimprogressId,
         'progressNama': progressNama,
         'progressDesc': progressDesc,
-        'progressTgl': progressTgl.toIso8601String(),
+        'progressTgl': progressTgl?.toIso8601String(),
         'fileUrl': fileUrl,
         'actioncode': actioncode,
       };

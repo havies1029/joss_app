@@ -94,6 +94,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       fieldComboRMatauang = idrCurrency;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     regother1CrudBloc = BlocProvider.of<Regother1CrudBloc>(context);

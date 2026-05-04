@@ -65,7 +65,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       case "10002":
         return "Cari tertanggung/lokasi/nopolis aset...";
       case "10003":
-        return "Cari tertanggung/nopolin/merk...";
+        return "Cari tertanggung/nopolis/merk...";
       case "10004":
         return "Cari nama kapal...";
       case "10005":

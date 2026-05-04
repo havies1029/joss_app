@@ -218,6 +218,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
               if (busy) return;
               _handleExit(context);
             },
+            onHome:  () {
+              if (busy) return;
+              _handleExit(context);
+            },
             title: "Metode Pembayaran",
             child: Stack(
               children: [

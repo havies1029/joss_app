@@ -1,7 +1,7 @@
 name: joss_app
 description: "Proteksi Plus mobile application."
 publish_to: 'none'
-version: 3.0.0+3
+version: 1.0.0+5
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -307,6 +307,8 @@ flutter:
     - assets/icons/logo_kebijakan.svg
     - assets/icons/zoom1.svg
     - assets/icons/delete_3.svg
+    - assets/icons/Information2.svg
+    - assets/icons/home3.svg
 
   fonts:
     - family: Delm-Regular

@@ -10,6 +10,7 @@ import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../helper/pdf_open_helper.dart';
+import '../../../../widgets/apptheme/register_client_pop_up.dart';
 
 enum RiwayatFilter { semua, menunggu, selesai }
 
@@ -189,13 +190,27 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
   }
 
   void onViewPaymentMethods(String curr, double totalBayar) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PaymentMethodPage(
-          curr: curr,
-          totalBayar: totalBayar,
-        ),
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (_) => PaymentMethodPage(
+    //       curr: curr,
+    //       totalBayar: totalBayar,
+    //     ),
+    //   ),
+    // );
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (dialogContext) => RegisterClientPopUp(
+        header: 'Fitur pembayaran belum tersedia.',
+        description:
+        'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+        buttonText: 'Mengerti',
+        onPressed: () {
+          Navigator.of(dialogContext).pop();
+        },
       ),
     );
   }

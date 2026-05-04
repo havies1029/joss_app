@@ -261,6 +261,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
             return BaseBackgroundSidePage(
               title: bankNama,
               onBack: () => _handleExit(context),
+              onHome: () => _handleExit(context),
               child: Container(
                 color: secondaryBlackColor,
                 padding: const EdgeInsets.symmetric(

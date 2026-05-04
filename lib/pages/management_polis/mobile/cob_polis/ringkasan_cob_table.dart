@@ -303,7 +303,8 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
         // Jumlah Polis + Satuan (LEFT)
         _cell(
           child: Text(
-            jumlahDenganSatuan,
+            // jumlahDenganSatuan,
+            d.jmlAset.toString(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: textStyle,

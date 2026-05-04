@@ -10,7 +10,9 @@ class BaseBackgroundSidePage extends StatelessWidget {
   final String backgroundAsset;
   final String title;
   final VoidCallback? onBack;
+  final VoidCallback? onHome;
   final bool showBackButton;
+  final bool showHomeButton;
 
   final List<BlocListener>? blocListeners;
 
@@ -19,10 +21,12 @@ class BaseBackgroundSidePage extends StatelessWidget {
     required this.child,
     required this.title,
     this.onBack,
+    this.onHome,
     this.fadeHeight = 300,
     this.backgroundAsset = "assets/images/background_gradient.png",
     this.blocListeners,
     this.showBackButton = true,
+    this.showHomeButton = true,
   });
 
   @override
@@ -55,18 +59,56 @@ class BaseBackgroundSidePage extends StatelessWidget {
                   if (showBackButton)
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: onBack ?? () => Navigator.pop(context),
-                        child: SvgPicture.asset("assets/icons/arrow_back.svg"),
+                      child: FractionallySizedBox(
+                        widthFactor: 0.25,
+                        heightFactor: 1,
+                        alignment: Alignment.centerLeft,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: onBack ?? () => Navigator.pop(context),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: SvgPicture.asset(
+                              "assets/icons/arrow_back.svg",
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+
                   Center(
-                    child: Text(
-                      title,
-                      style: headingStyle(context, fontSize: 20),
-                      overflow: TextOverflow.ellipsis,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 56),
+                      child: Text(
+                        title,
+                        style: headingStyle(context, fontSize: 20),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
+
+                  if (showHomeButton)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.25,
+                        heightFactor: 1,
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: onHome ??
+                                  () {
+                                    Navigator.of(context).popUntil((route) => route.isFirst);
+                              },
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: SvgPicture.asset(
+                              "assets/icons/home3.svg",
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -79,7 +121,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
 
                   return Stack(
                     children: [
-                      // Background fade
                       Align(
                         alignment: Alignment.topCenter,
                         child: SizedBox(
@@ -90,7 +131,10 @@ class BaseBackgroundSidePage extends StatelessWidget {
                               return const LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [primaryLightColor, Colors.transparent],
+                                colors: [
+                                  primaryLightColor,
+                                  Colors.transparent,
+                                ],
                                 stops: [0.0, 1.0],
                               ).createShader(rect);
                             },
@@ -104,7 +148,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
                         ),
                       ),
 
-                      // Konten utama
                       child,
                     ],
                   );

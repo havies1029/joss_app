@@ -9,7 +9,7 @@ class RegisterClientPopUp extends StatelessWidget {
   final String description;
   final String buttonText;
   final VoidCallback onPressed;
-
+  final bool showIcon;
   /// optional: kalau mau tap di luar / tombol close
   final VoidCallback? onClose;
 
@@ -19,6 +19,7 @@ class RegisterClientPopUp extends StatelessWidget {
     required this.description,
     required this.buttonText,
     required this.onPressed,
+    this.showIcon = true,
     this.onClose,
   });
 
@@ -37,6 +38,19 @@ class RegisterClientPopUp extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // 🔥 ICON BARU
+            SvgPicture.asset(
+              'assets/icons/Information2.svg',
+              width: 40,
+              height: 40,
+              colorFilter: const ColorFilter.mode(
+                primaryColor, // atau orange biar matching
+                BlendMode.srcIn,
+              ),
+            ),
+
+            const SizedBox(height: hPadding),
+
             Text(
               header,
               textAlign: TextAlign.center,
@@ -58,25 +72,31 @@ class RegisterClientPopUp extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Button di kanan (sesuai contoh Align kamu)
             Align(
               alignment: Alignment.centerRight,
-              child: AppButton.iconLeft(
+              child: showIcon
+                  ? AppButton.iconLeft(
                 text: buttonText,
                 backgroundColor: primaryColor,
                 icon: SvgPicture.asset(
                   'assets/icons/daftar_client.svg',
                   width: 18,
                   height: 18,
-                  // kalau icon kamu perlu putih:
                   colorFilter: const ColorFilter.mode(
                     Colors.white,
                     BlendMode.srcIn,
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop(); // tutup popup
-                  onPressed(); // lanjut navigate/action
+                  Navigator.of(context).pop();
+                  onPressed();
+                },
+              )
+                  : AppButton.primary(
+                text: buttonText,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onPressed();
                 },
               ),
             ),

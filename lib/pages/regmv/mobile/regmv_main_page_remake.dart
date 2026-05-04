@@ -654,6 +654,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onBack: () async {
           await _handleExit(context);
         },
+        onHome: () async {
+          await _handleExit(context);
+        },
         title: "Kendaraan",
         blocListeners: [
           BlocListener<Regmv1CrudBloc, Regmv1CrudState>(

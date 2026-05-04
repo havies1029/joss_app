@@ -2,7 +2,8 @@
   import 'package:flutter_bloc/flutter_bloc.dart';
   import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
   import '../../../../common/constants.dart';
-  import '../../../base/base_background_sidepage.dart';
+  import '../../../../widgets/apptheme/register_client_pop_up.dart';
+import '../../../base/base_background_sidepage.dart';
   import 'rincian_tabel_page.dart';
 
   //micky 2026-02-27
@@ -59,10 +60,25 @@
                     final dnBloc = context.read<DnRekap2invBloc>();
                     final curr = _resolveCurrFromRincian(dnBloc.state, selectedDnIds);
 
-                    context.read<DnRekap2invBloc>().add(
-                      DnToInvByListDnProcessEvent(
-                        listDn: selectedDnIds.join(";"),
-                        curr: curr.isEmpty ? null : curr,
+                    // context.read<DnRekap2invBloc>().add(
+                    //   DnToInvByListDnProcessEvent(
+                    //     listDn: selectedDnIds.join(";"),
+                    //     curr: curr.isEmpty ? null : curr,
+                    //   ),
+                    // );
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      barrierColor: Colors.black.withOpacity(0.6),
+                      builder: (dialogContext) => RegisterClientPopUp(
+                        header: 'Fitur pembayaran belum tersedia.',
+                        showIcon: false,
+                        description:
+                        'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                        buttonText: 'Mengerti',
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
                       ),
                     );
                   },
