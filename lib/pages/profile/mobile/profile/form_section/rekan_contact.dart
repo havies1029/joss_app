@@ -358,6 +358,7 @@ class MRekanContactCrudFormPageFormState
         hintText: "Kodepos (Opsional)",
         comboKey: comboRKodeposKey,
         initItem: fieldComboRKodepos,
+        showClearButton: true,
 
         params: {
           "mkotaId": fieldComboMKota?.mkotaId ?? "",
@@ -375,7 +376,7 @@ class MRekanContactCrudFormPageFormState
         displayText: (item) => item.kodeposNo,
         compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
 
-        validatorCallback: (v) => v == null ? kStringKodeposError : null,
+        //validatorCallback: (v) => v == null ? kStringKodeposError : null,
 
         onChangedCallback: (v) {
           setState(() {
