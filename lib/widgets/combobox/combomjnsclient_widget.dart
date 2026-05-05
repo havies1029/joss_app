@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:joss_app/models/combobox/combomjnsclient_model.dart';
 import 'package:joss_app/repositories/combobox/combomjnsclient_repository.dart';
 
-import '../../common/constants.dart';
 import '../apptheme/dropdown2.dart';
 
 Widget buildFieldComboMJnsclient({
