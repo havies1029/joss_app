@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
@@ -7,27 +8,71 @@ import 'package:joss_app/models/gen_profile/mrekangeneralcmpcrud_model.dart';
 class MRekanGeneralCmpCrudAPI {
 
 
-	Future<bool> mRekanGeneralCmpCrudUbahAPI(MRekanGeneralCmpCrudModel record) async {
+	Future<bool> mRekanGeneralCmpCrudUbahAPI(
+			MRekanGeneralCmpCrudModel record) async {
+
 		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/profile/mrekangeneralcmpcrud/update";
-		Map<String, String> queryParams = {"modul_id": "mRekanGeneralCmpCrudUbahAPI"};
+				"${AppData.prefixEndPoint}/api/profile/mrekangeneralcmpcrud/update";
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
+		Map<String, String> queryParams = {
+			"modul_id": "mRekanGeneralCmpCrudUbahAPI"
+		};
 
-		final http.Response response = await http.post(uri,
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			ubahEndpoint,
+			queryParams,
+		);
+
+		final requestBody = jsonEncode(record.toJson());
+
+		// =========================
+		// REQUEST LOG
+		// =========================
+		debugPrint("========== REQUEST ==========");
+		debugPrint("URL : $uri");
+
+		debugPrint("HEADERS : ");
+		debugPrint(jsonEncode({
+			'Content-Type': 'application/json; odata=verbose',
+			'Accept': 'application/json; odata=verbose',
+			'Authorization': 'Bearer ${AppData.userToken}'
+		}));
+
+		debugPrint("BODY : ");
+		debugPrint(requestBody);
+
+		final http.Response response = await http.post(
+			uri,
 			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
+				'Content-Type': 'application/json; odata=verbose',
+				'Accept': 'application/json; odata=verbose',
 				'Authorization': 'Bearer ${AppData.userToken}'
 			},
-			body: jsonEncode(record.toJson()));
+			body: requestBody,
+		);
+
+		// =========================
+		// RESPONSE LOG
+		// =========================
+		debugPrint("========== RESPONSE ==========");
+		debugPrint("STATUS CODE : ${response.statusCode}");
+		debugPrint("BODY : ${response.body}");
 
 		ReturnDataAPI returnData;
+
 		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			returnData = ReturnDataAPI.fromDatabaseJson(
+				jsonDecode(response.body),
+			);
 		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+			returnData = ReturnDataAPI(
+				success: false,
+				data: "",
+				rowcount: 0,
+			);
 		}
+
 		return returnData.success;
 	}
 	

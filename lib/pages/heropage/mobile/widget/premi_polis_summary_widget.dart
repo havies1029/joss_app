@@ -25,7 +25,11 @@ class PremiPolisSummaryWidget extends StatefulWidget {
 class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
   bool _isPremiumVisible = false;
 
-  String _getStarsText(String amount) => '*' * amount.length;
+  String _getStarsText(String amount) {
+    final digitCount = amount.replaceAll(RegExp(r'[^0-9]'), '').length;
+    final starCount = digitCount.clamp(0, 12);
+    return '*' * starCount;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,27 +130,19 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                               height: 22,
                             )
                                 : (_isPremiumVisible
-                                ? Text(
+                                ? _buildPremiumAmountText(
+                              context,
                               amount,
-                              key: const ValueKey('visible'),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style:
-                              headingStyle(context).copyWith(
-                                fontFeatures: const [
-                                  FontFeature.tabularFigures()
-                                ],
-                              ),
                             )
                                 : Text(
                               _getStarsText(amount),
                               key: const ValueKey('stars'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style:
-                              headingStyle(context).copyWith(
+                              style: headingStyle(context)
+                                  .copyWith(
                                 fontFeatures: const [
-                                  FontFeature.tabularFigures()
+                                  FontFeature.tabularFigures(),
                                 ],
                               ),
                             )),
@@ -217,6 +213,51 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
         .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.');
 
     return '$curr $formatted';
+  }
+
+  Widget _buildPremiumAmountText(BuildContext context, String amount) {
+    final digitOnly = amount.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digitOnly.length <= 10) {
+      return Text(
+        amount,
+        key: const ValueKey('visible'),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: headingStyle(context).copyWith(
+          fontFeatures: const [FontFeature.tabularFigures()],
+        ),
+      );
+    }
+
+    final last3 = amount.substring(amount.length - 3);
+    final beforeLast3 = amount.substring(0, amount.length - 3);
+
+    return RichText(
+      key: const ValueKey('visible-rich'),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: beforeLast3,
+            style: headingStyle(context).copyWith(
+              fontSize: getResponsiveFont(context, 21),
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          TextSpan(
+            text: last3,
+            style: headingStyle(context).copyWith(
+              fontSize: getResponsiveFont(context, 14),
+              fontWeight: FontWeight.w600,
+              color: primaryLightColor.withOpacity(0.75),
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

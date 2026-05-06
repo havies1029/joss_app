@@ -54,28 +54,30 @@ class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        if (regUserBloc.state.requestFrom.isNotEmpty){
+        if (regUserBloc.state.requestFrom.isNotEmpty) {
           authenticationBloc.add(
             LoggedIn(user: AppData.user),
           );
           regUserBloc.add(ClearRequestFromEvent());
         }
+
         Navigator.pop(context);
       },
       child: BaseBackgroundSidePage(
         title: 'Lapor Klaim',
         onBack: () async {
-          if (regUserBloc.state.requestFrom.isNotEmpty){
+          if (regUserBloc.state.requestFrom.isNotEmpty) {
             authenticationBloc.add(
               LoggedIn(user: AppData.user),
             );
+
             regUserBloc.add(ClearRequestFromEvent());
             Navigator.pop(context);
           }
+
           Navigator.pop(context);
         },
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: hPadding),
           child: _buildContent(context),
         ),
@@ -95,15 +97,15 @@ class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
                 topRight: Radius.circular(20),
               ),
             ),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: hPadding),
-                  _buildContent(context),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: hPadding),
+
+                Expanded(
+                  child: _buildContent(context),
+                ),
+              ],
             ),
           ),
         ),

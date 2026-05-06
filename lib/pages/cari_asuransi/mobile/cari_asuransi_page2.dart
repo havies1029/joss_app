@@ -53,14 +53,22 @@ class CariAsuransiWidget2 extends StatelessWidget {
       }) {
     return BaseBackgroundSidePage(
       title: "Cari Asuransi",
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: hPadding),
-        child: _buildContent(
-          context,
-          userType: userType,
-          title: "Cari Asuransi",
-          subtitle: "Pilih jenis asuransi dan hitung premi langsung di sini.",
-        ),
+      child: Column(
+        children: [
+          const SizedBox(height: hPadding),
+
+          Expanded(
+            child: _buildContent(
+              context,
+              userType: userType,
+              title: "Cari Asuransi",
+              subtitle:
+              "Pilih jenis asuransi dan hitung premi langsung di sini.",
+            ),
+          ),
+
+          const SizedBox(height: hPadding),
+        ],
       ),
     );
   }
@@ -80,18 +88,20 @@ class CariAsuransiWidget2 extends StatelessWidget {
                 topRight: Radius.circular(20),
               ),
             ),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.only(top: hPadding),
-                child: _buildContent(
-                  context,
-                  userType: userType,
-                  title: "Cari Asuransi",
-                  subtitle:
-                  "Pilih jenis asuransi dan hitung premi langsung di sini.",
+            child: Column(
+              children: [
+                const SizedBox(height: hPadding),
+
+                Expanded(
+                  child: _buildContent(
+                    context,
+                    userType: userType,
+                    title: "Cari Asuransi",
+                    subtitle:
+                    "Pilih jenis asuransi dan hitung premi langsung di sini.",
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

@@ -36,8 +36,9 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
 
     final baseText = primaryLightColor;
 
-    final dotColor = active ? kategoriYellow : Color(0xFF4A4B4B);
-    final lineColor = Color(0xFF4A4B4B);
+    // final dotColor = active ? kategoriYellow : hintGrey;
+    final dotColor = hintGrey;
+    final lineColor = hintGrey;
     final headers = <String, String>{
       'Authorization': 'Bearer ${AppData.userToken}',
     };

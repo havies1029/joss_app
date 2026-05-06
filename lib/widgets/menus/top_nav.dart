@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../common/constants.dart';
 import '../../pages/notification/mobile/notification_page.dart';
+import '../../pages/notification/mobile/test_notification.dart';
 
 AppBar MobileTopNavigationBar({
   required BuildContext context,
@@ -54,10 +55,52 @@ AppBar MobileTopNavigationBar({
                     ),
                   );
                 },
-            child: SvgPicture.asset(
-              'assets/icons/notification.svg',
-              height: 39,
-              width: 40,
+            child: ValueListenableBuilder<int>(
+              valueListenable: NotifDummyHelper.unreadNotifier,
+              builder: (context, notifCount, _) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/notification.svg',
+                      height: 39,
+                      width: 40,
+                    ),
+
+                    if (notifCount > 0)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              notifCount > 99
+                                  ? '99+'
+                                  : notifCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ),
         ],

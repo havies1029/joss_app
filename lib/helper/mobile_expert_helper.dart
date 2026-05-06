@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:file_saver/file_saver.dart';
 
 class MobileDownloadHelper {
   static Future<void> download({
@@ -19,38 +20,45 @@ class MobileDownloadHelper {
     required String reportTitle,
     String logoAssetPath = 'assets/images/logo.png',
   }) async {
-    final hasPermission =
-    await Permission.manageExternalStorage.request().isGranted;
-    if (!hasPermission) return;
+    final lowerFormat = format.toLowerCase();
 
-    final directory = Directory('/storage/emulated/0/Download');
-    if (!await directory.exists()) {
-      await directory.create(recursive: true);
+    late final Uint8List bytes;
+    late final String ext;
+    late final MimeType mimeType;
+
+    if (lowerFormat == 'pdf') {
+      final pdf = await _generatePdf(
+        data,
+        reportTitle: reportTitle,
+        logoAssetPath: logoAssetPath,
+      );
+
+      bytes = await pdf.save();
+      ext = 'pdf';
+      mimeType = MimeType.pdf;
+    } else if (lowerFormat == 'excel' || lowerFormat == 'xlsx') {
+      final excel = _generateExcel(data);
+
+      bytes = Uint8List.fromList(excel.encode()!);
+      ext = 'xlsx';
+      mimeType = MimeType.microsoftExcel;
+    } else {
+      throw UnsupportedError("Format $format tidak didukung di mobile.");
     }
 
-    final path = '${directory.path}/$fileName';
-    final file = File(path);
+    final cleanName = fileName.replaceAll(RegExp(r'\.(pdf|xlsx)$'), '');
 
-    try {
-      final lowerFormat = format.toLowerCase();
+    final savedPath = await FileSaver.instance.saveFile(
+      name: cleanName,
+      bytes: bytes,
+      ext: ext,
+      mimeType: mimeType,
+    );
 
-      if (lowerFormat == 'pdf') {
-        final pdf = await _generatePdf(
-          data,
-          reportTitle: reportTitle,
-          logoAssetPath: logoAssetPath,
-        );
-        await file.writeAsBytes(await pdf.save());
-      } else if (lowerFormat == 'excel' || lowerFormat == 'xlsx') {
-        final excel = _generateExcel(data);
-        await file.writeAsBytes(excel.encode()!);
-      } else {
-        throw UnsupportedError("Format $format tidak didukung di mobile.");
-      }
+    debugPrint("SAVED PATH: $savedPath");
 
-      await OpenFilex.open(file.path);
-    } catch (e) {
-      rethrow;
+    if (savedPath != null && savedPath.isNotEmpty) {
+      await OpenFilex.open(savedPath);
     }
   }
 
@@ -72,13 +80,35 @@ class MobileDownloadHelper {
     await file.writeAsBytes(await pdf.save());
     return file;
   }
-
   static Future<pw.Document> _generatePdf(
       List<Map<String, dynamic>> data, {
         required String reportTitle,
         required String logoAssetPath,
       }) async {
-    final pdf = pw.Document();
+    pw.Font? regularFont;
+    pw.Font? boldFont;
+
+    try {
+      final regularFontData =
+      await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
+      final boldFontData =
+      await rootBundle.load('assets/fonts/Roboto-Bold.ttf');
+
+      regularFont = pw.Font.ttf(regularFontData);
+      boldFont = pw.Font.ttf(boldFontData);
+    } catch (_) {
+      regularFont = null;
+      boldFont = null;
+    }
+
+    final pdf = pw.Document(
+      theme: regularFont != null && boldFont != null
+          ? pw.ThemeData.withFont(
+        base: regularFont,
+        bold: boldFont,
+      )
+          : null,
+    );
 
     final headers = data.isNotEmpty
         ? data.first.keys.map((e) => e.toString()).toList()
@@ -95,6 +125,7 @@ class MobileDownloadHelper {
     final subTextColor = PdfColor.fromHex('#4b5563');
 
     pw.MemoryImage? logoImage;
+
     try {
       final logoBytes = await rootBundle.load(logoAssetPath);
       logoImage = pw.MemoryImage(
@@ -157,9 +188,7 @@ class MobileDownloadHelper {
                   ),
               ],
             ),
-
             pw.SizedBox(height: 16),
-
             pw.Container(
               decoration: pw.BoxDecoration(
                 border: pw.Border.all(color: borderColor, width: 1),
@@ -180,7 +209,8 @@ class MobileDownloadHelper {
                     ),
                   ),
                   columnWidths: _getColumnWidths(headers),
-                  defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+                  defaultVerticalAlignment:
+                  pw.TableCellVerticalAlignment.middle,
                   children: [
                     _buildHeaderRow(
                       headers: headers,
@@ -210,15 +240,9 @@ class MobileDownloadHelper {
         footer: (context) => pw.Container(
           width: double.infinity,
           padding: const pw.EdgeInsets.symmetric(horizontal: hPadding),
-          // decoration: pw.BoxDecoration(
-          //   color: PdfColor.fromHex('#8bbb4e'),
-          // ),
           child: pw.Row(
             children: [
-              // kiri (kosong biar balance)
               pw.Expanded(child: pw.SizedBox()),
-
-              // tengah (brand)
               pw.Expanded(
                 flex: 2,
                 child: pw.Center(
@@ -232,8 +256,6 @@ class MobileDownloadHelper {
                   ),
                 ),
               ),
-
-              // kanan (page number)
               pw.Expanded(
                 child: pw.Align(
                   alignment: pw.Alignment.centerRight,

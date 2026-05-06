@@ -292,9 +292,61 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
   Widget _buildDetailTableCompact(List<DnDetailSppaModel> details) {
     if (details.isEmpty) return const Text("Tidak ada detail polis");
+
     final widths = _compactColumnWidths(context, details);
+
+    final rowHeight = 54.0 * 0.8;
+    final headerHeight = 54.0;
+    final maxVisibleRows = 8;
+
+    final useVerticalScroll = details.length >= maxVisibleRows;
+
+    final bodyHeight = details.length * rowHeight;
+    final maxBodyHeight = maxVisibleRows * rowHeight;
+    final finalBodyHeight = useVerticalScroll ? maxBodyHeight : bodyHeight;
+
+    final finalHeight = headerHeight + finalBodyHeight;
+
     return StatefulBuilder(
       builder: (context, setState) {
+        final headerTable = Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: const TableBorder(
+            horizontalInside: BorderSide(color: sGrey, width: 1),
+            verticalInside: BorderSide(color: sGrey, width: 1),
+          ),
+          columnWidths: widths,
+          children: [
+            _tableHeader(context, [
+              "",
+              "NO",
+              "NO POLIS",
+              "PERIODE POLIS",
+              "MATA UANG",
+              "PREMI",
+              "AGING",
+            ]),
+          ],
+        );
+
+        final bodyTable = Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: const TableBorder(
+            horizontalInside: BorderSide(color: sGrey, width: 1),
+            verticalInside: BorderSide(color: sGrey, width: 1),
+          ),
+          columnWidths: widths,
+          children: [
+            ...details.asMap().entries.map(
+                  (e) => _detailRowWithCheckbox(
+                e.value,
+                e.key,
+                compact: true,
+              ),
+            ),
+          ],
+        );
+
         return ClipRRect(
           borderRadius: widget.readOnly
               ? BorderRadius.circular(cardBorderRadius)
@@ -316,37 +368,37 @@ class _RincianTablePageState extends State<RincianTablePage> {
                 bottom: BorderSide(color: sGrey, width: 0.5),
               ),
             ),
-            child: NestedScrollableTableShell(
-              height: 48 * 8 * 0.8,
-              borderRadius: BorderRadius.circular(cardBorderRadius),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Table(
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  border: const TableBorder(
-                    horizontalInside: BorderSide(color: sGrey, width: 1),
-                    verticalInside: BorderSide(color: sGrey, width: 1),
-                  ),
-                  columnWidths: widths,
-                  children: [
-                    _tableHeader(context, [
-                      "",
-                      "NO",
-                      "NO POLIS",
-                      "PERIODE POLIS",
-                      "MATA UANG",
-                      "PREMI",
-                      "AGING",
-                    ]),
-                    ...details.asMap().entries.map(
-                          (e) => _detailRowWithCheckbox(
-                        e.value,
-                        e.key,
-                        compact: true,
+            child: SizedBox(
+              height: finalHeight,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            height: headerHeight,
+                            child: headerTable,
+                          ),
+                          SizedBox(
+                            height: finalBodyHeight,
+                            child: useVerticalScroll
+                                ? SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: bodyTable,
+                            )
+                                : bodyTable,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ),
