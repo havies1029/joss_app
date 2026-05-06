@@ -22,6 +22,7 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -33,16 +34,18 @@
 			</array>
 		</dict>
 	</array>
+
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
+
 	<key>NSCameraUsageDescription</key>
-	<string>Proteksi Plus membutuhkan akses kamera untuk mengambil foto dan mengirimkannya lewat chat.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Proteksi Plus membutuhkan akses mikrofon untuk merekam voice note dan mengirimkannya lewat chat.</string>
+	<string>This app requires access to your camera so you can take photos of supporting documents for insurance policies and claims. Proteksi Plus membutuhkan akses kamera untuk mengambil foto dokumen pendukung polis dan klaim asuransi.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library so you can select and upload images or documents for insurance policies and claims. Proteksi Plus membutuhkan akses ke galeri foto agar pengguna dapat memilih dan mengunggah gambar atau dokumen pendukung polis dan klaim asuransi.</string>
+	
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -64,20 +67,21 @@
 			</array>
 		</dict>
 	</dict>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -85,6 +89,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

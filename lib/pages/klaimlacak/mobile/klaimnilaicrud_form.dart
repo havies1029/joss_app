@@ -47,7 +47,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
   Widget build(BuildContext context) {
     const starOn = Color(0xFFFBBF24);
 
-    return BlocConsumer<KlaimnilaicrudBloc, KlaimnilaicrudState>(
+    return BlocListener<KlaimnilaicrudBloc, KlaimnilaicrudState>(
       listenWhen: (prev, curr) =>
       prev.isSaved != curr.isSaved ||
           prev.isLoaded != curr.isLoaded,
@@ -61,10 +61,9 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
 
         if (state.isSaved) {
           if (!state.hasFailure) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   successSnackBar("Data berhasil disimpan!"),
-            // );
-            Navigator.of(context).push(
+            reviewCariBloc.add(RefreshReviewCariEvent());
+
+            Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (_) => PerbaruiSuccessPage(
                   display: "Masukan Anda telah berhasil kami terima.",
@@ -81,9 +80,6 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
                 ),
               ),
             );
-
-            reviewCariBloc.add(RefreshReviewCariEvent());
-            _dismissDialog();
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               errorSnackBar("Data gagal disimpan!"),
@@ -91,128 +87,141 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
           }
         }
       },
-      builder: (context, state) {
-        return BaseBackgroundSidePage(
-          title: 'Beri Penilaianmu',
-          child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-              color: secondaryBlackColor,
-              child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+      child: BaseBackgroundSidePage(
+        title: 'Beri Penilaianmu',
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+          color: secondaryBlackColor,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Seberapa puas Anda dengan layanan asuransi kami?",
+                          style: headingStyle(context, fontSize: 20),
+                        ),
+                        const SizedBox(height: 24),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _StarRating(
+                              max: 5,
+                              value: _nilaiSuka,
+                              size: 50,
+                              activeColor: starOn,
+                              inactiveColor: pGrey,
+                              onChanged: (v) {
+                                setState(() => _nilaiSuka = v);
+                                removeError(error: 'Rating wajib dipilih');
+                              },
+                            ),
+                            const SizedBox(height: hPadding),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                    "Seberapa puas Anda dengan layanan asuransi kami?",
-                                    style: headingStyle(context, fontSize: 20)
+                                  'Sangat Tidak suka',
+                                  style: headingStyle(
+                                    context,
+                                    fontSize: getResponsiveFont(context, 16),
+                                  ),
                                 ),
-                                const SizedBox(height: 24),
-
-                                // ===== STAR RATING =====
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _StarRating(
-                                      max: 5,
-                                      value: _nilaiSuka,
-                                      size: 50,
-                                      activeColor: starOn,
-                                      inactiveColor: pGrey,
-                                      onChanged: (v) {
-                                        setState(() => _nilaiSuka = v);
-                                        removeError(error: 'Rating wajib dipilih');
-                                      },
-                                    ),
-                                    const SizedBox(height: hPadding),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('Sangat Tidak suka',
-                                            style: headingStyle(context, fontSize: getResponsiveFont(context, 16))),
-                                        Text('Sangat suka',
-                                            style: headingStyle(context, fontSize: getResponsiveFont(context, 16))),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: vPadding),
-
                                 Text(
-                                    "Apa alasan anda memberi penilaian ini?",
-                                    style: headingStyle(context, fontSize: 16)
-                                ),
-                                const SizedBox(height: hPadding),
-
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: formGrey,
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: sGrey),
-                                  ),
-                                  child: TextFormField(
-                                    controller: fieldAlasanController,
-                                    keyboardType: TextInputType.multiline,
-                                    minLines: 5,
-                                    maxLines: 7,
-                                    style: bodyTextStyle(context, fontSize: 16),
-                                    decoration: InputDecoration(
-                                      hintText: "Tulis pengalaman atau masukan anda",
-                                      hintStyle: bodyTextStyle(context, fontSize: 16).copyWith(color: hintGrey),
-                                      contentPadding: const EdgeInsets.all(10),
-                                      border: InputBorder.none,
-                                      errorText: err('form.alasan'),
-                                    ),
-                                    onChanged: (value) {
-                                      if (value.trim().isNotEmpty) {
-                                        clearErr('form.alasan');
-                                      }
-                                    },
+                                  'Sangat suka',
+                                  style: headingStyle(
+                                    context,
+                                    fontSize: getResponsiveFont(context, 16),
                                   ),
                                 ),
-
-                                const SizedBox(height: vPadding),
-
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(Icons.info_outline, size: 14, color: Colors.white.withOpacity(0.55)),
-                                    const SizedBox(width: 5),
-                                    Expanded(
-                                      child: Text(
-                                          "Masukan anda akan kami gunakan untuk peningkatan kualitasdan layanan kami",
-                                          style: bodyTextStyle(context, fontSize: 14).copyWith(color: hintGrey)
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 12),
-                                FormError(errors: errors, key: null),
-                                const SizedBox(height: 18),
                               ],
                             ),
-                          )
-                      ),
+                          ],
+                        ),
+
+                        const SizedBox(height: vPadding),
+
+                        Text(
+                          "Apa alasan anda memberi penilaian ini?",
+                          style: headingStyle(context, fontSize: 16),
+                        ),
+                        const SizedBox(height: hPadding),
+
+                        Container(
+                          decoration: BoxDecoration(
+                            color: formGrey,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: sGrey),
+                          ),
+                          child: TextFormField(
+                            controller: fieldAlasanController,
+                            keyboardType: TextInputType.multiline,
+                            minLines: 5,
+                            maxLines: 7,
+                            style: bodyTextStyle(context, fontSize: 16),
+                            decoration: InputDecoration(
+                              hintText: "Tulis pengalaman atau masukan anda",
+                              hintStyle: bodyTextStyle(context, fontSize: 16)
+                                  .copyWith(color: hintGrey),
+                              contentPadding: const EdgeInsets.all(10),
+                              border: InputBorder.none,
+                              errorText: err('form.alasan'),
+                            ),
+                            onChanged: (value) {
+                              if (value.trim().isNotEmpty) {
+                                clearErr('form.alasan');
+                              }
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: vPadding),
+
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 14,
+                              color: Colors.white.withOpacity(0.55),
+                            ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                "Masukan anda akan kami gunakan untuk peningkatan kualitas dan layanan kami",
+                                style: bodyTextStyle(context, fontSize: 14)
+                                    .copyWith(color: hintGrey),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+                        FormError(errors: errors, key: null),
+                        const SizedBox(height: 18),
+                      ],
                     ),
-                    SafeArea(
-                      child: // ===== BUTTON SIMPAN =====
-                      AppButton.primary(
-                        text: 'Selesai',
-                        onPressed: onSaveForm,
-                        height: 45,
-                        backgroundColor: primaryColor,
-                      ),
-                    )
-                  ]
-              )
+                  ),
+                ),
+              ),
+
+              SafeArea(
+                child: AppButton.primary(
+                  text: 'Selesai',
+                  onPressed: onSaveForm,
+                  height: 45,
+                  backgroundColor: primaryColor,
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

@@ -85,7 +85,7 @@ class KlaimProgressActiveCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      dateText,
+                      dateText.isEmpty ? '-' : dateText,
                       style: bodyTextStyle(context, fontSize: getResponsiveFont(context,14))
                           .copyWith(color: hintGrey),
                     ),

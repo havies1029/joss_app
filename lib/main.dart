@@ -12,7 +12,6 @@ import 'package:joss_app/repositories/dashboard/sumdash_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv4picker_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv5picker_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv7picker_repository.dart';
-import 'package:joss_app/repositories/gen_review/reviewcrud_repository.dart';
 import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/login/forgot_password_repository.dart';

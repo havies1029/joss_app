@@ -4,7 +4,6 @@ import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/pages/regklaim/mobile/floating_action_klaim.dart';
 import 'package:joss_app/widgets/apptheme/header_card.dart';
 
-import 'klaim_rasio_tab.dart';
 import 'klaim_rincian_tab.dart';
 import 'klaim_ringkasan_tab.dart';
 
