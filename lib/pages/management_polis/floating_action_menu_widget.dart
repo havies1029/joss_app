@@ -201,9 +201,14 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
     );
   }
 
+
+
   Widget _buildActionButton(ActionMenuItem action) {
     final isDisabled = !action.isEnabled;
-
+    final canTriggerGuardWhenDisabled =
+        isDisabled &&
+            (action.type == ActionType.perpanjangan ||
+                action.type == ActionType.aktifkanKembali);
     return Opacity(
       opacity: isDisabled ? 0.55 : 1,
       child: Row(
@@ -249,23 +254,38 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
               color: Colors.transparent,
               shape: const CircleBorder(),
               child: InkWell(
-                onTap: isDisabled
+                // onTap: isDisabled
+                //     ? null
+                //     : () {
+                //
+                //         debugPrint(
+                //           'FAB ITEM CLICK => type=${action.type}, '
+                //           'label=${action.label}, '
+                //           'enabled=${action.isEnabled}, '
+                //           'selectedItems=${widget.selectedItems.length}',
+                //         );
+                //
+                //         _toggleMenu();
+                //         widget.onActionTap(action.type, widget.selectedItems);
+                //
+                //         debugPrint('FAB ITEM CLICK => callback sent to parent');
+                //
+                //       },
+                onTap: (isDisabled && !canTriggerGuardWhenDisabled)
                     ? null
                     : () {
+                  debugPrint(
+                    'FAB ITEM CLICK => type=${action.type}, '
+                        'label=${action.label}, '
+                        'enabled=${action.isEnabled}, '
+                        'selectedItems=${widget.selectedItems.length}',
+                  );
 
-                        debugPrint(
-                          'FAB ITEM CLICK => type=${action.type}, '
-                          'label=${action.label}, '
-                          'enabled=${action.isEnabled}, '
-                          'selectedItems=${widget.selectedItems.length}',
-                        );
+                  _toggleMenu();
+                  widget.onActionTap(action.type, widget.selectedItems);
 
-                        _toggleMenu();
-                        widget.onActionTap(action.type, widget.selectedItems);
-
-                        debugPrint('FAB ITEM CLICK => callback sent to parent');
-
-                      },
+                  debugPrint('FAB ITEM CLICK => callback sent to parent');
+                },
                 customBorder: const CircleBorder(),
                 child: Container(
                   width: 45,

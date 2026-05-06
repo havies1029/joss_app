@@ -75,7 +75,7 @@ class FabActionExecutor {
     if (actionType == ActionType.aktifkanKembali) {
       flag = _readBool(selectedItem, 'isReaktif');
       if (flag == true) {
-        _snack(context, "Maaf polis ini sudah memiliki tahapan.");
+        _snack(context, "Polis sudah pernah diaktivasi sebelumnya.");
         return false;
       }
     }
@@ -83,13 +83,83 @@ class FabActionExecutor {
     if (actionType == ActionType.perpanjangan) {
       flag = _readBool(selectedItem, 'isRenewal');
       if (flag == true) {
-        _snack(context, "Maaf polis ini sudah memiliki tahapan.");
+        _snack(context, "Polis sudah pernah diperpanjang sebelumnya.");
         return false;
       }
     }
 
     return true;
   }
+
+  // void run({
+  //   required BuildContext context,
+  //   required ActionType actionType,
+  //   required Object? selectedItem,
+  //   VoidCallback? onDone,
+  // }) {
+  //   final cobId = _cobId(context);
+  //   final statusId = _statusId(context);
+  //
+  //   final allowed = policy.isActionAllowed(
+  //     cobId: cobId,
+  //     statusId: statusId,
+  //     selectedItem: selectedItem,
+  //     actionType: actionType,
+  //   );
+  //
+  //   if (!allowed) {
+  //     _snack(context, "Aksi tidak tersedia untuk kondisi ini.");
+  //     return;
+  //   }
+  //
+  //   if (FabActionPolicy.alwaysEnabled.contains(actionType)) {
+  //     _handleAlwaysEnabled(context, actionType, onDone);
+  //     return;
+  //   }
+  //
+  //   if (selectedItem == null) {
+  //     _snack(context, "Pilih Minimal 1 Item!");
+  //     return;
+  //   }
+  //
+  //   if (!_guardTahapan(context: context, actionType: actionType, selectedItem: selectedItem)) {
+  //     return;
+  //   }
+  //
+  //   switch (actionType) {
+  //     case ActionType.lacakPolis:
+  //       _navigateToDetail(context, selectedItem, onDone);
+  //       break;
+  //
+  //     case ActionType.endorse:
+  //       _openEndorse(context, cobId, selectedItem, onDone);
+  //       break;
+  //
+  //     case ActionType.perpanjangan:
+  //       _openRenewal(context, cobId, selectedItem, onDone);
+  //       break;
+  //
+  //     case ActionType.aktifkanKembali:
+  //       _openReactive(context, cobId, selectedItem, onDone);
+  //       break;
+  //
+  //     case ActionType.lihatPolisPar:
+  //       _downloadPar(context, selectedItem);
+  //       break;
+  //
+  //     case ActionType.lihatPolisEq:
+  //       _downloadEq(context, selectedItem);
+  //       break;
+  //
+  //     case ActionType.lihatPolis:
+  //     case ActionType.unduhPolis:
+  //       _downloadGeneric(context, cobId, selectedItem);
+  //       break;
+  //
+  //     default:
+  //       _handleAlwaysEnabled(context, actionType, onDone);
+  //   }
+  // }
 
   void run({
     required BuildContext context,
@@ -99,18 +169,6 @@ class FabActionExecutor {
   }) {
     final cobId = _cobId(context);
     final statusId = _statusId(context);
-
-    final allowed = policy.isActionAllowed(
-      cobId: cobId,
-      statusId: statusId,
-      selectedItem: selectedItem,
-      actionType: actionType,
-    );
-
-    if (!allowed) {
-      _snack(context, "Aksi tidak tersedia untuk kondisi ini.");
-      return;
-    }
 
     if (FabActionPolicy.alwaysEnabled.contains(actionType)) {
       _handleAlwaysEnabled(context, actionType, onDone);
@@ -122,7 +180,29 @@ class FabActionExecutor {
       return;
     }
 
-    if (!_guardTahapan(context: context, actionType: actionType, selectedItem: selectedItem)) {
+    final isTahapanAction =
+        actionType == ActionType.perpanjangan ||
+            actionType == ActionType.aktifkanKembali;
+
+    if (isTahapanAction) {
+      if (!_guardTahapan(
+        context: context,
+        actionType: actionType,
+        selectedItem: selectedItem,
+      )) {
+        return;
+      }
+    }
+
+    final allowed = policy.isActionAllowed(
+      cobId: cobId,
+      statusId: statusId,
+      selectedItem: selectedItem,
+      actionType: actionType,
+    );
+
+    if (!allowed) {
+      _snack(context, "Aksi tidak tersedia untuk kondisi ini.");
       return;
     }
 

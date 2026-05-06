@@ -7,6 +7,8 @@ import 'package:joss_app/blocs/klaimlacak/klaimnilaicrud_bloc.dart';
 import 'package:joss_app/models/klaimlacak/klaimnilaicrud_model.dart';
 
 import '../../../blocs/gen_review/reviewcari_bloc.dart';
+import '../../gen_klaim/mobile/klaim_main_page.dart';
+import '../../perbaruiklaimpar/mobile/perbaruisuccess_page.dart';
 
 class KlaimnilaicrudFormPage extends StatefulWidget {
   final String klaim1Id;
@@ -46,13 +48,47 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
     const starOn = Color(0xFFFBBF24);
 
     return BlocConsumer<KlaimnilaicrudBloc, KlaimnilaicrudState>(
+      listenWhen: (prev, curr) =>
+      prev.isSaved != curr.isSaved ||
+          prev.isLoaded != curr.isLoaded,
       listener: (context, state) {
-        // kalau ada state.record (mode ubah / prefill), isi 1x saja
         if (!_didInit && state.isLoaded && state.record != null) {
           _didInit = true;
           fieldAlasanController.text = state.record!.alasan;
           _nilaiSuka = state.record!.nilaiSuka.clamp(0, 5);
           setState(() {});
+        }
+
+        if (state.isSaved) {
+          if (!state.hasFailure) {
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   successSnackBar("Data berhasil disimpan!"),
+            // );
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PerbaruiSuccessPage(
+                  display: "Masukan Anda telah berhasil kami terima.",
+                  description: "Terima kasih atas masukan Anda.",
+                  displayButton: "Kembali",
+                  onButtonPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const KlaimMainPage(),
+                      ),
+                          (route) => route.isFirst,
+                    );
+                  },
+                ),
+              ),
+            );
+
+            reviewCariBloc.add(RefreshReviewCariEvent());
+            _dismissDialog();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar("Data gagal disimpan!"),
+            );
+          }
         }
       },
       builder: (context, state) {
@@ -223,9 +259,7 @@ class KlaimnilaicrudFormPageFormState extends State<KlaimnilaicrudFormPage> {
       nilaiSuka: _nilaiSuka,
     );
 
-    reviewCariBloc.add(RefreshReviewCariEvent());
     klaimnilaicrudBloc.add(KlaimnilaicrudTambahEvent(record: record));
-    _dismissDialog();
   }
 
   void addError({required String error}) {

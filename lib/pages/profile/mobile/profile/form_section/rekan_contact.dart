@@ -375,7 +375,7 @@ class MRekanContactCrudFormPageFormState
         displayText: (item) => item.kodeposNo,
         compareItems: (a, b) => a.rkodeposId == b.rkodeposId,
 
-        validatorCallback: (v) => v == null ? kStringKodeposError : null,
+        validatorCallback: (v) => null,
 
         onChangedCallback: (v) {
           setState(() {
