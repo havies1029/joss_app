@@ -195,29 +195,20 @@ class _ClientLogoCard extends StatelessWidget {
       width: cardWidth,
       height: cardHeight,
       padding: const EdgeInsets.all(1),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(cardBorderRadius),
-        border: Border.all(color: Colors.white),
-        color : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(cardBorderRadius - 1),
-        child: CachedNetworkImage(
-          imageUrl: imagePath,
-          fit: BoxFit.cover,
-          memCacheWidth: (cardWidth * 2).toInt(),
-          placeholder: (_, __) => const SizedBox.shrink(),
-          errorWidget: (_, __, ___) => Icon(
-            Icons.error,
-            color: Colors.black54,
-            size: isMobile ? 18 : 32,
+        child: Container(
+          color: const Color(0xFFFEFEFE),
+          child: CachedNetworkImage(
+            imageUrl: imagePath,
+            fit: BoxFit.contain,
+            memCacheWidth: (cardWidth * 2).toInt(),
+            placeholder: (_, __) => const SizedBox.shrink(),
+            errorWidget: (_, __, ___) => Icon(
+              Icons.error,
+              color: Colors.black54,
+              size: isMobile ? 18 : 32,
+            ),
           ),
         ),
       ),
@@ -265,7 +256,10 @@ Widget SocmedIcon(String assetPath, bool isMobile, {required String url}) => Mat
             assetPath,
             width: isMobile ? 20 : 30,
             height: isMobile ? 20 : 30,
-            colorFilter: const ColorFilter.mode(primaryLightColor, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(
+              Color(0xFFFFFFFF),
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ),

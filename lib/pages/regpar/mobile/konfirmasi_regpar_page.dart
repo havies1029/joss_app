@@ -228,9 +228,9 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Konfirmasi",
-      onBack: () async {
-        await _handleExit(context);
-      },
+      // onBack: () async {
+      //   await _handleExit(context);
+      // },
       onHome: () async {
         await _handleExit(context);
       },
@@ -445,42 +445,51 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   const SizedBox(height: hPadding),
 
 
+                  // Padding(
+                  //     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  //     child: AppButton.primary(
+                  //       text: "Lanjutkan",
+                  //       isLoading: isSubmitting,
+                  //       onPressed: isSubmitting
+                  //           ? null
+                  //           : () async {
+                  //         if (mounted) {
+                  //           setState(() => isSubmitting = true);
+                  //         }
+                  //
+                  //         // context.read<DnRekap2invBloc>().add(
+                  //         //   RegPar2InvoiceEvent(
+                  //         //     regpar1Id: widget.recordId ?? "",
+                  //         //   ),
+                  //         // );
+                  //       },
+                  //     )
+                  // ),
                   Padding(
-                      padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                      child: AppButton.primary(
-                        text: "Lanjutkan",
-                        isLoading: isSubmitting,
-                        onPressed: isSubmitting
-                            ? null
-                            : () async {
-                          if (mounted) {
-                            setState(() => isSubmitting = true);
-                          }
-
-                          // context.read<DnRekap2invBloc>().add(
-                          //   RegPar2InvoiceEvent(
-                          //     regpar1Id: widget.recordId ?? "",
-                          //   ),
-                          // );
-                          showDialog(
-                            context: context,
-                            barrierDismissible: true,
-                            barrierColor: Colors.black.withOpacity(0.6),
-                            builder: (dialogContext) => RegisterClientPopUp(
-                              showIcon: false,
-                              header: 'Fitur pembayaran belum tersedia.',
-                              description:
-                              'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-                              buttonText: 'Mengerti',
-                              onPressed: () {
-                                Navigator.of(dialogContext).pop();
-                              },
-                            ),
-                          );
-                        },
-                      )
+                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: AppButton.primary(
+                      text: "Lanjutkan",
+                      onPressed: isSubmitting
+                          ? null
+                          : () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierColor: Colors.black.withOpacity(0.6),
+                          builder: (dialogContext) => RegisterClientPopUp(
+                            showIcon: false,
+                            header: 'Fitur pembayaran belum tersedia.',
+                            description:
+                            'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                            buttonText: 'Mengerti',
+                            onPressed: () {
+                              // Navigator.of(dialogContext).pop();
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
-
                 ],
               ),
             ),

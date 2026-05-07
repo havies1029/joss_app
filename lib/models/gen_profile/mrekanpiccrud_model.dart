@@ -5,9 +5,10 @@ class MRekanPicCrudModel {
 	String? picHp;
 	String? picNama;
 
-	String? jabatanNama;
+	String? jabatanDesc;
+	String? mjabatanId;
 	String? alamat1;
-	String? alamat2; // optional
+	String? alamat2;
 
 	MRekanPicCrudModel({
 		this.isDefault,
@@ -15,7 +16,8 @@ class MRekanPicCrudModel {
 		this.picEmail,
 		this.picHp,
 		this.picNama,
-		this.jabatanNama,
+		this.jabatanDesc,
+		this.mjabatanId,
 		this.alamat1,
 		this.alamat2,
 	});
@@ -27,7 +29,8 @@ class MRekanPicCrudModel {
 			picEmail: data['picEmail'] ?? '',
 			picHp: data['picHp'] ?? '',
 			picNama: data['picNama'] ?? '',
-			jabatanNama: data['jabatanNama'] ?? '',
+			jabatanDesc: data['jabatanDesc'] ?? '',
+			mjabatanId: data['mjabatanId']??'',
 			alamat1: data['alamat1'] ?? '',
 			alamat2: data['alamat2'], // optional
 		);
@@ -39,7 +42,8 @@ class MRekanPicCrudModel {
 		'picEmail': picEmail,
 		'picHp': picHp,
 		'picNama': picNama,
-		'jabatanNama': jabatanNama,
+		'jabatanDesc': jabatanDesc,
+		'mjabatanId': mjabatanId,
 		'alamat1': alamat1,
 		'alamat2': alamat2,
 	};

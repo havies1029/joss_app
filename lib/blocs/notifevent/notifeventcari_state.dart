@@ -6,7 +6,7 @@ class NotifeventcariState extends Equatable {
 	final bool hasReachedMax;
 	final int hal;
 
-	final bool isLoadingMore; // ✅ tambah ini
+	final bool isLoadingMore;
 
 	const NotifeventcariState({
 		this.status = ListStatus.initial,

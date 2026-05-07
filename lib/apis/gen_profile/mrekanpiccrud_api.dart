@@ -71,56 +71,68 @@ class MRekanPicCrudAPI {
 		}
 
 		return returnData;
-	}Future<bool> mRekanPicCrudUbahAPI(MRekanPicCrudModel record) async {
-		String ubahEndpoint =
+	}
+
+	Future<bool> mRekanPicCrudUbahAPI(MRekanPicCrudModel record) async {
+		final ubahEndpoint =
 				"${AppData.prefixEndPoint}/api/profile/mrekanpiccrud/update";
 
-		Map<String, String> queryParams = {
-			"modul_id": "mRekanPicCrudUbahAPI"
+		final queryParams = {
+			"modul_id": "mRekanPicCrudUbahAPI",
 		};
 
-		var uri = AppData.uriHtpp(
+		final uri = AppData.uriHtpp(
 			AppData.httpAuthority,
 			ubahEndpoint,
 			queryParams,
 		);
 
-		final body = jsonEncode(record.toJson());
+		try {
+			final body = jsonEncode(record.toJson());
 
-		debugPrint("🚀 [API CALL] mRekanPicCrudUbahAPI");
-		debugPrint("📍 URI : $uri");
-		debugPrint("📦 BODY : $body");
-		debugPrint("🔑 TOKEN : ${AppData.userToken}");
+			debugPrint("🚀 [API CALL] mRekanPicCrudUbahAPI");
+			debugPrint("📍 URI : $uri");
+			debugPrint("📦 BODY : $body");
 
-		final http.Response response = await http.post(
-			uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: body,
-		);
-
-		debugPrint("📡 STATUS CODE : ${response.statusCode}");
-		debugPrint("📥 RESPONSE BODY : ${response.body}");
-
-		ReturnDataAPI returnData;
-
-		if (response.statusCode == 200) {
-			returnData =
-					ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(
-				success: false,
-				data: "",
-				rowcount: 0,
+			final response = await http.post(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbose',
+					'Accept': 'application/json; odata=verbose',
+					'Authorization': 'Bearer ${AppData.userToken}',
+				},
+				body: body,
 			);
+
+			debugPrint("📡 STATUS CODE : ${response.statusCode}");
+			debugPrint("📥 RESPONSE BODY : ${response.body}");
+
+			if (response.statusCode != 200) {
+				return false;
+			}
+
+			// Backend sekarang balikin body: null
+			// Jadi anggap HTTP 200 sebagai sukses.
+			if (response.body.trim().isEmpty || response.body.trim() == 'null') {
+				return true;
+			}
+
+			final decoded = jsonDecode(response.body);
+
+			if (decoded == null) {
+				return true;
+			}
+
+			final returnData = ReturnDataAPI.fromDatabaseJson(decoded);
+
+			debugPrint("✅ API SUCCESS : ${returnData.success}");
+
+			return returnData.success;
+		} catch (e, stackTrace) {
+			debugPrint("❌ ERROR mRekanPicCrudUbahAPI : $e");
+			debugPrint("📌 STACKTRACE : $stackTrace");
+			return false;
 		}
-
-		debugPrint("✅ API SUCCESS : ${returnData.success}");
-
-		return returnData.success;
 	}
 
 	Future<bool> mRekanPicCrudHapusAPI(String mrekanpicId) async {

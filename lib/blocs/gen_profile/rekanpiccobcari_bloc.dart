@@ -17,6 +17,30 @@ class RekanPicCobCariBloc
     on<UpdateCheckboxRekanPicCobEvent>(onUpdateCheckboxChanged);
     on<Update2ApiJRekanPicCobEvent>(onUpdate2ApiRekanPicCob);
     on<ResetSelectedCOBRekanPicCobEvent>(onResetSelectedCOB);
+    on<ToggleAllCheckboxRekanPicCobEvent>(onToggleAllCheckbox);
+  }
+
+  Future<void> onToggleAllCheckbox(
+      ToggleAllCheckboxRekanPicCobEvent event,
+      Emitter<RekanPicCobCariState> emit,
+      ) async {
+    final updatedItems = state.items.map((item) {
+      item.isChecked = event.isChecked;
+      return item;
+    }).toList();
+
+    final updatedSelectedItems = event.isChecked
+        ? _deduplicateByMcobId(updatedItems)
+        : const <RekanPicCobCariModel>[];
+
+    emit(state.copyWith(
+      items: updatedItems,
+      selectedItems: updatedSelectedItems,
+      status: ListStatus.success,
+      isSaved: false,
+      hasFailure: false,
+      requestToUpdate: false,
+    ));
   }
 
   Future<void> onResetSelectedCOB(

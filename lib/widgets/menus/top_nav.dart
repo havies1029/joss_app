@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../blocs/notif_read/notif_read_bloc.dart';
 import '../../common/constants.dart';
 import '../../pages/notification/mobile/notification_page.dart';
 import '../../pages/notification/mobile/test_notification.dart';
@@ -47,17 +49,22 @@ AppBar MobileTopNavigationBar({
           Expanded(child: SizedBox()),
           GestureDetector(
             onTap: onNotifTap ??
-                    () {
-                  Navigator.push(
+                    () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const NotificationPage(),
                     ),
                   );
+
+                  if (context.mounted) {
+                    context.read<NotifReadBloc>().add(RefreshNotifUnreadCountEvent());
+                  }
                 },
-            child: ValueListenableBuilder<int>(
-              valueListenable: NotifDummyHelper.unreadNotifier,
-              builder: (context, notifCount, _) {
+            child: BlocBuilder<NotifReadBloc, NotifReadState>(
+              builder: (context, state) {
+                final notifCount = state.unreadCount;
+
                 return Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -66,7 +73,6 @@ AppBar MobileTopNavigationBar({
                       height: 39,
                       width: 40,
                     ),
-
                     if (notifCount > 0)
                       Positioned(
                         right: -4,
@@ -86,9 +92,7 @@ AppBar MobileTopNavigationBar({
                           ),
                           child: Center(
                             child: Text(
-                              notifCount > 99
-                                  ? '99+'
-                                  : notifCount.toString(),
+                              notifCount > 99 ? '99+' : notifCount.toString(),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,

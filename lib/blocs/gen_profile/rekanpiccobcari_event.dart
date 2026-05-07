@@ -56,3 +56,14 @@ class ResetSelectedCOBRekanPicCobEvent extends RekanPicCobCariEvents {
   @override
   List<Object> get props => [];
 }
+
+class ToggleAllCheckboxRekanPicCobEvent extends RekanPicCobCariEvents {
+  final bool isChecked;
+
+  const ToggleAllCheckboxRekanPicCobEvent({
+    required this.isChecked,
+  });
+
+  @override
+  List<Object> get props => [isChecked];
+}

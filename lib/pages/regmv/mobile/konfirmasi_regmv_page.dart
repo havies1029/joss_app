@@ -233,9 +233,9 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: "Konfirmasi",
-      onBack: () async {
-        await _handleExit(context);
-      },
+      // onBack: () async {
+      //   await _handleExit(context);
+      // },
       onHome: () async {
         await _handleExit(context);
       },
@@ -459,23 +459,33 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
                   const SizedBox(height: hPadding),
 
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  //   child: AppButton.primary(
+                  //     text: "Lanjutkan",
+                  //     isLoading: isSubmitting,
+                  //     onPressed: isSubmitting
+                  //         ? null
+                  //         : () async {
+                  //       if (mounted) {
+                  //         setState(() => isSubmitting = true);
+                  //       }
+                  //
+                  //       context.read<DnRekap2invBloc>().add(
+                  //         RegMv2InvoiceEvent(
+                  //           regmv1Id: widget.recordId ?? "",
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: AppButton.primary(
                       text: "Lanjutkan",
-                      isLoading: isSubmitting,
                       onPressed: isSubmitting
                           ? null
                           : () async {
-                        if (mounted) {
-                          setState(() => isSubmitting = true);
-                        }
-
-                        // context.read<DnRekap2invBloc>().add(
-                        //   RegMv2InvoiceEvent(
-                        //     regmv1Id: widget.recordId ?? "",
-                        //   ),
-                        // );
                         showDialog(
                           context: context,
                           barrierDismissible: true,
@@ -487,7 +497,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                             'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
                             buttonText: 'Mengerti',
                             onPressed: () {
-                              Navigator.of(dialogContext).pop();
+                              // Navigator.of(dialogContext).pop();
                             },
                           ),
                         );

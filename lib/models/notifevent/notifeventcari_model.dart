@@ -1,4 +1,3 @@
-
 class NotifeventcariModel {
 	String eventDesc;
 	String eventNama;
@@ -19,6 +18,6 @@ class NotifeventcariModel {
 	Map<String, dynamic> toJson() =>
 		{'eventDesc': eventDesc,
 		'eventNama': eventNama,
-		'notifeventId': notifeventId};
-
+		'notifeventId': notifeventId
+		};
 }

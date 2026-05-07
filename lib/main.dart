@@ -175,6 +175,7 @@ import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
 import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_endors/endors2cari_bloc.dart';
+import 'blocs/notif_read/notif_read_bloc.dart';
 import 'blocs/notifevent/notifeventcari_bloc.dart';
 import 'blocs/notiflog/logtrscari_bloc.dart';
 import 'blocs/notiflog/logtrscaritopx_bloc.dart';
@@ -646,6 +647,7 @@ Future<void> main() async {
 
         // Log Notification
         BlocProvider(create: (context) => NotifeventcariBloc()),
+        BlocProvider(create: (context) => NotifReadBloc()),
 
         // Log Transaction
         BlocProvider(create: (context) => LogtrscariBloc()),
@@ -679,6 +681,7 @@ Future<void> main() async {
             listener: (context, state) {
               final s = state as AuthenticationAuthenticated;
               context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
+              context.read<NotifReadBloc>().add(RefreshNotifUnreadCountEvent());
 
               if (s.user.userType == 'C') {
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());

@@ -1,4 +1,5 @@
 
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,8 +12,10 @@ import '../../../../../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/indo_phone_result.dart';
+import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../../models/gen_profile/mrekanpiccrud_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
+import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import 'list_pic_widget.dart';
@@ -43,7 +46,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
-  final _jabatanNama = TextEditingController();
+  final _jabatanDesc = TextEditingController();
   final _alamat = TextEditingController();
 
   bool _isDefault = false;
@@ -53,6 +56,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   late final RekanPicCobCariBloc cobBloc;
   late MRekanPicListBloc listBloc;
   late HakaksesCrudBloc hakaksesCrudBloc;
+
+  final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
+  ComboMJabatanModel? _jabatan;
 
   @override
   void initState() {
@@ -84,7 +90,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _nama.dispose();
     _email.dispose();
     _hp.dispose();
-    _jabatanNama.dispose();
+    _jabatanDesc.dispose();
     _alamat.dispose();
     super.dispose();
   }
@@ -144,9 +150,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
-    final jabatanNama = (mjnsclientId == '10')
+    final jabatanDesc = (mjnsclientId == '10')
         ? ''
-        : _jabatanNama.text.trim();
+        : _jabatanDesc.text.trim();
 
     final hpNormalized = _toNormalizedPhone62(_hp.text.trim());
 
@@ -155,7 +161,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       picNama: _nama.text.trim(),
       picEmail: _email.text.trim().toLowerCase(),
       picHp: hpNormalized,
-      jabatanNama: jabatanNama,
+      jabatanDesc: jabatanDesc,
+      mjabatanId: _jabatan?.mjabatanId,
       alamat1: _alamat.text.trim(),
       alamat2: '',
       isDefault: _isDefault,
@@ -203,10 +210,13 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _nama.text = (record.picNama ?? '').trim();
     _email.text = (record.picEmail ?? '').trim();
     _hp.text = _toPhoneFieldValue((record.picHp ?? '').trim());
-    _jabatanNama.text = (record.jabatanNama ?? '').trim();
+    _jabatanDesc.text = (record.jabatanDesc ?? '').trim();
     _alamat.text = (record.alamat1 ?? '').trim();
     _isDefault = record.isDefault ?? false;
-
+    _jabatan = ComboMJabatanModel(
+      mjabatanId: (record.mjabatanId ?? '').trim(),
+      jabatanDesc: (record.jabatanDesc ?? '').trim(),
+    );
     setState(() {});
   }
 
@@ -220,22 +230,52 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         child: MultiBlocListener(
           listeners: [
             BlocListener<MRekanPicCrudBloc, MRekanPicCrudState>(
-              listenWhen: (prev, curr) =>
-              prev.isSaved != curr.isSaved ||
-                  prev.hasFailure != curr.hasFailure ||
-                  prev.isLoaded != curr.isLoaded ||
-                  prev.record != curr.record ||
-                  prev.isSaving != curr.isSaving ||
-                  prev.message != curr.message,
+              listenWhen: (prev, curr) {
+                return prev.isSaving != curr.isSaving ||
+                    prev.isSaved != curr.isSaved ||
+                    prev.hasFailure != curr.hasFailure ||
+                    prev.isLoaded != curr.isLoaded ||
+                    prev.record != curr.record;
+              },
               listener: (context, state) async {
-                if (state.isSaving) {
-                  setState(() => _saving = true);
+                // ===== LOAD DATA EFFECT =====
+                if (!_payloadInjected &&
+                    state.isLoaded == true &&
+                    state.record != null &&
+                    !_saving) {
+                  _injectPayload(state.record!);
+
+                  _initialRecord = MRekanPicCrudModel(
+                    mrekanpicId: (state.record!.mrekanpicId ?? '').trim(),
+                    picNama: (state.record!.picNama ?? '').trim(),
+                    picEmail: (state.record!.picEmail ?? '').trim().toLowerCase(),
+                    picHp: _toNormalizedPhone62((state.record!.picHp ?? '').trim()),
+                    jabatanDesc: (state.record!.jabatanDesc ?? '').trim(),
+                    mjabatanId: (state.record!.mjabatanId ?? ''),
+                    alamat1: (state.record!.alamat1 ?? '').trim(),
+                    alamat2: (state.record!.alamat2 ?? '').trim(),
+                    isDefault: state.record!.isDefault ?? false,
+                  );
+
+                  _payloadInjected = true;
                   return;
                 }
 
+                // ===== SAVE START EFFECT =====
+                if (state.isSaving == true) {
+                  if (!_saving) {
+                    setState(() => _saving = true);
+                  }
+                  return;
+                }
+
+                // Jangan proses saved/failure kalau bukan dari tombol simpan widget ini
+                if (!_saving) return;
+
+                // ===== SAVE SUCCESS EFFECT =====
                 if (state.isSaved == true) {
                   try {
-                    final picId = (widget.mrekanpicId).trim();
+                    final picId = widget.mrekanpicId.trim();
                     final cobRepo = RekanPicCobCariRepository();
 
                     final selectedCobItems =
@@ -257,54 +297,41 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
                     if (!context.mounted) return;
 
+                    setState(() => _saving = false);
+
                     if (cobResult.success) {
-                      setState(() {
-                        _saving = false;
-                      });
-
-                      ScaffoldMessenger.of(context).showSnackBar(successSnackBar('PIC & ${listCheckbox.length} COB berhasil disimpan!'));
-
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        successSnackBar(
+                          'PIC & ${listCheckbox.length} COB berhasil disimpan!',
+                        ),
+                      );
 
                       listBloc.add(FetchMRekanPicListEvent());
+                      hakaksesCrudBloc.add(HakaksesCrudLihatEvent());
+
                       Navigator.pop(context, true);
                     } else {
-                      setState(() {
-                        _saving = false;
-                      });
-
-                      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar('PIC tersimpan, tapi gagal update COB.'),
+                      );
                     }
                   } catch (e) {
                     if (!context.mounted) return;
 
-                    setState(() {
-                      _saving = false;
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi terjadi error saat update COB.'));
+                    setState(() => _saving = false);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar('PIC tersimpan, tapi terjadi error saat update COB.'),
+                    );
                   }
+
+                  return;
                 }
 
-                if (!_payloadInjected &&
-                    state.isLoaded == true &&
-                    state.record != null) {
-                  _injectPayload(state.record!);
-
-                  _initialRecord = MRekanPicCrudModel(
-                    mrekanpicId: (state.record!.mrekanpicId ?? '').trim(),
-                    picNama: (state.record!.picNama ?? '').trim(),
-                    picEmail: (state.record!.picEmail ?? '').trim().toLowerCase(),
-                    picHp: _toNormalizedPhone62((state.record!.picHp ?? '').trim()),
-                    jabatanNama: (state.record!.jabatanNama ?? '').trim(),
-                    alamat1: (state.record!.alamat1 ?? '').trim(),
-                    alamat2: (state.record!.alamat2 ?? '').trim(),
-                    isDefault: state.record!.isDefault ?? false,
-                  );
-
-                  _payloadInjected = true;
-                }
-
+                // ===== SAVE FAILURE EFFECT =====
                 if (state.hasFailure == true) {
                   setState(() => _saving = false);
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     errorSnackBar(
                       (state.message ?? '').trim().isNotEmpty
@@ -312,6 +339,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                           : 'Gagal menyimpan perubahan. Coba lagi.',
                     ),
                   );
+
+                  return;
                 }
               },
             ),
@@ -390,9 +419,12 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       const SizedBox(height: vPadding),
 
                                       if (mjnsclientId != '10') ...[
-                                        buildFieldJabatanNama(),
+                                        buildFieldjabatanDesc(),
                                         const SizedBox(height: vPadding),
                                       ],
+
+                                      buildFieldJabatan(),
+                                      const SizedBox(height: vPadding),
 
                                       // CheckboxListTile(
                                       //   value: _isDefault,
@@ -581,7 +613,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
         (a.picEmail ?? '').trim().toLowerCase() ==
             (b.picEmail ?? '').trim().toLowerCase() &&
         (a.picHp ?? '').trim() == (b.picHp ?? '').trim() &&
-        (a.jabatanNama ?? '').trim() == (b.jabatanNama ?? '').trim() &&
+        (a.jabatanDesc ?? '').trim() == (b.jabatanDesc ?? '').trim() &&
         (a.alamat1 ?? '').trim() == (b.alamat1 ?? '').trim() &&
         (a.isDefault ?? false) == (b.isDefault ?? false);
   }
@@ -615,10 +647,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
   }
 
 
-  Widget buildFieldJabatanNama() {
+  Widget buildFieldjabatanDesc() {
     return appTextField(
       label: 'Jabatan',
-      controller: _jabatanNama,
+      controller: _jabatanDesc,
       keyboardType: TextInputType.text,
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -629,6 +661,37 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
+  Widget buildFieldJabatan(){
+    return ReusableComboBox<ComboMJabatanModel>(
+      hintText: "Peran",
+      comboKey: _comboKey,
+      initItem: _jabatan,
+      dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
+      displayText: (i) => i.jabatanDesc,
+      compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
+      onChangedCallback: (value) {
+        setState(() {
+          _jabatan = value;
+        });
+
+        if (value != null) {
+          removeError(error: kStringNullError);
+          crudBloc.add(ComboMJabatanChangedEvent(comboMJabatan: value));
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          _jabatan = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          return "Peran wajib diisi";
+        }
+        return null;
+      },
+    );
+  }
 
   Widget buildFieldAlamat() {
     return appTextField(

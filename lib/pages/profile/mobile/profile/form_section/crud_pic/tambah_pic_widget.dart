@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +12,9 @@ import '../../../../../../blocs/gen_profile/rekanpiccobcari_bloc.dart';
 import '../../../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../../../common/constants.dart';
 import '../../../../../../helper/indo_phone_result.dart';
+import '../../../../../../models/combobox/combomjabatan_model.dart';
 import '../../../../../../models/gen_profile/rekanpiccobcari_model.dart';
+import '../../../../../../repositories/combobox/combomjabatan_repository.dart';
 import '../../../../../../repositories/gen_profile/rekanpiccobcari_repository.dart';
 import '../../../../../base/base_background_sidepage.dart';
 import 'list_pic_widget.dart';
@@ -33,13 +36,16 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
   final _nama = TextEditingController();
   final _email = TextEditingController();
   final _hp = TextEditingController();
-  final _jabatanNama = TextEditingController();
+  final _jabatanDesc = TextEditingController();
   final _alamat1 = TextEditingController();
 
   final bool _isDefault = false;
   bool _saving = false;
   bool _showErrors = false;
   late MRekanPicListBloc listBloc;
+
+  final _comboKey = GlobalKey<DropdownSearchState<ComboMJabatanModel>>();
+  ComboMJabatanModel? _jabatan;
 
   @override
   void initState() {
@@ -54,7 +60,7 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     _nama.dispose();
     _email.dispose();
     _hp.dispose();
-    _jabatanNama.dispose();
+    _jabatanDesc.dispose();
     _alamat1.dispose();
     super.dispose();
   }
@@ -81,15 +87,16 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
 
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
-    final jabatanNama = (mjnsclientId == '10')
+    final jabatanDesc = (mjnsclientId == '10')
         ? ''
-        : _jabatanNama.text.trim();
+        : _jabatanDesc.text.trim();
 
     final record = MRekanPicCrudModel(
       picNama: _nama.text.trim(),
       picEmail: _email.text.trim().toLowerCase(),
       picHp: hpNormalized,
-      jabatanNama: jabatanNama,
+      jabatanDesc: jabatanDesc,
+      mjabatanId: _jabatan?.mjabatanId,
       alamat1: _alamat1.text.trim(),
       alamat2: "",
       isDefault: _isDefault,
@@ -265,7 +272,10 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
                                       buildFiledTelp(),
                                       const SizedBox(height: vPadding),
 
-                                      if (mjnsclientId != '10') buildFieldJabatanNama(),
+                                      if (mjnsclientId != '10') buildFieldjabatanDesc(),
+                                      const SizedBox(height: vPadding),
+
+                                      buildFieldJabatan(),
                                       const SizedBox(height: vPadding),
 
                                       // CheckboxListTile(
@@ -488,14 +498,46 @@ class _TambahPicWidgetState extends State<TambahPicWidget> {
     );
   }
 
-  Widget buildFieldJabatanNama() {
+  Widget buildFieldjabatanDesc() {
     return appTextField(
       label: 'Jabatan',
-      controller: _jabatanNama,
+      controller: _jabatanDesc,
       keyboardType: TextInputType.text,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return 'Jabatan wajib diisi';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget buildFieldJabatan(){
+    return ReusableComboBox<ComboMJabatanModel>(
+      hintText: "Peran",
+      comboKey: _comboKey,
+      initItem: _jabatan,
+      dataLoader: () => ComboMJabatanRepository().getComboMJabatan(),
+      displayText: (i) => i.jabatanDesc,
+      compareItems: (a, b) => a.mjabatanId == b.mjabatanId,
+      onChangedCallback: (value) {
+        setState(() {
+          _jabatan = value;
+        });
+
+        if (value != null) {
+          removeError(error: kStringNullError);
+          crudBloc.add(ComboMJabatanChangedEvent(comboMJabatan: value));
+        }
+      },
+      onSaveCallback: (value) {
+        if (value != null) {
+          _jabatan = value;
+        }
+      },
+      validatorCallback: (value) {
+        if (value == null) {
+          return "Peran wajib diisi";
         }
         return null;
       },

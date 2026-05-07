@@ -147,9 +147,55 @@ class _ListPicWidgetState extends State<ListPicWidget> {
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.zero,
-            itemCount: state.items.length + (state.isFetchingMore ? 1 : 0),
+            itemCount: state.items.length + 1 + (state.isFetchingMore ? 1 : 0),
             itemBuilder: (context, index) {
-              if (index >= state.items.length) {
+
+              // =========================
+              // PILIH SEMUA
+              // =========================
+              if (index == 0) {
+                final allChecked = state.items.isNotEmpty &&
+                    state.items.every((item) => item.isChecked);
+
+                return InkWell(
+                  onTap: () {
+                    rekanPicCobCariBloc.add(
+                      ToggleAllCheckboxRekanPicCobEvent(
+                        isChecked: !allChecked,
+                      ),
+                    );
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Checkbox(
+                        activeColor: primaryColor,
+                        value: allChecked,
+                        onChanged: (_) {
+                          rekanPicCobCariBloc.add(
+                            ToggleAllCheckboxRekanPicCobEvent(
+                              isChecked: !allChecked,
+                            ),
+                          );
+                        },
+                      ),
+                      title: const Text(
+                        'Pilih Semua',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              // geser index karena index 0 dipakai pilih semua
+              final itemIndex = index - 1;
+
+              if (itemIndex >= state.items.length) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Center(
@@ -158,7 +204,7 @@ class _ListPicWidgetState extends State<ListPicWidget> {
                 );
               }
 
-              final item = state.items[index];
+              final item = state.items[itemIndex];
 
               return InkWell(
                 onTap: () => _toggleCheck(item),
