@@ -68,9 +68,17 @@ class FabActionKlaim extends StatelessWidget {
             type: ActionType.batalKlaim,
             label: "Batal Klaim",
             iconAsset: "assets/icons/close.svg",
-            gradientColors: const [Color(0xFFFF484B), Color(0xFFC30003)],
+            gradientColors: const [Color(0xFFF484B), Color(0xFFC30003)],
             borderColor: const Color(0xFFFF787A),
             isEnabled: isBerjalan,
+          ),
+          ActionMenuItem(
+            type: ActionType.hubungiJps,
+            label: "Hubungi JPS",
+            iconAsset: "assets/icons/cs_klaim.svg",
+            gradientColors: const [Color(0xFFF69713), Color(0xFFFFF782)],
+            borderColor: const Color(0xFFFFD06C),
+            isEnabled: true,
           ),
         ];
 

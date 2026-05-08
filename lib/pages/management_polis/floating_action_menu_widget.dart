@@ -17,6 +17,7 @@ enum ActionType {
   perbaruiKlaim,
   lacakKlaim,
   batalKlaim,
+  hubungiJps
 }
 
 class ActionMenuItem {

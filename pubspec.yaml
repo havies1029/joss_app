@@ -310,6 +310,7 @@ flutter:
     - assets/icons/delete_3.svg
     - assets/icons/Information2.svg
     - assets/icons/home3.svg
+    - assets/icons/cs_klaim.svg
 
   fonts:
     - family: Delm-Regular

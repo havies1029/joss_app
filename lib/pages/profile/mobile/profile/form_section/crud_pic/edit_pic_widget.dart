@@ -213,10 +213,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _jabatanDesc.text = (record.jabatanDesc ?? '').trim();
     _alamat.text = (record.alamat1 ?? '').trim();
     _isDefault = record.isDefault ?? false;
-    _jabatan = ComboMJabatanModel(
-      mjabatanId: (record.mjabatanId ?? '').trim(),
-      jabatanDesc: (record.jabatanDesc ?? '').trim(),
-    );
+    _jabatan = record.comboMJabatan;
     setState(() {});
   }
 
@@ -255,6 +252,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                     alamat1: (state.record!.alamat1 ?? '').trim(),
                     alamat2: (state.record!.alamat2 ?? '').trim(),
                     isDefault: state.record!.isDefault ?? false,
+
                   );
 
                   _payloadInjected = true;

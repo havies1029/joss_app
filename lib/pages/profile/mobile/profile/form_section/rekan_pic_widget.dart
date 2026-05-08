@@ -340,6 +340,14 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
               labelStyle,
               valueStyle,
             ),
+
+            _cardRow(
+              'Peran:',
+              _displayStatus(it.peranDesc),
+              labelStyle,
+              valueStyle,
+            ),
+
             _cardRow(
               'Status:',
               _displayStatus(it.statusPic),

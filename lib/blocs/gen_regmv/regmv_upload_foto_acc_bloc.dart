@@ -191,10 +191,10 @@ class RegmvUploadFotoAccBloc
       Regmv7UploadFotoObjectBatchSubmit event,
       Emitter<Regmv7UploadFotoObjectState> emit,
       ) async {
-    if (event.filePaths.isEmpty || event.names.isEmpty) {
-      _emitToast(emit, "Minimal pilih 1 file atau foto");
-      return;
-    }
+    // if (event.filePaths.isEmpty || event.names.isEmpty) {
+    //   _emitToast(emit, "Minimal pilih 1 file atau foto");
+    //   return;
+    // } //opsional
 
     final pairs = _zipPathsNames(event.filePaths, event.names);
     if (pairs.isEmpty) {

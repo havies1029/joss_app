@@ -1608,14 +1608,16 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     final okForm4 = stnkState.items.isNotEmpty;
     final okForm5 = mobilState.items.isNotEmpty;
-    final okForm7 = accState.items.isNotEmpty;
+    // final okForm7 = accState.items.isNotEmpty; //optional
 
-    if (!okForm4 || !okForm5 || !okForm7) {
+    // if (!okForm4 || !okForm5 || !okForm7) {
+    if (!okForm4 || !okForm5) { //opsional
       if (mounted) {
         setState(() {
           _showVal4 = !okForm4;
           _showVal5 = !okForm5;
-          _showVal7 = !okForm7;
+          // _showVal7 = !okForm7;
+          _showVal7 = false; //opsional
         });
       }
 
@@ -1623,9 +1625,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         openForm4(recordId: regmv1Id);
       } else if (!okForm5) {
         openForm5(recordId: regmv1Id);
-      } else if (!okForm7) {
-        openForm7(recordId: regmv1Id);
       }
+      // else if (!okForm7) {
+      //   openForm7(recordId: regmv1Id);
+      // } //opsional
 
       return;
     }
@@ -2766,7 +2769,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       case RegmvFormSection.form3: return validateForm3();
       case RegmvFormSection.form4: return context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
       case RegmvFormSection.form5: return context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
-      case RegmvFormSection.form7: return context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
+      // case RegmvFormSection.form7: return context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
+      case RegmvFormSection.form7: return true; //opsional
       case RegmvFormSection.form6: return true;
     }
   }

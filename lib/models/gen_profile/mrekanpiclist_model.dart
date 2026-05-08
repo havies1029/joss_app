@@ -12,6 +12,7 @@ class MRekanPicListModel {
 	String alamat1;
 	String? alamat2;
 	String? statusPic;
+	String? peranDesc;
 
 	MRekanPicListModel({
 		required this.isDefault,
@@ -27,6 +28,7 @@ class MRekanPicListModel {
 		required this.alamat1,
 		this.alamat2,
 		this.statusPic,
+		this.peranDesc,
 	});
 
 	factory MRekanPicListModel.fromJson(Map<String, dynamic> data) {
@@ -44,6 +46,7 @@ class MRekanPicListModel {
 			alamat1: data['alamat1'] ?? '',
 			alamat2: data['alamat2'], // optional
 			statusPic: data['statusPic'],
+			peranDesc: data['peranDesc'] ?? '',
 		);
 	}
 
@@ -61,5 +64,6 @@ class MRekanPicListModel {
 		'alamat1': alamat1,
 		'alamat2': alamat2,
 		'statusPic': statusPic,
+		'peranDesc' : peranDesc,
 	};
 }

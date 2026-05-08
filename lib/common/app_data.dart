@@ -1,4 +1,4 @@
-import 'package:joss_app/models/user/user_model.dart';
+ import 'package:joss_app/models/user/user_model.dart';
 
 class AppData {
 
