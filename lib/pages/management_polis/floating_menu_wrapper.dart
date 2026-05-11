@@ -71,7 +71,9 @@ class FloatingMenuWrapper extends StatelessWidget {
                 'selectedItemNull=${selectedItem == null}',
               );
 
-              final needsSelectedItem = actionType != ActionType.beliPolis;
+              final needsSelectedItem =
+                  actionType != ActionType.beliPolis &&
+                      actionType != ActionType.hubungiJps;
 
               if (needsSelectedItem && selectedItem == null) {
                 debugPrint('WRAPPER blocked => selectedItem required');

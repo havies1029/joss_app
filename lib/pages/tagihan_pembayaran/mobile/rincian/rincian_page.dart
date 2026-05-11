@@ -9,9 +9,11 @@ import '../../../../common/constants.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
 import '../../../../widgets/apptheme/empty_state_page.dart';
+import '../../../../widgets/apptheme/hubungi_cs.dart';
 import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
+import '../../fab_pembayaran.dart';
 import '../bayar_button.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
@@ -216,10 +218,25 @@ class _RincianPageState extends State<RincianPage> {
                   ],
                 ),
 
-                BayarButton(
+                // BayarButton(
+                //   isEnabled: state.selectedIds.isNotEmpty,
+                //   onTap: state.selectedIds.isNotEmpty
+                //       ? () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (_) => RincianKonfirmasiDetailPage(
+                //           selectedDnIds: List.from(state.selectedIds),
+                //         ),
+                //       ),
+                //     );
+                //   }
+                //       : null,
+                // ),
+                FabPembayaran(
                   isEnabled: state.selectedIds.isNotEmpty,
-                  onTap: state.selectedIds.isNotEmpty
-                      ? () {
+
+                  onBayarTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -228,8 +245,30 @@ class _RincianPageState extends State<RincianPage> {
                         ),
                       ),
                     );
-                  }
-                      : null,
+                  },
+
+                  onHubungiKeuTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      barrierColor: Colors.black.withOpacity(0.45),
+                      builder: (_) {
+                        return HubungiCs(
+                          onPilihLayanan: (layanan) {
+                            Navigator.pop(context);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Pilih layanan: $layanan")),
+                            );
+
+                            // TODO: arahkan ke chat / page tujuan
+                            // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
+                          },
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             );

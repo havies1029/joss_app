@@ -11,6 +11,7 @@ import '../pages/management_polis/floating_action_menu_widget.dart';
 import '../pages/management_polis/mobile/form_button_page/endorse_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/renewal_form_page.dart';
+import '../widgets/apptheme/hubungi_cs.dart';
 import 'fab_action_policy.dart';
 
 class FabActionExecutor {
@@ -375,6 +376,28 @@ class FabActionExecutor {
           context,
           MaterialPageRoute(builder: (_) => CariAsuransiWidget.page()),
         ).then((_) => onComplete?.call());
+        break;
+      case ActionType.hubungiJps:
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          barrierColor: Colors.black.withOpacity(0.45),
+          builder: (_) {
+            return HubungiCs(
+              onPilihLayanan: (layanan) {
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Pilih layanan: $layanan")),
+                );
+
+                // TODO: arahkan ke chat / page tujuan
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
+              },
+            );
+          },
+        );
         break;
       default:
         break;

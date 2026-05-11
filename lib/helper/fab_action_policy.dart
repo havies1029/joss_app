@@ -14,7 +14,10 @@ class FabActionPolicy {
     required this.downloadEqItem,
   });
 
-  static const alwaysEnabled = <ActionType>{ActionType.beliPolis};
+  static const alwaysEnabled = <ActionType>{
+    ActionType.beliPolis,
+    ActionType.hubungiJps,
+  };
 
   static const Map<String, Set<ActionType>> statusIdEnabledMatrix = {
     "10001": {ActionType.endorse, ActionType.unduhPolis},
@@ -33,6 +36,7 @@ class FabActionPolicy {
       ActionType.aktifkanKembali,
       ActionType.lihatPolisPar,
       ActionType.lihatPolisEq,
+      ActionType.hubungiJps,
     },
     "10003": {
       ActionType.beliPolis,
@@ -42,6 +46,7 @@ class FabActionPolicy {
       ActionType.perpanjangan,
       ActionType.aktifkanKembali,
       ActionType.lihatPolis,
+      ActionType.hubungiJps,
     },
     "10004": {
       ActionType.beliPolis,
@@ -51,6 +56,7 @@ class FabActionPolicy {
       ActionType.perpanjangan,
       ActionType.aktifkanKembali,
       ActionType.lihatPolis,
+      ActionType.hubungiJps,
     },
     "10005": {
       ActionType.beliPolis,
@@ -60,6 +66,7 @@ class FabActionPolicy {
       ActionType.perpanjangan,
       ActionType.aktifkanKembali,
       ActionType.lihatPolis,
+      ActionType.hubungiJps,
     },
     "10006": {
       ActionType.beliPolis,
@@ -69,6 +76,7 @@ class FabActionPolicy {
       ActionType.perpanjangan,
       ActionType.aktifkanKembali,
       ActionType.lihatPolis,
+      ActionType.hubungiJps,
     },
   };
 
@@ -80,6 +88,7 @@ class FabActionPolicy {
     ActionType.perpanjangan,
     ActionType.aktifkanKembali,
     ActionType.lihatPolis,
+    ActionType.hubungiJps,
   };
 
   bool _canReaktif(Object item) {
@@ -181,7 +190,8 @@ class FabActionPolicy {
           .where((a) => allowedByCob.contains(a.type))
           .map(
             (a) => a.copyWith(
-              isEnabled: a.type == ActionType.beliPolis,
+              isEnabled: a.type == ActionType.beliPolis ||
+                  a.type == ActionType.hubungiJps,
             ),
           )
           .toList();

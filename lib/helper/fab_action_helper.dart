@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/renewal_form_page.dart';
+import '../widgets/apptheme/hubungi_cs.dart';
 
 
 class FabActionHelper {
@@ -61,6 +62,14 @@ class FabActionHelper {
       borderColor: const Color(0xFFFF787B),
       isEnabled: false,
     ),
+    ActionMenuItem(
+      type: ActionType.hubungiJps,
+      label: "Hubungi JPS",
+      iconAsset: "assets/icons/cs_klaim.svg",
+      gradientColors: const [Color(0xFFF69713), Color(0xFFFFF782)],
+      borderColor: const Color(0xFFFFD06C),
+      isEnabled: true,
+    ),
   ];
 
   static final ActionMenuItem downloadPolisItem = ActionMenuItem(
@@ -91,7 +100,10 @@ class FabActionHelper {
   );
 
 
-  static final List<ActionType> alwaysEnabledActions = [ActionType.beliPolis];
+  static final List<ActionType> alwaysEnabledActions = [
+    ActionType.beliPolis,
+    ActionType.hubungiJps,
+  ];
 
   static final Map<String, List<ActionType>> prosesSourceEnabledMatrix = {
     "E": <ActionType>[ActionType.lacakPolis],
@@ -382,6 +394,28 @@ class FabActionHelper {
           context,
           MaterialPageRoute(builder: (_) => const BeliPolisPage()),
         ).then((_) => onComplete?.call());
+        break;
+      case ActionType.hubungiJps:
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          barrierColor: Colors.black.withOpacity(0.45),
+          builder: (_) {
+            return HubungiCs(
+              onPilihLayanan: (layanan) {
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Pilih layanan: $layanan")),
+                );
+
+                // TODO: arahkan ke chat / page tujuan
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
+              },
+            );
+          },
+        );
         break;
       case ActionType.unduhPolis:
         ScaffoldMessenger.of(context)

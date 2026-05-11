@@ -5,6 +5,7 @@ import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
+import '../../../widgets/apptheme/hubungi_cs.dart';
 import '../../klaimbatal/mobile/klaimbatalcrud_form.dart';
 import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
 import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
@@ -89,6 +90,27 @@ class FabActionKlaim extends StatelessWidget {
             if (selected == null) {
               if (type == ActionType.klaimBaru) {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
+              } else if (type == ActionType.hubungiJps) {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  barrierColor: Colors.black.withOpacity(0.45),
+                  builder: (_) {
+                    return HubungiCs(
+                      onPilihLayanan: (layanan) {
+                        Navigator.pop(context);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Pilih layanan: $layanan")),
+                        );
+
+                        // TODO: arahkan ke chat / page tujuan
+                        // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
+                      },
+                    );
+                  },
+                );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Pilih data terlebih dahulu")),
