@@ -3,24 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:joss_app/widgets/my_colors.dart';
 import 'package:joss_app/widgets/my_text.dart';
 
-class Sppa2CariTileWidget extends StatelessWidget {
-	final String currDesc;
-	final String keterangan;
-	final String objectDesc;
-	final double premi;
-	final String sppa1Id;
-	final String sppa2Id;
+class Sppa2healthCariTileWidget extends StatelessWidget {
+	final String nama;
+	final double premiNet;
+	final String sppa2healthId;
 	final double tsi;
+	final String paketNama;
 
-	const Sppa2CariTileWidget(
+	const Sppa2healthCariTileWidget(
 		{super.key,
-		required this.currDesc, 
-		required this.keterangan, 
-		required this.objectDesc, 
-		required this.premi, 
-		required this.sppa1Id, 
-		required this.sppa2Id, 
-		required this.tsi});
+		required this.nama, 
+		required this.premiNet, 
+		required this.sppa2healthId, 
+		required this.tsi, 
+		required this.paketNama});
 
 	@override
 	Widget build(BuildContext context) {
@@ -38,57 +34,39 @@ class Sppa2CariTileWidget extends StatelessWidget {
 				child: Column(
 					crossAxisAlignment: CrossAxisAlignment.start,
 					children: [
-						Text("currDesc",
+						Text("nama",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							currDesc,
+							nama,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("keterangan",
+						Text("premiNet",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							keterangan,
+							premiNet.toString(),
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("objectDesc",
+						Text("paketNama",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							objectDesc,
+							paketNama,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
-						Text("premi",
+						Text("sppa2healthId",
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_40)),
 						Container(height: 5),
 						Text(
-							NumberFormat("#,###").format(premi),
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("sppa1Id",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							sppa1Id,
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
-						Text("sppa2Id",
-							style: MyText.bodyLarge(context)!
-								.copyWith(color: MyColors.grey_40)),
-						Container(height: 5),
-						Text(
-							sppa2Id,
+							sppa2healthId,
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
 						Container(height: 10),
@@ -100,7 +78,7 @@ class Sppa2CariTileWidget extends StatelessWidget {
 							NumberFormat("#,###").format(tsi),
 							style: MyText.bodyLarge(context)!
 								.copyWith(color: MyColors.grey_80)),
-						Container(height: 10),
+						Container(height: 10),												
 				]),
 			)
 		);

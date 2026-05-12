@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
-import 'package:joss_app/blocs/assetdetail/sppa2cari_bloc.dart';
-import 'package:joss_app/pages/assetdetail/sppa2cari_list_widget.dart';
+import 'package:joss_app/blocs/asetothers/sppa2otherscari_bloc.dart';
+import 'package:joss_app/pages/asetothers/sppa2otherscari_list_widget.dart';
 
-class Sppa2CariPage extends StatefulWidget {
-	const Sppa2CariPage({super.key});
+class Sppa2othersCariPage extends StatefulWidget {
+	const Sppa2othersCariPage({super.key});
 
 	@override
-	Sppa2CariPageState createState() => Sppa2CariPageState();
+	Sppa2othersCariPageState createState() => Sppa2othersCariPageState();
 }
 
-class Sppa2CariPageState extends State<Sppa2CariPage> {
-	late Sppa2CariBloc sppa2CariBloc;
+class Sppa2othersCariPageState extends State<Sppa2othersCariPage> {
+	late Sppa2othersCariBloc sppa2othersCariBloc;
 	final TextEditingController _searchController = TextEditingController();
 	@override
 	void initState() {
@@ -24,7 +24,7 @@ class Sppa2CariPageState extends State<Sppa2CariPage> {
 
 	@override
 	Widget build(BuildContext context) {
-		sppa2CariBloc = BlocProvider.of<Sppa2CariBloc>(context);
+		sppa2othersCariBloc = BlocProvider.of<Sppa2othersCariBloc>(context);
 		return Center(
 			child: Column(
 				mainAxisAlignment: MainAxisAlignment.start,
@@ -39,8 +39,8 @@ class Sppa2CariPageState extends State<Sppa2CariPage> {
 		);
 	}
 	void refreshData() {
-		sppa2CariBloc.add(
-			RefreshSppa2CariEvent(searchText: _searchController.text));
+		sppa2othersCariBloc.add(
+			RefreshSppa2othersCariEvent(searchText: _searchController.text, hal: 0));
 	}
 
 	IconButton buildSearchButton() {
@@ -50,8 +50,8 @@ class Sppa2CariPageState extends State<Sppa2CariPage> {
 				size: 35.0,
 			),
 			onPressed: () {
-			sppa2CariBloc.add(RefreshSppa2CariEvent(
-				searchText: _searchController.text));
+			sppa2othersCariBloc.add(RefreshSppa2othersCariEvent(
+				searchText: _searchController.text, hal: 0));
 			});
 	}
 
@@ -59,7 +59,7 @@ class Sppa2CariPageState extends State<Sppa2CariPage> {
 		return Expanded(
 			child: Column(
 				mainAxisAlignment: MainAxisAlignment.start,
-				children: <Widget>[Sppa2CariListWidget(searchText: _searchController.text)],
+				children: <Widget>[Sppa2othersCariListWidget(searchText: _searchController.text)],
 		));
 	}
 

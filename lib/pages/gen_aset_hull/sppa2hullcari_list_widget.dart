@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/blocs/assetdetail/sppa2cari_bloc.dart';
-import 'package:joss_app/pages/assetdetail/sppa2cari_tile_widget.dart';
-import 'package:joss_app/models/assetdetail/sppa2cari_model.dart';
+import 'package:joss_app/blocs/gen_aset_hull/sppa2hullcari_bloc.dart';
+import 'package:joss_app/pages/gen_aset_hull/sppa2hullcari_tile_widget.dart';
+import 'package:joss_app/models/gen_aset_hull/sppa2hullcari_model.dart';
 
-class Sppa2CariListWidget extends StatefulWidget {
-	final String searchText;
-	const Sppa2CariListWidget({super.key, required this.searchText});
+class Sppa2hullCariListWidget extends StatefulWidget {
+	const Sppa2hullCariListWidget({super.key});
 
 	@override
-	Sppa2CariListWidgetState createState() => Sppa2CariListWidgetState();
+	Sppa2hullCariListWidgetState createState() => Sppa2hullCariListWidgetState();
 }
 
-class Sppa2CariListWidgetState extends State<Sppa2CariListWidget> {
-	late Sppa2CariBloc sppa2CariBloc;
-	List<Sppa2CariModel> sppa2Cari = [];
+class Sppa2hullCariListWidgetState extends State<Sppa2hullCariListWidget> {
+	late Sppa2hullCariBloc sppa2hullCariBloc;
+	List<Sppa2hullCariModel> sppa2hullCari = [];
 	final ScrollController _scrollController = ScrollController();
 
 	@override
@@ -34,12 +33,12 @@ class Sppa2CariListWidgetState extends State<Sppa2CariListWidget> {
 
 	@override
 	Widget build(BuildContext context) {
-		sppa2CariBloc = BlocProvider.of<Sppa2CariBloc>(context);
-		return BlocConsumer<Sppa2CariBloc, Sppa2CariState>(
+		sppa2hullCariBloc = BlocProvider.of<Sppa2hullCariBloc>(context);
+		return BlocConsumer<Sppa2hullCariBloc, Sppa2hullCariState>(
 			builder: (context, state) {
 		if (state.status == ListStatus.success) {
 			if (!state.hasReachedMax) {
-				sppa2Cari.addAll(state.items);
+				sppa2hullCari.addAll(state.items);
 			}
 
 		return state.items.isNotEmpty
@@ -55,14 +54,13 @@ class Sppa2CariListWidgetState extends State<Sppa2CariListWidget> {
 							borderRadius: BorderRadius.circular(15.0)),
 						child: Column(
 							children: <Widget>[
-								Sppa2CariTileWidget(
-									currDesc: state.items[index].currDesc,
-									keterangan: state.items[index].keterangan,
-									objectDesc: state.items[index].objectDesc,
-									premi: state.items[index].premi,
-									sppa1Id: state.items[index].sppa1Id,
-									sppa2Id: state.items[index].sppa2Id,
-									tsi: state.items[index].tsi,
+								Sppa2hullCariTileWidget(
+									kerangka: state.items[index].kerangka,
+									namaKapal: state.items[index].namaKapal,
+									premiNet: state.items[index].premiNet,
+									si: state.items[index].si,
+									sppa2hullId: state.items[index].sppa2hullId,
+									vesselClass: state.items[index].vesselClass,
 								)
 							],
 						),
@@ -100,7 +98,7 @@ class Sppa2CariListWidgetState extends State<Sppa2CariListWidget> {
 		if (!_scrollController.hasClients) return;
 		if (_scrollController.position.pixels ==
 				_scrollController.position.maxScrollExtent) {
-			sppa2CariBloc.add(FetchSppa2CariEvent());
+			sppa2hullCariBloc.add(FetchSppa2hullCariEvent());
 		}
 	}
 
