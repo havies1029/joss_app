@@ -193,15 +193,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                   if (showColumn) ...{
                     2: const FixedColumnWidth(140), // No Proses
                     3: const FixedColumnWidth(120), // No Polis
-                    4: const FixedColumnWidth(170), // Tertanggung
-                    5: const FixedColumnWidth(240), // Alamat
+                    4: const FixedColumnWidth(120), // Jml Object
+                    5: const FixedColumnWidth(170), // Tertanggung
                     6: const FixedColumnWidth(180), // Periode
                     7: const FixedColumnWidth(170), // Nilai Pertanggungan
                     8: const FixedColumnWidth(140), // Premi
                   } else ...{
                     2: const FixedColumnWidth(160), // No Polis
-                    3: const FixedColumnWidth(170), // Tertanggung
-                    4: const FixedColumnWidth(240), // Alamat
+                    3: const FixedColumnWidth(120), // Jml Object
+                    4: const FixedColumnWidth(170), // Tertanggung
                     5: const FixedColumnWidth(180), // Periode
                     6: const FixedColumnWidth(170), // Nilai Pertanggungan
                     7: const FixedColumnWidth(140), // Premi
@@ -260,15 +260,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             if (showColumn) ...{
               2: const FixedColumnWidth(140), // No Proses
               3: const FixedColumnWidth(120), // No Polis
-              4: const FixedColumnWidth(170), // Tertanggung
-              5: const FixedColumnWidth(240), // Alamat
+              4: const FixedColumnWidth(120), // Jml Object
+              5: const FixedColumnWidth(170), // Tertanggung
               6: const FixedColumnWidth(180), // Periode
               7: const FixedColumnWidth(170), // Nilai Pertanggungan
               8: const FixedColumnWidth(140), // Premi
             } else ...{
-              2: const FixedColumnWidth(120), // No Polis
-              3: const FixedColumnWidth(120), // Tertanggung
-              4: const FixedColumnWidth(240), // Alamat
+              2: const FixedColumnWidth(160), // No Polis
+              3: const FixedColumnWidth(120), // Jml Object
+              4: const FixedColumnWidth(170), // Tertanggung
               5: const FixedColumnWidth(180), // Periode
               6: const FixedColumnWidth(170), // Nilai Pertanggungan
               7: const FixedColumnWidth(140), // Premi
@@ -308,8 +308,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           "No",
           if (showColumn) "No Proses",
           "No Polis",
+          "Jumlah Objek",
           "Tertanggung",
-          "Lokasi",
           "Periode",
           "Nilai Pertanggungan",
           "Premi",
@@ -403,7 +403,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
 
         _cell(
           child: Text(
-            d.tertanggung,
+            "${d.jmlObject}",
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: primaryLightColor),
@@ -412,12 +412,21 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
 
         _cell(
           child: Text(
-            d.alamat,
+            d.tertanggung,
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: primaryLightColor),
           ),
         ),
+
+        // _cell(
+        //   child: Text(
+        //     d.alamat,
+        //     maxLines: compact ? 2 : 1,
+        //     overflow: TextOverflow.ellipsis,
+        //     style: TextStyle(color: primaryLightColor),
+        //   ),
+        // ),
 
         _cell(
           child: Text(

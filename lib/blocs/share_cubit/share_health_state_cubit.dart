@@ -67,17 +67,14 @@ class ShareHealthStateCubit extends Cubit<Map<String, AsetHealthCariModel>> {
   }
 
   /// 🔹 Data siap ekspor (versi readable untuk Excel/PDF)
+  /// 🔹 Data siap ekspor (versi readable untuk Excel/PDF)
   List<Map<String, dynamic>> getExportData() {
     return state.values.map((e) {
       return {
-        'ID': e.asethealthId,
-        'Nama': e.nama,
-        'Tanggal Lahir': e.dob.toIso8601String().split('T').first,
-        'Jenis Kelamin': e.jnskel,
-        'Posisi': e.posisi,
-        'No. Polis': e.polisNo,
-        'Status': e.status,
-        'Nomor Urut': e.nomor,
+        'No': e.nomor,
+        // 'No Polis': e.polisNo,
+        'Jumlah Objek': e.jmlObject,
+        'Status': e.status ?? '-',
       };
     }).toList();
   }

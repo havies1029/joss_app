@@ -1,11 +1,9 @@
 class AsethullCariModel {
 	String asetHullId;
-	String sppa2Id;
 	String tertanggung;
 	DateTime? periodeMulai;
 	DateTime? periodeAkhir;
 	String curr;
-	String namaKapal;
 	String polisNo;
 	double premi;
 	String status;
@@ -17,15 +15,14 @@ class AsethullCariModel {
 	String prosesSource;
 	bool isReaktif;
 	bool isRenewal;
+	int jmlObject;
 
 	AsethullCariModel({
 		required this.asetHullId,
-		required this.sppa2Id,
 		required this.tertanggung,
 		this.periodeMulai,
 		this.periodeAkhir,
 		required this.curr,
-		required this.namaKapal,
 		required this.polisNo,
 		required this.premi,
 		required this.status,
@@ -35,6 +32,7 @@ class AsethullCariModel {
 		required this.prosesId,
 		required this.prosesRemarks,
 		required this.prosesSource,
+		required this.jmlObject,
 		this.isReaktif = false,
 		this.isRenewal = false,
 	});
@@ -42,7 +40,6 @@ class AsethullCariModel {
 	factory AsethullCariModel.fromJson(Map<String, dynamic> data) {
 		return AsethullCariModel(
 			asetHullId: data['asetHullId'] ?? '',
-			sppa2Id: data['sppa2Id'] ?? '',
 			tertanggung: data['tertanggung'] ?? '',
 			periodeMulai: data['periodeMulai'] == null
 					? null
@@ -51,7 +48,6 @@ class AsethullCariModel {
 					? null
 					: DateTime.tryParse(data['periodeAkhir'].toString()),
 			curr: data['curr'] ?? '',
-			namaKapal: data['namaKapal'] ?? '',
 			polisNo: data['polisNo'] ?? '',
 			premi: double.tryParse(data['premi'].toString()) ?? 0,
 			status: data['status'] ?? '',
@@ -63,17 +59,16 @@ class AsethullCariModel {
 			prosesSource: data['prosesSource'] ?? '',
 			isReaktif: data['isReaktif'] ?? false,
 			isRenewal: data['isRenewal'] ?? false,
+			jmlObject: int.tryParse(data['jmlObject'].toString()) ?? 0,
 		);
 	}
 
 	Map<String, dynamic> toJson() => {
 		'asetHullId': asetHullId,
-		'sppa2Id': sppa2Id,
 		'tertanggung': tertanggung,
 		'periodeMulai': periodeMulai?.toIso8601String(),
 		'periodeAkhir': periodeAkhir?.toIso8601String(),
 		'curr': curr,
-		'namaKapal': namaKapal,
 		'polisNo': polisNo,
 		'premi': premi,
 		'tsi': tsi,
@@ -85,5 +80,6 @@ class AsethullCariModel {
 		'prosesSource': prosesSource,
 		'isReaktif': isReaktif,
 		'isRenewal': isRenewal,
+		'jmlObject': jmlObject,
 	};
 }

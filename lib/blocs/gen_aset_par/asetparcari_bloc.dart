@@ -221,7 +221,6 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 				debugPrint("""
 🏠 [Data PAR]
 ──────────────────────────────
-• Alamat       : ${i.alamat}
 • Currency     : ${i.curr}
 • Polis No     : ${i.polisNo}
 • Sum Insured  : ${i.sumInsured}

@@ -304,7 +304,6 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 
 			debugPrint("✅ [DebugFetch] ${results.length} hasil ditemukan untuk '${event.searchText}'");
 			for (final i in results) {
-				debugPrint("➡️ ${i.jenisMv} | Merk: ${i.merk} | Polis: ${i.polisNo} | Status: ${i.status} | filePolisId: ${i.filePolisId}");
 			}
 			debugPrint("-----------------------------------------------------");
 		} catch (e, stack) {

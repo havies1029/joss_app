@@ -157,15 +157,12 @@ class _HullCobTableState extends State<HullCobTable> {
     final selectCol = widget.readOnly ? 0.0 : 40.0;
 
     final tertanggungValues = details.map((d) => d.tertanggung);
-    final kapalValues = details.map((d) => d.namaKapal);
     final tsiValues = details.map((d) => formatNum(d.tsi));
     final premiValues = details.map((d) => formatNum(d.premi));
 
     // caps: tweak sesuai selera, ini ngikut gaya awalmu (190/290/210/130)
     final wTertanggung =
     _columnWidthFromLongest(context, tertanggungValues, min: 140, max: 190);
-    final wKapal =
-    _columnWidthFromLongest(context, kapalValues, min: 180, max: 290);
     final wTsi =
     _columnWidthFromLongest(context, tsiValues, min: 170, max: 210);
     final wPremi =
@@ -174,10 +171,11 @@ class _HullCobTableState extends State<HullCobTable> {
     return {
       0: FixedColumnWidth(selectCol),
       1: const FixedColumnWidth(50), // No
-      2: FixedColumnWidth(wTertanggung),
-      3: FixedColumnWidth(wKapal),
-      4: FixedColumnWidth(wTsi),
-      5: FixedColumnWidth(wPremi),
+      2: const FixedColumnWidth(140), // Polis No
+      3: const FixedColumnWidth(100), // Jml Object
+      4: FixedColumnWidth(wTertanggung), // Tertanggung
+      5: FixedColumnWidth(wTsi), // TSI
+      6: FixedColumnWidth(wPremi), // Premi
     };
   }
 
@@ -311,12 +309,15 @@ class _HullCobTableState extends State<HullCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
-            1: const FlexColumnWidth(1.0),
-            2: const FlexColumnWidth(2.6),
-            3: const FlexColumnWidth(3.7),
-            4: const FlexColumnWidth(2.7),
-            5: const FlexColumnWidth(1.6),
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FlexColumnWidth(0.8),
+            1: const FlexColumnWidth(1.0), // No
+            2: const FlexColumnWidth(2.0), // Polis No
+            3: const FlexColumnWidth(1.2), // Jml Object
+            4: const FlexColumnWidth(2.6), // Tertanggung
+            5: const FlexColumnWidth(2.2), // TSI
+            6: const FlexColumnWidth(1.8), // Premi
           },
           children: [
             _tableHeader(context),
@@ -345,9 +346,10 @@ class _HullCobTableState extends State<HullCobTable> {
         const SizedBox(),
         ...[
           "No",
+          "No Polis",
+          "Jumlah Objek",
           "Tertanggung",
-          "Detail Rangka Kapal",
-          "Nilai Tertanggung",
+          "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
           final center = t.toUpperCase() == "NO";
@@ -424,19 +426,25 @@ class _HullCobTableState extends State<HullCobTable> {
         _textCell((index + 1).toString(), center: true, softWrap: false),
 
         _textCell(
+          d.polisNo,
+          maxLines: compact ? 2 : 1,
+          softWrap: true,
+        ),
+
+        _textCell(
+          "${d.jmlObject}",
+          maxLines: 1,
+          softWrap: false,
+        ),
+
+        _textCell(
           d.tertanggung,
           maxLines: maxLinesTertanggung,
           softWrap: true,
         ),
 
         _textCell(
-          d.namaKapal,
-          maxLines: maxLinesKapal,
-          softWrap: true,
-        ),
-
-        _textCell(
-          formatNum(d.tsi),
+          "${d.curr} ${formatNum(d.tsi)}",
           maxLines: 1,
           softWrap: false,
         ),

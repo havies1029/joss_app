@@ -1,15 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/models/gen_aset_ringkasan/asetringkasancari_model.dart';
 
-/// 🔹 ShareRingkasanStateCubit
-/// Mengelola item-item yang dipilih untuk di-share di halaman Ringkasan Aset.
 class ShareRingkasanStateCubit extends Cubit<Map<String, AsetRingkasanCariModel>> {
   ShareRingkasanStateCubit() : super({});
 
   bool globalActive = false;
   int totalItems = 0;
-
-  /// 🔹 Tambah / hapus 1 item
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
   void toggleItem(AsetRingkasanCariModel item) {
     final updated = Map<String, AsetRingkasanCariModel>.from(state);
 
@@ -23,7 +22,6 @@ class ShareRingkasanStateCubit extends Cubit<Map<String, AsetRingkasanCariModel>
     _updateGlobalStatus();
   }
 
-  /// 🔹 Toggle semua item (select all / deselect all)
   void toggleGlobal(List<AsetRingkasanCariModel> items) {
     if (globalActive) {
       emit({});
@@ -34,22 +32,18 @@ class ShareRingkasanStateCubit extends Cubit<Map<String, AsetRingkasanCariModel>
     globalActive = !globalActive;
   }
 
-  /// 🔹 Update total item untuk sinkronisasi “Select All”
   void updateTotalItems(int total) {
     totalItems = total;
     _updateGlobalStatus();
   }
 
-  /// 🔹 Apakah item aktif (dipilih)
   bool isItemActive(String? id) {
     if (id == null) return false;
     return state.containsKey(id);
   }
 
-  /// 🔹 Ambil semua item terpilih
   List<AsetRingkasanCariModel> get selectedItems => state.values.toList();
 
-  /// 🔹 Siapkan data untuk ekspor / share
   List<Map<String, dynamic>> toExportData() {
     return state.values.map((e) => e.toJson()).toList();
   }
@@ -66,16 +60,14 @@ class ShareRingkasanStateCubit extends Cubit<Map<String, AsetRingkasanCariModel>
   List<Map<String, dynamic>> getExportData() {
     return state.values.map((e) {
       return {
-        'ID': e.asetRingkasanId,
-        'Nama Aset': e.asetNama,
-        'Currency': e.curr,
-        'Jumlah Aset': e.jmlAset,
-        'Nilai Aset': e.nilaiAset,
-        'Nilai Premi': e.nilaiPremi,
-        'Satuan': e.satuan,
-        'No Urut': e.noUrut,
+        'No': e.noUrut,
+        'Jenis Polis': e.asetNama,
+        'Jumlah Polis': e.jmlPolis,
+        'Nilai Pertanggungan':
+        '${e.curr} ${formatNum(e.nilaiAset)}',
+        'Total Premi':
+        '${e.curr} ${formatNum(e.nilaiPremi)}',
       };
     }).toList();
   }
-
 }

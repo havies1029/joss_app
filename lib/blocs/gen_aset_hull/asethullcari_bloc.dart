@@ -256,10 +256,7 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 
 			debugPrint("✅ [DebugFetch] ${results.length} hasil ditemukan untuk '${event.searchText}'");
 			for (final i in results) {
-				debugPrint(
-					"⚓ Nama Kapal: ${i.namaKapal} | Polis: ${i.polisNo} | Curr: ${i.curr} | "
-							"Premi: ${i.premi} | TSI: ${i.tsi} | Status: ${i.status} | filePolisId: ${i.filePolisId}",
-				);
+
 			}
 			debugPrint("-----------------------------------------------------");
 		} catch (e, stack) {

@@ -158,32 +158,49 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     final selectCol = widget.readOnly ? 0.0 : 40.0;
 
     final tertanggungValues = details.map((d) => d.tertanggung);
-    final merkValues = details.map((d) => d.merk);
-    final nopolValues = details.map((d) => d.noPolisi);
+    // final merkValues = details.map((d) => d.merk);
+    // final nopolValues = details.map((d) => d.noPolisi);
 
     const periodeWidth = 170.0;
 
     final nilaiValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
     final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
     final polisValues = details.map((d) => d.polisNo);
+    final jmlObjectValues = details.map((d) => d.jmlObject.toString());
 
     final wTertanggung = _columnWidthFromLongest(context, tertanggungValues, min: 140, max: 200);
-    final wMerk = _columnWidthFromLongest(context, merkValues, min: 110, max: 160);
-    final wNoPol = _columnWidthFromLongest(context, nopolValues, min: 120, max: 170);
+    // final wMerk = _columnWidthFromLongest(context, merkValues, min: 110, max: 160);
+    // final wNoPol = _columnWidthFromLongest(context, nopolValues, min: 120, max: 170);
     final wNilai = _columnWidthFromLongest(context, nilaiValues, min: 150, max: 190);
     final wPremi = _columnWidthFromLongest(context, premiValues, min: 120, max: 160);
     final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 170);
+    final wJmlObject = _columnWidthFromLongest(
+      context,
+      jmlObjectValues,
+      min: 80,
+      max: 100,
+    );
 
+    // return {
+    //   0: FixedColumnWidth(selectCol),
+    //   1: const FixedColumnWidth(50),
+    //   2: FixedColumnWidth(wPolis),
+    //   3: const FixedColumnWidth(periodeWidth),
+    //   4: FixedColumnWidth(wMerk),
+    //   5: FixedColumnWidth(wNoPol),
+    //   6: FixedColumnWidth(wTertanggung),
+    //   7: FixedColumnWidth(wNilai),
+    //   8: FixedColumnWidth(wPremi),
+    // };
     return {
       0: FixedColumnWidth(selectCol),
-      1: const FixedColumnWidth(50),
-      2: FixedColumnWidth(wPolis),
-      3: const FixedColumnWidth(periodeWidth),
-      4: FixedColumnWidth(wMerk),
-      5: FixedColumnWidth(wNoPol),
-      6: FixedColumnWidth(wTertanggung),
-      7: FixedColumnWidth(wNilai),
-      8: FixedColumnWidth(wPremi),
+      1: const FixedColumnWidth(50),      // No
+      2: FixedColumnWidth(wPolis),        // Polis No
+      3: FixedColumnWidth(wJmlObject),    // Jml Object
+      4: FixedColumnWidth(wTertanggung),  // Tertanggung
+      5: const FixedColumnWidth(periodeWidth), // Periode
+      6: FixedColumnWidth(wNilai),        // Nilai Pertanggungan
+      7: FixedColumnWidth(wPremi),        // Premi
     };
   }
 
@@ -315,14 +332,13 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           ),
           columnWidths: {
             0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
-            1: const FlexColumnWidth(1.0),
-            2: const FlexColumnWidth(2.0),
-            3: const FlexColumnWidth(2.0),
-            4: const FlexColumnWidth(2.0),
-            5: const FlexColumnWidth(2.4),
-            6: const FlexColumnWidth(2.4),
-            7: const FlexColumnWidth(1.9),
-            8: const FlexColumnWidth(1.6),
+            1: const FlexColumnWidth(1.0), // No
+            2: const FlexColumnWidth(2.0), // Polis No
+            3: const FlexColumnWidth(1.2), // Jml Object
+            4: const FlexColumnWidth(2.4), // Tertanggung
+            5: const FlexColumnWidth(2.0), // Periode
+            6: const FlexColumnWidth(2.4), // Nilai Pertanggungan
+            7: const FlexColumnWidth(1.6), // Premi
           },
           children: [
             _tableHeader(context),
@@ -352,10 +368,9 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         ...[
           "No",
           "Polis No",
+          "Jumlah Objek",
           "Tertanggung",
           "Periode",
-          "Merk Kendaraan",
-          "Nomor Polisi",
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
@@ -428,6 +443,12 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         ),
 
         _textCell(
+          "${d.jmlObject}",
+          maxLines: maxLinesNoPol,
+          softWrap: true,
+        ),
+
+        _textCell(
           d.tertanggung,
           maxLines: maxLinesTertanggung,
           softWrap: true,
@@ -440,17 +461,17 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           softWrap: true,
         ),
 
-        _textCell(
-          d.merk,
-          maxLines: maxLinesMerk,
-          softWrap: true,
-        ),
-
-        _textCell(
-          d.noPolisi,
-          maxLines: maxLinesNoPol,
-          softWrap: true,
-        ),
+        // _textCell(
+        //   d.merk,
+        //   maxLines: maxLinesMerk,
+        //   softWrap: true,
+        // ),
+        //
+        // _textCell(
+        //   d.noPolisi,
+        //   maxLines: maxLinesNoPol,
+        //   softWrap: true,
+        // ),
 
         _textCell(
           "${d.curr} ${formatNum(d.sumInsured)}",

@@ -561,6 +561,15 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     return context.select((AsetothersCariBloc b) => b.state.selectedIds.isNotEmpty);
   }
 
+  String fmtDate(DateTime? v) =>
+      v == null ? "-" : DateFormat('dd MMM yyyy').format(v);
+
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
+
+  String fmtMoney(String curr, num? value) =>
+      "$curr ${formatNum(value)}";
+
   List<Map<String, dynamic>> _exportRows() {
     final cobId = _cobId();
 
@@ -573,13 +582,12 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
       return dataSource.map((d) => {
         "No": d.nomor,
+        "Polis No": d.polisNo,
+        "Jumlah Objek": d.jmlObject,
         "Tertanggung": d.tertanggung,
-        "Alamat": d.alamat,
-        "Periode Mulai": d.periodeMulai,
-        "Periode Akhir": d.periodeAkhir,
-        "Nilai Pertanggungan": d.sumInsured,
-        "Premi": d.premi,
-        "Status": d.status,
+        "Periode": "${fmtDate(d.periodeMulai)} - ${fmtDate(d.periodeAkhir)}",
+        "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
+        "Premi": fmtMoney(d.curr, d.premi),
       }).toList();
     }
 
@@ -592,14 +600,12 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
       return dataSource.map((d) => {
         "No": d.nomor,
+        "No Polis": d.polisNo,
+        "Jumlah Objek": d.jmlObject,
         "Tertanggung": d.tertanggung,
-        "Periode Mulai": d.periodeMulai,
-        "Periode Akhir": d.periodeAkhir,
-        "Merk Kendaraan": d.merk,
-        "Nomor Polisi": d.noPolisi,
-        "Nilai Tertanggung": d.sumInsured,
-        "Premi": d.premi,
-        "Status": d.status,
+        "Periode": "${fmtDate(d.periodeMulai)} - ${fmtDate(d.periodeAkhir)}",
+        "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
+        "Premi": fmtMoney(d.curr, d.premi),
       }).toList();
     }
 
@@ -612,11 +618,11 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
       return dataSource.map((d) => {
         "No": st.items.indexOf(d) + 1,
+        "No Polis": d.polisNo,
+        "Jumlah Objek": d.jmlObject,
         "Tertanggung": d.tertanggung,
-        "Detail Rangka Kapal": d.namaKapal,
-        "Nilai Tertanggung": d.tsi,
-        "Premi": d.premi,
-        "Status": d.status,
+        "Nilai Pertanggungan": fmtMoney(d.curr, d.tsi),
+        "Premi": fmtMoney(d.curr, d.premi),
       }).toList();
     }
 
@@ -629,8 +635,9 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
       return dataSource.map((d) => {
         "No": d.nomor,
-        "Nama": d.nama,
-        "Status": d.status,
+        // "No Polis": d.polisNo,
+        "Nilai Pertanggungan": d.jmlObject,
+        "Status": d.status ?? "-",
       }).toList();
     }
 
@@ -640,12 +647,9 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       return st.items.map((d) => {
         "No": st.items.indexOf(d) + 1,
         "Jenis Polis": d.asetNama,
-        "Currency": d.curr,
-        "Jumlah": d.jmlAset,
-        "Nilai": d.nilaiAset,
-        "Premi": d.nilaiPremi,
-        "Nomor Urut": d.noUrut,
-        "Satuan": d.satuan,
+        "Jumlah Polis": d.jmlPolis,
+        "Nilai Pertanggungan": fmtMoney(d.curr, d.nilaiAset),
+        "Total Premi": fmtMoney(d.curr, d.nilaiPremi),
       }).toList();
     }
 
@@ -657,12 +661,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
 
     return dataSource.map((d) => {
       "No": d.nomor,
-      "Object": d.objectDesc,
-      "Polis No": d.polisNo,
-      "Currency": d.curr,
-      "Sum Insured": d.sumInsured,
-      "Premi": d.premi,
-      "Status": d.status,
+      "No Polis": d.polisNo,
+      "Jumlah Objek": d.jmlObject,
+      "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
+      "Premi": fmtMoney(d.curr, d.premi),
     }).toList();
   }
 

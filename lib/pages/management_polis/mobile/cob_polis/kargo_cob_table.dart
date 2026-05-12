@@ -155,24 +155,23 @@ class _KargoCobTableState extends State<KargoCobTable> {
       ) {
     final selectCol = widget.readOnly ? 0.0 : 40.0;
 
-    final objectValues = details.map((d) => d.objectDesc);
     final polisValues = details.map((d) => d.polisNo);
+    final jmlObjectValues = details.map((d) => d.jmlObject.toString());
     final sumInsuredValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
-    final premiValues = details.map((d) => formatNum(d.premi));
+    final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
 
-    // caps = “batas mentok”
-    final wObject = _columnWidthFromLongest(context, objectValues, min: 180, max: 310);
     final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 180);
+    final wJmlObject = _columnWidthFromLongest(context, jmlObjectValues, min: 80, max: 110);
     final wSumInsured = _columnWidthFromLongest(context, sumInsuredValues, min: 170, max: 240);
-    final wPremi = _columnWidthFromLongest(context, premiValues, min: 110, max: 140);
+    final wPremi = _columnWidthFromLongest(context, premiValues, min: 130, max: 170);
 
     return {
       0: FixedColumnWidth(selectCol),
       1: const FixedColumnWidth(50), // No
-      2: FixedColumnWidth(wObject),
-      3: FixedColumnWidth(wPolis),
-      4: FixedColumnWidth(wSumInsured),
-      5: FixedColumnWidth(wPremi),
+      2: FixedColumnWidth(wPolis), // Polis No
+      3: FixedColumnWidth(wJmlObject), // Jml Object
+      4: FixedColumnWidth(wSumInsured), // Sum Insured
+      5: FixedColumnWidth(wPremi), // Premi
     };
   }
 
@@ -302,11 +301,11 @@ class _KargoCobTableState extends State<KargoCobTable> {
           ),
           columnWidths: {
             0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
-            1: const FlexColumnWidth(1.0),
-            2: const FlexColumnWidth(3.6),
-            3: const FlexColumnWidth(2.3),
-            4: const FlexColumnWidth(3.0),
-            5: const FlexColumnWidth(1.6),
+            1: const FlexColumnWidth(1.0), // No
+            2: const FlexColumnWidth(2.3), // Polis No
+            3: const FlexColumnWidth(1.3), // Jml Object
+            4: const FlexColumnWidth(3.0), // Sum Insured
+            5: const FlexColumnWidth(1.8), // Premi
           },
           children: [
             _tableHeader(context),
@@ -331,9 +330,9 @@ class _KargoCobTableState extends State<KargoCobTable> {
         const SizedBox(),
         ...[
           "No",
-          "Object",
-          "Polis No",
-          "Sum Insured",
+          "No Polis",
+          "Jumlah Objek",
+          "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
           final center = t.toUpperCase() == "NO";
@@ -407,15 +406,15 @@ class _KargoCobTableState extends State<KargoCobTable> {
         _textCell(d.nomor.toString(), center: true, softWrap: false),
 
         _textCell(
-          d.objectDesc,
-          maxLines: maxLinesObject,
+          d.polisNo,
+          maxLines: compact ? 2 : 1,
           softWrap: true,
         ),
 
         _textCell(
-          d.polisNo,
-          maxLines: maxLinesPolis,
-          softWrap: true,
+          "${d.jmlObject}",
+          maxLines: 1,
+          softWrap: false,
         ),
 
         _textCell(
@@ -425,7 +424,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
         ),
 
         _textCell(
-          formatNum(d.premi),
+          "${d.curr} ${formatNum(d.premi)}",
           maxLines: 1,
           softWrap: false,
         ),

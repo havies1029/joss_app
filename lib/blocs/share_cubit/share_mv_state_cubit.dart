@@ -1,16 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import '../../models/gen_aset_mv/asetmvcari_model.dart';
 
-/// 🚗 ShareMvStateCubit
-/// Mengatur state untuk data kendaraan (Motor Vehicle) yang dipilih untuk di-share.
 class ShareMvStateCubit extends Cubit<Map<String, AsetMvCariModel>> {
   ShareMvStateCubit() : super({});
 
   bool globalActive = false;
   int totalItems = 0;
-
-  /// 🔹 Tambah / hapus 1 item dari daftar share
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
   void toggleItem(AsetMvCariModel item) {
     final updated = Map<String, AsetMvCariModel>.from(state);
 
@@ -24,7 +23,6 @@ class ShareMvStateCubit extends Cubit<Map<String, AsetMvCariModel>> {
     _updateGlobalStatus();
   }
 
-  /// 🔹 Pilih semua / batalkan semua
   void toggleGlobal(List<AsetMvCariModel> items) {
     if (globalActive) {
       emit({});
@@ -35,52 +33,43 @@ class ShareMvStateCubit extends Cubit<Map<String, AsetMvCariModel>> {
     globalActive = !globalActive;
   }
 
-  /// 🔹 Update total item (buat sinkronisasi status global select all)
   void updateTotalItems(int total) {
     totalItems = total;
     _updateGlobalStatus();
   }
 
-  /// 🔹 Cek apakah item sedang aktif (terpilih)
   bool isItemActive(String? id) {
     if (id == null) return false;
     return state.containsKey(id);
   }
 
-  /// 🔹 Ambil semua item terpilih
   List<AsetMvCariModel> get selectedItems => state.values.toList();
 
-  /// 🔹 Siapkan data untuk export atau share
   List<Map<String, dynamic>> toExportData() {
     return state.values.map((e) => e.toJson()).toList();
   }
 
-  /// 🔹 Reset semua pilihan
   void clear() {
     emit({});
     globalActive = false;
   }
 
-  /// 🔹 Update status globalActive (select all / not)
   void _updateGlobalStatus() {
     globalActive = state.length == totalItems && totalItems > 0;
   }
 
-  /// 🔹 Data siap ekspor (versi readable untuk Excel/PDF)
   List<Map<String, dynamic>> getExportData() {
     return state.values.map((e) {
       return {
-        'ID': e.asetMvId,
-        'No. Polisi': e.noPolisi,
-        'No. Polis': e.polisNo,
-        'Jenis': e.jenisMv,
-        'Merk': e.merk,
-        'Tahun': e.tahun,
-        'Currency': e.curr,
-        'Sum Insured': e.sumInsured,
-        'Premi': e.premi,
-        'Status': e.status,
-        'Nomor Urut': e.nomor,
+        'No': e.nomor,
+        'Polis No': e.polisNo,
+        'Jml Object': e.jmlObject,
+        'Tertanggung': e.tertanggung,
+        'Periode':
+        '${DateFormat('dd MMM yyyy').format(e.periodeMulai)} - '
+            '${DateFormat('dd MMM yyyy').format(e.periodeAkhir)}',
+        'Nilai Pertanggungan': '${e.curr} ${formatNum(e.sumInsured)}',
+        'Premi': '${e.curr} ${formatNum(e.premi)}',
       };
     }).toList();
   }
