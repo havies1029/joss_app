@@ -641,11 +641,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
         "No": st.items.indexOf(d) + 1,
         "Jenis Polis": d.asetNama,
         "Currency": d.curr,
-        "Jumlah": d.jmlAset,
+        "Jumlah": d.jmlPolis,
         "Nilai": d.nilaiAset,
         "Premi": d.nilaiPremi,
         "Nomor Urut": d.noUrut,
-        "Satuan": d.satuan,
       }).toList();
     }
 

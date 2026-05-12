@@ -271,7 +271,6 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
       return "$aa $bb";
     }
 
-    final jumlahDenganSatuan = join2(d.jmlAset.toString(), d.satuan);
     final nilaiDenganCurr = join2(d.curr, formatNum(d.nilaiAset));
     final premiDenganCurr = join2(d.curr, formatNum(d.nilaiPremi));
 
@@ -303,8 +302,7 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
         // Jumlah Polis + Satuan (LEFT)
         _cell(
           child: Text(
-            // jumlahDenganSatuan,
-            d.jmlAset.toString(),
+            d.jmlPolis.toString(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: textStyle,

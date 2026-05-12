@@ -69,10 +69,9 @@ class ShareRingkasanStateCubit extends Cubit<Map<String, AsetRingkasanCariModel>
         'ID': e.asetRingkasanId,
         'Nama Aset': e.asetNama,
         'Currency': e.curr,
-        'Jumlah Aset': e.jmlAset,
+        'Jumlah Polis': e.jmlPolis,
         'Nilai Aset': e.nilaiAset,
         'Nilai Premi': e.nilaiPremi,
-        'Satuan': e.satuan,
         'No Urut': e.noUrut,
       };
     }).toList();
