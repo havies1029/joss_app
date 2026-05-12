@@ -40,7 +40,7 @@ class Sppa2othersCariPageState extends State<Sppa2othersCariPage> {
 	}
 	void refreshData() {
 		sppa2othersCariBloc.add(
-			RefreshSppa2othersCariEvent(searchText: _searchController.text, hal: 0));
+			RefreshSppa2othersCariEvent(sppa1Id: '', searchText: _searchController.text));
 	}
 
 	IconButton buildSearchButton() {
@@ -50,8 +50,7 @@ class Sppa2othersCariPageState extends State<Sppa2othersCariPage> {
 				size: 35.0,
 			),
 			onPressed: () {
-			sppa2othersCariBloc.add(RefreshSppa2othersCariEvent(
-				searchText: _searchController.text, hal: 0));
+			sppa2othersCariBloc.add(RefreshSppa2othersCariEvent(sppa1Id: '', searchText: _searchController.text));
 			});
 	}
 
@@ -59,7 +58,7 @@ class Sppa2othersCariPageState extends State<Sppa2othersCariPage> {
 		return Expanded(
 			child: Column(
 				mainAxisAlignment: MainAxisAlignment.start,
-				children: <Widget>[Sppa2othersCariListWidget(searchText: _searchController.text)],
+				children: <Widget>[Sppa2othersCariListWidget()],
 		));
 	}
 

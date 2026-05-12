@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:joss_app/models/asetothers/sppa2otherscari_model.dart';
 
 class Sppa2othersCariAPI{
-	Future<List<Sppa2othersCariModel>> getSppa2othersCariAPI(String searchText, int hal) async {
+	Future<List<Sppa2othersCariModel>> getSppa2othersCariAPI(String sppa1Id, String searchText, int hal) async {
 		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/asetothers/sppa2otherscari/getlist";
 
-		Map<String, String> queryParams = {"searchText": searchText, "hal": hal.toString()};
+		Map<String, String> queryParams = {"sppa1Id": sppa1Id, "searchText": searchText, "hal": hal.toString()};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',

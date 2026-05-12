@@ -10,11 +10,12 @@ abstract class Sppa2othersCariEvents extends Equatable {
 class FetchSppa2othersCariEvent extends Sppa2othersCariEvents {}
 
 class RefreshSppa2othersCariEvent extends Sppa2othersCariEvents {
+  final String sppa1Id;
 	final String searchText;
 
-	const RefreshSppa2othersCariEvent({required this.searchText});
+	const RefreshSppa2othersCariEvent({required this.sppa1Id, required this.searchText});
 
 	@override
-	List<Object> get props => [searchText];
+	List<Object> get props => [sppa1Id, searchText];
 }
 

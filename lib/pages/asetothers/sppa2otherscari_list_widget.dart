@@ -6,8 +6,7 @@ import 'package:joss_app/pages/asetothers/sppa2otherscari_tile_widget.dart';
 import 'package:joss_app/models/asetothers/sppa2otherscari_model.dart';
 
 class Sppa2othersCariListWidget extends StatefulWidget {
-	final String searchText;
-	const Sppa2othersCariListWidget({super.key, required this.searchText});
+	const Sppa2othersCariListWidget({super.key});
 
 	@override
 	Sppa2othersCariListWidgetState createState() => Sppa2othersCariListWidgetState();
@@ -56,36 +55,11 @@ class Sppa2othersCariListWidgetState extends State<Sppa2othersCariListWidget> {
 						child: Column(
 							children: <Widget>[
 								Sppa2othersCariTileWidget(
-									beginDate: state.items[index].beginDate,
-									discNilai: state.items[index].discNilai,
-									discPercent: state.items[index].discPercent,
-									endDate: state.items[index].endDate,
 									info1: state.items[index].info1,
 									info2: state.items[index].info2,
 									info3: state.items[index].info3,
 									premiNet: state.items[index].premiNet,
-									premiNilai: state.items[index].premiNilai,
-									premiNilai1: state.items[index].premiNilai1,
-									premiNilai2: state.items[index].premiNilai2,
-									premiNilai3: state.items[index].premiNilai3,
-									premiNilai4: state.items[index].premiNilai4,
-									premiNilai5: state.items[index].premiNilai5,
-									premiRate1: state.items[index].premiRate1,
-									premiRate2: state.items[index].premiRate2,
-									premiRate3: state.items[index].premiRate3,
-									premiRate4: state.items[index].premiRate4,
-									premiRate5: state.items[index].premiRate5,
-									si1Desc: state.items[index].si1Desc,
-									si1Nilai: state.items[index].si1Nilai,
-									si2Desc: state.items[index].si2Desc,
-									si2Nilai: state.items[index].si2Nilai,
-									si3Desc: state.items[index].si3Desc,
-									si3Nilai: state.items[index].si3Nilai,
-									si4Desc: state.items[index].si4Desc,
-									si4Nilai: state.items[index].si4Nilai,
-									si5Desc: state.items[index].si5Desc,
-									si5Nilai: state.items[index].si5Nilai,
-									sppa1Id: state.items[index].sppa1Id,
+									curr: state.items[index].curr,
 									sppa2othersId: state.items[index].sppa2othersId,
 									tsi: state.items[index].tsi,
 								)

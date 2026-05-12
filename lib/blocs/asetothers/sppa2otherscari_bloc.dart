@@ -17,7 +17,7 @@ class Sppa2othersCariBloc extends Bloc<Sppa2othersCariEvents, Sppa2othersCariSta
 Future<void> onRefreshSppa2othersCari(
 		RefreshSppa2othersCariEvent event, Emitter<Sppa2othersCariState> emit) async {
 	emit(const Sppa2othersCariState());
-
+  emit(state.copyWith(searchText: event.searchText, sppa1Id: event.sppa1Id));
 	add(FetchSppa2othersCariEvent());
 }
 
@@ -27,14 +27,14 @@ Future<void> onFetchSppa2othersCari(
 
 	Sppa2othersCariRepository repo = Sppa2othersCariRepository();
 	if (state.status == ListStatus.initial) {
-		List<Sppa2othersCariModel> items = await repo.getSppa2othersCari(state.searchText, 0);
+		List<Sppa2othersCariModel> items = await repo.getSppa2othersCari(state.sppa1Id, state.searchText, 0);
 		return emit(state.copyWith(
 			items: items,
 			hasReachedMax: false,
 			status: ListStatus.success,
 			hal: 1));
 	}
-	List<Sppa2othersCariModel> items = await repo.getSppa2othersCari(state.searchText, state.hal);
+	List<Sppa2othersCariModel> items = await repo.getSppa2othersCari(state.sppa1Id, state.searchText, state.hal);
 	if (items.isEmpty) {
 		return emit(state.copyWith(hasReachedMax: true));
 	} else {
