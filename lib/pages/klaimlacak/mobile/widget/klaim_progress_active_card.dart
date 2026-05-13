@@ -95,15 +95,7 @@ class KlaimProgressActiveCard extends StatelessWidget {
                       softWrap: true,
                       style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 14)),
                     ),
-                    if (showMetodeGantiKlaim && klaimProgressInfo != null) ...[
-                      const SizedBox(height: 10),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: MetodeGantiKlaimWidget(
-                          metodeGantiKlaimId: klaimProgressInfo!.metodeKlaimId ?? '',
-                        ),
-                      ),
-                    ],
+                
                   ],
                 ),
               ),
