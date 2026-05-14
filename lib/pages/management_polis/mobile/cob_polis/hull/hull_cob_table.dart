@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
-import '../../../../common/constants.dart';
-import '../../../../models/gen_aset_hull/asethullcari_model.dart';
-
+import '../../../../../blocs/gen_aset_hull/asethullcari_bloc.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../models/gen_aset_hull/asethullcari_model.dart';
+import 'detail_polis_hull_table_page.dart';
 
 class HullCobTable extends StatefulWidget {
   final List<AsethullCariModel> items;
@@ -375,9 +375,13 @@ class _HullCobTableState extends State<HullCobTable> {
       }) {
     final isSelected = widget.selectedItem == d;
 
-    // wrap rules saat mentok max width (compact)
     final maxLinesTertanggung = compact ? 2 : 1;
-    final maxLinesKapal = compact ? 3 : 1;
+    final maxLinesPolis = compact ? 2 : 1;
+
+    void triggerRow() {
+      if (widget.readOnly) return;
+      _showSuccessPopup(context, d);
+    }
 
     return TableRow(
       decoration: BoxDecoration(
@@ -403,9 +407,6 @@ class _HullCobTableState extends State<HullCobTable> {
                   widget.onSelect(d.asetHullId);
                   widget.onSelectItem?.call(d);
 
-                  // kalau butuh prosesId (kalau ada di model), buka ini:
-                  // if (d.prosesId.isNotEmpty) widget.selectedProsesId(d.prosesId);
-
                   if (d.filePolisId.isNotEmpty) {
                     widget.onSelectFilePolisHullId(d.filePolisId);
                   }
@@ -423,38 +424,73 @@ class _HullCobTableState extends State<HullCobTable> {
         else
           const SizedBox(),
 
+        // No: tidak clickable
         _textCell((index + 1).toString(), center: true, softWrap: false),
 
-        _textCell(
+        // Mulai sini clickable
+        _clickableTextCell(
           d.polisNo,
-          maxLines: compact ? 2 : 1,
+          onTap: triggerRow,
+          maxLines: maxLinesPolis,
           softWrap: true,
         ),
 
-        _textCell(
+        _clickableTextCell(
           "${d.jmlObject}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
 
-        _textCell(
+        _clickableTextCell(
           d.tertanggung,
+          onTap: triggerRow,
           maxLines: maxLinesTertanggung,
           softWrap: true,
         ),
 
-        _textCell(
+        _clickableTextCell(
           "${d.curr} ${formatNum(d.tsi)}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
 
-        _textCell(
+        _clickableTextCell(
           "${d.curr} ${formatNum(d.premi)}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
       ],
+    );
+  }
+
+  Widget _clickableTextCell(
+      String text, {
+        required VoidCallback onTap,
+        int maxLines = 1,
+        bool softWrap = false,
+        bool center = false,
+      }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _textCell(
+        text,
+        maxLines: maxLines,
+        softWrap: softWrap,
+        center: center,
+      ),
+    );
+  }
+
+  void _showSuccessPopup(BuildContext context, AsethullCariModel d) {
+    showDialog(
+      context: context,
+      builder: (_) => DetailPolisHullTablePage(
+        sppa1Id: d.asetHullId,
+      ),
     );
   }
 

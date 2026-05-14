@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
-import '../../../../common/constants.dart';
-import '../../../../models/gen_aset_health/asethealthcari_model.dart';
+import '../../../../../blocs/asetothers/asetotherscari_bloc.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../models/asetothers/asetotherscari_model.dart';
+import 'detail_polis_others_table_page.dart';
 
-class HealthCobTable extends StatefulWidget {
-  final List<AsetHealthCariModel> items;
+class KargoCobTable extends StatefulWidget {
+  final List<AsetothersCariModel> items;
   final List<String> selectedIds;
 
-  final AsetHealthCariModel? selectedItem;
-  final void Function(AsetHealthCariModel item)? onSelectItem;
+  final AsetothersCariModel? selectedItem;
+  final void Function(AsetothersCariModel item)? onSelectItem;
   final VoidCallback? onClearSelectedItem;
 
   final void Function(String id) selectedProsesId;
@@ -25,7 +27,7 @@ class HealthCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
-  const HealthCobTable({
+  const KargoCobTable({
     super.key,
     required this.items,
     required this.selectedIds,
@@ -43,10 +45,12 @@ class HealthCobTable extends StatefulWidget {
   });
 
   @override
-  State<HealthCobTable> createState() => _HealthCobTableState();
+  State<KargoCobTable> createState() => _KargoCobTableState();
 }
+class _KargoCobTableState extends State<KargoCobTable> {
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
-class _HealthCobTableState extends State<HealthCobTable> {
   late final ScrollController hController;
   late final ScrollController vController;
 
@@ -59,18 +63,18 @@ class _HealthCobTableState extends State<HealthCobTable> {
   }
 
   void _onScroll() {
-    final bloc = context.read<AsetHealthCariBloc>();
+    final bloc = context.read<AsetothersCariBloc>();
     final s = bloc.state;
 
     if (!vController.hasClients) return;
-
     final max = vController.position.maxScrollExtent;
     final cur = vController.position.pixels;
+
     const threshold = 100.0;
 
     if (max - cur <= threshold) {
       if (!s.hasReachedMax && !s.isFetching) {
-        bloc.add(FetchAsetHealthCariEvent());
+        bloc.add(FetchAsetothersCariEvent());
       }
     }
   }
@@ -83,12 +87,14 @@ class _HealthCobTableState extends State<HealthCobTable> {
     super.dispose();
   }
 
-  List<AsetHealthCariModel> get _filteredItems {
+  List<AsetothersCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
-    return widget.items
-        .where((d) => widget.selectedIds.contains(d.asethealthId))
-        .toList();
+    return widget.items.where((d) => widget.selectedIds.contains(d.asetOthersId)).toList();
   }
+
+  // =========================
+  // Dynamic width helpers
+  // =========================
 
   double _measureTextWidth(
       BuildContext context,
@@ -127,6 +133,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
     return target.clamp(min, max);
   }
 
+  // helper text cell (wrap saat compact)
   Widget _textCell(
       String text, {
         int maxLines = 1,
@@ -140,82 +147,38 @@ class _HealthCobTableState extends State<HealthCobTable> {
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(color: primaryLightColor),
     );
-
-    return _cell(
-      child: center ? Center(child: t) : t,
-    );
+    return _cell(child: center ? Center(child: t) : t);
   }
 
   Map<int, TableColumnWidth> _compactColumnWidths(
       BuildContext context,
-      List<AsetHealthCariModel> details,
+      List<AsetothersCariModel> details,
       ) {
     final selectCol = widget.readOnly ? 0.0 : 40.0;
 
-    // final polisValues = details.map((d) => d.polisNo);
+    final polisValues = details.map((d) => d.polisNo);
     final jmlObjectValues = details.map((d) => d.jmlObject.toString());
-    final statusValues = details.map((d) => d.status ?? '-');
+    final sumInsuredValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
+    final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
 
-    final wPolis = _columnWidthFromLongest(
-      context,
-      // polisValues,
-      jmlObjectValues,
-      min: 140,
-      max: 220,
-    );
-
-    final wJmlObject = _columnWidthFromLongest(
-      context,
-      jmlObjectValues,
-      min: 80,
-      max: 100,
-    );
-
-    final wStatus = _columnWidthFromLongest(
-      context,
-      statusValues,
-      min: 140,
-      max: 220,
-    );
+    final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 180);
+    final wJmlObject = _columnWidthFromLongest(context, jmlObjectValues, min: 80, max: 110);
+    final wSumInsured = _columnWidthFromLongest(context, sumInsuredValues, min: 170, max: 240);
+    final wPremi = _columnWidthFromLongest(context, premiValues, min: 130, max: 170);
 
     return {
       0: FixedColumnWidth(selectCol),
       1: const FixedColumnWidth(50), // No
       2: FixedColumnWidth(wPolis), // Polis No
       3: FixedColumnWidth(wJmlObject), // Jml Object
-      4: FixedColumnWidth(wStatus), // Status
+      4: FixedColumnWidth(wSumInsured), // Sum Insured
+      5: FixedColumnWidth(wPremi), // Premi
     };
   }
 
-  void _handleSelect(AsetHealthCariModel d) {
-    final prev = widget.selectedItem;
-
-    if (prev != null && prev != d) {
-      widget.onUnselect(prev.asethealthId);
-
-      if (prev.filePolisId.isNotEmpty) {
-        widget.onUnselectFilePolisHealthId(prev.filePolisId);
-      }
-    }
-
-    widget.selectedProsesId(d.prosesId);
-    widget.onSelect(d.asethealthId);
-    widget.onSelectItem?.call(d);
-
-    if (d.filePolisId.isNotEmpty) {
-      widget.onSelectFilePolisHealthId(d.filePolisId);
-    }
-  }
-
-  void _handleUnselect(AsetHealthCariModel d) {
-    widget.onUnselect(d.asethealthId);
-    widget.selectedProsesId("");
-    widget.onClearSelectedItem?.call();
-
-    if (d.filePolisId.isNotEmpty) {
-      widget.onUnselectFilePolisHealthId(d.filePolisId);
-    }
-  }
+  // =========================
+  // UI
+  // =========================
 
   @override
   Widget build(BuildContext context) {
@@ -236,10 +199,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
           if (widget.title != null) ...[
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: Text(
-                widget.title!,
-                style: headingStyle(context, fontSize: 14),
-              ),
+              child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
             ),
             const SizedBox(height: hPadding),
           ],
@@ -257,9 +217,9 @@ class _HealthCobTableState extends State<HealthCobTable> {
 
   Widget _buildDetailTableCompact(
       BuildContext context,
-      List<AsetHealthCariModel> details,
+      List<AsetothersCariModel> details,
       ) {
-    if (details.isEmpty) return const Text("Tidak ada detail polis");
+    if (details.isEmpty) return const Text("Tidak ada detail");
 
     final columnWidths = _compactColumnWidths(context, details);
 
@@ -299,7 +259,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
                 children: [
                   _tableHeader(context),
                   ...details.asMap().entries.map(
-                        (e) => _detailRow(
+                        (e) => _detailRowWithRadioLikeProperty(
                       context,
                       e.value,
                       e.key,
@@ -317,9 +277,9 @@ class _HealthCobTableState extends State<HealthCobTable> {
 
   Widget _buildDetailTableNormal(
       BuildContext context,
-      List<AsetHealthCariModel> details,
+      List<AsetothersCariModel> details,
       ) {
-    if (details.isEmpty) return const Text("Tidak ada detail polis");
+    if (details.isEmpty) return const Text("Tidak ada detail");
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -341,18 +301,17 @@ class _HealthCobTableState extends State<HealthCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly
-                ? const FixedColumnWidth(0)
-                : const FlexColumnWidth(0.8),
+            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
             1: const FlexColumnWidth(1.0), // No
-            2: const FlexColumnWidth(3.0), // Polis No
-            3: const FlexColumnWidth(1.2), // Jml Object
-            4: const FlexColumnWidth(2.4), // Status
+            2: const FlexColumnWidth(2.3), // Polis No
+            3: const FlexColumnWidth(1.3), // Jml Object
+            4: const FlexColumnWidth(3.0), // Sum Insured
+            5: const FlexColumnWidth(1.8), // Premi
           },
           children: [
             _tableHeader(context),
             ...details.asMap().entries.map(
-                  (e) => _detailRow(
+                  (e) => _detailRowWithRadioLikeProperty(
                 context,
                 e.value,
                 e.key,
@@ -374,39 +333,34 @@ class _HealthCobTableState extends State<HealthCobTable> {
           "No",
           "No Polis",
           "Jumlah Objek",
-          "Status",
-        ].map((text) {
-          final isNo = text.toUpperCase() == "NO";
-
+          "Nilai Pertanggungan",
+          "Premi",
+        ].map((t) {
+          final center = t.toUpperCase() == "NO";
+          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-            child: isNo
-                ? Center(
-              child: Text(
-                text,
-                style: bodyTextStyle(context, fontSize: 15),
-              ),
-            )
-                : Text(
-              text,
-              style: bodyTextStyle(context, fontSize: 15),
-            ),
+            child: center ? Center(child: child) : child,
           );
         }),
       ],
     );
   }
 
-  TableRow _detailRow(
+  TableRow _detailRowWithRadioLikeProperty(
       BuildContext context,
-      AsetHealthCariModel d,
+      AsetothersCariModel d,
       int index, {
         required bool compact,
       }) {
     final isSelected = widget.selectedItem == d;
 
-    final maxLinesNama = compact ? 2 : 1;
-    final maxLinesBenefit = compact ? 3 : 2;
+    final maxLinesPolis = compact ? 2 : 1;
+
+    void triggerRow() {
+      if (widget.readOnly) return;
+      _showSuccessPopup(context, d);
+    }
 
     return TableRow(
       decoration: BoxDecoration(
@@ -421,9 +375,31 @@ class _HealthCobTableState extends State<HealthCobTable> {
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
-                  _handleSelect(d);
+                  final prev = widget.selectedItem;
+                  if (prev != null && prev != d) {
+                    widget.onUnselect(prev.asetOthersId);
+                    if (prev.filePolisId.isNotEmpty) {
+                      widget.onUnselectFilePolisHealthId(prev.filePolisId);
+                    }
+                  }
+
+                  widget.onSelect(d.asetOthersId);
+                  widget.onSelectItem?.call(d);
+
+                  if (d.prosesId.isNotEmpty) {
+                    widget.selectedProsesId(d.prosesId);
+                  }
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onSelectFilePolisHealthId(d.filePolisId);
+                  }
                 } else {
-                  _handleUnselect(d);
+                  widget.onUnselect(d.asetOthersId);
+                  widget.onClearSelectedItem?.call();
+
+                  if (d.filePolisId.isNotEmpty) {
+                    widget.onUnselectFilePolisHealthId(d.filePolisId);
+                  }
                 }
               },
             ),
@@ -431,30 +407,66 @@ class _HealthCobTableState extends State<HealthCobTable> {
         else
           const SizedBox(),
 
-        _textCell(
-          d.nomor.toString(),
-          center: true,
-          softWrap: false,
+        // No: tidak clickable
+        _textCell(d.nomor.toString(), center: true, softWrap: false),
+
+        // Mulai sini clickable
+        _clickableTextCell(
+          d.polisNo,
+          onTap: triggerRow,
+          maxLines: maxLinesPolis,
+          softWrap: true,
         ),
 
-        // _textCell(
-        //   d.polisNo,
-        //   maxLines: compact ? 2 : 1,
-        //   softWrap: true,
-        // ),
-
-        _textCell(
+        _clickableTextCell(
           "${d.jmlObject}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
 
-        _textCell(
-          d.status ?? '-',
-          maxLines: maxLinesBenefit,
-          softWrap: true,
+        _clickableTextCell(
+          "${d.curr} ${formatNum(d.sumInsured)}",
+          onTap: triggerRow,
+          maxLines: 1,
+          softWrap: false,
+        ),
+
+        _clickableTextCell(
+          "${d.curr} ${formatNum(d.premi)}",
+          onTap: triggerRow,
+          maxLines: 1,
+          softWrap: false,
         ),
       ],
+    );
+  }
+
+  Widget _clickableTextCell(
+      String text, {
+        required VoidCallback onTap,
+        int maxLines = 1,
+        bool softWrap = false,
+        bool center = false,
+      }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _textCell(
+        text,
+        maxLines: maxLines,
+        softWrap: softWrap,
+        center: center,
+      ),
+    );
+  }
+
+  void _showSuccessPopup(BuildContext context, AsetothersCariModel d) {
+    showDialog(
+      context: context,
+      builder: (_) => DetailPolisOthersTablePage(
+        sppa1Id: d.asetOthersId,
+      ),
     );
   }
 

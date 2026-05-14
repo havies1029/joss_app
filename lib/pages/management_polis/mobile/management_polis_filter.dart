@@ -24,11 +24,11 @@ import '../../../helper/mobile_expert_helper.dart';
 import '../../../widgets/EmptyStateWidget.dart';
 import '../../../widgets/apptheme/polis_button.dart';
 import '../../../widgets/apptheme/popup_widget.dart';
-import 'cob_polis/health_cob_table.dart';
-import 'cob_polis/hull_cob_table.dart';
-import 'cob_polis/kargo_cob_table.dart';
-import 'cob_polis/kendaraan_cob_table.dart';
-import 'cob_polis/property_cob_table.dart';
+import 'cob_polis/health/health_cob_table.dart';
+import 'cob_polis/hull/hull_cob_table.dart';
+import 'cob_polis/others/kargo_cob_table.dart';
+import 'cob_polis/kendaraan/kendaraan_cob_table.dart';
+import 'cob_polis/properti/property_cob_table.dart';
 import 'cob_polis/ringkasan_cob_table.dart';
 
 class ManagementPolisFilter extends StatefulWidget {

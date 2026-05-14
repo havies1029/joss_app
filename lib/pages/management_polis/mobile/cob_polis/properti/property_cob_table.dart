@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-import '../../../../common/constants.dart';
-import '../../../../models/gen_aset_par/asetparcari_model.dart';
+import '../../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
+import '../../../../../blocs/gen_aset_par/sppa2parcari_bloc.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../models/gen_aset_par/asetparcari_model.dart';
+import 'detail_polis_par_table_page.dart';
 
 class PropertyCobTable extends StatefulWidget {
   final List<AsetParCariModel> items;
@@ -96,6 +98,17 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
   List<AsetParCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
     return widget.items.where((d) => widget.selectedIds.contains(d.asetParId)).toList();
+  }
+
+  Widget _clickableCell({
+    required Widget child,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _cell(child: child),
+    );
   }
 
   @override
@@ -330,11 +343,16 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       BuildContext context,
       AsetParCariModel d,
       int index,
-      bool showColumn,
-      {
+      bool showColumn, {
         required bool compact,
       }) {
     final isSelected = widget.selectedItem == d;
+
+    void triggerRow() {
+      if (widget.readOnly) return;
+
+      _showSuccessPopup(context, d);
+    }
 
     return TableRow(
       decoration: BoxDecoration(
@@ -343,6 +361,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             : (index.isEven ? pGrey : formGrey),
       ),
       children: [
+        // checkbox: TIDAK ikut trigger row
         if (!widget.readOnly)
           Center(
             child: CheckboxRadio(
@@ -361,6 +380,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                 } else {
                   widget.onUnselect(d.asetParId);
                   widget.onClearSelectedItem?.call();
+
                   if (d.filePolisParId.isNotEmpty) {
                     widget.onUnselectFilePolisParId(d.filePolisParId);
                   }
@@ -374,61 +394,59 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         else
           const SizedBox(),
 
+        // No: TIDAK ikut trigger row
         _cell(
           child: Center(
             child: Text(
               d.nomor.toString(),
-              style: TextStyle(color: primaryLightColor),
+              style: const TextStyle(color: primaryLightColor),
             ),
           ),
         ),
 
+        // Mulai sini clickable
         if (showColumn)
-          _cell(
+          _clickableCell(
+            onTap: triggerRow,
             child: Text(
               d.prosesId.isEmpty ? "-" : d.prosesId,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: primaryLightColor),
+              style: const TextStyle(color: primaryLightColor),
             ),
           ),
 
-        _cell(
+        _clickableCell(
+          onTap: triggerRow,
           child: Text(
             d.polisNo,
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
 
-        _cell(
+        _clickableCell(
+          onTap: triggerRow,
           child: Text(
             "${d.jmlObject}",
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
 
-        _cell(
+        _clickableCell(
+          onTap: triggerRow,
           child: Text(
             d.tertanggung,
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: primaryLightColor),
+            style: const TextStyle(color: primaryLightColor),
           ),
         ),
 
-        // _cell(
-        //   child: Text(
-        //     d.alamat,
-        //     maxLines: compact ? 2 : 1,
-        //     overflow: TextOverflow.ellipsis,
-        //     style: TextStyle(color: primaryLightColor),
-        //   ),
-        // ),
-
-        _cell(
+        _clickableCell(
+          onTap: triggerRow,
           child: Text(
             "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} -\n"
                 "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
@@ -438,7 +456,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           ),
         ),
 
-        _cell(
+        _clickableCell(
+          onTap: triggerRow,
           child: Text(
             "${d.curr} ${formatNum(d.sumInsured)}",
             maxLines: 1,
@@ -447,7 +466,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           ),
         ),
 
-        _cell(
+        _clickableCell(
+          onTap: triggerRow,
           child: Text(
             "${d.curr} ${formatNum(d.premi)}",
             maxLines: 1,
@@ -463,6 +483,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     return Padding(
       padding: const EdgeInsets.all(6),
       child: child,
+    );
+  }
+
+  void _showSuccessPopup(BuildContext context, AsetParCariModel d) {
+    showDialog(
+      context: context,
+      builder: (_) => DetailPolisParTablePage(
+        sppa1Id: d.asetParId,
+      ),
     );
   }
 }

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../blocs/asetothers/asetotherscari_bloc.dart';
-import '../../../../common/constants.dart';
-import '../../../../models/asetothers/asetotherscari_model.dart';
+import '../../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../models/gen_aset_health/asethealthcari_model.dart';
+import 'detail_polis_health_table_page.dart';
 
-class KargoCobTable extends StatefulWidget {
-  final List<AsetothersCariModel> items;
+class HealthCobTable extends StatefulWidget {
+  final List<AsetHealthCariModel> items;
   final List<String> selectedIds;
 
-  final AsetothersCariModel? selectedItem;
-  final void Function(AsetothersCariModel item)? onSelectItem;
+  final AsetHealthCariModel? selectedItem;
+  final void Function(AsetHealthCariModel item)? onSelectItem;
   final VoidCallback? onClearSelectedItem;
 
   final void Function(String id) selectedProsesId;
@@ -26,7 +26,7 @@ class KargoCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
-  const KargoCobTable({
+  const HealthCobTable({
     super.key,
     required this.items,
     required this.selectedIds,
@@ -44,12 +44,10 @@ class KargoCobTable extends StatefulWidget {
   });
 
   @override
-  State<KargoCobTable> createState() => _KargoCobTableState();
+  State<HealthCobTable> createState() => _HealthCobTableState();
 }
-class _KargoCobTableState extends State<KargoCobTable> {
-  String formatNum(num? value) =>
-      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
+class _HealthCobTableState extends State<HealthCobTable> {
   late final ScrollController hController;
   late final ScrollController vController;
 
@@ -62,18 +60,18 @@ class _KargoCobTableState extends State<KargoCobTable> {
   }
 
   void _onScroll() {
-    final bloc = context.read<AsetothersCariBloc>();
+    final bloc = context.read<AsetHealthCariBloc>();
     final s = bloc.state;
 
     if (!vController.hasClients) return;
+
     final max = vController.position.maxScrollExtent;
     final cur = vController.position.pixels;
-
     const threshold = 100.0;
 
     if (max - cur <= threshold) {
       if (!s.hasReachedMax && !s.isFetching) {
-        bloc.add(FetchAsetothersCariEvent());
+        bloc.add(FetchAsetHealthCariEvent());
       }
     }
   }
@@ -86,14 +84,12 @@ class _KargoCobTableState extends State<KargoCobTable> {
     super.dispose();
   }
 
-  List<AsetothersCariModel> get _filteredItems {
+  List<AsetHealthCariModel> get _filteredItems {
     if (!widget.readOnly) return widget.items;
-    return widget.items.where((d) => widget.selectedIds.contains(d.asetOthersId)).toList();
+    return widget.items
+        .where((d) => widget.selectedIds.contains(d.asethealthId))
+        .toList();
   }
-
-  // =========================
-  // Dynamic width helpers
-  // =========================
 
   double _measureTextWidth(
       BuildContext context,
@@ -132,7 +128,6 @@ class _KargoCobTableState extends State<KargoCobTable> {
     return target.clamp(min, max);
   }
 
-  // helper text cell (wrap saat compact)
   Widget _textCell(
       String text, {
         int maxLines = 1,
@@ -146,38 +141,81 @@ class _KargoCobTableState extends State<KargoCobTable> {
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(color: primaryLightColor),
     );
-    return _cell(child: center ? Center(child: t) : t);
+
+    return _cell(
+      child: center ? Center(child: t) : t,
+    );
   }
 
   Map<int, TableColumnWidth> _compactColumnWidths(
       BuildContext context,
-      List<AsetothersCariModel> details,
+      List<AsetHealthCariModel> details,
       ) {
     final selectCol = widget.readOnly ? 0.0 : 40.0;
 
     final polisValues = details.map((d) => d.polisNo);
     final jmlObjectValues = details.map((d) => d.jmlObject.toString());
-    final sumInsuredValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
-    final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
+    final statusValues = details.map((d) => d.status ?? '-');
 
-    final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 180);
-    final wJmlObject = _columnWidthFromLongest(context, jmlObjectValues, min: 80, max: 110);
-    final wSumInsured = _columnWidthFromLongest(context, sumInsuredValues, min: 170, max: 240);
-    final wPremi = _columnWidthFromLongest(context, premiValues, min: 130, max: 170);
+    final wPolis = _columnWidthFromLongest(
+      context,
+      polisValues,
+      min: 140,
+      max: 220,
+    );
+
+    final wJmlObject = _columnWidthFromLongest(
+      context,
+      jmlObjectValues,
+      min: 80,
+      max: 100,
+    );
+
+    final wStatus = _columnWidthFromLongest(
+      context,
+      statusValues,
+      min: 140,
+      max: 220,
+    );
 
     return {
       0: FixedColumnWidth(selectCol),
       1: const FixedColumnWidth(50), // No
       2: FixedColumnWidth(wPolis), // Polis No
       3: FixedColumnWidth(wJmlObject), // Jml Object
-      4: FixedColumnWidth(wSumInsured), // Sum Insured
-      5: FixedColumnWidth(wPremi), // Premi
+      4: FixedColumnWidth(wStatus), // Status
     };
   }
 
-  // =========================
-  // UI
-  // =========================
+  void _handleSelect(AsetHealthCariModel d) {
+    final prev = widget.selectedItem;
+
+    if (prev != null && prev != d) {
+      widget.onUnselect(prev.asethealthId);
+
+      if (prev.filePolisId.isNotEmpty) {
+        widget.onUnselectFilePolisHealthId(prev.filePolisId);
+      }
+    }
+
+    widget.selectedProsesId(d.prosesId);
+    widget.onSelect(d.asethealthId);
+    widget.onSelectItem?.call(d);
+
+    if (d.filePolisId.isNotEmpty) {
+      widget.onSelectFilePolisHealthId(d.filePolisId);
+    }
+  }
+
+  void _handleUnselect(AsetHealthCariModel d) {
+    widget.onUnselect(d.asethealthId);
+    widget.selectedProsesId("");
+    widget.onClearSelectedItem?.call();
+
+    if (d.filePolisId.isNotEmpty) {
+      widget.onUnselectFilePolisHealthId(d.filePolisId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +236,10 @@ class _KargoCobTableState extends State<KargoCobTable> {
           if (widget.title != null) ...[
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
+              child: Text(
+                widget.title!,
+                style: headingStyle(context, fontSize: 14),
+              ),
             ),
             const SizedBox(height: hPadding),
           ],
@@ -216,9 +257,9 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
   Widget _buildDetailTableCompact(
       BuildContext context,
-      List<AsetothersCariModel> details,
+      List<AsetHealthCariModel> details,
       ) {
-    if (details.isEmpty) return const Text("Tidak ada detail");
+    if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     final columnWidths = _compactColumnWidths(context, details);
 
@@ -258,7 +299,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
                 children: [
                   _tableHeader(context),
                   ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadioLikeProperty(
+                        (e) => _detailRow(
                       context,
                       e.value,
                       e.key,
@@ -276,9 +317,9 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
   Widget _buildDetailTableNormal(
       BuildContext context,
-      List<AsetothersCariModel> details,
+      List<AsetHealthCariModel> details,
       ) {
-    if (details.isEmpty) return const Text("Tidak ada detail");
+    if (details.isEmpty) return const Text("Tidak ada detail polis");
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -300,17 +341,18 @@ class _KargoCobTableState extends State<KargoCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FlexColumnWidth(0.8),
             1: const FlexColumnWidth(1.0), // No
-            2: const FlexColumnWidth(2.3), // Polis No
-            3: const FlexColumnWidth(1.3), // Jml Object
-            4: const FlexColumnWidth(3.0), // Sum Insured
-            5: const FlexColumnWidth(1.8), // Premi
+            2: const FlexColumnWidth(3.0), // Polis No
+            3: const FlexColumnWidth(1.2), // Jml Object
+            4: const FlexColumnWidth(2.4), // Status
           },
           children: [
             _tableHeader(context),
             ...details.asMap().entries.map(
-                  (e) => _detailRowWithRadioLikeProperty(
+                  (e) => _detailRow(
                 context,
                 e.value,
                 e.key,
@@ -332,31 +374,43 @@ class _KargoCobTableState extends State<KargoCobTable> {
           "No",
           "No Polis",
           "Jumlah Objek",
-          "Nilai Pertanggungan",
-          "Premi",
-        ].map((t) {
-          final center = t.toUpperCase() == "NO";
-          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
+          "Status",
+        ].map((text) {
+          final isNo = text.toUpperCase() == "NO";
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-            child: center ? Center(child: child) : child,
+            child: isNo
+                ? Center(
+              child: Text(
+                text,
+                style: bodyTextStyle(context, fontSize: 15),
+              ),
+            )
+                : Text(
+              text,
+              style: bodyTextStyle(context, fontSize: 15),
+            ),
           );
         }),
       ],
     );
   }
 
-  TableRow _detailRowWithRadioLikeProperty(
+  TableRow _detailRow(
       BuildContext context,
-      AsetothersCariModel d,
+      AsetHealthCariModel d,
       int index, {
         required bool compact,
       }) {
     final isSelected = widget.selectedItem == d;
 
-    // wrap rules saat mentok max width
-    final maxLinesObject = compact ? 3 : 1;
-    final maxLinesPolis = compact ? 2 : 1;
+    final maxLinesBenefit = compact ? 3 : 2;
+
+    void triggerRow() {
+      if (widget.readOnly) return;
+      _showSuccessPopup(context, d);
+    }
 
     return TableRow(
       decoration: BoxDecoration(
@@ -371,31 +425,9 @@ class _KargoCobTableState extends State<KargoCobTable> {
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
-                  final prev = widget.selectedItem;
-                  if (prev != null && prev != d) {
-                    widget.onUnselect(prev.asetOthersId);
-                    if (prev.filePolisId.isNotEmpty) {
-                      widget.onUnselectFilePolisHealthId(prev.filePolisId);
-                    }
-                  }
-
-                  widget.onSelect(d.asetOthersId);
-                  widget.onSelectItem?.call(d);
-
-                  if (d.prosesId.isNotEmpty) {
-                    widget.selectedProsesId(d.prosesId);
-                  }
-
-                  if (d.filePolisId.isNotEmpty) {
-                    widget.onSelectFilePolisHealthId(d.filePolisId);
-                  }
+                  _handleSelect(d);
                 } else {
-                  widget.onUnselect(d.asetOthersId);
-                  widget.onClearSelectedItem?.call();
-
-                  if (d.filePolisId.isNotEmpty) {
-                    widget.onUnselectFilePolisHealthId(d.filePolisId);
-                  }
+                  _handleUnselect(d);
                 }
               },
             ),
@@ -403,36 +435,66 @@ class _KargoCobTableState extends State<KargoCobTable> {
         else
           const SizedBox(),
 
-        _textCell(d.nomor.toString(), center: true, softWrap: false),
-
+        // No: tidak clickable
         _textCell(
+          d.nomor.toString(),
+          center: true,
+          softWrap: false,
+        ),
+
+        _clickableTextCell(
           d.polisNo,
-          maxLines: compact ? 2 : 1,
-          softWrap: true,
+          onTap: triggerRow,
+          maxLines: 1,
+          softWrap: false,
         ),
 
-        _textCell(
+        // Mulai sini clickable
+        _clickableTextCell(
           "${d.jmlObject}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
 
-        _textCell(
-          "${d.curr} ${formatNum(d.sumInsured)}",
-          maxLines: 1,
-          softWrap: false,
-        ),
-
-        _textCell(
-          "${d.curr} ${formatNum(d.premi)}",
-          maxLines: 1,
-          softWrap: false,
+        _clickableTextCell(
+          d.status ?? '-',
+          onTap: triggerRow,
+          maxLines: maxLinesBenefit,
+          softWrap: true,
         ),
       ],
     );
   }
 
-  // kamu minta cell jangan diubah: tetap sama
+  Widget _clickableTextCell(
+      String text, {
+        required VoidCallback onTap,
+        int maxLines = 1,
+        bool softWrap = false,
+        bool center = false,
+      }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _textCell(
+        text,
+        maxLines: maxLines,
+        softWrap: softWrap,
+        center: center,
+      ),
+    );
+  }
+
+  void _showSuccessPopup(BuildContext context,  AsetHealthCariModel d) {
+    showDialog(
+      context: context,
+      builder: (_) => DetailPolisHealthTablePage(
+        sppa1Id: d.asethealthId,
+      ),
+    );
+  }
+
   Widget _cell({required Widget child}) {
     return Padding(
       padding: const EdgeInsets.all(6),

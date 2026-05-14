@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
-import '../../../../common/constants.dart';
-import '../../../../models/gen_aset_mv/asetmvcari_model.dart';
+import '../../../../../blocs/gen_aset_mv/asetmvcari_bloc.dart';
+import '../../../../../common/constants.dart';
+import '../../../../../models/gen_aset_mv/asetmvcari_model.dart';
+import 'detail_polis_mv_table_page.dart';
 
 class KendaraanCobTable extends StatefulWidget {
   final List<AsetMvCariModel> items;
@@ -398,8 +399,12 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     final isSelected = widget.selectedItem == d;
 
     final maxLinesTertanggung = compact ? 2 : 1;
-    final maxLinesMerk = compact ? 2 : 1;
     final maxLinesNoPol = compact ? 2 : 1;
+
+    void triggerRow() {
+      if (widget.readOnly) return;
+      _showSuccessPopup(context, d);
+    }
 
     return TableRow(
       decoration: BoxDecoration(
@@ -436,55 +441,77 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
 
         _textCell(d.nomor.toString(), center: true, softWrap: false),
 
-        _textCell(
+        _clickableTextCell(
           d.polisNo,
+          onTap: triggerRow,
           maxLines: compact ? 2 : 1,
           softWrap: true,
         ),
 
-        _textCell(
+        _clickableTextCell(
           "${d.jmlObject}",
+          onTap: triggerRow,
           maxLines: maxLinesNoPol,
           softWrap: true,
         ),
 
-        _textCell(
+        _clickableTextCell(
           d.tertanggung,
+          onTap: triggerRow,
           maxLines: maxLinesTertanggung,
           softWrap: true,
         ),
 
-        _textCell(
+        _clickableTextCell(
           "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} - "
               "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
+          onTap: triggerRow,
           maxLines: compact ? 2 : 1,
           softWrap: true,
         ),
 
-        // _textCell(
-        //   d.merk,
-        //   maxLines: maxLinesMerk,
-        //   softWrap: true,
-        // ),
-        //
-        // _textCell(
-        //   d.noPolisi,
-        //   maxLines: maxLinesNoPol,
-        //   softWrap: true,
-        // ),
-
-        _textCell(
+        _clickableTextCell(
           "${d.curr} ${formatNum(d.sumInsured)}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
 
-        _textCell(
+        _clickableTextCell(
           "${d.curr} ${formatNum(d.premi)}",
+          onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
       ],
+    );
+  }
+
+  void _showSuccessPopup(BuildContext context, AsetMvCariModel d) {
+    showDialog(
+      context: context,
+      builder: (_) => DetailPolisMvTablePage(
+        sppa1Id: d.asetMvId,
+      ),
+    );
+  }
+
+  Widget _clickableTextCell(
+      String text, {
+        required VoidCallback onTap,
+        int maxLines = 1,
+        bool softWrap = false,
+        bool center = false,
+      }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _textCell(
+        text,
+        maxLines: maxLines,
+        softWrap: softWrap,
+        center: center,
+      ),
     );
   }
 

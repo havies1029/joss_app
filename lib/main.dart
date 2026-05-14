@@ -123,7 +123,12 @@ import 'package:joss_app/blocs/reguser/reguser_bloc.dart';
 
 import 'package:joss_app/blocs/local_prefs/simulasi_par_local_cubit.dart';
 import 'package:joss_app/blocs/local_prefs/simulasi_mv_local_cubit.dart';
+import 'blocs/asetothers/sppa2otherscari_bloc.dart';
 import 'blocs/dashboard/sumdash_bloc.dart';
+import 'blocs/gen_aset_health/sppa2healthcari_bloc.dart';
+import 'blocs/gen_aset_hull/sppa2hullcari_bloc.dart';
+import 'blocs/gen_aset_mv/sppa2mvcari_bloc.dart';
+import 'blocs/gen_aset_par/sppa2parcari_bloc.dart';
 import 'blocs/gen_calmv/calmvaccordion_bloc.dart';
 import 'blocs/gen_dn1/dn1cari_bloc.dart';
 import 'blocs/gen_promo/promo1cari_bloc.dart';
@@ -662,6 +667,13 @@ Future<void> main() async {
 
         //review
         BlocProvider(create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
+
+        // polis detail
+        BlocProvider(create: (context) => Sppa2parCariBloc()),
+        BlocProvider(create: (context) => Sppa2mvCariBloc()),
+        BlocProvider(create: (context) => Sppa2othersCariBloc()),
+        BlocProvider(create: (context) => Sppa2hullCariBloc()),
+        BlocProvider(create: (context) => Sppa2healthCariBloc()),
 
       ],
       child: MultiBlocListener(

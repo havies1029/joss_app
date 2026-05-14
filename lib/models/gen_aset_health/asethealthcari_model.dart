@@ -9,6 +9,7 @@ class AsetHealthCariModel {
 	bool isReaktif;
 	bool isRenewal;
 	int jmlObject;
+	String polisNo;
 
 	AsetHealthCariModel({
 		required this.asethealthId,
@@ -19,6 +20,7 @@ class AsetHealthCariModel {
 		required this.prosesRemarks,
 		required this.prosesSource,
 		required this.jmlObject,
+		required this.polisNo,
 		this.isReaktif = false,
 		this.isRenewal = false,
 	});
@@ -35,6 +37,7 @@ class AsetHealthCariModel {
 			isReaktif: data['isReaktif'] ?? false,
 			isRenewal: data['isRenewal'] ?? false,
 			jmlObject: int.tryParse(data['jmlObject'].toString()) ?? 0,
+			polisNo: data['polisNo'] ?? '',
 		);
 	}
 
@@ -49,5 +52,6 @@ class AsetHealthCariModel {
 		'isReaktif': isReaktif,
 		'isRenewal': isRenewal,
 		'jmlObject': jmlObject,
+		'polisNo': polisNo,
 	};
 }

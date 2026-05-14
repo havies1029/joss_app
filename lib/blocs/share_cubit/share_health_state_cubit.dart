@@ -1,15 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/gen_aset_health/asethealthcari_model.dart';
 
-/// 🩺 ShareHealthStateCubit
-/// Mengatur state untuk data HEALTH yang dipilih untuk di-share / export.
 class ShareHealthStateCubit extends Cubit<Map<String, AsetHealthCariModel>> {
   ShareHealthStateCubit() : super({});
 
   bool globalActive = false;
   int totalItems = 0;
 
-  /// 🔹 Tambah / hapus 1 item dari daftar share
   void toggleItem(AsetHealthCariModel item) {
     final updated = Map<String, AsetHealthCariModel>.from(state);
 
@@ -23,7 +20,6 @@ class ShareHealthStateCubit extends Cubit<Map<String, AsetHealthCariModel>> {
     _updateGlobalStatus();
   }
 
-  /// 🔹 Pilih semua / batalkan semua
   void toggleGlobal(List<AsetHealthCariModel> items) {
     if (globalActive) {
       emit({});
@@ -35,44 +31,36 @@ class ShareHealthStateCubit extends Cubit<Map<String, AsetHealthCariModel>> {
     _updateGlobalStatus();
   }
 
-  /// 🔹 Update total item (buat sinkronisasi status global select all)
   void updateTotalItems(int total) {
     totalItems = total;
     _updateGlobalStatus();
   }
 
-  /// 🔹 Cek apakah item sedang aktif (terpilih)
   bool isItemActive(String? id) {
     if (id == null) return false;
     return state.containsKey(id);
   }
 
-  /// 🔹 Ambil semua item terpilih
   List<AsetHealthCariModel> get selectedItems => state.values.toList();
 
-  /// 🔹 Siapkan data untuk export atau share
   List<Map<String, dynamic>> toExportData() {
     return state.values.map((e) => e.toJson()).toList();
   }
 
-  /// 🔹 Reset semua pilihan
   void clear() {
     emit({});
     globalActive = false;
   }
 
-  /// 🔹 Update status globalActive (select all / not)
   void _updateGlobalStatus() {
     globalActive = state.length == totalItems && totalItems > 0;
   }
 
-  /// 🔹 Data siap ekspor (versi readable untuk Excel/PDF)
-  /// 🔹 Data siap ekspor (versi readable untuk Excel/PDF)
   List<Map<String, dynamic>> getExportData() {
     return state.values.map((e) {
       return {
         'No': e.nomor,
-        // 'No Polis': e.polisNo,
+        'No Polis': e.polisNo,
         'Jumlah Objek': e.jmlObject,
         'Status': e.status ?? '-',
       };
