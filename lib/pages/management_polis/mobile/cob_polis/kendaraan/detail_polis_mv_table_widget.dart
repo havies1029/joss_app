@@ -81,8 +81,6 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
                           4: IntrinsicColumnWidth(),
                           5: IntrinsicColumnWidth(),
                           6: IntrinsicColumnWidth(),
-                          7: IntrinsicColumnWidth(),
-                          8: IntrinsicColumnWidth(),
                         },
                         children: [
                           _headerRow(),
@@ -121,15 +119,13 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   border: _tableBorder(),
                   columnWidths: const {
-                    0: FlexColumnWidth(0.6),
-                    1: FlexColumnWidth(1.2),
-                    2: FlexColumnWidth(1.3),
-                    3: FlexColumnWidth(1.4),
-                    4: FlexColumnWidth(1.4),
-                    5: FlexColumnWidth(1.4),
-                    6: FlexColumnWidth(1.8),
-                    7: FlexColumnWidth(1.4),
-                    8: FlexColumnWidth(1.4),
+                    0: FixedColumnWidth(50),
+                    1: FixedColumnWidth(130),
+                    2: FixedColumnWidth(240),
+                    3: FixedColumnWidth(80),
+                    4: FixedColumnWidth(180),
+                    5: FixedColumnWidth(150),
+                    6: FixedColumnWidth(140),
                   },
                   children: [
                     _headerRow(),
@@ -177,8 +173,6 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
         _HeaderCell("NO", center: true),
         _HeaderCell("NO POLISI"),
         _HeaderCell("MERK"),
-        _HeaderCell("MODEL"),
-        _HeaderCell("JENIS"),
         _HeaderCell("TAHUN", center: true),
         _HeaderCell("COVER"),
         _HeaderCell("HARGA", right: true),
@@ -195,6 +189,12 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
     final harga = "${d.curr} ${formatNum(d.harga)}";
     final premi = "${d.curr} ${formatNum(d.premiNet)}";
 
+    final merkGabungan = [
+      d.merk,
+      d.modelMv,
+      d.jenisMv,
+    ].where((e) => e.trim().isNotEmpty).join(" - ");
+
     return TableRow(
       decoration: BoxDecoration(
         color: index.isEven ? pGrey : formGrey,
@@ -202,9 +202,7 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
       children: [
         _cellCenter((index + 1).toString()),
         _cellText(d.polisiNo.isNotEmpty ? d.polisiNo : "-", compact: compact),
-        _cellText(d.merk.isNotEmpty ? d.merk : "-", compact: compact),
-        _cellText(d.modelMv.isNotEmpty ? d.modelMv : "-", compact: compact),
-        _cellText(d.jenisMv.isNotEmpty ? d.jenisMv : "-", compact: compact),
+        _cellText(merkGabungan.isNotEmpty ? merkGabungan : "-", compact: compact),
         _cellCenter(d.thnBuat == 0 ? "-" : d.thnBuat.toString()),
         _cellText(d.coverName.isNotEmpty ? d.coverName : "-", compact: compact),
         _cellRight(harga),
