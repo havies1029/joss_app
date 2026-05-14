@@ -48,11 +48,16 @@ class KargoCobTable extends StatefulWidget {
   State<KargoCobTable> createState() => _KargoCobTableState();
 }
 class _KargoCobTableState extends State<KargoCobTable> {
+  late final ScrollController hController;
+  late final ScrollController vController;
+
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
-  late final ScrollController hController;
-  late final ScrollController vController;
+  String formatDate(DateTime? date) {
+    if (date == null) return "-";
+    return DateFormat('dd MMM yyyy').format(date);
+  }
 
   @override
   void initState() {
@@ -158,21 +163,56 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
     final polisValues = details.map((d) => d.polisNo);
     final jmlObjectValues = details.map((d) => d.jmlObject.toString());
-    final sumInsuredValues = details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
-    final premiValues = details.map((d) => "${d.curr} ${formatNum(d.premi)}");
+    final tertanggungValues = details.map((d) => d.tertanggung);
+    final sumInsuredValues =
+    details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
+    final premiValues =
+    details.map((d) => "${d.curr} ${formatNum(d.premi)}");
 
-    final wPolis = _columnWidthFromLongest(context, polisValues, min: 120, max: 180);
-    final wJmlObject = _columnWidthFromLongest(context, jmlObjectValues, min: 80, max: 110);
-    final wSumInsured = _columnWidthFromLongest(context, sumInsuredValues, min: 170, max: 240);
-    final wPremi = _columnWidthFromLongest(context, premiValues, min: 130, max: 170);
+    final wPolis = _columnWidthFromLongest(
+      context,
+      polisValues,
+      min: 120,
+      max: 180,
+    );
+
+    final wJmlObject = _columnWidthFromLongest(
+      context,
+      jmlObjectValues,
+      min: 110,
+      max: 140,
+    );
+
+    final wTertanggung = _columnWidthFromLongest(
+      context,
+      tertanggungValues,
+      min: 150,
+      max: 220,
+    );
+
+    final wSumInsured = _columnWidthFromLongest(
+      context,
+      sumInsuredValues,
+      min: 170,
+      max: 240,
+    );
+
+    final wPremi = _columnWidthFromLongest(
+      context,
+      premiValues,
+      min: 130,
+      max: 170,
+    );
 
     return {
       0: FixedColumnWidth(selectCol),
       1: const FixedColumnWidth(50), // No
       2: FixedColumnWidth(wPolis), // Polis No
       3: FixedColumnWidth(wJmlObject), // Jml Object
-      4: FixedColumnWidth(wSumInsured), // Sum Insured
-      5: FixedColumnWidth(wPremi), // Premi
+      4: const FixedColumnWidth(180), // Periode
+      5: FixedColumnWidth(wTertanggung), // Tertanggung
+      6: FixedColumnWidth(wSumInsured), // Nilai Pertanggungan
+      7: FixedColumnWidth(wPremi), // Premi
     };
   }
 
@@ -301,12 +341,17 @@ class _KargoCobTableState extends State<KargoCobTable> {
             verticalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: {
-            0: widget.readOnly ? const FixedColumnWidth(0) : const FlexColumnWidth(0.8),
+            0: widget.readOnly
+                ? const FixedColumnWidth(0)
+                : const FlexColumnWidth(0.8),
+
             1: const FlexColumnWidth(1.0), // No
-            2: const FlexColumnWidth(2.3), // Polis No
-            3: const FlexColumnWidth(1.3), // Jml Object
-            4: const FlexColumnWidth(3.0), // Sum Insured
-            5: const FlexColumnWidth(1.8), // Premi
+            2: const FlexColumnWidth(2.2), // Polis No
+            3: const FlexColumnWidth(1.5), // Jml Object
+            4: const FlexColumnWidth(2.2), // Periode
+            5: const FlexColumnWidth(2.5), // Tertanggung
+            6: const FlexColumnWidth(2.3), // Nilai Pertanggungan
+            7: const FlexColumnWidth(1.8), // Premi
           },
           children: [
             _tableHeader(context),
@@ -333,6 +378,8 @@ class _KargoCobTableState extends State<KargoCobTable> {
           "No",
           "No Polis",
           "Jumlah Objek",
+          "Periode",
+          "Tertanggung",
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
@@ -419,10 +466,24 @@ class _KargoCobTableState extends State<KargoCobTable> {
         ),
 
         _clickableTextCell(
-          "${d.jmlObject}",
+          "${d.jmlObject} ${d.satuan}",
           onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
+        ),
+
+        _clickableTextCell(
+          "${formatDate(d.periodeMulai)} - ${formatDate(d.periodeAkhir)}",
+          onTap: triggerRow,
+          maxLines: 2,
+          softWrap: true,
+        ),
+
+        _clickableTextCell(
+          d.tertanggung,
+          onTap: triggerRow,
+          maxLines: compact ? 2 : 1,
+          softWrap: true,
         ),
 
         _clickableTextCell(
@@ -464,9 +525,15 @@ class _KargoCobTableState extends State<KargoCobTable> {
   void _showSuccessPopup(BuildContext context, AsetothersCariModel d) {
     showDialog(
       context: context,
-      builder: (_) => DetailPolisOthersTablePage(
-        sppa1Id: d.asetOthersId,
-      ),
+      builder: (dialogContext) {
+        return MediaQuery.removeViewInsets(
+          context: dialogContext,
+          removeBottom: true,
+          child: DetailPolisOthersTablePage(
+            sppa1Id: d.asetOthersId,
+          ),
+        );
+      },
     );
   }
 

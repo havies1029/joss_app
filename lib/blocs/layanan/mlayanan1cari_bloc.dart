@@ -14,44 +14,46 @@ class Mlayanan1CariBloc extends Bloc<Mlayanan1CariEvents, Mlayanan1CariState> {
 		on<RefreshMlayanan1CariEvent>(onRefreshMlayanan1Cari);
 	}
 
-Future<void> onRefreshMlayanan1Cari(
-		RefreshMlayanan1CariEvent event, Emitter<Mlayanan1CariState> emit) async {
-	emit(const Mlayanan1CariState());
-  emit(state.copyWith(mlayanan1Id: state.mlayanan1Id));
-	add(FetchMlayanan1CariEvent(mlayanan1Id: state.mlayanan1Id));
-}
+	Future<void> onRefreshMlayanan1Cari(
+			RefreshMlayanan1CariEvent event,
+			Emitter<Mlayanan1CariState> emit,
+			) async {
+		final currentId = state.mlayanan1Id;
 
-Future<void> onFetchMlayanan1Cari(
-		FetchMlayanan1CariEvent event, Emitter<Mlayanan1CariState> emit) async {
-	if (state.hasReachedMax) return;
+		emit(Mlayanan1CariState(mlayanan1Id: currentId));
 
-	Mlayanan1CariRepository repo = Mlayanan1CariRepository();
-	if (state.status == ListStatus.initial) {
-		List<Mlayanan1CariModel> items = await repo.getMlayanan1Cari(event.mlayanan1Id);
-		return emit(state.copyWith(
-			items: items,
-			hasReachedMax: false,
-			status: ListStatus.success,
-			));
+		add(FetchMlayanan1CariEvent(mlayanan1Id: currentId));
 	}
-	List<Mlayanan1CariModel> items = await repo.getMlayanan1Cari(event.mlayanan1Id);
-	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
-	} else {
-		List<Mlayanan1CariModel> mlayanan1Cari = List.of(state.items)..addAll(items);
 
-		final result = mlayanan1Cari
-			.whereWithIndex((e, index) =>
-				mlayanan1Cari.indexWhere((e2) => e2.mLayanan1Id == e.mLayanan1Id) ==
-				index)
-			.toList();
+	Future<void> onFetchMlayanan1Cari(
+			FetchMlayanan1CariEvent event,
+			Emitter<Mlayanan1CariState> emit,
+			) async {
+		final repo = Mlayanan1CariRepository();
 
-		return emit(state.copyWith(
-			items: result,
+		emit(state.copyWith(
+			items: const <Mlayanan1CariModel>[],
 			hasReachedMax: false,
-			status: ListStatus.success,
+			status: ListStatus.initial,
+			mlayanan1Id: event.mlayanan1Id,
+		));
+
+		try {
+			final items = await repo.getMlayanan1Cari(event.mlayanan1Id);
+
+			emit(state.copyWith(
+				items: items,
+				hasReachedMax: items.isEmpty,
+				status: ListStatus.success,
+				mlayanan1Id: event.mlayanan1Id,
+			));
+		} catch (_) {
+			emit(state.copyWith(
+				items: const <Mlayanan1CariModel>[],
+				hasReachedMax: false,
+				status: ListStatus.failure,
+				mlayanan1Id: event.mlayanan1Id,
 			));
 		}
-
 	}
 }

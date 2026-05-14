@@ -173,7 +173,7 @@ class KlaimmvklaimcrudFormPageFormState
 	Widget buildFieldCurrId() {
 		return buildFieldComboRMatauang(
 			comboKey: comboRMatauangKey,
-			labelText: 'currId',
+			labelText: 'Mata Uang',
 			initItem: fieldComboRMatauang,
 			onChangedCallback: (value) {
 				if (value != null) {

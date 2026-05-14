@@ -8,7 +8,7 @@ class Regendors1FormAPI {
 
 	Future<ReturnDataAPI> regendors1FormTambahAPI(Regendors1FormModel record) async {
 		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/a/regendors1form/create";
+				"${AppData.prefixEndPoint}/api/regendors/regendors1form/create";
 		Map<String, String> queryParams = {"modul_id": "regendors1FormTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 

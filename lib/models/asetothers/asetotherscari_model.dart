@@ -1,5 +1,8 @@
 class AsetothersCariModel {
 	String asetOthersId;
+	String tertanggung;
+	DateTime? periodeMulai;
+	DateTime? periodeAkhir;
 	String curr;
 	int nomor;
 	String polisNo;
@@ -13,9 +16,13 @@ class AsetothersCariModel {
 	bool isReaktif;
 	bool isRenewal;
 	int jmlObject;
+	String satuan;
 
 	AsetothersCariModel({
 		required this.asetOthersId,
+		required this.tertanggung,
+		required this.periodeMulai,
+		required this.periodeAkhir,
 		required this.curr,
 		required this.nomor,
 		required this.polisNo,
@@ -27,6 +34,7 @@ class AsetothersCariModel {
 		required this.prosesRemarks,
 		required this.prosesSource,
 		required this.jmlObject,
+		required this.satuan,
 		this.isReaktif = false,
 		this.isRenewal = false,
 	});
@@ -34,6 +42,13 @@ class AsetothersCariModel {
 	factory AsetothersCariModel.fromJson(Map<String, dynamic> data) {
 		return AsetothersCariModel(
 			asetOthersId: data['asetOthersId'] ?? '',
+			tertanggung: data['tertanggung'] ?? '',
+			periodeMulai: data['periodeMulai'] == null
+					? null
+					: DateTime.tryParse(data['periodeMulai'].toString()),
+			periodeAkhir: data['periodeAkhir'] == null
+					? null
+					: DateTime.tryParse(data['periodeAkhir'].toString()),
 			curr: data['curr'] ?? '',
 			nomor: int.tryParse(data['nomor'].toString()) ?? 0,
 			polisNo: data['polisNo'] ?? '',
@@ -47,11 +62,15 @@ class AsetothersCariModel {
 			isReaktif: data['isReaktif'] ?? false,
 			isRenewal: data['isRenewal'] ?? false,
 			jmlObject: int.tryParse(data['jmlObject'].toString()) ?? 0,
+			satuan: data['satuan'] ?? '',
 		);
 	}
 
 	Map<String, dynamic> toJson() => {
 		'asetOthersId': asetOthersId,
+		'tertanggung': tertanggung,
+		'periodeMulai': periodeMulai?.toIso8601String(),
+		'periodeAkhir': periodeAkhir?.toIso8601String(),
 		'curr': curr,
 		'nomor': nomor,
 		'polisNo': polisNo,
@@ -65,5 +84,6 @@ class AsetothersCariModel {
 		'isReaktif': isReaktif,
 		'isRenewal': isRenewal,
 		'jmlObject': jmlObject,
+		'satuan': satuan,
 	};
 }

@@ -311,6 +311,11 @@ flutter:
     - assets/icons/Information2.svg
     - assets/icons/home3.svg
     - assets/icons/cs_klaim.svg
+    - assets/icons/klaim_properti.svg
+    - assets/icons/klaim_kendaraan.svg
+    - assets/icons/klaim_lainnya.svg
+    - assets/icons/teknik_jps.svg
+    - assets/icons/marketing_jps.svg
 
   fonts:
     - family: Delm-Regular

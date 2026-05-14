@@ -278,7 +278,7 @@ class FabActionExecutor {
           recordId: "",
           sppaId: sppa1Id,
           cobId: cobId,
-          sppa2Id: item.sppa2Id ?? "",
+          sppa2Id: "",
         ),
       ),
     ).then((_) => done?.call());
@@ -385,13 +385,14 @@ class FabActionExecutor {
           barrierColor: Colors.black.withOpacity(0.45),
           builder: (_) {
             return HubungiCs(
-              onPilihLayanan: (layanan) {
+              mlayanan1Id: '02',
+              onPilihLayanan: (noTelepon) {
                 Navigator.pop(context);
-
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Pilih layanan: $layanan")),
+                  SnackBar(
+                    content: Text("No telepon: $noTelepon"),
+                  ),
                 );
-
                 // TODO: arahkan ke chat / page tujuan
                 // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
               },

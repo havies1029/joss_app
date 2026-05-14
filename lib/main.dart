@@ -143,6 +143,7 @@ import 'blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'blocs/klaimrinci/mstatusrincicari_bloc.dart';
 import 'blocs/klaimringkas/klaimringkascari_bloc.dart';
 import 'blocs/klaimringkas/mstatusringkascari_bloc.dart';
+import 'blocs/layanan/mlayanan1cari_bloc.dart';
 import 'blocs/local_prefs/article_selection_cubit.dart';
 
 import 'package:joss_app/blocs/gen_profile/mrekan1crud_bloc.dart';
@@ -674,6 +675,9 @@ Future<void> main() async {
         BlocProvider(create: (context) => Sppa2othersCariBloc()),
         BlocProvider(create: (context) => Sppa2hullCariBloc()),
         BlocProvider(create: (context) => Sppa2healthCariBloc()),
+
+        //layanan
+        BlocProvider(create: (context) => Mlayanan1CariBloc()),
 
       ],
       child: MultiBlocListener(

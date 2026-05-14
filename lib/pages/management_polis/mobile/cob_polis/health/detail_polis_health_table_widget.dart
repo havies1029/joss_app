@@ -167,11 +167,11 @@ class _DetailPolisHealthTableWidgetState
     return const TableRow(
       decoration: BoxDecoration(color: formGrey),
       children: [
-        _HeaderCell("NO", center: true),
-        _HeaderCell("NAMA"),
-        _HeaderCell("PAKET"),
-        _HeaderCell("TSI", right: true),
-        _HeaderCell("PREMI", right: true),
+        _HeaderCell("No", center: true),
+        _HeaderCell("Nama"),
+        _HeaderCell("Paket Nama"),
+        _HeaderCell("Nilai Pertanggungan", right: true),
+        _HeaderCell("Premi", right: true),
       ],
     );
   }

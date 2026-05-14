@@ -98,11 +98,14 @@ class FabActionKlaim extends StatelessWidget {
                   barrierColor: Colors.black.withOpacity(0.45),
                   builder: (_) {
                     return HubungiCs(
-                      onPilihLayanan: (layanan) {
+                      mlayanan1Id: '01',
+                      onPilihLayanan: (noTelepon) {
                         Navigator.pop(context);
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Pilih layanan: $layanan")),
+                          SnackBar(
+                            content: Text("No telepon: $noTelepon"),
+                          ),
                         );
 
                         // TODO: arahkan ke chat / page tujuan

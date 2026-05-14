@@ -79,8 +79,6 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
                           2: IntrinsicColumnWidth(),
                           3: IntrinsicColumnWidth(),
                           4: IntrinsicColumnWidth(),
-                          5: IntrinsicColumnWidth(),
-                          6: IntrinsicColumnWidth(),
                         },
                         children: [
                           _headerRow(),
@@ -121,11 +119,9 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
                   columnWidths: const {
                     0: FixedColumnWidth(50),
                     1: FixedColumnWidth(130),
-                    2: FixedColumnWidth(240),
-                    3: FixedColumnWidth(80),
-                    4: FixedColumnWidth(180),
-                    5: FixedColumnWidth(150),
-                    6: FixedColumnWidth(140),
+                    2: FixedColumnWidth(300),
+                    3: FixedColumnWidth(180),
+                    4: FixedColumnWidth(150),
                   },
                   children: [
                     _headerRow(),
@@ -170,13 +166,11 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
     return const TableRow(
       decoration: BoxDecoration(color: formGrey),
       children: [
-        _HeaderCell("NO", center: true),
-        _HeaderCell("NO POLISI"),
-        _HeaderCell("MERK"),
-        _HeaderCell("TAHUN", center: true),
-        _HeaderCell("COVER"),
-        _HeaderCell("HARGA", right: true),
-        _HeaderCell("PREMI", right: true),
+        _HeaderCell("No", center: true),
+        _HeaderCell("No Polisi"),
+        _HeaderCell("Merk Kendaraan"),
+        _HeaderCell("Nilai Pertanggungan", right: true),
+        _HeaderCell("Premi", right: true),
       ],
     );
   }
@@ -203,8 +197,6 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
         _cellCenter((index + 1).toString()),
         _cellText(d.polisiNo.isNotEmpty ? d.polisiNo : "-", compact: compact),
         _cellText(merkGabungan.isNotEmpty ? merkGabungan : "-", compact: compact),
-        _cellCenter(d.thnBuat == 0 ? "-" : d.thnBuat.toString()),
-        _cellText(d.coverName.isNotEmpty ? d.coverName : "-", compact: compact),
         _cellRight(harga),
         _cellRight(premi),
       ],

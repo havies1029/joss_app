@@ -17,6 +17,7 @@ class AsetParCariModel {
 	bool isReaktif;
 	bool isRenewal;
 	int jmlObject;
+	String satuan;
 
 	AsetParCariModel({
 		required this.asetParId,
@@ -35,6 +36,7 @@ class AsetParCariModel {
 		required this.prosesRemarks,
 		required this.prosesSource,
 		required this.jmlObject,
+		required this.satuan,
 		this.isReaktif = false,
 		this.isRenewal = false,
 	});
@@ -64,6 +66,7 @@ class AsetParCariModel {
 			isReaktif: data['isReaktif'] ?? false,
 			isRenewal: data['isRenewal'] ?? false,
 			jmlObject: int.tryParse(data['jmlObject'].toString()) ?? 0,
+			satuan: data['satuan'] ?? '',
 		);
 	}
 
@@ -86,5 +89,6 @@ class AsetParCariModel {
 		'isReaktif': isReaktif,
 		'isRenewal': isRenewal,
 		'jmlObject': jmlObject,
+		'satuan': satuan,
 	};
 }

@@ -68,7 +68,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     final max = vController.position.maxScrollExtent;
     final cur = vController.position.pixels;
 
-    const threshold = 100.0;
+    const threshold = 80.0;
 
     if (max - cur <= threshold) {
       if (!s.hasReachedMax && !s.isFetching) {
@@ -178,8 +178,8 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     final wJmlObject = _columnWidthFromLongest(
       context,
       jmlObjectValues,
-      min: 80,
-      max: 100,
+      min: 110,
+      max: 140,
     );
 
     // return {
@@ -195,13 +195,13 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
     // };
     return {
       0: FixedColumnWidth(selectCol),
-      1: const FixedColumnWidth(50),      // No
-      2: FixedColumnWidth(wPolis),        // Polis No
-      3: FixedColumnWidth(wJmlObject),    // Jml Object
-      4: FixedColumnWidth(wTertanggung),  // Tertanggung
-      5: const FixedColumnWidth(periodeWidth), // Periode
-      6: FixedColumnWidth(wNilai),        // Nilai Pertanggungan
-      7: FixedColumnWidth(wPremi),        // Premi
+      1: const FixedColumnWidth(50), // No
+      2: FixedColumnWidth(wPolis), // Polis No
+      3: FixedColumnWidth(wJmlObject), // Jml Object
+      4: const FixedColumnWidth(periodeWidth), // Periode
+      5: FixedColumnWidth(wTertanggung), // Tertanggung
+      6: FixedColumnWidth(wNilai), // Nilai Pertanggungan
+      7: FixedColumnWidth(wPremi), // Premi
     };
   }
 
@@ -336,8 +336,8 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
             1: const FlexColumnWidth(1.0), // No
             2: const FlexColumnWidth(2.0), // Polis No
             3: const FlexColumnWidth(1.2), // Jml Object
-            4: const FlexColumnWidth(2.4), // Tertanggung
-            5: const FlexColumnWidth(2.0), // Periode
+            4: const FlexColumnWidth(2.0), // Periode
+            5: const FlexColumnWidth(2.4), // Tertanggung
             6: const FlexColumnWidth(2.4), // Nilai Pertanggungan
             7: const FlexColumnWidth(1.6), // Premi
           },
@@ -370,8 +370,8 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
           "No",
           "Polis No",
           "Jumlah Objek",
-          "Tertanggung",
           "Periode",
+          "Tertanggung",
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
@@ -449,16 +449,9 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         ),
 
         _clickableTextCell(
-          "${d.jmlObject}",
+          "${d.jmlObject} ${d.satuan}",
           onTap: triggerRow,
           maxLines: maxLinesNoPol,
-          softWrap: true,
-        ),
-
-        _clickableTextCell(
-          d.tertanggung,
-          onTap: triggerRow,
-          maxLines: maxLinesTertanggung,
           softWrap: true,
         ),
 
@@ -467,6 +460,13 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
               "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
           onTap: triggerRow,
           maxLines: compact ? 2 : 1,
+          softWrap: true,
+        ),
+
+        _clickableTextCell(
+          d.tertanggung,
+          onTap: triggerRow,
+          maxLines: maxLinesTertanggung,
           softWrap: true,
         ),
 
@@ -490,9 +490,15 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
   void _showSuccessPopup(BuildContext context, AsetMvCariModel d) {
     showDialog(
       context: context,
-      builder: (_) => DetailPolisMvTablePage(
-        sppa1Id: d.asetMvId,
-      ),
+      builder: (dialogContext) {
+        return MediaQuery.removeViewInsets(
+          context: dialogContext,
+          removeBottom: true,
+          child: DetailPolisMvTablePage(
+            sppa1Id: d.asetMvId,
+          ),
+        );
+      },
     );
   }
 

@@ -48,11 +48,16 @@ class HullCobTable extends StatefulWidget {
 }
 
 class _HullCobTableState extends State<HullCobTable> {
-  String formatNum(num? value) =>
-      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
-
   late final ScrollController hController;
   late final ScrollController vController;
+
+  String formatDate(DateTime? date) {
+    if (date == null) return "-";
+    return DateFormat('dd MMM yyyy').format(date);
+  }
+
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
   @override
   void initState() {
@@ -173,9 +178,10 @@ class _HullCobTableState extends State<HullCobTable> {
       1: const FixedColumnWidth(50), // No
       2: const FixedColumnWidth(140), // Polis No
       3: const FixedColumnWidth(100), // Jml Object
-      4: FixedColumnWidth(wTertanggung), // Tertanggung
-      5: FixedColumnWidth(wTsi), // TSI
-      6: FixedColumnWidth(wPremi), // Premi
+      4: const FixedColumnWidth(180), // Periode
+      5: FixedColumnWidth(wTertanggung), // Tertanggung
+      6: FixedColumnWidth(wTsi), // TSI
+      7: FixedColumnWidth(wPremi), // Premi
     };
   }
 
@@ -315,9 +321,10 @@ class _HullCobTableState extends State<HullCobTable> {
             1: const FlexColumnWidth(1.0), // No
             2: const FlexColumnWidth(2.0), // Polis No
             3: const FlexColumnWidth(1.2), // Jml Object
-            4: const FlexColumnWidth(2.6), // Tertanggung
-            5: const FlexColumnWidth(2.2), // TSI
-            6: const FlexColumnWidth(1.8), // Premi
+            4: const FlexColumnWidth(2.2), // Periode
+            5: const FlexColumnWidth(2.6), // Tertanggung
+            6: const FlexColumnWidth(2.2), // TSI
+            7: const FlexColumnWidth(1.8), // Premi
           },
           children: [
             _tableHeader(context),
@@ -348,6 +355,7 @@ class _HullCobTableState extends State<HullCobTable> {
           "No",
           "No Polis",
           "Jumlah Objek",
+          "Periode",
           "Tertanggung",
           "Nilai Pertanggungan",
           "Premi",
@@ -436,10 +444,17 @@ class _HullCobTableState extends State<HullCobTable> {
         ),
 
         _clickableTextCell(
-          "${d.jmlObject}",
+          "${d.jmlObject} ${d.satuan}",
           onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
+        ),
+
+        _clickableTextCell(
+          "${formatDate(d.periodeMulai)} - ${formatDate(d.periodeAkhir)}",
+          onTap: triggerRow,
+          maxLines: 2,
+          softWrap: true,
         ),
 
         _clickableTextCell(
@@ -488,9 +503,15 @@ class _HullCobTableState extends State<HullCobTable> {
   void _showSuccessPopup(BuildContext context, AsethullCariModel d) {
     showDialog(
       context: context,
-      builder: (_) => DetailPolisHullTablePage(
-        sppa1Id: d.asetHullId,
-      ),
+      builder: (dialogContext) {
+        return MediaQuery.removeViewInsets(
+          context: dialogContext,
+          removeBottom: true,
+          child: DetailPolisHullTablePage(
+            sppa1Id: d.asetHullId,
+          ),
+        );
+      },
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../blocs/layanan/mlayanan1cari_bloc.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../blocs/payment/dnrekapcobcari_bloc.dart';
 import '../../../../common/constants.dart';
@@ -21,6 +22,7 @@ import '../payment_page/payment_success/payment_success.dart';
 import 'konfirmasi_detail_polis.dart';
 import 'rincian_grand_total_widget.dart';
 import 'rincian_tabel_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RincianPage extends StatefulWidget {
   const RincianPage({super.key});
@@ -33,12 +35,13 @@ class _RincianPageState extends State<RincianPage> {
   late DnRekap2invBloc dn2invBloc;
   late DnrekapcobCariBloc dnrekapcobCariBloc;
   final TextEditingController _searchController = TextEditingController();
-
+  Mlayanan1CariBloc? mlayanan1cariBloc;
   @override
   void initState() {
     super.initState();
     dn2invBloc = context.read<DnRekap2invBloc>();
     dnrekapcobCariBloc = context.read<DnrekapcobCariBloc>();
+    mlayanan1cariBloc = context.read<Mlayanan1CariBloc>();
 
     Future.delayed(const Duration(milliseconds: 500), () {
       dn2invBloc.add(InitializeDnRekap2invEvent());
@@ -46,7 +49,26 @@ class _RincianPageState extends State<RincianPage> {
     });
   }
 
+
+  Future<void> openLinkLayanan(String link) async {
+    if (link.trim().isEmpty) return;
+
+    final uri = Uri.parse(link.trim());
+
+    if (!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    )) {
+      debugPrint("Tidak bisa membuka link: $link");
+    }
+  }
+
   void refreshData() {
+    mlayanan1cariBloc?.add(
+      FetchMlayanan1CariEvent(
+        mlayanan1Id: "03",
+      ),
+    );
     dn2invBloc.add(GetRincianSOACustomerEvent(searchText: _searchController.text));
   }
 
@@ -247,27 +269,42 @@ class _RincianPageState extends State<RincianPage> {
                     );
                   },
 
-                  onHubungiKeuTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      barrierColor: Colors.black.withOpacity(0.45),
-                      builder: (_) {
-                        return HubungiCs(
-                          onPilihLayanan: (layanan) {
-                            Navigator.pop(context);
+                  onHubungiKeuTap: () async {
+                    final layananState = context.read<Mlayanan1CariBloc>().state;
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Pilih layanan: $layanan")),
-                            );
+                    if (layananState.items.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Data layanan tidak ditemukan"),
+                        ),
+                      );
+                      return;
+                    }
 
-                            // TODO: arahkan ke chat / page tujuan
-                            // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
-                          },
-                        );
-                      },
-                    );
+                    final layanan1 = layananState.items.first;
+
+                    if (layanan1.mLayanan2.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Detail layanan kosong"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    final layanan = layanan1.mLayanan2.first;
+                    final link = layanan.linkLayanan;
+
+                    if (link.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Link layanan tidak tersedia"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    await openLinkLayanan(link);
                   },
                 ),
               ],
@@ -276,6 +313,7 @@ class _RincianPageState extends State<RincianPage> {
         ),
       ),
     );
+
   }
 
   void _showExportDialog(BuildContext context) {

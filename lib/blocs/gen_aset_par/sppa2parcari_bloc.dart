@@ -14,46 +14,102 @@ class Sppa2parCariBloc extends Bloc<Sppa2parCariEvents, Sppa2parCariState> {
 		on<RefreshSppa2parCariEvent>(onRefreshSppa2parCari);
 	}
 
-Future<void> onRefreshSppa2parCari(
-		RefreshSppa2parCariEvent event, Emitter<Sppa2parCariState> emit) async {
-	emit(const Sppa2parCariState());
-
-  emit(state.copyWith(searchText: event.searchText, sppa1Id: event.sppa1Id));
-
-	add(FetchSppa2parCariEvent());
-}
-
-Future<void> onFetchSppa2parCari(
-		FetchSppa2parCariEvent event, Emitter<Sppa2parCariState> emit) async {
-	if (state.hasReachedMax) return;
-
-	Sppa2parCariRepository repo = Sppa2parCariRepository();
-	if (state.status == ListStatus.initial) {
-		List<Sppa2parCariModel> items = await repo.getSppa2parCari(state.sppa1Id, state.searchText, 0);
-		return emit(state.copyWith(
-			items: items,
-			hasReachedMax: false,
-			status: ListStatus.success,
-			hal: 1));
+	String buildKey({
+		required String sppa1Id,
+		required String search,
+	}) {
+		return '${sppa1Id.trim()}|${search.trim().toLowerCase()}';
 	}
-	List<Sppa2parCariModel> items = await repo.getSppa2parCari(state.sppa1Id, state.searchText, state.hal);
-	if (items.isEmpty) {
-		return emit(state.copyWith(hasReachedMax: true));
-	} else {
-		List<Sppa2parCariModel> sppa2parCari = List.of(state.items)..addAll(items);
 
-		final result = sppa2parCari
-			.whereWithIndex((e, index) =>
-				sppa2parCari.indexWhere((e2) => e2.sppa2parId == e.sppa2parId) ==
-				index)
-			.toList();
+	Future<void> onRefreshSppa2parCari(
+			RefreshSppa2parCariEvent event,
+			Emitter<Sppa2parCariState> emit,
+			) async {
+		final newKey = buildKey(
+			sppa1Id: event.sppa1Id,
+			search: event.searchText,
+		);
 
-		return emit(state.copyWith(
-			items: result,
+		emit(state.copyWith(
+			status: ListStatus.initial,
+			items: const <Sppa2parCariModel>[],
 			hasReachedMax: false,
-			status: ListStatus.success,
-			hal: state.hal + 1));
-		}
+			isFetching: false,
+			hal: 0,
+			searchText: event.searchText,
+			sppa1Id: event.sppa1Id,
+			queryKey: newKey,
+		));
 
+		add(FetchSppa2parCariEvent());
+	}
+
+	Future<void> onFetchSppa2parCari(
+			FetchSppa2parCariEvent event,
+			Emitter<Sppa2parCariState> emit,
+			) async {
+		if (state.hasReachedMax) return;
+		if (state.isFetching) return;
+		if (state.sppa1Id.trim().isEmpty) return;
+
+		final repo = Sppa2parCariRepository();
+		final keyAtRequest = state.queryKey;
+		final nextHal = state.hal;
+
+		emit(state.copyWith(isFetching: true));
+
+		try {
+			final items = await repo.getSppa2parCari(
+				state.sppa1Id,
+				state.searchText,
+				nextHal,
+			);
+
+			if (state.queryKey != keyAtRequest) return;
+
+			if (nextHal == 0) {
+				emit(state.copyWith(
+					items: items,
+					hasReachedMax: items.isEmpty,
+					status: ListStatus.success,
+					hal: 1,
+					isFetching: false,
+				));
+				return;
+			}
+
+			if (items.isEmpty) {
+				emit(state.copyWith(
+					hasReachedMax: true,
+					isFetching: false,
+				));
+				return;
+			}
+
+			final merged = List<Sppa2parCariModel>.of(state.items)..addAll(items);
+
+			final result = merged
+					.whereWithIndex(
+						(e, index) =>
+				merged.indexWhere((e2) => e2.sppa2parId == e.sppa2parId) ==
+						index,
+			)
+					.toList();
+
+			emit(state.copyWith(
+				items: result,
+				hasReachedMax: false,
+				status: ListStatus.success,
+				hal: state.hal + 1,
+				isFetching: false,
+			));
+		} catch (_) {
+			if (state.queryKey == keyAtRequest) {
+				emit(state.copyWith(
+					status: ListStatus.failure,
+					isFetching: false,
+				));
+			}
+		}
 	}
 }

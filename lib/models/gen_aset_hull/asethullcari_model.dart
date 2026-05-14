@@ -16,6 +16,7 @@ class AsethullCariModel {
 	bool isReaktif;
 	bool isRenewal;
 	int jmlObject;
+	String satuan;
 
 	AsethullCariModel({
 		required this.asetHullId,
@@ -33,6 +34,7 @@ class AsethullCariModel {
 		required this.prosesRemarks,
 		required this.prosesSource,
 		required this.jmlObject,
+		required this.satuan,
 		this.isReaktif = false,
 		this.isRenewal = false,
 	});
@@ -60,6 +62,7 @@ class AsethullCariModel {
 			isReaktif: data['isReaktif'] ?? false,
 			isRenewal: data['isRenewal'] ?? false,
 			jmlObject: int.tryParse(data['jmlObject'].toString()) ?? 0,
+			satuan: data['satuan'] ?? '',
 		);
 	}
 
@@ -81,5 +84,6 @@ class AsethullCariModel {
 		'isReaktif': isReaktif,
 		'isRenewal': isRenewal,
 		'jmlObject': jmlObject,
+		'satuan': satuan,
 	};
 }

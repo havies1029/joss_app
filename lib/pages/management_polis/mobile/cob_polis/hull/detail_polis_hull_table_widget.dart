@@ -27,22 +27,29 @@ class _DetailPolisHullTableWidgetState extends State<DetailPolisHullTableWidget>
 
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
 
+  void _onScroll() {
+    if (!_verticalController.hasClients) return;
+    if (widget.isLoadingMore) return;
+
+    final max = _verticalController.position.maxScrollExtent;
+    final cur = _verticalController.position.pixels;
+
+    const threshold = 80.0;
+
+    if (max - cur <= threshold) {
+      widget.onLoadMore();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    _verticalController.addListener(() {
-      if (widget.isLoadingMore) return;
-
-      if (_verticalController.position.pixels >=
-          _verticalController.position.maxScrollExtent - 80) {
-        widget.onLoadMore();
-      }
-    });
+    _verticalController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _verticalController.removeListener(_onScroll);
     _verticalController.dispose();
     super.dispose();
   }
@@ -80,7 +87,6 @@ class _DetailPolisHullTableWidgetState extends State<DetailPolisHullTableWidget>
                           2: IntrinsicColumnWidth(),
                           3: IntrinsicColumnWidth(),
                           4: IntrinsicColumnWidth(),
-                          5: IntrinsicColumnWidth(),
                         },
                         children: [
                           _headerRow(),
@@ -122,9 +128,8 @@ class _DetailPolisHullTableWidgetState extends State<DetailPolisHullTableWidget>
                     0: FlexColumnWidth(0.7),
                     1: FlexColumnWidth(2),
                     2: FlexColumnWidth(2),
-                    3: FlexColumnWidth(2),
+                    3: FlexColumnWidth(1.6),
                     4: FlexColumnWidth(1.6),
-                    5: FlexColumnWidth(1.6),
                   },
                   children: [
                     _headerRow(),
@@ -169,12 +174,11 @@ class _DetailPolisHullTableWidgetState extends State<DetailPolisHullTableWidget>
     return const TableRow(
       decoration: BoxDecoration(color: formGrey),
       children: [
-        _HeaderCell("NO", center: true),
-        _HeaderCell("NAMA KAPAL"),
-        _HeaderCell("KERANGKA"),
-        _HeaderCell("VESSEL CLASS"),
-        _HeaderCell("SI", right: true),
-        _HeaderCell("PREMI", right: true),
+        _HeaderCell("No", center: true),
+        _HeaderCell("Nama Kapal"),
+        _HeaderCell("Kelas Kapal"),
+        _HeaderCell("Nilai Pertanggungan", right: true),
+        _HeaderCell("Premi", right: true),
       ],
     );
   }
@@ -194,7 +198,6 @@ class _DetailPolisHullTableWidgetState extends State<DetailPolisHullTableWidget>
       children: [
         _cellCenter((index + 1).toString()),
         _cellText(d.namaKapal.isNotEmpty ? d.namaKapal : "-", compact: compact),
-        _cellText(d.kerangka.isNotEmpty ? d.kerangka : "-", compact: compact),
         _cellText(
           d.vesselClass.isNotEmpty ? d.vesselClass : "-",
           compact: compact,

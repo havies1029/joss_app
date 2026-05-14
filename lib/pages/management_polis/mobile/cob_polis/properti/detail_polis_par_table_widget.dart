@@ -27,20 +27,29 @@ class _DetailPolisParTableWidgetState
 
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
 
+  void _onScroll() {
+    if (!_verticalController.hasClients) return;
+    if (widget.isLoadingMore) return;
+
+    final max = _verticalController.position.maxScrollExtent;
+    final cur = _verticalController.position.pixels;
+
+    const threshold = 80.0;
+
+    if (max - cur <= threshold) {
+      widget.onLoadMore();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    _verticalController.addListener(() {
-      if (_verticalController.position.pixels >=
-          _verticalController.position.maxScrollExtent - 80) {
-        widget.onLoadMore();
-      }
-    });
+    _verticalController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _verticalController.removeListener(_onScroll);
     _verticalController.dispose();
     super.dispose();
   }

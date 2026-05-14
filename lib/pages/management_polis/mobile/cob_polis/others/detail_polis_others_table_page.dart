@@ -116,7 +116,8 @@ class _DetailPolisOthersTablePageState
                 buildWhen: (p, c) =>
                 p.status != c.status ||
                     p.items != c.items ||
-                    p.hasReachedMax != c.hasReachedMax,
+                    p.hasReachedMax != c.hasReachedMax ||
+                    p.isFetching != c.isFetching,
                 builder: (context, state) {
                   if (state.status == ListStatus.initial) {
                     return const SizedBox(
@@ -143,12 +144,13 @@ class _DetailPolisOthersTablePageState
                     height: _tableHeight(state.items.length),
                     child: DetailPolisOthersTableWidget(
                       items: state.items,
-                      isLoadingMore: !state.hasReachedMax &&
-                          state.status == ListStatus.success,
+                      isLoadingMore: state.isFetching,
                       onLoadMore: () {
-                        context
-                            .read<Sppa2othersCariBloc>()
-                            .add(FetchSppa2othersCariEvent());
+                        if (!state.hasReachedMax && !state.isFetching) {
+                          context
+                              .read<Sppa2othersCariBloc>()
+                              .add(FetchSppa2othersCariEvent());
+                        }
                       },
                     ),
                   );

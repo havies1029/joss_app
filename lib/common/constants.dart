@@ -94,6 +94,7 @@ const Color aGrey = Color(0xFF383838);
 const Color unselectedColor = Color(0xFF666666);
 const Color scrollBar = Color(0xFFD9D9D9);
 const Color greyKlaim = Color(0xFFA8A8A8);
+const Color anotherGrey = Color(0xFF404040);
 
 const Color bGrey = Color(0xFFA1A1AA);
 const Color bdGrey = Color(0xFFBCBCC7);

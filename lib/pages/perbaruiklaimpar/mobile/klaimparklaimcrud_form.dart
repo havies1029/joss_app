@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/repositories/combobox/combomjenisrugi_repository.dart';
 import 'package:joss_app/blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-
+import 'package:joss_app/models/combobox/combormatauang_model.dart';
+import 'package:joss_app/repositories/combobox/combormatauang_repository.dart';
 import '../../../helper/indo_phone_result.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
+import '../../../widgets/combobox/combormatauang_widget.dart';
+import '../../perbaruiklaimmv/mobile/klaimmvklaimcrud_form.dart';
 
 class KlaimparklaimcrudFormPage extends StatefulWidget {
 	final String cobGroupId;
@@ -45,6 +49,11 @@ class KlaimparklaimcrudFormPageFormState
 	final comboMJenisrugiKey =
 	GlobalKey<DropdownSearchState<ComboMJenisrugiModel>>();
 
+	ComboRMatauangModel? fieldComboRMatauang;
+	final comboRMatauangKey =
+	GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
+
+	final fieldKlaimAmountController = TextEditingController();
 	final fieldPenyebabController = TextEditingController();
 	final fieldPicEmailController = TextEditingController();
 	final fieldPicJabatanController = TextEditingController();
@@ -157,12 +166,84 @@ class KlaimparklaimcrudFormPageFormState
 			ok = false;
 		}
 
+		if (fieldComboRMatauang == null) {
+			setErr('form.currId', kStringNullError);
+			ok = false;
+		}
+
+		final klaimAmount = parseAmount(fieldKlaimAmountController.text);
+		if (klaimAmount <= 0) {
+			setErr('form.klaimAmount', kStringNullError);
+			ok = false;
+		}
+
 		return ok;
+	}
+
+	void syncFormToBloc() {
+		klaimparklaimcrudBloc.add(FieldDolChangedEvent(
+			dol: DateTime.parse(fieldDolController.text),
+		));
+
+		klaimparklaimcrudBloc.add(FieldLaporJpsChangedEvent(
+			laporJps: DateTime.parse(fieldLaporJpsController.text),
+		));
+
+		if (!isPolisJps) {
+			klaimparklaimcrudBloc.add(FieldLaporAsuransiChangedEvent(
+				laporAsuransi: DateTime.parse(fieldLaporAsuransiController.text),
+			));
+		}
+
+		klaimparklaimcrudBloc.add(FieldPicNamaChangedEvent(
+			picNama: fieldPicNamaController.text.trim(),
+		));
+
+		klaimparklaimcrudBloc.add(FieldPicJabatanChangedEvent(
+			picJabatan: fieldPicJabatanController.text.trim(),
+		));
+
+		klaimparklaimcrudBloc.add(FieldPicEmailChangedEvent(
+			picEmail: fieldPicEmailController.text.trim(),
+		));
+
+		klaimparklaimcrudBloc.add(FieldPicTelpChangedEvent(
+			picTelp: fieldPicTelpController.text.trim(),
+		));
+
+		if (fieldComboMJenisrugi != null) {
+			klaimparklaimcrudBloc.add(
+				ComboMJenisrugiChangedEvent(comboMJenisrugi: fieldComboMJenisrugi!),
+			);
+		}
+
+		if (fieldComboRMatauang != null) {
+			klaimparklaimcrudBloc.add(
+				ComboRMatauangChangedEvent(comboRMatauang: fieldComboRMatauang!),
+			);
+		}
+
+		klaimparklaimcrudBloc.add(FieldKlaimAmountChangedEvent(
+			klaimAmount: parseAmount(fieldKlaimAmountController.text),
+		));
+
+		klaimparklaimcrudBloc.add(FieldPenyebabChangedEvent(
+			penyebab: fieldPenyebabController.text.trim(),
+		));
+
+		klaimparklaimcrudBloc.add(FieldKeteranganChangedEvent(
+			keterangan: fieldKeteranganController.text.trim(),
+		));
 	}
 
 	bool runFullValidation() {
 		final ok = validateForm();
 		widget.formKey.currentState?.validate();
+
+		if (ok) {
+			syncFormToBloc();
+		}
+
 		return ok;
 	}
 
@@ -186,6 +267,7 @@ class KlaimparklaimcrudFormPageFormState
 		fieldPicNamaController.dispose();
 		fieldPicTelpController.dispose();
 		fieldCobNamaController.dispose();
+		fieldKlaimAmountController.dispose();
 		super.dispose();
 	}
 
@@ -224,6 +306,8 @@ class KlaimparklaimcrudFormPageFormState
 								const SizedBox(height: hPadding),
 								buildFieldMjenisrugiId(),
 								const SizedBox(height: hPadding),
+								buildFieldKlaimAmount(),
+								const SizedBox(height: hPadding),
 								buildFieldPenyebab(),
 								const SizedBox(height: hPadding),
 								buildFieldKeterangan(),
@@ -246,10 +330,13 @@ class KlaimparklaimcrudFormPageFormState
 						fieldPicEmailController.text = state.record!.picEmail;
 						fieldPicJabatanController.text = state.record!.picJabatan;
 						fieldPicNamaController.text = state.record!.picNama;
+						fieldComboRMatauang = state.comboRMatauang;
 						fieldPicTelpController.text =
 								IndoPhoneHelper.toDisplay(state.record!.picTelp);
 						isPolisJps = state.record?.isPolisJps ?? false;
 						fieldCobNamaController.text = state.record!.cobNama;
+						fieldKlaimAmountController.text =
+								NumberFormat("#,###").format(state.record!.klaimAmount);
 					}
 					fieldComboMJenisrugi = state.comboMJenisrugi;
 				}
@@ -492,5 +579,73 @@ class KlaimparklaimcrudFormPageFormState
 				);
 			},
 		);
+	}
+
+	Widget buildFieldCurrId() {
+		return buildFieldComboRMatauang(
+			comboKey: comboRMatauangKey,
+			labelText: 'Mata Uang',
+			initItem: fieldComboRMatauang,
+			onChangedCallback: (value) {
+				setState(() {
+					fieldComboRMatauang = value;
+					if (value != null) clearErr('form.currId');
+				});
+
+				klaimparklaimcrudBloc.add(
+					FieldCurrIdChangedEvent(
+						currId: fieldComboRMatauang?.rmatauangKode ?? '',
+					),
+				);
+			},
+			onSaveCallback: (value) {
+				fieldComboRMatauang = value;
+
+				klaimparklaimcrudBloc.add(
+					FieldCurrIdChangedEvent(
+						currId: fieldComboRMatauang?.rmatauangKode ?? '',
+					),
+				);
+			},
+		);
+	}
+
+	Widget buildFieldKlaimAmount() {
+		return AppCurrencyAmountField(
+			label: "Nilai Klaim",
+			currency: fieldComboRMatauang,
+			errorText: err('form.klaimAmount'),
+			onCurrencyChanged: (v) {
+				setState(() {
+					fieldComboRMatauang = v;
+					if (v != null) clearErr('form.currId');
+				});
+
+				if (v != null) {
+					klaimparklaimcrudBloc.add(
+						ComboRMatauangChangedEvent(comboRMatauang: v),
+					);
+				}
+			},
+			amountController: fieldKlaimAmountController,
+			onAmountChanged: (rawText) {
+				final amount = parseAmount(rawText);
+
+				klaimparklaimcrudBloc.add(
+					FieldKlaimAmountChangedEvent(klaimAmount: amount),
+				);
+
+				if (amount > 0) {
+					clearErr('form.klaimAmount');
+				}
+			},
+			validator: (_) => err('form.klaimAmount'),
+		);
+	}
+
+	double parseAmount(String s) {
+		final cleaned = s.replaceAll(RegExp(r'[^0-9.]'), '');
+		if (cleaned.isEmpty) return 0;
+		return double.tryParse(cleaned) ?? 0;
 	}
 }

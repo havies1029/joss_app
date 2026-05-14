@@ -207,15 +207,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
                     2: const FixedColumnWidth(140), // No Proses
                     3: const FixedColumnWidth(120), // No Polis
                     4: const FixedColumnWidth(120), // Jml Object
-                    5: const FixedColumnWidth(170), // Tertanggung
-                    6: const FixedColumnWidth(180), // Periode
+                    5: const FixedColumnWidth(180), // Periode
+                    6: const FixedColumnWidth(170), // Tertanggung
                     7: const FixedColumnWidth(170), // Nilai Pertanggungan
                     8: const FixedColumnWidth(140), // Premi
                   } else ...{
                     2: const FixedColumnWidth(160), // No Polis
                     3: const FixedColumnWidth(120), // Jml Object
-                    4: const FixedColumnWidth(170), // Tertanggung
-                    5: const FixedColumnWidth(180), // Periode
+                    4: const FixedColumnWidth(180), // Periode
+                    5: const FixedColumnWidth(170), // Tertanggung
                     6: const FixedColumnWidth(170), // Nilai Pertanggungan
                     7: const FixedColumnWidth(140), // Premi
                   },
@@ -274,15 +274,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
               2: const FixedColumnWidth(140), // No Proses
               3: const FixedColumnWidth(120), // No Polis
               4: const FixedColumnWidth(120), // Jml Object
-              5: const FixedColumnWidth(170), // Tertanggung
-              6: const FixedColumnWidth(180), // Periode
+              5: const FixedColumnWidth(180), // Periode
+              6: const FixedColumnWidth(170), // Tertanggung
               7: const FixedColumnWidth(170), // Nilai Pertanggungan
               8: const FixedColumnWidth(140), // Premi
             } else ...{
               2: const FixedColumnWidth(160), // No Polis
               3: const FixedColumnWidth(120), // Jml Object
-              4: const FixedColumnWidth(170), // Tertanggung
-              5: const FixedColumnWidth(180), // Periode
+              4: const FixedColumnWidth(180), // Periode
+              5: const FixedColumnWidth(170), // Tertanggung
               6: const FixedColumnWidth(170), // Nilai Pertanggungan
               7: const FixedColumnWidth(140), // Premi
             },
@@ -322,8 +322,8 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           if (showColumn) "No Proses",
           "No Polis",
           "Jumlah Objek",
-          "Tertanggung",
           "Periode",
+          "Tertanggung",
           "Nilai Pertanggungan",
           "Premi",
         ].map((t) {
@@ -428,17 +428,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
         _clickableCell(
           onTap: triggerRow,
           child: Text(
-            "${d.jmlObject}",
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            d.tertanggung,
+            "${d.jmlObject} ${d.satuan}",
             maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: primaryLightColor),
@@ -451,6 +441,16 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
             "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} - "
                 "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
             maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: primaryLightColor),
+          ),
+        ),
+
+        _clickableCell(
+          onTap: triggerRow,
+          child: Text(
+            d.tertanggung,
+            maxLines: compact ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: primaryLightColor),
           ),
@@ -489,9 +489,15 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
   void _showSuccessPopup(BuildContext context, AsetParCariModel d) {
     showDialog(
       context: context,
-      builder: (_) => DetailPolisParTablePage(
-        sppa1Id: d.asetParId,
-      ),
+      builder: (dialogContext) {
+        return MediaQuery.removeViewInsets(
+          context: dialogContext,
+          removeBottom: true,
+          child: DetailPolisParTablePage(
+            sppa1Id: d.asetParId,
+          ),
+        );
+      },
     );
   }
 }

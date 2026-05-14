@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
@@ -51,6 +52,14 @@ class _HealthCobTableState extends State<HealthCobTable> {
   late final ScrollController hController;
   late final ScrollController vController;
 
+  String formatNum(num? value) =>
+      NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
+
+  String formatDate(DateTime? date) {
+    if (date == null) return "-";
+    return DateFormat('dd MMM yyyy').format(date);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -67,7 +76,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
 
     final max = vController.position.maxScrollExtent;
     final cur = vController.position.pixels;
-    const threshold = 100.0;
+    const threshold = 80.0;
 
     if (max - cur <= threshold) {
       if (!s.hasReachedMax && !s.isFetching) {
@@ -167,8 +176,8 @@ class _HealthCobTableState extends State<HealthCobTable> {
     final wJmlObject = _columnWidthFromLongest(
       context,
       jmlObjectValues,
-      min: 80,
-      max: 100,
+      min: 110,
+      max: 140,
     );
 
     final wStatus = _columnWidthFromLongest(
@@ -181,9 +190,12 @@ class _HealthCobTableState extends State<HealthCobTable> {
     return {
       0: FixedColumnWidth(selectCol),
       1: const FixedColumnWidth(50), // No
-      2: FixedColumnWidth(wPolis), // Polis No
+      2: FixedColumnWidth(wPolis), // No Polis
       3: FixedColumnWidth(wJmlObject), // Jml Object
-      4: FixedColumnWidth(wStatus), // Status
+      4: const FixedColumnWidth(180), // Periode
+      5: const FixedColumnWidth(180), // Tertanggung
+      6: const FixedColumnWidth(170), // Nilai Pertanggungan
+      7: const FixedColumnWidth(140), // Premi
     };
   }
 
@@ -345,9 +357,12 @@ class _HealthCobTableState extends State<HealthCobTable> {
                 ? const FixedColumnWidth(0)
                 : const FlexColumnWidth(0.8),
             1: const FlexColumnWidth(1.0), // No
-            2: const FlexColumnWidth(3.0), // Polis No
-            3: const FlexColumnWidth(1.2), // Jml Object
-            4: const FlexColumnWidth(2.4), // Status
+            2: const FlexColumnWidth(2.0), // No Polis
+            3: const FlexColumnWidth(1.6), // Jml Object
+            4: const FlexColumnWidth(2.2), // Periode
+            5: const FlexColumnWidth(2.4), // Tertanggung
+            6: const FlexColumnWidth(2.2), // Nilai Pertanggungan
+            7: const FlexColumnWidth(1.8), // Premi
           },
           children: [
             _tableHeader(context),
@@ -374,7 +389,10 @@ class _HealthCobTableState extends State<HealthCobTable> {
           "No",
           "No Polis",
           "Jumlah Objek",
-          "Status",
+          "Periode",
+          "Tertanggung",
+          "Nilai Pertanggungan",
+          "Premi",
         ].map((text) {
           final isNo = text.toUpperCase() == "NO";
 
@@ -451,17 +469,38 @@ class _HealthCobTableState extends State<HealthCobTable> {
 
         // Mulai sini clickable
         _clickableTextCell(
-          "${d.jmlObject}",
+          "${d.jmlObject} ${d.satuan}",
           onTap: triggerRow,
           maxLines: 1,
           softWrap: false,
         ),
 
         _clickableTextCell(
-          d.status ?? '-',
+          "${formatDate(d.periodeMulai)} - ${formatDate(d.periodeAkhir)}",
           onTap: triggerRow,
-          maxLines: maxLinesBenefit,
+          maxLines: 2,
           softWrap: true,
+        ),
+
+        _clickableTextCell(
+          d.tertanggung,
+          onTap: triggerRow,
+          maxLines: compact ? 2 : 1,
+          softWrap: true,
+        ),
+
+        _clickableTextCell(
+          "${d.curr} ${formatNum(d.sumInsured)}",
+          onTap: triggerRow,
+          maxLines: 1,
+          softWrap: false,
+        ),
+
+        _clickableTextCell(
+          "${d.curr} ${formatNum(d.premi)}",
+          onTap: triggerRow,
+          maxLines: 1,
+          softWrap: false,
         ),
       ],
     );
@@ -486,12 +525,18 @@ class _HealthCobTableState extends State<HealthCobTable> {
     );
   }
 
-  void _showSuccessPopup(BuildContext context,  AsetHealthCariModel d) {
+  void _showSuccessPopup(BuildContext context, AsetHealthCariModel d) {
     showDialog(
       context: context,
-      builder: (_) => DetailPolisHealthTablePage(
-        sppa1Id: d.asethealthId,
-      ),
+      builder: (dialogContext) {
+        return MediaQuery.removeViewInsets(
+          context: dialogContext,
+          removeBottom: true,
+          child: DetailPolisHealthTablePage(
+            sppa1Id: d.asethealthId,
+          ),
+        );
+      },
     );
   }
 
