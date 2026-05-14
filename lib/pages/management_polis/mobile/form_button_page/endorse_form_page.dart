@@ -418,7 +418,6 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
       notePerubahan: fieldNotePerubahanController.text,
       sppa1Id: widget.sppaId,
       regendors1Id: "",
-      sppa2Id: widget.sppa2Id,
     );
     regendors1FormBloc.add(Regendors1FormTambahEvent(record: record));
   }
