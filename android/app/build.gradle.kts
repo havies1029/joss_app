@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId = "id.co.jayaproteksindo.proteksiplus"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = 3
         versionName = "3.0"
