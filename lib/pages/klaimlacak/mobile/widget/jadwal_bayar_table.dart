@@ -38,16 +38,20 @@ class JadwalBayarTable extends StatelessWidget {
 
     // Lebar fixed per kolom supaya bisa horizontal scroll
     const double colNama = 160;
+    const double colJenisPenggantian = 150;
     const double colShare = 70;
     const double colNilai = 150;
     const double colTanggal = 110;
-    const double totalWidth = colNama + colShare + colNilai + colTanggal;
+
+    const double totalWidth =
+        colNama + colJenisPenggantian + colShare + colNilai + colTanggal;
 
     Widget buildHeader() => Container(
       color: headerBg,
       child: Row(
         children: [
           _Cell('NAMA TERTANGGUNG', width: colNama, isHeader: true, borderColor: borderColor),
+          _Cell('JENIS PENGGANTIAN', width: colJenisPenggantian, isHeader: true, borderColor: borderColor),
           _Cell('SHARE', width: colShare, isHeader: true, borderColor: borderColor),
           _Cell('NILAI KLAIM', width: colNilai, isHeader: true, borderColor: borderColor),
           _Cell('TANGGAL BAYAR', width: colTanggal, isHeader: true, borderColor: borderColor),
@@ -63,6 +67,7 @@ class JadwalBayarTable extends StatelessWidget {
       child: Row(
         children: [
           _Cell(it.penanggung, width: colNama, color: textColor, borderColor: borderColor),
+          _Cell(it.metodeBayar, width: colJenisPenggantian, color: textColor, borderColor: borderColor),
           _Cell(_formatPercent(it.sharePersen), width: colShare, color: textColor, borderColor: borderColor),
           _Cell(_formatMoney(it.curr, it.nilaiBayar), width: colNilai, color: textColor, borderColor: borderColor),
           _Cell(_formatDate(it.jadwalBayar), width: colTanggal, color: textColor, borderColor: borderColor),

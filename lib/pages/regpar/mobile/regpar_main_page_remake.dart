@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -2254,8 +2255,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldSiBuildingController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
 
     // error-map pattern
@@ -2270,8 +2274,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldSiContentController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form4.siContent'),
     validator: (_) => err('form4.siContent'),
@@ -2283,8 +2290,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldSiMachineryController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form4.siMachinery'),
     validator: (_) => err('form4.siMachinery'),
@@ -2296,8 +2306,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldSiOtherController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form4.siOther'),
     validator: (_) => err('form4.siOther'),
@@ -2309,8 +2322,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldSiStockController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form4.siStock'),
     validator: (_) => err('form4.siStock'),
@@ -2325,8 +2341,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     keyboardType: TextInputType.number,
     enabled: false,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.diskonNilai'),
     validator: (_) => err('form7.diskonNilai'),
@@ -2338,8 +2357,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldDiskonPersenController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.diskonPersen'),
     validator: (_) => err('form7.diskonPersen'),
@@ -2352,8 +2374,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     keyboardType: TextInputType.number,
     enabled: false,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiEqvet'),
     validator: (_) => err('form7.premiEqvet'),
@@ -2366,8 +2391,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     keyboardType: TextInputType.number,
     enabled: false,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiNet'),
     validator: (_) => err('form7.premiNet'),
@@ -2379,8 +2407,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldPremiOtherController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiOther'),
     validator: (_) => err('form7.premiOther'),
@@ -2392,8 +2423,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldPremiParController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiPar'),
     validator: (_) => err('form7.premiPar'),
@@ -2405,8 +2439,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldPremiRsmdccController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiRsmdcc'),
     validator: (_) => err('form7.premiRsmdcc'),
@@ -2418,8 +2455,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldPremiTsfwdController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiTsfwd'),
     validator: (_) => err('form7.premiTsfwd'),
@@ -2431,8 +2471,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     controller: fieldPremiTotalController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form7.premiTotal'),
     validator: (_) => err('form7.premiTotal'),

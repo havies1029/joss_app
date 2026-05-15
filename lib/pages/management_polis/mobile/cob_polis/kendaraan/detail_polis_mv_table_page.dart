@@ -27,15 +27,18 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
 
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
+
   double _tableHeight(int itemCount) {
     const double headerHeight = 48;
     const double rowHeight = 48;
     const int maxVisibleRows = 7;
+    const double borderBuffer = 4;
 
     final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
 
-    return headerHeight + (visibleRows * rowHeight);
+    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
   }
+
   @override
   void initState() {
     super.initState();
@@ -93,9 +96,7 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(context),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: ListPageFilterBarUIWidget(
@@ -104,9 +105,7 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
                 hintText: "Cari no polisi / rangka / mesin...",
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2mvCariBloc, Sppa2mvCariState>(
@@ -144,7 +143,9 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
                       isLoadingMore: state.isFetching,
                       onLoadMore: () {
                         if (!state.hasReachedMax && !state.isFetching) {
-                          context.read<Sppa2mvCariBloc>().add(FetchSppa2mvCariEvent());
+                          context
+                              .read<Sppa2mvCariBloc>()
+                              .add(FetchSppa2mvCariEvent());
                         }
                       },
                     ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,22 +16,26 @@ class CarouselMenuWidget extends StatefulWidget {
 }
 
 class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
-  late final PageController _pageController;
-  int _currentIndex = 1;
-  int _currentRealIndex = 0;
   static const int _kFakeCount = 100000;
-  late final int _initialPage;
-  bool _didSyncInitialIndex = false;
+  static const Duration _autoSlideInterval = Duration(seconds: 4);
+  static const Duration _slideDuration = Duration(milliseconds: 450);
+
+  late final PageController _pageController;
+
+  Timer? _autoSlideTimer;
+
+  int _currentRealIndex = 0;
+  int? _lastItemLength;
+  bool _hasSyncedInitialPage = false;
 
   @override
   void initState() {
     super.initState();
-    _initialPage = _kFakeCount ~/ 2;
 
     _pageController = PageController(
       viewportFraction: 0.82,
-      initialPage: _initialPage,
-      keepPage: true,
+      initialPage: 0,
+      keepPage: false,
     );
 
     context.read<GalleryeventCariBloc>().add(RefreshGalleryeventCariEvent());
@@ -37,8 +43,61 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
   @override
   void dispose() {
+    _autoSlideTimer?.cancel();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _syncInitialPageIfNeeded(int itemLength) {
+    if (itemLength <= 0) return;
+
+    final isNewLength = _lastItemLength != itemLength;
+
+    if (_hasSyncedInitialPage && !isNewLength) return;
+
+    _hasSyncedInitialPage = true;
+    _lastItemLength = itemLength;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_pageController.hasClients) return;
+
+      final middlePage = _kFakeCount ~/ 2;
+      final fixedInitialPage = middlePage - (middlePage % itemLength);
+
+      _pageController.jumpToPage(fixedInitialPage);
+
+      if (mounted) {
+        setState(() {
+          _currentRealIndex = 0;
+        });
+      }
+
+      _startAutoSlide(itemLength);
+    });
+  }
+
+  void _startAutoSlide(int itemLength) {
+    _autoSlideTimer?.cancel();
+
+    if (itemLength <= 1) return;
+
+    _autoSlideTimer = Timer.periodic(_autoSlideInterval, (_) {
+      if (!mounted || !_pageController.hasClients) return;
+
+      final currentPage = _pageController.page?.round() ??
+          _pageController.initialPage;
+
+      _pageController.animateToPage(
+        currentPage + 1,
+        duration: _slideDuration,
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  void _stopAutoSlide() {
+    _autoSlideTimer?.cancel();
+    _autoSlideTimer = null;
   }
 
   @override
@@ -52,7 +111,6 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
           _buildHeader(context),
           const SizedBox(height: 8),
           _buildCarouselFromBloc(context),
-
         ],
       ),
     );
@@ -70,22 +128,25 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
   Widget _buildCarouselFromBloc(BuildContext context) {
     return BlocBuilder<GalleryeventCariBloc, GalleryeventCariState>(
-      buildWhen: (prev, curr) => prev.items != curr.items || prev.status != curr.status,
+      buildWhen: (prev, curr) {
+        return prev.items != curr.items || prev.status != curr.status;
+      },
       builder: (context, state) {
         if (state.status == ListStatus.initial) {
+          _stopAutoSlide();
+
           return const Padding(
             padding: EdgeInsets.all(16),
-            child: Center(
-              child: LoadingIndicator(),
-            ),
+            child: Center(child: LoadingIndicator()),
           );
         }
 
-
         if (state.status == ListStatus.success && state.items.isEmpty) {
+          _stopAutoSlide();
+
           return Center(
             child: Text(
-              "Tidak ada gambar event",
+              'Tidak ada gambar event',
               style: TextStyle(
                 color: primaryLightColor.withOpacity(0.6),
                 fontSize: getResponsiveFont(context, 16),
@@ -96,21 +157,9 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
         if (state.status == ListStatus.success && state.items.isNotEmpty) {
           final images = state.items;
-          if (!_didSyncInitialIndex) {
-            _didSyncInitialIndex = true;
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
+          _syncInitialPageIfNeeded(images.length);
 
-              final page = _pageController.hasClients
-                  ? (_pageController.page?.round() ?? _pageController.initialPage)
-                  : _pageController.initialPage;
-
-              setState(() {
-                _currentRealIndex = page % images.length;
-              });
-            });
-          }
           return Column(
             children: [
               _buildInfiniteCarousel(images),
@@ -120,110 +169,18 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
           );
         }
 
-        return const Center(
-          child: Text("Terjadi kesalahan saat memuat gambar"),
-        );
-      },
-    );
-  }
+        _stopAutoSlide();
 
-  Widget _buildCarousel(List images) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final height = width * 0.38;
-        return SizedBox(
-          height: height,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: images.length,
-            physics: const BouncingScrollPhysics(),
-            onPageChanged: (index) {
-              final lastIndex = images.length - 1;
-
-              if (index == 0) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _pageController.jumpToPage(images.length - 2);
-                });
-                return;
-              }
-
-              if (index == lastIndex) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _pageController.jumpToPage(1);
-                });
-                return;
-              }
-
-              setState(() => _currentIndex = index);
-            },
-
-            itemBuilder: (context, index) {
-              final item = images[index];
-              return AnimatedBuilder(
-                animation: _pageController,
-                builder: (context, child) {
-                  double scale = 1.0;
-                  if (_pageController.position.haveDimensions) {
-                    final diff = _pageController.page! - index;
-                    scale = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);
-                  }
-                  return Center(
-                    child: Transform.scale(
-                      scale: scale,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: _buildCachedImage(item.galleryUrl),
-                ),
-              );
-            },
+        return Center(
+          child: Text(
+            'Terjadi kesalahan saat memuat gambar',
+            style: TextStyle(
+              color: primaryLightColor.withOpacity(0.7),
+              fontSize: getResponsiveFont(context, 14),
+            ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildCachedImage(String imageUrl) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        placeholder: (_, __) => const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation(primaryColor),
-          ),
-        ),
-        errorWidget: (_, __, ___) => Container(
-          color: Colors.grey,
-          alignment: Alignment.center,
-          child: const Icon(Icons.broken_image),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIndicator(int itemCount) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(itemCount, (index) {
-        final isActive = index == _currentRealIndex;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isActive ? primaryLightColor : aGrey,
-          ),
-        );
-      }),
     );
   }
 
@@ -240,9 +197,12 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
             itemCount: _kFakeCount,
             physics: const BouncingScrollPhysics(),
             onPageChanged: (pageIndex) {
-              final real = pageIndex % images.length;
+              final realIndex = pageIndex % images.length;
+
+              if (_currentRealIndex == realIndex) return;
+
               setState(() {
-                _currentRealIndex = real;
+                _currentRealIndex = realIndex;
               });
             },
             itemBuilder: (context, pageIndex) {
@@ -251,25 +211,87 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
               return AnimatedBuilder(
                 animation: _pageController,
-                builder: (context, child) {
-                  double scale = 1.0;
-                  if (_pageController.position.haveDimensions) {
-                    final diff = _pageController.page! - pageIndex;
-                    scale = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);
-                  }
-                  return Center(
-                    child: Transform.scale(scale: scale, child: child),
-                  );
-                },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: _buildCachedImage(item.galleryUrl),
                 ),
+                builder: (context, child) {
+                  double scale = 1.0;
+
+                  if (_pageController.hasClients &&
+                      _pageController.position.haveDimensions) {
+                    final currentPage =
+                        _pageController.page ?? _pageController.initialPage.toDouble();
+
+                    final diff = currentPage - pageIndex;
+                    scale = (1 - (diff.abs() * 0.25)).clamp(0.9, 1.0);
+                  }
+
+                  return Center(
+                    child: Transform.scale(
+                      scale: scale,
+                      child: child,
+                    ),
+                  );
+                },
               );
             },
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCachedImage(String imageUrl) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        filterQuality: FilterQuality.medium,
+        fadeInDuration: const Duration(milliseconds: 250),
+        placeholder: (_, __) {
+          return Container(
+            color: formGrey,
+            alignment: Alignment.center,
+            child: const LoadingIndicator(),
+          );
+        },
+        errorWidget: (_, __, ___) {
+          return Container(
+            color: Colors.grey.withOpacity(0.25),
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.broken_image,
+              color: primaryLightColor.withOpacity(0.6),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildIndicator(int itemCount) {
+    if (itemCount <= 1) return const SizedBox.shrink();
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(itemCount, (index) {
+        final isActive = index == _currentRealIndex;
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: isActive ? 18 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(99),
+            color: isActive ? primaryLightColor : aGrey,
+          ),
+        );
+      }),
     );
   }
 }

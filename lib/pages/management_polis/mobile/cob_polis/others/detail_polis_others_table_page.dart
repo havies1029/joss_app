@@ -33,10 +33,11 @@ class _DetailPolisOthersTablePageState
     const double headerHeight = 48;
     const double rowHeight = 48;
     const int maxVisibleRows = 7;
+    const double borderBuffer = 4;
 
     final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
 
-    return headerHeight + (visibleRows * rowHeight);
+    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
   }
 
   @override
@@ -96,20 +97,16 @@ class _DetailPolisOthersTablePageState
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(context),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "Cari info...",
+                hintText: "Cari info / deskripsi...",
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2othersCariBloc, Sppa2othersCariState>(

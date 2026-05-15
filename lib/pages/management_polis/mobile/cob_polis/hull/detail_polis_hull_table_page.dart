@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -29,6 +28,17 @@ class _DetailPolisHullTablePageState extends State<DetailPolisHullTablePage> {
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
 
+  double _tableHeight(int itemCount) {
+    const double headerHeight = 48;
+    const double rowHeight = 48;
+    const int maxVisibleRows = 7;
+    const double borderBuffer = 4;
+
+    final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
+
+    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,16 +64,6 @@ class _DetailPolisHullTablePageState extends State<DetailPolisHullTablePage> {
         searchText: searchController.text,
       ),
     );
-  }
-
-  double _tableHeight(int itemCount) {
-    const double headerHeight = 48;
-    const double rowHeight = 48;
-    const int maxVisibleRows = 7;
-
-    final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
-
-    return headerHeight + (visibleRows * rowHeight);
   }
 
   void _onSearchChanged(String value) {
@@ -96,9 +96,7 @@ class _DetailPolisHullTablePageState extends State<DetailPolisHullTablePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(context),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: ListPageFilterBarUIWidget(
@@ -107,9 +105,7 @@ class _DetailPolisHullTablePageState extends State<DetailPolisHullTablePage> {
                 hintText: "Cari nama kapal / kerangka...",
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2hullCariBloc, Sppa2hullCariState>(
@@ -147,7 +143,9 @@ class _DetailPolisHullTablePageState extends State<DetailPolisHullTablePage> {
                       isLoadingMore: state.isFetching,
                       onLoadMore: () {
                         if (!state.hasReachedMax && !state.isFetching) {
-                          context.read<Sppa2hullCariBloc>().add(FetchSppa2hullCariEvent());
+                          context
+                              .read<Sppa2hullCariBloc>()
+                              .add(FetchSppa2hullCariEvent());
                         }
                       },
                     ),

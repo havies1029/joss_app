@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -1249,8 +1250,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     controller: fieldHargaController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form1.hargaKendaraan'),
     validator: (_) => err('form1.hargaKendaraan'),
@@ -1262,15 +1266,21 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       }
     },
   );
-//form1 field
 
+  //form1 field
+
+
+  //form2 field
   Widget _buildFieldPAD() => appTextField(
     label: "Kecelakaan Diri Pengemudi",
     controller: fieldPadController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.pad'),
     validator: (_) => err('form2.pad'),
@@ -1291,8 +1301,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     controller: fieldPapController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.pap'),
     validator: (_) => err('form2.pap'),
@@ -1335,14 +1348,16 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     );
   }
 
-
   Widget _buildFieldPLL() => appTextField(
     label: "Tanggung Jawab Penumpang",
     controller: fieldPllController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.pll'),
     validator: (_) => err('form2.pll'),
@@ -1365,8 +1380,11 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     controller: fieldTplController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.tpl'),
     validator: (_) => err('form2.tpl'),

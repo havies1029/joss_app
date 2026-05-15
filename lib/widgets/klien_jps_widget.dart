@@ -1,11 +1,14 @@
 import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:joss_app/common/constants.dart';
-import '../blocs/gallery/gallerymembercari_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../blocs/gallery/gallerymembercari_bloc.dart';
+import '../common/loading_indicator.dart';
 
 class ClientSection extends StatefulWidget {
   const ClientSection({super.key});
@@ -15,62 +18,66 @@ class ClientSection extends StatefulWidget {
 }
 
 class _ClientSectionState extends State<ClientSection> {
-  final PageController _pageController = PageController(viewportFraction: 0.33); // tampil ±3 logo
-  int _currentPage = 0;
+  static const Duration _autoSlideInterval = Duration(seconds: 3);
+  static const Duration _slideDuration = Duration(milliseconds: 600);
+
+  late final PageController _pageController;
+
   Timer? _autoSlideTimer;
+  int _currentPage = 0;
+  int _lastAutoSlideLength = 0;
 
   @override
   void initState() {
     super.initState();
-    context.read<GallerymemberCariBloc>().add(RefreshGallerymemberCariEvent());
 
-    _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (!_pageController.hasClients) return;
-      final nextPage = (_currentPage + 1) % 6; // muter ke 6 logo
-      _pageController.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-      );
-    });
+    _pageController = PageController(viewportFraction: 0.33);
+
+    context.read<GallerymemberCariBloc>().add(
+      RefreshGallerymemberCariEvent(),
+    );
   }
 
-  int _lastAutoSlideLength = 0;
+  @override
+  void dispose() {
+    _stopAutoSlide();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   void _ensureAutoSlide(int length) {
     if (length <= 1) {
-      _autoSlideTimer?.cancel();
-      _autoSlideTimer = null;
+      _stopAutoSlide();
       return;
     }
 
     if (_autoSlideTimer != null && _lastAutoSlideLength == length) return;
 
-    _autoSlideTimer?.cancel();
+    _stopAutoSlide();
     _lastAutoSlideLength = length;
 
-    _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+    _autoSlideTimer = Timer.periodic(_autoSlideInterval, (_) {
       if (!mounted || !_pageController.hasClients) return;
 
       final nextPage = (_currentPage + 1) % length;
+
       _pageController.animateToPage(
         nextPage,
-        duration: const Duration(milliseconds: 600),
+        duration: _slideDuration,
         curve: Curves.easeInOut,
       );
     });
   }
 
-  @override
-  void dispose() {
+  void _stopAutoSlide() {
     _autoSlideTimer?.cancel();
-    _pageController.dispose();
-    super.dispose();
+    _autoSlideTimer = null;
+    _lastAutoSlideLength = 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = MediaQuery.of(context).size.width < 768;
+    final isMobile = MediaQuery.of(context).size.width < 768;
 
     return Container(
       width: double.infinity,
@@ -78,197 +85,170 @@ class _ClientSectionState extends State<ClientSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Judul
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset('assets/icons/badge.svg', height: 24),
-              const SizedBox(width: 6),
-              Text(
-                "Didukung oleh Mitra Kami",
-                style: bodyTextStyle(context, fontSize: 24),
-              ),
-            ],
-          ),
+          _buildTitle(context),
           const SizedBox(height: 6),
-
-          // Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: hPadding, vertical: 5),
-            decoration: BoxDecoration(
-              color: pGrey,
-              borderRadius: BorderRadius.circular(cardBorderRadius),
-              border: Border.all(color: sGrey),
-            ),
-            child: Text(
-              "Bekerja Sama Dengan:",
-              style: bodyTextStyle(context, fontSize: 14),
-            ),
-          ),
+          _buildBadge(context),
           const SizedBox(height: 18),
+          _buildLogoCarousel(context, isMobile),
+          const SizedBox(height: 22),
+          _buildDescription(context),
+          const SizedBox(height: 12),
+          _buildSocmedRow(isMobile),
+        ],
+      ),
+    );
+  }
 
-          // Carousel Manual 3 Gambar
-          BlocBuilder<GallerymemberCariBloc, GallerymemberCariState>(
-            builder: (context, state) {
-              if (state.items.isEmpty) {
-                _autoSlideTimer?.cancel(); // stop timer kalau kosong
-                return Text("Belum ada partner terdaftar", style: bodyTextStyle(context));
-              }
+  Widget _buildTitle(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SvgPicture.asset('assets/icons/badge.svg', height: 24),
+        const SizedBox(width: 6),
+        Text(
+          'Didukung oleh Mitra Kami',
+          style: bodyTextStyle(context, fontSize: 24),
+        ),
+      ],
+    );
+  }
 
-              final items = state.items.take(6).toList();
-              _ensureAutoSlide(items.length); // start/refresh timer sesuai jumlah item
+  Widget _buildBadge(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: hPadding,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: pGrey,
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        border: Border.all(color: sGrey),
+      ),
+      child: Text(
+        'Bekerja Sama Dengan:',
+        style: bodyTextStyle(context, fontSize: 14),
+      ),
+    );
+  }
 
-              return SizedBox(
-                height: isMobile ? 60 : 80,
-                child: PageView.builder(
-                  key: const PageStorageKey('client_logo_carousel'),
-                  controller: _pageController,
-                  physics: const BouncingScrollPhysics(),
-                  onPageChanged: (index) => setState(() => _currentPage = index),
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          final currentPage = _pageController.page ??
+  Widget _buildLogoCarousel(BuildContext context, bool isMobile) {
+    return BlocBuilder<GallerymemberCariBloc, GallerymemberCariState>(
+      buildWhen: (prev, curr) {
+        return prev.items != curr.items || prev.status != curr.status;
+      },
+      builder: (context, state) {
+        if (state.items.isEmpty) {
+          _stopAutoSlide();
+
+          return Text(
+            'Belum ada partner terdaftar',
+            style: bodyTextStyle(context),
+          );
+        }
+
+        final items = state.items.take(6).toList();
+
+        _ensureAutoSlide(items.length);
+
+        return SizedBox(
+          height: isMobile ? 60 : 80,
+          child: PageView.builder(
+            key: const PageStorageKey('client_logo_carousel'),
+            controller: _pageController,
+            physics: const BouncingScrollPhysics(),
+            itemCount: items.length,
+            onPageChanged: (index) {
+              if (_currentPage == index) return;
+
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              final item = items[index];
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: AnimatedBuilder(
+                  animation: _pageController,
+                  child: _ClientLogoPageItem(
+                    imageUrl: item.image1Url,
+                    isMobile: isMobile,
+                  ),
+                  builder: (context, child) {
+                    double scale = 1.0;
+
+                    if (_pageController.hasClients &&
+                        _pageController.position.haveDimensions) {
+                      final currentPage =
+                          _pageController.page ??
                               _pageController.initialPage.toDouble();
 
-                          final diff = (currentPage - index).abs();
-                          final scale = (1 - (diff * 0.3)).clamp(0.8, 1.0);
+                      final diff = (currentPage - index).abs();
+                      scale = (1 - (diff * 0.3)).clamp(0.8, 1.0);
+                    }
 
-                          return Transform.scale(scale: scale, child: child);
-                        },
-                        child: _ClientLogoPageItem(
-                          imageUrl: items[index].image1Url,
-                          isMobile: isMobile,
-                        ),
-                      ),
+                    return Transform.scale(
+                      scale: scale,
+                      child: child,
                     );
                   },
                 ),
               );
             },
           ),
+        );
+      },
+    );
+  }
 
-          const SizedBox(height: 22),
+  Widget _buildDescription(BuildContext context) {
+    return Text(
+      'Didukung mitra finansial untuk pengalaman asuransi yang lebih mudah.',
+      textAlign: TextAlign.center,
+      style: bodyTextStyle(context),
+    );
+  }
 
-          // Sosmed
-          Text(
-            "Didukung mitra finansial untuk pengalaman asuransi yang lebih mudah.",
-            textAlign: TextAlign.center,
-            style: bodyTextStyle(context),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SocmedIcon('assets/icons/instagram.svg', isMobile, url: 'https://www.instagram.com/jayaproteksindosakti?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=='),
-              const SizedBox(width: 20),
-              SocmedIcon('assets/icons/tiktok.svg', isMobile, url: 'https://www.tiktok.com/@proteksi.plus?_r=1&_t=ZS-96BYZfSuRbE'),
-              const SizedBox(width: 20),
-              SocmedIcon('assets/icons/website_logo.svg', isMobile, url: 'https://jayaproteksindo.co.id/'),
-              const SizedBox(width: 20),
-              SocmedIcon('assets/icons/linkedin.svg', isMobile, url: 'https://www.linkedin.com/company/jayaproteksindo/'),
-              const SizedBox(width: 20),
-              SocmedIcon('assets/icons/facebook.svg', isMobile, url: 'https://www.facebook.com/people/PT-Jaya-Proteksindo-Sakti/100054470620648/'),
-              const SizedBox(width: 20),
-            ],
-          ),
-        ],
-      ),
+  Widget _buildSocmedRow(bool isMobile) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SocmedIcon(
+          'assets/icons/instagram.svg',
+          isMobile,
+          url:
+          'https://www.instagram.com/jayaproteksindosakti?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
+        ),
+        const SizedBox(width: 20),
+        SocmedIcon(
+          'assets/icons/tiktok.svg',
+          isMobile,
+          url: 'https://www.tiktok.com/@proteksi.plus?_r=1&_t=ZS-96BYZfSuRbE',
+        ),
+        const SizedBox(width: 20),
+        SocmedIcon(
+          'assets/icons/website_logo.svg',
+          isMobile,
+          url: 'https://jayaproteksindo.co.id/',
+        ),
+        const SizedBox(width: 20),
+        SocmedIcon(
+          'assets/icons/linkedin.svg',
+          isMobile,
+          url: 'https://www.linkedin.com/company/jayaproteksindo/',
+        ),
+        const SizedBox(width: 20),
+        SocmedIcon(
+          'assets/icons/facebook.svg',
+          isMobile,
+          url:
+          'https://www.facebook.com/people/PT-Jaya-Proteksindo-Sakti/100054470620648/',
+        ),
+      ],
     );
   }
 }
-
-// Card Logo
-class _ClientLogoCard extends StatelessWidget {
-  final String imagePath;
-  final bool isMobile;
-
-  const _ClientLogoCard({required this.imagePath, required this.isMobile});
-
-  @override
-  Widget build(BuildContext context) {
-    final double cardWidth = isMobile ? 72 : 95;
-    final double cardHeight = isMobile ? 42 : 60;
-
-    return Container(
-      width: cardWidth,
-      height: cardHeight,
-      padding: const EdgeInsets.all(1),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(cardBorderRadius - 1),
-        child: Container(
-          color: const Color(0xFFFEFEFE),
-          child: CachedNetworkImage(
-            imageUrl: imagePath,
-            fit: BoxFit.contain,
-            memCacheWidth: (cardWidth * 2).toInt(),
-            placeholder: (_, __) => const SizedBox.shrink(),
-            errorWidget: (_, __, ___) => Icon(
-              Icons.error,
-              color: Colors.black54,
-              size: isMobile ? 18 : 32,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-Future<void> openUrl(String url) async {
-  final uri = Uri.parse(url);
-
-  if (!await launchUrl(
-    uri,
-    mode: LaunchMode.externalApplication,
-  )) {
-    throw 'Tidak bisa membuka $url';
-  }
-}
-
-Future<void> _launchLink(String url) async {
-  final uri = Uri.parse(url);
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
-}
-
-Widget SocmedIcon(String assetPath, bool isMobile, {required String url}) => Material(
-  color: Colors.transparent,
-  shape: const CircleBorder(),
-  child: InkWell(
-    onTap: () => openUrl(url), // atau _launchLink(url)
-    customBorder: const CircleBorder(),
-    child: Container(
-      width: isMobile ? 40 : 48,
-      height: isMobile ? 40 : 48,
-      padding: const EdgeInsets.all(1),
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: sGrey,
-      ),
-      child: Container(
-        decoration: const BoxDecoration(
-          color: pGrey,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: SvgPicture.asset(
-            assetPath,
-            width: isMobile ? 20 : 30,
-            height: isMobile ? 20 : 30,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFFFFFFFF),
-              BlendMode.srcIn,
-            ),
-          ),
-        ),
-      ),
-    ),
-  ),
-);
 
 class _ClientLogoPageItem extends StatefulWidget {
   final String imageUrl;
@@ -291,11 +271,109 @@ class _ClientLogoPageItemState extends State<_ClientLogoPageItem>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return RepaintBoundary( // bantu isolasi repaint saat animasi scale
+
+    return RepaintBoundary(
       child: _ClientLogoCard(
         imagePath: widget.imageUrl,
         isMobile: widget.isMobile,
       ),
     );
+  }
+}
+
+class _ClientLogoCard extends StatelessWidget {
+  final String imagePath;
+  final bool isMobile;
+
+  const _ClientLogoCard({
+    required this.imagePath,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cardWidth = isMobile ? 72.0 : 95.0;
+    final cardHeight = isMobile ? 42.0 : 60.0;
+
+    return Container(
+      width: cardWidth,
+      height: cardHeight,
+      padding: const EdgeInsets.all(1),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(cardBorderRadius - 1),
+        child: Container(
+          color: const Color(0xFFFEFEFE),
+          child: CachedNetworkImage(
+            imageUrl: imagePath,
+            fit: BoxFit.contain,
+            memCacheWidth: (cardWidth * 2).toInt(),
+            placeholder: (_, __) => const Center(
+              child: LoadingIndicator(),
+            ),
+            errorWidget: (_, __, ___) {
+              return Icon(
+                Icons.error,
+                color: Colors.black54,
+                size: isMobile ? 18 : 32,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget SocmedIcon(
+    String assetPath,
+    bool isMobile, {
+      required String url,
+    }) {
+  return Material(
+    color: Colors.transparent,
+    shape: const CircleBorder(),
+    child: InkWell(
+      onTap: () => openUrl(url),
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: isMobile ? 40 : 48,
+        height: isMobile ? 40 : 48,
+        padding: const EdgeInsets.all(1),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: sGrey,
+        ),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: pGrey,
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: SvgPicture.asset(
+              assetPath,
+              width: isMobile ? 20 : 30,
+              height: isMobile ? 20 : 30,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFFFFFFFF),
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> openUrl(String url) async {
+  final uri = Uri.parse(url);
+
+  final canOpen = await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+  );
+
+  if (!canOpen) {
+    throw 'Tidak bisa membuka $url';
   }
 }

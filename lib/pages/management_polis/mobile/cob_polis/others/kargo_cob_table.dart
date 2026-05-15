@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/asetothers/asetotherscari_model.dart';
+import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import 'detail_polis_others_table_page.dart';
 
 class KargoCobTable extends StatefulWidget {
@@ -523,6 +524,28 @@ class _KargoCobTableState extends State<KargoCobTable> {
   }
 
   void _showSuccessPopup(BuildContext context, AsetothersCariModel d) {
+    final asetOthersId = d.asetOthersId.trim();
+
+    if (asetOthersId.isEmpty) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.6),
+        builder: (dialogContext) => RegisterClientPopUp(
+          showIcon: false,
+          header: 'Detail Polis Belum Tersedia',
+          description:
+          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+          buttonText: 'Mengerti',
+          onPressed: () {
+            // optional action
+          },
+        ),
+      );
+
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -530,7 +553,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
           context: dialogContext,
           removeBottom: true,
           child: DetailPolisOthersTablePage(
-            sppa1Id: d.asetOthersId,
+            sppa1Id: asetOthersId,
           ),
         );
       },

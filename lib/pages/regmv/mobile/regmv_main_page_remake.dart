@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -2207,8 +2208,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     controller: fieldPllController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     validator: (v) {
       if (v == null || v.isEmpty) return null;
@@ -2224,8 +2228,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     controller: fieldTplController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     validator: (v) {
       if (v == null || v.isEmpty) return null;
@@ -2241,8 +2248,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     controller: fieldPadController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     validator: (v) {
       if (v == null || v.isEmpty) return null;
@@ -2258,8 +2268,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     controller: fieldPapController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     validator: (v) {
       if (v == null || v.isEmpty) return null;

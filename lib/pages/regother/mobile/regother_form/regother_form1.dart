@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -569,8 +570,11 @@ class AppCurrencyField extends StatelessWidget {
                   controller: valueController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
+                    CurrencyTextInputFormatter.currency(
+                      locale: 'en',
+                      decimalDigits: 0,
+                      symbol: '',
+                    ),
                   ],
                   validator: validator,
                   cursorColor: primaryLightColor,

@@ -50,6 +50,7 @@ class KlaimMainPageState extends State<KlaimMainPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: secondaryBlackColor,
       body: SafeArea(
         child: Stack(

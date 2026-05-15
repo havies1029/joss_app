@@ -28,14 +28,16 @@ class _DetailPolisHealthTablePageState
 
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
+
   double _tableHeight(int itemCount) {
     const double headerHeight = 48;
     const double rowHeight = 48;
     const int maxVisibleRows = 7;
+    const double borderBuffer = 4;
 
     final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
 
-    return headerHeight + (visibleRows * rowHeight);
+    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
   }
 
   @override
@@ -95,9 +97,7 @@ class _DetailPolisHealthTablePageState
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(context),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: ListPageFilterBarUIWidget(
@@ -106,9 +106,7 @@ class _DetailPolisHealthTablePageState
                 hintText: "Cari nama / paket...",
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2healthCariBloc, Sppa2healthCariState>(
@@ -146,7 +144,9 @@ class _DetailPolisHealthTablePageState
                       isLoadingMore: state.isFetching,
                       onLoadMore: () {
                         if (!state.hasReachedMax && !state.isFetching) {
-                          context.read<Sppa2healthCariBloc>().add(FetchSppa2healthCariEvent());
+                          context
+                              .read<Sppa2healthCariBloc>()
+                              .add(FetchSppa2healthCariEvent());
                         }
                       },
                     ),

@@ -79,6 +79,7 @@ class _ManagementPolisPageState extends State<ManagementPolisPage>
           return Stack(
             children: [
               Scaffold(
+                resizeToAvoidBottomInset: false,
                 backgroundColor: secondaryBlackColor,
                 body: SafeArea(
                   child: Stack(

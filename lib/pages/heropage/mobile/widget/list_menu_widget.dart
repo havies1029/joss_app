@@ -51,63 +51,85 @@ class ListMenuWidget extends StatelessWidget {
         */
       },
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (userType != 'C') _buildDaftarKlienButton(context),
 
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            decoration: const BoxDecoration(
               color: secondaryBlackColor,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(cardBorderRadius),
                 bottomRight: Radius.circular(cardBorderRadius),
               ),
             ),
-            child: SizedBox(
-              height: menuHeight,
-              child: Stack(
-                children: [
-                  ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: menuItems.length,
-                    itemBuilder: (context, index) {
-                      final item = menuItems[index];
-                      return SizedBox(
-                        width: itemWidth,
-                        child: _buildMenuItem(context, item, userType),
-                      );
-                    },
-                  ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 40,
-                    child: IgnorePointer(
-                      ignoring: true,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: blackFadeGradientHorizontal,
-                        ),
-                      ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  child: Text(
+                    'Claim is Simple.',
+                    style: headingStyle(context).copyWith(
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 48,
-                    child: IgnorePointer(
-                      ignoring: true,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: blackFadeGradientHorizontalReversed,
+                ),
+
+                const SizedBox(height: 8),
+
+                SizedBox(
+                  height: menuHeight,
+                  child: Stack(
+                    children: [
+                      ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: menuItems.length,
+                        itemBuilder: (context, index) {
+                          final item = menuItems[index];
+
+                          return SizedBox(
+                            width: itemWidth,
+                            child: _buildMenuItem(context, item, userType),
+                          );
+                        },
+                      ),
+
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 40,
+                        child: IgnorePointer(
+                          ignoring: true,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: blackFadeGradientHorizontal,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 48,
+                        child: IgnorePointer(
+                          ignoring: true,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: blackFadeGradientHorizontalReversed,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

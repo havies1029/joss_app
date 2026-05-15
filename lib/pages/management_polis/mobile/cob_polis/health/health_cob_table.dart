@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/gen_aset_health/asethealthcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/gen_aset_health/asethealthcari_model.dart';
+import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import 'detail_polis_health_table_page.dart';
 
 class HealthCobTable extends StatefulWidget {
@@ -526,6 +527,28 @@ class _HealthCobTableState extends State<HealthCobTable> {
   }
 
   void _showSuccessPopup(BuildContext context, AsetHealthCariModel d) {
+    final asetHealthId = d.asethealthId.trim();
+
+    if (asetHealthId.isEmpty) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.6),
+        builder: (dialogContext) => RegisterClientPopUp(
+          showIcon: false,
+          header: 'Detail Polis Belum Tersedia',
+          description:
+          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+          buttonText: 'Mengerti',
+          onPressed: () {
+            // optional action
+          },
+        ),
+      );
+
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -533,7 +556,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
           context: dialogContext,
           removeBottom: true,
           child: DetailPolisHealthTablePage(
-            sppa1Id: d.asethealthId,
+            sppa1Id: asetHealthId,
           ),
         );
       },

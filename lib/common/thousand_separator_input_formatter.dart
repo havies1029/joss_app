@@ -19,7 +19,7 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
         oldValue.text.length == newValue.text.length + 1) {
       newValueText = newValueText.substring(0, newValueText.length - 1);
     }
-
+  
     // Only process if the old value and new value are different
     if (oldValueText != newValueText) {
       int selectionIndex =

@@ -6,6 +6,7 @@ import '../../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
 import '../../../../../blocs/gen_aset_par/sppa2parcari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/gen_aset_par/asetparcari_model.dart';
+import '../../../../../widgets/apptheme/register_client_pop_up.dart';
 import 'detail_polis_par_table_page.dart';
 
 class PropertyCobTable extends StatefulWidget {
@@ -319,7 +320,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           const SizedBox(),
         ...[
           "No",
-          if (showColumn) "No Proses",
+          if (showColumn) "Nomor Proses",
           "No Polis",
           "Jumlah Objek",
           "Periode",
@@ -487,6 +488,28 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
   }
 
   void _showSuccessPopup(BuildContext context, AsetParCariModel d) {
+    final asetParId = d.asetParId.trim();
+
+    if (asetParId.isEmpty) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.6),
+        builder: (dialogContext) => RegisterClientPopUp(
+          showIcon: false,
+          header: 'Detail Polis Belum Tersedia',
+          description:
+          'Detail polis belum dapat ditampilkan karena polis masih dalam proses.',
+          buttonText: 'Mengerti',
+          onPressed: () {
+            // optional action
+          },
+        ),
+      );
+
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -494,7 +517,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
           context: dialogContext,
           removeBottom: true,
           child: DetailPolisParTablePage(
-            sppa1Id: d.asetParId,
+            sppa1Id: asetParId,
           ),
         );
       },

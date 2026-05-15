@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1464,8 +1465,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     controller: fieldSiBuildingController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.siBuilding'),
     validator: (_) => err('form2.siBuilding'),
@@ -1481,8 +1485,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     controller: fieldSiContentController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.siContent'),
     validator: (_) => err('form2.siContent'),
@@ -1498,8 +1505,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     controller: fieldSiMachineryController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.siMachinery'),
     validator: (_) => err('form2.siMachinery'),
@@ -1516,8 +1526,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     controller: fieldSiOtherController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.siOther'),
     validator: (_) => err('form2.siOther'),
@@ -1533,8 +1546,11 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     controller: fieldSiStockController,
     keyboardType: TextInputType.number,
     inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
+      CurrencyTextInputFormatter.currency(
+        locale: 'en',
+        decimalDigits: 0,
+        symbol: '',
+      ),
     ],
     errorText: err('form2.siStock'),
     validator: (_) => err('form2.siStock'),

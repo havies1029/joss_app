@@ -9,7 +9,7 @@ import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/repositories/combobox/combormatauang_repository.dart';
-import '../../../helper/indo_phone_result.dart';
+import '../../../helper/phone_number_result.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
 import '../../../widgets/combobox/combormatauang_widget.dart';
 import '../../perbaruiklaimmv/mobile/klaimmvklaimcrud_form.dart';
@@ -135,13 +135,13 @@ class KlaimparklaimcrudFormPageFormState
 		}
 
 		final telp = fieldPicTelpController.text.trim();
+
 		if (telp.isEmpty) {
 			setErr('form.picTelp', kPhoneNumberNullError);
 			ok = false;
 		} else {
-			final res = IndoPhoneHelper.normalize(telp);
-			if (!res.isValid) {
-				setErr('form.picTelp', res.error ?? "Nomor HP tidak valid");
+			if (!PhoneNumberHelper.isValid(telp)) {
+				setErr('form.picTelp', "Nomor telepon tidak valid");
 				ok = false;
 			}
 		}
@@ -332,7 +332,7 @@ class KlaimparklaimcrudFormPageFormState
 						fieldPicNamaController.text = state.record!.picNama;
 						fieldComboRMatauang = state.comboRMatauang;
 						fieldPicTelpController.text =
-								IndoPhoneHelper.toDisplay(state.record!.picTelp);
+								state.record?.picTelp ?? '';
 						isPolisJps = state.record?.isPolisJps ?? false;
 						fieldCobNamaController.text = state.record!.cobNama;
 						fieldKlaimAmountController.text =
@@ -554,10 +554,6 @@ class KlaimparklaimcrudFormPageFormState
 			label: 'No Telp PIC',
 			controller: fieldPicTelpController,
 			keyboardType: TextInputType.phone,
-			prefix: Text(
-				"+62 | ",
-				style: inputTextStyle(context, color: primaryLightColor),
-			),
 			errorText: err('form.picTelp'),
 			validator: (_) => err('form.picTelp'),
 			onChanged: (value) {
@@ -566,11 +562,10 @@ class KlaimparklaimcrudFormPageFormState
 				if (telp.isEmpty) {
 					clearErr('form.picTelp');
 				} else {
-					final res = IndoPhoneHelper.normalize(telp);
-					if (res.isValid) {
+					if (PhoneNumberHelper.isValid(telp)) {
 						clearErr('form.picTelp');
 					} else {
-						setErr('form.picTelp', res.error ?? "Nomor HP tidak valid");
+						setErr('form.picTelp', "Nomor telepon tidak valid");
 					}
 				}
 
