@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
 import 'package:joss_app/pages/login/mobile/client/forgot_password_page.dart';
@@ -82,6 +83,9 @@ class _LoginFormClientState extends State<LoginFormClient>
       controller: _usernameController,
       focusNode: _emailFocusNode,
       keyboardType: TextInputType.text,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
       validator: (value) {
         final input = (value ?? '').trim();
         if (input.isEmpty) {
@@ -116,6 +120,9 @@ class _LoginFormClientState extends State<LoginFormClient>
       controller: _passwordController,
       focusNode: _passwordFocusNode,
       obscureText: !_isPasswordVisible,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
       suffixIcon: IconButton(
         icon: Icon(
           _isPasswordVisible ? Icons.visibility : Icons.visibility_off,

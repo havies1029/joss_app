@@ -156,6 +156,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     controller: fieldPasswordController,
     keyboardType: TextInputType.visiblePassword,
     obscureText: _obscurePassword,
+    inputFormatters: [
+      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+    ],
     errorText: err('form1.password'),
     validator: (_) => err('form1.password'),
     suffixIcon: IconButton(
@@ -185,6 +188,9 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     obscureText: _obscureConfirm,
     errorText: err('form1.konfirmasiPassword'),
     validator: (_) => err('form1.konfirmasiPassword'),
+    inputFormatters: [
+      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+    ],
     suffixIcon: IconButton(
       icon: Icon(
         _obscureConfirm

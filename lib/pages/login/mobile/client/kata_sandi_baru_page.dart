@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/forgot_password_bloc.dart';
 import 'package:joss_app/common/constants.dart';
@@ -246,6 +247,9 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                           obscureText: !_showNew,
                           focusNode: _newPasswordFocus,
                           validator: _validateNewPassword,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                          ],
                           suffixIcon: IconButton(
                             icon: Icon(
                               _showNew
@@ -269,6 +273,9 @@ class _KataSandiBaruPageState extends State<KataSandiBaruPage> {
                           obscureText: !_showConfirm,
                           focusNode: _confirmPasswordFocus,
                           validator: _validateConfirmPassword,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                          ],
                           suffixIcon: IconButton(
                             icon: Icon(
                               _showConfirm

@@ -492,6 +492,9 @@ class KlaimparklaimcrudFormPageFormState
 			keyboardType: TextInputType.emailAddress,
 			errorText: err('form.picEmail'),
 			validator: (_) => err('form.picEmail'),
+			inputFormatters: [
+				FilteringTextInputFormatter.deny(RegExp(r'\s')),
+			],
 			onChanged: (value) {
 				final email = value.trim();
 

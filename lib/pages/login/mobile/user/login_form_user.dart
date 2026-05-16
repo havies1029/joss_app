@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -62,6 +63,9 @@ class _LoginFormUserState extends State<LoginFormUser>
       hint: "Masukkan email atau nomor HP kamu",
       controller: _emailOrPhoneController,
       keyboardType: TextInputType.text,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
       validator: (value) {
         final input = (value ?? '').trim();
         if (input.isEmpty) {

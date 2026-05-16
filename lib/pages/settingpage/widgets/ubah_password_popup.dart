@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/change_password_bloc.dart';
 import 'package:joss_app/models/authentication/change_password_model.dart';
@@ -209,6 +210,9 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
                               label: "Kata Sandi Lama",
                               obscureText: !_showOld,
                               validator: _validateOldPassword,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                              ],
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _showOld
@@ -228,6 +232,9 @@ class _UbahPasswordPageState extends State<UbahPasswordPage> {
                               label: "Kata Sandi Baru",
                               obscureText: !_showNew,
                               focusNode: _newPasswordFocus,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                              ],
                               validator: _validateNewPassword,
                               suffixIcon: IconButton(
                                 icon: Icon(

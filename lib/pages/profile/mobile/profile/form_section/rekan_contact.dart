@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
@@ -245,6 +246,9 @@ class MRekanContactCrudFormPageFormState
     label: "Email",
     controller: fieldEmailController,
     keyboardType: TextInputType.emailAddress,
+    inputFormatters: [
+      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+    ],
     validator: (v) {
       final email = v?.trim() ?? "";
       if (email.isEmpty) {
