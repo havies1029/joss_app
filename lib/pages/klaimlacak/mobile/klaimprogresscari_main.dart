@@ -6,13 +6,14 @@ import 'klaimprogresscari_list.dart';
 
 class KlaimProgressCariMainPage extends StatelessWidget {
   final String klaim1Id;
-  const KlaimProgressCariMainPage({super.key, required this.klaim1Id});
+  final String statusDesc;
+  const KlaimProgressCariMainPage({super.key, required this.klaim1Id, required this.statusDesc});
 
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
       title: 'Lacak Klaim',
-      child: KlaimprogresscariPage(klaim1Id: klaim1Id),
+      child: KlaimprogresscariPage(klaim1Id: klaim1Id,statusDesc: statusDesc,),
     );
   }
 }

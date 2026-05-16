@@ -13,7 +13,8 @@ import 'klaimnilaicrud_form.dart';
 
 class KlaimprogresscariListWidget extends StatefulWidget {
   final String klaim1Id;
-  const KlaimprogresscariListWidget({super.key, required this.klaim1Id});
+  final String statusDesc;
+  const KlaimprogresscariListWidget({super.key, required this.klaim1Id, required this.statusDesc});
 
   @override
   KlaimprogresscariListWidgetState createState() => KlaimprogresscariListWidgetState();
@@ -117,6 +118,7 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
                 item: curr,
                 isLast: isLastRow,
                 isLastActive: isLastActive,
+                isProgressColor : widget.statusDesc,
                 infoNilaiKlaim: curr.actioncode.trim().toLowerCase() == 'nilai_klaim' ? stateProgress.nilaiKlaim : null,
                 jadwalBayarItems: curr.actioncode.trim().toLowerCase() == 'table_payment' ? stateProgress.jadwalBayar : null,
                 klaimProgressInfo: curr.actioncode.trim().toLowerCase() == 'table_payment' ? stateProgress.klaimProgressInfo : null,

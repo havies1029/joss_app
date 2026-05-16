@@ -131,7 +131,7 @@ class FabActionKlaim extends StatelessWidget {
                 ));
               case ActionType.lacakKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                    KlaimProgressCariMainPage(klaim1Id: selected!.klaim1Id)));
+                    KlaimProgressCariMainPage(klaim1Id: selected!.klaim1Id, statusDesc: selected!.statusDesc)));
               case ActionType.batalKlaim:
                 Navigator.push(context, MaterialPageRoute(builder: (_) =>
                     KlaimbatalcrudFormPage(klaim1Id: selected!.klaim1Id)));

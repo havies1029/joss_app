@@ -18,6 +18,7 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
   final KlaimProgressNilaiKlaimModel? infoNilaiKlaim;
   final List<KlaimProgressJadwalBayarModel>? jadwalBayarItems;
   final KlaimProgressInfoModel? klaimProgressInfo;
+  final String isProgressColor;
 
   const KlaimProgressCariTileWidget({
     super.key,
@@ -27,6 +28,7 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
     this.infoNilaiKlaim,
     this.jadwalBayarItems,
     this.klaimProgressInfo,
+    required this.isProgressColor
   });
 
   @override
@@ -37,7 +39,10 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
     final baseText = primaryLightColor;
 
     // final dotColor = active ? kategoriYellow : hintGrey;
-    final dotColor = hintGrey;
+    final dotColor =
+    isProgressColor.toLowerCase().trim() == 'berjalan'
+        ? sYellow
+        : hintGrey;
     final lineColor = hintGrey;
     final headers = <String, String>{
       'Authorization': 'Bearer ${AppData.userToken}',

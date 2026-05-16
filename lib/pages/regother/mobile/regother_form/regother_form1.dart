@@ -63,24 +63,26 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   @override
   void initState() {
     super.initState();
+
     _loadDefaultCurrency();
-    mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
-    mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
+
     regUserBloc = context.read<RegUserBloc>();
     authenticationBloc = context.read<AuthenticationBloc>();
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mjenisClient == "10") {
-        mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
-      }else if (mjenisClient == "20"){
-        mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
-      }
-    });
-    Future.delayed(const Duration(milliseconds: 500), () {
-      loadData();
-    });
+
+    if (mjenisClient == "10") {
+      context.read<MRekanGeneralIdvCrudBloc>().add(
+        MRekanGeneralIdvCrudLihatEvent(),
+      );
+    } else if (mjenisClient == "20") {
+      context.read<MRekanGeneralCmpCrudBloc>().add(
+        MRekanGeneralCmpCrudLihatEvent(),
+      );
+    }
+
+    loadData();
   }
 
   Future<void> _loadDefaultCurrency() async {
@@ -148,29 +150,41 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                       const SizedBox(height: 12),
                       buildFieldRemark(),
                       const SizedBox(height: 25),
-                      AppButton.primary(
-                        text: "Konfirmasi",
-                        isLoading: _isKonfirmasiLoading,
-                        backgroundColor:
-                        _isKonfirmasiLoading ? secondaryBlackColor : primaryColor,
-                        onPressed: _isKonfirmasiLoading
-                            ? null
-                            : () async {
-                          setState(() {
-                            _isKonfirmasiLoading = true;
-                          });
+                      BlocBuilder<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+                        builder: (context, idvState) {
+                          return BlocBuilder<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+                            builder: (context, cmpState) {
+                              return AppButton.primary(
+                                text: "Konfirmasi",
+                                isLoading: _isKonfirmasiLoading,
+                                backgroundColor: _isKonfirmasiLoading
+                                    ? secondaryBlackColor
+                                    : primaryColor,
+                                onPressed: _isKonfirmasiLoading
+                                    ? null
+                                    : () async {
+                                  setState(() {
+                                    _isKonfirmasiLoading = true;
+                                  });
 
-                          onSaveForm();
+                                  onSaveForm(
+                                    idvState: idvState,
+                                    cmpState: cmpState,
+                                  );
 
-                          await Future.delayed(const Duration(seconds: 2));
+                                  await Future.delayed(const Duration(seconds: 2));
 
-                          if (mounted) {
-                            setState(() {
-                              _isKonfirmasiLoading = false;
-                            });
-                          }
+                                  if (mounted) {
+                                    setState(() {
+                                      _isKonfirmasiLoading = false;
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                          );
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -296,24 +310,6 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     );
   }
 
-  // Widget buildFieldMcobId() => ReusableComboBox<ComboMCobApp1Model>(
-  //   hintText: "Jenis Asuransi",
-  //   initItem: fieldComboMCobApp1,
-  //   dataLoader: () => ComboMCobApp1Repository().getComboMCobApp1(),
-  //   displayText: (item) => item.cobNama,
-  //   compareItems: (a, b) => a.mCobApp1Id == b.mCobApp1Id,
-  //     onChangedCallback: (value) {
-  //             setState(() {
-  //               fieldComboMCobApp1 = value;
-  //             });
-  //           },
-  //   onSaveCallback: (value) {
-  //     fieldComboMCobApp1 = value;
-  //   },
-  //   validatorCallback: (value) =>
-  //   value == null ? kStringNullError : null,
-  // );
-
   Widget buildFieldRemark() {
     return appTextField(
       label: 'Tambahkan Catatan',
@@ -348,133 +344,148 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     );
   }
 
-  void _showPengajuanDialog() {
-    if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
-      final user =
-          (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated)
-              .user;
+  void _showPengajuanDialog({
+    required MRekanGeneralIdvCrudState idvState,
+    required MRekanGeneralCmpCrudState cmpState,
+  }) {
+    final authState = context.read<AuthenticationBloc>().state;
 
-      if (user.userType == "C") {
-        final mjenisClient =
-            context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+    if (authState is! AuthenticationAuthenticated) return;
 
-        if (mjenisClient == "10") {
-          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
+    final user = authState.user;
 
-          if (!idvState.isDataComplete) {
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.6),
-              builder: (context) => RegisterClientPopUp(
-                header: 'Isi Data Pribadi Anda',
-                description:
-                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
-                buttonText: 'Lengkapi Data Pribadi',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const MRekanGeneralIdvPopUpPage(),
-                    ),
-                  );
-                },
-              ),
-            );
-            return;
-          }
-        } else if (mjenisClient == "20") {
-          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
-
-          if (!cmpState.isDataComplete) {
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.6),
-              builder: (context) => RegisterClientPopUp(
-                header: 'Isi Data Perusahaan Anda',
-                description:
-                'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',
-                buttonText: 'Lengkapi Data Perusahaan',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const MRekanGeneralCmpPopUpPage(),
-                    ),
-                  );
-                },
-              ),
-            );
-            return;
-          }
-        }
-
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (context) {
-            return Dialog(
-              backgroundColor: formGrey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.info_outline_rounded,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "Pengajuan diproses tim internal.",
-                      textAlign: TextAlign.center,
-                      style: headingStyle(context, fontSize: 17.49),
-                    ),
-                    const SizedBox(height: 12),
-                    AppButton.primary(
-                      text: 'Ajukan Sekarang',
-                      backgroundColor: const Color(0xFF0ED7FF),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _executeSave();
-                      },
-                    ),
-                  ],
+    if (user.userType != "C") {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.6),
+        builder: (context) => RegisterClientPopUp(
+          header: 'Data Klien Belum Terdaftar!',
+          description:
+          'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+          buttonText: 'Daftar Klien',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RegisterClient(
+                  requestFrom: 'regother_page',
                 ),
               ),
             );
           },
+        ),
+      );
+      return;
+    }
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+
+    if (mjenisClient == "10") {
+      if (idvState.isLoading || !idvState.isLoaded) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('Data pribadi masih dimuat. Silakan coba lagi.'),
         );
-      } else {
+        return;
+      }
+
+      if (!idvState.isDataComplete) {
         showDialog(
           context: context,
           barrierDismissible: true,
           barrierColor: Colors.black.withOpacity(0.6),
           builder: (context) => RegisterClientPopUp(
-            header: 'Data Klien Belum Terdaftar!',
+            header: 'Isi Data Pribadi Anda',
             description:
-            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
-            buttonText: 'Daftar Klien',
+            'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+            buttonText: 'Lengkapi Data Pribadi',
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RegisterClient(
-                    requestFrom: 'regother_page',
-                  ),
+                  builder: (_) => const MRekanGeneralIdvPopUpPage(),
                 ),
               );
             },
           ),
         );
+        return;
       }
     }
+
+    if (mjenisClient == "20") {
+      if (cmpState.isLoading || !cmpState.isLoaded) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('Data perusahaan masih dimuat. Silakan coba lagi.'),
+        );
+        return;
+      }
+
+      if (!cmpState.isDataComplete) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          barrierColor: Colors.black.withOpacity(0.6),
+          builder: (context) => RegisterClientPopUp(
+            header: 'Isi Data Perusahaan Anda',
+            description:
+            'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',
+            buttonText: 'Lengkapi Data Perusahaan',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MRekanGeneralCmpPopUpPage(),
+                ),
+              );
+            },
+          ),
+        );
+        return;
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: formGrey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "Pengajuan diproses tim internal.",
+                  textAlign: TextAlign.center,
+                  style: headingStyle(context, fontSize: 17.49),
+                ),
+                const SizedBox(height: 12),
+                AppButton.primary(
+                  text: 'Ajukan Sekarang',
+                  backgroundColor: const Color(0xFF0ED7FF),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _executeSave();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _executeSave() {
@@ -499,7 +510,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     }
   }
 
-  void onSaveForm() {
+  void onSaveForm({
+    required MRekanGeneralIdvCrudState idvState,
+    required MRekanGeneralCmpCrudState cmpState,
+  }) {
     if (fieldComboMCobApp1 == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(
@@ -510,7 +524,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     }
 
     if (_formKey.currentState!.validate()) {
-      _showPengajuanDialog();
+      _showPengajuanDialog(
+        idvState: idvState,
+        cmpState: cmpState,
+      );
     }
   }
 }

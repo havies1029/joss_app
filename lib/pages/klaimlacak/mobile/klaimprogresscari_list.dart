@@ -8,7 +8,8 @@ import 'klaimprogresscari_list_widget.dart';
 
 class KlaimprogresscariPage extends StatefulWidget {
 	final String klaim1Id;
-	const KlaimprogresscariPage({super.key, required this.klaim1Id});
+	final String statusDesc;
+	const KlaimprogresscariPage({super.key, required this.klaim1Id, required this.statusDesc});
 
 	@override
 	KlaimprogresscariPageState createState() => KlaimprogresscariPageState();
@@ -34,6 +35,7 @@ class KlaimprogresscariPageState extends State<KlaimprogresscariPage> {
 					Expanded(
 							child: KlaimprogresscariListWidget(
 								klaim1Id: widget.klaim1Id,
+								statusDesc: widget.statusDesc,
 							)),
 				],
 			),
