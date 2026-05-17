@@ -16,6 +16,31 @@ class FabActionKlaim extends StatelessWidget {
 
   const FabActionKlaim({super.key, required this.selectedTab});
 
+  void showHubungiJps(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.45),
+      builder: (_) {
+        return HubungiCs(
+          mlayanan1Id: '01',
+          onPilihLayanan: (noTelepon) {
+            Navigator.pop(context);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("No telepon: $noTelepon"),
+              ),
+            );
+
+            // TODO: arahkan ke chat / page tujuan
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
@@ -86,61 +111,79 @@ class FabActionKlaim extends StatelessWidget {
         return FloatingActionMenuWidget(
           availableActions: actions,
           selectedItems: const [],
-          onActionTap: (type, _) {
-            if (selected == null) {
-              if (type == ActionType.klaimBaru) {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
-              } else if (type == ActionType.hubungiJps) {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  barrierColor: Colors.black.withOpacity(0.45),
-                  builder: (_) {
-                    return HubungiCs(
-                      mlayanan1Id: '01',
-                      onPilihLayanan: (noTelepon) {
-                        Navigator.pop(context);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("No telepon: $noTelepon"),
-                          ),
-                        );
-
-                        // TODO: arahkan ke chat / page tujuan
-                        // Navigator.push(context, MaterialPageRoute(builder: (_) => ...));
-                      },
-                    );
-                  },
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Pilih data terlebih dahulu")),
-                );
+            onActionTap: (type, _) {
+              if (type == ActionType.hubungiJps) {
+                showHubungiJps(context);
+                return;
               }
-              return;
+
+              if (selected == null) {
+                if (type == ActionType.klaimBaru) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Pilih data terlebih dahulu")),
+                  );
+                }
+                return;
+              }
+
+              switch (type) {
+                case ActionType.perbaruiKlaim:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => selected!.cobId == "10002"
+                          ? PerbaruiKlaimMvPage(
+                        klaim1Id: selected.klaim1Id,
+                        cobGroupNama: selected.cobNama,
+                      )
+                          : PerbaruiKlaimParPage(
+                        klaim1Id: selected.klaim1Id,
+                        cobGroupNama: selected.cobNama,
+                        cobGroupId: selected.cobId,
+                      ),
+                    ),
+                  );
+                  break;
+
+                case ActionType.lacakKlaim:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => KlaimProgressCariMainPage(
+                        klaim1Id: selected!.klaim1Id,
+                        statusDesc: selected!.statusDesc,
+                      ),
+                    ),
+                  );
+                  break;
+
+                case ActionType.batalKlaim:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => KlaimbatalcrudFormPage(
+                        klaim1Id: selected!.klaim1Id,
+                      ),
+                    ),
+                  );
+                  break;
+
+                case ActionType.klaimBaru:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()),
+                  );
+                  break;
+
+                default:
+                  break;
+              }
             }
-        
-            switch (type) {
-              case ActionType.perbaruiKlaim:
-                Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                selected!.cobId == "10002"
-                    ? PerbaruiKlaimMvPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama)
-                    : PerbaruiKlaimParPage(klaim1Id: selected.klaim1Id, cobGroupNama: selected.cobNama, cobGroupId: selected.cobId),
-                ));
-              case ActionType.lacakKlaim:
-                Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                    KlaimProgressCariMainPage(klaim1Id: selected!.klaim1Id, statusDesc: selected!.statusDesc)));
-              case ActionType.batalKlaim:
-                Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                    KlaimbatalcrudFormPage(klaim1Id: selected!.klaim1Id)));
-              case ActionType.klaimBaru:
-                Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarCobKlaimPage()));
-              default:
-                break;
-            }
-          },
         );
       },
     );

@@ -736,8 +736,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         isForm3Complete() &&
         isForm4Complete() &&
         isForm5Complete() &&
-        isForm6Complete() &&
-        isForm7Complete();
+        isForm6Complete();
+        // &&
+        // isForm7Complete();
   }
 
   Widget _buildForm() {
@@ -1658,12 +1659,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       ),
     );
 
-    context.read<RegmvUploadFotoAccBloc>().add(
-      Regmv7StorageUploadMany(
-        regmv1Id: regmv1Id!,
-        localIds: localIds7,
-      ),
-    );
+    if (localIds7.isNotEmpty) {
+      context.read<RegmvUploadFotoAccBloc>().add(
+        Regmv7StorageUploadMany(
+          regmv1Id: regmv1Id!,
+          localIds: localIds7,
+        ),
+      );
+    }
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -2760,8 +2763,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   bool isForm4Complete() => context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
   bool isForm5Complete() => context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
-  bool isForm7Complete() => context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
-
+  // bool isForm7Complete() => context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
+  bool isForm7Complete() => true;
   // form6 = premi sudah terhitung
   bool isForm6Complete() => context.read<Regmv6FormBloc>().state.record != null;
 

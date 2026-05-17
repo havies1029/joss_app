@@ -100,7 +100,7 @@ class PolisDetailCard extends StatelessWidget {
             "Kategori Asuransi",
             context.read<Regother1CrudBloc>().state.namaCob,
           ),
-          MapEntry("Nilai Pertanggungan", s("tsi")),
+          MapEntry("Nilai Pertanggungan", money("tsi")),
           MapEntry("Catatan", s("remark")),
         ];
 
@@ -235,7 +235,8 @@ class PolisDetailCard extends StatelessWidget {
     return num.tryParse(s) ?? 0;
   }
 
-  static String _formatNum(num v) => NumberFormat.decimalPattern().format(v);
+  static String _formatNum(num v) =>
+      NumberFormat.decimalPattern('en_US').format(v.toInt());
 
   static String _formatDate(dynamic value) {
     if (value == null) return "-";
