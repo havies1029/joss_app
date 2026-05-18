@@ -246,8 +246,8 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
         _headerCell("NO", center: true),
         _headerCell("NO POLISI"),
         _headerCell("MERK KENDARAAN"),
-        _headerCell("NILAI PERTANGGUNGAN", right: true),
-        _headerCell("PREMI", right: true),
+        _headerCell("NILAI PERTANGGUNGAN"),
+        _headerCell("PREMI"),
       ],
     );
   }
@@ -275,8 +275,8 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
         _cellCenter((index + 1).toString()),
         _cellText(polisiNo, compact: compact),
         _cellText(merkGabungan.isNotEmpty ? merkGabungan : "-", compact: compact),
-        _cellRight(harga),
-        _cellRight(premi),
+        _cellText(harga, compact: compact),
+        _cellText(premi, compact: compact),
       ],
     );
   }

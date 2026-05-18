@@ -4,6 +4,7 @@ import 'package:joss_app/pages/regmv/mobile/preview/regmv5_preview_page.dart';
 import 'package:joss_app/pages/regmv/mobile/preview/regmv5_storage_picker_panel.dart';
 
 import '../../../../blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
+import '../../../../common/constants.dart';
 
 class Regmv5StoragePickerSectionWidget extends StatelessWidget {
   final bool showRequiredError;
@@ -27,7 +28,7 @@ class Regmv5StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                SnackBar(content: Text(msg)),
+                errorSnackBar(msg ?? 'Terjadi kesalahan'),
               );
           },
         ),

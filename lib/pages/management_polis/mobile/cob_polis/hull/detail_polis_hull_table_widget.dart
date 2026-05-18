@@ -246,8 +246,8 @@ class _DetailPolisHullTableWidgetState
         _headerCell("NO", center: true),
         _headerCell("NAMA KAPAL"),
         _headerCell("KELAS KAPAL"),
-        _headerCell("NILAI PERTANGGUNGAN", right: true),
-        _headerCell("PREMI", right: true),
+        _headerCell("NILAI PERTANGGUNGAN"),
+        _headerCell("PREMI"),
       ],
     );
   }
@@ -270,8 +270,8 @@ class _DetailPolisHullTableWidgetState
         _cellCenter((index + 1).toString()),
         _cellText(namaKapal, compact: compact),
         _cellText(vesselClass, compact: compact),
-        _cellRight(si),
-        _cellRight(premi),
+        _cellText(si, compact: compact),
+        _cellText(premi, compact: compact),
       ],
     );
   }

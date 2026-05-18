@@ -115,8 +115,8 @@ class _LoginFormClientState extends State<LoginFormClient>
 
   Widget _buildPasswordField(double hPadding) {
     return appTextField(
-      label: "Password",
-      hint: "Masukkan password",
+      label: "Kata Sandi",
+      hint: "Masukkan Kata Sandi",
       controller: _passwordController,
       focusNode: _passwordFocusNode,
       obscureText: !_isPasswordVisible,

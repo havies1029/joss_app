@@ -4,6 +4,7 @@ import 'package:joss_app/pages/regpar/mobile/preview/regpar6_preview_page.dart';
 import 'package:joss_app/pages/regpar/mobile/preview/regpar6_storage_picker_panel.dart';
 
 import '../../../../blocs/regpar/regpar_upload_foto_object_bloc.dart';
+import '../../../../common/constants.dart';
 
 
 class Regpar6StoragePickerSectionWidget extends StatelessWidget {
@@ -28,7 +29,7 @@ class Regpar6StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                SnackBar(content: Text(msg)),
+                errorSnackBar(msg ?? 'Terjadi kesalahan'),
               );
           },
         ),

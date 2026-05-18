@@ -246,8 +246,8 @@ class _DetailPolisHealthTableWidgetState
         _headerCell("NO", center: true),
         _headerCell("NAMA"),
         _headerCell("PAKET NAMA"),
-        _headerCell("NILAI PERTANGGUNGAN", right: true),
-        _headerCell("PREMI", right: true),
+        _headerCell("NILAI PERTANGGUNGAN"),
+        _headerCell("PREMI"),
       ],
     );
   }
@@ -270,8 +270,8 @@ class _DetailPolisHealthTableWidgetState
         _cellCenter((index + 1).toString()),
         _cellText(nama, compact: compact),
         _cellText(paketNama, compact: compact),
-        _cellRight(tsi),
-        _cellRight(premi),
+        _cellText(tsi, compact: compact),
+        _cellText(premi, compact: compact),
       ],
     );
   }

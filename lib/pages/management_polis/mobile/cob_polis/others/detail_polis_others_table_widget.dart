@@ -199,8 +199,8 @@ class _DetailPolisOthersTableWidgetState
             columnWidths: const {
               0: FixedColumnWidth(48),
               1: FlexColumnWidth(2.4),
-              2: FlexColumnWidth(1.8),
-              3: FlexColumnWidth(1.6),
+              2: FlexColumnWidth(2.2),
+              3: FlexColumnWidth(2.0),
             },
             children: [
               _headerRow(),
@@ -244,8 +244,8 @@ class _DetailPolisOthersTableWidgetState
       children: [
         _headerCell("NO", center: true),
         _headerCell("INFO"),
-        _headerCell("NILAI PERTANGGUNGAN", right: true),
-        _headerCell("PREMI", right: true),
+        _headerCell("NILAI PERTANGGUNGAN"),
+        _headerCell("PREMI"),
       ],
     );
   }
@@ -266,8 +266,8 @@ class _DetailPolisOthersTableWidgetState
       children: [
         _cellCenter((index + 1).toString()),
         _cellText(info, compact: compact),
-        _cellRight(tsi),
-        _cellRight(premi),
+        _cellText(tsi, compact: compact),
+        _cellText(premi, compact: compact),
       ],
     );
   }
@@ -462,16 +462,16 @@ class _DetailPolisOthersTableWidgetState
         _columnWidthFromLongest(
           context,
           tsiValues,
-          min: 135,
-          max: 190,
+          min: 170,
+          max: 240,
         ),
       ),
       3: FixedColumnWidth(
         _columnWidthFromLongest(
           context,
           premiValues,
-          min: 115,
-          max: 170,
+          min: 150,
+          max: 220,
         ),
       ),
     };

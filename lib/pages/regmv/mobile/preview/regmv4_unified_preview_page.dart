@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/pages/regmv/mobile/preview/regmv4_preview_page.dart';
 
 import '../../../../blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
+import '../../../../common/constants.dart';
 import 'regmv4_storage_picker_panel.dart';
 
 class Regmv4StoragePickerSectionWidget extends StatelessWidget {
@@ -27,7 +28,7 @@ class Regmv4StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                SnackBar(content: Text(msg)),
+                errorSnackBar(msg ?? 'Terjadi kesalahan'),
               );
           },
         ),

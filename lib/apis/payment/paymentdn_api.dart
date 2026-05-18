@@ -189,6 +189,11 @@ class PaymentDnAPI{
 				queryParams,
 			);
 
+			debugPrint("========== GET RINCIAN SOA ==========");
+			debugPrint("URL       : $uri");
+			debugPrint("PARAMS    : $queryParams");
+			debugPrint("TOKEN     : ${AppData.userToken}");
+
 			final http.Response response = await http.get(
 				uri,
 				headers: <String, String>{
@@ -198,16 +203,30 @@ class PaymentDnAPI{
 				},
 			);
 
+			debugPrint("STATUS CODE : ${response.statusCode}");
+			debugPrint("RESPONSE    : ${response.body}");
+
 			if (response.statusCode == 200) {
 				final Map<String, dynamic> jsonData =
 				json.decode(response.body) as Map<String, dynamic>;
+
+				debugPrint("JSON DATA   : $jsonData");
+
 				return RincianSOAModel.fromJson(jsonData);
 			} else {
+				debugPrint(
+					"ERROR RESPONSE : ${response.body}",
+				);
+
 				throw Exception(
 					"Failed to load data. Status: ${response.statusCode}",
 				);
 			}
 		} catch (e, stackTrace) {
+			debugPrint("========== ERROR GET RINCIAN SOA ==========");
+			debugPrint("ERROR      : $e");
+			debugPrint("STACKTRACE : $stackTrace");
+
 			rethrow;
 		}
 	}

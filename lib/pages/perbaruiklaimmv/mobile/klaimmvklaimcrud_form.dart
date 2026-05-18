@@ -337,7 +337,7 @@ class AppCurrencyAmountField extends StatelessWidget {
 								child: TextFormField(
 									controller: amountController,
 									keyboardType: TextInputType.number,
-									textAlign: TextAlign.right,
+									textAlign: TextAlign.left,
 									inputFormatters: [
 										FilteringTextInputFormatter.digitsOnly,
 										ThousandsSeparatorInputFormatter(),

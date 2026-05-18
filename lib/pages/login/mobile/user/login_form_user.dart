@@ -159,7 +159,7 @@ class _LoginFormUserState extends State<LoginFormUser>
           listener: (context, state) {
             if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar("Username atau Password Anda salah!"),
+                errorSnackBar("Nama Pengguna atau Kata Sandi Anda salah!"),
               );
             }
           },

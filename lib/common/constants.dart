@@ -72,7 +72,7 @@ final RegExp phoneValidatorRegExp =
 RegExp(r'^(?:\+62|62|0)[0-9]{9,13}$');
 
 final RegExp emailValidatorRegExp = RegExp(
-  r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$",
 );
 
 /// Color Palette
@@ -106,6 +106,7 @@ const Color pYellow = Color(0xFFEFA728);
 const Color sYellow = Color(0xFFECB43C);
 const Color pBlue = Color(0xFF377BFC);
 const Color sBlue = Color(0xFF0088FF);
+const Color dBlue = Color(0xFF2196F3);
 const Color pRed = Color(0xFFFF0000);
 const Color pGreen = Color(0xFF90DE24);
 const Color pGreen2 = Color(0xFF91C050);

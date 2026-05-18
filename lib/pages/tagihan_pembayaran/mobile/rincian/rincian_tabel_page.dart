@@ -295,11 +295,11 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
     final widths = _compactColumnWidths(context, details);
 
-    final rowHeight = 54.0 * 0.8;
+    final rowHeight = 52.0;
     final headerHeight = 54.0;
     final maxVisibleRows = 8;
 
-    final useVerticalScroll = details.length >= maxVisibleRows;
+    final useVerticalScroll = details.length > maxVisibleRows;
 
     final bodyHeight = details.length * rowHeight;
     final maxBodyHeight = maxVisibleRows * rowHeight;
@@ -630,29 +630,31 @@ class _RincianTablePageState extends State<RincianTablePage> {
       ),
       children: [
         if (!widget.readOnly)
-          Center(
-            child: Checkbox(
-              value: isSelected,
-              onChanged: (checked) {
-                if (checked == true) {
-                  widget.onSelect(d.dn1Id);
-                } else {
-                  widget.onUnselect(d.dn1Id);
-                }
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+          SizedBox(
+            height: 52,
+            child: Center(
+              child: Checkbox(
+                value: isSelected,
+                onChanged: (checked) {
+                  if (checked == true) {
+                    widget.onSelect(d.dn1Id);
+                  } else {
+                    widget.onUnselect(d.dn1Id);
+                  }
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(cardBorderRadius / 2),
+                ),
+                side: WidgetStateBorderSide.resolveWith(
+                      (states) => const BorderSide(color: sGrey),
+                ),
+                fillColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? primaryColor
+                      : Colors.transparent,
+                ),
+                checkColor: primaryLightColor,
               ),
-              side: WidgetStateBorderSide.resolveWith(
-                    (states) => const BorderSide(color: sGrey),
-              ),
-              fillColor: WidgetStateProperty.resolveWith(
-                    (states) =>
-                states.contains(WidgetState.selected)
-                    ? primaryColor
-                    : Colors.transparent,
-              ),
-              checkColor: primaryLightColor,
             ),
           )
         else
@@ -729,9 +731,15 @@ class _RincianTablePageState extends State<RincianTablePage> {
   }) {
     return InkWell(
       onTap: () => _showDetailPopup(context, data),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: child,
+      child: SizedBox(
+        height: 52,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: child,
+          ),
+        ),
       ),
     );
   }
