@@ -6,7 +6,6 @@ import 'package:joss_app/pages/regpar/mobile/preview/regpar6_storage_picker_pane
 import '../../../../blocs/regpar/regpar_upload_foto_object_bloc.dart';
 import '../../../../common/constants.dart';
 
-
 class Regpar6StoragePickerSectionWidget extends StatelessWidget {
   final bool showRequiredError;
 
@@ -29,12 +28,13 @@ class Regpar6StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                errorSnackBar(msg ?? 'Terjadi kesalahan'),
+                errorSnackBar(msg),
               );
           },
         ),
       ],
-      child: BlocBuilder<RegparUploadFotoObjectBloc, RegParUploadFotoObjectState>(
+      child:
+      BlocBuilder<RegparUploadFotoObjectBloc, RegParUploadFotoObjectState>(
         builder: (context, state) {
           final bloc = context.read<RegparUploadFotoObjectBloc>();
 
@@ -44,9 +44,24 @@ class Regpar6StoragePickerSectionWidget extends StatelessWidget {
               Regpar6StoragePickerPanel(
                 items: state.items,
                 isLoading: state.isClearing && state.items.isEmpty,
-                onPickFile: () => bloc.add(RegparStoragePickFilesFromStorage()),
-                onPickPhoto: () => bloc.add(RegparStoragePickImageFromCamera()),
-                onRemove: (id) => bloc.add(RegparStorageRemoveAttachment(id)),
+
+                locked: state.isActionLocked,
+                onLockedTap: () {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      errorSnackBar(
+                        "Sedang menghitung premi, foto tidak bisa diubah dulu.",
+                      ),
+                    );
+                },
+
+                onPickFile: () =>
+                    bloc.add(RegparStoragePickFilesFromStorage()),
+                onPickPhoto: () =>
+                    bloc.add(RegparStoragePickImageFromCamera()),
+                onRemove: (id) =>
+                    bloc.add(RegparStorageRemoveAttachment(id)),
                 onTapItem: (item) => openPreviewPar6(context, item),
 
                 showRequiredError: showRequiredError,

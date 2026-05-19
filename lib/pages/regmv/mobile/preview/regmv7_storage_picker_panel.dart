@@ -17,6 +17,10 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
   final void Function(String localId) onRemove;
   final void Function(Regmv7UploadModel item) onTapItem;
   final bool isLoading;
+
+  final bool locked;
+  final VoidCallback? onLockedTap;
+
   final bool showRequiredError;
   final String requiredErrorText;
 
@@ -28,6 +32,8 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
     required this.onRemove,
     required this.onTapItem,
     required this.isLoading,
+    this.locked = false,
+    this.onLockedTap,
     required this.showRequiredError,
     this.requiredErrorText = "Wajib diisi",
   });
@@ -60,6 +66,8 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
                 final item = items[i];
                 return _ThumbCard(
                   item: item,
+                  locked: locked,
+                  onLockedTap: onLockedTap,
                   onRemove: () => onRemove(item.localId),
                   onTap: () => onTapItem(item),
                 );
@@ -95,7 +103,7 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
                     color: Colors.white,
                   ),
                   backgroundColor: const Color(0xFF4A4A4A),
-                  onPressed: onPickFile,
+                  onPressed: locked ? onLockedTap : onPickFile,
                 ),
               ),
               const SizedBox(width: 12),
@@ -109,7 +117,7 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
                     color: Colors.white,
                   ),
                   backgroundColor: const Color(0xFFF28C28),
-                  onPressed: onPickPhoto,
+                  onPressed: locked ? onLockedTap : onPickPhoto,
                 ),
               ),
             ],
@@ -160,10 +168,15 @@ class _ThumbCard extends StatefulWidget {
   final VoidCallback onRemove;
   final VoidCallback onTap;
 
+  final bool locked;
+  final VoidCallback? onLockedTap;
+
   const _ThumbCard({
     required this.item,
     required this.onRemove,
     required this.onTap,
+    this.locked = false,
+    this.onLockedTap,
   });
 
   @override
@@ -217,7 +230,7 @@ class _ThumbCardState extends State<_ThumbCard> {
                   right: 6,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: widget.onRemove,
+                    onTap: widget.locked ? widget.onLockedTap : widget.onRemove,
                     child: Container(
                       width: 34,
                       height: 34,

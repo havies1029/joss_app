@@ -48,6 +48,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   Timer? _timer;
   int _remainingTime = 59;
   bool _isResendAvailable = false;
+  bool _isVerifyingOtp = false;
 
   @override
   void initState() {
@@ -179,6 +180,7 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       _remainingTime = 59;
       _isResendAvailable = false;
       _otpError = false;
+      _isVerifyingOtp = false;
     });
     _startTimer();
 
@@ -200,6 +202,8 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   }
 
   void _verifyOtp({String? otpOverride}) {
+    if (_isVerifyingOtp) return;
+
     final otp = (otpOverride ?? _pinController.text).trim();
 
     if (otp.length != 6) {
@@ -212,19 +216,30 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       return;
     }
 
-    RegUserModel? record = context.read<RegUserBloc>().state.record;
-    record?.kodePin = otp;
+    if (mounted) {
+      setState(() {
+        _isVerifyingOtp = true;
+        _otpError = false;
+      });
+    }
+
+    final record = context.read<RegUserBloc>().state.record;
+    if (record == null) {
+      if (mounted) {
+        setState(() => _isVerifyingOtp = false);
+      }
+      return;
+    }
+
+    record.kodePin = otp;
 
     context.read<RegUserBloc>().add(
       ValidasiPinHPEvent(
-        record: record!,
+        record: record,
         sentTo: widget.sentTo,
         sentVia: widget.sentVia,
       ),
     );
-
-
-    // Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override
@@ -272,6 +287,12 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       listener: (context, state) {
         if (!state.isSaved) return;
 
+        if (mounted) {
+          setState(() {
+            _isVerifyingOtp = false;
+          });
+        }
+
         final messenger = ScaffoldMessenger.of(context);
         messenger.hideCurrentSnackBar();
 
@@ -292,7 +313,8 @@ class PopupClientWidgetState extends State<PopupClientWidget>
           messenger.showSnackBar(
             successSnackBar("Verifikasi OTP berhasil"),
           );
-            context.read<ProfileDownloadFotoBloc>().add(RefreshSecureImage());
+
+          context.read<ProfileDownloadFotoBloc>().add(RefreshSecureImage());
         }
       },
       child: Scaffold(
@@ -478,9 +500,6 @@ class PopupClientWidgetState extends State<PopupClientWidget>
                                           },
 
                                           onCompleted: (pin) {
-                                            if (_otpError) {
-                                              setState(() => _otpError = false);
-                                            }
                                             _verifyOtp(otpOverride: pin);
                                           },
                                         ),
@@ -499,8 +518,13 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
                                     AppButton.primary(
                                       text: "Lanjut",
-                                      onPressed: () {
+                                      isLoading: _isVerifyingOtp,
+                                      backgroundColor: _isVerifyingOtp ? secondaryBlackColor : primaryColor,
+                                      onPressed: _isVerifyingOtp
+                                          ? null
+                                          : () {
                                         final otp = _pinController.text.trim();
+
                                         if (otp.length == 6) {
                                           _verifyOtp();
                                         } else {

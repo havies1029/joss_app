@@ -9,7 +9,7 @@ class RegUserAPI {
 	Future<ReturnDataAPI> regUserTambahAPI(RegUserModel record) async {
 		String endpoint =
 				"${AppData.prefixEndPoint}/api/reguser/create";
-	
+
 		Map<String, String> queryParams = {
 			"modul_id": "regUserTambahAPI"
 		};
@@ -24,49 +24,24 @@ class RegUserAPI {
 		};
 
 		try {
-			/// ===== REQUEST DEBUG =====
-			debugPrint("=== REG USER CREATE REQUEST ===");
-			debugPrint("URL: $uri");
-			debugPrint("METHOD: POST");
-			debugPrint("HEADERS: $headers");
-			debugPrint("PARAMS: $queryParams");
-			debugPrint("BODY: ${jsonEncode(record.toJson())}");
-
 			final http.Response response = await http.post(
 				uri,
 				headers: headers,
 				body: jsonEncode(record.toJson()),
 			);
 
-			/// ===== RESPONSE DEBUG =====
-			debugPrint("=== REG USER CREATE RESPONSE ===");
-			debugPrint("STATUS: ${response.statusCode}");
-			debugPrint("BODY: ${response.body}");
-			debugPrint("BODY TYPE: ${response.body.runtimeType}");
-
 			if (response.statusCode == 200) {
 				final decoded = jsonDecode(response.body);
 
 				if (decoded == null) {
-					debugPrint("=== WARNING: RESPONSE NULL ===");
 					return ReturnDataAPI(success: false, data: "", rowcount: 0);
 				}
 
 				return ReturnDataAPI.fromDatabaseJson(decoded);
 			} else {
-				/// ===== ERROR RESPONSE =====
-				debugPrint("=== REG USER CREATE ERROR (NON-200) ===");
-				debugPrint("STATUS: ${response.statusCode}");
-				debugPrint("BODY: ${response.body}");
-
 				return ReturnDataAPI(success: false, data: "", rowcount: 0);
 			}
 		} catch (e, stackTrace) {
-			/// ===== EXCEPTION DEBUG =====
-			debugPrint("=== REG USER CREATE EXCEPTION ===");
-			debugPrint("ERROR: $e");
-			debugPrint("STACKTRACE: $stackTrace");
-
 			return ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
 	}
@@ -152,7 +127,7 @@ class RegUserAPI {
     } else {
       return ReturnDataAPI(success: false, data: "", rowcount: 0);
     }
-  } 
+  }
 
   Future<ReturnDataAPI> regUserResendOtpAPI(String reguserId) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/reguser/resendotp";

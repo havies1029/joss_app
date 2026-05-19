@@ -43,6 +43,7 @@ class Regmv4StoragePickerSectionWidget extends StatelessWidget {
               Regmv4StoragePickerPanel(
                 items: state.items,
                 isLoading: state.isClearing && state.items.isEmpty,
+
                 onPickFile: () => bloc.add(Regmv4StoragePickFilesFromStorage()),
                 onPickPhoto: () => bloc.add(Regmv4StoragePickImageFromCamera()),
                 onRemove: (id) => bloc.add(Regmv4StorageRemoveAttachment(id)),

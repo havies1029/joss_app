@@ -48,6 +48,7 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
   Timer? _timer;
   int _remainingTime = 59;
   bool _isResendAvailable = false;
+  bool _isVerifyingOtp = false;
 
   @override
   void initState() {
@@ -272,11 +273,18 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
       listener: (context, state) {
         if (!state.isLoaded) return;
 
+        if (mounted) {
+          setState(() {
+            _isVerifyingOtp = false;
+          });
+        }
+
         final messenger = ScaffoldMessenger.of(context);
         messenger.hideCurrentSnackBar();
 
         if (state.verificationFailed) {
           _shakeOtpFields();
+
           setState(() => _otpError = true);
 
           _pinController.clear();
@@ -509,11 +517,16 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
                                             },
 
                                             onCompleted: (pin) {
+                                              if (_isVerifyingOtp) return;
+
                                               if (_otpError) {
-                                                setState(() =>
-                                                _otpError =
-                                                false);
+                                                setState(() => _otpError = false);
                                               }
+
+                                              setState(() {
+                                                _isVerifyingOtp = true;
+                                              });
+
                                               _verifyOtpFromPin(pin);
                                             },
                                           ),
@@ -531,17 +544,28 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
 
                                       AppButton.primary(
                                         text: "Lanjut",
-                                        onPressed: () {
-                                          final otp =
-                                              _pinController.text;
+                                        isLoading: _isVerifyingOtp,
+                                        backgroundColor:
+                                        _isVerifyingOtp ? secondaryBlackColor : primaryColor,
+                                        onPressed: _isVerifyingOtp
+                                            ? null
+                                            : () {
+                                          final otp = _pinController.text;
+
                                           if (otp.length == 6) {
+                                            setState(() {
+                                              _isVerifyingOtp = true;
+                                            });
+
                                             _verifyOtpFromPin(otp);
                                           } else {
                                             _shakeOtpFields();
-                                            setState(() =>
-                                            _otpError = true);
-                                            _pinFocusNode
-                                                .requestFocus();
+
+                                            setState(() {
+                                              _otpError = true;
+                                            });
+
+                                            _pinFocusNode.requestFocus();
                                           }
                                         },
                                       ),

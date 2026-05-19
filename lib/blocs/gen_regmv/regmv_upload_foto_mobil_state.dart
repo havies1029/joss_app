@@ -6,6 +6,7 @@ class Regmv5UploadFotoObjectState extends Equatable {
   final bool isClearing;
   final bool uploadAllDone;
   final bool isUploadingAll;
+  final bool isActionLocked;
 
   const Regmv5UploadFotoObjectState({
     this.items = const [],
@@ -13,7 +14,11 @@ class Regmv5UploadFotoObjectState extends Equatable {
     this.isClearing = false,
     this.uploadAllDone = false,
     this.isUploadingAll = false,
+    this.isActionLocked = false,
   });
+
+  bool get canModifyItems =>
+      !isActionLocked && !isUploadingAll && !isClearing;
 
   Regmv5UploadFotoObjectState copyWith({
     List<Regmv5UploadModel>? items,
@@ -22,6 +27,7 @@ class Regmv5UploadFotoObjectState extends Equatable {
     bool? isClearing,
     bool? uploadAllDone,
     bool? isUploadingAll,
+    bool? isActionLocked,
   }) {
     return Regmv5UploadFotoObjectState(
       items: items ?? this.items,
@@ -29,6 +35,7 @@ class Regmv5UploadFotoObjectState extends Equatable {
       isClearing: isClearing ?? this.isClearing,
       uploadAllDone: uploadAllDone ?? false, // auto reset (ONE SHOT FLAG)
       isUploadingAll: isUploadingAll ?? this.isUploadingAll,
+      isActionLocked: isActionLocked ?? this.isActionLocked,
     );
   }
 
@@ -39,5 +46,6 @@ class Regmv5UploadFotoObjectState extends Equatable {
     isClearing,
     uploadAllDone,
     isUploadingAll,
+    isActionLocked,
   ];
 }

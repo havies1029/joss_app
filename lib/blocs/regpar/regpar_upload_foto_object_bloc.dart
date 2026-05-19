@@ -32,25 +32,41 @@ class RegparUploadFotoObjectBloc
     });
   }
 
-
   static const int _maxItems = 10;
 
   bool get _isMaxReached => state.items.length >= _maxItems;
 
-  void _emitMaxToast(Emitter<RegParUploadFotoObjectState> emit) {
-    emit(state.copyWith(toast: "Maksimal $_maxItems file."));
+  static const String _lockedMsg =
+      "Sedang menghitung premi, foto tidak bisa diubah dulu.";
+
+  bool get _isActionLocked => state.isUploadingAll || state.isClearing;
+
+  void _emitToast(Emitter<RegParUploadFotoObjectState> emit, String msg) {
+    emit(state.copyWith(toast: msg));
     emit(state.copyWith(clearToast: true));
   }
 
+  void _emitLockedToast(Emitter<RegParUploadFotoObjectState> emit) {
+    _emitToast(emit, _lockedMsg);
+  }
+
+  void _emitMaxToast(Emitter<RegParUploadFotoObjectState> emit) {
+    _emitToast(emit, "Maksimal $_maxItems file.");
+  }
+
   void _emitOverPickedToast(Emitter<RegParUploadFotoObjectState> emit) {
-    emit(state.copyWith(toast: "Maksimal foto $_maxItems. Sisanya tidak ditambahkan."));
-    emit(state.copyWith(clearToast: true));
+    _emitToast(emit, "Maksimal foto $_maxItems. Sisanya tidak ditambahkan.");
   }
 
   Future<void> _onPickCamera(
       RegparStoragePickImageFromCamera event,
       Emitter<RegParUploadFotoObjectState> emit,
       ) async {
+    if (_isActionLocked) {
+      _emitLockedToast(emit);
+      return;
+    }
+
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -66,6 +82,11 @@ class RegparUploadFotoObjectBloc
       RegparStoragePickFilesFromStorage event,
       Emitter<RegParUploadFotoObjectState> emit,
       ) async {
+    if (_isActionLocked) {
+      _emitLockedToast(emit);
+      return;
+    }
+
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -88,6 +109,11 @@ class RegparUploadFotoObjectBloc
       RegparStorageRemoveAttachment event,
       Emitter<RegParUploadFotoObjectState> emit,
       ) async {
+    if (_isActionLocked) {
+      _emitLockedToast(emit);
+      return;
+    }
+
     final localId = event.localId;
 
     final idx = state.items.indexWhere((e) => e.localId == localId);
@@ -106,6 +132,7 @@ class RegparUploadFotoObjectBloc
     final newItems = state.items.where((e) => e.localId != localId).toList();
     emit(state.copyWith(items: newItems));
   }
+
   Future<void> _onUploadMany(
       RegparStorageUploadMany event,
       Emitter<RegParUploadFotoObjectState> emit,

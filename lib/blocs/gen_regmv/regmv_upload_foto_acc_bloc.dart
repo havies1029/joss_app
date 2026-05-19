@@ -51,6 +51,15 @@ class RegmvUploadFotoAccBloc
 
   bool get _isMaxReached => state.items.length >= _maxItems;
 
+  static const String _lockedMsg =
+      "Sedang menghitung premi, foto tidak bisa diubah dulu.";
+
+  bool get _isActionLocked => state.isUploadingAll || state.isClearing;
+
+  void _emitLockedToast(Emitter<Regmv7UploadFotoObjectState> emit) {
+    _emitToast(emit, _lockedMsg);
+  }
+
   void _emitToast(Emitter<Regmv7UploadFotoObjectState> emit, String msg) {
     emit(state.copyWith(toast: msg));
     emit(state.copyWith(clearToast: true));
@@ -70,6 +79,11 @@ class RegmvUploadFotoAccBloc
       Regmv7StoragePickImageFromCamera event,
       Emitter<Regmv7UploadFotoObjectState> emit,
       ) async {
+    if (_isActionLocked) {
+      _emitLockedToast(emit);
+      return;
+    }
+
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -85,6 +99,11 @@ class RegmvUploadFotoAccBloc
       Regmv7StoragePickFilesFromStorage event,
       Emitter<Regmv7UploadFotoObjectState> emit,
       ) async {
+    if (_isActionLocked) {
+      _emitLockedToast(emit);
+      return;
+    }
+
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -166,6 +185,11 @@ class RegmvUploadFotoAccBloc
       Regmv7StorageRemoveAttachment event,
       Emitter<Regmv7UploadFotoObjectState> emit,
       ) async {
+    if (_isActionLocked) {
+      _emitLockedToast(emit);
+      return;
+    }
+
     final localId = event.localId;
 
     final idx = state.items.indexWhere((e) => e.localId == localId);
@@ -177,7 +201,6 @@ class RegmvUploadFotoAccBloc
 
     final serverId = (current.serverId ?? '');
     if (serverId.isNotEmpty) {
-      // NOTE: pastikan nama event ini sesuai yang ada di Regmv7FormBloc kamu
       regmv7formBloc.add(Regmv7FormHapusEvent(recordId: serverId));
     }
 

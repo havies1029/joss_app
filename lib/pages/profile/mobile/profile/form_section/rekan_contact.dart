@@ -12,7 +12,7 @@ import 'package:joss_app/models/combobox/comborkodepos_model.dart';
 
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
-import '../../../../../helper/indo_phone_result.dart';
+import '../../../../../helper/phone_number_result.dart';
 import '../../../../../repositories/combobox/combomkota_repository.dart';
 import '../../../../../repositories/combobox/combompropinsi_repository.dart';
 import '../../../../../repositories/combobox/comborkodepos_repository.dart';
@@ -124,11 +124,11 @@ class MRekanContactCrudFormPageFormState
                           final userTelp = (AppData.user.hp ?? '').trim();
 
                           if (contactTelp.isNotEmpty) {
-                            fieldTelpController.text = IndoPhoneHelper.toDisplay(contactTelp);
+                            fieldTelpController.text = PhoneNumberHelper.clean(contactTelp);
                           } else if (rekanTelp.isNotEmpty) {
-                            fieldTelpController.text = IndoPhoneHelper.toDisplay(rekanTelp);
+                            fieldTelpController.text = PhoneNumberHelper.clean(rekanTelp);
                           } else if (userTelp.isNotEmpty) {
-                            fieldTelpController.text = IndoPhoneHelper.toDisplay(userTelp);
+                            fieldTelpController.text = PhoneNumberHelper.clean(userTelp);
                           }
                         }
 
@@ -265,10 +265,6 @@ class MRekanContactCrudFormPageFormState
     label: "No. Telp Perusahaan",
     controller: fieldTelpController,
     keyboardType: TextInputType.phone,
-    prefix: Text(
-      "+62 | ",
-      style: inputTextStyle(context, color: primaryLightColor),
-    ),
     validator: (v) {
       final telp = v?.trim() ?? "";
 
@@ -276,10 +272,10 @@ class MRekanContactCrudFormPageFormState
         return kPhoneNumberNullError;
       }
 
-      final res = IndoPhoneHelper.normalize(telp);
+      final res = PhoneNumberHelper.normalize(telp);
 
       if (!res.isValid) {
-        return res.error ?? "Nomor HP tidak valid";
+        return res.error ?? "Nomor telepon tidak valid";
       }
 
       return null;
@@ -396,11 +392,11 @@ class MRekanContactCrudFormPageFormState
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
-    final phoneRes = IndoPhoneHelper.normalize(
+    final phoneRes = PhoneNumberHelper.normalize(
       fieldTelpController.text.trim(),
     );
 
-    final telpNormalized = phoneRes.phone62 ?? "";
+    final telpNormalized = phoneRes.phone ?? "";
 
     if (mounted) {
       setState(() {

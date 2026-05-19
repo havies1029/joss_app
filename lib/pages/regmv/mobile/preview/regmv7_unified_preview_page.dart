@@ -6,7 +6,6 @@ import 'package:joss_app/pages/regmv/mobile/preview/regmv7_storage_picker_panel.
 import '../../../../blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import '../../../../common/constants.dart';
 
-
 class Regmv7StoragePickerSectionWidget extends StatelessWidget {
   final bool showRequiredError;
 
@@ -29,7 +28,7 @@ class Regmv7StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                errorSnackBar(msg ?? 'Terjadi kesalahan'),
+                errorSnackBar(msg),
               );
           },
         ),
@@ -44,6 +43,18 @@ class Regmv7StoragePickerSectionWidget extends StatelessWidget {
               Regmv7StoragePickerPanel(
                 items: state.items,
                 isLoading: state.isClearing && state.items.isEmpty,
+
+                locked: state.isActionLocked,
+                onLockedTap: () {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      errorSnackBar(
+                        "Sedang menghitung premi, foto tidak bisa diubah dulu.",
+                      ),
+                    );
+                },
+
                 onPickFile: () => bloc.add(Regmv7StoragePickFilesFromStorage()),
                 onPickPhoto: () => bloc.add(Regmv7StoragePickImageFromCamera()),
                 onRemove: (id) => bloc.add(Regmv7StorageRemoveAttachment(id)),

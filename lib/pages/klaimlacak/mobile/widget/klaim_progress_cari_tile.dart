@@ -38,11 +38,11 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
 
     final baseText = primaryLightColor;
 
-    // final dotColor = active ? kategoriYellow : hintGrey;
-    final dotColor =
-    isProgressColor.toLowerCase().trim() == 'berjalan'
-        ? sYellow
-        : hintGrey;
+    final dotColor = active ? sYellow : hintGrey;
+    // final dotColor =
+    // isProgressColor.toLowerCase().trim() == 'berjalan'
+    //     ? sYellow
+    //     : hintGrey;
     final lineColor = hintGrey;
     final headers = <String, String>{
       'Authorization': 'Bearer ${AppData.userToken}',

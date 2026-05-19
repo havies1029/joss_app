@@ -47,6 +47,7 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   Timer? _timer;
   int _remainingTime = 59;
   bool _isResendAvailable = false;
+  bool _isVerifyingOtp = false;
 
   @override
   void initState() {
@@ -224,6 +225,8 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
   }
 
   void _verifyOtp({String? otpOverride}) {
+    if (_isVerifyingOtp) return;
+
     final otp = (otpOverride ?? _pinController.text).trim();
 
     if (otp.length != 6) {
@@ -247,14 +250,19 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
       return;
     }
 
+    setState(() {
+      _isVerifyingOtp = true;
+      _otpError = false;
+    });
+
     record.kodePin = otp;
 
     context.read<ForgotPasswordBloc>().add(
-          ForgotPswdValidasiPinEmailEvent(
-            record: record,
-            requestAt: DateTime.now(),
-          ),
-        );
+      ForgotPswdValidasiPinEmailEvent(
+        record: record,
+        requestAt: DateTime.now(),
+      ),
+    );
   }
 
   void _handleResendSuccess() {
@@ -293,6 +301,16 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
           prev.resendOtpSuccess != curr.resendOtpSuccess ||
           prev.errorMessage != curr.errorMessage,
       listener: (context, state) {
+        if (state.verificationPinSuccess ||
+            state.verificationPinFailed ||
+            state.errorMessage.isNotEmpty) {
+          if (mounted) {
+            setState(() {
+              _isVerifyingOtp = false;
+            });
+          }
+        }
+
         final messenger = ScaffoldMessenger.of(context);
         messenger.hideCurrentSnackBar();
 
@@ -617,11 +635,6 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                             }
                                           },
                                           onCompleted: (pin) {
-                                            if (_otpError) {
-                                              setState(() {
-                                                _otpError = false;
-                                              });
-                                            }
                                             _verifyOtp(otpOverride: pin);
                                           },
                                         ),
@@ -636,32 +649,24 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 18),
-                                    BlocBuilder<ForgotPasswordBloc,
-                                        ForgotPasswordState>(
-                                      buildWhen: (prev, curr) =>
-                                          prev.isLoading != curr.isLoading,
-                                      builder: (context, state) {
-                                        return AppButton.primary(
-                                          text: state.isLoading
-                                              ? "Memverifikasi..."
-                                              : "Lanjut",
-                                          onPressed: state.isLoading
-                                              ? null
-                                              : () {
-                                                  final otp =
-                                                      _pinController.text.trim();
+                                    AppButton.primary(
+                                      text: "Lanjut",
+                                      isLoading: _isVerifyingOtp,
+                                      backgroundColor: _isVerifyingOtp ? secondaryBlackColor : primaryColor,
+                                      onPressed: _isVerifyingOtp
+                                          ? null
+                                          : () {
+                                        final otp = _pinController.text.trim();
 
-                                                  if (otp.length == 6) {
-                                                    _verifyOtp();
-                                                  } else {
-                                                    _shakeOtpFields();
-                                                    setState(() {
-                                                      _otpError = true;
-                                                    });
-                                                    _pinFocusNode.requestFocus();
-                                                  }
-                                                },
-                                        );
+                                        if (otp.length == 6) {
+                                          _verifyOtp();
+                                        } else {
+                                          _shakeOtpFields();
+                                          setState(() {
+                                            _otpError = true;
+                                          });
+                                          _pinFocusNode.requestFocus();
+                                        }
                                       },
                                     ),
                                   ],

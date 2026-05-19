@@ -28,7 +28,7 @@ class Regmv5StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                errorSnackBar(msg ?? 'Terjadi kesalahan'),
+                errorSnackBar(msg),
               );
           },
         ),
@@ -43,6 +43,18 @@ class Regmv5StoragePickerSectionWidget extends StatelessWidget {
               Regmv5StoragePickerPanel(
                 items: state.items,
                 isLoading: state.isClearing && state.items.isEmpty,
+
+                locked: state.isActionLocked,
+                onLockedTap: () {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      errorSnackBar(
+                        "Sedang menghitung premi, foto tidak bisa diubah dulu.",
+                      ),
+                    );
+                },
+
                 onPickFile: () => bloc.add(Regmv5StoragePickFilesFromStorage()),
                 onPickPhoto: () => bloc.add(Regmv5StoragePickImageFromCamera()),
                 onRemove: (id) => bloc.add(Regmv5StorageRemoveAttachment(id)),
