@@ -1076,7 +1076,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                             HitungPremiRow(
                               label: "PERHITUNGAN PREMI\n(Asuransi PAR Termasuk EQVET)",
                               description: "${fieldComboRMatauang?.rmatauangSimbol} ${formatControllerNumber(fieldSumInsuredController)} x ${fieldRateTotalController.text}% =",
-                              controller: fieldPremiNetController,
+                              controller: fieldPremiTotalController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,
@@ -1100,7 +1100,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                             ),
                             HitungPremiRow(
                               label: "TOTAL TAGIHAN",
-                              controller: fieldPremiTotalController,
+                              controller: fieldPremiNetController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,

@@ -10,7 +10,7 @@ class RegisterClientPopUp extends StatelessWidget {
   final String buttonText;
   final VoidCallback onPressed;
   final bool showIcon;
-  /// optional: kalau mau tap di luar / tombol close
+  final bool showHeaderIcon;
   final VoidCallback? onClose;
 
   const RegisterClientPopUp({
@@ -20,6 +20,7 @@ class RegisterClientPopUp extends StatelessWidget {
     required this.buttonText,
     required this.onPressed,
     this.showIcon = true,
+    this.showHeaderIcon = true,
     this.onClose,
   });
 
@@ -38,18 +39,19 @@ class RegisterClientPopUp extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🔥 ICON BARU
-            SvgPicture.asset(
-              'assets/icons/Information2.svg',
-              width: 40,
-              height: 40,
-              colorFilter: const ColorFilter.mode(
-                primaryColor, // atau orange biar matching
-                BlendMode.srcIn,
+            if (showHeaderIcon) ...[
+              SvgPicture.asset(
+                'assets/icons/Information2.svg',
+                width: 40,
+                height: 40,
+                colorFilter: const ColorFilter.mode(
+                  primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
 
-            const SizedBox(height: hPadding),
+              const SizedBox(height: hPadding),
+            ],
 
             Text(
               header,
@@ -60,7 +62,9 @@ class RegisterClientPopUp extends StatelessWidget {
                 color: primaryLightColor,
               ),
             ),
+
             const SizedBox(height: 6),
+
             Text(
               description,
               textAlign: TextAlign.center,
@@ -70,6 +74,7 @@ class RegisterClientPopUp extends StatelessWidget {
                 color: dGrey,
               ),
             ),
+
             const SizedBox(height: 16),
 
             Align(

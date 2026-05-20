@@ -104,6 +104,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
         ),
       ],
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         body: Container(
           padding: EdgeInsets.symmetric(
             horizontal: hPadding * 1.5,
@@ -162,13 +163,26 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           }
 
           if (state.items.isEmpty) {
-            return const Center(
-              child: EmptyStatePage(
-                iconPath: 'assets/icons/belipolis_no_file.svg',
-                title: 'Tidak ada Riwayat Pembayaran',
-                description:
-                'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
-              ),
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: const Center(
+                      child: EmptyStatePage(
+                        iconPath: 'assets/icons/belipolis_no_file.svg',
+                        title: 'Tidak ada Riwayat Pembayaran',
+                        description:
+                        'Riwayat pembayaran yang telah dilakukan akan muncul di sini',
+                      ),
+                    ),
+                  ),
+                );
+              },
             );
           }
 

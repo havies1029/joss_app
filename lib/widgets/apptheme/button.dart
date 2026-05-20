@@ -465,12 +465,21 @@ class _AppButtonState extends State<AppButton>
     return ElevatedButton.styleFrom(
       backgroundColor: backgroundColor,
       foregroundColor: widget.textColor ?? Colors.white,
+
+      disabledBackgroundColor:
+      widget.isLoading ? null : backgroundColor,
+
+      disabledForegroundColor:
+      widget.isLoading
+          ? null
+          : (widget.textColor ?? Colors.white),
+
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
         side: widget.borderSide ?? BorderSide.none,
       ),
       elevation: elevation,
-      padding: widget.padding ?? EdgeInsets.symmetric(vertical: 5),
+      padding: widget.padding ?? const EdgeInsets.symmetric(vertical: 5),
     );
   }
 

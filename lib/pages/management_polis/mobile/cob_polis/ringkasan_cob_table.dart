@@ -34,7 +34,7 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
     super.initState();
     hController = ScrollController();
     vController = ScrollController();
-    vController.addListener(_onScroll);
+    // vController.addListener(_onScroll);
   }
 
   void _onScroll() {
@@ -57,7 +57,7 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
   @override
   void dispose() {
     hController.dispose();
-    vController.removeListener(_onScroll);
+    // vController.removeListener(_onScroll);
     vController.dispose();
     super.dispose();
   }

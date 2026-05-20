@@ -113,7 +113,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
                     icon: const Icon(Icons.autorenew_rounded, size: 35.0),
                     onPressed: _refreshData,
                   ),
-                  hintText: "Cari No Polis...",
+                  hintText: "Cari No Klaim/No Polis...",
                 ),
               ),
               const SizedBox(width: 8),

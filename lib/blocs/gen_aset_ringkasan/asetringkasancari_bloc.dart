@@ -15,49 +15,96 @@ class AsetRingkasanCariBloc
     on<RefreshAsetRingkasanCariEvent>(onRefreshAsetRingkasanCari);
   }
 
-  Future<void> onRefreshAsetRingkasanCari(RefreshAsetRingkasanCariEvent event,
-      Emitter<AsetRingkasanCariState> emit) async {
-    emit(const AsetRingkasanCariState());
-
-    emit(state.copyWith(searchText: event.searchText, statusId: event.statusId));
+  // Future<void> onRefreshAsetRingkasanCari(RefreshAsetRingkasanCariEvent event,
+  //     Emitter<AsetRingkasanCariState> emit) async {
+  //   emit(const AsetRingkasanCariState());
+  //
+  //   emit(state.copyWith(searchText: event.searchText, statusId: event.statusId));
+  //
+  //   add(FetchAsetRingkasanCariEvent());
+  // }
+  //
+  // Future<void> onFetchAsetRingkasanCari(FetchAsetRingkasanCariEvent event,
+  //     Emitter<AsetRingkasanCariState> emit) async {
+  //   if (state.hasReachedMax) return;
+  //
+  //   AsetRingkasanCariRepository repo = AsetRingkasanCariRepository();
+  //   if (state.status == ListStatus.initial) {
+  //     List<AsetRingkasanCariModel> items =
+  //     await repo.getAsetRingkasanCari(state.statusId, state.searchText, 0);
+  //     return emit(state.copyWith(
+  //         items: items,
+  //         hasReachedMax: false,
+  //         status: ListStatus.success,
+  //         hal: 1));
+  //   }
+  //   List<AsetRingkasanCariModel> items =
+  //   await repo.getAsetRingkasanCari(state.statusId, state.searchText, state.hal);
+  //   if (items.isEmpty) {
+  //     return emit(state.copyWith(hasReachedMax: true));
+  //   } else {
+  //     List<AsetRingkasanCariModel> asetRingkasanCari = List.of(state.items)
+  //       ..addAll(items);
+  //
+  //     final result = asetRingkasanCari
+  //         .whereWithIndex((e, index) =>
+  //     asetRingkasanCari.indexWhere(
+  //             (e2) => e2.asetRingkasanId == e.asetRingkasanId) ==
+  //         index)
+  //         .toList();
+  //
+  //     return emit(state.copyWith(
+  //         items: result,
+  //         hasReachedMax: false,
+  //         status: ListStatus.success,
+  //         hal: state.hal + 1));
+  //   }
+  // }
+  Future<void> onRefreshAsetRingkasanCari(
+      RefreshAsetRingkasanCariEvent event,
+      Emitter<AsetRingkasanCariState> emit,
+      ) async {
+    emit(state.copyWith(
+      status: ListStatus.initial,
+      hasReachedMax: false,
+      hal: 0,
+      searchText: event.searchText,
+      statusId: event.statusId,
+      isFetching: false,
+    ));
 
     add(FetchAsetRingkasanCariEvent());
   }
 
-  Future<void> onFetchAsetRingkasanCari(FetchAsetRingkasanCariEvent event,
-      Emitter<AsetRingkasanCariState> emit) async {
-    if (state.hasReachedMax) return;
+  Future<void> onFetchAsetRingkasanCari(
+      FetchAsetRingkasanCariEvent event,
+      Emitter<AsetRingkasanCariState> emit,
+      ) async {
+    if (state.isFetching) return;
 
-    AsetRingkasanCariRepository repo = AsetRingkasanCariRepository();
-    if (state.status == ListStatus.initial) {
-      List<AsetRingkasanCariModel> items =
-      await repo.getAsetRingkasanCari(state.statusId, state.searchText, 0);
-      return emit(state.copyWith(
-          items: items,
-          hasReachedMax: false,
-          status: ListStatus.success,
-          hal: 1));
-    }
-    List<AsetRingkasanCariModel> items =
-    await repo.getAsetRingkasanCari(state.statusId, state.searchText, state.hal);
-    if (items.isEmpty) {
-      return emit(state.copyWith(hasReachedMax: true));
-    } else {
-      List<AsetRingkasanCariModel> asetRingkasanCari = List.of(state.items)
-        ..addAll(items);
+    final repo = AsetRingkasanCariRepository();
 
-      final result = asetRingkasanCari
-          .whereWithIndex((e, index) =>
-      asetRingkasanCari.indexWhere(
-              (e2) => e2.asetRingkasanId == e.asetRingkasanId) ==
-          index)
-          .toList();
+    emit(state.copyWith(isFetching: true));
 
-      return emit(state.copyWith(
-          items: result,
-          hasReachedMax: false,
-          status: ListStatus.success,
-          hal: state.hal + 1));
+    try {
+      final items = await repo.getAsetRingkasanCari(
+        state.statusId,
+        state.searchText,
+        0, // tetap 0 karena API belum support paging beneran
+      );
+
+      emit(state.copyWith(
+        items: items,
+        status: ListStatus.success,
+        hasReachedMax: true, // penting: stop fetch berikutnya
+        hal: 0,
+        isFetching: false,
+      ));
+    } catch (_) {
+      emit(state.copyWith(
+        status: ListStatus.failure,
+        isFetching: false,
+      ));
     }
   }
 }

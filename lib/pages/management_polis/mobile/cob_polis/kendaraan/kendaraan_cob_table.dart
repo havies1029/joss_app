@@ -369,7 +369,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
         const SizedBox(),
         ...[
           "No",
-          "Polis No",
+          "No Polis",
           "Jumlah Objek",
           "Periode",
           "Tertanggung",

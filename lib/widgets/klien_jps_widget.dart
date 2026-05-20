@@ -8,6 +8,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../blocs/gallery/gallerymembercari_bloc.dart';
+import '../blocs/logoclient/mlogoclient_cari_bloc.dart';
 import '../common/loading_indicator.dart';
 
 class ClientSection extends StatefulWidget {
@@ -35,6 +36,10 @@ class _ClientSectionState extends State<ClientSection> {
 
     context.read<GallerymemberCariBloc>().add(
       RefreshGallerymemberCariEvent(),
+    );
+
+    context.read<MlogoclientCariBloc>().add(
+      FetchMlogoclientCariEvent(),
     );
   }
 
@@ -211,41 +216,32 @@ class _ClientSectionState extends State<ClientSection> {
   }
 
   Widget _buildSocmedRow(bool isMobile) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SocmedIcon(
-          'assets/icons/instagram.svg',
-          isMobile,
-          url:
-          'https://www.instagram.com/jayaproteksindosakti?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
-        ),
-        const SizedBox(width: 20),
-        SocmedIcon(
-          'assets/icons/tiktok.svg',
-          isMobile,
-          url: 'https://www.tiktok.com/@proteksi.plus?_r=1&_t=ZS-96BYZfSuRbE',
-        ),
-        const SizedBox(width: 20),
-        SocmedIcon(
-          'assets/icons/website_logo.svg',
-          isMobile,
-          url: 'https://jayaproteksindo.co.id/',
-        ),
-        const SizedBox(width: 20),
-        SocmedIcon(
-          'assets/icons/linkedin.svg',
-          isMobile,
-          url: 'https://www.linkedin.com/company/jayaproteksindo/',
-        ),
-        const SizedBox(width: 20),
-        SocmedIcon(
-          'assets/icons/facebook.svg',
-          isMobile,
-          url:
-          'https://www.facebook.com/people/PT-Jaya-Proteksindo-Sakti/100054470620648/',
-        ),
-      ],
+    return BlocBuilder<
+        MlogoclientCariBloc,
+        MlogoclientCariState>(
+      builder: (context, state) {
+
+        if (state.status == ListStatus.loadingMore) {
+          return const SizedBox.shrink();
+        }
+
+        if (state.items.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 20,
+          runSpacing: 12,
+          children: state.items.map((item) {
+            return SocmedIcon(
+              'assets/icons/${item.logoSvg}',
+              isMobile,
+              url: item.linkUrl,
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }

@@ -45,6 +45,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   final TextEditingController _searchController = TextEditingController();
   String? globalMataUang;
   bool isSubmitting = false;
+  bool isAgreementChecked = false;
+
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
         .format(value);
@@ -465,11 +467,133 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   //       },
                   //     )
                   // ),
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  //   child: AppButton.primary(
+                  //     text: "Lanjutkan",
+                  //     onPressed: isSubmitting
+                  //         ? null
+                  //         : () async {
+                  //       showDialog(
+                  //         context: context,
+                  //         barrierDismissible: true,
+                  //         barrierColor: Colors.black.withOpacity(0.6),
+                  //         builder: (dialogContext) => RegisterClientPopUp(
+                  //           showIcon: false,
+                  //           header: 'Fitur pembayaran belum tersedia.',
+                  //           description:
+                  //           'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                  //           buttonText: 'Mengerti',
+                  //           onPressed: () {
+                  //             // Navigator.of(dialogContext).pop();
+                  //           },
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: AppButton.iconLeft(
+                      text: "Lihat Penawaran PDF",
+                      backgroundColor: pdfRed,
+                      onPressed: isSubmitting
+                          ? null
+                          : () async {
+                        // TODO: open pdf
+                      },
+                      icon: SvgPicture.asset(
+                        'assets/icons/icon_pdf.svg',
+                        width: 18,
+                        height: 18,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: hPadding),
+
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "*Silakan baca detail penawaran sebelum melanjutkan pembayaran.",
+                            style: bodyTextStyle(context).copyWith(
+                              color: primaryLightColor,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(checkboxBorderRadius),
+                      onTap: () {
+                        setState(() {
+                          isAgreementChecked = !isAgreementChecked;
+                        });
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: isAgreementChecked,
+                            activeColor: primaryColor,
+                            checkColor: Colors.white,
+                            side: const BorderSide(
+                              color: sGrey,
+                              width: 1.4,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                checkboxBorderRadius,
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                isAgreementChecked = value ?? false;
+                              });
+                            },
+                          ),
+
+                          const SizedBox(width: 6),
+
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Text(
+                                'Saya telah membaca dan menyetujui penawaran yang diberikan.',
+                                style: bodyTextStyle(context).copyWith(
+                                  color: primaryLightColor,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: hPadding),
+
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: AppButton.primary(
-                      text: "Lanjutkan",
-                      onPressed: isSubmitting
+                      text: "Pembayaran",
+                      backgroundColor:
+                      isAgreementChecked ? primaryColor : sGrey,
+                      onPressed: isSubmitting || !isAgreementChecked
                           ? null
                           : () async {
                         showDialog(

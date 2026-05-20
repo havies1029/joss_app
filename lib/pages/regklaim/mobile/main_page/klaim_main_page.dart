@@ -62,7 +62,7 @@ class KlaimMainPageState extends State<KlaimMainPage>
                 child: Column(
                   children: [
                     const HeaderCard(
-                      iconPath: "assets/icons/menu_lapor_klaim.svg",
+                      iconPath: "assets/icons/menu_klaim.svg",
                       title: "Klaim",
                       subtitle:
                       "Masukan klaim Anda sesuai dengan kategori asuransi yang tersedia.",

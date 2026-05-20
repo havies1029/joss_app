@@ -97,7 +97,7 @@ class _PremiPolisSummaryWidgetState extends State<PremiPolisSummaryWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Premi',
+                      'OS Premi',
                       style: bodyTextStyle(context, fontSize: 16),
                     ),
                     Row(

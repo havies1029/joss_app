@@ -317,6 +317,7 @@ flutter:
     - assets/icons/klaim_lainnya.svg
     - assets/icons/teknik_jps.svg
     - assets/icons/marketing_jps.svg
+    - assets/icons/icon_pdf.svg
 
   fonts:
     - family: Delm-Regular

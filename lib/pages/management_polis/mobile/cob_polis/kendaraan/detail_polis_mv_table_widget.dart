@@ -263,8 +263,8 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
 
     final merkGabungan = [
       d.merk,
-      d.modelMv,
       d.jenisMv,
+      d.modelMv,
     ].where((e) => e.trim().isNotEmpty).join(" - ");
 
     return TableRow(
