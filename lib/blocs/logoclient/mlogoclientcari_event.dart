@@ -1,4 +1,4 @@
-part of 'mlogoclient_cari_bloc.dart';
+part of 'mlogoclientcari_bloc.dart';
 
 abstract class MlogoclientCariEvents extends Equatable {
   const MlogoclientCariEvents();

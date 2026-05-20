@@ -8,7 +8,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../blocs/gallery/gallerymembercari_bloc.dart';
-import '../blocs/logoclient/mlogoclient_cari_bloc.dart';
+import '../blocs/logoclient/mlogoclientcari_bloc.dart';
 import '../common/loading_indicator.dart';
 
 class ClientSection extends StatefulWidget {

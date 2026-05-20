@@ -5,8 +5,8 @@ import 'package:joss_app/common/constants.dart';
 import '../../models/logoclient/mlogoclientcari_model.dart';
 import '../../repositories/logoclient/mlogoclientcari_repository.dart';
 
-part 'mlogoclient_cari_event.dart';
-part 'mlogoclient_cari_state.dart';
+part 'mlogoclientcari_event.dart';
+part 'mlogoclientcari_state.dart';
 
 class MlogoclientCariBloc
     extends Bloc<MlogoclientCariEvents, MlogoclientCariState> {

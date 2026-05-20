@@ -181,7 +181,7 @@ import 'blocs/gen_invite/invite_bloc.dart';
 import 'blocs/gen_endors/endors1crud_bloc.dart';
 import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_endors/endors2cari_bloc.dart';
-import 'blocs/logoclient/mlogoclient_cari_bloc.dart';
+import 'blocs/logoclient/mlogoclientcari_bloc.dart';
 import 'blocs/notif_read/notif_read_bloc.dart';
 import 'blocs/notifevent/notifeventcari_bloc.dart';
 import 'blocs/notiflog/logtrscari_bloc.dart';
