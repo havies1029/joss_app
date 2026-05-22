@@ -173,7 +173,7 @@ class _ClientSectionState extends State<ClientSection> {
               final item = items[index];
 
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: AnimatedBuilder(
                   animation: _pageController,
                   child: _ClientLogoPageItem(
@@ -288,32 +288,30 @@ class _ClientLogoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardWidth = isMobile ? 72.0 : 95.0;
-    final cardHeight = isMobile ? 42.0 : 60.0;
+    final cardWidth = isMobile ? 76.0 : 95.0;
+    final cardHeight = isMobile ? 46.0 : 60.0;
 
-    return Container(
+    return SizedBox(
       width: cardWidth,
       height: cardHeight,
-      padding: const EdgeInsets.all(1),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(cardBorderRadius - 1),
-        child: Container(
-          color: const Color(0xFFFEFEFE),
-          child: CachedNetworkImage(
-            imageUrl: imagePath,
-            fit: BoxFit.contain,
-            memCacheWidth: (cardWidth * 2).toInt(),
-            placeholder: (_, __) => const Center(
-              child: LoadingIndicator(),
-            ),
-            errorWidget: (_, __, ___) {
-              return Icon(
-                Icons.error,
-                color: Colors.black54,
-                size: isMobile ? 18 : 32,
-              );
-            },
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+        child: CachedNetworkImage(
+          imageUrl: imagePath,
+          fit: BoxFit.contain,
+          memCacheWidth: (cardWidth * 3).toInt(),
+          fadeInDuration: Duration.zero,
+          fadeOutDuration: Duration.zero,
+          placeholder: (_, __) => const Center(
+            child: LoadingIndicator(),
           ),
+          errorWidget: (_, __, ___) {
+            return Icon(
+              Icons.error,
+              color: Colors.white54,
+              size: isMobile ? 18 : 32,
+            );
+          },
         ),
       ),
     );

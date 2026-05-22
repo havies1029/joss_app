@@ -107,10 +107,10 @@ class _DetailPolisParTableWidgetState
           builder: (context, constraints) {
             return ScrollbarTheme(
               data: ScrollbarThemeData(
-                thumbColor: WidgetStateProperty.all(hintGrey),
-                trackColor: WidgetStateProperty.all(
-                  hintGrey.withOpacity(.15),
-                ),
+                thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
+                // trackColor: WidgetStateProperty.all(
+                //     scrollBar.withOpacity(0.1)
+                // ),
                 trackBorderColor: WidgetStateProperty.all(
                   Colors.transparent,
                 ),
@@ -146,11 +146,10 @@ class _DetailPolisParTableWidgetState
                           child: useVerticalScroll
                               ? ScrollbarTheme(
                             data: ScrollbarThemeData(
-                              thumbColor:
-                              WidgetStateProperty.all(hintGrey),
-                              trackColor: WidgetStateProperty.all(
-                                hintGrey.withOpacity(.15),
-                              ),
+                              thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
+                              // trackColor: WidgetStateProperty.all(
+                              //     scrollBar.withOpacity(0.1)
+                              // ),
                               trackBorderColor:
                               WidgetStateProperty.all(
                                 Colors.transparent,

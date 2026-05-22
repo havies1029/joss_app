@@ -134,7 +134,7 @@ class _RingkasanCobTableState extends State<RingkasanCobTable> {
             thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
             thumbColor: WidgetStateProperty.all(
-              scrollBar.withOpacity(0.1), // <-- 30% opacity
+              hintGrey,
             ),
           ),
           child: Scrollbar(

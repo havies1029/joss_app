@@ -47,11 +47,12 @@ import '../../../models/gen_review/reviewcari_model.dart';
       return Container(
         color: secondaryBlackColor,
         width: double.infinity,
-        // padding: widget.isPageMode ? EdgeInsets.all(15) : EdgeInsets.all(0),
         child: Align(
           alignment: Alignment.topCenter,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical: hPadding),
+            padding: EdgeInsets.symmetric(
+              horizontal: hPadding * 1.5,
+            ),
             child: SizedBox(
               width: 360,
               child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
@@ -65,9 +66,6 @@ import '../../../models/gen_review/reviewcari_model.dart';
                   }
 
                   final items = state.items;
-
-                  // final items =
-                  // state.items.isEmpty ? DummyReviewData.items : state.items;
 
                   return widget.isPageMode
                       ? SingleChildScrollView(
@@ -104,6 +102,8 @@ import '../../../models/gen_review/reviewcari_model.dart';
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: vPadding,),
+
           Row(
             children: [
               SvgPicture.asset('assets/icons/quote.svg', height: 24),
@@ -407,26 +407,30 @@ import '../../../models/gen_review/reviewcari_model.dart';
     }
 
     Widget _buildLoadMoreButton(int totalItems) {
-      return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(top: 8),
-        child: ElevatedButton(
-          onPressed: () => _loadMoreItems(totalItems),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+      return Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _loadMoreItems(totalItems),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                'Lihat Lebih Banyak',
+                style: bodyTextStyle(context, fontSize: 16).copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
           ),
-          child: Text(
-            'Lihat Lebih Banyak',
-            style: bodyTextStyle(context, fontSize: 16).copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
+          const SizedBox(height: vPadding),
+        ],
       );
     }
 
@@ -439,7 +443,6 @@ import '../../../models/gen_review/reviewcari_model.dart';
             height: 50,
           ),
           const SizedBox(height: 20),
-
           Text(
             'Tidak ada Review tersedia',
             style: TextStyle(
@@ -448,7 +451,6 @@ import '../../../models/gen_review/reviewcari_model.dart';
             ),
           ),
           const SizedBox(height: 6),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(

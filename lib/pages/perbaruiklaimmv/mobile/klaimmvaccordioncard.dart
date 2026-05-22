@@ -20,6 +20,7 @@ class Klaimmvaccordioncard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: pGrey,
+      clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Column(
@@ -34,16 +35,19 @@ class Klaimmvaccordioncard extends StatelessWidget {
             ),
             onTap: onTap,
           ),
-          AnimatedCrossFade(
-            firstChild: const SizedBox.shrink(),
-            secondChild: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              child: child,
+          ClipRect(
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topCenter,
+              child: isOpen
+                  ? Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: child,
+              )
+                  : const SizedBox.shrink(),
             ),
-            crossFadeState:
-                isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-            duration: const Duration(milliseconds: 200),
-          )
+          ),
         ],
       ),
     );

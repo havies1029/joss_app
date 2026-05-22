@@ -273,7 +273,9 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
             trackVisibility: WidgetStateProperty.all(false),
             thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
-            thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
+            thumbColor: WidgetStateProperty.all(
+              hintGrey,
+            ),
           ),
           child: Scrollbar(
             controller: hController,

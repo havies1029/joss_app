@@ -61,6 +61,7 @@ class ArtikelListPage extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: hPadding,),
                   sectionTitleBar(context, 'Cerita Besar'),
                   kDivider(),
                   ...state1.items.map(

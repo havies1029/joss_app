@@ -47,51 +47,51 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
     return Container(
       color: secondaryBlackColor,
       width: double.infinity,
-      // padding: widget.isPageMode ? EdgeInsets.all(15) : EdgeInsets.all(0),
       child: Align(
         alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: 360,
-          child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
-            builder: (context, state) {
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: hPadding * 1.5,
+          ),
+          child: SizedBox(
+            width: 360,
+            child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
+              builder: (context, state) {
+                if (state.status == ListStatus.initial) {
+                  return const Center(child: LoadingIndicator());
+                } else if (state.status == ListStatus.failure) {
+                  return Center(child: _emptyReviewWidget(context));
+                } else if (state.items.isEmpty) {
+                  return Center(child: _emptyReviewWidget(context));
+                }
 
-              if (state.status == ListStatus.initial) {
-                return const Center(child: LoadingIndicator());
-              } else if (state.status == ListStatus.failure) {
-                return Center(child: _emptyReviewWidget(context));
-              } else if (state.items.isEmpty) {
-                return Center(child: _emptyReviewWidget(context));
-              }
+                final items = state.items;
 
-              final items = state.items;
-              //
-              // final items =
-              // state.items.isEmpty ? DummyReviewData.items : state.items;
-
-              return widget.isPageMode
-                  ? SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return widget.isPageMode
+                    ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(context),
+                      const SizedBox(height: 16),
+                      _buildGridView(context, items),
+                      if (_displayedItems < items.length)
+                        _buildLoadMoreButton(items.length),
+                    ],
+                  ),
+                )
+                    : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildHeader(context),
                     const SizedBox(height: 16),
-                    _buildGridView(context, items),
-                    if (_displayedItems < items.length)
-                      _buildLoadMoreButton(items.length),
+                    _buildCarouselView(context, items),
+                    SizedBox(height: isMobile(context) ? 10.0 : 15.0),
+                    _buildNavigationControls(context, items),
                   ],
-                ),
-              )
-                  : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 16),
-                  _buildCarouselView(context, items),
-                  SizedBox(height: isMobile(context) ? 10.0 : 15.0),
-                  _buildNavigationControls(context, items),
-                ],
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -102,6 +102,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: vPadding,),
         Row(
           children: [
             SvgPicture.asset('assets/icons/quote.svg', height: 24),
