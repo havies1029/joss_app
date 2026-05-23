@@ -6,13 +6,14 @@ class KlaimProgressTimeline extends StatelessWidget {
   final bool isLastActive;
   final Color dotColor;
   final Color lineColor;
+  final String isProgressColor;
 
   const KlaimProgressTimeline({
     super.key,
     required this.isLast,
     required this.isLastActive,
     required this.dotColor,
-    required this.lineColor,
+    required this.lineColor, required this.isProgressColor,
   });
 
   @override
@@ -29,7 +30,9 @@ class KlaimProgressTimeline extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: pGreen,
+                color: isProgressColor.toLowerCase().trim() == 'berjalan'
+                    ? sYellow
+                    : pGreen,
                 shape: BoxShape.circle,
               ),
             )

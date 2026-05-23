@@ -1,156 +1,256 @@
-  import 'package:flutter/material.dart';
-  import 'package:joss_app/common/constants.dart';
-  import 'package:joss_app/pages/base/base_background_sidepage.dart';
-  import 'package:joss_app/widgets/apptheme/radio_button.dart';
-  import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
-  import 'package:joss_app/repositories/combobox/combomcobapp1_repository.dart';
-  import 'package:flutter_bloc/flutter_bloc.dart';
-  import '../../../../blocs/regother/regother1crud_bloc.dart';
-  import '../../../../common/loading_indicator.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
+import 'package:joss_app/models/combobox/combomcobapp1_model.dart';
+import 'package:joss_app/pages/base/base_background_sidepage.dart';
+import 'package:joss_app/repositories/combobox/combomcobapp1_repository.dart';
+import 'package:joss_app/widgets/apptheme/radio_button.dart';
+import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 
-  class CobCariPage extends StatefulWidget {
-    const CobCariPage({super.key});
+import '../../../../blocs/regother/regother1crud_bloc.dart';
+import '../../../../widgets/apptheme/empty_state_page.dart';
 
-    @override
-    State<CobCariPage> createState() => _CobCariPageState();
+class CobCariPage extends StatefulWidget {
+  const CobCariPage({super.key});
+
+  @override
+  State<CobCariPage> createState() => _CobCariPageState();
+}
+
+class _CobCariPageState extends State<CobCariPage> {
+  final ComboMCobApp1Repository _repository = ComboMCobApp1Repository();
+
+  final TextEditingController _searchController = TextEditingController();
+
+  late Future<List<ComboMCobApp1Model>> _futureData;
+
+  ComboMCobApp1Model? _selectedCobModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureData = _loadCobItems();
   }
 
-  class _CobCariPageState extends State<CobCariPage> {
-    String? selectedCobId;
-    ComboMCobApp1Model? selectedCobModel;
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
-    late Future<List<ComboMCobApp1Model>> futureData;
+  Future<List<ComboMCobApp1Model>> _loadCobItems() {
+    return _repository.getComboMCobApp1(
+      _searchController.text.trim(),
+    );
+  }
 
-    @override
-    void initState() {
-      super.initState();
-      futureData = ComboMCobApp1Repository().getComboMCobApp1("");
+  void _refreshData() {
+    setState(() {
+      _futureData = _loadCobItems();
+    });
+  }
+
+  IconButton _buildSearchButton() {
+    return IconButton(
+      icon: const Icon(
+        Icons.autorenew_rounded,
+        size: 35.0,
+      ),
+      onPressed: _refreshData,
+    );
+  }
+
+  List<ComboMCobApp1Model> _filterExcludedCob(
+      List<ComboMCobApp1Model> items,
+      ) {
+    return items
+        .where((e) => e.mCobApp1Id != "10002" && e.mCobApp1Id != "10003")
+        .toList();
+  }
+
+  void _syncSelectedModel({
+    required List<ComboMCobApp1Model> items,
+    required String selectedId,
+  }) {
+    if (_selectedCobModel != null || selectedId.isEmpty) return;
+
+    final found = items.where((e) => e.mCobApp1Id == selectedId).toList();
+
+    if (found.isNotEmpty) {
+      _selectedCobModel = found.first;
     }
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      // ambil selected id dari bloc (satu sumber kebenaran)
-      final selectedId = context.select<Regother1CrudBloc, String>(
-            (b) => b.state.selectedCOBId,
-      );
+  void _selectCob(ComboMCobApp1Model item) {
+    setState(() {
+      _selectedCobModel = item;
+    });
 
-      final selectedName = context.select<Regother1CrudBloc, String>(
-            (b) => b.state.namaCob,
-      );
+    context.read<Regother1CrudBloc>().add(
+      SelectButton(
+        item.mCobApp1Id,
+        item.cobNama,
+      ),
+    );
+  }
 
-      return BaseBackgroundSidePage(
-        title: "Kategori Asuransi",
-        child: Container(
-          color: secondaryBlackColor,
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          child: FutureBuilder<List<ComboMCobApp1Model>>(
-            future: futureData,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 50),
-                    child: LoadingIndicator(),
-                  ),
-                );
-              }
+  void _submitSelectedCob() {
+    if (_selectedCobModel == null) return;
 
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    "Gagal memuat kategori: ${snapshot.error}",
-                    style: bodyTextStyle(context),
-                  ),
-                );
-              }
+    Navigator.pop(context, _selectedCobModel);
+  }
 
-              final rawItems = snapshot.data ?? [];
-              final items = rawItems
-                  .where((e) =>
-              e.mCobApp1Id != "10002" && e.mCobApp1Id != "10003")
-                  .toList();
+  @override
+  Widget build(BuildContext context) {
+    final selectedId = context.select<Regother1CrudBloc, String>(
+          (bloc) => bloc.state.selectedCOBId,
+    );
 
-              if (items.isEmpty) {
-                return Center(
-                  child: Text(
-                    "Kategori asuransi kosong.",
-                    style: bodyTextStyle(context),
-                  ),
-                );
-              }
-
-              // kalau sudah pernah pilih sebelumnya, pastikan model lokal ikut kebaca
-              if (selectedCobModel == null && selectedId.isNotEmpty) {
-                final found =
-                items.where((e) => e.mCobApp1Id == selectedId).toList();
-                if (found.isNotEmpty) selectedCobModel = found.first;
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: items.length,
-                      itemBuilder: (_, i) =>
-                          _buildCobItem(
-                            context,
-                            items[i],
-                            selectedId,
-                            selectedName,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  AppButton.primary(
-                    text: "Lanjut",
-                    onPressed: selectedCobModel == null
-                        ? null
-                        : () => Navigator.pop(context, selectedCobModel),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              );
-            },
-          ),
+    return BaseBackgroundSidePage(
+      title: "Kategori Asuransi",
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: secondaryBlackColor,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 10,
         ),
-      );
-    }
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListPageFilterBarUIWidget(
+              searchController: _searchController,
+              searchButton: _buildSearchButton(),
+              hintText: "Cari kategori asuransi...",
+            ),
 
-    Widget _buildCobItem(BuildContext context,
-        ComboMCobApp1Model item,
-        String selectedId,
-        String selectedName,) {
-      final isSelected = selectedId == item.mCobApp1Id;
+            const SizedBox(height: 12),
 
-      void pick() {
-        selectedCobModel = item;
-        context.read<Regother1CrudBloc>().add(
-          SelectButton(item.mCobApp1Id, item.cobNama),
-        );
-      }
+            Expanded(
+              child: FutureBuilder<List<ComboMCobApp1Model>>(
+                future: _futureData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return _buildLoading();
+                  }
 
-      return InkWell(
-        onTap: pick,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: Row(
-            children: [
-              RadioButton(
-                isSelected: isSelected,
-                onTap: pick,
+                  if (snapshot.hasError) {
+                    return _buildError(snapshot.error);
+                  }
+
+                  final items = _filterExcludedCob(snapshot.data ?? []);
+
+                  if (items.isEmpty) {
+                    return _buildEmpty();
+                  }
+
+                  _syncSelectedModel(
+                    items: items,
+                    selectedId: selectedId,
+                  );
+
+                  return _buildCobList(
+                    items: items,
+                    selectedId: selectedId,
+                  );
+                },
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  item.cobNama,
-                  style: bodyTextStyle(context, fontSize: 16),
+            ),
+
+            const SizedBox(height: 15),
+
+            _buildSubmitButton(),
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.only(top: 50),
+        child: LoadingIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildError(Object? error) {
+    return Center(
+      child: Text(
+        "Gagal memuat kategori: $error",
+        style: bodyTextStyle(context),
+      ),
+    );
+  }
+
+  Widget _buildEmpty() {
+    return const EmptyStatePage(
+      title: "Kategori Asuransi tidak tersedia",
+      description: "Coba gunakan kata kunci lain atau muat ulang data kategori.",
+    );
+  }
+
+  Widget _buildCobList({
+    required List<ComboMCobApp1Model> items,
+    required String selectedId,
+  }) {
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: items.length,
+      itemBuilder: (_, index) {
+        return _buildCobItem(
+          item: items[index],
+          selectedId: selectedId,
+        );
+      },
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return AppButton.primary(
+      text: "Lanjut",
+      onPressed: _selectedCobModel == null
+          ? null
+          : _submitSelectedCob,
+    );
+  }
+
+  Widget _buildCobItem({
+    required ComboMCobApp1Model item,
+    required String selectedId,
+  }) {
+    final isSelected = selectedId == item.mCobApp1Id;
+
+    return InkWell(
+      onTap: () => _selectCob(item),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          children: [
+            RadioButton(
+              isSelected: isSelected,
+              onTap: () => _selectCob(item),
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Text(
+                item.cobNama,
+                style: bodyTextStyle(
+                  context,
+                  fontSize: 16,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
+}

@@ -38,12 +38,12 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
 
     final baseText = primaryLightColor;
 
-    final dotColor = active ? sYellow : hintGrey;
+    final dotColor = active ? hintGrey : sGrey;
     // final dotColor =
     // isProgressColor.toLowerCase().trim() == 'berjalan'
     //     ? sYellow
     //     : hintGrey;
-    final lineColor = hintGrey;
+    final lineColor = sGrey;
     final headers = <String, String>{
       'Authorization': 'Bearer ${AppData.userToken}',
     };
@@ -60,6 +60,7 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           KlaimProgressTimeline(
+            isProgressColor: isProgressColor,
             isLast: isLast,
             isLastActive: isLastActive,
             dotColor: dotColor,

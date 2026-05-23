@@ -286,7 +286,7 @@ class PaymentDnAPI{
 	}
 
 	Future<InvoiceStatusModel> regPar2InvAPI(String regpar1Id) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/regpartosppa";
+			String lihatEndpoint = "${AppData.prefixEndPoint}/api/payment/regpartosppa";
 		Map<String, String> queryParams = {'regpar1Id': regpar1Id, 'modulId': 'RegPar2InvAPI'};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 		final http.Response response =
