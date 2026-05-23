@@ -147,10 +147,6 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   }
 
   Widget _buildContent(BuildContext context) {
-    final statusId = context.select<MstatusrinciCariBloc, String>(
-          (b) => b.state.selectedStatusId,
-    );
-
     return Expanded(
       child: BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
         buildWhen: (previous, current) =>
@@ -181,7 +177,10 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
             );
           }
 
-          return const KlaimRincianTableWidget();
+          return const SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: KlaimRincianTableWidget(),
+          );
         },
       ),
     );

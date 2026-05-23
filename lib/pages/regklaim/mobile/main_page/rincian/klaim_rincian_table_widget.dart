@@ -20,6 +20,8 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   late GroupcobCariBloc groupcobCariBloc;
   late final ScrollController hController;
 
+  late final ScrollController vController;
+
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
   }
@@ -29,11 +31,13 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     super.initState();
     groupcobCariBloc = context.read<GroupcobCariBloc>();
     hController = ScrollController();
+    vController = ScrollController();
   }
 
   @override
   void dispose() {
     hController.dispose();
+    vController.dispose();
     super.dispose();
   }
 
@@ -52,6 +56,8 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
         if (state.status == ListStatus.success) {
           return state.items.isNotEmpty
               ? ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
             padding: EdgeInsets.zero,
             itemCount: state.items.length,
             itemBuilder: (_, index) {
@@ -115,16 +121,83 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
 
   Widget _buildDetailTable(
       List<KlaimdetailCariModel> details,
-  final String? selectedId, {
+      final String? selectedId, {
         required bool isLainnya,
         required bool compact,
       }) {
     if (details.isEmpty) return const Text("Tidak ada detail klaim");
 
+    const rowHeight = 52.0;
+    const headerHeight = 54.0;
+    const maxVisibleRows = 8;
+
+    final useVerticalScroll = details.length > maxVisibleRows;
+    final finalBodyHeight =
+    useVerticalScroll ? maxVisibleRows * rowHeight : details.length * rowHeight;
+    final finalHeight = headerHeight + finalBodyHeight;
+
+    final columnWidths = isLainnya
+        ? const {
+      0: FixedColumnWidth(50),
+      1: FixedColumnWidth(50),
+      2: FixedColumnWidth(100),
+      3: FixedColumnWidth(120),
+      4: FixedColumnWidth(120),
+      5: FixedColumnWidth(90),
+      6: FixedColumnWidth(120),
+    }
+        : const {
+      0: FixedColumnWidth(50),
+      1: FixedColumnWidth(50),
+      2: FixedColumnWidth(100),
+      3: FixedColumnWidth(120),
+      4: FixedColumnWidth(90),
+      5: FixedColumnWidth(120),
+    };
+
+    final headerTable = Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      border: const TableBorder(
+        horizontalInside: BorderSide(color: sGrey, width: 1),
+        verticalInside: BorderSide(color: sGrey, width: 1),
+      ),
+      columnWidths: columnWidths,
+      children: [
+        _tableHeader(context, [
+          "",
+          "NO",
+          "NO KLAIM",
+          "NO POLIS",
+          if (isLainnya) "COB",
+          "TANGGAL\nKEJADIAN",
+          "NILAI",
+        ]),
+      ],
+    );
+
+    final bodyTable = Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      border: const TableBorder(
+        horizontalInside: BorderSide(color: sGrey, width: 1),
+        verticalInside: BorderSide(color: sGrey, width: 1),
+      ),
+      columnWidths: columnWidths,
+      children: details.asMap().entries.map(
+            (e) {
+          return _detailRow(
+            e.value,
+            e.key,
+            selectedId,
+            compact: compact,
+            isLainnya: isLainnya,
+          );
+        },
+      ).toList(),
+    );
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
       child: ClipRRect(
-        // DESIGN: rounded corner hanya atas, persis dari kode gagal
         borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
         child: Container(
           decoration: BoxDecoration(
@@ -137,62 +210,51 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
               bottom: BorderSide(color: sGrey, width: 0.5),
             ),
           ),
-          child: ScrollbarTheme(
-            data: ScrollbarThemeData(
-              thumbVisibility: WidgetStateProperty.all(false),
-              trackVisibility: WidgetStateProperty.all(false),
-              thickness: WidgetStateProperty.all(5),
-              radius: const Radius.circular(cardBorderRadius),
-              thumbColor: WidgetStateProperty.all(
-                scrollBar.withOpacity(0.1),
-              ),
-            ),
-            child: HScrollAlwaysThumb(
-                child: Table(
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  border: const TableBorder(
-                    horizontalInside: BorderSide(color: sGrey, width: 1),
-                    verticalInside: BorderSide(color: sGrey, width: 1),
-                  ),
-                  columnWidths: isLainnya
-                      ? const {
-                    0: FixedColumnWidth(50),
-                    1: FixedColumnWidth(50),
-                    2: FixedColumnWidth(100),
-                    3: FixedColumnWidth(120),
-                    4: FixedColumnWidth(120), // COB
-                    5: FixedColumnWidth(80), // TANGGAL
-                    6: FixedColumnWidth(100), // ESTIMASI
-                  }
-                      : const {
-                    0: FixedColumnWidth(50),
-                    1: FixedColumnWidth(50),
-                    2: FixedColumnWidth(100),
-                    3: FixedColumnWidth(120),
-                    4: FixedColumnWidth(80), // TANGGAL
-                    5: FixedColumnWidth(100), // ESTIMASI
-                  },
-                  children: [
-                    _tableHeader(context, [
-                      "",
-                      "NO",
-                      "NO KLAIM",
-                      "NO POLIS",
-                      if (isLainnya) "COB",
-                      "TANGGAL\nKEJADIAN",
-                      "NILAI",
-                    ]),
-                    ...details.asMap().entries.map(
-                          (e) => _detailRow(
-                        e.value,
-                        e.key,
-                        selectedId,
-                        compact: compact,
-                        isLainnya: isLainnya,
-                      ),
+          child: SizedBox(
+            height: finalHeight,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return HScrollAlwaysThumb(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: constraints.maxWidth,
                     ),
-                  ],
-                )),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: headerHeight,
+                          child: headerTable,
+                        ),
+                        SizedBox(
+                          height: finalBodyHeight,
+                          child: useVerticalScroll
+                              ? ScrollbarTheme(
+                            data: ScrollbarThemeData(
+                              thumbVisibility: WidgetStateProperty.all(true),
+                              trackVisibility: WidgetStateProperty.all(false),
+                              thickness: WidgetStateProperty.all(5),
+                              radius: const Radius.circular(cardBorderRadius),
+                              thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
+                            ),
+                            child: Scrollbar(
+                              controller: vController,
+                              thumbVisibility: true,
+                              child: SingleChildScrollView(
+                                controller: vController,
+                                scrollDirection: Axis.vertical,
+                                child: bodyTable,
+                              ),
+                            ),
+                          )
+                              : bodyTable,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
