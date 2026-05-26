@@ -91,6 +91,7 @@ class Regmv6FormAPI {
 			return throw Exception("Failed to load data");
 		}
 	}
+
 	Future<Regmv6FormModel> regmv6FormHitungPremiAPI(String regmv1Id) async {
 		final hitungPremiEndpoint =
 				"${AppData.prefixEndPoint}/api/regmv/regmv6form/hitungpremi";

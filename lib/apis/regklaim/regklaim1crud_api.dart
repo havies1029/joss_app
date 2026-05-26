@@ -19,13 +19,6 @@ class Regklaim1CrudAPI {
 
 		final requestBody = jsonEncode(record.toJson());
 
-		// ================= REQUEST DEBUG =================
-		debugPrint("========== REQUEST regklaim1CrudTambahAPI ==========");
-		debugPrint("POST URI     : $uri");
-		debugPrint("Headers      : Bearer ${AppData.userToken}");
-		debugPrint("Body         : $requestBody");
-		debugPrint("====================================================");
-
 		final http.Response response = await http.post(
 			uri,
 			headers: <String, String>{
@@ -35,12 +28,6 @@ class Regklaim1CrudAPI {
 			},
 			body: requestBody,
 		);
-
-		// ================= RESPONSE DEBUG =================
-		debugPrint("========== RESPONSE regklaim1CrudTambahAPI ==========");
-		debugPrint("Status Code  : ${response.statusCode}");
-		debugPrint("Response Body: ${response.body}");
-		debugPrint("====================================================");
 
 		if (response.statusCode == 200) {
 			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -60,12 +47,6 @@ class Regklaim1CrudAPI {
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 
-		// ================= REQUEST DEBUG =================
-		debugPrint("========== REQUEST regklaim1Tambah4PolisJpsAPI ==========");
-		debugPrint("GET URI      : $uri");
-		debugPrint("sppa1Id      : $sppa1Id");
-		debugPrint("=========================================================");
-
 		final http.Response response = await http.get(
 			uri,
 			headers: <String, String>{
@@ -74,12 +55,6 @@ class Regklaim1CrudAPI {
 				'Authorization': 'Bearer ${AppData.userToken}'
 			},
 		);
-
-		// ================= RESPONSE DEBUG =================
-		debugPrint("========== RESPONSE regklaim1Tambah4PolisJpsAPI ==========");
-		debugPrint("Status Code  : ${response.statusCode}");
-		debugPrint("Response Body: ${response.body}");
-		debugPrint("==========================================================");
 
 		if (response.statusCode == 200) {
 			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -99,12 +74,6 @@ class Regklaim1CrudAPI {
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 
-		// ================= REQUEST DEBUG =================
-		debugPrint("========== REQUEST regklaimToKlaimAPI ==========");
-		debugPrint("GET URI        : $uri");
-		debugPrint("regklaim1Id    : $regklaim1Id");
-		debugPrint("================================================");
-
 		final http.Response response = await http.get(
 			uri,
 			headers: <String, String>{
@@ -113,12 +82,6 @@ class Regklaim1CrudAPI {
 				'Authorization': 'Bearer ${AppData.userToken}'
 			},
 		);
-
-		// ================= RESPONSE DEBUG =================
-		debugPrint("========== RESPONSE regklaimToKlaimAPI ==========");
-		debugPrint("Status Code  : ${response.statusCode}");
-		debugPrint("Response Body: ${response.body}");
-		debugPrint("================================================");
 
 		if (response.statusCode == 200) {
 			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -136,13 +99,6 @@ class Regklaim1CrudAPI {
 
 		final requestBody = jsonEncode(record.toJson());
 
-		// ================= REQUEST DEBUG =================
-		debugPrint("========== REQUEST regklaim1CrudUbahAPI ==========");
-		debugPrint("POST URI     : $uri");
-		debugPrint("Headers      : Bearer ${AppData.userToken}");
-		debugPrint("Body         : $requestBody");
-		debugPrint("==================================================");
-
 		final http.Response response = await http.post(
 			uri,
 			headers: <String, String>{
@@ -152,12 +108,6 @@ class Regklaim1CrudAPI {
 			},
 			body: requestBody,
 		);
-
-		// ================= RESPONSE DEBUG =================
-		debugPrint("========== RESPONSE regklaim1CrudUbahAPI ==========");
-		debugPrint("Status Code  : ${response.statusCode}");
-		debugPrint("Response Body: ${response.body}");
-		debugPrint("===================================================");
 
 		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {

@@ -50,6 +50,10 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
 
           final extra = showButton ? 1 : 0;
 
+          final lastActiveIndex = stateProgress.items.lastIndexWhere(
+                (e) => e.klaimprogressId.trim().isNotEmpty,
+          );
+
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             controller: _scrollController,
@@ -108,12 +112,10 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
 
               final curr = stateProgress.items[index];
               final currActive = curr.klaimprogressId.trim().isNotEmpty;
-              final nextIsPlaceholder = (index < stateProgress.items.length - 1)
-                  ? stateProgress.items[index + 1].klaimprogressId.trim().isEmpty
-                  : true;
 
-              final isLastActive = currActive && nextIsPlaceholder;
+              final isLastActive = currActive && index == lastActiveIndex;
               final isLastRow = index == stateProgress.items.length - 1;
+
               return KlaimProgressCariTileWidget(
                 item: curr,
                 isLast: isLastRow,
@@ -133,6 +135,7 @@ class KlaimprogresscariListWidgetState extends State<KlaimprogresscariListWidget
     );
 
   }
+
   void _onScroll() {
     if (!_scrollController.hasClients) return;
     if (_scrollController.position.pixels ==

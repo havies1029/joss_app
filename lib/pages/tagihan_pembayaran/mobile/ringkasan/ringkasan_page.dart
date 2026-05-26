@@ -24,13 +24,23 @@ class RingkasanPage extends StatefulWidget {
 
 class RingkasanPageState extends State<RingkasanPage> {
   late DnrekapcobCariBloc dnrekapcobCariBloc;
-  final TextEditingController _searchController = TextEditingController();
+
+  final TextEditingController _searchController =
+  TextEditingController();
+
+  bool _firstLoading = true;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      refreshData();
+
+    dnrekapcobCariBloc = context.read<DnrekapcobCariBloc>();
+
+    refreshData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _firstLoading = false);
     });
   }
 
@@ -128,6 +138,10 @@ class RingkasanPageState extends State<RingkasanPage> {
                 Expanded(
                   child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
                     builder: (context, state) {
+                      if (_firstLoading) {
+                        return const Center(child: LoadingIndicator());
+                      }
+
                       if (state.status != ListStatus.success) {
                         return const Center(child: LoadingIndicator());
                       }
@@ -141,17 +155,6 @@ class RingkasanPageState extends State<RingkasanPage> {
                         alignment: Alignment.topCenter,
                         child: RingkasanTablePage(
                           items: state.items,
-                          // selectedIds: state.selectedIds,
-                          // onSelect: (id) {
-                          //   context
-                          //       .read<DnrekapcobCariBloc>()
-                          //       .add(ToggleSelectItemEvent(id));
-                          // },
-                          // onUnselect: (id) {
-                          //   context
-                          //       .read<DnrekapcobCariBloc>()
-                          //       .add(ToggleSelectItemEvent(id));
-                          // },
                         ),
                       );
                     },

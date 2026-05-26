@@ -109,6 +109,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
       },
     );
   }
+
   Widget _buildHeaderTitle(BuildContext context, GroupcobCariModel header) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
@@ -293,21 +294,6 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
         required bool isLainnya,
       }) {
     final isSelected = selectedId == d.klaim1Id;
-
-    void logSelectedRow(KlaimdetailCariModel d, int index) {
-      debugPrint("=========== ROW SELECTED ===========");
-      debugPrint("Index         : $index");
-      debugPrint("No Urut       : ${d.nourut}");
-      debugPrint("Klaim1Id      : ${d.klaim1Id}");
-      debugPrint("COB ID        : ${d.cobId}");
-      debugPrint("COB Nama      : ${d.cobNama}");
-      debugPrint("No Polis      : ${d.noPolis}");
-      debugPrint("Status        : ${d.statusDesc}");
-      debugPrint("Tanggal       : ${DateFormat('yyyy-MM-dd').format(d.tglKejadian)}");
-      debugPrint("Currency      : ${d.curr}");
-      debugPrint("Nilai Klaim   : ${d.curr} ${formatNum(d.klaimAmount)}");
-      debugPrint("====================================");
-    }
 
     return TableRow(
       decoration: BoxDecoration(

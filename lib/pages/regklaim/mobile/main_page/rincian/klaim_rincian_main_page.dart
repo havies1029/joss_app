@@ -113,7 +113,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
                     icon: const Icon(Icons.autorenew_rounded, size: 35.0),
                     onPressed: _refreshData,
                   ),
-                  hintText: "Cari No Klaim/No Polis...",
+                  hintText: "No Klaim/No Polis",
                 ),
               ),
               const SizedBox(width: 8),
@@ -186,31 +186,31 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     );
   }
 
-  List<KlaimdetailCariModel> _getExportDetails() {
+  List<Map<String, dynamic>> _getExportRows() {
     final state = groupcobCariBloc.state;
 
     if (state.status != ListStatus.success) return [];
 
-    final allDetails =
-    state.items.expand((cob) => cob.details).toList();
+    final selectedId = state.selectedId?.trim();
 
-    if (state.selectedIds.isNotEmpty) {
-      return allDetails
-          .where((d) => state.selectedIds.contains(d.klaim1Id))
-          .toList();
-    }
+    return state.items.expand((cob) {
+      final isLainnya = cob.cobNama.toLowerCase() == "lainnya";
 
-    return allDetails;
+      final details = selectedId != null && selectedId.isNotEmpty
+          ? cob.details.where((d) => d.klaim1Id == selectedId)
+          : cob.details;
+
+      return details.map(
+            (d) => _detailToExportMap(
+          d,
+          isLainnya: isLainnya,
+        ),
+      );
+    }).toList();
   }
 
   void _showExportDialog(BuildContext context) {
-    final details = _getExportDetails();
-
-    if (details.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Tidak ada data untuk diekspor"));
-      return;
-    }
+    final data = _getExportRows();
 
     showGeneralDialog(
       context: context,
@@ -220,35 +220,37 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-            child: IntrinsicHeight(
-              child: PopupWidget(
-                title: "Pilih format file untuk diunduh",
-                subtitle: "Tersedia Excel dan PDF",
-                button1Text: "Excel",
-                button2Text: "PDF",
-                onExportSelected: (format) async {
-                  Navigator.pop(context);
-                  final data = details.map(_detailToExportMap).toList();
-                  await _exportData(context, format, data);
-                },
-              ),
-            )
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: IntrinsicHeight(
+            child: PopupWidget(
+              title: "Pilih format file untuk diunduh",
+              subtitle: "Tersedia Excel dan PDF",
+              button1Text: "Excel",
+              button2Text: "PDF",
+              onExportSelected: (format) async {
+                Navigator.pop(context);
+                await _exportData(context, format, data);
+              },
+            ),
+          ),
         );
       },
     );
   }
 
-  Map<String, dynamic> _detailToExportMap(KlaimdetailCariModel d) {
+  Map<String, dynamic> _detailToExportMap(
+      KlaimdetailCariModel d, {
+        required bool isLainnya,
+      }) {
     return {
       "No": d.nourut,
       "No Klaim": d.klaim1Id,
       "No Polis": d.noPolis,
+      if (isLainnya) "COB Desc": d.cobDesc,
       "Tanggal Kejadian": DateFormat('yyyy-MM-dd').format(d.tglKejadian),
       "Curr": d.curr,
       "Nilai Klaim": d.klaimAmount,
-      "Status": d.statusDesc,
     };
   }
 
@@ -290,15 +292,13 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   }
 
   Future<void> _onShare(BuildContext context) async {
-    final details = _getExportDetails();
+    final data = _getExportRows();
 
-    if (details.isEmpty) {
+    if (data.isEmpty) {
       ScaffoldMessenger.of(context)
           .showSnackBar(infoSnackBar("Tidak ada data untuk dibagikan"));
       return;
     }
-
-    final data = details.map(_detailToExportMap).toList();
 
     try {
       if (kIsWeb) {
@@ -324,9 +324,9 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'application/pdf')],
         subject: "Rincian Klaim",
-        text: details.length == 1
+        text: data.length == 1
             ? "Berikut terlampir rincian klaim."
-            : "Berikut terlampir ${details.length} rincian klaim terpilih.",
+            : "Berikut terlampir ${data.length} rincian klaim terpilih.",
       );
     } catch (e) {
       if (context.mounted) {

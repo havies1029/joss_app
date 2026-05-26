@@ -87,7 +87,7 @@ class _ListPageFilterBarUIWidgetState
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding:
-                const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                const EdgeInsets.symmetric(vertical: 5),
               ),
             ),
           ),

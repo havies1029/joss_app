@@ -118,10 +118,7 @@ class _TagihanPembayaranPageState extends State<TagihanPembayaranPage>
             ),
 
             Expanded(
-              child: IndexedStack(
-                index: selectedTab,
-                children: tabItems.map((e) => e['page'] as Widget).toList(),
-              ),
+              child: tabItems[selectedTab]['page'] as Widget,
             ),
           ],
         ),

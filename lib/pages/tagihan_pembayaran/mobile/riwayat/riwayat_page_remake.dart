@@ -35,11 +35,10 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
   @override
   void initState() {
     super.initState();
+
     historybayarCariBloc = context.read<HistorybayarCariBloc>();
 
-    Future.delayed(const Duration(milliseconds: 500), () {
-      refreshData(); // default load sesuai _filter (semua)
-    });
+    refreshData();
   }
 
   @override
@@ -120,7 +119,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 onSearch: (value) {
                   refreshData();
                 },
-               hintText: "Cari No Pembayaran...",
+               hintText: "No Pembayaran",
               ),
               const SizedBox(height: 10),
 

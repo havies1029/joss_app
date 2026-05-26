@@ -63,13 +63,13 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
   String _hintByCob(String cobId) {
     switch (cobId) {
       case "10002":
-        return "Cari tertanggung/lokasi/nopolis aset...";
+        return "Tertanggung/No Polis";
       case "10003":
-        return "Cari tertanggung/nopolis/merk...";
+        return "Tertanggung/No Polis/Merk";
       case "10004":
-        return "Cari nama kapal...";
+        return "Nama Kapal";
       case "10005":
-        return "Cari nama...";
+        return "Nama";
       default:
         return "Cari...";
     }

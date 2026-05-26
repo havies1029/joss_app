@@ -20,14 +20,12 @@ class KlaimprogresscariPageState extends State<KlaimprogresscariPage> {
 	@override
 	void initState() {
 		super.initState();
-		Future.delayed(const Duration(milliseconds: 500), () {
-			refreshData();
-		});
+		klaimprogresscariBloc = context.read<KlaimprogresscariBloc>();
+		refreshData();
 	}
 
 	@override
 	Widget build(BuildContext context) {
-		klaimprogresscariBloc = BlocProvider.of<KlaimprogresscariBloc>(context);
 		return Container(
 			color: secondaryBlackColor,
 			child: Column(

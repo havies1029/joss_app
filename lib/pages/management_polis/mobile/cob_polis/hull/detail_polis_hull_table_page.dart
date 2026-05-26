@@ -102,7 +102,7 @@ class _DetailPolisHullTablePageState extends State<DetailPolisHullTablePage> {
               child: ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "Cari nama kapal / kerangka...",
+                hintText: "Nama Kapal/Kerangka",
               ),
             ),
             const Divider(height: 1),

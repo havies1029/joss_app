@@ -103,7 +103,7 @@ class _DetailPolisParTablePageState
               child: ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "Cari lokasi / okupasi...",
+                hintText: "Lokasi/Okupasi",
               ),
             ),
 

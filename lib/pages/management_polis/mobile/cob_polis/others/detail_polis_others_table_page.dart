@@ -103,7 +103,7 @@ class _DetailPolisOthersTablePageState
               child: ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "Cari info / deskripsi...",
+                hintText: "Info/Deskripsi",
               ),
             ),
             const Divider(height: 1),

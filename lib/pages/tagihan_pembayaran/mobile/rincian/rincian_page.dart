@@ -35,21 +35,39 @@ class RincianPage extends StatefulWidget {
 class _RincianPageState extends State<RincianPage> {
   late DnRekap2invBloc dn2invBloc;
   late DnrekapcobCariBloc dnrekapcobCariBloc;
-  final TextEditingController _searchController = TextEditingController();
+
+  final TextEditingController _searchController =
+  TextEditingController();
+
   Mlayanan1CariBloc? mlayanan1cariBloc;
+
+  bool _firstLoading = true;
+
+  Set<String> getSelectedCurrSet(DnRekap2invState state) {
+    return state.rincianSOA.headers
+        .expand((header) => header.details)
+        .where((detail) => state.selectedIds.contains(detail.dn1Id))
+        .map((detail) => detail.currSimbol.trim().toUpperCase())
+        .where((curr) => curr.isNotEmpty)
+        .toSet();
+  }
+
   @override
   void initState() {
     super.initState();
+
     dn2invBloc = context.read<DnRekap2invBloc>();
     dnrekapcobCariBloc = context.read<DnrekapcobCariBloc>();
     mlayanan1cariBloc = context.read<Mlayanan1CariBloc>();
 
-    Future.delayed(const Duration(milliseconds: 500), () {
-      dn2invBloc.add(InitializeDnRekap2invEvent());
-      refreshData();
+    dn2invBloc.add(InitializeDnRekap2invEvent());
+    refreshData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _firstLoading = false);
     });
   }
-
 
   Future<void> openLinkLayanan(String link) async {
     if (link.trim().isEmpty) return;
@@ -179,7 +197,7 @@ class _RincianPageState extends State<RincianPage> {
                               ),
                             );
                           },
-                          hintText: "Cari No Polis...",
+                          hintText: "No Polis",
                         ),
                       ),
 
@@ -241,6 +259,11 @@ class _RincianPageState extends State<RincianPage> {
                 Expanded(
                   child: BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
                     builder: (context, state) {
+                      if (_firstLoading) {
+                        return const Center(
+                          child: LoadingIndicator(),
+                        );
+                      }
 
                       final bool isEmpty =
                           state.rincianSOA.headers.isEmpty;
@@ -256,8 +279,7 @@ class _RincianPageState extends State<RincianPage> {
                           child: SingleChildScrollView(
                             padding: EdgeInsets.only(bottom: 24),
                             child: EmptyStatePage(
-                              iconPath:
-                              'assets/icons/belipolis_no_file.svg',
+                              iconPath: 'assets/icons/belipolis_no_file.svg',
                               title: 'Tidak ada Rincian Tagihan',
                               description:
                               'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
@@ -271,27 +293,18 @@ class _RincianPageState extends State<RincianPage> {
                         ScrollViewKeyboardDismissBehavior.onDrag,
                         child: Column(
                           children: [
-
                             RincianTablePage(
                               headers: state.rincianSOA.headers,
                               selectedIds: state.selectedIds,
-
                               onSelect: (dn1Id) {
-                                dn2invBloc.add(
-                                  SelectDetailEvent(dn1Id),
-                                );
+                                dn2invBloc.add(SelectDetailEvent(dn1Id));
                               },
-
                               onUnselect: (dn1Id) {
-                                dn2invBloc.add(
-                                  UnselectDetailEvent(dn1Id),
-                                );
+                                dn2invBloc.add(UnselectDetailEvent(dn1Id));
                               },
                             ),
-
                             RincianGrandTotalTableWidget(
-                              grandTotals:
-                              state.rincianSOA.grandtotal,
+                              grandTotals: state.rincianSOA.grandtotal,
                             ),
                           ],
                         ),
@@ -315,7 +328,14 @@ class _RincianPageState extends State<RincianPage> {
                   isEnabled: state.selectedIds.isNotEmpty,
 
                   onBayarTap: () {
-                    if (state.curr.toUpperCase() != 'IDR') {
+                    final selectedCurrSet = getSelectedCurrSet(state);
+
+                    debugPrint("SELECTED CURR SET : $selectedCurrSet");
+
+                    final isAllIdr =
+                        selectedCurrSet.length == 1 && selectedCurrSet.contains('IDR');
+
+                    if (!isAllIdr) {
                       showDialog(
                         context: context,
                         barrierDismissible: true,
@@ -494,19 +514,30 @@ class _RincianPageState extends State<RincianPage> {
     );
   }
 
+  String formatDateNullable(DateTime? value) {
+    if (value == null) return '-';
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  String formatPeriode(DateTime? mulai, DateTime? akhir) {
+    if (mulai == null && akhir == null) return '-';
+    return "${formatDateNullable(mulai)} - ${formatDateNullable(akhir)}";
+  }
+
   Map<String, dynamic> _detailToExportMap(dynamic d) {
     // ganti dynamic -> DnDetailSppaModel kalau importnya ada di file ini
     return {
-      "DN ID": d.dn1Id,
       "No": d.rownumber,
       "No Polis": d.noPolis,
-      "Mulai": d.polisMulai.toString().substring(0, 10),
-      "Akhir": d.polisAkhir.toString().substring(0, 10),
+      "Periode": formatPeriode(d.polisMulai, d.polisAkhir),
       "Curr": d.currSimbol,
-      "Premi": d.dnOs, // atau field premi detail kamu
+      "DN OS": d.dnOs,
+      "Aging": d.aging,
     };
   }
-
 
   Future<void> _exportDataRincian(
       BuildContext context,

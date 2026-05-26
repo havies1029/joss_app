@@ -138,17 +138,19 @@ class KlaimRingkasanMainPage extends StatefulWidget {
     );
   }
 
-  List<Map<String, dynamic>> _exportRows() {
-    final st = context.read<KlaimringkasCariBloc>().state;
-    return st.items
-        .map((d) => {
-      "No": d.nourut,
-      "Kategori": d.cobNama,
-      "Total Nilai": d.klaimQty,
-      "Jumlah Klaim": d.klaimAmount,
-    })
-        .toList();
-  }
+    List<Map<String, dynamic>> _exportRows() {
+      final st = context.read<KlaimringkasCariBloc>().state;
+
+      return st.items
+          .map((d) => {
+        "No": d.nourut,
+        "COB": d.cobNama,
+        "Qty Klaim": d.klaimQty,
+        "Curr": d.currNama,
+        "Nilai Klaim": d.klaimAmount,
+      })
+          .toList();
+    }
 
   CategoryType _exportCategory() => CategoryType.klaim;
 

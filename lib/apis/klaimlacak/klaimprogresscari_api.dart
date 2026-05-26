@@ -7,7 +7,7 @@ class KlaimprogresscariAPI{
 	Future<KlaimprogressCariResultModel?> getKlaimprogresscariAPI(String klaim1Id) async {
 		String urlGetListEndPoint = "${AppData.prefixEndPoint}/api/klaimlacak/klaimprogresscari/getlist";
 
-    Map<String, String> queryParams = {"klaim1Id": klaim1Id};
+		Map<String, String> queryParams = {"klaim1Id": klaim1Id};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
 		final http.Response response = await http.get(uri, headers: <String, String>{
 			'Content-Type': 'application/json; odata=verbos',
@@ -17,10 +17,10 @@ class KlaimprogresscariAPI{
 
 		if (response.statusCode == 200) {
 
-      final jsonData = ObjectMapHelper().decodeJsonMapOrNull(response.body);
-      if (jsonData == null) return null;
+			final jsonData = ObjectMapHelper().decodeJsonMapOrNull(response.body);
+			if (jsonData == null) return null;
 
-      var result = KlaimprogressCariResultModel.fromJson(jsonData);
+			var result = KlaimprogressCariResultModel.fromJson(jsonData);
 
 			return result;
 		} else {

@@ -103,7 +103,7 @@ class _DetailPolisHealthTablePageState
               child: ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "Cari nama / paket...",
+                hintText: "Nama/Paket",
               ),
             ),
             const Divider(height: 1),

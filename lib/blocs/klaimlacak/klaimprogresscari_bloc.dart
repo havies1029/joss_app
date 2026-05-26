@@ -21,10 +21,13 @@ class KlaimprogresscariBloc
 			RefreshKlaimprogresscariEvent event,
 			Emitter<KlaimprogresscariState> emit,
 			) async {
-		// reset sekali (gak emit 2x)
-		emit(state.reset(klaim1Id: event.klaim1Id));
+		// reset total state lama, tapi klaim1Id tetap masuk
+		emit(
+			KlaimprogresscariState(
+				klaim1Id: event.klaim1Id,
+			),
+		);
 
-		// lanjut fetch
 		add(FetchKlaimprogresscariEvent());
 	}
 
@@ -32,9 +35,7 @@ class KlaimprogresscariBloc
 			FetchKlaimprogresscariEvent event,
 			Emitter<KlaimprogresscariState> emit,
 			) async {
-		// guard biar gak spam
 		if (state.hasReachedMax) return;
-		if (state.status == ListStatus.loadingMore) return;
 		if (state.klaim1Id.trim().isEmpty) return;
 
 		emit(state.copyWith(status: ListStatus.loadingMore));
@@ -43,15 +44,17 @@ class KlaimprogresscariBloc
 			final repo = KlaimprogresscariRepository();
 			final result = await repo.getKlaimprogresscari(state.klaim1Id);
 
-			emit(state.copyWith(
-				items: result?.listProgress ?? [],
-				nilaiKlaim: result?.nilaiKlaim,
-				jadwalBayar: result?.jadwalBayar,
-				klaimProgressInfo: result?.klaimProgressInfo,
-				hasReachedMax: true, // karena kamu memang cuma fetch sekali
-				status: ListStatus.success,
-			));
-		} catch (_) {
+			emit(
+				state.copyWith(
+					items: result?.listProgress ?? const [],
+					nilaiKlaim: result?.nilaiKlaim,
+					jadwalBayar: result?.jadwalBayar ?? const [],
+					klaimProgressInfo: result?.klaimProgressInfo,
+					hasReachedMax: true,
+					status: ListStatus.success,
+				),
+			);
+		} catch (e) {
 			emit(state.copyWith(status: ListStatus.failure));
 		}
 	}

@@ -8,7 +8,6 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:permission_handler/permission_handler.dart';
 import 'package:file_saver/file_saver.dart';
 
 class MobileDownloadHelper {
@@ -80,6 +79,7 @@ class MobileDownloadHelper {
     await file.writeAsBytes(await pdf.save());
     return file;
   }
+
   static Future<pw.Document> _generatePdf(
       List<Map<String, dynamic>> data, {
         required String reportTitle,
@@ -208,7 +208,7 @@ class MobileDownloadHelper {
                       width: 0.25,
                     ),
                   ),
-                  columnWidths: _getColumnWidths(headers),
+                  columnWidths: _getPdfColumnWidths(headers, data),
                   defaultVerticalAlignment:
                   pw.TableCellVerticalAlignment.middle,
                   children: [
@@ -283,25 +283,20 @@ class MobileDownloadHelper {
   }) {
     return pw.TableRow(
       decoration: pw.BoxDecoration(
-        color: headerBg, // 🔥 FULL ROW COLOR (no gap)
+        color: headerBg,
       ),
-      children: headers.asMap().entries.map((entry) {
-        final index = entry.key;
-        final rawHeader = entry.value;
-
-        final isNo = rawHeader.trim().toLowerCase() == 'no';
+      children: headers.map((rawHeader) {
+        final isNo = _isNoColumn(rawHeader);
 
         return pw.Container(
           padding: const pw.EdgeInsets.symmetric(
             horizontal: 8,
             vertical: 10,
           ),
-          alignment: isNo
-              ? pw.Alignment.center
-              : pw.Alignment.centerLeft,
+          alignment: isNo ? pw.Alignment.center : pw.Alignment.centerLeft,
           child: pw.Text(
             isNo ? 'No' : _formatHeaderName(rawHeader),
-            maxLines: 1,
+            maxLines: _shouldWrapHeader(rawHeader) ? 2 : 1,
             overflow: pw.TextOverflow.clip,
             style: pw.TextStyle(
               fontSize: 9,
@@ -327,7 +322,6 @@ class MobileDownloadHelper {
         final colIndex = entry.key;
         final header = entry.value;
         final value = _displayValue(row[header]);
-        final alignment = _getCellAlignment(header);
 
         return pw.Container(
           decoration: pw.BoxDecoration(
@@ -346,10 +340,10 @@ class MobileDownloadHelper {
             vertical: 8,
           ),
           child: pw.Align(
-            alignment: alignment,
+            alignment: _getCellAlignment(header),
             child: pw.Text(
               value,
-              maxLines: _isLongTextColumn(header) ? 3 : 1,
+              maxLines: _shouldWrapValue(value) ? 3 : 1,
               overflow: pw.TextOverflow.clip,
               style: pw.TextStyle(
                 fontSize: 9,
@@ -372,37 +366,33 @@ class MobileDownloadHelper {
       return excel;
     }
 
-    // Header row
     sheet.appendRow(headers.map((h) => _formatHeaderName(h)).toList());
 
-    // Data rows
     for (final row in data) {
       sheet.appendRow(
         headers.map((h) => _displayValue(row[h])).toList(),
       );
     }
 
-    // Header style
     for (int col = 0; col < headers.length; col++) {
       final cell = sheet.cell(
         CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0),
       );
 
-      final rawHeader = headers[col].trim().toLowerCase();
+      final header = headers[col];
 
       cell.cellStyle = CellStyle(
         bold: true,
         fontColorHex: '#FFFFFF',
         backgroundColorHex: '#8BBB4E',
         horizontalAlign:
-        rawHeader == 'no' ? HorizontalAlign.Center : HorizontalAlign.Left,
+        _isNoColumn(header) ? HorizontalAlign.Center : HorizontalAlign.Left,
         verticalAlign: VerticalAlign.Center,
       );
     }
 
-    // Body style
     for (int col = 0; col < headers.length; col++) {
-      final rawHeader = headers[col].trim().toLowerCase();
+      final header = headers[col];
 
       for (int row = 1; row <= data.length; row++) {
         final cell = sheet.cell(
@@ -411,81 +401,92 @@ class MobileDownloadHelper {
 
         cell.cellStyle = CellStyle(
           horizontalAlign:
-          rawHeader == 'no' ? HorizontalAlign.Center : HorizontalAlign.Left,
+          _isNoColumn(header) ? HorizontalAlign.Center : HorizontalAlign.Left,
           verticalAlign: VerticalAlign.Center,
         );
       }
     }
 
-    // Column widths
     for (int col = 0; col < headers.length; col++) {
-      final rawHeader = headers[col].trim().toLowerCase();
-      sheet.setColWidth(col, _getExcelColumnWidth(rawHeader));
+      sheet.setColWidth(
+        col,
+        _getExcelColumnWidth(headers[col], data),
+      );
     }
 
     return excel;
   }
 
-  static double _getExcelColumnWidth(String header) {
-    if (header == 'no') return 6;
-    if (header == 'currency') return 12;
+  static Map<int, pw.TableColumnWidth> _getPdfColumnWidths(
+      List<String> headers,
+      List<Map<String, dynamic>> data,
+      ) {
+    final widths = <int, pw.TableColumnWidth>{};
 
-    if (_isTinyExcelColumn(header)) return 10;
-    if (_isSmallExcelColumn(header)) return 14;
-    if (_isMediumExcelColumn(header)) return 20;
-    if (_isLargeExcelColumn(header)) return 28;
-    if (_isXLargeExcelColumn(header)) return 36;
+    for (var i = 0; i < headers.length; i++) {
+      final header = headers[i];
 
-    return 18;
+      if (_isNoColumn(header)) {
+        widths[i] = const pw.FixedColumnWidth(32);
+        continue;
+      }
+
+      final maxLength = _maxColumnTextLength(header, data);
+
+      if (maxLength <= 8) {
+        widths[i] = const pw.FixedColumnWidth(55);
+      } else if (maxLength <= 12) {
+        widths[i] = const pw.FixedColumnWidth(75);
+      } else if (maxLength <= 18) {
+        widths[i] = const pw.FixedColumnWidth(95);
+      } else if (maxLength <= 28) {
+        widths[i] = const pw.FixedColumnWidth(125);
+      } else {
+        widths[i] = const pw.FixedColumnWidth(155);
+      }
+    }
+
+    return widths;
   }
 
-  static bool _isTinyExcelColumn(String header) {
-    return [
-      'id',
-      'kode',
-      'code',
-      'jk',
-      'usia',
-      'umur',
-      'qty',
-    ].contains(header);
+  static double _getExcelColumnWidth(
+      String header,
+      List<Map<String, dynamic>> data,
+      ) {
+    if (_isNoColumn(header)) return 6;
+
+    final maxLength = _maxColumnTextLength(header, data);
+
+    if (maxLength <= 8) return 10;
+    if (maxLength <= 12) return 14;
+    if (maxLength <= 18) return 20;
+    if (maxLength <= 28) return 28;
+
+    return 36;
   }
 
-  static bool _isSmallExcelColumn(String header) {
-    return header.contains('tanggal') ||
-        header.contains('date') ||
-        header.contains('status') ||
-        header.contains('level') ||
-        header.contains('phone') ||
-        header.contains('hp') ||
-        header.contains('nomor');
+  static int _maxColumnTextLength(
+      String header,
+      List<Map<String, dynamic>> data,
+      ) {
+    final headerLength = _formatHeaderName(header).length;
+
+    final maxValueLength = data.fold<int>(0, (currentMax, row) {
+      final valueLength = _displayValue(row[header]).length;
+      return valueLength > currentMax ? valueLength : currentMax;
+    });
+
+    return headerLength > maxValueLength ? headerLength : maxValueLength;
   }
 
-  static bool _isMediumExcelColumn(String header) {
-    return header.contains('nama') ||
-        header.contains('name') ||
-        header.contains('email') ||
-        header.contains('jabatan') ||
-        header.contains('kategori') ||
-        header.contains('jenis');
+  static bool _shouldWrapHeader(String header) {
+    if (_isNoColumn(header)) return false;
+
+    return _formatHeaderName(header).length > 28;
   }
 
-  static bool _isLargeExcelColumn(String header) {
-    return header.contains('alamat') ||
-        header.contains('address') ||
-        header.contains('keterangan') ||
-        header.contains('deskripsi') ||
-        header.contains('description') ||
-        header.contains('catatan') ||
-        header.contains('note');
-  }
-
-  static bool _isXLargeExcelColumn(String header) {
-    return header.contains('remark') ||
-        header.contains('uraian') ||
-        header.contains('detail') ||
-        header.contains('informasi') ||
-        header.contains('message');
+  static bool _shouldWrapValue(String value) {
+    return value.length > 28;
   }
 
   static String _formatHeaderName(String header) {
@@ -498,60 +499,14 @@ class MobileDownloadHelper {
     return header
         .replaceAll('_', ' ')
         .split(' ')
-        .map((word) =>
-    word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1))
+        .map(
+          (word) => word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1),
+    )
         .join(' ');
   }
 
-  static bool _isCurrencyColumn(String header) {
-    return header == 'currency';
-  }
-
-  static Map<int, pw.TableColumnWidth> _getColumnWidths(List<String> headers) {
-    final widths = <int, pw.TableColumnWidth>{};
-
-    for (var i = 0; i < headers.length; i++) {
-      final header = headers[i].trim().toLowerCase();
-
-      if (_isNoColumn(header)) {
-        widths[i] = const pw.FixedColumnWidth(32);
-      } else if (_isCurrencyColumn(header)) {
-        widths[i] = const pw.FixedColumnWidth(58);
-      } else if (_isTinyColumn(header)) {
-        widths[i] = const pw.FixedColumnWidth(55);
-      } else if (_isSmallColumn(header)) {
-        widths[i] = const pw.FixedColumnWidth(80);
-      } else if (_isMediumColumn(header)) {
-        widths[i] = const pw.FlexColumnWidth(1.2);
-      } else if (_isLargeColumn(header)) {
-        widths[i] = const pw.FlexColumnWidth(2.2);
-      } else if (_isXLargeColumn(header)) {
-        widths[i] = const pw.FlexColumnWidth(3.0);
-      } else {
-        widths[i] = const pw.FlexColumnWidth(1.4);
-      }
-    }
-
-    return widths;
-  }
-  // static pw.Alignment _getCellAlignment(String header, {bool isHeader = false}) {
-  //   final h = header.trim().toLowerCase();
-  //
-  //   if (_isNumericColumn(h)) {
-  //     return pw.Alignment.centerRight;
-  //   }
-  //
-  //   if (_isCenteredColumn(h)) {
-  //     return pw.Alignment.center;
-  //   }
-  //
-  //   return isHeader ? pw.Alignment.centerLeft : pw.Alignment.centerLeft;
-  // }
-
   static pw.Alignment _getCellAlignment(String header) {
-    final h = header.trim().toLowerCase();
-
-    if (h == 'no') {
+    if (_isNoColumn(header)) {
       return pw.Alignment.center;
     }
 
@@ -559,99 +514,7 @@ class MobileDownloadHelper {
   }
 
   static bool _isNoColumn(String header) {
-    return header == 'no';
-  }
-
-  static bool _isTinyColumn(String header) {
-    return [
-      'id',
-      'kode',
-      'code',
-      'jk',
-      'usia',
-      'umur',
-      'qty',
-      'jumlah',
-      'currency',
-    ].contains(header);
-  }
-
-  static bool _isSmallColumn(String header) {
-    return header.contains('tanggal') ||
-        header.contains('date') ||
-        header.contains('status') ||
-        header.contains('hp') ||
-        header.contains('phone') ||
-        header.contains('nomor') ||
-        header.contains('no ') ||
-        header.startsWith('no_') ||
-        header.contains('level');
-  }
-
-  static bool _isMediumColumn(String header) {
-    return header.contains('nama') ||
-        header.contains('name') ||
-        header.contains('email') ||
-        header.contains('jabatan') ||
-        header.contains('kategori') ||
-        header.contains('jenis');
-  }
-
-  static bool _isLargeColumn(String header) {
-    return header.contains('alamat') ||
-        header.contains('address') ||
-        header.contains('keterangan') ||
-        header.contains('deskripsi') ||
-        header.contains('description') ||
-        header.contains('catatan') ||
-        header.contains('note');
-  }
-
-  static bool _isXLargeColumn(String header) {
-    return header.contains('remark') ||
-        header.contains('uraian') ||
-        header.contains('detail') ||
-        header.contains('informasi') ||
-        header.contains('message');
-  }
-
-  static bool _isNumericColumn(String header) {
-    return header.contains('total') ||
-        header.contains('harga') ||
-        header.contains('price') ||
-        header.contains('amount') ||
-        header.contains('qty') ||
-        header.contains('jumlah') ||
-        header.contains('nominal') ||
-        header.contains('persen') ||
-        header.contains('percent') ||
-        header.contains('rate') ||
-        header.contains('nilai') ||
-        header.contains('score') ||
-        header.contains('poin');
-  }
-
-  static bool _isCenteredColumn(String header) {
-    return _isNoColumn(header) ||
-        header.contains('status') ||
-        header.contains('level') ||
-        header.contains('jenis') ||
-        header.contains('kategori') ||
-        header.contains('gender') ||
-        header.contains('jk');
-  }
-
-  static bool _isLongTextColumn(String header) {
-    return header.contains('alamat') ||
-        header.contains('address') ||
-        header.contains('deskripsi') ||
-        header.contains('description') ||
-        header.contains('keterangan') ||
-        header.contains('catatan') ||
-        header.contains('remark') ||
-        header.contains('detail') ||
-        header.contains('message') ||
-        header.contains('informasi');
+    return header.trim().toLowerCase() == 'no';
   }
 
   static String _displayValue(dynamic value) {
