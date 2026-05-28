@@ -303,6 +303,7 @@ import 'blocs/regreaktif/regreaktifcari_bloc.dart';
 import 'blocs/regreaktif/regreaktif2cari_bloc.dart';
 
 import 'blocs/loading_flow/loading_flow_bloc.dart';
+import 'helper/navigation_keys.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -312,6 +313,7 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
 
   /*
   HydratedBloc.storage = await HydratedStorage.build(
@@ -866,7 +868,10 @@ class _AppState extends State<_App> {
 
               final user = state.user;
               final homeWidget =
-              HomeTabWidget(userRepository: widget.userRepository);
+              HomeTabWidget(
+                key: homeTabKey,
+                userRepository: widget.userRepository,
+              );
 
               if (ChatInitService.I.isInitialized) {
                 debugPrint("⚠️ [ChatInitService] Sudah diinisialisasi, skip ulang init.");

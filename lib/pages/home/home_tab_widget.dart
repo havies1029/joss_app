@@ -20,19 +20,34 @@ import '../settingpage/mobile/settingpage.dart';
 
 class HomeTabWidget extends StatefulWidget {
   final UserRepository userRepository;
-  const HomeTabWidget({super.key, required this.userRepository});
+  final int initialIndex;
+
+  const HomeTabWidget({
+    super.key,
+    required this.userRepository,
+    this.initialIndex = 0,
+  });
 
   @override
-  State<HomeTabWidget> createState() => _HomeTabWidgetState();
+  State<HomeTabWidget> createState() => HomeTabWidgetState();
 }
 
-class _HomeTabWidgetState extends State<HomeTabWidget> {
-  int selectedIndex = 0;
+class HomeTabWidgetState extends State<HomeTabWidget> {
+  late int selectedIndex;
   late final List<Widget> pages;
+
+  void goToHeroPage() {
+    setState(() {
+      selectedIndex = 0;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+
+    selectedIndex = widget.initialIndex;
+
     pages = [
       const HeroPage(),
       const CariAsuransiWidget.menu(),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../common/constants.dart';
+import '../../helper/navigation_keys.dart';
 
 class BaseBackgroundSidePage extends StatelessWidget {
   final Widget child;
@@ -98,7 +99,13 @@ class BaseBackgroundSidePage extends StatelessWidget {
                           behavior: HitTestBehavior.translucent,
                           onTap: onHome ??
                                   () {
-                                    Navigator.of(context).popUntil((route) => route.isFirst);
+                                final homeState = homeTabKey.currentState;
+
+                                if (homeState != null) {
+                                  homeState.goToHeroPage();
+                                }
+
+                                Navigator.of(context).popUntil((route) => route.isFirst);
                               },
                           child: Align(
                             alignment: Alignment.centerRight,

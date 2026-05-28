@@ -53,24 +53,26 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
 
     final isNewLength = _lastItemLength != itemLength;
 
-    if (_hasSyncedInitialPage && !isNewLength) return;
+    if (_hasSyncedInitialPage && !isNewLength && _pageController.hasClients) {
+      debugPrint("[CAROUSEL] sync skipped");
+      return;
+    }
 
-    _hasSyncedInitialPage = true;
-    _lastItemLength = itemLength;
+    final middlePage = _kFakeCount ~/ 2;
+    final fixedInitialPage = middlePage - (middlePage % itemLength);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_pageController.hasClients) return;
 
-      final middlePage = _kFakeCount ~/ 2;
-      final fixedInitialPage = middlePage - (middlePage % itemLength);
-
       _pageController.jumpToPage(fixedInitialPage);
 
-      if (mounted) {
-        setState(() {
-          _currentRealIndex = 0;
-        });
-      }
+      _hasSyncedInitialPage = true;
+      _lastItemLength = itemLength;
+
+
+      setState(() {
+        _currentRealIndex = 0;
+      });
 
       _startAutoSlide(itemLength);
     });
@@ -79,14 +81,16 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
   void _startAutoSlide(int itemLength) {
     _autoSlideTimer?.cancel();
 
-    if (itemLength <= 1) return;
+    if (itemLength <= 1) {
+      debugPrint("[CAROUSEL] autoSlide skipped because itemLength <= 1");
+      return;
+    }
 
     _autoSlideTimer = Timer.periodic(_autoSlideInterval, (_) {
       if (!mounted || !_pageController.hasClients) return;
 
-      final currentPage = _pageController.page?.round() ??
-          _pageController.initialPage;
-
+      final currentPage =
+          _pageController.page?.round() ?? _pageController.initialPage;
       _pageController.animateToPage(
         currentPage + 1,
         duration: _slideDuration,

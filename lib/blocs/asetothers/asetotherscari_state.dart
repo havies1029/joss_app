@@ -41,36 +41,37 @@ class AsetothersCariState extends Equatable {
 
 	const AsetothersCariState.failure() : this(status: ListStatus.failure);
 
-	AsetothersCariState copyWith(
-		{List<AsetothersCariModel>? items,
+	AsetothersCariState copyWith({
+		List<AsetothersCariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
 		int? hal,
-    String? statusId,
-    String? searchText,
-    String? cobId,
+		String? statusId,
+		String? searchText,
+		String? cobId,
 		Set<String>? selectedIds,
 		String? selectedFilePolisId,
 		String? activeAsetOthersId,
 		String? selectedId,
 		AsetothersCariModel? selectedItem,
+		bool clearSelectedItem = false,
 		String? selectedProsesId,
 		String? queryKey,
 		bool? isFetching,
-		}) {
+	}) {
 		return AsetothersCariState(
 			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
 			hal: hal ?? this.hal,
-      statusId: statusId ?? this.statusId,
-      searchText: searchText ?? this.searchText,
-      cobId: cobId ?? this.cobId,
+			statusId: statusId ?? this.statusId,
+			searchText: searchText ?? this.searchText,
+			cobId: cobId ?? this.cobId,
 			selectedIds: selectedIds ?? this.selectedIds,
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
 			activeAsetOthersId: activeAsetOthersId ?? this.activeAsetOthersId,
 			selectedId: selectedId ?? this.selectedId,
-			selectedItem: selectedItem ?? this.selectedItem,
+			selectedItem: clearSelectedItem ? null : selectedItem ?? this.selectedItem,
 			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
 			queryKey: queryKey ?? this.queryKey,
 			isFetching: isFetching ?? this.isFetching,

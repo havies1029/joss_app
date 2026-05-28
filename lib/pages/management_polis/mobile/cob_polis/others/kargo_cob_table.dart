@@ -48,6 +48,7 @@ class KargoCobTable extends StatefulWidget {
   @override
   State<KargoCobTable> createState() => _KargoCobTableState();
 }
+
 class _KargoCobTableState extends State<KargoCobTable> {
   late final ScrollController hController;
   late final ScrollController vController;
@@ -423,20 +424,8 @@ class _KargoCobTableState extends State<KargoCobTable> {
               value: isSelected,
               onChanged: (checked) {
                 if (checked == true) {
-                  final prev = widget.selectedItem;
-                  if (prev != null && prev != d) {
-                    widget.onUnselect(prev.asetOthersId);
-                    if (prev.filePolisId.isNotEmpty) {
-                      widget.onUnselectFilePolisHealthId(prev.filePolisId);
-                    }
-                  }
-
                   widget.onSelect(d.asetOthersId);
                   widget.onSelectItem?.call(d);
-
-                  if (d.prosesId.isNotEmpty) {
-                    widget.selectedProsesId(d.prosesId);
-                  }
 
                   if (d.filePolisId.isNotEmpty) {
                     widget.onSelectFilePolisHealthId(d.filePolisId);
@@ -455,10 +444,8 @@ class _KargoCobTableState extends State<KargoCobTable> {
         else
           const SizedBox(),
 
-        // No: tidak clickable
         _textCell(d.nomor.toString(), center: true, softWrap: false),
 
-        // Mulai sini clickable
         _clickableTextCell(
           d.polisNo,
           onTap: triggerRow,

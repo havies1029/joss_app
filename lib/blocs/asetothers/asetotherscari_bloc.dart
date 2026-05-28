@@ -17,7 +17,6 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 		on<UnselectOthersDetailEvent>(onUnselectDetail);
 		on<ClearOthersSelectionEvent>(onClearSelection);
 
-		// UI masih ngirim? tetap ada, tapi kita bikin aman
 		on<SelectPolisOthersDetailEvent>(onSelectPolisOthersDetail);
 		on<UnselectPolisOthersDetailEvent>(onUnselectPolisOthersDetail);
 		on<ClearPolisOthersSelectionEvent>(onClearPolisOthersSelection);
@@ -31,13 +30,10 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			emit(state.copyWith(selectedProsesId: event.prosesId));
 		});
 		on<ClearSelectedOthersItemEvent>((event, emit) {
-			emit(state.copyWith(selectedItem: null));
+			emit(state.copyWith(clearSelectedItem: true));
 		});
 	}
 
-	// -----------------------
-	// Helpers
-	// -----------------------
 	AsetothersCariModel? _findByAsetOthersId(String id) {
 		try {
 			return state.items.firstWhere((e) => e.asetOthersId == id);
@@ -73,10 +69,6 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 		));
 	}
 
-	// -----------------------
-	// Refresh / Fetch
-	// -----------------------
-
 	String buildKey({required String search, required String statusId, String? cobId}) {
 		final s = search.trim().toLowerCase();
 		final c = cobId ?? '';
@@ -87,7 +79,7 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			RefreshAsetothersCariEvent event,
 			Emitter<AsetothersCariState> emit,
 			) async {
-		// ✅ Fix C: jangan emit(const ...) biar gak kedip
+
 		final newKey = buildKey(search: event.searchText, statusId: event.statusId, cobId: event.cobId);
 
 		emit(state.copyWith(
@@ -118,7 +110,7 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 		emit(state.copyWith(isFetching: true));
 
 		try {
-			final nextHal = state.hal; // 0 untuk first page, dst.
+			final nextHal = state.hal;
 			debugPrint("getAsetothersCari di trigger");
 			final items = await repo.getAsetothersCari(
 				state.cobId,
@@ -127,10 +119,8 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 				nextHal,
 			);
 
-			// kalau query berubah saat nunggu -> buang hasil
 			if (state.queryKey != keyAtRequest) return;
 
-			// helper ambil 5 id pertama (biar kelihatan nyampur apa enggak)
 			List<String> first5IdsFrom(List<AsetothersCariModel> list) {
 				return list
 						.take(5)
@@ -139,7 +129,6 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			}
 
 			if (nextHal == 0) {
-				// FIRST PAGE selalu REPLACE, bukan append
 				emit(state.copyWith(
 					items: items,
 					hasReachedMax: items.isEmpty,
@@ -180,7 +169,6 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			}
 		}
 	}
-
 
 	/*
 	Future<void> onFetchAsetothersCari(
@@ -249,11 +237,14 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			SelectOthersDetailEvent event,
 			Emitter<AsetothersCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..add(event.asetOthersId);
+		final updatedSelectedIds = <String>{event.asetOthersId};
 
 		emit(state.copyWith(selectedIds: updatedSelectedIds));
 
-		_recomputeActiveAndFile(emit, preferId: event.asetOthersId);
+		_recomputeActiveAndFile(
+			emit,
+			preferId: event.asetOthersId,
+		);
 	}
 
 	Future<void> onUnselectDetail(
@@ -323,17 +314,21 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			) async {
 		emit(state.copyWith(
 			selectedId: event.asetOthersId,
+			activeAsetOthersId: event.asetOthersId,
+			selectedFilePolisId: _findByAsetOthersId(event.asetOthersId)?.filePolisId ?? "",
 		));
 	}
 
 	Future<void> onUnselectDetailOthersId(
-			UnselectSingleOthersDetailEvent  event,
+			UnselectSingleOthersDetailEvent event,
 			Emitter<AsetothersCariState> emit,
 			) async {
 		if (state.selectedId != event.asetOthersId) return;
 
 		emit(state.copyWith(
 			selectedId: "",
+			activeAsetOthersId: "",
+			selectedFilePolisId: "",
 		));
 	}
 }
