@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../common/constants.dart';
+
 class BaseBackgroundFirstPage extends StatelessWidget {
   final Widget child;
   final double fadeHeight;
@@ -14,17 +16,40 @@ class BaseBackgroundFirstPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final h = MediaQuery.of(context).size.height;
+
     return Stack(
       children: [
-        Align(
-          alignment: Alignment.topCenter,
+        Container(color: primaryBlackColor),
+
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
           child: SizedBox(
-            height: fadeHeight,
-            width: double.infinity,
-            child: Image.asset(
-              backgroundAsset,
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
+            height: h * 0.30,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  backgroundAsset,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                ),
+
+                Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        primaryBlackColor,
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -5,20 +5,20 @@ import 'package:joss_app/models/regother/regother3cari_model.dart';
 import 'package:joss_app/models/regreaktif/regreaktif2cari_model.dart';
 import 'package:joss_app/models/regrenewal/regrenewal2cari_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/polis_detail_card.dart';
-import 'package:joss_app/pages/management_polis/detail_management_page/timeline_page.dart';
+import 'package:joss_app/pages/management_polis/mobile/detail_management_page/polis_detail_card.dart';
+import 'package:joss_app/pages/management_polis/mobile/detail_management_page/timeline_page.dart';
 import 'package:joss_app/pages/management_polis/mobile/management_polis_page.dart';
 import '../../../../../common/constants.dart';
 
-import '../../../blocs/regendors/regendors1form_bloc.dart';
-import '../../../blocs/regendors/regendors2cari_bloc.dart';
-import '../../../blocs/regother/regother1crud_bloc.dart';
-import '../../../blocs/regother/regother3cari_bloc.dart';
-import '../../../blocs/regreaktif/regreaktif1_bloc.dart';
-import '../../../blocs/regreaktif/regreaktif2cari_bloc.dart';
-import '../../../blocs/regrenewal/regrenew1form_bloc.dart';
-import '../../../blocs/regrenewal/regrenewal2cari_bloc.dart';
-import '../../../models/regendors/regendors2cari_model.dart';
+import '../../../../blocs/regendors/regendors1form_bloc.dart';
+import '../../../../blocs/regendors/regendors2cari_bloc.dart';
+import '../../../../blocs/regother/regother1crud_bloc.dart';
+import '../../../../blocs/regother/regother3cari_bloc.dart';
+import '../../../../blocs/regreaktif/regreaktif1_bloc.dart';
+import '../../../../blocs/regreaktif/regreaktif2cari_bloc.dart';
+import '../../../../blocs/regrenewal/regrenew1form_bloc.dart';
+import '../../../../blocs/regrenewal/regrenewal2cari_bloc.dart';
+import '../../../../models/regendors/regendors2cari_model.dart';
 
 class DetailManagementPolisPage extends StatefulWidget {
   final dynamic data;

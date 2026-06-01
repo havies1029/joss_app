@@ -19,12 +19,6 @@ class SppapoliscariAPI{
 
 		var uri = AppData.uriHtpp(AppData.httpAuthority, urlGetListEndPoint, queryParams);
 
-		// 🔍 DEBUG REQUEST
-		debugPrint("=== API CALL START ===");
-		debugPrint("URL: $uri");
-		debugPrint("Params: $queryParams");
-		debugPrint("Token: ${AppData.userToken}");
-
 		final http.Response response = await http.get(
 			uri,
 			headers: <String, String>{
@@ -34,21 +28,13 @@ class SppapoliscariAPI{
 			},
 		);
 
-		// 🔍 DEBUG RESPONSE
-		debugPrint("Status Code: ${response.statusCode}");
-		debugPrint("Response Body: ${response.body}");
-
 		if (response.statusCode == 200) {
 			final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
-
-			// 🔍 DEBUG PARSED RESULT
-			debugPrint("Parsed length: ${parsed.length}");
 
 			return parsed
 					.map<SppapoliscariModel>((json) => SppapoliscariModel.fromJson(json))
 					.toList();
 		} else {
-			// 🔥 ERROR DEBUG
 			debugPrint("❌ API ERROR: ${response.statusCode}");
 			throw Exception("Failed to load data");
 		}

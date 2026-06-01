@@ -53,8 +53,10 @@ import '../../../models/gen_review/reviewcari_model.dart';
             padding: EdgeInsets.symmetric(
               horizontal: hPadding * 1.5,
             ),
-            child: SizedBox(
-              width: 360,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: widget.isPageMode ? 1200 : 1000,
+              ),
               child: BlocBuilder<ReviewCariBloc, ReviewCariState>(
                 builder: (context, state) {
                   if (state.status == ListStatus.initial) {
@@ -181,15 +183,19 @@ import '../../../models/gen_review/reviewcari_model.dart';
       );
     }
 
-    Widget _buildTestimonialCards(BuildContext context, List<ReviewCariModel> items) {
-      final mobile = isMobile(context);
-      final tablet = isTablet(context);
+    Widget _buildTestimonialCards(
+        BuildContext context,
+        List<ReviewCariModel> items,
+        ) {
+      final width = MediaQuery.of(context).size.width;
 
-      final int itemsPerPage = mobile ? 1 : (tablet ? 2 : 3);
+      final int itemsPerPage =
+      width < 600 ? 1 : (width < 1000 ? 2 : 3);
+
       final totalPages = (items.length / itemsPerPage).ceil();
 
       return SizedBox(
-        height: 210.37,
+        height: 260,
         child: PageView.builder(
           controller: _pageController,
           onPageChanged: (int page) => setState(() => _currentPage = page),
@@ -202,15 +208,24 @@ import '../../../models/gen_review/reviewcari_model.dart';
                 : startIndex + itemsPerPage;
 
             return Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (int i = startIndex; i < endIndex; i++) ...[
-                  Expanded(child: _buildTestimonialCard(context, items[i])),
-                  if (i < endIndex - 1) const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTestimonialCard(
+                      context,
+                      items[i],
+                    ),
+                  ),
+                  if (i < endIndex - 1)
+                    const SizedBox(width: 16),
                 ],
                 if (endIndex - startIndex < itemsPerPage)
                   ...List.generate(
                     itemsPerPage - (endIndex - startIndex),
-                        (_) => const Expanded(child: SizedBox()),
+                        (_) => const Expanded(
+                      child: SizedBox(),
+                    ),
                   ),
               ],
             );
@@ -219,9 +234,12 @@ import '../../../models/gen_review/reviewcari_model.dart';
       );
     }
 
-    Widget _buildTestimonialCard(BuildContext context, ReviewCariModel item) {
+    Widget _buildTestimonialCard(
+        BuildContext context,
+        ReviewCariModel item,
+        ) {
       return Container(
-        padding: const EdgeInsets.only(right: 25, left: 25, top: 20, bottom: 35),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: pGrey,
           borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -230,65 +248,77 @@ import '../../../models/gen_review/reviewcari_model.dart';
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              runSpacing: 8,
               children: [
-                Expanded(
-                  child: Wrap(
-                    spacing: 4,
-                    runSpacing: 2,
-                    children: [
-                      Text(
-                        "${formatTanggalIndonesia(item.reviewTgl)} ·",
-                        style: bodyTextStyle(context, fontSize: 16)
-                            .copyWith(color: hintGrey),
-                      ),
-                      Text(
-                        formatJam(item.reviewTgl),
-                        style: bodyTextStyle(context, fontSize: 16)
-                            .copyWith(color: hintGrey),
-                      ),
-                    ],
-                  ),
-                ),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      height: 20.37,
-                      padding: const EdgeInsets.symmetric(horizontal: hPadding),
-                      decoration: BoxDecoration(
-                        color: pYellow.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(cardBorderRadius),
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              item.nilai.toStringAsFixed(1),
-                              style: const TextStyle(color: pYellow, fontSize: 14),
-                            ),
-                            Text(
-                              ' /${item.skala.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                color: hintGrey,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
+                    Text(
+                      "${formatTanggalIndonesia(item.reviewTgl)} · ",
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: 14,
+                      ).copyWith(
+                        color: hintGrey,
                       ),
                     ),
-                    const SizedBox(width: 5),
-                    _buildStarRating(item.nilai, 18),
+                    Text(
+                      formatJam(item.reviewTgl),
+                      style: bodyTextStyle(
+                        context,
+                        fontSize: 14,
+                      ).copyWith(
+                        color: hintGrey,
+                      ),
+                    ),
                   ],
-                )
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: pYellow.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(
+                          cardBorderRadius,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            item.nilai.toStringAsFixed(1),
+                            style: const TextStyle(
+                              color: pYellow,
+                              fontSize: 13,
+                            ),
+                          ),
+                          Text(
+                            ' /${item.skala.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              color: hintGrey,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    _buildStarRating(item.nilai, 16),
+                  ],
+                ),
               ],
             ),
+
             const SizedBox(height: 15),
+
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Column(
@@ -296,37 +326,39 @@ import '../../../models/gen_review/reviewcari_model.dart';
                     children: [
                       Text(
                         item.reviewer,
-                        style: bodyTextStyle(context, fontSize: 20),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: bodyTextStyle(
+                          context,
+                          fontSize: 18,
+                        ),
                       ),
                       Text(
                         item.instansi,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: bodyTextStyle(
                           context,
-                          fontSize: 16,
-                        ).copyWith(color: hintGrey),
+                          fontSize: 14,
+                        ).copyWith(
+                          color: hintGrey,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/thumbsup_solid.svg',
-                      width: 16.66,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Testimonial',
-                      style: bodyTextStyle(context, fontSize: 16),
-                    ),
-                  ],
-                ),
               ],
             ),
+
             const SizedBox(height: 15),
-            // Quote testimonial
+
             Expanded(
-              child: Text('"${item.komentar}"', style: bodyTextStyle(context)),
+              child: Text(
+                '"${item.komentar}"',
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                style: bodyTextStyle(context),
+              ),
             ),
           ],
         ),

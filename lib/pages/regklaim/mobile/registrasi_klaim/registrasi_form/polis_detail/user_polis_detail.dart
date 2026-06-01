@@ -201,7 +201,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                                   barrierDismissible: true,
                                   barrierColor: Colors.black.withOpacity(0.6),
                                   builder: (context) => RegisterClientPopUp(
-                                    header: 'Isi Data Pribadi Anda1',
+                                    header: 'Isi Data Pribadi Anda',
                                     description:
                                     'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
                                     buttonText: 'Lengkapi Data Pribadi',

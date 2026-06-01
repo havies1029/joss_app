@@ -6,7 +6,7 @@ import '../../../blocs/gen_status_aset/statusasetcari_bloc.dart';
 import '../blocs/gen_sppamv/sppa_download_polis_bloc.dart';
 import '../common/constants.dart';
 import '../pages/cari_asuransi/mobile/cari_asuransi_page.dart';
-import '../pages/management_polis/detail_management_page/detail_management_widget.dart';
+import '../pages/management_polis/mobile/detail_management_page/detail_management_widget.dart';
 import '../pages/management_polis/floating_action_menu_widget.dart';
 import '../pages/management_polis/mobile/form_button_page/endorse_form_page.dart';
 import '../pages/management_polis/mobile/form_button_page/reactive_form_page.dart';

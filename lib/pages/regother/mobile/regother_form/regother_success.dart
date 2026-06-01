@@ -7,7 +7,7 @@ import 'package:joss_app/pages/base/base_background_firstpage.dart';
 
 import 'package:confetti/confetti.dart';
 
-import '../../../management_polis/detail_management_page/detail_management_widget.dart';
+import '../../../management_polis/mobile/detail_management_page/detail_management_widget.dart';
 
 class RegotherSucess extends StatefulWidget {
   final String display;

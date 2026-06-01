@@ -21,6 +21,9 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 
 		on<SelectPolisHullDetailEvent>(onSelectPolisHullDetail);
 		on<UnselectPolisHullDetailEvent>(onUnselectPolisHullDetail);
+		on<SelectSingleHullDetailEvent>(onSelectDetailHullId);
+		on<UnselectSingleHullDetailEvent>(onUnselectDetailHullId);
+
 		on<ClearPolisHullSelectionEvent>(onClearPolisHullSelection);
 		on<SelectHullCariEvent>((event, emit) {
 			emit(state.copyWith(selectedItem: event.selectedItem));

@@ -40,34 +40,38 @@ class AsethullCariState extends Equatable {
 
 	const AsethullCariState.failure() : this(status: ListStatus.failure);
 
-	AsethullCariState copyWith(
-		{List<AsethullCariModel>? items,
+	static const _unset = Object();
+
+	AsethullCariState copyWith({
+		List<AsethullCariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
-    int? hal,
-    String? searchText,
-    String? statusId,
+		int? hal,
+		String? searchText,
+		String? statusId,
 		Set<String>? selectedIds,
 		String? selectedFilePolisId,
 		String? activeAsetHullId,
 		String? selectedId,
-		AsethullCariModel? selectedItem,
+		Object? selectedItem = _unset,
 		String? selectedProsesId,
 		String? queryKey,
 		bool? isFetching,
-		}){
+	}) {
 		return AsethullCariState(
 			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
 			status: status ?? this.status,
-      hal: hal ?? this.hal,
-      searchText: searchText ?? this.searchText,
-      statusId: statusId ?? this.statusId,
+			hal: hal ?? this.hal,
+			searchText: searchText ?? this.searchText,
+			statusId: statusId ?? this.statusId,
 			selectedIds: selectedIds ?? this.selectedIds,
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
 			activeAsetHullId: activeAsetHullId ?? this.activeAsetHullId,
 			selectedId: selectedId ?? this.selectedId,
-			selectedItem: selectedItem ?? this.selectedItem,
+			selectedItem: identical(selectedItem, _unset)
+					? this.selectedItem
+					: selectedItem as AsethullCariModel?,
 			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
 			queryKey: queryKey ?? this.queryKey,
 			isFetching: isFetching ?? this.isFetching,

@@ -74,6 +74,7 @@ dependencies:
   pinput: ^5.0.0
   visibility_detector: ^0.4.0+2
   currency_text_input_formatter: ^2.3.0
+  linked_scroll_controller: ^0.2.0
 
 dev_dependencies:
   flutter_test:

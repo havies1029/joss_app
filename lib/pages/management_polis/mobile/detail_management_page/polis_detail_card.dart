@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 
-import '../../../blocs/regother/regother1crud_bloc.dart';
+import '../../../../blocs/regother/regother1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 class PolisDetailCard extends StatelessWidget {
   final Map<String, dynamic> dataMap;

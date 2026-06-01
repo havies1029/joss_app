@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/gen_aset_par/asetparcari_bloc.dart';
-import '../../../../../blocs/gen_aset_par/sppa2parcari_bloc.dart';
-import '../../../../../common/constants.dart';
 import '../../../../../models/gen_aset_par/asetparcari_model.dart';
 import '../../../../../widgets/apptheme/register_client_pop_up.dart';
+import '../template_polis_table/cob_policy_table.dart';
 import 'detail_polis_par_table_page.dart';
 
 class PropertyCobTable extends StatefulWidget {
@@ -60,58 +58,123 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
-  late final ScrollController hController;
-  late final ScrollController vController;
-
   @override
-  void initState() {
-    super.initState();
-    hController = ScrollController();
-    vController = ScrollController();
-    vController.addListener(_onScroll);
-  }
+  Widget build(BuildContext context) {
+    final showColumn = widget.statusId == "10002";
 
-  void _onScroll() {
-    final bloc = context.read<AsetParCariBloc>();
-    final s = bloc.state;
+    return CobPolicyTable<AsetParCariModel>(
+      items: widget.items,
+      selectedIds: widget.selectedIds,
+      idGetter: (d) => d.asetParId,
+      nomorGetter: (d, index) => d.nomor.toString(),
 
-    if (!vController.hasClients) return;
-    final max = vController.position.maxScrollExtent;
-    final cur = vController.position.pixels;
+      title: widget.title,
+      readOnly: widget.readOnly,
+      showFooter: widget.showFooter,
 
-    const threshold = 100.0;
+      hasReachedMax: context.watch<AsetParCariBloc>().state.hasReachedMax,
+      isFetching: context.watch<AsetParCariBloc>().state.isFetching,
+      onLoadMore: () {
+        context.read<AsetParCariBloc>().add(FetchAsetParCariEvent());
+      },
 
-    if (max - cur <= threshold) {
-      if (!s.hasReachedMax && !s.isFetching) {
-        bloc.add(FetchAsetParCariEvent());
-      }
-    }
-  }
+      onSelect: widget.onSelect,
+      onUnselect: widget.onUnselect,
+      onSelectItem: widget.onSelectItem,
+      onClearSelectedItem: widget.onClearSelectedItem,
 
-  @override
-  void dispose() {
-    hController.dispose();
-    vController.removeListener(_onScroll);
-    vController.dispose();
-    super.dispose();
-  }
+      onSelectExtra: (d) {
+        if (d.filePolisParId.isNotEmpty) {
+          widget.onSelectFilePolisParId(d.filePolisParId);
+        }
+        if (d.filePolisEqId.isNotEmpty) {
+          widget.onSelectFilePolisEqId(d.filePolisEqId);
+        }
+      },
 
-  List<AsetParCariModel> get _filteredItems {
-    if (!widget.readOnly) return widget.items;
-    return widget.items.where((d) => widget.selectedIds.contains(d.asetParId)).toList();
-  }
+      onUnselectExtra: (d) {
+        if (d.filePolisParId.isNotEmpty) {
+          widget.onUnselectFilePolisParId(d.filePolisParId);
+        }
+        if (d.filePolisEqId.isNotEmpty) {
+          widget.onUnselectFilePolisEqId(d.filePolisEqId);
+        }
+      },
 
-  Widget _clickableCell({
-    required Widget child,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: _cell(child: child),
+      onOpenDetail: (context, d) {
+        _showSuccessPopup(context, d);
+      },
+
+      columns: [
+        if (showColumn)
+          CobPolicyColumn<AsetParCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
+
+        CobPolicyColumn<AsetParCariModel>(
+          title: "NO POLIS",
+          valueGetter: (d) => d.polisNo,
+          normalFlex: showColumn ? 1.2 : 1.6,
+          compactWidth: showColumn ? 120 : 160,
+          normalMaxLines: 1,
+          compactMaxLines: 2,
+        ),
+
+        CobPolicyColumn<AsetParCariModel>(
+          title: "JUMLAH OBJEK",
+          valueGetter: (d) => "${d.jmlObject} ${d.satuan}",
+          normalFlex: 1.2,
+          compactWidth: 120,
+          normalMaxLines: 1,
+          compactMaxLines: 2,
+        ),
+
+        CobPolicyColumn<AsetParCariModel>(
+          title: "PERIODE",
+          valueGetter: (d) =>
+          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+          normalFlex: 1.8,
+          compactWidth: 180,
+          normalMaxLines: 2,
+          compactMaxLines: 2,
+        ),
+
+        CobPolicyColumn<AsetParCariModel>(
+          title: "TERTANGGUNG",
+          valueGetter: (d) => d.tertanggung,
+          normalFlex: 1.7,
+          compactWidth: 170,
+          normalMaxLines: 1,
+          compactMaxLines: 2,
+        ),
+
+        CobPolicyColumn<AsetParCariModel>(
+          title: "NILAI PERTANGGUNGAN",
+          valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
+          normalFlex: 1.7,
+          compactWidth: 170,
+          normalSoftWrap: false,
+          compactSoftWrap: false,
+        ),
+
+        CobPolicyColumn<AsetParCariModel>(
+          title: "PREMI",
+          valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.premi)}",
+          normalFlex: 1.4,
+          compactWidth: 140,
+          normalSoftWrap: false,
+          compactSoftWrap: false,
+        ),
+      ],
     );
   }
 
+  /*
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -148,344 +211,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       ),
     );
   }
-
-  Widget _buildHeaderTitle(BuildContext context, String cobNama) {
-    return Text(
-      "Polis $cobNama",
-      style: headingStyle(context, fontSize: 14),
-    );
-  }
-
-  Widget _buildDetailTableCompact(
-      BuildContext context,
-      List<AsetParCariModel> details,
-      bool showColumn
-      ) {
-    if (details.isEmpty) return const Text("Tidak ada detail polis");
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Container(
-        decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: const Border(
-            top: BorderSide(color: sGrey, width: 1),
-            left: BorderSide(color: sGrey, width: 1),
-            right: BorderSide(color: sGrey, width: 1),
-            bottom: BorderSide(color: sGrey, width: 1),
-          ),
-        ),
-        child: ScrollbarTheme(
-          data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(false),
-            trackVisibility: WidgetStateProperty.all(false),
-            thickness: WidgetStateProperty.all(5),
-            radius: const Radius.circular(cardBorderRadius),
-            thumbColor: WidgetStateProperty.all(
-              scrollBar.withOpacity(0.1),
-            ),
-          ),
-          child: Scrollbar(
-            controller: hController,
-            child: SingleChildScrollView(
-              controller: hController,
-              scrollDirection: Axis.horizontal,
-              child: Table(
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                border: const TableBorder(
-                  horizontalInside: BorderSide(color: sGrey, width: 1),
-                  verticalInside: BorderSide(color: sGrey, width: 1),
-                ),
-                columnWidths: {
-                  0: widget.readOnly
-                      ? const FixedColumnWidth(0)
-                      : const FixedColumnWidth(40),
-
-                  1: const FixedColumnWidth(50), // No
-
-                  if (showColumn) ...{
-                    2: const FixedColumnWidth(140), // No Proses
-                    3: const FixedColumnWidth(120), // No Polis
-                    4: const FixedColumnWidth(120), // Jml Object
-                    5: const FixedColumnWidth(180), // Periode
-                    6: const FixedColumnWidth(170), // Tertanggung
-                    7: const FixedColumnWidth(170), // Nilai Pertanggungan
-                    8: const FixedColumnWidth(140), // Premi
-                  } else ...{
-                    2: const FixedColumnWidth(160), // No Polis
-                    3: const FixedColumnWidth(120), // Jml Object
-                    4: const FixedColumnWidth(180), // Periode
-                    5: const FixedColumnWidth(170), // Tertanggung
-                    6: const FixedColumnWidth(170), // Nilai Pertanggungan
-                    7: const FixedColumnWidth(140), // Premi
-                  },
-                },
-                children: [
-                  _tableHeader(context, details, showColumn, compact: true),
-
-                  ...details.asMap().entries.map(
-                        (e) => _detailRowWithCheckbox(
-                      context,
-                      e.value,
-                      e.key,
-                      showColumn,
-                      compact: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailTableNormal(BuildContext context, List<AsetParCariModel> details, bool showColumn) {
-    if (details.isEmpty) return const Text("Tidak ada detail polis");
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Container(
-        decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: const Border(
-            top: BorderSide(color: sGrey, width: 1),
-            left: BorderSide(color: sGrey, width: 1),
-            right: BorderSide(color: sGrey, width: 1),
-            bottom: BorderSide(color: sGrey, width: 1),
-          ),
-        ),
-        child: Table(
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          border: const TableBorder(
-            horizontalInside: BorderSide(color: sGrey, width: 1),
-            verticalInside: BorderSide(color: sGrey, width: 1),
-          ),
-          columnWidths: {
-            0: widget.readOnly
-                ? const FixedColumnWidth(0)
-                : const FixedColumnWidth(40),
-
-            1: const FixedColumnWidth(50), // No
-
-            if (showColumn) ...{
-              2: const FixedColumnWidth(140), // No Proses
-              3: const FixedColumnWidth(120), // No Polis
-              4: const FixedColumnWidth(120), // Jml Object
-              5: const FixedColumnWidth(180), // Periode
-              6: const FixedColumnWidth(170), // Tertanggung
-              7: const FixedColumnWidth(170), // Nilai Pertanggungan
-              8: const FixedColumnWidth(140), // Premi
-            } else ...{
-              2: const FixedColumnWidth(160), // No Polis
-              3: const FixedColumnWidth(120), // Jml Object
-              4: const FixedColumnWidth(180), // Periode
-              5: const FixedColumnWidth(170), // Tertanggung
-              6: const FixedColumnWidth(170), // Nilai Pertanggungan
-              7: const FixedColumnWidth(140), // Premi
-            },
-          },
-          children: [
-            _tableHeader(context, details, showColumn, compact: false),
-
-            ...details.asMap().entries.map((e) => _detailRowWithCheckbox(
-              context,
-              e.value,
-              e.key,
-              showColumn,
-              compact: false,
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  TableRow _tableHeader(
-      BuildContext context,
-      List<AsetParCariModel> details,
-      bool showColumn,
-      {
-        required bool compact,
-      }) {
-    return TableRow(
-      decoration: const BoxDecoration(color: formGrey),
-      children: [
-        if (!widget.readOnly)
-          const SizedBox()
-        else
-          const SizedBox(),
-        ...[
-          "No",
-          if (showColumn) "Nomor Proses",
-          "No Polis",
-          "Jumlah Objek",
-          "Periode",
-          "Tertanggung",
-          "Nilai Pertanggungan",
-          "Premi",
-        ].map((t) {
-          final upper = t.toUpperCase();
-          final center = upper == "NO";
-          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-            child: center ? Center(child: child) : child,
-          );
-        }),
-      ],
-    );
-  }
-
-  TableRow _detailRowWithCheckbox(
-      BuildContext context,
-      AsetParCariModel d,
-      int index,
-      bool showColumn, {
-        required bool compact,
-      }) {
-    final isSelected = widget.selectedItem == d;
-
-    void triggerRow() {
-      if (widget.readOnly) return;
-
-      _showSuccessPopup(context, d);
-    }
-
-    return TableRow(
-      decoration: BoxDecoration(
-        color: (!widget.readOnly && isSelected)
-            ? primaryColor.withOpacity(0.3)
-            : (index.isEven ? pGrey : formGrey),
-      ),
-      children: [
-        // checkbox: TIDAK ikut trigger row
-        if (!widget.readOnly)
-          Center(
-            child: CheckboxRadio(
-              value: isSelected,
-              onChanged: (checked) {
-                if (checked == true) {
-                  widget.onSelect(d.asetParId);
-                  widget.onSelectItem?.call(d);
-
-                  if (d.filePolisParId.isNotEmpty) {
-                    widget.onSelectFilePolisParId(d.filePolisParId);
-                  }
-                  if (d.filePolisEqId.isNotEmpty) {
-                    widget.onSelectFilePolisEqId(d.filePolisEqId);
-                  }
-                } else {
-                  widget.onUnselect(d.asetParId);
-                  widget.onClearSelectedItem?.call();
-
-                  if (d.filePolisParId.isNotEmpty) {
-                    widget.onUnselectFilePolisParId(d.filePolisParId);
-                  }
-                  if (d.filePolisEqId.isNotEmpty) {
-                    widget.onUnselectFilePolisEqId(d.filePolisEqId);
-                  }
-                }
-              },
-            ),
-          )
-        else
-          const SizedBox(),
-
-        // No: TIDAK ikut trigger row
-        _cell(
-          child: Center(
-            child: Text(
-              d.nomor.toString(),
-              style: const TextStyle(color: primaryLightColor),
-            ),
-          ),
-        ),
-
-        // Mulai sini clickable
-        if (showColumn)
-          _clickableCell(
-            onTap: triggerRow,
-            child: Text(
-              d.prosesId.isEmpty ? "-" : d.prosesId,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: primaryLightColor),
-            ),
-          ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            d.polisNo,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            "${d.jmlObject} ${d.satuan}",
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            "${DateFormat('dd MMM yyyy').format(d.periodeMulai)} - "
-                "${DateFormat('dd MMM yyyy').format(d.periodeAkhir)}",
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            d.tertanggung,
-            maxLines: compact ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            "${d.curr} ${formatNum(d.sumInsured)}",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-
-        _clickableCell(
-          onTap: triggerRow,
-          child: Text(
-            "${d.curr} ${formatNum(d.premi)}",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: primaryLightColor),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _cell({required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.all(6),
-      child: child,
-    );
-  }
+  */
 
   void _showSuccessPopup(BuildContext context, AsetParCariModel d) {
     final asetParId = d.asetParId.trim();

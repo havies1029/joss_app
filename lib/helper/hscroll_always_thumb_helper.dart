@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/constants.dart';
 
 class HScrollAlwaysThumb extends StatefulWidget {
   final Widget child;
-  const HScrollAlwaysThumb({super.key, required this.child});
+
+  const HScrollAlwaysThumb({
+    super.key,
+    required this.child,
+  });
 
   @override
   State<HScrollAlwaysThumb> createState() => HScrollAlwaysThumbState();
@@ -19,13 +24,24 @@ class HScrollAlwaysThumbState extends State<HScrollAlwaysThumb> {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-      controller: _ctrl,
-      thumbVisibility: true,
-      child: SingleChildScrollView(
+    return ScrollbarTheme(
+      data: ScrollbarThemeData(
+        thumbVisibility: WidgetStateProperty.all(true),
+        trackVisibility: WidgetStateProperty.all(false),
+        thickness: WidgetStateProperty.all(5),
+        radius: const Radius.circular(cardBorderRadius),
+        thumbColor: WidgetStateProperty.all(
+          scrollBar.withOpacity(0.1),
+        ),
+      ),
+      child: Scrollbar(
         controller: _ctrl,
-        scrollDirection: Axis.horizontal,
-        child: widget.child,
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          controller: _ctrl,
+          scrollDirection: Axis.horizontal,
+          child: widget.child,
+        ),
       ),
     );
   }

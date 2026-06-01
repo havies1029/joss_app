@@ -12,7 +12,7 @@
   import '../../../../blocs/gen_cob_app/cobmanpol_bloc.dart';
   import 'package:confetti/confetti.dart';
 
-  import '../../detail_management_page/detail_management_widget.dart';
+  import '../detail_management_page/detail_management_widget.dart';
 
   class PolisSuccess extends StatefulWidget {
     final String display;

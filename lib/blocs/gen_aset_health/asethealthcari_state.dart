@@ -39,8 +39,10 @@ class AsetHealthCariState extends Equatable {
 
 	const AsetHealthCariState.failure() : this(status: ListStatus.failure);
 
-	AsetHealthCariState copyWith(
-		{List<AsetHealthCariModel>? items,
+	static const _unset = Object();
+
+	AsetHealthCariState copyWith({
+		List<AsetHealthCariModel>? items,
 		bool? hasReachedMax,
 		ListStatus? status,
 		int? hal,
@@ -50,11 +52,11 @@ class AsetHealthCariState extends Equatable {
 		String? selectedFilePolisId,
 		String? activeAsetHealthId,
 		String? selectedId,
-		AsetHealthCariModel? selectedItem,
+		Object? selectedItem = _unset,
 		String? selectedProsesId,
 		String? queryKey,
 		bool? isFetching,
-		}) {
+	}) {
 		return AsetHealthCariState(
 			items: items ?? this.items,
 			hasReachedMax: hasReachedMax ?? this.hasReachedMax,
@@ -66,7 +68,9 @@ class AsetHealthCariState extends Equatable {
 			selectedFilePolisId: selectedFilePolisId ?? this.selectedFilePolisId,
 			activeAsetHealthId: activeAsetHealthId ?? this.activeAsetHealthId,
 			selectedId: selectedId ?? this.selectedId,
-			selectedItem: selectedItem ?? this.selectedItem,
+			selectedItem: identical(selectedItem, _unset)
+					? this.selectedItem
+					: selectedItem as AsetHealthCariModel?,
 			selectedProsesId: selectedProsesId ?? this.selectedProsesId,
 			queryKey: queryKey ?? this.queryKey,
 			isFetching: isFetching ?? this.isFetching,

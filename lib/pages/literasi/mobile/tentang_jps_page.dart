@@ -68,9 +68,13 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
         curve: Curves.easeOut,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
           decoration: BoxDecoration(
-            color: isSelected ? primaryColor : pGrey,
+            color: isSelected ? primaryColor : Colors.transparent,
             borderRadius: BorderRadius.circular(cardBorderRadius),
           ),
           child: Text(
@@ -103,22 +107,35 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
               hPadding * 1.5,
               vPadding,
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(
-                        chipItems.length,
-                            (index) => buildChip(chipItems[index], index),
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: pGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                border: Border.all(color: sGrey),
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(
+                          chipItems.length,
+                              (index) => buildChip(
+                            chipItems[index],
+                            index,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           Expanded(

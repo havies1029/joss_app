@@ -6,6 +6,7 @@ import '../../../../../blocs/asetothers/asetotherscari_bloc.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../models/asetothers/asetotherscari_model.dart';
 import '../../../../../widgets/apptheme/register_client_pop_up.dart';
+import '../template_polis_table/cob_policy_table.dart';
 import 'detail_polis_others_table_page.dart';
 
 class KargoCobTable extends StatefulWidget {
@@ -50,8 +51,6 @@ class KargoCobTable extends StatefulWidget {
 }
 
 class _KargoCobTableState extends State<KargoCobTable> {
-  late final ScrollController hController;
-  late final ScrollController vController;
 
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
@@ -61,452 +60,150 @@ class _KargoCobTableState extends State<KargoCobTable> {
     return DateFormat('dd MMM yyyy').format(date);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    hController = ScrollController();
-    vController = ScrollController();
-    vController.addListener(_onScroll);
-  }
 
-  void _onScroll() {
-    final bloc = context.read<AsetothersCariBloc>();
-    final s = bloc.state;
-
-    if (!vController.hasClients) return;
-    final max = vController.position.maxScrollExtent;
-    final cur = vController.position.pixels;
-
-    const threshold = 100.0;
-
-    if (max - cur <= threshold) {
-      if (!s.hasReachedMax && !s.isFetching) {
-        bloc.add(FetchAsetothersCariEvent());
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    hController.dispose();
-    vController.removeListener(_onScroll);
-    vController.dispose();
-    super.dispose();
-  }
-
-  List<AsetothersCariModel> get _filteredItems {
-    if (!widget.readOnly) return widget.items;
-    return widget.items.where((d) => widget.selectedIds.contains(d.asetOthersId)).toList();
-  }
-
-  // =========================
-  // Dynamic width helpers
-  // =========================
-
-  double _measureTextWidth(
-      BuildContext context,
-      String text, {
-        TextStyle? style,
-      }) {
-    final effectiveStyle = style ??
-        bodyTextStyle(context, fontSize: 14).copyWith(
-          color: primaryLightColor,
-        );
-
-    final tp = TextPainter(
-      text: TextSpan(text: text, style: effectiveStyle),
-      textDirection: Directionality.of(context),
-      maxLines: 1,
-      ellipsis: '…',
-    )..layout();
-
-    return tp.width;
-  }
-
-  double _columnWidthFromLongest(
-      BuildContext context,
-      Iterable<String> values, {
-        required double min,
-        required double max,
-        double padding = 16,
-        TextStyle? style,
-      }) {
-    var longest = 0.0;
-    for (final v in values) {
-      final w = _measureTextWidth(context, v, style: style);
-      if (w > longest) longest = w;
-    }
-    final target = longest + padding;
-    return target.clamp(min, max);
-  }
-
-  // helper text cell (wrap saat compact)
-  Widget _textCell(
-      String text, {
-        int maxLines = 1,
-        bool center = false,
-        bool softWrap = true,
-      }) {
-    final t = Text(
-      text,
-      maxLines: maxLines,
-      softWrap: softWrap,
-      overflow: TextOverflow.ellipsis,
-      style: const TextStyle(color: primaryLightColor),
-    );
-    return _cell(child: center ? Center(child: t) : t);
-  }
-
-  Map<int, TableColumnWidth> _compactColumnWidths(
-      BuildContext context,
-      List<AsetothersCariModel> details,
-      ) {
-    final selectCol = widget.readOnly ? 0.0 : 40.0;
-
-    final polisValues = details.map((d) => d.polisNo);
-    final jmlObjectValues = details.map((d) => d.jmlObject.toString());
-    final tertanggungValues = details.map((d) => d.tertanggung);
-    final sumInsuredValues =
-    details.map((d) => "${d.curr} ${formatNum(d.sumInsured)}");
-    final premiValues =
-    details.map((d) => "${d.curr} ${formatNum(d.premi)}");
-
-    final wPolis = _columnWidthFromLongest(
-      context,
-      polisValues,
-      min: 120,
-      max: 180,
-    );
-
-    final wJmlObject = _columnWidthFromLongest(
-      context,
-      jmlObjectValues,
-      min: 110,
-      max: 140,
-    );
-
-    final wTertanggung = _columnWidthFromLongest(
-      context,
-      tertanggungValues,
-      min: 150,
-      max: 220,
-    );
-
-    final wSumInsured = _columnWidthFromLongest(
-      context,
-      sumInsuredValues,
-      min: 170,
-      max: 240,
-    );
-
-    final wPremi = _columnWidthFromLongest(
-      context,
-      premiValues,
-      min: 130,
-      max: 170,
-    );
-
-    return {
-      0: FixedColumnWidth(selectCol),
-      1: const FixedColumnWidth(50), // No
-      2: FixedColumnWidth(wPolis), // Polis No
-      3: FixedColumnWidth(wJmlObject), // Jml Object
-      4: const FixedColumnWidth(180), // Periode
-      5: FixedColumnWidth(wTertanggung), // Tertanggung
-      6: FixedColumnWidth(wSumInsured), // Nilai Pertanggungan
-      7: FixedColumnWidth(wPremi), // Premi
-    };
-  }
-
-  // =========================
-  // UI
-  // =========================
+  // @override
+  // Widget build(BuildContext context) {
+  //   final width = MediaQuery.of(context).size.width;
+  //   final bool isNarrow = width < 900;
+  //
+  //   final items = _filteredItems;
+  //
+  //   if (items.isEmpty) {
+  //     return const Center(child: Text("Data kosong"));
+  //   }
+  //
+  //   return SingleChildScrollView(
+  //     controller: vController,
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         if (widget.title != null) ...[
+  //           Padding(
+  //             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+  //             child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
+  //           ),
+  //           const SizedBox(height: hPadding),
+  //         ],
+  //         Padding(
+  //           padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+  //           child: isNarrow
+  //               ? _buildDetailTableCompact(context, items)
+  //               : _buildDetailTableNormal(context, items),
+  //         ),
+  //         const SizedBox(height: hPadding),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 900;
+    return CobPolicyTable<AsetothersCariModel>(
+      items: widget.items,
+      selectedIds: widget.selectedIds,
+      idGetter: (d) => d.asetOthersId,
+      nomorGetter: (d, index) => d.nomor.toString(),
 
-    final items = _filteredItems;
+      title: widget.title,
+      readOnly: widget.readOnly,
+      showFooter: widget.showFooter,
 
-    if (items.isEmpty) {
-      return const Center(child: Text("Data kosong"));
-    }
+      hasReachedMax: context.watch<AsetothersCariBloc>().state.hasReachedMax,
+      isFetching: context.watch<AsetothersCariBloc>().state.isFetching,
+      onLoadMore: () {
+        context.read<AsetothersCariBloc>().add(FetchAsetothersCariEvent());
+      },
 
-    return SingleChildScrollView(
-      controller: vController,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.title != null) ...[
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-            ),
-            const SizedBox(height: hPadding),
-          ],
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-            child: isNarrow
-                ? _buildDetailTableCompact(context, items)
-                : _buildDetailTableNormal(context, items),
-          ),
-          const SizedBox(height: hPadding),
-        ],
-      ),
-    );
-  }
+      onSelect: widget.onSelect,
+      onUnselect: widget.onUnselect,
+      onSelectItem: widget.onSelectItem,
+      onClearSelectedItem: widget.onClearSelectedItem,
 
-  Widget _buildDetailTableCompact(
-      BuildContext context,
-      List<AsetothersCariModel> details,
-      ) {
-    if (details.isEmpty) return const Text("Tidak ada detail");
+      onSelectExtra: (d) {
+        if (d.filePolisId.isNotEmpty) {
+          widget.onSelectFilePolisHealthId(d.filePolisId);
+        }
+      },
 
-    final columnWidths = _compactColumnWidths(context, details);
+      onUnselectExtra: (d) {
+        if (d.filePolisId.isNotEmpty) {
+          widget.onUnselectFilePolisHealthId(d.filePolisId);
+        }
+      },
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Container(
-        decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: const Border(
-            top: BorderSide(color: sGrey, width: 1),
-            left: BorderSide(color: sGrey, width: 1),
-            right: BorderSide(color: sGrey, width: 1),
-            bottom: BorderSide(color: sGrey, width: 1),
-          ),
-        ),
-        child: ScrollbarTheme(
-          data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(false),
-            trackVisibility: WidgetStateProperty.all(false),
-            thickness: WidgetStateProperty.all(5),
-            radius: const Radius.circular(cardBorderRadius),
-            thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
-          ),
-          child: Scrollbar(
-            controller: hController,
-            child: SingleChildScrollView(
-              controller: hController,
-              scrollDirection: Axis.horizontal,
-              child: Table(
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                border: const TableBorder(
-                  horizontalInside: BorderSide(color: sGrey, width: 1),
-                  verticalInside: BorderSide(color: sGrey, width: 1),
-                ),
-                columnWidths: columnWidths,
-                children: [
-                  _tableHeader(context),
-                  ...details.asMap().entries.map(
-                        (e) => _detailRowWithRadioLikeProperty(
-                      context,
-                      e.value,
-                      e.key,
-                      compact: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+      onOpenDetail: (context, d) {
+        _showSuccessPopup(context, d);
+      },
 
-  Widget _buildDetailTableNormal(
-      BuildContext context,
-      List<AsetothersCariModel> details,
-      ) {
-    if (details.isEmpty) return const Text("Tidak ada detail");
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(cardBorderRadius),
-      child: Container(
-        decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.circular(cardBorderRadius),
-          border: const Border(
-            top: BorderSide(color: sGrey, width: 1),
-            left: BorderSide(color: sGrey, width: 1),
-            right: BorderSide(color: sGrey, width: 1),
-            bottom: BorderSide(color: sGrey, width: 1),
-          ),
-        ),
-        child: Table(
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          border: const TableBorder(
-            horizontalInside: BorderSide(color: sGrey, width: 1),
-            verticalInside: BorderSide(color: sGrey, width: 1),
-          ),
-          columnWidths: {
-            0: widget.readOnly
-                ? const FixedColumnWidth(0)
-                : const FlexColumnWidth(0.8),
-
-            1: const FlexColumnWidth(1.0), // No
-            2: const FlexColumnWidth(2.2), // Polis No
-            3: const FlexColumnWidth(1.5), // Jml Object
-            4: const FlexColumnWidth(2.2), // Periode
-            5: const FlexColumnWidth(2.5), // Tertanggung
-            6: const FlexColumnWidth(2.3), // Nilai Pertanggungan
-            7: const FlexColumnWidth(1.8), // Premi
-          },
-          children: [
-            _tableHeader(context),
-            ...details.asMap().entries.map(
-                  (e) => _detailRowWithRadioLikeProperty(
-                context,
-                e.value,
-                e.key,
-                compact: false,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  TableRow _tableHeader(BuildContext context) {
-    return TableRow(
-      decoration: const BoxDecoration(color: formGrey),
-      children: [
-        const SizedBox(),
-        ...[
-          "No",
-          "No Polis",
-          "Jumlah Objek",
-          "Periode",
-          "Tertanggung",
-          "Nilai Pertanggungan",
-          "Premi",
-        ].map((t) {
-          final center = t.toUpperCase() == "NO";
-          final child = Text(t, style: bodyTextStyle(context, fontSize: 15));
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
-            child: center ? Center(child: child) : child,
-          );
-        }),
-      ],
-    );
-  }
-
-  TableRow _detailRowWithRadioLikeProperty(
-      BuildContext context,
-      AsetothersCariModel d,
-      int index, {
-        required bool compact,
-      }) {
-    final isSelected = widget.selectedItem == d;
-
-    final maxLinesPolis = compact ? 2 : 1;
-
-    void triggerRow() {
-      if (widget.readOnly) return;
-      _showSuccessPopup(context, d);
-    }
-
-    return TableRow(
-      decoration: BoxDecoration(
-        color: (!widget.readOnly && isSelected)
-            ? primaryColor.withOpacity(0.3)
-            : (index.isEven ? pGrey : formGrey),
-      ),
-      children: [
-        if (!widget.readOnly)
-          Center(
-            child: CheckboxRadio(
-              value: isSelected,
-              onChanged: (checked) {
-                if (checked == true) {
-                  widget.onSelect(d.asetOthersId);
-                  widget.onSelectItem?.call(d);
-
-                  if (d.filePolisId.isNotEmpty) {
-                    widget.onSelectFilePolisHealthId(d.filePolisId);
-                  }
-                } else {
-                  widget.onUnselect(d.asetOthersId);
-                  widget.onClearSelectedItem?.call();
-
-                  if (d.filePolisId.isNotEmpty) {
-                    widget.onUnselectFilePolisHealthId(d.filePolisId);
-                  }
-                }
-              },
-            ),
-          )
-        else
-          const SizedBox(),
-
-        _textCell(d.nomor.toString(), center: true, softWrap: false),
-
-        _clickableTextCell(
-          d.polisNo,
-          onTap: triggerRow,
-          maxLines: maxLinesPolis,
-          softWrap: true,
+      columns: [
+        CobPolicyColumn<AsetothersCariModel>(
+          title: "NO POLIS",
+          valueGetter: (d) => d.polisNo,
+          normalFlex: 2.2,
+          compactWidth: 160,
+          normalMaxLines: 1,
+          compactMaxLines: 2,
+          normalSoftWrap: true,
+          compactSoftWrap: true,
         ),
 
-        _clickableTextCell(
-          "${d.jmlObject} ${d.satuan}",
-          onTap: triggerRow,
-          maxLines: 1,
-          softWrap: false,
+        CobPolicyColumn<AsetothersCariModel>(
+          title: "JUMLAH OBJEK",
+          valueGetter: (d) => "${d.jmlObject} ${d.satuan}",
+          normalFlex: 1.5,
+          compactWidth: 120,
+          normalMaxLines: 1,
+          compactMaxLines: 1,
+          normalSoftWrap: false,
+          compactSoftWrap: false,
         ),
 
-        _clickableTextCell(
-          "${formatDate(d.periodeMulai)} - ${formatDate(d.periodeAkhir)}",
-          onTap: triggerRow,
-          maxLines: 2,
-          softWrap: true,
+        CobPolicyColumn<AsetothersCariModel>(
+          title: "PERIODE",
+          valueGetter: (d) =>
+          "${cobPolicyFormatDate(d.periodeMulai)} - ${cobPolicyFormatDate(d.periodeAkhir)}",
+          normalFlex: 2.2,
+          compactWidth: 180,
+          normalMaxLines: 2,
+          compactMaxLines: 2,
+          normalSoftWrap: true,
+          compactSoftWrap: true,
         ),
 
-        _clickableTextCell(
-          d.tertanggung,
-          onTap: triggerRow,
-          maxLines: compact ? 2 : 1,
-          softWrap: true,
+        CobPolicyColumn<AsetothersCariModel>(
+          title: "TERTANGGUNG",
+          valueGetter: (d) => d.tertanggung,
+          normalFlex: 2.5,
+          compactWidth: 170,
+          normalMaxLines: 1,
+          compactMaxLines: 2,
+          normalSoftWrap: true,
+          compactSoftWrap: true,
         ),
 
-        _clickableTextCell(
-          "${d.curr} ${formatNum(d.sumInsured)}",
-          onTap: triggerRow,
-          maxLines: 1,
-          softWrap: false,
+        CobPolicyColumn<AsetothersCariModel>(
+          title: "NILAI PERTANGGUNGAN",
+          valueGetter: (d) =>
+          "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
+          normalFlex: 2.3,
+          compactWidth: 170,
+          normalMaxLines: 1,
+          compactMaxLines: 1,
+          normalSoftWrap: false,
+          compactSoftWrap: false,
         ),
 
-        _clickableTextCell(
-          "${d.curr} ${formatNum(d.premi)}",
-          onTap: triggerRow,
-          maxLines: 1,
-          softWrap: false,
+        CobPolicyColumn<AsetothersCariModel>(
+          title: "PREMI",
+          valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.premi)}",
+          normalFlex: 1.8,
+          compactWidth: 140,
+          normalMaxLines: 1,
+          compactMaxLines: 1,
+          normalSoftWrap: false,
+          compactSoftWrap: false,
         ),
       ],
-    );
-  }
-
-  Widget _clickableTextCell(
-      String text, {
-        required VoidCallback onTap,
-        int maxLines = 1,
-        bool softWrap = false,
-        bool center = false,
-      }) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: _textCell(
-        text,
-        maxLines: maxLines,
-        softWrap: softWrap,
-        center: center,
-      ),
     );
   }
 
@@ -544,13 +241,6 @@ class _KargoCobTableState extends State<KargoCobTable> {
           ),
         );
       },
-    );
-  }
-
-  Widget _cell({required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.all(6),
-      child: child,
     );
   }
 }

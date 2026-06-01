@@ -71,7 +71,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
       case "10005":
         return "Nama";
       default:
-        return "Cari...";
+        return "No Polis/Tertanggung";
     }
   }
 
