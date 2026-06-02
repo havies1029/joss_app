@@ -29,21 +29,10 @@ class InvoiceDownloadApi {
     final response = await http.get(
       uri,
       headers: {
-        "Authorization": _bearerToken(), // 🔥 token dari dalam class ini
+        "Authorization": _bearerToken(),
         "Accept": "image/*",
       },
     );
-
-    // 🔍 DEBUG
-    debugPrint("====== DOWNLOAD INVOICE DEBUG ======");
-    debugPrint("URL         : $uri");
-    debugPrint("TOKEN LEN   : ${_token?.length}");
-    debugPrint("STATUS CODE : ${response.statusCode}");
-    debugPrint("CONTENTTYPE : ${response.headers['content-type']}");
-    debugPrint("HEADERS     : ${response.headers}");
-    debugPrint("BODY STRING : ${response.body}"); // kalau json error bakal kebaca
-    debugPrint("BODY BYTES  : ${response.bodyBytes.length} bytes");
-    debugPrint("====================================");
 
     return response;
   }

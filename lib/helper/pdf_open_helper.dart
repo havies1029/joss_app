@@ -58,4 +58,24 @@ class PdfOpenHelper {
       throw Exception(result.message);
     }
   }
+
+  Future<void> openFilePdf({
+    required String filePath,
+  }) async {
+    if (filePath.trim().isEmpty) {
+      throw Exception('Path PDF kosong');
+    }
+
+    final file = File(filePath);
+
+    if (!await file.exists()) {
+      throw Exception('File PDF tidak ditemukan: $filePath');
+    }
+
+    final result = await OpenFilex.open(file.path);
+
+    if (result.type != ResultType.done) {
+      throw Exception(result.message);
+    }
+  }
 }

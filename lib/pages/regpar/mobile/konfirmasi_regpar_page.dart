@@ -9,11 +9,16 @@ import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_me
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
 import '../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../blocs/quopdf/quopdf_bloc.dart';
+import '../../../blocs/quopdf/quopdf_event.dart';
+import '../../../blocs/quopdf/quopdf_state.dart';
 import '../../../blocs/regpar/regpar1list_bloc.dart';
 import '../../../blocs/regpar/regpar2form_bloc.dart';
 import '../../../blocs/regpar/regpar3form_bloc.dart';
 import '../../../blocs/regpar/regpar4form_bloc.dart';
 import '../../../common/loading_indicator.dart';
+import '../../../helper/navigation_keys.dart';
+import '../../../helper/pdf_open_helper.dart';
 import '../../../models/regpar/regpar2form_model.dart';
 import '../../../models/regpar/regpar3form_model.dart';
 import '../../../models/regpar/regpar4form_model.dart';
@@ -77,6 +82,28 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
         ),
       ),
     );
+  }
+
+  void _showPdfLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(
+          child: LoadingIndicator(),
+        ),
+      ),
+    );
+  }
+
+  void _closePdfLoadingDialog(BuildContext context) {
+    final navigator = Navigator.of(context, rootNavigator: true);
+
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   Future<bool?> showExitConfirmDialog(BuildContext context) {
@@ -222,7 +249,14 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
       context.read<Regpar1CrudBloc>().add(
         Regpar1CrudHapusEvent(recordId:  widget.recordId ?? ""),
       );
-      Navigator.pop(context);
+
+      final homeState = homeTabKey.currentState;
+
+      if (homeState != null) {
+        homeState.goToHeroPage();
+      }
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -323,6 +357,41 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 ),
               );
             }
+        ),
+
+        BlocListener<QuotationPdfBloc, QuotationPdfState>(
+          listener: (context, state) async {
+            if (state is QuotationPdfLoading) {
+              _showPdfLoadingDialog(context);
+              return;
+            }
+
+            if (state is QuotationPdfLoaded) {
+              _closePdfLoadingDialog(context);
+
+              try {
+                await PdfOpenHelper().openFilePdf(
+                  filePath: state.filePath,
+                );
+              } catch (e) {
+                debugPrint('Gagal buka quotation PDF: $e');
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar("Gagal membuka PDF penawaran."),
+                );
+              }
+
+              return;
+            }
+
+            if (state is QuotationPdfError) {
+              _closePdfLoadingDialog(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar("Gagal mengunduh PDF penawaran."),
+              );
+            }
+          },
         ),
 
         _buildGenericListener<Regpar1CrudBloc, Regpar1CrudState, Regpar1CrudModel>(
@@ -494,23 +563,64 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   // ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                    child: AppButton.iconLeft(
-                      text: "Lihat Penawaran PDF",
+                    child: regpar3Record == null
+                        ? const Center(
+                      child: LoadingIndicator(),
+                    )
+                        : (regpar3Record?.isEq == true)
+                        ? Row(
+                      children: [
+                        Expanded(
+                          child: AppButton.iconLeft(
+                            text: "Lihat Penawaran PAR",
+                            backgroundColor: pdfRed,
+                            onPressed: isSubmitting
+                                ? null
+                                : () {
+                              context.read<QuotationPdfBloc>().add(
+                                DownloadQuotationPdfEvent(
+                                  quotationType: "par",
+                                  quotationNo: widget.recordId ?? "",
+                                ),
+                              );
+                            },
+                            icon: _pdfIcon(),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AppButton.iconLeft(
+                            text: "Lihat Penawaran PAREQ",
+                            backgroundColor: pdfRed,
+                            onPressed: isSubmitting
+                                ? null
+                                : () {
+                              context.read<QuotationPdfBloc>().add(
+                                DownloadQuotationPdfEvent(
+                                  quotationType: "pareq",
+                                  quotationNo: widget.recordId ?? "",
+                                ),
+                              );
+                            },
+                            icon: _pdfIcon(),
+                          ),
+                        ),
+                      ],
+                    )
+                        : AppButton.iconLeft(
+                      text: "Lihat Penawaran PAR",
                       backgroundColor: pdfRed,
                       onPressed: isSubmitting
                           ? null
-                          : () async {
-                        // TODO: open pdf
+                          : () {
+                        context.read<QuotationPdfBloc>().add(
+                          DownloadQuotationPdfEvent(
+                            quotationType: "par",
+                            quotationNo: widget.recordId ?? "",
+                          ),
+                        );
                       },
-                      icon: SvgPicture.asset(
-                        'assets/icons/icon_pdf.svg',
-                        width: 18,
-                        height: 18,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
+                      icon: _pdfIcon(),
                     ),
                   ),
 
@@ -619,6 +729,18 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _pdfIcon() {
+    return SvgPicture.asset(
+      'assets/icons/icon_pdf.svg',
+      width: 18,
+      height: 18,
+      colorFilter: const ColorFilter.mode(
+        Colors.white,
+        BlendMode.srcIn,
       ),
     );
   }

@@ -1,7 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/apis/quopdf/quopdf_api.dart';
 import 'package:joss_app/blocs/quopdf/quopdf_event.dart';
 import 'package:joss_app/blocs/quopdf/quopdf_state.dart';
+
+import '../../repositories/quopdf/quopdf_repository.dart';
 
 class QuotationPdfBloc extends Bloc<QuotationPdfEvent, QuotationPdfState> {
   QuotationPdfBloc() : super(QuotationPdfInitial()) {
@@ -9,13 +10,15 @@ class QuotationPdfBloc extends Bloc<QuotationPdfEvent, QuotationPdfState> {
   }
 
   Future<void> _downloadQuotationPdf(
-    DownloadQuotationPdfEvent event,
-    Emitter<QuotationPdfState> emit,
-  ) async {
+      DownloadQuotationPdfEvent event,
+      Emitter<QuotationPdfState> emit,
+      ) async {
     try {
       emit(QuotationPdfLoading());
 
-      final file = await QuotationPdfAPI().downloadQuotationPdfAPI(
+      final repo = QuotationPdfRepository();
+
+      final file = await repo.downloadQuotationPdf(
         event.quotationType,
         event.quotationNo,
       );

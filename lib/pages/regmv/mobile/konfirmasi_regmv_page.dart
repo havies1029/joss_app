@@ -11,6 +11,12 @@ import '../../../blocs/gen_regmv/regmv1list_bloc.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv3form_bloc.dart';
 import '../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../blocs/quopdf/quopdf_bloc.dart';
+import '../../../blocs/quopdf/quopdf_event.dart';
+import '../../../blocs/quopdf/quopdf_state.dart';
+import '../../../common/loading_indicator.dart';
+import '../../../helper/navigation_keys.dart';
+import '../../../helper/pdf_open_helper.dart';
 import '../../../models/gen_regmv/regmv1crud_model.dart';
 import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
@@ -224,7 +230,36 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
       context.read<Regmv1CrudBloc>().add(
         Regmv1CrudHapusEvent(recordId: widget.recordId ?? ""),
       );
-      Navigator.pop(context);
+
+      final homeState = homeTabKey.currentState;
+
+      if (homeState != null) {
+        homeState.goToHeroPage();
+      }
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
+  void _showPdfLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(
+          child: LoadingIndicator(),
+        ),
+      ),
+    );
+  }
+
+  void _closePdfLoadingDialog(BuildContext context) {
+    final navigator = Navigator.of(context, rootNavigator: true);
+
+    if (navigator.canPop()) {
+      navigator.pop();
     }
   }
 
@@ -305,6 +340,45 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
             //   );
             // }
+          },
+        ),
+
+        BlocListener<QuotationPdfBloc, QuotationPdfState>(
+          listener: (context, state) async {
+            if (state is QuotationPdfLoading) {
+              _showPdfLoadingDialog(context);
+              return;
+            }
+
+            if (state is QuotationPdfLoaded) {
+              _closePdfLoadingDialog(context);
+
+              try {
+                await PdfOpenHelper().openFilePdf(
+                  filePath: state.filePath,
+                );
+              } catch (e) {
+                debugPrint('Gagal buka quotation PDF: $e');
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar(
+                    "Gagal membuka PDF penawaran.",
+                  ),
+                );
+              }
+
+              return;
+            }
+
+            if (state is QuotationPdfError) {
+              _closePdfLoadingDialog(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                  "Gagal mengunduh PDF penawaran.",
+                ),
+              );
+            }
           },
         ),
 
@@ -485,8 +559,13 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                       backgroundColor: pdfRed,
                       onPressed: isSubmitting
                           ? null
-                          : () async {
-                        // TODO: open pdf
+                          : () {
+                        context.read<QuotationPdfBloc>().add(
+                          DownloadQuotationPdfEvent(
+                            quotationType: "mv",
+                            quotationNo: widget.recordId ?? "",
+                          ),
+                        );
                       },
                       icon: SvgPicture.asset(
                         'assets/icons/icon_pdf.svg',

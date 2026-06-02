@@ -204,6 +204,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   final fieldPremiTsfwdController = TextEditingController();
   //form4
 
+  void _initForm2DefaultZero() {
+    fieldSiBuildingController.text = "0";
+    fieldSiContentController.text = "0";
+    fieldSiMachineryController.text = "0";
+    fieldSiOtherController.text = "0";
+    fieldSiStockController.text = "0";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -224,6 +232,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     });
 
     fieldCoverBulanController.text = "12";
+
+    _initForm2DefaultZero();
 
     expanded = List.filled(CalparFormSection.values.length, false);
     expanded[sectionIndex(CalparFormSection.form1)] = true;
@@ -293,7 +303,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       final jnsCoverPar = record.comboMJnscoverPar;
       if (fieldComboMJnscoverPar == null && jnsCoverPar != null) {
         fieldComboMJnscoverPar = jnsCoverPar;
-        _applyCoverParRule(jnsCoverPar.mjnscoverparId); // ✅ sync dari data
+        _applyCoverParRule(jnsCoverPar.mjnscoverparId);
       }
 
       final konstruksi = record.comboRKonstruksiojk;

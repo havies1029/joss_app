@@ -110,6 +110,8 @@ import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
 
 import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
+import 'package:joss_app/repositories/quopdf/quopdf_repository.dart';
+
 
 // Blocs / Cubits
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
@@ -196,6 +198,7 @@ import 'blocs/perbaruiklaimmv/klaimmvstatuscrud_bloc.dart';
 import 'blocs/perbaruiklaimpar/klaimpar_tanggal_bloc.dart';
 import 'blocs/perbaruiklaimpar/klaimparaccordion_bloc.dart';
 import 'blocs/perbaruiklaimpar/klaimparklaimcrud_bloc.dart';
+import 'blocs/quopdf/quopdf_bloc.dart';
 import 'blocs/regendors/regendorscari_bloc.dart';
 import 'blocs/regendors/regendors1form_bloc.dart';
 import 'blocs/regendors/regendors2cari_bloc.dart';
@@ -684,6 +687,9 @@ Future<void> main() async {
 
         //logo client
         BlocProvider(create: (context) => MlogoclientCariBloc()),
+
+        //quotation pdf
+        BlocProvider(create: (context) => QuotationPdfBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

@@ -1,4 +1,4 @@
-abstract class QuotationPdfState {}
+abstract class  QuotationPdfState {}
 
 class QuotationPdfInitial extends QuotationPdfState {}
 
