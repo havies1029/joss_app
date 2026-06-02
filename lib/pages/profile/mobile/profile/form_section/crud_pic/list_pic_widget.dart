@@ -81,6 +81,12 @@ class _ListPicWidgetState extends State<ListPicWidget> {
     );
   }
 
+  void _clearSelectedCob() {
+    rekanPicCobCariBloc.add(
+      const ResetSelectedCOBRekanPicCobEvent(),
+    );
+  }
+
   Widget _buildCobList() {
     return BlocConsumer<RekanPicCobCariBloc, RekanPicCobCariState>(
       listener: (context, state) {
@@ -323,7 +329,7 @@ class _ListPicWidgetState extends State<ListPicWidget> {
                       ),
                       const SizedBox(width: 8),
                       GestureDetector(
-                        onTap: _refreshList,
+                        onTap: _clearSelectedCob,
                         child: Container(
                           height: 44,
                           padding: const EdgeInsets.symmetric(horizontal: 14),

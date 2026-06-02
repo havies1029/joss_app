@@ -29,6 +29,8 @@ class KargoCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
+  final String statusId;
+
   const KargoCobTable({
     super.key,
     required this.items,
@@ -44,6 +46,7 @@ class KargoCobTable extends StatefulWidget {
     this.readOnly = false,
     this.showFooter = true,
     this.title,
+    required this.statusId,
   });
 
   @override
@@ -60,44 +63,10 @@ class _KargoCobTableState extends State<KargoCobTable> {
     return DateFormat('dd MMM yyyy').format(date);
   }
 
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   final width = MediaQuery.of(context).size.width;
-  //   final bool isNarrow = width < 900;
-  //
-  //   final items = _filteredItems;
-  //
-  //   if (items.isEmpty) {
-  //     return const Center(child: Text("Data kosong"));
-  //   }
-  //
-  //   return SingleChildScrollView(
-  //     controller: vController,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         if (widget.title != null) ...[
-  //           Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //             child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-  //           ),
-  //           const SizedBox(height: hPadding),
-  //         ],
-  //         Padding(
-  //           padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //           child: isNarrow
-  //               ? _buildDetailTableCompact(context, items)
-  //               : _buildDetailTableNormal(context, items),
-  //         ),
-  //         const SizedBox(height: hPadding),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final showColumn = widget.statusId == "10002";
+
     return CobPolicyTable<AsetothersCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
@@ -120,6 +89,10 @@ class _KargoCobTableState extends State<KargoCobTable> {
       onClearSelectedItem: widget.onClearSelectedItem,
 
       onSelectExtra: (d) {
+        if (d.prosesId.isNotEmpty) {
+          widget.selectedProsesId(d.prosesId);
+        }
+
         if (d.filePolisId.isNotEmpty) {
           widget.onSelectFilePolisHealthId(d.filePolisId);
         }
@@ -136,11 +109,21 @@ class _KargoCobTableState extends State<KargoCobTable> {
       },
 
       columns: [
+        if (showColumn)
+          CobPolicyColumn<AsetothersCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
+
         CobPolicyColumn<AsetothersCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: 2.2,
-          compactWidth: 160,
+          normalFlex: showColumn ? 1.2 : 2.2,
+          compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
           normalSoftWrap: true,
@@ -183,8 +166,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
         CobPolicyColumn<AsetothersCariModel>(
           title: "NILAI PERTANGGUNGAN",
-          valueGetter: (d) =>
-          "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
+          valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
           normalFlex: 2.3,
           compactWidth: 170,
           normalMaxLines: 1,

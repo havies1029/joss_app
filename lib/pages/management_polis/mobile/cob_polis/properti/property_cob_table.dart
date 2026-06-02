@@ -174,45 +174,6 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
     );
   }
 
-  /*
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 900;
-
-    final showColumn = widget.statusId == "10002";
-
-    final items = _filteredItems;
-
-    if (items.isEmpty) {
-      return const Center(child: Text("Data kosong"));
-    }
-
-    return SingleChildScrollView(
-      controller: vController,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.title != null) ...[
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-              child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-            ),
-            const SizedBox(height: hPadding),
-          ],
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-            child: isNarrow
-                ? _buildDetailTableCompact(context, items, showColumn)
-                : _buildDetailTableNormal(context, items, showColumn),
-          ),
-          const SizedBox(height: hPadding),
-        ],
-      ),
-    );
-  }
-  */
-
   void _showSuccessPopup(BuildContext context, AsetParCariModel d) {
     final asetParId = d.asetParId.trim();
 

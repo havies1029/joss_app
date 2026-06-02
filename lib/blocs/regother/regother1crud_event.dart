@@ -63,3 +63,9 @@ class SelectButton extends Regother1CrudEvents {
 	List<Object> get props => [id, namaCob];
 }
 
+class ResetSelectedCobEvent extends Regother1CrudEvents {
+	const ResetSelectedCobEvent();
+
+	@override
+	List<Object> get props => [];
+}

@@ -28,6 +28,8 @@ class HullCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
+  final String statusId;
+
   const HullCobTable({
     super.key,
     required this.items,
@@ -40,6 +42,7 @@ class HullCobTable extends StatefulWidget {
     required this.onUnselectFilePolisHullId,
     required this.selectedItem,
     required this.onClearSelectedItem,
+    required this.statusId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -58,43 +61,10 @@ class _HullCobTableState extends State<HullCobTable> {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final width = MediaQuery.of(context).size.width;
-  //   final bool isNarrow = width < 900;
-  //
-  //   final items = _filteredItems;
-  //
-  //   if (items.isEmpty) {
-  //     return const Center(child: Text("Data kosong"));
-  //   }
-  //
-  //   return SingleChildScrollView(
-  //     controller: vController,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         if (widget.title != null) ...[
-  //           Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //             child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-  //           ),
-  //           const SizedBox(height: hPadding),
-  //         ],
-  //         Padding(
-  //           padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //           child: isNarrow
-  //               ? _buildDetailTableCompact(context, items)
-  //               : _buildDetailTableNormal(context, items),
-  //         ),
-  //         const SizedBox(height: hPadding),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final showColumn = widget.statusId == "10002";
+
     return CobPolicyTable<AsethullCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
@@ -117,6 +87,10 @@ class _HullCobTableState extends State<HullCobTable> {
       onClearSelectedItem: widget.onClearSelectedItem,
 
       onSelectExtra: (d) {
+        if (d.prosesId.isNotEmpty) {
+          widget.selectedProsesId(d.prosesId);
+        }
+
         if (d.filePolisId.isNotEmpty) {
           widget.onSelectFilePolisHullId(d.filePolisId);
         }
@@ -133,11 +107,21 @@ class _HullCobTableState extends State<HullCobTable> {
       },
 
       columns: [
+        if (showColumn)
+          CobPolicyColumn<AsethullCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
+
         CobPolicyColumn<AsethullCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: 2.0,
-          compactWidth: 140,
+          normalFlex: showColumn ? 1.2 : 2.0,
+          compactWidth: showColumn ? 120 : 140,
           normalMaxLines: 1,
           compactMaxLines: 2,
           normalSoftWrap: true,

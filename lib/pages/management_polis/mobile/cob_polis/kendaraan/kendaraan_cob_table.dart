@@ -25,6 +25,8 @@ class KendaraanCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
+  final String statusId;
+
   const KendaraanCobTable({
     super.key,
     required this.items,
@@ -37,6 +39,7 @@ class KendaraanCobTable extends StatefulWidget {
     required this.onUnselectFilePolisMvId,
     required this.selectedItem,
     required this.onClearSelectedItem,
+    required this.statusId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -45,44 +48,15 @@ class KendaraanCobTable extends StatefulWidget {
   @override
   State<KendaraanCobTable> createState() => _KendaraanCobTableState();
 }
+
 class _KendaraanCobTableState extends State<KendaraanCobTable> {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final width = MediaQuery.of(context).size.width;
-  //   final bool isNarrow = width < 900;
-  //
-  //   final items = _filteredItems;
-  //   if (items.isEmpty) return const Center(child: Text("Data kosong"));
-  //
-  //   return SingleChildScrollView(
-  //     controller: vController,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         if (widget.title != null) ...[
-  //           Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //             child: Text(widget.title!, style: headingStyle(context, fontSize: 14)),
-  //           ),
-  //           const SizedBox(height: hPadding),
-  //         ],
-  //         Padding(
-  //           padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //           child: isNarrow
-  //               ? _buildDetailTableCompact(context, items)
-  //               : _buildDetailTableNormal(context, items),
-  //         ),
-  //         const SizedBox(height: hPadding),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final showColumn = widget.statusId == "10002";
+
     return CobPolicyTable<AsetMvCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
@@ -105,6 +79,10 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       onClearSelectedItem: widget.onClearSelectedItem,
 
       onSelectExtra: (d) {
+        if (d.prosesId.isNotEmpty) {
+          widget.selectedProsesId(d.prosesId);
+        }
+
         if (d.filePolisId.isNotEmpty) {
           widget.onSelectFilePolisMvId(d.filePolisId);
         }
@@ -121,11 +99,21 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       },
 
       columns: [
+        if (showColumn)
+          CobPolicyColumn<AsetMvCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
+
         CobPolicyColumn<AsetMvCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: 2.0,
-          compactWidth: 160,
+          normalFlex: showColumn ? 1.2 : 2.0,
+          compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
           normalSoftWrap: true,
@@ -168,8 +156,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
 
         CobPolicyColumn<AsetMvCariModel>(
           title: "NILAI PERTANGGUNGAN",
-          valueGetter: (d) =>
-          "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
+          valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
           normalFlex: 2.4,
           compactWidth: 170,
           normalMaxLines: 1,

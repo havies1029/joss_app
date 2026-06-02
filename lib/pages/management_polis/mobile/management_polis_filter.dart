@@ -60,18 +60,32 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     super.dispose();
   }
 
-  String _hintByCob(String cobId) {
-    switch (cobId) {
-      case "10002":
-        return "Tertanggung/No Polis";
-      case "10003":
-        return "Tertanggung/No Polis/Merk";
-      case "10004":
-        return "Nama Kapal";
-      case "10005":
-        return "Nama";
-      default:
-        return "No Polis/Tertanggung";
+String _hintByCob(String cobId, String statusCobId) {
+  switch (cobId) {
+    case "10002":
+      return statusCobId == "10002"
+          ? "No Proses/Tertanggung/No Polis"
+          : "Tertanggung/No Polis";
+
+    case "10003":
+      return statusCobId == "10002"
+          ? "No Proses/Tertanggung/No Polis/Merk"
+          : "Tertanggung/No Polis/Merk";
+
+    case "10004":
+      return statusCobId == "10002"
+          ? "No Proses/No Polis/Tertanggung"
+          : "No Polis/Tertanggung";
+
+    case "10005":
+      return statusCobId == "10002"
+          ? "No Proses/No Polis/Tertanggung"
+          : "No Polis/Tertanggung";
+
+    default:
+      return statusCobId == "10002"
+          ? "No Proses/No Polis/Tertanggung"
+          : "No Polis/Tertanggung";
     }
   }
 
@@ -138,6 +152,9 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             BlocSelector<CobManPolBloc, CobManPolState, String>(
               selector: (state) => state.selectedCOBId,
               builder: (context, selectedCobId) {
+                final selectedStatusCobId =
+                    context.watch<StatusAsetCariBloc>().state.selectedStatusId;
+
                 final hideSearch = selectedCobId == "10001";
 
                 return Row(
@@ -151,7 +168,10 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
                         child: ListPageFilterBarUIWidget(
                           searchController: _searchController,
                           searchButton: buildSearchButton(),
-                          hintText: _hintByCob(selectedCobId),
+                          hintText: _hintByCob(
+                            selectedCobId,
+                            selectedStatusCobId,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -319,6 +339,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             items: s.items,
             selectedIds: s.selectedIds.toList(),
             selectedItem: s.selectedItem,
+            statusId: statusId,
             onClearSelectedItem: () {
               context.read<AsetMvCariBloc>().add(ClearSelectedMvItemEvent());
             },
@@ -362,6 +383,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             items: s.items,
             selectedIds: s.selectedIds.toList(),
             selectedItem: s.selectedItem,
+            statusId: statusId,
             onClearSelectedItem: () {
               context.read<AsethullCariBloc>().add(ClearSelectedHullItemEvent());
             },
@@ -405,6 +427,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             items: s.items,
             selectedIds: s.selectedIds.toList(),
             selectedItem: s.selectedItem,
+            statusId: statusId,
             onClearSelectedItem: () {
               context.read<AsetHealthCariBloc>().add(ClearSelectedHealthItemEvent());
             },
@@ -448,6 +471,7 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
             items: s.items,
             selectedIds: s.selectedIds.toList(),
             selectedItem: s.selectedItem,
+            statusId: statusId,
             onClearSelectedItem: () {
               context.read<AsetothersCariBloc>().add(ClearSelectedOthersItemEvent());
             },

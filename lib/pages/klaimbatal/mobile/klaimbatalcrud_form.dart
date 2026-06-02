@@ -5,6 +5,7 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/klaimbatal/klaimbatalcrud_model.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 
+import '../../../blocs/klaimrinci/mstatusrincicari_bloc.dart';
 import '../../gen_klaim/mobile/klaim_main_page.dart';
 import '../../perbaruiklaimpar/mobile/perbaruisuccess_page.dart';
 
@@ -53,6 +54,10 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
     return BlocConsumer<KlaimbatalcrudBloc, KlaimbatalcrudState>(
       listener: (context, state) {
         if (state.isSaved || !state.hasFailure) {
+          context.read<MstatusrinciCariBloc>().add(
+            SelectedIdChanged("30"),
+          );
+
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => PerbaruiSuccessPage(

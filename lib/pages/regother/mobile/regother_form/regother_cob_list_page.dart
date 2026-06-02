@@ -9,6 +9,7 @@ import 'package:joss_app/widgets/apptheme/radio_button.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 
 import '../../../../blocs/regother/regother1crud_bloc.dart';
+import '../../../../helper/navigation_keys.dart';
 import '../../../../widgets/apptheme/empty_state_page.dart';
 
 class CobCariPage extends StatefulWidget {
@@ -96,7 +97,12 @@ class _CobCariPageState extends State<CobCariPage> {
   }
 
   void _submitSelectedCob() {
-    if (_selectedCobModel == null) return;
+    if (_selectedCobModel == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar("Silakan pilih kategori asuransi terlebih dahulu"),
+      );
+      return;
+    }
 
     Navigator.pop(context, _selectedCobModel);
   }
@@ -107,64 +113,94 @@ class _CobCariPageState extends State<CobCariPage> {
           (bloc) => bloc.state.selectedCOBId,
     );
 
-    return BaseBackgroundSidePage(
-      title: "Kategori Asuransi",
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: secondaryBlackColor,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 10,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListPageFilterBarUIWidget(
-              searchController: _searchController,
-              searchButton: _buildSearchButton(),
-              hintText: "Cari kategori asuransi...",
-            ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
 
-            const SizedBox(height: 12),
+        context.read<Regother1CrudBloc>().add(
+          const ResetSelectedCobEvent(),
+        );
 
-            Expanded(
-              child: FutureBuilder<List<ComboMCobApp1Model>>(
-                future: _futureData,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _buildLoading();
-                  }
+        Navigator.pop(context);
+      },
+      child: BaseBackgroundSidePage(
+        title: "Kategori Asuransi",
+        onBack: () {
+          context.read<Regother1CrudBloc>().add(
+            const ResetSelectedCobEvent(),
+          );
 
-                  if (snapshot.hasError) {
-                    return _buildError(snapshot.error);
-                  }
+          Navigator.pop(context);
+        },
+        onHome: () {
+          context.read<Regother1CrudBloc>().add(
+            const ResetSelectedCobEvent(),
+          );
 
-                  final items = _filterExcludedCob(snapshot.data ?? []);
+          final homeState = homeTabKey.currentState;
 
-                  if (items.isEmpty) {
-                    return _buildEmpty();
-                  }
+          if (homeState != null) {
+            homeState.goToHeroPage();
+          }
 
-                  _syncSelectedModel(
-                    items: items,
-                    selectedId: selectedId,
-                  );
-
-                  return _buildCobList(
-                    items: items,
-                    selectedId: selectedId,
-                  );
-                },
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: secondaryBlackColor,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 10,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListPageFilterBarUIWidget(
+                searchController: _searchController,
+                searchButton: _buildSearchButton(),
+                hintText: "Cari kategori asuransi...",
               ),
-            ),
 
-            const SizedBox(height: 15),
+              const SizedBox(height: 12),
 
-            _buildSubmitButton(),
+              Expanded(
+                child: FutureBuilder<List<ComboMCobApp1Model>>(
+                  future: _futureData,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return _buildLoading();
+                    }
 
-            const SizedBox(height: 20),
-          ],
+                    if (snapshot.hasError) {
+                      return _buildError(snapshot.error);
+                    }
+
+                    final items = _filterExcludedCob(snapshot.data ?? []);
+
+                    if (items.isEmpty) {
+                      return _buildEmpty();
+                    }
+
+                    _syncSelectedModel(
+                      items: items,
+                      selectedId: selectedId,
+                    );
+
+                    return _buildCobList(
+                      items: items,
+                      selectedId: selectedId,
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: vPadding),
+
+              _buildSubmitButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -214,9 +250,17 @@ class _CobCariPageState extends State<CobCariPage> {
   Widget _buildSubmitButton() {
     return AppButton.primary(
       text: "Lanjut",
-      onPressed: _selectedCobModel == null
-          ? null
-          : _submitSelectedCob,
+      onPressed: _submitSelectedCob,
+    );
+  }
+
+  void _resetSelectedCob() {
+    setState(() {
+      _selectedCobModel = null;
+    });
+
+    context.read<Regother1CrudBloc>().add(
+      SelectButton('', ''),
     );
   }
 

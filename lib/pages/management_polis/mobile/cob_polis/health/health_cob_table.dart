@@ -27,6 +27,8 @@ class HealthCobTable extends StatefulWidget {
   final bool showFooter;
   final String? title;
 
+  final String statusId;
+
   const HealthCobTable({
     super.key,
     required this.items,
@@ -39,6 +41,7 @@ class HealthCobTable extends StatefulWidget {
     required this.onUnselect,
     required this.onSelectFilePolisHealthId,
     required this.onUnselectFilePolisHealthId,
+    required this.statusId,
     this.readOnly = false,
     this.showFooter = true,
     this.title,
@@ -58,46 +61,10 @@ class _HealthCobTableState extends State<HealthCobTable> {
     return DateFormat('dd MMM yyyy').format(date);
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final width = MediaQuery.of(context).size.width;
-  //   final bool isNarrow = width < 900;
-  //
-  //   final items = _filteredItems;
-  //
-  //   if (items.isEmpty) {
-  //     return const Center(child: Text("Data kosong"));
-  //   }
-  //
-  //   return SingleChildScrollView(
-  //     controller: vController,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         if (widget.title != null) ...[
-  //           Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //             child: Text(
-  //               widget.title!,
-  //               style: headingStyle(context, fontSize: 14),
-  //             ),
-  //           ),
-  //           const SizedBox(height: hPadding),
-  //         ],
-  //         Padding(
-  //           padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-  //           child: isNarrow
-  //               ? _buildDetailTableCompact(context, items)
-  //               : _buildDetailTableNormal(context, items),
-  //         ),
-  //         const SizedBox(height: hPadding),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final showColumn = widget.statusId == "10002";
+
     return CobPolicyTable<AsetHealthCariModel>(
       items: widget.items,
       selectedIds: widget.selectedIds,
@@ -120,6 +87,10 @@ class _HealthCobTableState extends State<HealthCobTable> {
       onClearSelectedItem: widget.onClearSelectedItem,
 
       onSelectExtra: (d) {
+        if (d.prosesId.isNotEmpty) {
+          widget.selectedProsesId(d.prosesId);
+        }
+
         if (d.filePolisId.isNotEmpty) {
           widget.onSelectFilePolisHealthId(d.filePolisId);
         }
@@ -136,14 +107,25 @@ class _HealthCobTableState extends State<HealthCobTable> {
       },
 
       columns: [
+        if (showColumn)
+          CobPolicyColumn<AsetHealthCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
+
         CobPolicyColumn<AsetHealthCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: 2.0,
-          compactWidth: 160,
+          normalFlex: showColumn ? 1.2 : 2.0,
+          compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
         ),
+
         CobPolicyColumn<AsetHealthCariModel>(
           title: "JUMLAH OBJEK",
           valueGetter: (d) => "${d.jmlObject} ${d.satuan}",
@@ -152,6 +134,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
           normalSoftWrap: false,
           compactSoftWrap: false,
         ),
+
         CobPolicyColumn<AsetHealthCariModel>(
           title: "PERIODE",
           valueGetter: (d) =>
@@ -161,6 +144,7 @@ class _HealthCobTableState extends State<HealthCobTable> {
           normalMaxLines: 2,
           compactMaxLines: 2,
         ),
+
         CobPolicyColumn<AsetHealthCariModel>(
           title: "TERTANGGUNG",
           valueGetter: (d) => d.tertanggung,
@@ -169,15 +153,16 @@ class _HealthCobTableState extends State<HealthCobTable> {
           normalMaxLines: 1,
           compactMaxLines: 2,
         ),
+
         CobPolicyColumn<AsetHealthCariModel>(
           title: "NILAI PERTANGGUNGAN",
-          valueGetter: (d) =>
-          "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
+          valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.sumInsured)}",
           normalFlex: 2.2,
           compactWidth: 170,
           normalSoftWrap: false,
           compactSoftWrap: false,
         ),
+
         CobPolicyColumn<AsetHealthCariModel>(
           title: "PREMI",
           valueGetter: (d) => "${d.curr} ${cobPolicyFormatNum(d.premi)}",

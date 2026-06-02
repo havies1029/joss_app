@@ -107,15 +107,38 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
   void didUpdateWidget(covariant FloatingActionMenuWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final actionsChanged = oldWidget.availableActions != widget.availableActions;
-    final selectionChanged = oldWidget.selectedItems.length != widget.selectedItems.length;
+    final actionsChanged =
+        oldWidget.availableActions.length != widget.availableActions.length ||
+            !_sameActionStates(oldWidget.availableActions, widget.availableActions);
+
+    final selectionChanged =
+        oldWidget.selectedItems.length != widget.selectedItems.length;
 
     if (actionsChanged || selectionChanged) {
       if (_isExpanded) {
-        _isExpanded = false;
-        _animationController.reverse();
+        _toggleMenu();
       }
     }
+  }
+
+  bool _sameActionStates(
+      List<ActionMenuItem> oldActions,
+      List<ActionMenuItem> newActions,
+      ) {
+    if (oldActions.length != newActions.length) return false;
+
+    for (var i = 0; i < oldActions.length; i++) {
+      final oldAction = oldActions[i];
+      final newAction = newActions[i];
+
+      if (oldAction.type != newAction.type ||
+          oldAction.isEnabled != newAction.isEnabled ||
+          oldAction.label != newAction.label) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @override
@@ -190,9 +213,19 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 backgroundColor: mainFabColor,
                 onPressed: _toggleMenu,
                 shape: const CircleBorder(),
-                child: Icon(
-                  _isExpanded ? Icons.close : Icons.add,
-                  color: primaryLightColor,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  transitionBuilder: (child, animation) {
+                    return ScaleTransition(
+                      scale: animation,
+                      child: child,
+                    );
+                  },
+                  child: Icon(
+                    _isExpanded ? Icons.close : Icons.add,
+                    key: ValueKey<bool>(_isExpanded),
+                    color: primaryLightColor,
+                  ),
                 ),
               ),
             ),

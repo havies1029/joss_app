@@ -319,6 +319,7 @@ flutter:
     - assets/icons/teknik_jps.svg
     - assets/icons/marketing_jps.svg
     - assets/icons/icon_pdf.svg
+    - assets/icons/regother_ajukan.svg
 
   fonts:
     - family: Delm-Regular

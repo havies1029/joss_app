@@ -21,6 +21,20 @@ class Regother1CrudBloc extends Bloc<Regother1CrudEvents, Regother1CrudState> {
 			emit(Regother1CrudState.initial());
 		});
 		on<SelectButton>(onSelectButton);
+		on<ResetSelectedCobEvent>(onResetSelectedCob);
+	}
+
+	Future<void> onResetSelectedCob(
+			ResetSelectedCobEvent event,
+			Emitter<Regother1CrudState> emit,
+			) async {
+		emit(state.copyWith(
+			selectedCOBId: '',
+			namaCob: '',
+			comboMCobApp1: null,
+			isSaved: false,
+			hasFailure: false,
+		));
 	}
 
 	Future<void> onSelectButton(

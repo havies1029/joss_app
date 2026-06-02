@@ -460,18 +460,18 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.white,
-                  size: 40,
+                SvgPicture.asset(
+                  'assets/icons/regother_ajukan.svg',
+                  width: 40,
+                  height: 40,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: hPadding),
                 Text(
                   "Pengajuan diproses tim internal.",
                   textAlign: TextAlign.center,
                   style: headingStyle(context, fontSize: 17.49),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: hPadding),
                 AppButton.primary(
                   text: 'Ajukan Sekarang',
                   backgroundColor: const Color(0xFF0ED7FF),
@@ -499,6 +499,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
         mcobId: fieldComboMCobApp1!.mCobApp1Id,
         remark: fieldRemarkController.text,
         tsi: double.parse(fieldTsiController.text.replaceAll(',', '')),
+      );
+
+      regother1CrudBloc.add(
+        const ResetSelectedCobEvent(),
       );
 
       if (widget.viewMode == "tambah") {
