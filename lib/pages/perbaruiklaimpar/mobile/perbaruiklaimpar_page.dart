@@ -103,11 +103,17 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
 
     switch (index) {
       case 0:
-        context.read<KlaimparklaimcrudBloc>().add(
-          KlaimparklaimcrudAutoSaveEvent(),
-        );
-        await Future.delayed(const Duration(milliseconds: 150));
+        final klaimState = context.read<KlaimparklaimcrudBloc>().state;
+
+        if (klaimState.isDirty) {
+          context.read<KlaimparklaimcrudBloc>().add(
+            KlaimparklaimcrudAutoSaveEvent(),
+          );
+
+          await Future.delayed(const Duration(milliseconds: 150));
+        }
         break;
+
       default:
         break;
     }
@@ -220,12 +226,17 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
         color: secondaryBlackColor,
         child: BlocConsumer<KlaimparaccordionBloc, KlaimparaccordionState>(
           listener: (context, state) async {
-            if (state.previousIndex != null &&
-                state.previousIndex != state.openedIndex) {
-              FocusManager.instance.primaryFocus?.unfocus();
-              await Future.delayed(const Duration(milliseconds: 50));
-              await _autoSaveSection(state.previousIndex);
+            if (state.previousIndex == null ||
+                state.previousIndex == state.openedIndex) {
+              return;
             }
+
+            FocusManager.instance.primaryFocus?.unfocus();
+            await Future.delayed(const Duration(milliseconds: 50));
+
+            if (!mounted) return;
+
+            await _autoSaveSection(state.previousIndex);
           },
           builder: (context, acc) {
             return SingleChildScrollView(

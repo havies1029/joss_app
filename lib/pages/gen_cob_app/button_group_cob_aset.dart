@@ -49,7 +49,7 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
           if (state.selectedCOBId.isEmpty) {
             context
                 .read<CobManPolBloc>()
-                .add(SelectButton(filteredItems.first.mCobApp1Id));
+                .add(SelectCobButton(filteredItems.first.mCobApp1Id));
           }
 
           final chips = filteredItems.map((cob) {
@@ -83,7 +83,7 @@ class _ButtonGroupCobAsetWidgetState extends State<ButtonGroupCobAsetWidget> {
                   vertical: 5,
                 ),
                 onSelected: (_) {
-                  context.read<CobManPolBloc>().add(SelectButton(cob.mCobApp1Id));
+                  context.read<CobManPolBloc>().add(SelectCobButton(cob.mCobApp1Id));
                 },
               ),
             );

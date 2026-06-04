@@ -31,21 +31,24 @@ class Klaimmvaccordioncard extends StatelessWidget {
             trailing: AnimatedRotation(
               turns: isOpen ? 0.5 : 0,
               duration: const Duration(milliseconds: 250),
-              child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
+              child: SvgPicture.asset(
+                "assets/icons/dropdown.svg",
+                width: 16,
+              ),
             ),
             onTap: onTap,
           ),
+
           ClipRect(
-            child: AnimatedSize(
+            child: AnimatedAlign(
+              alignment: Alignment.topCenter,
+              heightFactor: isOpen ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeInOut,
-              alignment: Alignment.topCenter,
-              child: isOpen
-                  ? Padding(
+              child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: child,
-              )
-                  : const SizedBox.shrink(),
+              ),
             ),
           ),
         ],

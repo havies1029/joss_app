@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/blocs/regendors/regendors1form_bloc.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/models/regendors/regendors1form_model.dart';
@@ -360,15 +361,12 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 🔹 Icon atas
-                const Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.white,
-                  size: 40,
+                SvgPicture.asset(
+                  'assets/icons/regother_ajukan.svg',
+                  width: 40,
+                  height: 40,
                 ),
-                const SizedBox(height: 12),
-
-                // 🔹 Pesan
+                const SizedBox(height: hPadding),
                 Text(
                   "Pengajuan diproses tim internal.",
                   textAlign: TextAlign.center,

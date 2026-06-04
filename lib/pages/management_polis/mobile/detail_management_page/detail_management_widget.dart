@@ -10,6 +10,7 @@ import 'package:joss_app/pages/management_polis/mobile/detail_management_page/ti
 import 'package:joss_app/pages/management_polis/mobile/management_polis_page.dart';
 import '../../../../../common/constants.dart';
 
+import '../../../../blocs/gen_status_aset/statusasetcari_bloc.dart';
 import '../../../../blocs/regendors/regendors1form_bloc.dart';
 import '../../../../blocs/regendors/regendors2cari_bloc.dart';
 import '../../../../blocs/regother/regother1crud_bloc.dart';
@@ -293,11 +294,55 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     SizeConfig().init(context);
     final dataMap = _toMap(widget.data);
 
+    String _currentProcessSource() {
+      final fromData = _prosesSource.trim().toUpperCase();
+      if (fromData.isNotEmpty) return fromData;
+
+      return (widget.jenisProses ?? "").trim().toUpperCase();
+    }
+
     void goToManagementPolis() {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const ManagementPolisPage()),
-            (route) => route.isFirst,
+      final source = _currentProcessSource();
+
+      if (source == "O") {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => const ManagementPolisPage(),
+          ),
+              (route) => route.isFirst,
+        );
+        return;
+      }
+
+      String targetStatusId;
+
+      switch (source) {
+        case "E": // Endorse
+          targetStatusId = "10002";
+          break;
+
+        case "R": // Renewal
+          targetStatusId = "10004";
+          break;
+
+        case "A": // Reaktif
+          targetStatusId = "10003";
+          break;
+
+        default:
+          targetStatusId = widget.statusId;
+          break;
+      }
+
+      context.read<StatusAsetCariBloc>().add(
+        SelectStatusAsetButton(targetStatusId),
       );
+
+      int count = 0;
+
+      Navigator.of(context).popUntil((route) {
+        return count++ >= 3;
+      });
     }
 
     return PopScope(
@@ -309,6 +354,7 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
+          bottom: false,
           child: BaseBackgroundSidePage(
             onBack: goToManagementPolis,
             title: 'Detail Manajemen Polis',
@@ -438,11 +484,10 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
                   Container(
                     width: double.infinity,
                     color: secondaryBlackColor,
-                    padding: EdgeInsets.fromLTRB(
-                      hPadding * 1.5,
-                      12,
-                      hPadding * 1.5,
-                      MediaQuery.of(context).padding.bottom, // hapus +12
+                    padding: EdgeInsets.only(
+                      left: hPadding * 1.5,
+                      right: hPadding * 1.5,
+                      bottom: 0,
                     ),
                     child: AppButton(
                       text: "Kembali ke Polis",

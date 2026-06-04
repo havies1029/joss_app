@@ -12,7 +12,7 @@ class StatusAsetCariBloc extends Bloc<StatusAsetCariEvents, StatusAsetCariState>
 	StatusAsetCariBloc() : super(const StatusAsetCariState()) {
 		on<FetchStatusAsetCariEvent>(onFetchStatusAsetCari);
 		on<RefreshStatusAsetCariEvent>(onRefreshStatusAsetCari);
-    on<SelectButton>(onSelectButton);
+		on<SelectStatusAsetButton>(onSelectButton);
 	}
 
 Future<void> onRefreshStatusAsetCari(
@@ -57,8 +57,9 @@ Future<void> onFetchStatusAsetCari(
 	}
 
 	Future<void> onSelectButton(
-			SelectButton event, Emitter<StatusAsetCariState> emit) async {
-
+			SelectStatusAsetButton event,
+			Emitter<StatusAsetCariState> emit,
+			) async {
 		if (event.id == state.selectedStatusId) return;
 
 		emit(state.copyWith(

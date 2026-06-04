@@ -37,16 +37,15 @@ class Klaimparaccordioncard extends StatelessWidget {
           ),
 
           ClipRect(
-            child: AnimatedSize(
+            child: AnimatedAlign(
+              alignment: Alignment.topCenter,
+              heightFactor: isOpen ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeInOut,
-              alignment: Alignment.topCenter,
-              child: isOpen
-                  ? Padding(
+              child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: child,
-              )
-                  : const SizedBox.shrink(),
+              ),
             ),
           ),
         ],

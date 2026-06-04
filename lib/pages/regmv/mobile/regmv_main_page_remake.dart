@@ -1579,12 +1579,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       regmv1Id: regmv1Id ?? "",
     );
 
-    // DEBUG isi record
-    debugPrint("=== DEBUG RECORD FORM2 ===");
-    debugPrint("record.polisMulai : ${record.polisMulai}");
-    debugPrint("record.polisAkhir : ${record.polisAkhir}");
-    debugPrint("=========================");
-
     context.read<Regmv2FormBloc>().add(Regmv2DraftEvent(record: record));
   }
 
@@ -1592,7 +1586,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   void draftForm3ToBloc(BuildContext context){
     final record = Regmv3FormModel(
       regmv1Id: regmv1Id ?? "",
-      aksesoris: fieldAksesorisController.text,
+      aksesoris: fieldAksesorisController.text.trim(),
       harga: double.parse(fieldHargaController.text.replaceAll(',', '')),
       mesinNo: fieldMesinNoController.text,
       mmvmerkId: fieldComboMMvmerk?.mmvmerkId,

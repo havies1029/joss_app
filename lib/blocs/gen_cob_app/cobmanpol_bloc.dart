@@ -12,7 +12,7 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
   CobManPolBloc() : super(const CobManPolState()) {
     on<FetchCobManPolEvent>(onFetchCobManPol);
     on<RefreshCobManPolEvent>(onRefreshCobManPol);
-    on<SelectButton>(onSelectButton);
+    on<SelectCobButton>(onSelectButton);
   }
 
   Future<void> onRefreshCobManPol(
@@ -56,9 +56,11 @@ class CobManPolBloc extends Bloc<CobManPolEvents, CobManPolState> {
   }
 
   Future<void> onSelectButton(
-    SelectButton event, Emitter<CobManPolState> emit) async {
-      emit(state.copyWith(
-        selectedCOBId: event.id,
-      ));
-    }
+      SelectCobButton event,
+      Emitter<CobManPolState> emit,
+      ) async {
+    emit(state.copyWith(
+      selectedCOBId: event.id,
+    ));
+  }
 }

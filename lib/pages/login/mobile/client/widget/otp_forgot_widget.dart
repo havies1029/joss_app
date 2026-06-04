@@ -433,7 +433,11 @@ class _OtpForgotWidgetState extends State<OtpForgotWidget>
                                 ),
                               ),
                             ),
+
                             Container(
+                              constraints: BoxConstraints(
+                                minHeight: MediaQuery.of(context).size.height,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: cardBorderGradient,
                                 borderRadius: const BorderRadius.only(

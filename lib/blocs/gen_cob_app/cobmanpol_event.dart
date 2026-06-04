@@ -11,12 +11,11 @@ class FetchCobManPolEvent extends CobManPolEvents {}
 
 class RefreshCobManPolEvent extends CobManPolEvents {}
 
-class SelectButton extends CobManPolEvents {
+class SelectCobButton extends CobManPolEvents {
   final String id;
 
-  const SelectButton(this.id);
+  const SelectCobButton(this.id);
 
   @override
   List<Object> get props => [id];
 }
-

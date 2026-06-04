@@ -479,9 +479,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     label: "No Polis",
     controller: fieldPolisNoController,
     keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-    ],
     errorText: err('form1.noPolis'),
     validator: (_) => err('form1.noPolis'),
     onChanged: (v) {

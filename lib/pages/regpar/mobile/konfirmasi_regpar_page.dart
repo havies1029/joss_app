@@ -590,7 +590,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: AppButton.iconLeft(
-                            text: "Lihat Penawaran PAREQ",
+                            text: "Lihat Penawaran EQ",
                             backgroundColor: pdfRed,
                             onPressed: isSubmitting
                                 ? null
@@ -697,32 +697,55 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
                   const SizedBox(height: hPadding),
 
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  //   child: AppButton.primary(
+                  //     text: "Pembayaran",
+                  //     backgroundColor:
+                  //     isAgreementChecked ? primaryColor : sGrey,
+                  //     onPressed: isSubmitting || !isAgreementChecked
+                  //         ? null
+                  //         : () async {
+                  //       showDialog(
+                  //         context: context,
+                  //         barrierDismissible: true,
+                  //         barrierColor: Colors.black.withOpacity(0.6),
+                  //         builder: (dialogContext) => RegisterClientPopUp(
+                  //           showIcon: false,
+                  //           header: 'Fitur pembayaran belum tersedia.',
+                  //           description:
+                  //           'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                  //           buttonText: 'Mengerti',
+                  //           onPressed: () {
+                  //             // Navigator.of(dialogContext).pop();
+                  //           },
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                    child: AppButton.primary(
-                      text: "Pembayaran",
-                      backgroundColor:
-                      isAgreementChecked ? primaryColor : sGrey,
-                      onPressed: isSubmitting || !isAgreementChecked
-                          ? null
-                          : () async {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: true,
-                          barrierColor: Colors.black.withOpacity(0.6),
-                          builder: (dialogContext) => RegisterClientPopUp(
-                            showIcon: false,
-                            header: 'Fitur pembayaran belum tersedia.',
-                            description:
-                            'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-                            buttonText: 'Mengerti',
-                            onPressed: () {
-                              // Navigator.of(dialogContext).pop();
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                      padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                      child: AppButton.primary(
+                        text: "Pembayaran",
+                        isLoading: isSubmitting,
+                        backgroundColor:
+                        isAgreementChecked ? primaryColor : sGrey,
+                        onPressed: isSubmitting || !isAgreementChecked
+                            ? null
+                            : () async {
+                          if (mounted) {
+                            setState(() => isSubmitting = true);
+                          }
+
+                          context.read<DnRekap2invBloc>().add(
+                            RegPar2InvoiceEvent(
+                              regpar1Id: widget.recordId ?? "",
+                            ),
+                          );
+                        },
+                      )
                   ),
                 ],
               ),

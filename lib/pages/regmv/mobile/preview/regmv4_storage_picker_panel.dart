@@ -190,24 +190,25 @@ class _ThumbCardState extends State<_ThumbCard> {
     return Container(
       margin: const EdgeInsets.only(right: 8),
       child: Material(
-        color: const Color(0xFF101010),
+        color: Colors.transparent,
         child: InkWell(
           onTap: widget.onTap,
           child: Container(
             width: _size,
             height: _size,
+            clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withOpacity(0.10)),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.10),
+              ),
             ),
             child: Stack(
+              fit: StackFit.expand,
               children: [
-                SizedBox(
-                  width: _size,
-                  height: _size,
+                Positioned.fill(
                   child: _content(),
                 ),
 
-                // gradient tetap
                 Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
@@ -237,11 +238,7 @@ class _ThumbCardState extends State<_ThumbCard> {
                         color: sGrey,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 20),
                     ),
                   ),
                 ),

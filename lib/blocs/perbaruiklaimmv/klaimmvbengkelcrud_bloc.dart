@@ -9,58 +9,81 @@ import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_reposit
 
 part 'klaimmvbengkelcrud_event.dart';
 part 'klaimmvbengkelcrud_state.dart';
-
 class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, KlaimmvbengkelcrudState> {
-	final KlaimmvbengkelcrudRepository repository;
-	KlaimmvbengkelcrudBloc({required this.repository}) : super(const KlaimmvbengkelcrudState()) {
-		on<KlaimmvbengkelcrudUbahEvent>(onUbahKlaimmvbengkelcrud);
-		on<KlaimmvbengkelcrudTambahEvent>(onTambahKlaimmvbengkelcrud);
-		on<KlaimmvbengkelcrudHapusEvent>(onHapusKlaimmvbengkelcrud);
-		on<KlaimmvbengkelcrudLihatEvent>(onLihatKlaimmvbengkelcrud);
-		on<ComboMJnsbengkelChangedEvent>(onComboMJnsbengkelChanged);
-		on<ComboMWilayahBengkelChangedEvent>(onComboMWilayahBengkelChanged);
-		on<ComboMBengkelChangedEvent>(onComboMBengkelChanged);
+  final KlaimmvbengkelcrudRepository repository;
+
+  KlaimmvbengkelcrudBloc({required this.repository})
+      : super(const KlaimmvbengkelcrudState()) {
+    on<KlaimmvbengkelcrudUbahEvent>(onUbahKlaimmvbengkelcrud);
+    on<KlaimmvbengkelcrudTambahEvent>(onTambahKlaimmvbengkelcrud);
+    on<KlaimmvbengkelcrudHapusEvent>(onHapusKlaimmvbengkelcrud);
+    on<KlaimmvbengkelcrudLihatEvent>(onLihatKlaimmvbengkelcrud);
+    on<ComboMJnsbengkelChangedEvent>(onComboMJnsbengkelChanged);
+    on<ComboMWilayahBengkelChangedEvent>(onComboMWilayahBengkelChanged);
+    on<ComboMBengkelChangedEvent>(onComboMBengkelChanged);
     on<KlaimmvbengkelAutoSaveEvent>(onKlaimmvbengkelAutoSave);
     on<FieldNamaBengkelLainChangedEvent>(onFieldNamaBengkelLainChanged);
-	}
+  }
 
-	Future<void> onTambahKlaimmvbengkelcrud(
-		KlaimmvbengkelcrudTambahEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
+  Future<void> onTambahKlaimmvbengkelcrud(
+      KlaimmvbengkelcrudTambahEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
+    ReturnDataAPI returnData;
+    bool hasFailure = true;
 
-		ReturnDataAPI returnData;
-		bool hasFailure = true;
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		returnData = await repository.klaimmvbengkelcrudTambah(event.record);
-		hasFailure = !returnData.success;
-		emit(state.copyWith(
-			isSaving: false,
-			isSaved: true,
-			hasFailure: hasFailure));
-	}
+    emit(state.copyWith(isSaving: true, isSaved: false));
 
-	Future<void> onUbahKlaimmvbengkelcrud(
-		KlaimmvbengkelcrudUbahEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.klaimmvbengkelcrudUbah(event.record);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-	}
+    returnData = await repository.klaimmvbengkelcrudTambah(event.record);
+    hasFailure = !returnData.success;
 
-	Future<void> onHapusKlaimmvbengkelcrud(
-		KlaimmvbengkelcrudHapusEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.klaimmvbengkelcrudHapus(event.recordId);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-	}
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+    ));
+  }
+
+  Future<void> onUbahKlaimmvbengkelcrud(
+      KlaimmvbengkelcrudUbahEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
+    emit(state.copyWith(isSaving: true, isSaved: false));
+
+    bool hasFailure = !await repository.klaimmvbengkelcrudUbah(event.record);
+
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+    ));
+  }
+
+  Future<void> onHapusKlaimmvbengkelcrud(
+      KlaimmvbengkelcrudHapusEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
+    emit(state.copyWith(isSaving: true, isSaved: false));
+
+    bool hasFailure = !await repository.klaimmvbengkelcrudHapus(event.recordId);
+
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+    ));
+  }
 
   Future<void> onLihatKlaimmvbengkelcrud(
       KlaimmvbengkelcrudLihatEvent event,
-      Emitter<KlaimmvbengkelcrudState> emit
+      Emitter<KlaimmvbengkelcrudState> emit,
       ) async {
-
     emit(state.copyWith(isLoading: true, isLoaded: false));
 
     KlaimmvbengkelcrudModel? record =
     await repository.klaimmvbengkelcrudLihat(event.recordId);
+
+    final valid = _validate(record);
 
     emit(state.copyWith(
       isLoading: false,
@@ -69,110 +92,148 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       comboMJnsbengkel: record?.comboMJnsbengkel,
       comboMWilayahBengkel: record?.comboMWilayahBengkel,
       comboMBengkel: record?.comboMBengkel,
-      isComplete: _validate(record),
+      isValid: valid,
+      isComplete: valid,
+      hasFailure: false,
     ));
   }
 
-	Future<void> onComboMJnsbengkelChanged(
-			ComboMJnsbengkelChangedEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
+  Future<void> onComboMJnsbengkelChanged(
+      ComboMJnsbengkelChangedEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
+    emit(state.copyWith(isLoading: true, isLoaded: false));
 
-		emit(state.copyWith(isLoading: true, isLoaded: false));   
+    final comboMJnsbengkel = event.comboMJnsbengkel;
+    final jenisId = comboMJnsbengkel.mjnsbengkelId;
 
-		ComboMJnsbengkelModel comboMJnsbengkel = event.comboMJnsbengkel;
-
-    KlaimmvbengkelcrudModel updatedRecord = state.record ?? KlaimmvbengkelcrudModel.empty();
+    KlaimmvbengkelcrudModel updatedRecord =
+        state.record ?? KlaimmvbengkelcrudModel.empty();
 
     updatedRecord = updatedRecord.copyWith(
-        mjnsbengkelId: comboMJnsbengkel.mjnsbengkelId,
-        mwilayahbengkelId: "",
-        mbengkelId: "",
+      mjnsbengkelId: jenisId,
+      mwilayahbengkelId: '',
+      mbengkelId: '',
+      namaBengkelLain: '',
     );
 
-		emit(state.copyWith(
-			isLoading: false,
-			isLoaded: true,
-			comboMJnsbengkel: comboMJnsbengkel,
+    final valid = _validate(updatedRecord);
+
+    emit(state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      comboMJnsbengkel: comboMJnsbengkel,
       comboMWilayahBengkel: null,
       comboMBengkel: null,
       record: updatedRecord,
       isDirty: true,
-      isValid: _validate(updatedRecord),
-      isComplete: _validate(updatedRecord),
+      isValid: valid,
+      isComplete: valid,
+      hasFailure: false,
     ));
-	}
+  }
 
-	Future<void> onComboMWilayahBengkelChanged(
-			ComboMWilayahBengkelChangedEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
+  Future<void> onComboMWilayahBengkelChanged(
+      ComboMWilayahBengkelChangedEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
+    ComboMWilayahBengkelModel comboMWilayahBengkel =
+        event.comboMWilayahBengkel;
 
-		ComboMWilayahBengkelModel comboMWilayahBengkel = event.comboMWilayahBengkel;
-    KlaimmvbengkelcrudModel updatedRecord = state.record ?? KlaimmvbengkelcrudModel.empty();
+    KlaimmvbengkelcrudModel updatedRecord =
+        state.record ?? KlaimmvbengkelcrudModel.empty();
+
     updatedRecord = updatedRecord.copyWith(
       mwilayahbengkelId: comboMWilayahBengkel.mwilayahbengkelId,
-      mbengkelId: ""
+      mbengkelId: '',
+      namaBengkelLain: '',
     );
-		emit(state.copyWith(
-			comboMWilayahBengkel: comboMWilayahBengkel,
+
+    final valid = _validate(updatedRecord);
+
+    emit(state.copyWith(
+      comboMWilayahBengkel: comboMWilayahBengkel,
       comboMBengkel: null,
       record: updatedRecord,
       isDirty: true,
-      isValid: _validate(updatedRecord),
-      isComplete: _validate(updatedRecord),
+      isValid: valid,
+      isComplete: valid,
+      hasFailure: false,
     ));
-	}
+  }
 
-	Future<void> onComboMBengkelChanged(
-			ComboMBengkelChangedEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
-
+  Future<void> onComboMBengkelChanged(
+      ComboMBengkelChangedEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
     emit(state.copyWith(isLoading: true, isLoaded: false));
-  
-		ComboMBengkelModel comboMBengkel = event.comboMBengkel;
-    KlaimmvbengkelcrudModel updatedRecord = state.record ?? KlaimmvbengkelcrudModel.empty();
+
+    ComboMBengkelModel comboMBengkel = event.comboMBengkel;
+
+    KlaimmvbengkelcrudModel updatedRecord =
+        state.record ?? KlaimmvbengkelcrudModel.empty();
+
     updatedRecord = updatedRecord.copyWith(
       mbengkelId: comboMBengkel.mbengkelId,
+      namaBengkelLain: '',
     );
-		emit(state.copyWith(
-			comboMBengkel: comboMBengkel,
+
+    final valid = _validate(updatedRecord);
+
+    emit(state.copyWith(
+      comboMBengkel: comboMBengkel,
       record: updatedRecord,
       isLoading: false,
       isLoaded: true,
       isDirty: true,
-      isValid: _validate(updatedRecord),
-      isComplete: _validate(updatedRecord),
+      isValid: valid,
+      isComplete: valid,
+      hasFailure: false,
     ));
-	}
+  }
 
   Future<void> onKlaimmvbengkelAutoSave(
-      KlaimmvbengkelAutoSaveEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
+      KlaimmvbengkelAutoSaveEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
     if (state.record != null && state.isDirty) {
       emit(state.copyWith(isSaving: true, isSaved: false));
 
-      if (state.record != null){
-        bool hasFailure = !await repository.klaimmvbengkelcrudUbah(state.record!);
-        emit(state.copyWith(
-          isSaving: false,
-          isSaved: true,
-          hasFailure: hasFailure,
-          isDirty: false,
-          saveFrom: event.saveFrom,
-        ));
-      }
+      bool hasFailure =
+      !await repository.klaimmvbengkelcrudUbah(state.record!);
+
+      emit(state.copyWith(
+        isSaving: false,
+        isSaved: true,
+        hasFailure: hasFailure,
+        isDirty: false,
+        saveFrom: event.saveFrom,
+      ));
     }
   }
 
   Future<void> onFieldNamaBengkelLainChanged(
-      FieldNamaBengkelLainChangedEvent event, Emitter<KlaimmvbengkelcrudState> emit) async {
+      FieldNamaBengkelLainChangedEvent event,
+      Emitter<KlaimmvbengkelcrudState> emit,
+      ) async {
+    KlaimmvbengkelcrudModel updatedRecord =
+        state.record ?? KlaimmvbengkelcrudModel.empty();
 
-      KlaimmvbengkelcrudModel updatedRecord = state.record ?? KlaimmvbengkelcrudModel.empty();
-      updatedRecord = updatedRecord.copyWith(
-        namaBengkelLain: event.namaBengkelLain,
-      );
-      emit(state.copyWith(
-        record: updatedRecord, 
-        isDirty: true,
-        isValid: _validate(updatedRecord),
-        isComplete: _validate(updatedRecord),
-      ));
-    
+    updatedRecord = updatedRecord.copyWith(
+      namaBengkelLain: event.namaBengkelLain,
+      mwilayahbengkelId: '',
+      mbengkelId: '',
+    );
+
+    final valid = _validate(updatedRecord);
+
+    emit(state.copyWith(
+      record: updatedRecord,
+      isDirty: true,
+      isValid: valid,
+      isComplete: valid,
+      hasFailure: false,
+    ));
   }
 
   bool _validate(KlaimmvbengkelcrudModel? record) {
@@ -184,16 +245,17 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
     if (mjns == '10') {
       final wilayah = record.mwilayahbengkelId?.trim() ?? '';
       final bengkel = record.mbengkelId?.trim() ?? '';
+
       if (wilayah.isEmpty) return false;
       if (bengkel.isEmpty) return false;
     }
 
     if (mjns == '20') {
       final lain = record.namaBengkelLain.trim();
+
       if (lain.isEmpty) return false;
     }
 
     return true;
   }
-
 }

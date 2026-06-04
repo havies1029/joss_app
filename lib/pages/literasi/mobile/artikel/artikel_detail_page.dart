@@ -8,6 +8,8 @@ import '../../../../blocs/local_prefs/article_selection_cubit.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/klien_jps_widget.dart';
 
+import '../../../../blocs/logoclient/mlogoclientcari_bloc.dart';
+
 class ArtikelDetailPage extends StatelessWidget {
   final String authorNama;
   final String tglTerbit;
@@ -81,17 +83,31 @@ class ArtikelDetailPage extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SocmedIcon('assets/icons/instagram.svg', isMobile, url: 'https://www.instagram.com/jayaproteksindosakti?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=='),
-                    const SizedBox(width: 20),
-                    SocmedIcon('assets/icons/website_logo.svg', isMobile, url: 'https://jayaproteksindo.co.id/'),
-                    const SizedBox(width: 20),
-                    SocmedIcon('assets/icons/linkedin.svg', isMobile, url: 'https://www.linkedin.com/company/jayaproteksindo/'),
-                    const SizedBox(width: 20),
-                    SocmedIcon('assets/icons/facebook.svg', isMobile, url: 'https://www.facebook.com/people/PT-Jaya-Proteksindo-Sakti/100054470620648/'),
-                  ],
+
+                BlocBuilder<MlogoclientCariBloc, MlogoclientCariState>(
+                  builder: (context, state) {
+                    if (state.items.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+
+                    final items = state.items
+                        .where((e) => e.isActive)
+                        .toList()
+                      ..sort((a, b) => a.noUrut.compareTo(b.noUrut));
+
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 20,
+                      runSpacing: 12,
+                      children: items.map((item) {
+                        return SocmedIcon(
+                          'assets/icons/${item.logoSvg}',
+                          isMobile,
+                          url: item.linkUrl,
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
               ],
             ),

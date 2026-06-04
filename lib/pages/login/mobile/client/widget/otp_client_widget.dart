@@ -367,8 +367,10 @@ class PopupClientWidgetState extends State<PopupClientWidget>
                               ),
                             ),
 
-                            // ✅ Card DNA patokan (gradient border)
                             Container(
+                              constraints: BoxConstraints(
+                                minHeight: MediaQuery.of(context).size.height,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: cardBorderGradient,
                                 borderRadius: const BorderRadius.only(

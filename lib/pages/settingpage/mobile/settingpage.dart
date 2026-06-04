@@ -207,296 +207,301 @@ class _SettingsPageState extends State<SettingsPage> {
       body: BaseBackgroundFirstPage(
         child: SafeArea(
           child: MultiBlocListener(
-            listeners: [
+            listeners: _buildListeners(),
+            child: _buildContent(context, mjenisClient),
+          ),
+        ),
+      ),
+    );
+  }
 
-              BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
-                listener: (context, state) {
-                  final rec = state.record;
-                  if (rec != null) {
-                    setState(() {
-                      profileEmail =
-                      rec.email.trim().isNotEmpty ? rec.email : AppData.user.email;
+  List<BlocListener> _buildListeners() {
+    return [
+      BlocListener<MRekanContactCrudBloc, MRekanContactCrudState>(
+        listener: (context, state) {
+          final rec = state.record;
+          if (rec != null) {
+            setState(() {
+              profileEmail =
+              rec.email.trim().isNotEmpty ? rec.email : AppData.user.email;
 
-                      profileTelepon =
-                      rec.telp.trim().isNotEmpty ? rec.telp : AppData.user.hp;
-                    });
+              profileTelepon =
+              rec.telp.trim().isNotEmpty ? rec.telp : AppData.user.hp;
+            });
+          }
+        },
+      ),
+      BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+        listener: (context, state) {
+          final rec = state.record;
+          if (rec != null) {
+            setState(() {
+              profileNama = rec.rekanNama.trim().isNotEmpty
+                  ? rec.rekanNama
+                  : AppData.user.nama;
+            });
+          }
+        },
+      ),
+      BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+        listener: (context, state) {
+          final rec = state.record;
+          if (rec != null) {
+            setState(() {
+              profileNama = (rec.rekanNama?.trim().isNotEmpty ?? false)
+                  ? rec.rekanNama
+                  : AppData.user.nama;
+            });
+          }
+        },
+      ),
+    ];
+  }
+
+  Widget _buildContent(BuildContext context, String mjenisClient) {
+    return Container(
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height,
+      ),
+      decoration: const BoxDecoration(
+        color: secondaryBlackColor,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 20,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, authState) {
+                  final userType =
+                  authState is AuthenticationAuthenticated
+                      ? (authState.user.userType ?? '').toUpperCase()
+                      : '';
+
+                  if (userType == 'C') {
+                    return SettingsProfileCardWidget(
+                      nama: profileNama ?? AppData.user.nama ?? "",
+                      email: profileEmail ?? AppData.user.email,
+                      telepon: profileTelepon ?? AppData.user.hp,
+                      subtitle: "Klien JPS",
+                    );
+                  } else {
+                    return const SettingsProfileCardWidget(
+                      nama: "Pengguna Baru",
+                    );
                   }
                 },
               ),
 
-              BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
-                listener: (context, state) {
-                  final rec = state.record;
-                  if (rec != null) {
-                    setState(() {
-                      profileNama = rec.rekanNama.trim().isNotEmpty
-                          ? rec.rekanNama
-                          : AppData.user.nama;
-                    });
+              const SizedBox(height: hPadding),
+
+              BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, authState) {
+                  final userType =
+                  authState is AuthenticationAuthenticated
+                      ? authState.user.userType
+                      : '';
+
+                  if (userType == 'C') {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle(context, 'Akun'),
+                        _buildCardContainer(
+                          children: [
+                            _buildMenuItem(
+                              svgAsset: 'assets/icons/ubah_pass.svg',
+                              title: 'Ubah Kata Sandi',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const UbahPasswordPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: vPadding),
+
+                        _buildSectionTitle(context, 'Informasi'),
+
+                        _buildCardContainer(
+                          children: [
+                            _buildMenuItem(
+                              svgAsset: 'assets/icons/informasi_klien.svg',
+                              title: 'Informasi Klien',
+                              onTap: () async {
+                                if (mjenisClient == '10') {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                      const MRekanGeneralIdvCrudFormPage(),
+                                    ),
+                                  );
+                                } else {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                      const MRekanGeneralCmpCrudFormPage(),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                            sDivider,
+                            _buildMenuItem(
+                              svgAsset: 'assets/icons/location.svg',
+                              title: 'Kontak & Alamat',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const MRekanContactCrudFormPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            sDivider,
+                            _buildMenuItem(
+                              svgAsset: 'assets/icons/bank.svg',
+                              title: 'Rekening Bank',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const MRekanBankCrudFormPage(
+                                      viewMode: 'tambah',
+                                      recordId: '',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            sDivider,
+                            _buildMenuItem(
+                              svgAsset: 'assets/icons/group.svg',
+                              title: 'Akses & Anggota',
+                              svgAssetColor: primaryLightColor,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const RekanPicWidgetPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
                   }
+
+                  return const SizedBox.shrink();
                 },
               ),
 
-              BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
-                listener: (context, state) {
-                  final rec = state.record;
-                  if (rec != null) {
-                    setState(() {
-                      profileNama = (rec.rekanNama?.trim().isNotEmpty ?? false)
-                          ? rec.rekanNama
-                          : AppData.user.nama;
-                    });
-                  }
-                },
+              const SizedBox(height: vPadding),
+
+              _buildSectionTitle(context, 'Syarat dan Ketentuan'),
+
+              _buildCardContainer(
+                children: [
+                  _buildMenuItem(
+                    svgAsset: 'assets/icons/sk.svg',
+                    title: 'Syarat dan Ketentuan',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SyaratKetentuanPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  sDivider,
+                  _buildMenuItem(
+                    svgAsset: 'assets/icons/shield.svg',
+                    title: 'Kebijakan dan Privasi',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const KebijakanPrivasiPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
+
+              const SizedBox(height: vPadding),
+
+              _buildSectionTitle(context, 'Lainnya'),
+
+              _buildCardContainer(
+                children: [
+                  _buildSwitchItem(
+                    svgAsset: 'assets/icons/notification.svg',
+                    title: 'Email Notifikasi',
+                    value: emailNotification,
+                    onChanged: (value) {
+                      setState(() => emailNotification = value);
+                      successSnackBar(
+                        'Email Notifikasi ${value ? 'diaktifkan' : 'dinonaktifkan'}',
+                      );
+                    },
+                  ),
+                  sDivider,
+                  _buildMenuItem(
+                    svgAsset: 'assets/icons/bantuan.svg',
+                    title: 'Bantuan',
+                    onTap: () {
+                      Navigator.pushNamed(context, 'chat');
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: vPadding),
+
+              _buildSectionTitle(context, 'Keluar'),
+
+              _buildCardContainer(
+                children: [
+                  _buildMenuItem(
+                    svgAsset: 'assets/icons/logout.svg',
+                    title: 'Keluar',
+                    titleColor: pDarkRed,
+                    showForwardsvgAsset: false,
+                    svgAssetColor: pRed,
+                    onTap: () async {
+                      await handleLogout(context);
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: hPadding),
+
+              _buildSectionTitle(context, 'v1.0.1'),
+
+              const SizedBox(height: 50),
             ],
-
-            child: Container(
-              decoration: const BoxDecoration(
-                color: secondaryBlackColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 20,
-                  ),
-
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                        builder: (context, authState) {
-                          final userType =
-                          authState is AuthenticationAuthenticated
-                              ? (authState.user.userType ?? '').toUpperCase()
-                              : '';
-
-                          if (userType == 'C') {
-                            return SettingsProfileCardWidget(
-                              nama: profileNama ?? AppData.user.nama ?? "",
-                              email: profileEmail ?? AppData.user.email,
-                              telepon: profileTelepon ?? AppData.user.hp,
-                              subtitle: "Klien JPS",
-                            );
-                          } else {
-                            return const SettingsProfileCardWidget(
-                              nama: "Pengguna Baru",
-                            );
-                          }
-                        },
-                      ),
-
-                      const SizedBox(height: hPadding),
-
-                      BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                        builder: (context, authState) {
-                          final userType =
-                          authState is AuthenticationAuthenticated
-                              ? authState.user.userType
-                              : '';
-
-                          if (userType == 'C') {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionTitle(context, 'Akun'),
-                                _buildCardContainer(
-                                  children: [
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/ubah_pass.svg',
-                                      title: 'Ubah Kata Sandi',
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const UbahPasswordPage(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: vPadding),
-
-                                _buildSectionTitle(context, 'Informasi'),
-
-                                _buildCardContainer(
-                                  children: [
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/informasi_klien.svg',
-                                      title: 'Informasi Klien',
-                                      onTap: () async {
-                                        if (mjenisClient == '10') {
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                              const MRekanGeneralIdvCrudFormPage(),
-                                            ),
-                                          );
-                                        } else {
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                              const MRekanGeneralCmpCrudFormPage(),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    sDivider,
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/location.svg',
-                                      title: 'Kontak & Alamat',
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const MRekanContactCrudFormPage(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    sDivider,
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/bank.svg',
-                                      title: 'Rekening Bank',
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const MRekanBankCrudFormPage(
-                                              viewMode: 'tambah',
-                                              recordId: '',
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    sDivider,
-                                    _buildMenuItem(
-                                      svgAsset: 'assets/icons/group.svg',
-                                      title: 'Akses & Anggota',
-                                      svgAssetColor: primaryLightColor,
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const RekanPicWidgetPage(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          }
-
-                          return const SizedBox.shrink();
-                        },
-                      ),
-
-                      const SizedBox(height: vPadding),
-
-                      _buildSectionTitle(context, 'Syarat dan Ketentuan'),
-
-                      _buildCardContainer(
-                        children: [
-                          _buildMenuItem(
-                            svgAsset: 'assets/icons/sk.svg',
-                            title: 'Syarat dan Ketentuan',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const SyaratKetentuanPage(),
-                                ),
-                              );
-                            },
-                          ),
-                          sDivider,
-                          _buildMenuItem(
-                            svgAsset: 'assets/icons/shield.svg',
-                            title: 'Kebijakan dan Privasi',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const KebijakanPrivasiPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: vPadding),
-
-                      _buildSectionTitle(context, 'Lainnya'),
-
-                      _buildCardContainer(
-                        children: [
-                          _buildSwitchItem(
-                            svgAsset: 'assets/icons/notification.svg',
-                            title: 'Email Notifikasi',
-                            value: emailNotification,
-                            onChanged: (value) {
-                              setState(() => emailNotification = value);
-                              successSnackBar(
-                                'Email Notifikasi ${value ? 'diaktifkan' : 'dinonaktifkan'}',
-                              );
-                            },
-                          ),
-                          sDivider,
-                          _buildMenuItem(
-                            svgAsset: 'assets/icons/bantuan.svg',
-                            title: 'Bantuan',
-                            onTap: () {
-                              Navigator.pushNamed(context, 'chat');
-                            },
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: vPadding),
-
-                      _buildSectionTitle(context, 'Keluar'),
-
-                      _buildCardContainer(
-                        children: [
-                          _buildMenuItem(
-                            svgAsset: 'assets/icons/logout.svg',
-                            title: 'Keluar',
-                            titleColor: pDarkRed,
-                            showForwardsvgAsset: false,
-                            svgAssetColor: pRed,
-                            onTap: () async {
-                              await handleLogout(context);
-                            },
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: hPadding),
-
-                      _buildSectionTitle(context, 'v1.0.1'),
-
-                      const SizedBox(height: 50),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
         ),
       ),

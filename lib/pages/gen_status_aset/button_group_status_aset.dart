@@ -46,7 +46,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
               context.read<StatusAsetCariBloc>().add(
-                SelectButton(state.items.first.mstatusasetId),
+                SelectStatusAsetButton(state.items.first.mstatusasetId),
               );
             });
           }
@@ -89,7 +89,7 @@ class _ButtonGroupStatusAsetWidgetState extends State<ButtonGroupStatusAsetWidge
                     label: statusNama(id),
                     isSelected: isSelected,
                     onTap: () {
-                      context.read<StatusAsetCariBloc>().add(SelectButton(id));
+                      context.read<StatusAsetCariBloc>().add(SelectStatusAsetButton(id));
                     },
                   ),
                 );

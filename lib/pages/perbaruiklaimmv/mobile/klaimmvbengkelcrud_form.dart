@@ -159,12 +159,18 @@ class KlaimmvbengkelcrudFormPageFormState
 			},
 			listener: (context, state) {
 				if (state.isLoaded) {
-					if (state.record != null) {
-						fieldNamaBengkelLainController.text = state.record!.namaBengkelLain;
-					}
-					fieldComboMBengkel = state.comboMBengkel;
-					fieldComboMJnsbengkel = state.comboMJnsbengkel;
-					fieldComboMWilayahBengkel = state.comboMWilayahBengkel;
+					if (!mounted) return;
+
+					setState(() {
+						if (state.record != null) {
+							fieldNamaBengkelLainController.text =
+									state.record!.namaBengkelLain;
+						}
+
+						fieldComboMBengkel = state.comboMBengkel;
+						fieldComboMJnsbengkel = state.comboMJnsbengkel;
+						fieldComboMWilayahBengkel = state.comboMWilayahBengkel;
+					});
 				}
 			},
 		);
