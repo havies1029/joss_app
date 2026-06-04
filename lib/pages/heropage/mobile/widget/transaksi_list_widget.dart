@@ -116,13 +116,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
                   }
 
                   if (state.items.isEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Text(
-                        'Tidak ada transaksi.',
-                        style: bodyTextStyle(context),
-                      ),
-                    );
+                    return _emptyTransactionState(context);
                   }
 
                   // tampilkan max 3 (top 3)
@@ -176,6 +170,53 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _emptyTransactionState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: hPadding * 1.5,
+          vertical: hPadding + 2,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              "assets/icons/notification_group.svg",
+              width: 32,
+              height: 32,
+              colorFilter: const ColorFilter.mode(
+                hintGrey,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(height: hPadding),
+            Text(
+              "Tidak Ada Riwayat",
+              textAlign: TextAlign.center,
+              style: bodyTextStyle(
+                context,
+                fontSize: getResponsiveFont(context, 16),
+              ).copyWith(
+                color: hintGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "Saat ini Anda belum membuat Riwayat apa pun.",
+              textAlign: TextAlign.center,
+              style: bodyTextStyle(
+                context,
+                fontSize: getResponsiveFont(context, 14),
+              ).copyWith(
+                color: hintGrey,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

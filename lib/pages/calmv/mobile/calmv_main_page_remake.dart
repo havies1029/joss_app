@@ -484,7 +484,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   Form2Page(
                     idx: 1,
                     context: context,
-                    title: "Pertanggungan",
+                    title: "Nilai Pertanggungan",
                     isExpanded: expanded[1],
                     //onToggle: (v) => setState(() => expanded[1] = v),
                     onRefresh: () {

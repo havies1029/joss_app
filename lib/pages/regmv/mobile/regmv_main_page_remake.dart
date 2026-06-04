@@ -27,6 +27,7 @@ import '../../../common/constants.dart';
 import '../../../common/plat_nomor_formatter.dart';
 import '../../../common/rangka_no_formatter.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
+import '../../../helper/navigation_keys.dart';
 import '../../../models/combobox/combommvjnscover_model.dart';
 import '../../../models/combobox/combommvmerk_model.dart';
 import '../../../models/combobox/combommvmodel_model.dart';
@@ -185,8 +186,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldRatePapController = TextEditingController();
   final fieldRateAwController = TextEditingController();
   final fieldBiayaPolisController = TextEditingController();
+  final fieldBiayaMateraiController = TextEditingController();
   final fieldSumInsuredController = TextEditingController();
   final fieldRateTotalController = TextEditingController();
+  final fieldTotalTagihanController = TextEditingController();
   //form6
 
   @override
@@ -257,9 +260,11 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldRatePadController.dispose();
     fieldRatePapController.dispose();
     fieldBiayaPolisController.dispose();
+    fieldBiayaMateraiController.dispose();
     fieldSumInsuredController.dispose();
     fieldRateTotalController.dispose();
     fieldRateAwController.dispose();
+    fieldTotalTagihanController.dispose();
     //form6
 
     super.dispose();
@@ -480,6 +485,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldPremiNetController.text = cleanNum(record.premiNet);
     fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
     fieldBiayaPolisController.text = cleanNum(record.biayaPolis);
+    fieldBiayaMateraiController.text = cleanNum(record.biayaMaterai);
     fieldSumInsuredController.text = cleanNum(record.tsi);
     fieldRateDasarController.text = record.rateDasar.toString();
     fieldRateLoadingController.text = record.rateLoading.toString();
@@ -491,6 +497,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     fieldRatePapController.text = record.ratePap.toString();
     fieldRateAwController.text = record.rateAw.toString();
     fieldRateTotalController.text = record.rateTotal.toString();
+    fieldTotalTagihanController.text = record.totalTagihan.toString();
   }
 
   Future<bool?> showExitConfirmDialog(BuildContext context) {
@@ -640,6 +647,23 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
   }
 
+  Future<void> _handleExit2(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      context.read<Regmv1CrudBloc>().add(
+        Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
+      );
+      final homeState = homeTabKey.currentState;
+
+      if (homeState != null) {
+        homeState.goToHeroPage();
+      }
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
   bool _isLanjutkanLoading = false;
 
   @override
@@ -656,7 +680,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           await _handleExit(context);
         },
         onHome: () async {
-          await _handleExit(context);
+          await _handleExit2(context);
         },
         title: "Kendaraan",
         blocListeners: [
@@ -1178,9 +1202,26 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
+                              label: "BIAYA MATERAI",
+                              controller: fieldBiayaMateraiController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+                            ),
+                            // HitungPremiRow(
+                            //   // label: "TOTAL PREMI",
+                            //   label: "TOTAL TAGIHAN",
+                            //   controller: fieldPremiNetController,
+                            //   layoutType: HitungPremiLayoutType.vertical,
+                            //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                            //   showValueBorder: true,
+                            //   formatNumber: true,
+                            // ),
+                            HitungPremiRow(
                               // label: "TOTAL PREMI",
                               label: "TOTAL TAGIHAN",
-                              controller: fieldPremiNetController,
+                              controller: fieldTotalTagihanController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,

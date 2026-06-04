@@ -119,7 +119,7 @@ class KlaimmvpoliscrudFormPageFormState
 
 		final noPlat = fieldNoPlatController.text.trim();
 		if (noPlat.isEmpty) {
-			setErr('form.noPlat', 'No Plat tidak boleh kosong');
+			setErr('form.noPlat', 'No Polisi tidak boleh kosong');
 			ok = false;
 		}
 
@@ -372,7 +372,7 @@ class KlaimmvpoliscrudFormPageFormState
 
 	Widget buildFieldNoPlat() {
 		return appTextField(
-			label: 'No Plat',
+			label: 'No Polisi',
 			controller: fieldNoPlatController,
 			inputFormatters: [
 				PlatNomorFormatter(),

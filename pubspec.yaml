@@ -316,6 +316,7 @@ flutter:
     - assets/icons/marketing_jps.svg
     - assets/icons/icon_pdf.svg
     - assets/icons/regother_ajukan.svg
+    - assets/icons/notification_group.svg
 
   fonts:
     - family: Delm-Regular

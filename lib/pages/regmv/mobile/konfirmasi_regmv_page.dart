@@ -555,7 +555,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: AppButton.iconLeft(
-                      text: "Lihat Penawaran PDF",
+                      text: "Lihat Penawaran",
                       backgroundColor: pdfRed,
                       onPressed: isSubmitting
                           ? null

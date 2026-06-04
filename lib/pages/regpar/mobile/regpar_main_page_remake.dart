@@ -22,6 +22,7 @@ import '../../../blocs/regpar/regpar6cari_bloc.dart';
 import '../../../blocs/regpar/regpar_flow_bloc.dart';
 import '../../../common/constants.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
+import '../../../helper/navigation_keys.dart';
 import '../../../models/combobox/combomjnscoverpar_model.dart';
 import '../../../models/combobox/combomkabzonagempa_model.dart';
 import '../../../models/combobox/combomkecamatan_model.dart';
@@ -236,6 +237,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldRateTotalController = TextEditingController();
   final fieldSumInsuredController = TextEditingController();
   final fieldBiayaPolisController = TextEditingController();
+  final fieldBiayaMateraiController = TextEditingController();
+  final fieldTotalTagihanController = TextEditingController();
   //form5
 
   @override
@@ -302,6 +305,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     fieldRateTotalController.dispose();
     fieldSumInsuredController.dispose();
     fieldBiayaPolisController.dispose();
+    fieldBiayaMateraiController.dispose();
+    fieldTotalTagihanController.dispose();
     // form5
 
     super.dispose();
@@ -502,6 +507,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     fieldRateTotalController.text = record.rateTotal.toString();
     fieldSumInsuredController.text = record.tsi.toString();
     fieldBiayaPolisController.text = record.biayaPolis.toString();
+    fieldBiayaMateraiController.text = cleanNum(record.biayaMaterai);
+    fieldTotalTagihanController.text = record.totalTagihan.toString();
   }
 
   Future<bool?> showExitConfirmDialog(BuildContext context) {
@@ -651,6 +658,24 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
   }
 
+  Future<void> _handleExit2(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      context.read<Regpar1CrudBloc>().add(
+        Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
+      );
+
+      final homeState = homeTabKey.currentState;
+
+      if (homeState != null) {
+        homeState.goToHeroPage();
+      }
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
   bool _isLanjutkanLoading = false;
 
   @override
@@ -666,7 +691,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           await _handleExit(context);
         },
         onHome: () async {
-          await _handleExit(context);
+          await _handleExit2(context);
         },
         title: "Properti",
         blocListeners: [
@@ -1099,8 +1124,25 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               formatNumber: true,
                             ),
                             HitungPremiRow(
+                              label: "BIAYA MATERAI",
+                              controller: fieldBiayaMateraiController,
+                              layoutType: HitungPremiLayoutType.vertical,
+                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                              showValueBorder: true,
+                              formatNumber: true,
+                            ),
+                            // HitungPremiRow(
+                            //   label: "TOTAL TAGIHAN",
+                            //   controller: fieldPremiNetController,
+                            //   layoutType: HitungPremiLayoutType.vertical,
+                            //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                            //   showValueBorder: true,
+                            //   formatNumber: true,
+                            // ),
+                            HitungPremiRow(
+                              // label: "TOTAL PREMI",
                               label: "TOTAL TAGIHAN",
-                              controller: fieldPremiNetController,
+                              controller: fieldTotalTagihanController,
                               layoutType: HitungPremiLayoutType.vertical,
                               valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
                               showValueBorder: true,
