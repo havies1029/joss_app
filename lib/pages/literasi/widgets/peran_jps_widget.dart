@@ -71,7 +71,7 @@ class _PeranJPSWidgetState extends State<PeranJPSWidget> {
                 height: 24,
               ),
               const SizedBox(width: 6),
-              Text("Peran JPS", style: bodyTextStyle(context, fontSize: 24)),
+              Text("Peran Proteksi Plus", style: bodyTextStyle(context, fontSize: 24)),
             ],
           ),
           const SizedBox(height: 2),

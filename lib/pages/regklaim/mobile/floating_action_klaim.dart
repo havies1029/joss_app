@@ -100,7 +100,7 @@ class FabActionKlaim extends StatelessWidget {
           ),
           ActionMenuItem(
             type: ActionType.hubungiJps,
-            label: "Hubungi JPS",
+            label: "Hubungi Proteksi Plus",
             iconAsset: "assets/icons/cs_klaim.svg",
             gradientColors: const [Color(0xFFF69713), Color(0xFFFFF782)],
             borderColor: const Color(0xFFFFD06C),

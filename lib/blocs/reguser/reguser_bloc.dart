@@ -30,6 +30,16 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
     on<ClearRequestFromEvent>(_onClearRequestFrom);
   }
 
+  @override
+  void onEvent(RegUserEvents event) {
+    super.onEvent(event);
+  }
+
+  @override
+  void onTransition(Transition<RegUserEvents, RegUserState> transition) {
+    super.onTransition(transition);
+  }
+
   void _onClearRequestFrom(
       ClearRequestFromEvent event,
       Emitter<RegUserState> emit,
@@ -186,16 +196,6 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
         userType: "C",
       );
 
-      debugPrint("USER DEBUG BEFORE SEND:");
-      debugPrint("id: ${user.id}");
-      debugPrint("token: ${user.token}");
-      debugPrint("username: ${user.username}");
-      debugPrint("nama: ${user.nama}");
-      debugPrint("email: ${user.email}");
-      debugPrint("userCabang: ${user.userCabang}");
-      debugPrint("userType: ${user.userType}");
-      debugPrint("authenticatedFrom: ${state.requestFrom}");
-
       AppData.user = user;
       AppData.userToken = user.token!;
 
@@ -222,12 +222,12 @@ class RegUserBloc extends Bloc<RegUserEvents, RegUserState> {
 
     emit(state.copyWith(
       isSaving: false,
-      isSaved: true,
+      isSaved: false,
       hasFailure: hasFailure,
       verificationFailed: false,
       errors: errors,
       isResendOtp: false,
       record: state.record?.copyWith(reguserId: returnData.data)
-    )); 
+    ));
   }
 }

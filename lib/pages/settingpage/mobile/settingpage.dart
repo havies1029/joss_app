@@ -292,7 +292,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       nama: profileNama ?? AppData.user.nama ?? "",
                       email: profileEmail ?? AppData.user.email,
                       telepon: profileTelepon ?? AppData.user.hp,
-                      subtitle: "Klien JPS",
+                      subtitle: "Klien Proteksi Plus",
                     );
                   } else {
                     return const SettingsProfileCardWidget(

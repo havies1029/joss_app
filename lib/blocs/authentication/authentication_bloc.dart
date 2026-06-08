@@ -54,6 +54,7 @@ class AuthenticationBloc
     });
   }
 
+
   Future<void> _onAppStarted(
       AppStarted event, Emitter<AuthenticationState> emit) async {
     debugPrint("_onAppStarted");

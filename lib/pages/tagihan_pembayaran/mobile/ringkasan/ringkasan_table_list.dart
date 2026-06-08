@@ -463,7 +463,7 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
                   "NO",
                   "KATEGORI",
                   "JUMLAH\nPOLIS",
-                  "CURR",
+                  "MATA UANG",
                   "TOTAL NILAI\nPERTANGGUNGAN",
                   "TOTAL PREMI",
                 ]),

@@ -24,7 +24,7 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
   int? pressedChip;
 
   final List<String> chipItems = [
-    "Tentang",
+    "Proteksi Plus",
     "Profil Perusahaan",
     "Testimoni",
   ];

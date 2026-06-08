@@ -16,6 +16,7 @@ import '../../../../../blocs/regklaim/attach_bloc.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../common/plat_nomor_formatter.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
@@ -399,9 +400,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       ok = false;
     }
 
-    final lokasi = fieldLokasiObjectController.text.trim();
-    if (lokasi.isEmpty) {
-      setErr('form1.alamatTertanggung', kAddressNullError);
+    if (fieldLokasiObjectController.text.trim().isEmpty) {
+      setErr(
+        'form1.alamatTertanggung',
+        widget.cobKlaimId == '10002'
+            ? 'Nomor Polisi wajib diisi'
+            : kAddressNullError,
+      );
       ok = false;
     }
 
@@ -540,12 +545,20 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   );
 
   Widget buildFieldLokasiResiko() => appTextField(
-    label: "Lokasi Risiko",
+    label: widget.cobKlaimId == '10002'
+        ? "Nomor Polisi"
+        : "Lokasi Risiko",
     controller: fieldLokasiObjectController,
-    maxLines: 4,
+    maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
     keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
+    inputFormatters: widget.cobKlaimId == '10002'
+        ? [
+      PlatNomorFormatter(),
+    ]
+        : [
+      FilteringTextInputFormatter.allow(
+        RegExp(r"[0-9a-zA-Z ,./\-#()]"),
+      ),
     ],
     errorText: err('form1.alamatTertanggung'),
     validator: (_) => err('form1.alamatTertanggung'),

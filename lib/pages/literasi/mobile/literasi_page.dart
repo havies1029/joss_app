@@ -16,7 +16,7 @@ class _LiterasiPageState extends State<LiterasiPage> {
   int selectedTab = 0;
 
   final List<Map<String, dynamic>> tabItems = [
-    {'label': 'Tentang JPS', 'page': const TentangJPSPage()},
+    {'label': 'Tentang', 'page': const TentangJPSPage()},
     {
       'label': 'Artikel',
       'page': const ArtikelPage(constraints: BoxConstraints()),

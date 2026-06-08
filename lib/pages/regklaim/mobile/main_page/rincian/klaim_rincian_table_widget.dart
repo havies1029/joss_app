@@ -414,7 +414,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           softWrap: compact,
         ),
         _textCell(
-          d.noPolis,
+          d.noPolis.trim().isEmpty ? "-" : d.noPolis,
           maxLines: compact ? 2 : 1,
           softWrap: compact,
         ),

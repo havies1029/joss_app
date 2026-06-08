@@ -105,7 +105,11 @@ class PopupClientWidgetState extends State<PopupClientWidget>
   }
 
   bool _isEmail(String input) => EmailValidator.validate(input);
-  bool _isPhone(String input) => IndoPhoneHelper.normalize(input).isValid;
+
+  bool _isPhone(String input) =>
+      IndoPhoneHelper
+          .normalize(input)
+          .isValid;
 
   String _formatPhoneVisual(String phone62) {
     if (!phone62.startsWith('62')) return phone62;
@@ -196,7 +200,11 @@ class PopupClientWidgetState extends State<PopupClientWidget>
 
     context.read<RegUserBloc>().add(
       ResendOtpEvent(
-        reguserId: context.read<RegUserBloc>().state.record?.reguserId ?? '',
+        reguserId: context
+            .read<RegUserBloc>()
+            .state
+            .record
+            ?.reguserId ?? '',
       ),
     );
   }
@@ -223,7 +231,10 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       });
     }
 
-    final record = context.read<RegUserBloc>().state.record;
+    final record = context
+        .read<RegUserBloc>()
+        .state
+        .record;
     if (record == null) {
       if (mounted) {
         setState(() => _isVerifyingOtp = false);
@@ -281,10 +292,35 @@ class PopupClientWidgetState extends State<PopupClientWidget>
       border: Border.all(color: pRed, width: 2),
     );
 
-    return BlocListener<RegUserBloc, RegUserState>(
-      listenWhen: (prev, curr) =>
-      prev.isSaved != curr.isSaved || prev.hasFailure != curr.hasFailure,
+    return BlocConsumer<RegUserBloc, RegUserState>(
+      listenWhen: (prev, curr) {
+        final resendStarted = !prev.isResendOtp && curr.isResendOtp;
+        final resendFinished = prev.isResendOtp && !curr.isResendOtp;
+        final verificationFinished = !prev.isSaved && curr.isSaved;
+
+        return resendStarted || resendFinished || verificationFinished;
+      },
       listener: (context, state) {
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+
+        // masih proses resend
+        if (state.isResendOtp) return;
+
+        // resend selesai
+        if (!state.isSaved && !state.isResendOtp) {
+          messenger.showSnackBar(
+            state.hasFailure
+                ? errorSnackBar(
+              state.errors.isNotEmpty
+                  ? state.errors.first
+                  : 'Kode OTP belum bisa dikirim ulang',
+            )
+                : successSnackBar("Kode OTP telah dikirim ulang"),
+          );
+          return;
+        }
+
         if (!state.isSaved) return;
 
         if (mounted) {
@@ -292,9 +328,6 @@ class PopupClientWidgetState extends State<PopupClientWidget>
             _isVerifyingOtp = false;
           });
         }
-
-        final messenger = ScaffoldMessenger.of(context);
-        messenger.hideCurrentSnackBar();
 
         if (state.hasFailure) {
           _shakeOtpFields();
@@ -309,7 +342,10 @@ class PopupClientWidgetState extends State<PopupClientWidget>
           );
 
           _resetOtpAndFocusFirst();
-        } else {
+          return;
+        }
+
+        if (state.isOtpClient) {
           messenger.showSnackBar(
             successSnackBar("Verifikasi OTP berhasil"),
           );
@@ -317,240 +353,263 @@ class PopupClientWidgetState extends State<PopupClientWidget>
           context.read<ProfileDownloadFotoBloc>().add(RefreshSecureImage());
         }
       },
-      child: Scaffold(
-        backgroundColor: secondaryBlackColor,
-        body: SafeArea(
-          child: BaseBackgroundFirstPage(
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: TextButton.icon(
-                                    onPressed: () {
-                                      _resetOtpAndFocusFirst();
-                                      _timer?.cancel();
-                                      Navigator.of(context,
-                                          rootNavigator: false)
-                                          .pop();
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: const Size(0, 0),
-                                      tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    icon: Icon(
-                                      Icons.arrow_back_ios_new,
-                                      color: primaryLightColor,
-                                      size: getResponsiveFont(context, 18),
-                                    ),
-                                    label: Text(
-                                      "Kembali",
-                                      style: bodyTextStyle(context)
-                                          .copyWith(color: primaryLightColor),
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: secondaryBlackColor,
+          body: SafeArea(
+            child: BaseBackgroundFirstPage(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: SlideTransition(
+                          position: _slideAnimation,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 10,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: TextButton.icon(
+                                      onPressed: () {
+                                        _resetOtpAndFocusFirst();
+                                        _timer?.cancel();
+                                        Navigator.of(
+                                          context,
+                                          rootNavigator: false,
+                                        ).pop();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: const Size(0, 0),
+                                        tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new,
+                                        color: primaryLightColor,
+                                        size: getResponsiveFont(context, 18),
+                                      ),
+                                      label: Text(
+                                        "Kembali",
+                                        style: bodyTextStyle(context)
+                                            .copyWith(color: primaryLightColor),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-
-                            Container(
-                              constraints: BoxConstraints(
-                                minHeight: MediaQuery.of(context).size.height,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: cardBorderGradient,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  topRight: Radius.circular(20),
+                              Container(
+                                constraints: BoxConstraints(
+                                  minHeight: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .height,
                                 ),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: vPadding * 2,
-                                  horizontal: hPadding * 1.5,
-                                ),
-                                margin: const EdgeInsets.all(1),
-                                decoration: const BoxDecoration(
-                                  color: secondaryBlackColor,
-                                  borderRadius: BorderRadius.only(
+                                decoration: BoxDecoration(
+                                  gradient: cardBorderGradient,
+                                  borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(20),
                                     topRight: Radius.circular(20),
                                   ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    SvgPicture.asset(
-                                      "assets/icons/otp_icon.svg",
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: vPadding * 2,
+                                    horizontal: hPadding * 1.5,
+                                  ),
+                                  margin: const EdgeInsets.all(1),
+                                  decoration: const BoxDecoration(
+                                    color: secondaryBlackColor,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
                                     ),
-                                    const SizedBox(height: 24),
-                                    Text(
-                                      'Verifikasi OTP',
-                                      style:
-                                      headingStyle(context, fontSize: 25),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(widget.sentTo)}",
-                                          style: bodyTextStyle(context,
-                                              fontSize: 20),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Text(
-                                          _buildOtpValue(widget.sentTo),
-                                          style: bodyTextStyle(context,
-                                              fontSize: 20)
-                                              .copyWith(color: primaryColor),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-
-                                    // ⏱ Timer / resend (DNA)
-                                    AnimatedSwitcher(
-                                      duration:
-                                      const Duration(milliseconds: 300),
-                                      child: _isResendAvailable
-                                          ? GestureDetector(
-                                        onTap: _resendOtp,
-                                        child: Text(
-                                          'Kirim ulang kode',
-                                          style: bodyTextStyle(context)
-                                              .copyWith(
-                                              color: primaryColor),
-                                        ),
-                                      )
-                                          : Text(
-                                        _formatTime(_remainingTime),
-                                        style: bodyTextStyle(context)
-                                            .copyWith(color: pRed),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/icons/otp_icon.svg",
                                       ),
-                                    ),
-
-                                    const SizedBox(height: 16),
-
-                                    // 🔢 OTP Field (Pinput) + Shake (DNA)
-                                    TextSelectionTheme(
-                                      data: TextSelectionThemeData(
-                                        cursorColor: primaryColor,
-                                        selectionColor:
-                                        primaryColor.withOpacity(0.25),
-                                        selectionHandleColor: primaryColor,
+                                      const SizedBox(height: 24),
+                                      Text(
+                                        'Verifikasi OTP',
+                                        style: headingStyle(
+                                          context,
+                                          fontSize: 25,
+                                        ),
                                       ),
-                                      child: AnimatedBuilder(
-                                        animation: _shakeAnimation,
-                                        builder: (_, child) {
-                                          return Transform.translate(
-                                            offset: Offset(
-                                              math.sin(_shakeAnimation.value) *
-                                                  8,
-                                              0,
+                                      const SizedBox(height: 6),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            "Kami sudah mengirim kode OTP ke ${_buildOtpLabel(
+                                                widget.sentTo)}",
+                                            style: bodyTextStyle(
+                                              context,
+                                              fontSize: 20,
                                             ),
-                                            child: child,
-                                          );
-                                        },
-                                        child: Pinput(
-                                          length: 6,
-                                          controller: _pinController,
-                                          focusNode: _pinFocusNode,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.digitsOnly
-                                          ],
-                                          autofillHints: const <String>[],
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          Text(
+                                            _buildOtpValue(widget.sentTo),
+                                            style: bodyTextStyle(
+                                              context,
+                                              fontSize: 20,
+                                            ).copyWith(color: primaryColor),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
 
-                                          defaultPinTheme: basePinTheme,
-                                          focusedPinTheme: focusedPinTheme,
-                                          errorPinTheme: errorPinTheme,
-                                          forceErrorState: _otpError,
-
-                                          showCursor: true,
-                                          cursor: Align(
-                                            alignment: Alignment.center,
-                                            child: Container(
-                                              width: 2,
-                                              height: 24,
+                                      // ⏱ Timer / resend (DNA)
+                                      AnimatedSwitcher(
+                                        duration:
+                                        const Duration(milliseconds: 300),
+                                        child: _isResendAvailable
+                                            ? GestureDetector(
+                                          onTap: _resendOtp,
+                                          child: Text(
+                                            'Kirim ulang kode',
+                                            style: bodyTextStyle(context)
+                                                .copyWith(
                                               color: primaryColor,
                                             ),
                                           ),
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-
-                                          onTap: () =>
-                                              HapticFeedback.selectionClick(),
-
-                                          onChanged: (v) {
-                                            if (_otpError) {
-                                              setState(() => _otpError = false);
-                                            }
-                                          },
-
-                                          onCompleted: (pin) {
-                                            _verifyOtp(otpOverride: pin);
-                                          },
+                                        )
+                                            : Text(
+                                          _formatTime(_remainingTime),
+                                          style: bodyTextStyle(context)
+                                              .copyWith(color: pRed),
                                         ),
                                       ),
-                                    ),
 
-                                    const SizedBox(height: 18),
-                                    Text(
-                                      'Silakan masukkan kode di atas untuk melanjutkan.',
-                                      style: bodyTextStyle(context)
-                                          .copyWith(color: hintGrey),
-                                      textAlign: TextAlign.center,
-                                    ),
+                                      const SizedBox(height: 16),
 
-                                    const SizedBox(height: 18),
+                                      // 🔢 OTP Field (Pinput) + Shake (DNA)
+                                      TextSelectionTheme(
+                                        data: TextSelectionThemeData(
+                                          cursorColor: primaryColor,
+                                          selectionColor:
+                                          primaryColor.withOpacity(0.25),
+                                          selectionHandleColor: primaryColor,
+                                        ),
+                                        child: AnimatedBuilder(
+                                          animation: _shakeAnimation,
+                                          builder: (_, child) {
+                                            return Transform.translate(
+                                              offset: Offset(
+                                                math.sin(
+                                                    _shakeAnimation.value) *
+                                                    8,
+                                                0,
+                                              ),
+                                              child: child,
+                                            );
+                                          },
+                                          child: Pinput(
+                                            length: 6,
+                                            controller: _pinController,
+                                            focusNode: _pinFocusNode,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            autofillHints: const <String>[],
 
-                                    AppButton.primary(
-                                      text: "Lanjut",
-                                      isLoading: _isVerifyingOtp,
-                                      backgroundColor: _isVerifyingOtp ? secondaryBlackColor : primaryColor,
-                                      onPressed: _isVerifyingOtp
-                                          ? null
-                                          : () {
-                                        final otp = _pinController.text.trim();
+                                            defaultPinTheme: basePinTheme,
+                                            focusedPinTheme: focusedPinTheme,
+                                            errorPinTheme: errorPinTheme,
+                                            forceErrorState: _otpError,
 
-                                        if (otp.length == 6) {
-                                          _verifyOtp();
-                                        } else {
-                                          _shakeOtpFields();
-                                          setState(() => _otpError = true);
-                                          _pinFocusNode.requestFocus();
-                                        }
-                                      },
-                                    ),
-                                  ],
+                                            showCursor: true,
+                                            cursor: Align(
+                                              alignment: Alignment.center,
+                                              child: Container(
+                                                width: 2,
+                                                height: 24,
+                                                color: primaryColor,
+                                              ),
+                                            ),
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+
+                                            onTap: () =>
+                                                HapticFeedback.selectionClick(),
+
+                                            onChanged: (v) {
+                                              if (_otpError) {
+                                                setState(
+                                                      () => _otpError = false,
+                                                );
+                                              }
+                                            },
+
+                                            onCompleted: (pin) {
+                                              _verifyOtp(otpOverride: pin);
+                                            },
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 18),
+                                      Text(
+                                        'Silakan masukkan kode di atas untuk melanjutkan.',
+                                        style: bodyTextStyle(context)
+                                            .copyWith(color: hintGrey),
+                                        textAlign: TextAlign.center,
+                                      ),
+
+                                      const SizedBox(height: 18),
+
+                                      AppButton.primary(
+                                        text: "Lanjut",
+                                        isLoading: _isVerifyingOtp,
+                                        backgroundColor: _isVerifyingOtp
+                                            ? secondaryBlackColor
+                                            : primaryColor,
+                                        onPressed: _isVerifyingOtp
+                                            ? null
+                                            : () {
+                                          final otp =
+                                          _pinController.text.trim();
+
+                                          if (otp.length == 6) {
+                                            _verifyOtp();
+                                          } else {
+                                            _shakeOtpFields();
+                                            setState(
+                                                  () => _otpError = true,
+                                            );
+                                            _pinFocusNode.requestFocus();
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -63,7 +63,7 @@ class MilestoneJPSWidget extends StatelessWidget {
             children: [
               // Judul
               Text(
-                "Timeline Pencapaian JPS",
+                "Timeline Pencapaian Proteksi Plus",
                 style: bodyTextStyle(
                   context,
                   fontSize: 22,
