@@ -15,6 +15,9 @@ class PaymentList extends StatelessWidget {
   final VoidCallback onTapHeader;
   final String iconPath;
 
+  final bool isCreditCard;
+  final Widget? creditCardForm;
+
   const PaymentList({
     super.key,
     required this.categoryName,
@@ -22,6 +25,8 @@ class PaymentList extends StatelessWidget {
     required this.isExpanded,
     required this.onTapHeader,
     required this.iconPath,
+    required this.isCreditCard,
+    this.creditCardForm,
   });
 
   @override
@@ -68,59 +73,59 @@ class PaymentList extends StatelessWidget {
         ),
         if (isExpanded) ...[
           Divider(height: 1, thickness: 1, color: sGrey),
-          Column(
-            children: sortedItems.map<Widget>((item) {
-              final bool isSelected = item.methodId == selectedId;
 
-              return InkWell(
-                onTap: () {
-                  context
-                      .read<PaymentMethodCariBloc>()
-                      .add(PaymentSelectMethodEvent(item.methodId));
-                },
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: hPadding * 1.5,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          buildBankLogo(
-                            item.iconId,
-                            item.iconUrl,
-                            size: 36,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              item.title,
-                              style: bodyTextStyle(context),
-                            ),
-                          ),
-                          if (isSelected)
-                            SvgPicture.asset(
-                              'assets/icons/checklist2.svg',
-                              width: 18,
-                              height: 18,
-                              colorFilter: const ColorFilter.mode(
-                                primaryColor,
-                                BlendMode.srcIn,
+          if (isCreditCard)
+            creditCardForm ?? const SizedBox.shrink()
+          else
+            Column(
+              children: sortedItems.map<Widget>((item) {
+                final bool isSelected = item.methodId == selectedId;
+
+                return InkWell(
+                  onTap: () {
+                    context
+                        .read<PaymentMethodCariBloc>()
+                        .add(PaymentSelectMethodEvent(item.methodId));
+                  },
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: hPadding * 1.5,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            buildBankLogo(item.iconId, item.iconUrl, size: 36),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                item.title,
+                                style: bodyTextStyle(context),
                               ),
                             ),
-                        ],
+                            if (isSelected)
+                              SvgPicture.asset(
+                                'assets/icons/checklist2.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(
+                                  primaryColor,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Divider(height: 1, thickness: 1, color: sGrey),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Divider(height: 1, thickness: 1, color: sGrey),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
         ],
       ],
     );

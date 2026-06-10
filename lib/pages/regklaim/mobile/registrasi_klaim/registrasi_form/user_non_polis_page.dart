@@ -17,12 +17,15 @@ import '../../../../../blocs/regklaim/polissourcecari_bloc.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../common/loading_indicator.dart';
 import '../../../../../common/plat_nomor_formatter.dart';
 import '../../../../../models/combobox/combominsurance_model.dart';
+import '../../../../../models/combobox/combomjenisrugimv_model.dart';
 import '../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
 import '../../../../../models/user/user_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
+import '../../../../../repositories/combobox/combomjenisrugimv_repository.dart';
 import '../../../../../repositories/regklaim/picker_repository.dart';
 import '../../../../../repositories/regklaim/upload_repository.dart';
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
@@ -62,6 +65,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   final fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
   final fieldPolisNoController = TextEditingController();
   final fieldLokasiObjectController = TextEditingController();
+  ComboMJenisrugimvModel? fieldComboMJenisrugimv;
+
+  late Future<List<ComboMJenisrugimvModel>> _futureJenisKerugian;
+
+  final comboMJenisrugimvKey =
+  GlobalKey<DropdownSearchState<ComboMJenisrugimvModel>>();
+
   DateTime? fieldPolisMulai;
   DateTime? fieldPolisBerakhir;
 
@@ -112,6 +122,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       pickerRepo: PickerRepositoryImpl(),
       uploadRepo: UploadRepositoryImpl(_dio),
     );
+
+    _futureJenisKerugian =
+        ComboMJenisrugimvRepository().getComboMJenisrugimv();
 
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   final now = DateTime.now();
@@ -232,6 +245,10 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                     ),
                     const SizedBox(height: hPadding),
                     buildFieldInsuredNama(),
+                    if (widget.cobKlaimId == '10002') ...[
+                      const SizedBox(height: hPadding),
+                      buildFieldJenisKerugian(),
+                    ],
                     const SizedBox(height: hPadding),
                     buildFieldLokasiResiko(),
                     const SizedBox(height: hPadding),
@@ -293,6 +310,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       polisAkhir: fieldPolisBerakhir,
       polisMulai: fieldPolisMulai,
       polisNo: fieldPolisNoController.text.trim(),
+      // mjenisrugimvId: widget.cobKlaimId == '10002'
+      //     ? fieldComboMJenisrugimv?.mjenisrugimvId ?? ''
+      //     : '',
       regklaim1Id: regklaim1Id,
     );
 
@@ -402,6 +422,11 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     final nama = fieldInsuredNamaController.text.trim();
     if (nama.isEmpty) {
       setErr('form1.namaTertanggung', kStringNullError);
+      ok = false;
+    }
+
+    if (widget.cobKlaimId == '10002' && fieldComboMJenisrugimv == null) {
+      setErr('form1.jenisKerugian', kStringNullError);
       ok = false;
     }
 
@@ -552,6 +577,114 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
     },
   );
+
+  Widget buildFieldJenisKerugian() {
+    return FutureBuilder<List<ComboMJenisrugimvModel>>(
+      future: _futureJenisKerugian,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: LoadingIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        final jenisKerugianList = snapshot.data ?? [];
+
+        if (jenisKerugianList.isEmpty) {
+          return const Text('Tidak ada data jenis kerugian');
+        }
+
+        return FormField<ComboMJenisrugimvModel>(
+          initialValue: fieldComboMJenisrugimv,
+          validator: (_) {
+            if (widget.cobKlaimId == '10002' &&
+                fieldComboMJenisrugimv == null) {
+              return kStringNullError;
+            }
+            return null;
+          },
+          builder: (fieldState) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Jenis Kerugian',
+                  style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 18)),
+                ),
+                const SizedBox(height: hPadding),
+                Row(
+                  children: jenisKerugianList.map((item) {
+                    final isSelected =
+                        fieldComboMJenisrugimv?.mjenisrugimvId ==
+                            item.mjenisrugimvId;
+
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            fieldComboMJenisrugimv = item;
+                          });
+
+                          fieldState.didChange(item);
+                          clearErr('form1.jenisKerugian');
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected ? primaryColor : hintGrey,
+                                  width: 1,
+                                ),
+                              ),
+                              child: isSelected
+                                  ? Center(
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                              )
+                                  : null,
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                item.jenisrugiNama,
+                                overflow: TextOverflow.ellipsis,
+                                style: isSelected
+                                    ? inputTextStyle(context)
+                                    : bodyTextStyle(context),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: hPadding),
+                if (fieldState.hasError || err('form1.jenisKerugian') != null)
+                  Text(
+                    fieldState.errorText ?? err('form1.jenisKerugian') ?? '',
+                    style: const TextStyle(color: pRed, fontSize: 12),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget buildFieldLokasiResiko() => appTextField(
     label: widget.cobKlaimId == '10002'

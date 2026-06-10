@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -30,6 +31,24 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   int? _expandedIndex;
   late final ScrollController _scrollCtrl;
 
+  final fieldNomorKartuController = TextEditingController();
+
+  DateTime? fieldMasaBerlakuKartu;
+
+  String get expiryMonth =>
+      fieldMasaBerlakuKartu == null
+          ? ''
+          : fieldMasaBerlakuKartu!.month.toString().padLeft(2, '0');
+
+  String get expiryYear =>
+      fieldMasaBerlakuKartu == null
+          ? ''
+          : fieldMasaBerlakuKartu!.year.toString();
+
+  final fieldCvnController = TextEditingController();
+  final fieldNamaDepanPemilikKartuController = TextEditingController();
+  final fieldNamaBelakangPemilikKartuController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +61,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   @override
   void dispose() {
     _scrollCtrl.dispose();
+    fieldNomorKartuController.dispose();
+    fieldCvnController.dispose();
+    fieldNamaDepanPemilikKartuController.dispose();
+    fieldNamaBelakangPemilikKartuController.dispose();
     super.dispose();
   }
 
@@ -319,27 +342,26 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                               cat.sortOrder,
                                             );
 
+                                            final isCreditCard = cat.categoryId.toString() == '20';
+
                                             return PaymentList(
                                               iconPath: icon,
                                               categoryName: cat.categoryName,
                                               items: cat.items,
                                               isExpanded: _expandedIndex == index,
+                                              isCreditCard: isCreditCard,
+                                              creditCardForm: buildFormKartuKredit(),
                                               onTapHeader: () {
                                                 if (busy) return;
 
                                                 if (_expandedIndex != index) {
-                                                  context
-                                                      .read<PaymentMethodCariBloc>()
-                                                      .add(
+                                                  context.read<PaymentMethodCariBloc>().add(
                                                     PaymentResetSelectedEvent(),
                                                   );
                                                 }
 
                                                 setState(() {
-                                                  _expandedIndex =
-                                                  _expandedIndex == index
-                                                      ? null
-                                                      : index;
+                                                  _expandedIndex = _expandedIndex == index ? null : index;
                                                 });
                                               },
                                             );
@@ -358,15 +380,33 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
                       BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
                         builder: (context, state) {
-                          if (state.selectedMethodId == null) {
+                          final sortedCategories = [...state.categories]
+                            ..sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
+
+                          final isCreditCardExpanded =
+                              _expandedIndex != null &&
+                                  sortedCategories[_expandedIndex!].categoryId.toString() == '20';
+
+                          final canShowButton = isCreditCardExpanded || state.selectedMethodId != null;
+
+                          if (!canShowButton) {
                             return const SizedBox.shrink();
                           }
 
                           return Padding(
                             padding: const EdgeInsets.only(top: 10),
                             child: AppButton.primary(
-                              text: "Lanjutkan",
-                              onPressed: busy ? null : _onLanjutkanPressed,
+                              text: "Konfirmasi",
+                              onPressed: busy
+                                  ? null
+                                  : () {
+                                if (isCreditCardExpanded) {
+                                  final ok = validateFormKartuKredit();
+                                  if (!ok) return;
+                                }
+
+                                _onLanjutkanPressed();
+                              },
                             ),
                           );
                         },
@@ -395,6 +435,69 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     );
   }
 
+  Widget buildFormKartuKredit() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+      child: Column(
+        children: [
+          buildFieldNomorKartu(),
+          const SizedBox(height: hPadding),
+          buildFieldNamaDepanPemilikKartu(),
+          const SizedBox(height: hPadding),
+          buildFieldNamaBelakangPemilikKartu(),
+          const SizedBox(height: hPadding),
+          Row(
+            children: [
+              Expanded(child: buildFieldMasaBerlakuKartu()),
+              const SizedBox(width: hPadding),
+              Expanded(child: buildFieldCvn()),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool validateFormKartuKredit() {
+    bool ok = true;
+
+    setState(() {
+      fieldErrors.removeWhere((key, value) => key.startsWith('kartuKredit.'));
+
+      final nomorKartu = fieldNomorKartuController.text.trim();
+      final cvn = fieldCvnController.text.trim();
+      final namaDepan = fieldNamaDepanPemilikKartuController.text.trim();
+      final namaBelakang = fieldNamaBelakangPemilikKartuController.text.trim();
+
+      if (nomorKartu.length < 12) {
+        setErr('kartuKredit.nomorKartu', kStringNullError);
+        ok = false;
+      }
+
+      if (namaDepan.isEmpty) {
+        setErr('kartuKredit.namaDepan', kStringNullError);
+        ok = false;
+      }
+
+      if (namaBelakang.isEmpty) {
+        setErr('kartuKredit.namaBelakang', kStringNullError);
+        ok = false;
+      }
+
+      if (fieldMasaBerlakuKartu == null) {
+        setErr('kartuKredit.masaBerlaku', kStringNullError);
+        ok = false;
+      }
+
+      if (cvn.length < 3) {
+        setErr('kartuKredit.cvn', kStringNullError);
+        ok = false;
+      }
+    });
+
+    return ok;
+  }
+
   void _onLanjutkanPressed() {
     FocusManager.instance.primaryFocus?.unfocus();
     final methodState = context.read<PaymentMethodCariBloc>().state;
@@ -409,6 +512,126 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
         methodId: selectedId,
       ),
     );
+  }
+
+  Widget buildFieldNomorKartu() => appTextField(
+    label: "Nomor Kartu Kredit",
+    controller: fieldNomorKartuController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.digitsOnly,
+    ],
+    errorText: err('kartuKredit.nomorKartu'),
+    validator: (_) => err('kartuKredit.nomorKartu'),
+    onChanged: (v) {
+      if (v.trim().isNotEmpty) clearErr('kartuKredit.nomorKartu');
+    },
+  );
+
+  // Widget buildFieldBulanKedaluwarsa() => appTextField(
+  //   label: "Bulan Kedaluwarsa",
+  //   controller: fieldBulanKedaluwarsaController,
+  //   keyboardType: TextInputType.number,
+  //   inputFormatters: [
+  //     FilteringTextInputFormatter.digitsOnly,
+  //     LengthLimitingTextInputFormatter(2),
+  //   ],
+  //   errorText: err('kartuKredit.bulanKedaluwarsa'),
+  //   validator: (_) => err('kartuKredit.bulanKedaluwarsa'),
+  //   onChanged: (v) {
+  //     if (v.trim().isNotEmpty) clearErr('kartuKredit.bulanKedaluwarsa');
+  //   },
+  // );
+  //
+  // Widget buildFieldTahunKedaluwarsa() => appTextField(
+  //   label: "Tahun Kedaluwarsa",
+  //   controller: fieldTahunKedaluwarsaController,
+  //   keyboardType: TextInputType.number,
+  //   inputFormatters: [
+  //     FilteringTextInputFormatter.digitsOnly,
+  //     LengthLimitingTextInputFormatter(4),
+  //   ],
+  //   errorText: err('kartuKredit.tahunKedaluwarsa'),
+  //   validator: (_) => err('kartuKredit.tahunKedaluwarsa'),
+  //   onChanged: (v) {
+  //     if (v.trim().isNotEmpty) clearErr('kartuKredit.tahunKedaluwarsa');
+  //   },
+  // );
+
+  Widget buildFieldMasaBerlakuKartu() => AppDateField(
+    label: "Masa Berlaku Kartu",
+    initialValue: fieldMasaBerlakuKartu,
+    firstDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
+    lastDate: DateTime(DateTime.now().year + 15, 12, 1),
+    mode: AppDateFieldMode.monthYear,
+    validator: (_) => err('kartuKredit.masaBerlaku'),
+    onChanged: (dt) {
+      setState(() {
+        fieldMasaBerlakuKartu = dt;
+        if (dt != null) clearErr('kartuKredit.masaBerlaku');
+      });
+    },
+  );
+
+  Widget buildFieldCvn() => appTextField(
+    label: "CVN",
+    controller: fieldCvnController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.digitsOnly,
+      LengthLimitingTextInputFormatter(4),
+    ],
+    errorText: err('kartuKredit.cvn'),
+    validator: (_) => err('kartuKredit.cvn'),
+    onChanged: (v) {
+      if (v.trim().isNotEmpty) clearErr('kartuKredit.cvn');
+    },
+  );
+
+  Widget buildFieldNamaDepanPemilikKartu() => appTextField(
+    label: "Nama Depan Pemilik Kartu",
+    controller: fieldNamaDepanPemilikKartuController,
+    keyboardType: TextInputType.text,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+    ],
+    errorText: err('kartuKredit.namaDepan'),
+    validator: (_) => err('kartuKredit.namaDepan'),
+    onChanged: (v) {
+      if (v.trim().isNotEmpty) clearErr('kartuKredit.namaDepan');
+    },
+  );
+
+  Widget buildFieldNamaBelakangPemilikKartu() => appTextField(
+    label: "Nama Belakang Pemilik Kartu",
+    controller: fieldNamaBelakangPemilikKartuController,
+    keyboardType: TextInputType.text,
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+    ],
+    errorText: err('kartuKredit.namaBelakang'),
+    validator: (_) => err('kartuKredit.namaBelakang'),
+    onChanged: (v) {
+      if (v.trim().isNotEmpty) clearErr('kartuKredit.namaBelakang');
+    },
+  );
+
+  final Map<String, String?> fieldErrors = {};
+  String? err(String key) => fieldErrors[key];
+
+  void setErr(String key, String? msg) {
+    setState(() => fieldErrors[key] = msg);
+  }
+
+  void clearErr(String key) {
+    if (!fieldErrors.containsKey(key)) return;
+    setState(() => fieldErrors.remove(key));
+  }
+
+  void clearErrsByPrefix(String prefix) {
+    setState(() {
+      fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
+    });
   }
 }
 

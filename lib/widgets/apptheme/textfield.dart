@@ -156,6 +156,11 @@ class appTextField extends StatelessWidget {
   }
 }
 
+enum AppDateFieldMode {
+  date,
+  monthYear,
+}
+
 class AppDateField extends StatefulWidget {
   final String label;
   final DateTime? initialValue;
@@ -166,6 +171,7 @@ class AppDateField extends StatefulWidget {
   final EdgeInsets? padding;
   final double? height;
   final bool enabled;
+  final AppDateFieldMode mode;
 
   const AppDateField({
     super.key,
@@ -178,6 +184,7 @@ class AppDateField extends StatefulWidget {
     this.padding,
     this.height,
     this.enabled = true,
+    this.mode = AppDateFieldMode.date,
   });
 
   @override
@@ -202,6 +209,11 @@ class _AppDateFieldState extends State<AppDateField> {
   }
 
   Future<void> _pickDate(BuildContext context) async {
+    if (widget.mode == AppDateFieldMode.monthYear) {
+      await _pickMonthYear(context);
+      return;
+    }
+
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
@@ -228,6 +240,146 @@ class _AppDateFieldState extends State<AppDateField> {
     }
   }
 
+
+  Future<void> _pickMonthYear(BuildContext context) async {
+    final now = DateTime.now();
+
+    int selectedMonth = selectedDate?.month ?? now.month;
+    int selectedYear = selectedDate?.year ?? now.year;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: formGrey,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(cardBorderRadius),
+        ),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(hPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.label,
+                    style: headingStyle(context).copyWith(fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<int>(
+                          dropdownColor: formGrey,
+                          value: selectedMonth,
+                          style: const TextStyle(
+                            color: primaryLightColor,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: "Bulan",
+                            labelStyle: const TextStyle(
+                              color: primaryLightColor,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderSide: const BorderSide(color: sGrey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderSide: const BorderSide(color: primaryColor),
+                            ),
+                          ),
+                          iconEnabledColor: primaryLightColor,
+                          items: List.generate(12, (i) {
+                            final month = i + 1;
+                            return DropdownMenuItem(
+                              value: month,
+                              child: Text(
+                                month.toString().padLeft(2, '0'),
+                                style: const TextStyle(
+                                  color: primaryLightColor,
+                                ),
+                              ),
+                            );
+                          }),
+                          onChanged: (v) {
+                            if (v == null) return;
+                            setModalState(() {
+                              selectedMonth = v;
+                            });
+                          },
+                        )
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<int>(
+                          dropdownColor: formGrey,
+                          value: selectedYear,
+                          style: const TextStyle(
+                            color: primaryLightColor,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: "Tahun",
+                            labelStyle: const TextStyle(
+                              color: primaryLightColor,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderSide: const BorderSide(color: sGrey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(cardBorderRadius),
+                              borderSide: const BorderSide(color: primaryColor),
+                            ),
+                          ),
+                          iconEnabledColor: primaryLightColor,
+                          items: List.generate(16, (i) {
+                            final year = now.year + i;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(
+                                year.toString(),
+                                style: const TextStyle(
+                                  color: primaryLightColor,
+                                ),
+                              ),
+                            );
+                          }),
+                          onChanged: (v) {
+                            if (v == null) return;
+                            setModalState(() {
+                              selectedYear = v;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton.primary(
+                    text: "Pilih",
+                    onPressed: () {
+                      final picked = DateTime(selectedYear, selectedMonth, 1);
+
+                      setState(() {
+                        selectedDate = picked;
+                      });
+
+                      widget.onChanged?.call(picked);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isEnabled = widget.enabled;
@@ -242,7 +394,9 @@ class _AppDateFieldState extends State<AppDateField> {
       readOnly: true,
       controller: TextEditingController(
         text: selectedDate != null
-            ? DateFormat('yyyy-MM-dd').format(selectedDate!)
+            ? widget.mode == AppDateFieldMode.monthYear
+            ? DateFormat('MM / yyyy').format(selectedDate!)
+            : DateFormat('yyyy-MM-dd').format(selectedDate!)
             : '',
       ),
       cursorColor: primaryLightColor,
