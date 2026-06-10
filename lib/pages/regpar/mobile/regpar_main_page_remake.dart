@@ -1459,8 +1459,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       objectKelurahanId: fieldComboMKelurahan?.mkelurahanId,
     );
 
-    debugPrint("[draftForm2ToBloc] record => ${record.toJson()}");
-
     context.read<Regpar2FormBloc>().add(Regpar2DraftEvent(record: record));
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:joss_app/blocs/gallery/galleryeventcari_bloc.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../common/loading_indicator.dart';
 
@@ -46,6 +47,26 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
     _autoSlideTimer?.cancel();
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _openUrl(String url) async {
+    if (url.trim().isEmpty) return;
+
+    final uri = Uri.tryParse(url.trim());
+
+    if (uri == null || !uri.hasScheme) {
+      debugPrint('[CAROUSEL] invalid url: $url');
+      return;
+    }
+
+    final success = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!success) {
+      debugPrint('[CAROUSEL] tidak bisa membuka url: $url');
+    }
   }
 
   void _syncInitialPageIfNeeded(int itemLength) {
@@ -217,7 +238,11 @@ class _CarouselMenuWidgetState extends State<CarouselMenuWidget> {
                 animation: _pageController,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: _buildCachedImage(item.galleryUrl),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _openUrl(item.eventUrl),
+                    child: _buildCachedImage(item.galleryUrl),
+                  ),
                 ),
                 builder: (context, child) {
                   double scale = 1.0;

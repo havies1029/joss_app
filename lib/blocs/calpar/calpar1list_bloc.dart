@@ -99,13 +99,13 @@ class Calpar1ListBloc extends Bloc<Calpar1ListEvents, Calpar1ListState> {
 			CalPar2RegParEvent event,
 			Emitter<Calpar1ListState> emit,
 			) async {
-		if (state.isProcessing) return; // ✅ anti double trigger
+		if (state.isProcessing) return;
 
 		emit(state.copyWith(
 			isProcessing: true,
 			isProcessed: false,
 			hasFailure: false,
-			processMessage: "", // ✅ reset dulu biar listener gak ketarik nilai lama
+			processMessage: "",
 		));
 
 		Calpar1ListRepository repo = Calpar1ListRepository();

@@ -85,55 +85,46 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   late AuthenticationBloc authenticationBloc;
 
   bool _lockCheckboxes = true;
+  bool _showZonaGempa = true;
 
   void _setBool(TextEditingController c, bool v) {
     c.text = v.toString();
   }
 
   void _applyCoverParRule(String? mjnscoverparId) {
-    // default: tidak ada yg kecentang, tidak terkunci
-    if (mjnscoverparId == null) {
-      setState(() {
-        _lockCheckboxes = false;
-        _setBool(fieldIsEqController, false);
-        _setBool(fieldIsTsfwdController, false);
-        _setBool(fieldIsFlexasController, false);
-        _setBool(fieldIsOtherController, false);
-        _setBool(fieldIsRsmdccController, false);
-      });
-      return;
-    }
+    _lockCheckboxes = false;
+    _showZonaGempa = true;
+
+    _setBool(fieldIsEqController, false);
+    _setBool(fieldIsTsfwdController, false);
+    _setBool(fieldIsFlexasController, false);
+    _setBool(fieldIsOtherController, false);
+    _setBool(fieldIsRsmdccController, false);
 
     if (mjnscoverparId == "10") {
-      // dengan gempa: semua centang termasuk gempa
-      setState(() {
-        _lockCheckboxes = true;
-        _setBool(fieldIsEqController, true);
-        _setBool(fieldIsTsfwdController, true);
-        _setBool(fieldIsFlexasController, true);
-        _setBool(fieldIsOtherController, true);
-        _setBool(fieldIsRsmdccController, true);
-      });
+      // Dengan Gempa
+      _lockCheckboxes = true;
+      _showZonaGempa = true;
+
+      _setBool(fieldIsEqController, true);
+      _setBool(fieldIsTsfwdController, true);
+      _setBool(fieldIsFlexasController, true);
+      _setBool(fieldIsOtherController, true);
+      _setBool(fieldIsRsmdccController, true);
     } else if (mjnscoverparId == "20") {
-      // tanpa gempa: semua centang selain gempa
-      setState(() {
-        _lockCheckboxes = true;
-        _setBool(fieldIsEqController, false);
-        _setBool(fieldIsTsfwdController, true);
-        _setBool(fieldIsFlexasController, true);
-        _setBool(fieldIsOtherController, true);
-        _setBool(fieldIsRsmdccController, true);
-      });
-    } else {
-      // id lain: balik ke default (atau sesuai kebutuhan)
-      setState(() {
-        _lockCheckboxes = false;
-        _setBool(fieldIsEqController, false);
-        _setBool(fieldIsTsfwdController, false);
-        _setBool(fieldIsFlexasController, false);
-        _setBool(fieldIsOtherController, false);
-        _setBool(fieldIsRsmdccController, false);
-      });
+      // Tanpa Gempa
+      _lockCheckboxes = true;
+      _showZonaGempa = false;
+
+      _setBool(fieldIsEqController, false);
+      _setBool(fieldIsTsfwdController, true);
+      _setBool(fieldIsFlexasController, true);
+      _setBool(fieldIsOtherController, true);
+      _setBool(fieldIsRsmdccController, true);
+
+      fieldComboMKabZonaGempa = null;
+      comboMKabZonaGempaKey.currentState?.clear();
+      clearErr('form3.kab2zonagempaId');
     }
   }
 
@@ -704,7 +695,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                         const SizedBox(height: hPadding),
                         buildFieldMwilayahId(),
                         const SizedBox(height: hPadding),
-                        buildFieldKab2zonagempaId(),
+                        if (_showZonaGempa) ...[
+                          buildFieldKab2zonagempaId(),
+                        ],
                         const SizedBox(height: 15),
                       ],
                     ),
@@ -1093,7 +1086,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       isFlexas: toBoolean(fieldIsFlexasController.text),
       isOther: toBoolean(fieldIsOtherController.text),
       isRsmdcc: toBoolean(fieldIsRsmdccController.text),
-      kab2zonagempaId: fieldComboMKabZonaGempa?.mkabzonagempaId,
+      kab2zonagempaId: _showZonaGempa
+          ? fieldComboMKabZonaGempa?.mkabzonagempaId
+          : null,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
     );
@@ -1287,7 +1282,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       ok = false;
     }
 
-    if (fieldComboMKabZonaGempa == null) {
+    if (_showZonaGempa && fieldComboMKabZonaGempa == null) {
       setErr('form3.kab2zonagempaId', kStringNullError);
       ok = false;
     }
@@ -1683,7 +1678,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     },
     displayText: (i) => i.kabupaten,
     compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
+    validatorCallback: (v) {
+      if (!_showZonaGempa) return null;
+      return v == null ? kStringNullError : null;
+    },
     errorText: err('form3.kab2zonagempaId'),
     onChangedCallback: (v) {
       fieldComboMKabZonaGempa = v;

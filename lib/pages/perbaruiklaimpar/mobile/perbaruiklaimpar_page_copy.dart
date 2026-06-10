@@ -48,6 +48,56 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
     );
   }
 
+  bool _validateKlaimState() {
+    final klaimState = context.read<KlaimparklaimcrudBloc>().state;
+
+    if (!klaimState.isComplete) {
+      _openAccordion(0);
+      _showMessage('Data klaim belum lengkap');
+      return false;
+    }
+
+    // if (!klaimState.isValid) {
+    //   _openAccordion(0);
+    //   _showMessage('Data klaim belum valid');
+    //   return false;
+    // }
+
+    if (klaimState.hasFailure) {
+      _openAccordion(0);
+      _showMessage('Penyimpanan data klaim sebelumnya gagal');
+      return false;
+    }
+
+    return true;
+  }
+
+  bool _validateDokumenState() {
+    final dokState = context.read<Klaim5cariBloc>().state;
+
+    debugPrint('=== VALIDATE DOKUMEN START ===');
+    debugPrint('items length: ${dokState.items.length}');
+    debugPrint('isComplete: ${dokState.isComplete}');
+
+    for (int i = 0; i < dokState.items.length; i++) {
+      final x = dokState.items[i];
+      debugPrint(
+        'item[$i] fileName=${x.fileName} | fileUrl=${x.fileUrl}',
+      );
+    }
+
+    final hasValidDoc = dokState.items.any(
+          (x) => (x.fileUrl?.isNotEmpty ?? false) || (x.fileName?.isNotEmpty ?? false),
+    );
+
+    if (dokState.emptyDocumentIds.isNotEmpty) {
+      _openAccordion(1);
+      _showMessage('Dokumen klaim belum lengkap');
+      return false;
+    }
+    return true;
+  }
+
   Future<void> _autoSaveSection(int? index) async {
     if (index == null) return;
 
@@ -69,29 +119,87 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
     }
   }
 
+  bool _validateKlaimForm() {
+    final formOk = klaimPageKey.currentState?.runFullValidation() ?? false;
+
+    if (!formOk) {
+      _openAccordion(0);
+      _showMessage('Form data klaim belum valid');
+      return false;
+    }
+    return true;
+  }
+
+  bool _validateKlaimFull() {
+    if (!_validateKlaimForm()) return false;
+    if (!_validateKlaimState()) return false;
+    return true;
+  }
+
+  bool _validateKlaimUI() {
+    final ok = klaimPageKey.currentState?.runFullValidation() ?? false;
+
+    if (!ok) {
+      _openAccordion(0);
+      _showMessage('Form data klaim belum valid');
+      return false;
+    }
+    return true;
+  }
+
+  bool _validateKlaimBloc() {
+    final state = context.read<KlaimparklaimcrudBloc>().state;
+
+    if (!state.isComplete) {
+      _openAccordion(0);
+      _showMessage('Data klaim belum lengkap');
+      return false;
+    }
+
+    if (state.hasFailure) {
+      _openAccordion(0);
+      _showMessage('Penyimpanan data klaim sebelumnya gagal');
+      return false;
+    }
+
+    return true;
+  }
+
+  bool _validateKlaim() {
+    if (!_validateKlaimUI()) return false;
+    if (!_validateKlaimBloc()) return false;
+    return true;
+  }
+
   Future<void> _handleAccordionTap(int index, KlaimparaccordionState acc) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    await _autoSaveSection(acc.openedIndex);
+    if (index == 0) {
+      _openAccordion(0);
+      return;
+    }
 
-    _openAccordion(index);
+    if (index == 1) {
+      await _autoSaveSection(acc.openedIndex);
+
+      final klaimOk = _validateKlaim();
+      if (!klaimOk) return;
+
+      _openAccordion(1);
+      return;
+    }
   }
 
   Future<void> _handlePerbarui(KlaimparaccordionState acc) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     await _autoSaveSection(acc.openedIndex);
-    await Future.delayed(const Duration(milliseconds: 200));
 
-    if (!mounted) return;
+    final klaimOk = _validateKlaim();
+    if (!klaimOk) return;
 
-    final klaimState = context.read<KlaimparklaimcrudBloc>().state;
-
-    if (klaimState.hasFailure) {
-      _openAccordion(0);
-      _showMessage('Penyimpanan data klaim gagal');
-      return;
-    }
+    final dokOk = _validateDokumenState();
+    if (!dokOk) return;
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -102,6 +210,9 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
         ),
       ),
     );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(successSnackBar('Semua data sudah valid dan siap diperbarui'));
   }
 
   @override

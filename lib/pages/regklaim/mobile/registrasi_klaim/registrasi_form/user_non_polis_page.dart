@@ -13,6 +13,7 @@ import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../../../blocs/gen_regmv/polis_tanggal_state.dart';
 import '../../../../../blocs/regklaim/attach_bloc.dart';
+import '../../../../../blocs/regklaim/polissourcecari_bloc.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
@@ -61,6 +62,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   final fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
   final fieldPolisNoController = TextEditingController();
   final fieldLokasiObjectController = TextEditingController();
+  DateTime? fieldPolisMulai;
+  DateTime? fieldPolisBerakhir;
+
   bool _toKlaimTriggered = false;
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
@@ -109,11 +113,11 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       uploadRepo: UploadRepositoryImpl(_dio),
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final now = DateTime.now();
+    //   final today = DateTime(now.year, now.month, now.day);
+    //   context.read<PolisTanggalBloc>().add(PolisMulaiChanged(today));
+    // });
 
     mRekanGeneralIdvCrudBloc = context.read<MRekanGeneralIdvCrudBloc>();
     mRekanGeneralCmpCrudBloc = context.read<MRekanGeneralCmpCrudBloc>();
@@ -235,7 +239,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: vPadding),
               SizedBox(
                 width: double.infinity,
                 child: AppButton.primary(
@@ -283,14 +287,15 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     }
 
     final record = Regklaim1CrudModel(
-      insuredNama: fieldInsuredNamaController.text,
-      lokasiObject: fieldLokasiObjectController.text,
-      minsuranceId: fieldComboMInsurance?.minsuranceId,
-      polisAkhir: polis.berakhir,
-      polisMulai: polis.mulai,
-      polisNo: fieldPolisNoController.text,
+      insuredNama: fieldInsuredNamaController.text.trim(),
+      lokasiObject: fieldLokasiObjectController.text.trim(),
+      minsuranceId: fieldComboMInsurance?.minsuranceId ?? '',
+      polisAkhir: fieldPolisBerakhir,
+      polisMulai: fieldPolisMulai,
+      polisNo: fieldPolisNoController.text.trim(),
       regklaim1Id: regklaim1Id,
     );
+
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
 
@@ -388,11 +393,11 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       ok = false;
     }
 
-    final noPolis = fieldPolisNoController.text.trim();
-    if (noPolis.isEmpty) {
-      setErr('form1.noPolis', kStringNullError);
-      ok = false;
-    }
+    // final noPolis = fieldPolisNoController.text.trim();
+    // if (noPolis.isEmpty) {
+    //   setErr('form1.noPolis', kStringNullError);
+    //   ok = false;
+    // }
 
     final nama = fieldInsuredNamaController.text.trim();
     if (nama.isEmpty) {
@@ -400,17 +405,15 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       ok = false;
     }
 
-    if (fieldLokasiObjectController.text.trim().isEmpty) {
-      setErr(
-        'form1.alamatTertanggung',
-        widget.cobKlaimId == '10002'
-            ? 'Nomor Polisi wajib diisi'
-            : kAddressNullError,
-      );
-      ok = false;
-    }
-
-    final tglMulai = context.read<PolisTanggalBloc>().state.mulai;
+    // if (fieldLokasiObjectController.text.trim().isEmpty) {
+    //   setErr(
+    //     'form1.alamatTertanggung',
+    //     widget.cobKlaimId == '10002'
+    //         ? 'Nomor Polisi wajib diisi'
+    //         : kAddressNullError,
+    //   );
+    //   ok = false;
+    // }
 
     return ok;
   }
@@ -485,48 +488,54 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     controller: fieldPolisNoController,
     keyboardType: TextInputType.text,
     errorText: err('form1.noPolis'),
-    validator: (_) => err('form1.noPolis'),
+    // validator: (_) => err('form1.noPolis'),
+    validator: (_) => null,
     onChanged: (v) {
       if (v.trim().isNotEmpty) clearErr('form1.noPolis');
     },
   );
 
   Widget buildFieldPolisMulai() {
-    return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
-      buildWhen: (prev, curr) => prev.mulai != curr.mulai,
-      builder: (context, state) {
-        final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final today = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
 
-        return AppDateField(
-          label: 'Tanggal Mulai',
-          initialValue: state.mulai,
-          firstDate: today,
-          lastDate: DateTime(2100),
-          validator: (_) => null,
-          onChanged: (dt) {
-            if (dt == null) return;
-            context.read<PolisTanggalBloc>().add(PolisMulaiChanged(dt));
-          },
-        );
+    return AppDateField(
+      label: 'Tanggal Mulai',
+      initialValue: fieldPolisMulai,
+      firstDate: today,
+      lastDate: DateTime(2100),
+      validator: (_) => null,
+      onChanged: (dt) {
+        setState(() {
+          fieldPolisMulai = dt;
+
+          if (dt == null) {
+            fieldPolisBerakhir = null;
+          } else {
+            fieldPolisBerakhir = DateTime(
+              dt.year + 1,
+              dt.month,
+              dt.day,
+            );
+          }
+        });
       },
     );
   }
 
   Widget buildFieldPolisBerakhir() {
-    return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
-      buildWhen: (prev, curr) => prev.berakhir != curr.berakhir,
-      builder: (context, state) {
-        return AppDateField(
-          key: ValueKey(state.berakhir.toIso8601String()),
-          label: 'Tanggal Berakhir',
-          enabled: false,
-          initialValue: state.berakhir,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-          validator: (_) => null,
-          onChanged: (_) {},
-        );
-      },
+    return AppDateField(
+      key: ValueKey(fieldPolisBerakhir?.toIso8601String() ?? 'empty'),
+      label: 'Tanggal Berakhir',
+      enabled: false,
+      initialValue: fieldPolisBerakhir,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      validator: (_) => null,
+      onChanged: (_) {},
     );
   }
 
@@ -547,7 +556,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   Widget buildFieldLokasiResiko() => appTextField(
     label: widget.cobKlaimId == '10002'
         ? "Nomor Polisi"
-        : "Lokasi Risiko",
+        : "Keterangan",
     controller: fieldLokasiObjectController,
     maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
     keyboardType: TextInputType.text,
@@ -561,7 +570,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       ),
     ],
     errorText: err('form1.alamatTertanggung'),
-    validator: (_) => err('form1.alamatTertanggung'),
+    // validator: (_) => err('form1.alamatTertanggung'),
+    validator: (_) => null,
     onChanged: (v) {
       if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
     },

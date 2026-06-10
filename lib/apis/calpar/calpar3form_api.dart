@@ -13,17 +13,6 @@ class Calpar3FormAPI {
 		Map<String, String> queryParams = {"modul_id": "calpar3FormTambahAPI"};
 		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
 
-		// 🔍 DEBUG — sebelum request
-		debugPrint("=== [CALPAR3 CREATE] REQUEST ===");
-		debugPrint("URL        : $uri");
-		debugPrint("Headers    : ${{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}',
-		}}");
-		debugPrint("Body (json): ${jsonEncode(record.toJson())}");
-		debugPrint("================================");
-
 		ReturnDataAPI returnData;
 
 		try {
@@ -37,12 +26,6 @@ class Calpar3FormAPI {
 				body: jsonEncode(record.toJson()),
 			);
 
-			// 🔍 DEBUG — setelah request
-			debugPrint("=== [CALPAR3 CREATE] RESPONSE ===");
-			debugPrint("StatusCode : ${response.statusCode}");
-			debugPrint("Response   : ${response.body}");
-			debugPrint("=================================");
-
 			if (response.statusCode == 200) {
 				returnData =
 						ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
@@ -54,12 +37,6 @@ class Calpar3FormAPI {
 				);
 			}
 		} catch (e, stack) {
-			// 🔥 DEBUG — jika terjadi error (misal timeout / no internet / parsing error)
-			debugPrint("=== [CALPAR3 CREATE] ERROR ===");
-			debugPrint("Error : $e");
-			debugPrint("Stack : $stack");
-			debugPrint("===============================");
-
 			returnData = ReturnDataAPI(
 				success: false,
 				data: e.toString(),

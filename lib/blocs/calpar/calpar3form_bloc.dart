@@ -28,45 +28,28 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 			Calpar3DraftEvent event,
 			Emitter<Calpar3FormState> emit,
 			) async {
-		debugPrint('[onDraftCalpar3Crud] event masuk');
-		debugPrint('[onDraftCalpar3Crud] event.record = ${event.record}');
 
 		emit(state.copyWith(
 			record: event.record,
 		));
-
-		debugPrint('[onDraftCalpar3Crud] emit selesai, state.record sekarang = ${state.copyWith(record: event.record).record}');
 	}
 
 	Future<void> onTambahCalpar3Form(
 			Calpar3FormTambahEvent event,
 			Emitter<Calpar3FormState> emit,
 			) async {
-		debugPrint("=== [BLOC] CALPAR3 FORM TAMBAH ===");
-
-		debugPrint("Event diterima: Calpar3FormTambahEvent");
-		debugPrint("Record dikirim (toJson): ${event.record.toJson()}");
 
 		ReturnDataAPI returnData;
 		bool hasFailure = true;
 
 		// SEBELUM SAVING
 		emit(state.copyWith(isSaving: true, isSaved: false));
-		debugPrint("State: isSaving=true, isSaved=false");
 
 		try {
-			debugPrint("Memanggil repository.calpar3FormTambah...");
 			returnData = await repository.calpar3FormTambah(event.record);
-
-			debugPrint("=== [API RESPONSE] CALPAR3 FORM TAMBAH ===");
-			debugPrint("Success   : ${returnData.success}");
-			debugPrint("Row Count : ${returnData.rowcount}");
-			debugPrint("Data      : ${returnData.data}");
-			debugPrint("=========================================");
 
 			hasFailure = !returnData.success;
 
-			// 🔥 UPDATE RECORD DENGAN ID BARU DARI API
 			Calpar3FormModel updatedRecord = event.record.copyWith(
 				calpar3Id: returnData.data.toString(),
 			);

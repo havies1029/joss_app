@@ -48,7 +48,7 @@ class Klaim5cariListWidgetState extends State<Klaim5cariListWidget> {
 			builder: (context, state) {
 
 		  if (state.status == ListStatus.success) {
-        context.read<Klaim5cariBloc>().add(Klaim5ValidateDocumentsEvent());
+        // context.read<Klaim5cariBloc>().add(Klaim5ValidateDocumentsEvent());
 
       return state.items.isNotEmpty
         ? Column(
@@ -256,7 +256,7 @@ Future<void> showPreviewDialog({
         ),
       );
 
-      bloc.add(Klaim5ValidateDocumentsEvent());
+      // bloc.add(Klaim5ValidateDocumentsEvent());
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

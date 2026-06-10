@@ -288,9 +288,24 @@ class _AppDateFieldState extends State<AppDateField> {
           fontSize: 12,
         ),
 
-        suffixIcon: Icon(
-          Icons.event,
-          color: iconColor,
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isEnabled && selectedDate != null)
+              IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                color: primaryLightColor,
+                onPressed: () {
+                  setState(() => selectedDate = null);
+                  widget.onChanged?.call(null);
+                },
+              ),
+            Icon(
+              Icons.event,
+              color: iconColor,
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
       ),
       validator: (v) {
