@@ -6,30 +6,30 @@ String? _getLocalLogoPath(String? iconId) {
   if (iconId == null) return null;
 
   switch (iconId.toLowerCase()) {
-    case 'bca':
-      return 'assets/images/logo_va/logo_BCA.png';
     case 'bjb':
-      return 'assets/images/logo_va/logo_BJB.png';
-    case 'bni':
-      return 'assets/images/logo_va/logo_BNI.png';
-    case 'bri':
-      return 'assets/images/logo_va/logo_BRI.png';
-    case 'bsi':
-      return 'assets/images/logo_va/logo_BSI.png';
+      return 'assets/bank_logo/bjb.svg';
     case 'bss':
-      return 'assets/images/logo_va/logo_BSS.png';
+      return 'assets/bank_logo/bss.svg';
+    case 'bca':
+      return 'assets/bank_logo/bca.svg';
     case 'bnc':
-      return 'assets/images/logo_va/logo_BNC.png';
+      return 'assets/bank_logo/bnc.svg';
+    case 'bni':
+      return 'assets/bank_logo/bni.svg';
+    case 'bri':
+      return 'assets/bank_logo/bri.svg';
+    case 'bsi':
+      return 'assets/bank_logo/bsi.svg';
     case 'cimb':
-      return 'assets/images/logo_va/logo_CIMB.png';
+      return 'assets/bank_logo/cimb.svg';
     case 'mandiri':
-      return 'assets/images/logo_va/logo_Mandiri.png';
+      return 'assets/bank_logo/mandiri.svg';
     case 'muamalat':
-      return 'assets/images/logo_va/logo_Muamalat.png';
+      return 'assets/bank_logo/muamalat.svg';
     case 'nnc':
-      return 'assets/images/logo_va/logo_BNC.png';
+      return 'assets/bank_logo/bnc.svg';
     case 'permata':
-      return 'assets/images/logo_va/logo_Permata.png';
+      return 'assets/bank_logo/permata.svg';
     default:
       return null;
   }
@@ -39,25 +39,47 @@ Widget buildBankLogo(String? iconId, String? iconUrl, {double size = 36}) {
   final localPath = _getLocalLogoPath(iconId);
 
   if (localPath != null) {
-    return Image.asset(
-      localPath,
+    return Container(
       width: size,
       height: size,
-      fit: BoxFit.contain,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.25),
+          width: 0.5,
+        ),
+      ),
+      child: SvgPicture.asset(
+        localPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
     );
   }
 
   if (iconUrl != null && iconUrl.isNotEmpty) {
-    return Image.network(
-      iconUrl,
+    return Container(
       width: size,
       height: size,
-      fit: BoxFit.contain,
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) return child;
-        return _placeholder(size);
-      },
-      errorBuilder: (_, __, ___) => _placeholder(size),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.25),
+          width: 0.5,
+        ),
+      ),
+      child: Image.network(
+        iconUrl,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return _placeholder(size);
+        },
+        errorBuilder: (_, __, ___) => _placeholder(size),
+      ),
     );
   }
 

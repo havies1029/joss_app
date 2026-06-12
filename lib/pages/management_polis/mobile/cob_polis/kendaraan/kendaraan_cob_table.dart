@@ -99,21 +99,32 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
       },
 
       columns: [
-        if (showColumn)
-          CobPolicyColumn<AsetMvCariModel>(
-            title: "NOMOR PROSES",
-            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
-            normalFlex: 1.4,
-            compactWidth: 140,
-            normalSoftWrap: false,
-            compactSoftWrap: false,
-          ),
+        // if (showColumn)
+        //   CobPolicyColumn<AsetMvCariModel>(
+        //     title: "NOMOR PROSES",
+        //     valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+        //     normalFlex: 1.4,
+        //     compactWidth: 140,
+        //     normalSoftWrap: false,
+        //     compactSoftWrap: false,
+        //   ),
+
+        // CobPolicyColumn<AsetMvCariModel>(
+        //   title: "NO POLIS",
+        //   valueGetter: (d) => d.polisNo,
+        //   normalFlex: showColumn ? 1.2 : 2.0,
+        //   compactWidth: showColumn ? 120 : 160,
+        //   normalMaxLines: 1,
+        //   compactMaxLines: 2,
+        //   normalSoftWrap: true,
+        //   compactSoftWrap: true,
+        // ),
 
         CobPolicyColumn<AsetMvCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: showColumn ? 1.2 : 2.0,
-          compactWidth: showColumn ? 120 : 160,
+          normalFlex: 2.0,
+          compactWidth: 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
           normalSoftWrap: true,

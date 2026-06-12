@@ -106,21 +106,30 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
       },
 
       columns: [
-        if (showColumn)
-          CobPolicyColumn<AsetParCariModel>(
-            title: "NOMOR PROSES",
-            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
-            normalFlex: 1.4,
-            compactWidth: 140,
-            normalSoftWrap: false,
-            compactSoftWrap: false,
-          ),
+        // if (showColumn)
+        //   CobPolicyColumn<AsetParCariModel>(
+        //     title: "NOMOR PROSES",
+        //     valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+        //     normalFlex: 1.4,
+        //     compactWidth: 140,
+        //     normalSoftWrap: false,
+        //     compactSoftWrap: false,
+        //   ),
+
+        // CobPolicyColumn<AsetParCariModel>(
+        //   title: "NO POLIS",
+        //   valueGetter: (d) => d.polisNo,
+        //   normalFlex: showColumn ? 1.2 : 1.6,
+        //   compactWidth: showColumn ? 120 : 160,
+        //   normalMaxLines: 1,
+        //   compactMaxLines: 2,
+        // ),
 
         CobPolicyColumn<AsetParCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: showColumn ? 1.2 : 1.6,
-          compactWidth: showColumn ? 120 : 160,
+          normalFlex: 1.6,
+          compactWidth: 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
         ),

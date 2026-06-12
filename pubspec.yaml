@@ -88,6 +88,17 @@ flutter:
   uses-material-design: true
   assets:
     - assets/bank_logo/
+    - assets/bank_logo/bjb.svg
+    - assets/bank_logo/bss.svg
+    - assets/bank_logo/bca.svg
+    - assets/bank_logo/bnc.svg
+    - assets/bank_logo/bni.svg
+    - assets/bank_logo/bri.svg
+    - assets/bank_logo/bsi.svg
+    - assets/bank_logo/cimb.svg
+    - assets/bank_logo/mandiri.svg
+    - assets/bank_logo/muamalat.svg
+    - assets/bank_logo/permata.svg
     - assets/images/
     - assets/icons/
     - assets/images/month/

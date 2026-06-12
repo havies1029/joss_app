@@ -60,32 +60,51 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     super.dispose();
   }
 
-String _hintByCob(String cobId, String statusCobId) {
-  switch (cobId) {
-    case "10002":
-      return statusCobId == "10002"
-          ? "No Proses/Tertanggung/No Polis"
-          : "Tertanggung/No Polis";
+// String _hintByCob(String cobId, String statusCobId) {
+//   switch (cobId) {
+//     case "10002":
+//       return statusCobId == "10002"
+//           ? "No Proses/Tertanggung/No Polis"
+//           : "Tertanggung/No Polis";
+//
+//     case "10003":
+//       return statusCobId == "10002"
+//           ? "No Proses/Tertanggung/No Polis/Merk"
+//           : "Tertanggung/No Polis/Merk";
+//
+//     case "10004":
+//       return statusCobId == "10002"
+//           ? "No Proses/No Polis/Tertanggung"
+//           : "No Polis/Tertanggung";
+//
+//     case "10005":
+//       return statusCobId == "10002"
+//           ? "No Proses/No Polis/Tertanggung"
+//           : "No Polis/Tertanggung";
+//
+//     default:
+//       return statusCobId == "10002"
+//           ? "No Proses/No Polis/Tertanggung"
+//           : "No Polis/Tertanggung";
+//     }
+//   }
 
-    case "10003":
-      return statusCobId == "10002"
-          ? "No Proses/Tertanggung/No Polis/Merk"
-          : "Tertanggung/No Polis/Merk";
+  String _hintByCob(String cobId, String statusCobId) {
+    switch (cobId) {
+      case "10002":
+        return "Tertanggung/No Polis";
 
-    case "10004":
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      case "10003":
+        return "Tertanggung/No Polis/Merk";
 
-    case "10005":
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      case "10004":
+        return "No Polis/Tertanggung";
 
-    default:
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      case "10005":
+        return "No Polis/Tertanggung";
+
+      default:
+        return "No Polis/Tertanggung";
     }
   }
 

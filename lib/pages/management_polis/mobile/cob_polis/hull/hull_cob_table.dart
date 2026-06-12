@@ -107,21 +107,32 @@ class _HullCobTableState extends State<HullCobTable> {
       },
 
       columns: [
-        if (showColumn)
-          CobPolicyColumn<AsethullCariModel>(
-            title: "NOMOR PROSES",
-            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
-            normalFlex: 1.4,
-            compactWidth: 140,
-            normalSoftWrap: false,
-            compactSoftWrap: false,
-          ),
+        // if (showColumn)
+        //   CobPolicyColumn<AsethullCariModel>(
+        //     title: "NOMOR PROSES",
+        //     valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+        //     normalFlex: 1.4,
+        //     compactWidth: 140,
+        //     normalSoftWrap: false,
+        //     compactSoftWrap: false,
+        //   ),
+        //
+        // CobPolicyColumn<AsethullCariModel>(
+        //   title: "NO POLIS",
+        //   valueGetter: (d) => d.polisNo,
+        //   normalFlex: showColumn ? 1.2 : 2.0,
+        //   compactWidth: showColumn ? 120 : 140,
+        //   normalMaxLines: 1,
+        //   compactMaxLines: 2,
+        //   normalSoftWrap: true,
+        //   compactSoftWrap: true,
+        // ),
 
         CobPolicyColumn<AsethullCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: showColumn ? 1.2 : 2.0,
-          compactWidth: showColumn ? 120 : 140,
+          normalFlex: 2.0,
+          compactWidth: 140,
           normalMaxLines: 1,
           compactMaxLines: 2,
           normalSoftWrap: true,

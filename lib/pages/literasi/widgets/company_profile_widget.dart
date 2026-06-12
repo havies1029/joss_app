@@ -79,7 +79,7 @@ class CompanyProfileCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Semua tentang JPS dalam satu dokumen.',
+                          'Semua tentang Proteksi Plus dalam satu dokumen.',
                           textAlign: TextAlign.center,
                           style: bodyTextStyle(
                             context,
