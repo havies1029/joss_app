@@ -27,12 +27,16 @@ class UserPolisDetail extends StatefulWidget {
   final String cobKlaimId;
   final String cobKlaimNama;
   final String sppa1Id;
+  final String mjenisrugimvId;
+  final String keterangan;
 
   const UserPolisDetail({
     super.key,
     required this.cobKlaimId,
     required this.cobKlaimNama,
     required this.sppa1Id,
+    required this.mjenisrugimvId,
+    required this.keterangan,
   });
 
   @override
@@ -264,6 +268,8 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                             regklaim1crudbloc.add(
                               Regklaim1Tambah4PolisJpsEvent(
                                 sppa1Id: widget.sppa1Id,
+                                mjenisrugimvId: widget.mjenisrugimvId,
+                                keterangan: widget.keterangan,
                               ),
                             );
                           } else {
@@ -406,9 +412,13 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
         const SizedBox(height: vPadding),
 
         _buildDetailRow(
-          label: "Alamat Resiko:",
-          value: "${fieldObjectAlamat1Controller.text},\n${fieldObjectAlamat2Controller.text}",
-          valueMultiline: true,
+          label: widget.cobKlaimId == "10002"
+              ? "Nomor Polisi:"
+              : "Alamat Risiko:",
+          value: widget.cobKlaimId == "10002"
+              ? fieldObjectAlamat1Controller.text
+              : "${fieldObjectAlamat1Controller.text},\n${fieldObjectAlamat2Controller.text}",
+          valueMultiline: widget.cobKlaimId != "10002",
         ),
         // const SizedBox(height: vPadding),
 

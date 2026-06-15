@@ -1,4 +1,3 @@
-
 import 'package:joss_app/models/combobox/combominsurance_model.dart';
 
 class Regklaim1CrudModel {
@@ -11,6 +10,9 @@ class Regklaim1CrudModel {
 	String? minsuranceId;
 	ComboMInsuranceModel? comboMInsurance;
 
+	String? mjenisrugimvId;
+	String? keterangan;
+
 	Regklaim1CrudModel({
 		required this.insuredNama,
 		this.polisAkhir,
@@ -20,6 +22,8 @@ class Regklaim1CrudModel {
 		required this.lokasiObject,
 		this.minsuranceId,
 		this.comboMInsurance,
+		this.mjenisrugimvId,
+		this.keterangan,
 	});
 
 	factory Regklaim1CrudModel.fromJson(Map<String, dynamic> data) {
@@ -37,6 +41,8 @@ class Regklaim1CrudModel {
 			lokasiObject: data['lokasiObject'] ?? '',
 			minsuranceId: data['minsuranceId'] ?? '',
 			comboMInsurance: comboMInsurance,
+			mjenisrugimvId: data['mjenisrugimvId'] ?? '',
+			keterangan: data['keterangan'] ?? '',
 		);
 	}
 
@@ -49,5 +55,7 @@ class Regklaim1CrudModel {
 		'lokasiObject': lokasiObject,
 		'minsuranceId': minsuranceId,
 		'comboMInsurance': comboMInsurance?.toJson(),
+		'mjenisrugimvId': mjenisrugimvId,
+		'keterangan': keterangan,
 	};
 }

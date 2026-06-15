@@ -121,3 +121,14 @@ class SetPaymentSummaryEvent extends DnRekap2invEvent {
   @override
   List<Object> get props => [curr, totalBayar];
 }
+
+class Invoice2PaymentViaCardEvent extends DnRekap2invEvent {
+  final PaymentCardModel record;
+
+  const Invoice2PaymentViaCardEvent({
+    required this.record,
+  });
+
+  @override
+  List<Object> get props => [record];
+}

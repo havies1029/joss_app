@@ -310,9 +310,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       polisAkhir: fieldPolisBerakhir,
       polisMulai: fieldPolisMulai,
       polisNo: fieldPolisNoController.text.trim(),
-      // mjenisrugimvId: widget.cobKlaimId == '10002'
-      //     ? fieldComboMJenisrugimv?.mjenisrugimvId ?? ''
-      //     : '',
+      mjenisrugimvId: widget.cobKlaimId == '10002'
+          ? fieldComboMJenisrugimv?.mjenisrugimvId ?? ''
+          : '',
       regklaim1Id: regklaim1Id,
     );
 
@@ -430,15 +430,15 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       ok = false;
     }
 
-    // if (fieldLokasiObjectController.text.trim().isEmpty) {
-    //   setErr(
-    //     'form1.alamatTertanggung',
-    //     widget.cobKlaimId == '10002'
-    //         ? 'Nomor Polisi wajib diisi'
-    //         : kAddressNullError,
-    //   );
-    //   ok = false;
-    // }
+    if (fieldLokasiObjectController.text.trim().isEmpty) {
+      setErr(
+        'form1.alamatTertanggung',
+        widget.cobKlaimId == '10002'
+            ? 'Nomor Polisi wajib diisi'
+            : kAddressNullError,
+      );
+      ok = false;
+    }
 
     return ok;
   }
@@ -465,13 +465,25 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   bool get _isAutoInsurance =>
       widget.cobKlaimId == '10001' || widget.cobKlaimId == '10002';
 
+  static const _priorityInsuranceIds = [
+    '21',
+    '17',
+    '47',
+    '52',
+    '03',
+    '46',
+    // '??', // jiwa
+  ];
+
   Widget buildFieldMinsuranceId() => ReusableComboBoxV2<ComboMInsuranceModel>(
     key: ValueKey('minsurance_${widget.cobKlaimId}'),
     hintText: "Kategori Asuransi",
     comboKey: comboMInsuranceKey,
     initItem: fieldComboMInsurance,
     isEnabled: !_isAutoInsurance,
-
+    initialVisibleCount: _priorityInsuranceIds.length,
+    expandText: (count) => "Lihat $count Kategori Lainnya",
+    collapseText: "Tampilkan Lebih Sedikit",
     loader: (q) async {
       final data = await ComboMInsuranceRepository().getComboMInsurance(
         q.searchText,

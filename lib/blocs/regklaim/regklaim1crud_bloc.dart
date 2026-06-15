@@ -57,13 +57,27 @@ class Regklaim1CrudBloc extends Bloc<Regklaim1CrudEvents, Regklaim1CrudState> {
 		emit(state.copyWith(isLoading: false, isLoaded: true, record: record));
 	}
 
-  Future<void> onTambah4PolisJps(
-    Regklaim1Tambah4PolisJpsEvent event, Emitter<Regklaim1CrudState> emit) async {
+	Future<void> onTambah4PolisJps(
+			Regklaim1Tambah4PolisJpsEvent event,
+			Emitter<Regklaim1CrudState> emit,
+			) async {
 		emit(state.copyWith(isSaving: true, isSaved: false));
-    ReturnDataAPI returnData = await repository.regklaim1Tambah4PolisJps(event.sppa1Id);
-    bool hasFailure = !returnData.success;
-    emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
-  }
+
+		ReturnDataAPI returnData =
+		await repository.regklaim1Tambah4PolisJps(
+			event.sppa1Id,
+			event.mjenisrugimvId,
+			event.keterangan,
+		);
+
+		bool hasFailure = !returnData.success;
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: hasFailure,
+		));
+	}
 
   Future<void> onComboMInsuranceChanged(
 			ComboMInsuranceChangedEvent event, Emitter<Regklaim1CrudState> emit) async {

@@ -9,6 +9,7 @@ import '../../../../../blocs/payment/paymentmethodcari_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_event.dart';
 import '../../../../../blocs/payment/paymentmethodcari_state.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../models/payment/paymentcard_model.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
 import 'payment_list.dart';
@@ -405,7 +406,9 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                                   if (!ok) return;
                                 }
 
-                                _onLanjutkanPressed();
+                                _onLanjutkanPressed(
+                                  isCreditCard: isCreditCardExpanded,
+                                );
                               },
                             ),
                           );
@@ -498,13 +501,38 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     return ok;
   }
 
-  void _onLanjutkanPressed() {
+  void _onLanjutkanPressed({
+    required bool isCreditCard,
+  }) {
     FocusManager.instance.primaryFocus?.unfocus();
+
+    final dnState = context.read<DnRekap2invBloc>().state;
+
+    if (isCreditCard) {
+      context.read<DnRekap2invBloc>().add(
+        Invoice2PaymentViaCardEvent(
+          record: PaymentCardModel(
+            invoiceId: dnState.invoiceId,
+            cardNumber: fieldNomorKartuController.text.trim(),
+            expiryMonth: expiryMonth,
+            expiryYear: expiryYear,
+            cvn: fieldCvnController.text.trim(),
+            cardholderFirstName:
+            fieldNamaDepanPemilikKartuController.text.trim(),
+            cardholderLastName:
+            fieldNamaBelakangPemilikKartuController.text.trim(),
+            cardholderEmail: '',
+            cardholderPhoneNumber: '',
+          ),
+        ),
+      );
+
+      return;
+    }
+
     final methodState = context.read<PaymentMethodCariBloc>().state;
     final selectedId = methodState.selectedMethodId;
     if (selectedId == null) return;
-
-    final dnState = context.read<DnRekap2invBloc>().state;
 
     context.read<DnRekap2invBloc>().add(
       Invoice2PaymentViaVAEvent(

@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:dropdown_search/dropdown_search.dart';
@@ -43,14 +42,14 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
   final IconData? prefixIcon;
   final String? errorText;
 
-  /// dipakai untuk mendeteksi perubahan parent filter
-  /// mis: dependencyKey: selectedProvinceCode
   final Object? dependencyKey;
-
-  /// kalau dependency berubah, widget akan clear cache
   final bool clearCacheOnDependencyChange;
 
   final bool clientSideSearch;
+
+  final int? initialVisibleCount;
+  final String Function(int hiddenCount)? expandText;
+  final String collapseText;
 
   const ReusableComboBoxV2({
     super.key,
@@ -76,6 +75,9 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
     this.dependencyKey,
     this.clearCacheOnDependencyChange = true,
     this.clientSideSearch = false,
+    this.initialVisibleCount,
+    this.expandText,
+    this.collapseText = "Tampilkan Lebih Sedikit",
   });
 
   @override
@@ -84,8 +86,55 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
 
 class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   List<T>? _cachedItems;
+  List<T> _currentPopupItems = [];
+
   Timer? _debounceTimer;
   int _reqSeq = 0;
+
+  final ValueNotifier<bool> _showAllItemsNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<int> _hiddenCountNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<bool> _isSearchingNotifier = ValueNotifier<bool>(false);
+
+  void _syncPopupMeta(List<T> items, String q) {
+    _currentPopupItems = items;
+
+    final isSearching = q.isNotEmpty;
+    _isSearchingNotifier.value = isSearching;
+
+    if (widget.initialVisibleCount == null || isSearching) {
+      _hiddenCountNotifier.value = 0;
+      return;
+    }
+
+    final limit = widget.initialVisibleCount!;
+    if (items.length <= limit) {
+      _hiddenCountNotifier.value = 0;
+      return;
+    }
+
+    _hiddenCountNotifier.value = items.length - limit;
+  }
+
+  bool _isHiddenItem(T item, bool showAllItems) {
+    if (widget.initialVisibleCount == null) return false;
+    if (showAllItems) return false;
+    if (_isSearchingNotifier.value) return false;
+
+    final index = _currentPopupItems.indexWhere(
+          (element) => widget.compareItems(element, item),
+    );
+
+    if (index < 0) return false;
+
+    return index >= widget.initialVisibleCount!;
+  }
+
+  List<T> _visibleItems(bool showAllItems) {
+    if (widget.initialVisibleCount == null) return _currentPopupItems;
+    if (showAllItems || _isSearchingNotifier.value) return _currentPopupItems;
+
+    return _currentPopupItems.take(widget.initialVisibleCount!).toList();
+  }
 
   @override
   void didUpdateWidget(covariant ReusableComboBoxV2<T> oldWidget) {
@@ -95,8 +144,11 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
 
     if (dependencyChanged && widget.clearCacheOnDependencyChange) {
       _cachedItems = null;
+      _currentPopupItems = [];
+      _showAllItemsNotifier.value = false;
+      _hiddenCountNotifier.value = 0;
+      _isSearchingNotifier.value = false;
 
-      // optional: clear internal dropdown state
       widget.comboKey?.currentState?.clear();
     }
   }
@@ -104,6 +156,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _showAllItemsNotifier.dispose();
+    _hiddenCountNotifier.dispose();
+    _isSearchingNotifier.dispose();
     super.dispose();
   }
 
@@ -115,11 +170,15 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         ComboQuery(searchText: '', params: widget.params),
       );
       _cachedItems = items;
+      _syncPopupMeta(items, q);
       return items;
     }
 
     if (q.isNotEmpty && q.length < widget.minSearchChars) {
       _cachedItems = const [];
+      _currentPopupItems = [];
+      _hiddenCountNotifier.value = 0;
+      _isSearchingNotifier.value = true;
       return const [];
     }
 
@@ -138,6 +197,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       }).toList();
 
       _cachedItems = baseItems;
+      _syncPopupMeta(filteredItems, q);
       return filteredItems;
     }
 
@@ -146,6 +206,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         ComboQuery(searchText: '', params: widget.params),
       );
       _cachedItems = items;
+      _syncPopupMeta(items, q);
       return items;
     }
 
@@ -165,6 +226,8 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         }
 
         _cachedItems = result;
+        _syncPopupMeta(result, q);
+
         if (!completer.isCompleted) completer.complete(result);
       } catch (_) {
         if (!completer.isCompleted) completer.complete(const []);
@@ -217,7 +280,8 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
             color: Colors.red,
             fontSize: 12,
           ),
-          errorText: (widget.errorText != null && widget.errorText!.trim().isNotEmpty)
+          errorText:
+          (widget.errorText != null && widget.errorText!.trim().isNotEmpty)
               ? widget.errorText
               : null,
         ),
@@ -259,30 +323,95 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
                 bottom: Radius.circular(cardBorderRadius),
               ),
             ),
-            child: popupWidget,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(child: popupWidget),
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isSearchingNotifier,
+                  builder: (context, isSearching, _) {
+                    if (isSearching) return const SizedBox.shrink();
+
+                    return ValueListenableBuilder<int>(
+                      valueListenable: _hiddenCountNotifier,
+                      builder: (context, hiddenCount, _) {
+                        return ValueListenableBuilder<bool>(
+                          valueListenable: _showAllItemsNotifier,
+                          builder: (context, showAllItems, _) {
+                            final showToggle =
+                                widget.initialVisibleCount != null &&
+                                    (hiddenCount > 0 || showAllItems);
+
+                            if (!showToggle) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return InkWell(
+                              onTap: () {
+                                _showAllItemsNotifier.value = !showAllItems;
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 14),
+                                alignment: Alignment.center,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      showAllItems
+                                          ? Icons.keyboard_arrow_up
+                                          : Icons.keyboard_arrow_down,
+                                      size: 20,
+                                      color: primaryColor,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      showAllItems
+                                          ? widget.collapseText
+                                          : (widget.expandText
+                                          ?.call(hiddenCount) ??
+                                          "Lihat $hiddenCount Kategori Lainnya"),
+                                      style: bodyTextStyle(context).copyWith(
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
           );
         },
         searchFieldProps: widget.enableSearch
             ? TextFieldProps(
-                style: inputTextStyle(context, color: hintGrey),
-                cursorColor: primaryLightColor,
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: 'Cari ${widget.hintText}...',
-                  hintStyle: inputTextStyle(context, color: hintGrey),
-                  prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
-                  filled: true,
-                  fillColor: formGrey,
-                  border: InputBorder.none,
-                  prefixIconConstraints: const BoxConstraints(
-                    minWidth: 40,
-                    minHeight: 20,
-                  ),
-                ),
-              )
+          style: inputTextStyle(context, color: hintGrey),
+          cursorColor: primaryLightColor,
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: 'Cari ${widget.hintText}...',
+            hintStyle: inputTextStyle(context, color: hintGrey),
+            prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
+            filled: true,
+            fillColor: formGrey,
+            border: InputBorder.none,
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 20,
+            ),
+          ),
+        )
             : const TextFieldProps(
-                decoration: InputDecoration(border: InputBorder.none),
-              ),
+          decoration: InputDecoration(border: InputBorder.none),
+        ),
       ),
       compareFn: widget.compareItems,
       itemAsString: widget.displayText,
@@ -302,27 +431,41 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   }
 
   Widget _defaultItemBuilderWithDivider(
-    BuildContext context,
-    T item,
-    bool isSelected,
-    bool isDisabled,
-  ) {
-    final items = _cachedItems ?? [];
-    final isFirstItem = items.isNotEmpty && widget.compareItems(item, items.first);
-    final isLastItem = items.isNotEmpty && widget.compareItems(item, items.last);
+      BuildContext context,
+      T item,
+      bool isSelected,
+      bool isDisabled,
+      ) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _showAllItemsNotifier,
+      builder: (context, showAllItems, _) {
+        if (_isHiddenItem(item, showAllItems)) {
+          return const SizedBox.shrink();
+        }
 
-    return Column(
-      children: [
-        if (isFirstItem) kDivider(color: sGrey),
-        Padding(
-          padding: const EdgeInsets.all(15),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(widget.displayText(item), style: bodyTextStyle(context)),
-          ),
-        ),
-        if (!isLastItem) kDivider(color: sGrey),
-      ],
+        final visibleItems = _visibleItems(showAllItems);
+        final isFirstItem = visibleItems.isNotEmpty &&
+            widget.compareItems(item, visibleItems.first);
+        final isLastItem = visibleItems.isNotEmpty &&
+            widget.compareItems(item, visibleItems.last);
+
+        return Column(
+          children: [
+            if (isFirstItem) kDivider(color: sGrey),
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.displayText(item),
+                  style: bodyTextStyle(context),
+                ),
+              ),
+            ),
+            if (!isLastItem) kDivider(color: sGrey),
+          ],
+        );
+      },
     );
   }
 }

@@ -41,10 +41,21 @@ class Regklaim1CrudLihatEvent extends Regklaim1CrudEvents {
 
 class Regklaim1Tambah4PolisJpsEvent extends Regklaim1CrudEvents {
 	final String sppa1Id;
-	const Regklaim1Tambah4PolisJpsEvent({required this.sppa1Id});
+	final String mjenisrugimvId;
+	final String keterangan;
+
+	const Regklaim1Tambah4PolisJpsEvent({
+		required this.sppa1Id,
+		required this.mjenisrugimvId,
+		required this.keterangan,
+	});
 
 	@override
-	List<Object> get props => [sppa1Id];
+	List<Object> get props => [
+		sppa1Id,
+		mjenisrugimvId,
+		keterangan,
+	];
 }
 
 class ComboMInsuranceChangedEvent extends Regklaim1CrudEvents{

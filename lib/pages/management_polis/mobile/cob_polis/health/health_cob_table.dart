@@ -107,33 +107,33 @@ class _HealthCobTableState extends State<HealthCobTable> {
       },
 
       columns: [
-        // if (showColumn)
-        //   CobPolicyColumn<AsetHealthCariModel>(
-        //     title: "NOMOR PROSES",
-        //     valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
-        //     normalFlex: 1.4,
-        //     compactWidth: 140,
-        //     normalSoftWrap: false,
-        //     compactSoftWrap: false,
-        //   ),
-
-        // CobPolicyColumn<AsetHealthCariModel>(
-        //   title: "NO POLIS",
-        //   valueGetter: (d) => d.polisNo,
-        //   normalFlex: showColumn ? 1.2 : 2.0,
-        //   compactWidth: showColumn ? 120 : 160,
-        //   normalMaxLines: 1,
-        //   compactMaxLines: 2,
-        // ),
+        if (showColumn)
+          CobPolicyColumn<AsetHealthCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
 
         CobPolicyColumn<AsetHealthCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: 2.0,
-          compactWidth: 160,
+          normalFlex: showColumn ? 1.2 : 2.0,
+          compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
         ),
+
+        // CobPolicyColumn<AsetHealthCariModel>(
+        //   title: "NO POLIS",
+        //   valueGetter: (d) => d.polisNo,
+        //   normalFlex: 2.0,
+        //   compactWidth: 160,
+        //   normalMaxLines: 1,
+        //   compactMaxLines: 2,
+        // ),
 
         CobPolicyColumn<AsetHealthCariModel>(
           title: "JUMLAH OBJEK",

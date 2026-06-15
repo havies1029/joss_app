@@ -109,37 +109,37 @@ class _KargoCobTableState extends State<KargoCobTable> {
       },
 
       columns: [
-        // if (showColumn)
-        //   CobPolicyColumn<AsetothersCariModel>(
-        //     title: "NOMOR PROSES",
-        //     valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
-        //     normalFlex: 1.4,
-        //     compactWidth: 140,
-        //     normalSoftWrap: false,
-        //     compactSoftWrap: false,
-        //   ),
-
-        // CobPolicyColumn<AsetothersCariModel>(
-        //   title: "NO POLIS",
-        //   valueGetter: (d) => d.polisNo,
-        //   normalFlex: showColumn ? 1.2 : 2.2,
-        //   compactWidth: showColumn ? 120 : 160,
-        //   normalMaxLines: 1,
-        //   compactMaxLines: 2,
-        //   normalSoftWrap: true,
-        //   compactSoftWrap: true,
-        // ),
+        if (showColumn)
+          CobPolicyColumn<AsetothersCariModel>(
+            title: "NOMOR PROSES",
+            valueGetter: (d) => d.prosesId.isEmpty ? "-" : d.prosesId,
+            normalFlex: 1.4,
+            compactWidth: 140,
+            normalSoftWrap: false,
+            compactSoftWrap: false,
+          ),
 
         CobPolicyColumn<AsetothersCariModel>(
           title: "NO POLIS",
           valueGetter: (d) => d.polisNo,
-          normalFlex: 2.2,
-          compactWidth: 160,
+          normalFlex: showColumn ? 1.2 : 2.2,
+          compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,
           compactMaxLines: 2,
           normalSoftWrap: true,
           compactSoftWrap: true,
         ),
+
+        // CobPolicyColumn<AsetothersCariModel>(
+        //   title: "NO POLIS",
+        //   valueGetter: (d) => d.polisNo,
+        //   normalFlex: 2.2,
+        //   compactWidth: 160,
+        //   normalMaxLines: 1,
+        //   compactMaxLines: 2,
+        //   normalSoftWrap: true,
+        //   compactSoftWrap: true,
+        // ),
 
         CobPolicyColumn<AsetothersCariModel>(
           title: "JUMLAH OBJEK",

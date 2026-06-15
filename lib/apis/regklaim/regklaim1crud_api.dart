@@ -7,57 +7,122 @@ import 'package:joss_app/models/regklaim/regklaim1crud_model.dart';
 
 class Regklaim1CrudAPI {
 
-	Future<ReturnDataAPI> regklaim1CrudTambahAPI(Regklaim1CrudModel record) async {
-		String tambahEndpoint =
-				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create";
+	Future<ReturnDataAPI> regklaim1CrudTambahAPI(
+			Regklaim1CrudModel record,
+			) async {
+		try {
+			String tambahEndpoint =
+					"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create";
 
-		Map<String, String> queryParams = {
-			"modul_id": "regklaim1CrudTambahAPI"
-		};
+			Map<String, String> queryParams = {
+				"modul_id": "regklaim1CrudTambahAPI",
+			};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
+			var uri = AppData.uriHtpp(
+				AppData.httpAuthority,
+				tambahEndpoint,
+				queryParams,
+			);
 
-		final requestBody = jsonEncode(record.toJson());
+			final requestBody = jsonEncode(record.toJson());
 
-		final http.Response response = await http.post(
-			uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: requestBody,
-		);
+			debugPrint(
+				"================ REGKLAIM CREATE REQUEST ================",
+			);
+			debugPrint("Endpoint : $tambahEndpoint");
+			debugPrint("URI      : $uri");
+			debugPrint("Params   : $queryParams");
+			debugPrint("Body     : $requestBody");
+			debugPrint(
+				"========================================================",
+			);
 
-		if (response.statusCode == 200) {
-			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			return ReturnDataAPI(success: false, data: "", rowcount: 0);
+			final http.Response response = await http.post(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}',
+				},
+				body: requestBody,
+			);
+
+			debugPrint(
+				"================ REGKLAIM CREATE RESPONSE ===============",
+			);
+			debugPrint("Status Code : ${response.statusCode}");
+			debugPrint("Response    : ${response.body}");
+			debugPrint(
+				"========================================================",
+			);
+
+			if (response.statusCode == 200) {
+				return ReturnDataAPI.fromDatabaseJson(
+					jsonDecode(response.body),
+				);
+			} else {
+				debugPrint(
+					"REGKLAIM CREATE FAILED => Status ${response.statusCode}",
+				);
+
+				return ReturnDataAPI(
+					success: false,
+					data: "",
+					rowcount: 0,
+				);
+			}
+		} catch (e, stackTrace) {
+			debugPrint(
+				"================ REGKLAIM CREATE ERROR =================",
+			);
+			debugPrint("Error      : $e");
+			debugPrint("StackTrace : $stackTrace");
+			debugPrint(
+				"========================================================",
+			);
+
+			return ReturnDataAPI(
+				success: false,
+				data: "",
+				rowcount: 0,
+			);
 		}
 	}
 
-	Future<ReturnDataAPI> regklaim1Tambah4PolisJpsAPI(String sppa1Id) async {
+	Future<ReturnDataAPI> regklaim1Tambah4PolisJpsAPI(
+			String sppa1Id,
+			String mjenisrugimvId,
+			String keterangan,
+			) async {
 		String lihatEndpoint =
 				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create4polisjps";
 
 		Map<String, String> queryParams = {
 			'sppa1Id': sppa1Id,
-			'modul_id': 'regklaim1Tambah4PolisJpsAPI'
+			'mjenisrugimvId': mjenisrugimvId,
+			'keterangan': keterangan,
+			'modul_id': 'regklaim1Tambah4PolisJpsAPI',
 		};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			lihatEndpoint,
+			queryParams,
+		);
 
 		final http.Response response = await http.get(
 			uri,
 			headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
+				'Authorization': 'Bearer ${AppData.userToken}',
 			},
 		);
 
 		if (response.statusCode == 200) {
-			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+			return ReturnDataAPI.fromDatabaseJson(
+				jsonDecode(response.body),
+			);
 		} else {
 			throw Exception("Failed to load data");
 		}

@@ -18,7 +18,6 @@ class ComboMCobApp1API {
     );
 
     try {
-      debugPrint("COB API REQUEST: $uri");
 
       final http.Response response = await http.get(
         uri,
@@ -29,9 +28,6 @@ class ComboMCobApp1API {
         },
       );
 
-      debugPrint("COB API STATUS: ${response.statusCode}");
-      debugPrint("COB API RESPONSE: ${response.body}");
-
       if (response.statusCode == 200) {
         final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 
@@ -40,7 +36,6 @@ class ComboMCobApp1API {
             ComboMCobApp1Model.fromJson(json))
             .toList();
       } else {
-        debugPrint("COB API ERROR: status ${response.statusCode}");
         throw Exception("Failed to load data");
       }
     } catch (e, stack) {

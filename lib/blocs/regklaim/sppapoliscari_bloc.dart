@@ -27,7 +27,7 @@ Future<void> onFetchSppapoliscari(
 
 	SppapoliscariRepository repo = SppapoliscariRepository();
 	if (state.status == ListStatus.initial) {
-		List<SppapoliscariModel> items = await repo.getSppapoliscari(state.cobKlaimId, state.searchText, 0);
+		List<SppapoliscariModel> items = await repo.getSppapoliscari(state.cobKlaimId, state.searchText);
 		return emit(state.copyWith(
 			items: items,
 			hasReachedMax: false,
@@ -35,7 +35,7 @@ Future<void> onFetchSppapoliscari(
       hal: 1,
 			));
 	}
-	List<SppapoliscariModel> items = await repo.getSppapoliscari(state.cobKlaimId, state.searchText, state.hal + 1);
+	List<SppapoliscariModel> items = await repo.getSppapoliscari(state.cobKlaimId, state.searchText);
 	if (items.isEmpty) {
 		return emit(state.copyWith(hasReachedMax: true));
 	} else {

@@ -3,6 +3,8 @@ import 'package:joss_app/models/payment/invoicestatus_model.dart';
 import 'package:joss_app/models/payment/paymentmethodcategory_model.dart';
 import 'package:joss_app/models/payment/rinciansoa_model.dart';
 
+import '../../models/payment/paymentcard_model.dart';
+
 class PaymentDnRepository {
   final PaymentDnAPI api;
 
@@ -26,6 +28,12 @@ class PaymentDnRepository {
 
   Future<InvoiceStatusModel> processInvoiceToPaymentViaVa(String invoiceId, String methodId) async {
     return await api.invoice2PaymentViaVaAPI(invoiceId, methodId);
+  }
+
+  Future<InvoiceStatusModel> processInvoiceToPaymentViaCard(
+      PaymentCardModel record,
+      ) async {
+    return await api.invoice2PaymentViaCardAPI(record);
   }
 
   Future<RincianSOAModel> fetchRincianSOACustomer(String searchText) async {

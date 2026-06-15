@@ -58,11 +58,11 @@ class FabActionKlaim extends StatelessWidget {
               .where((d) => d.klaim1Id == selectedId)
               .firstOrNull
               : null;
+
           final status = (selected?.statusDesc ?? '').toLowerCase().trim();
 
           isBerjalan = status == "berjalan";
-          // isLacak = true;
-          isLacak = selected != null;
+          isLacak = selected?.isLacak == true;
         }
        
         final actions = [
@@ -151,6 +151,11 @@ class FabActionKlaim extends StatelessWidget {
                   break;
 
                 case ActionType.lacakKlaim:
+                  if (selected?.isLacak != true) {
+                    /* ini tempat taro popup atau notifikasi kalau di klik */
+                    return;
+                  }
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(

@@ -6,6 +6,8 @@ import 'package:joss_app/models/payment/paymentmethodcategory_model.dart';
 import 'package:joss_app/models/payment/rinciansoa_model.dart';
 import 'package:http/http.dart' as http;
 
+import '../../models/payment/paymentcard_model.dart';
+
 class PaymentDnAPI{
 	void _logRequest({
 		required String name,
@@ -171,6 +173,69 @@ class PaymentDnAPI{
 			}
 		} catch (e, stackTrace) {
 			rethrow;
+		}
+	}
+
+	Future<InvoiceStatusModel> invoice2PaymentViaCardAPI(
+			PaymentCardModel record,
+			) async {
+		String endpoint =
+				"${AppData.prefixEndPoint}/api/payment/invtobayarviacard";
+
+		Map<String, String> queryParams = {
+			'invoiceId': record.invoiceId,
+			'card_number': record.cardNumber,
+			'expiry_month': record.expiryMonth,
+			'expiry_year': record.expiryYear,
+			'cvn': record.cvn,
+			'cardholder_first_name': record.cardholderFirstName,
+			'cardholder_last_name': record.cardholderLastName,
+			'cardholder_email': record.cardholderEmail,
+			'cardholder_phone_number': record.cardholderPhoneNumber,
+			'modulId': 'invoice2PaymentViaCardAPI',
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			endpoint,
+			queryParams,
+		);
+
+		final headers = <String, String>{
+			'Content-Type': 'application/json; odata=verbose',
+			'Accept': 'application/json; odata=verbose',
+			'Authorization': 'Bearer ${AppData.userToken}',
+		};
+
+		_logRequest(
+			name: "invoice2PaymentViaCardAPI",
+			uri: uri,
+			headers: headers,
+		);
+
+		final response = await http.get(uri, headers: headers);
+
+		_logResponse(
+			name: "invoice2PaymentViaCardAPI",
+			response: response,
+		);
+
+		if (response.statusCode == 200) {
+			final decoded = json.decode(response.body);
+
+			if (decoded == null) {
+				throw Exception("API returned null body");
+			}
+
+			if (decoded is! Map<String, dynamic>) {
+				throw Exception("Invalid response format: ${decoded.runtimeType}");
+			}
+
+			return InvoiceStatusModel.fromJson(decoded);
+		} else {
+			throw Exception(
+				"Failed to load data (Status: ${response.statusCode})",
+			);
 		}
 	}
 

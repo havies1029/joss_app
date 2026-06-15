@@ -10,9 +10,17 @@ class Regklaim1CrudRepository {
 		return await api.regklaim1CrudTambahAPI(record);
 	}
 
-  Future<ReturnDataAPI> regklaim1Tambah4PolisJps(String sppa1Id) async {
-    return await api.regklaim1Tambah4PolisJpsAPI(sppa1Id);
-  }
+	Future<ReturnDataAPI> regklaim1Tambah4PolisJps(
+			String sppa1Id,
+			String mjenisrugimvId,
+			String keterangan,
+			) async {
+		return await api.regklaim1Tambah4PolisJpsAPI(
+			sppa1Id,
+			mjenisrugimvId,
+			keterangan,
+		);
+	}
 
   Future<ReturnDataAPI> regklaimToKlaim(String regklaim1Id) async {
     return await api.regklaimToKlaimAPI(regklaim1Id);

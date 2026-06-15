@@ -7,6 +7,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../models/payment/paymentcard_model.dart';
+
 part 'dnrekap2inv_event.dart';
 part 'dnrekap2inv_state.dart';
 
@@ -28,6 +30,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
     on<RegPar2InvoiceEvent>(onRegPar2Inv);
     on<SetPaymentSummaryEvent>(onSetPaymentSummary);
     on<SetRecordInvoiceStatusEvent>(onSetRecordInvoiceStatus);
+    on<Invoice2PaymentViaCardEvent>(onInvoice2PaymentViaCard);
   }
 
   Future<void> onSetPaymentSummary(
@@ -164,6 +167,42 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
         paymentStatus: invoiceStatus.status,
         totalBayar: invoiceStatus.totalBayar,
       ));    
+  }
+
+  Future<void> onInvoice2PaymentViaCard(
+      Invoice2PaymentViaCardEvent event,
+      Emitter<DnRekap2invState> emit,
+      ) async {
+    if (state.isProcessing) return;
+
+    emit(state.copyWith(
+      isProcessing: true,
+      isProcessed: false,
+      hasFailure: false,
+    ));
+
+    try {
+      PaymentDnAPI api = PaymentDnAPI();
+      PaymentDnRepository repo = PaymentDnRepository(api: api);
+
+      InvoiceStatusModel invoiceStatus =
+      await repo.processInvoiceToPaymentViaCard(
+        event.record,
+      );
+
+      emit(state.copyWith(
+        isProcessing: false,
+        isProcessed: true,
+        invoiceId: invoiceStatus.invoiceId,
+        paymentStatus: invoiceStatus.status,
+        totalBayar: invoiceStatus.totalBayar,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isProcessing: false,
+        hasFailure: true,
+      ));
+    }
   }
 
   Future<void> onInvoice2PaymentViaVA(

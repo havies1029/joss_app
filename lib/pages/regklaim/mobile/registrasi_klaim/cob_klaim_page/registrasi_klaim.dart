@@ -8,6 +8,7 @@ import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../../blocs/regklaim/polissourcecari_bloc.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../models/combobox/combomjenisrugimv_model.dart';
 import '../../../../../models/regklaim/sppapoliscari_model.dart';
 import '../../../../../widgets/apptheme/header_card_polis.dart';
 import '../../../../base/base_background_sidepage.dart';
@@ -30,8 +31,9 @@ class RegistrasiKlaim extends StatefulWidget {
 
 class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   SppapoliscariModel? _selectedPolis;
+  ComboMJenisrugimvModel? _selectedJenisKerugian;
+  String _keterangan = '';
   bool _isCariPolisLoading = false;
 
   String get _iconPath {
@@ -54,6 +56,84 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
+  Widget _ValidationDialog({
+    required String title,
+    required String message,
+  }) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+          decoration: BoxDecoration(
+            color: formGrey,
+            borderRadius: BorderRadius.circular(cardBorderRadius),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.35),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: primaryLightColor,
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: primaryLightColor,
+                  fontSize: getResponsiveFont(context, 18),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: primaryLightColor.withOpacity(0.7),
+                  fontSize: getResponsiveFont(context, 16),
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: sGrey,
+                    foregroundColor: primaryLightColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(cardBorderRadius),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Kembali",
+                    style: TextStyle(
+                      fontSize: getResponsiveFont(context, 16),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -175,34 +255,74 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
   }
 
   Future<void> _handleCariPressed() async {
+    final isValid = _formKey.currentState?.validate() ?? false;
+
     if (_selectedPolis == null) {
       await showPolisRequiredDialog(context);
       return;
     }
 
+    if (widget.cobKlaimId == '10002') {
+      if (_selectedJenisKerugian == null) {
+        await showGeneralDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          barrierLabel: "Tutup",
+          barrierColor: Colors.black.withOpacity(0.45),
+          transitionDuration: const Duration(milliseconds: 220),
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return _ValidationDialog(
+              title: "Data Belum Lengkap",
+              message: "Silakan pilih penyebab kerugian terlebih dahulu.",
+            );
+          },
+        );
+        return;
+      }
+
+      if (_keterangan.trim().isEmpty) {
+        await showGeneralDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          barrierLabel: "Tutup",
+          barrierColor: Colors.black.withOpacity(0.45),
+          transitionDuration: const Duration(milliseconds: 220),
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return _ValidationDialog(
+              title: "Data Belum Lengkap",
+              message: "Silakan isi nomor polisi terlebih dahulu.",
+            );
+          },
+        );
+        return;
+      }
+    }
+
+    if (!isValid) return;
+
     setState(() {
       _isCariPolisLoading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserPolisDetail(
-          cobKlaimId: widget.cobKlaimId,
-          cobKlaimNama: widget.cobKlaimNama,
-          sppa1Id: _selectedPolis!.sppaId,
+    try {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserPolisDetail(
+            cobKlaimId: widget.cobKlaimId,
+            cobKlaimNama: widget.cobKlaimNama,
+            sppa1Id: _selectedPolis!.sppaId,
+            mjenisrugimvId: _selectedJenisKerugian?.mjenisrugimvId ?? '',
+            keterangan: _keterangan.trim(),
+          ),
         ),
-      ),
-    );
-
-    if (mounted) {
-      setState(() {
-        _isCariPolisLoading = false;
-      });
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCariPolisLoading = false;
+        });
+      }
     }
   }
 
@@ -247,10 +367,25 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                             BasePolisPage(
                               cobKlaimId: widget.cobKlaimId,
                               cobKlaimNama: widget.cobKlaimNama,
+
                               selectedPolis: _selectedPolis,
                               onPolisChanged: (value) {
                                 setState(() {
                                   _selectedPolis = value;
+                                });
+                              },
+
+                              selectedJenisKerugian: _selectedJenisKerugian,
+                              onJenisKerugianChanged: (value) {
+                                setState(() {
+                                  _selectedJenisKerugian = value;
+                                });
+                              },
+
+                              keterangan: _keterangan,
+                              onKeteranganChanged: (value) {
+                                setState(() {
+                                  _keterangan = value;
                                 });
                               },
                             ),
