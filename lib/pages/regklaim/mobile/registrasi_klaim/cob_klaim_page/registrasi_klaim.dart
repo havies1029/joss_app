@@ -416,7 +416,9 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: hPadding * 1.5,
+                    ),
                     child: SafeArea(
                       child: AppButton.iconLeft(
                         text: "Cari",

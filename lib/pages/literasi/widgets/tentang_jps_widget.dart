@@ -18,9 +18,9 @@ class _TentangCardWidgetState extends State<TentangCardWidget> {
 
   static const String deskripsi =
       "Proteksi Plus (PT. Jaya Proteksindo Sakti) adalah broker asuransi berpengalaman yang berdiri sejak 2 Januari 2001. Kami berkomitmen untuk menghadirkan solusi perlindungan terbaik melalui keputusan strategis, layanan profesional, serta pendampingan menyeluruh bagi setiap klien.\n\n"
-      "Sebagai konsultan dan fasilitator, JPS membantu merancang kebutuhan asuransi khusus agar klien memperoleh manfaat maksimal berupa perlindungan luas, harga kompetitif, dan kemudahan dalam proses klaim.\n\n"
+      "Sebagai konsultan dan fasilitator, Proteksi Plus (PT. Jaya Proteksindo Sakti) membantu merancang kebutuhan asuransi khusus agar klien memperoleh manfaat maksimal berupa perlindungan luas, harga kompetitif, dan kemudahan dalam proses klaim.\n\n"
       "Fokus layanan kami mencakup penempatan asuransi umum seperti properti, manfaat karyawan, mesin, rekayasa (engineering), konstruksi, kendaraan bermotor, pengangkutan laut (marine cargo), penerbangan, kredit perdagangan, serta produk asuransi khusus lainnya.\n\n"
-      "Sebagai bukti legalitas dan kepercayaan, JPS telah memiliki izin usaha dari Otoritas Jasa Keuangan (OJK) berdasarkan Keputusan Menteri Keuangan No. 431/KM.17/2000.";
+      "Sebagai bukti legalitas dan kepercayaan, Proteksi Plus (PT. Jaya Proteksindo Sakti) telah memiliki izin usaha dari Otoritas Jasa Keuangan (OJK) berdasarkan Keputusan Menteri Keuangan No. 431/KM.17/2000.";
 
   @override
   Widget build(BuildContext context) {

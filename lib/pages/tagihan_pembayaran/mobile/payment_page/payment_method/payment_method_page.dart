@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/loading_indicator.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_event.dart';
 import '../../../../../blocs/payment/paymentmethodcari_state.dart';
@@ -451,11 +452,17 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
           const SizedBox(height: hPadding),
           Row(
             children: [
-              Expanded(child: buildFieldMasaBerlakuKartu()),
+              Expanded(
+                flex: 7,
+                child: buildFieldMasaBerlakuKartu(),
+              ),
               const SizedBox(width: hPadding),
-              Expanded(child: buildFieldCvn()),
+              Expanded(
+                flex: 3,
+                child: buildFieldCvn(),
+              ),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -509,29 +516,25 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     final dnState = context.read<DnRekap2invBloc>().state;
 
     if (isCreditCard) {
-      context.read<DnRekap2invBloc>().add(
-        Invoice2PaymentViaCardEvent(
-          record: PaymentCardModel(
-            invoiceId: dnState.invoiceId,
-            cardNumber: fieldNomorKartuController.text.trim(),
-            expiryMonth: expiryMonth,
-            expiryYear: expiryYear,
-            cvn: fieldCvnController.text.trim(),
-            cardholderFirstName:
-            fieldNamaDepanPemilikKartuController.text.trim(),
-            cardholderLastName:
-            fieldNamaBelakangPemilikKartuController.text.trim(),
-            cardholderEmail: '',
-            cardholderPhoneNumber: '',
-          ),
+      context.read<InvoiceStatusCardBloc>().add(
+        InvToBayarViaCardEvent(
+          invoiceId: dnState.invoiceId,
+          cardNumber: fieldNomorKartuController.text.trim(),
+          expiryMonth: expiryMonth,
+          expiryYear: expiryYear,
+          cvn: fieldCvnController.text.trim(),
+          cardholderFirstName:
+          fieldNamaDepanPemilikKartuController.text.trim(),
+          cardholderLastName:
+          fieldNamaBelakangPemilikKartuController.text.trim(),
         ),
       );
-
       return;
     }
 
     final methodState = context.read<PaymentMethodCariBloc>().state;
     final selectedId = methodState.selectedMethodId;
+
     if (selectedId == null) return;
 
     context.read<DnRekap2invBloc>().add(

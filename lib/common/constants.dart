@@ -100,6 +100,7 @@ const Color bGrey = Color(0xFFA1A1AA);
 const Color bdGrey = Color(0xFFBCBCC7);
 const Color bBlue = Color(0xFF295EFF);
 const Color bdBlue = Color(0xFF5D86FF);
+const Color rBlue = Color(0xFF0ED7FF);
 const Color cGrey = Color(0xFFA1A1A1);
 
 const Color pYellow = Color(0xFFEFA728);
@@ -116,6 +117,7 @@ const Color greenforPayment = Color(0xFF12C127);
 const Color sGreen = Color(0xFF27C840);
 const Color pDarkRed = Color(0xFFDC1C1C);
 const Color pSlowRed = Color(0xFFFF0E12);
+const Color redPayment = Color(0xFFFF1B1B);
 const Color kategoriYellow = Color(0xFFFFC107);
 const Color kategoriCream = Color(0xFFFFFDD8);
 const Color excelGreen = Color(0xFF27AE68);

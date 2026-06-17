@@ -6,11 +6,14 @@ import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_method/payment_method_page.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_process/payment_process.dart';
 import 'package:joss_app/pages/tagihan_pembayaran/mobile/payment_page/payment_success/payment_success.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../blocs/gen_regmv/regmv1crud_bloc.dart';
 import '../../../blocs/gen_regmv/regmv1list_bloc.dart';
 import '../../../blocs/gen_regmv/regmv2form_bloc.dart';
 import '../../../blocs/gen_regmv/regmv3form_bloc.dart';
 import '../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../blocs/payment/invbayarvaform_bloc.dart';
+import '../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../blocs/quopdf/quopdf_bloc.dart';
 import '../../../blocs/quopdf/quopdf_event.dart';
 import '../../../blocs/quopdf/quopdf_state.dart';
@@ -342,6 +345,51 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             // }
           },
         ),
+
+        BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
+          listenWhen: (previous, current) {
+            return previous.isLoaded != current.isLoaded ||
+                previous.hasFailure != current.hasFailure;
+          },
+          listener: (context, state) async {
+            final messenger = ScaffoldMessenger.of(context);
+
+            if (state.hasFailure) {
+              messenger.showSnackBar(
+                errorSnackBar(
+                  'Proses pembayaran kartu gagal. Silakan coba lagi.',
+                ),
+              );
+              return;
+            }
+
+            if (!state.isLoaded || state.record == null) return;
+
+            final redirectUrl = state.record!.redirectUrl.trim();
+
+            if (redirectUrl.isEmpty) {
+              messenger.showSnackBar(
+                errorSnackBar(
+                  'Redirect URL pembayaran tidak ditemukan.',
+                ),
+              );
+              return;
+            }
+
+            await launchUrl(
+              Uri.parse(redirectUrl),
+              mode: LaunchMode.externalApplication,
+            );
+
+            context.read<InvbayarvaFormBloc>().add(
+              InvoiceStatusPollingStarted(
+                invoiceId: state.record!.invoiceId,
+                interval: const Duration(seconds: 4),
+              ),
+            );
+          },
+        ),
+
 
         BlocListener<QuotationPdfBloc, QuotationPdfState>(
           listener: (context, state) async {

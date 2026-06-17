@@ -124,61 +124,110 @@ class _UserPolisPageState extends State<UserPolisPage> {
     );
   }
 
-  Widget buildFieldComboSppaPolis() =>
-      ReusableComboBoxV2<SppapoliscariModel>(
-        hintText: "No. Polis",
-        initItem: widget.selectedPolis,
-        params: {
-          "cobKlaimId": widget.cobKlaimId,
-        },
-        loader: (query) {
-          return SppapoliscariRepository().getSppapoliscari(
-            query.params["cobKlaimId"] ?? "",
-            query.searchText,
-          );
-        },
-        displayText: (i) {
-          final noPolis = i.polisNo.trim();
-          return noPolis.isEmpty ? '-' : noPolis;
-        },
-        compareItems: (a, b) => a.sppaId == b.sppaId,
-        onChangedCallback: (v) {
-          widget.onPolisChanged(v);
-        },
-        customItemBuilder: (context, item, isSelected, isDisabled) {
-          final noPolis =
-          item.polisNo.trim().isEmpty ? '-' : item.polisNo.trim();
-          final objek =
-          item.sppaNoRef.trim().isEmpty ? '-' : item.sppaNoRef.trim();
-          final detail =
-          item.objectDesc.trim().isEmpty ? '-' : item.objectDesc.trim();
+  Widget buildFieldComboSppaPolis() {
+    String clean(String? value) {
+      final text = value?.trim() ?? '';
+      return text.isEmpty ? '-' : text;
+    }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: hPadding * 1.5,
-                  vertical: hPadding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("No Polis: $noPolis", style: bodyTextStyle(context)),
-                    const SizedBox(height: 4),
-                    Text("Objek : $objek", style: bodyTextStyle(context)),
-                    const SizedBox(height: 4),
-                    Text("Detail : $detail", style: bodyTextStyle(context)),
-                  ],
-                ),
+    String itemKey(SppapoliscariModel item) {
+      return [
+        clean(item.sppaId),
+        clean(item.polisNo),
+        clean(item.sppaNoRef),
+        clean(item.objectDesc),
+      ].join('|');
+    }
+
+    return ReusableComboBoxV2<SppapoliscariModel>(
+      hintText: "No. Polis",
+      initItem: widget.selectedPolis,
+      params: {
+        "cobKlaimId": widget.cobKlaimId,
+      },
+      loader: (query) async {
+        final cobKlaimId = query.params["cobKlaimId"]?.toString() ?? "";
+        final searchText = query.searchText.trim();
+
+        debugPrint("========== COMBO QUERY ==========");
+        debugPrint("cobKlaimId : $cobKlaimId");
+        debugPrint("searchText : [$searchText]");
+
+        if (cobKlaimId.isEmpty) {
+          debugPrint("SPPAPOLIS SKIP: cobKlaimId empty");
+          return <SppapoliscariModel>[];
+        }
+
+        final result = await SppapoliscariRepository().getSppapoliscari(
+          cobKlaimId,
+          searchText,
+        );
+
+        debugPrint("TOTAL RESULT : ${result.length}");
+
+        return result;
+      },
+      displayText: (item) {
+        final noPolis = clean(item.polisNo);
+        final noSppa = clean(item.sppaNoRef);
+        final detail = clean(item.objectDesc);
+
+        return "$noPolis - $noSppa - $detail";
+      },
+      compareItems: (a, b) => itemKey(a) == itemKey(b),
+      onChangedCallback: (value) {
+        widget.onPolisChanged(value);
+      },
+      customItemBuilder: (context, item, isSelected, isDisabled) {
+        final noPolis = clean(item.polisNo);
+        final noSppa = clean(item.sppaNoRef);
+        final detail = clean(item.objectDesc);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: hPadding * 1.5,
+                vertical: hPadding,
               ),
-              kDivider(color: sGrey),
-            ],
-          );
-        },
-        onSaveCallback: (SppapoliscariModel? p1) {},
-      );
+              decoration: BoxDecoration(
+                color: isSelected ? primaryColor.withOpacity(0.12) : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "No. Polis: $noPolis",
+                    style: bodyTextStyle(context),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "No. SPPA: $noSppa",
+                    style: bodyTextStyle(context),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Detail: $detail",
+                    style: bodyTextStyle(context),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            kDivider(color: sGrey),
+          ],
+        );
+      },
+      onSaveCallback: (SppapoliscariModel? value) {},
+    );
+  }
 
   Widget buildFieldJenisKerugian() {
     return FutureBuilder<List<ComboMJenisrugimvModel>>(

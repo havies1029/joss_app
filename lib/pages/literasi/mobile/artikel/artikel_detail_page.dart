@@ -29,6 +29,8 @@ class ArtikelDetailPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         titleSpacing: 0,
         title: Padding(
           padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5,vertical: vPadding),
@@ -68,21 +70,16 @@ class ArtikelDetailPage extends StatelessWidget {
               style: bodyTextStyle(context, fontSize: 22),
             ),
             const SizedBox(height: vPadding),
-            Row(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(authorNama, style: bodyTextStyle(context)),
-                    const SizedBox(height: 3),
-                    Text(
-                      tglTerbit,
-                      style: bodyTextStyle(context).copyWith(color: hintGrey),
-                    ),
-                  ],
+                Text(authorNama, style: bodyTextStyle(context)),
+                const SizedBox(height: 3),
+                Text(
+                  tglTerbit,
+                  style: bodyTextStyle(context).copyWith(color: hintGrey),
                 ),
-                const Spacer(),
+                const SizedBox(height: vPadding),
 
                 BlocBuilder<MlogoclientCariBloc, MlogoclientCariState>(
                   builder: (context, state) {
@@ -96,9 +93,9 @@ class ArtikelDetailPage extends StatelessWidget {
                       ..sort((a, b) => a.noUrut.compareTo(b.noUrut));
 
                     return Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 20,
-                      runSpacing: 12,
+                      alignment: WrapAlignment.start,
+                      spacing: 12,
+                      runSpacing: 10,
                       children: items.map((item) {
                         return SocmedIcon(
                           'assets/icons/${item.logoSvg}',
@@ -156,7 +153,7 @@ class ArtikelDetailPage extends StatelessWidget {
 
             if (selectedArticle.gambarArtikel != null &&
                 selectedArticle.gambarArtikel!.isNotEmpty)
-              const SizedBox(height: 18),
+              const SizedBox(height: vPadding),
             BlocBuilder<Berita3CariBloc, Berita3CariState>(
               builder: (context, contentState) {
                 return AnimatedSwitcher(

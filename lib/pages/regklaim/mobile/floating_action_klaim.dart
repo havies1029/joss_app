@@ -1,10 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
 import 'package:joss_app/pages/management_polis/floating_action_menu_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/klaimrinci/groupcobcari_bloc.dart';
 import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/daftar_cob_klaim_page.dart';
+import '../../../common/constants.dart';
 import '../../../widgets/apptheme/hubungi_cs.dart';
 import '../../klaimbatal/mobile/klaimbatalcrud_form.dart';
 import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
@@ -15,6 +17,115 @@ class FabActionKlaim extends StatelessWidget {
   final int selectedTab;
 
   const FabActionKlaim({super.key, required this.selectedTab});
+
+  Future<void> showLacakBelumTersediaDialog(BuildContext context) {
+    return showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: SvgPicture.asset(
+                      "assets/icons/lacak_klaim_kehilangan.svg",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Informasi Klaim Kehilangan",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor,
+                      fontSize: getResponsiveFont(context, 18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Informasi klaim kehilangan kendaraan dapat diperoleh melalui Bagian Klaim. Silakan hubungi Bagian Klaim untuk informasi lebih lanjut.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryLightColor.withOpacity(0.7),
+                      fontSize: getResponsiveFont(context, 16),
+                      height: 1.3,
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: rBlue,
+                        foregroundColor: primaryLightColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        showHubungiJps(context);
+                      },
+                      child: Text(
+                        "Hubungi",
+                        style: TextStyle(
+                          fontSize: getResponsiveFont(context, 16),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
 
   void showHubungiJps(BuildContext context) {
     showModalBottomSheet(
@@ -152,7 +263,7 @@ class FabActionKlaim extends StatelessWidget {
 
                 case ActionType.lacakKlaim:
                   if (selected?.isLacak != true) {
-                    /* ini tempat taro popup atau notifikasi kalau di klik */
+                    showLacakBelumTersediaDialog(context);
                     return;
                   }
 

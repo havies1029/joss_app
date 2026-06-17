@@ -18,3 +18,13 @@ class RefreshKlaimprogresscariEvent extends KlaimprogresscariEvents {
   List<Object> get props => [klaim1Id];
 }
 
+class InjectDummyKlaimprogresscariEvent extends KlaimprogresscariEvents {
+  final String klaim1Id;
+
+  const InjectDummyKlaimprogresscariEvent({
+    required this.klaim1Id,
+  });
+
+  @override
+  List<Object> get props => [klaim1Id];
+}

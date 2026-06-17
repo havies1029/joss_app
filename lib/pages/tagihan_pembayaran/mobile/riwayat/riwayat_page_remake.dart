@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 // import 'package:joss_app/pages/payment/mobile/riwayat/riwayat_table_page_remake.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
+import '../../../../blocs/payment/invbayarvaform_bloc.dart';
+import '../../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../common/loading_indicator.dart';
 import '../../../../widgets/apptheme/empty_state_page.dart';
@@ -99,6 +102,43 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 errorSnackBar('Proses pembayaran gagal. Silakan coba lagi.'),
               );
             }
+          },
+        ),
+        BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
+          listenWhen: (previous, current) {
+            return previous.isLoaded != current.isLoaded ||
+                previous.hasFailure != current.hasFailure;
+          },
+          listener: (context, state) async {
+            if (state.hasFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar('Proses pembayaran kartu gagal. Silakan coba lagi.'),
+              );
+              return;
+            }
+
+            if (!state.isLoaded || state.record == null) return;
+
+            final redirectUrl = state.record!.redirectUrl.trim();
+
+            if (redirectUrl.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
+              );
+              return;
+            }
+
+            await launchUrl(
+              Uri.parse(redirectUrl),
+              mode: LaunchMode.externalApplication,
+            );
+
+            context.read<InvbayarvaFormBloc>().add(
+              InvoiceStatusPollingStarted(
+                invoiceId: state.record!.invoiceId,
+                interval: const Duration(seconds: 4),
+              ),
+            );
           },
         ),
       ],

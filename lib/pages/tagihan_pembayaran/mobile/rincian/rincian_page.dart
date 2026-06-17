@@ -6,6 +6,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../blocs/layanan/mlayanan1cari_bloc.dart';
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../blocs/payment/dnrekapcobcari_bloc.dart';
+import '../../../../blocs/payment/invbayarvaform_bloc.dart';
+import '../../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
@@ -116,63 +118,105 @@ class _RincianPageState extends State<RincianPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<DnRekap2invBloc, DnRekap2invState>(
-      listenWhen: (previous, current) {
-        return previous.isProcessed != current.isProcessed ||
-            previous.paymentStatus != current.paymentStatus;
-      },
-      listener: (BuildContext context, DnRekap2invState state) {
-        if (!state.isProcessed) return;
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<DnRekap2invBloc, DnRekap2invState>(
+          listenWhen: (previous, current) {
+            return previous.isProcessed != current.isProcessed ||
+                previous.paymentStatus != current.paymentStatus;
+          },
+          listener: (BuildContext context, DnRekap2invState state) {
+            if (!state.isProcessed) return;
 
-        if (state.paymentStatus == "20") {
-          ScaffoldMessenger.of(context).showSnackBar(
-            successSnackBar('Silakan lanjutkan ke metode pembayaran.'),
-          );
+            if (state.paymentStatus == "20") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar('Silakan lanjutkan ke metode pembayaran.'),
+              );
 
-          onViewPaymentMethods(state.curr, state.totalBayar);
+              onViewPaymentMethods(state.curr, state.totalBayar);
 
-        } else if (state.paymentStatus == "30") {
+            } else if (state.paymentStatus == "30") {
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            infoSnackBar('Silakan lakukan pembayaran.'),
-          );
+              ScaffoldMessenger.of(context).showSnackBar(
+                infoSnackBar('Silakan lakukan pembayaran.'),
+              );
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PaymentProcess(
-                viewMode: "ubah",
-                recordId: state.invoiceId,
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentProcess(
+                    viewMode: "ubah",
+                    recordId: state.invoiceId,
+                  ),
+                ),
+              );
+
+            } else if (state.paymentStatus == "40") {
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar('Proses pembayaran berhasil.'),
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentSuccess(
+                    display: "Pembayaran Berhasil!",
+                    description: "Polis Anda kini aktif.",
+                    displayButton: "Kembali",
+                  ),
+                ),
+              );
+
+            } else if (state.paymentStatus == "91") {
+
+              refreshData();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar('Proses pembayaran gagal. Silakan coba lagi.'),
+              );
+            }
+          },
+        ),
+
+        BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
+          listenWhen: (previous, current) {
+            return previous.isLoaded != current.isLoaded ||
+                previous.hasFailure != current.hasFailure;
+          },
+          listener: (BuildContext context, InvoiceStatusCardState state) async {
+            if (state.hasFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar('Proses pembayaran kartu gagal. Silakan coba lagi.'),
+              );
+              return;
+            }
+
+            if (!state.isLoaded || state.record == null) return;
+
+            final redirectUrl = state.record!.redirectUrl.trim();
+
+            if (redirectUrl.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
+              );
+              return;
+            }
+
+            await launchUrl(
+              Uri.parse(redirectUrl),
+              mode: LaunchMode.externalApplication,
+            );
+
+            context.read<InvbayarvaFormBloc>().add(
+              InvoiceStatusPollingStarted(
+                invoiceId: state.record!.invoiceId,
+                interval: const Duration(seconds: 4),
               ),
-            ),
-          );
-
-        } else if (state.paymentStatus == "40") {
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            successSnackBar('Proses pembayaran berhasil.'),
-          );
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PaymentSuccess(
-                display: "Pembayaran Berhasil!",
-                description: "Polis Anda kini aktif.",
-                displayButton: "Kembali",
-              ),
-            ),
-          );
-
-        } else if (state.paymentStatus == "91") {
-
-          refreshData();
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar('Proses pembayaran gagal. Silakan coba lagi.'),
-          );
-        }
-      },
+            );
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: secondaryBlackColor,
         resizeToAvoidBottomInset: true,

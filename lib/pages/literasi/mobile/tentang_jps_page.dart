@@ -93,7 +93,6 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
     _scrollController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -107,27 +106,23 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
               hPadding * 1.5,
               vPadding,
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: constraints.maxWidth,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: List.generate(
+                  chipItems.length,
+                      (index) => Padding(
+                    padding: EdgeInsets.only(
+                      right: index == chipItems.length - 1 ? 0 : 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        chipItems.length,
-                            (index) => buildChip(
-                          chipItems[index],
-                          index,
-                        ),
-                      ),
+                    child: buildChip(
+                      chipItems[index],
+                      index,
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -143,25 +138,21 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
                 ),
                 child: Column(
                   children: [
-
                     Container(
                       key: tentangKey,
                       child: TentangCardWidget(),
                     ),
                     const SizedBox(height: 40),
-
                     Container(
                       key: companyProfileKey,
                       child: CompanyProfileCard(),
                     ),
                     const SizedBox(height: 40),
-
                     Container(
                       key: testimoniKey,
                       child: TestimoniPage1(),
                     ),
                     const SizedBox(height: 40),
-
                     ClientSection(),
                   ],
                 ),

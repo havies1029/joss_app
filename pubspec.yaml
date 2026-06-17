@@ -87,6 +87,8 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons/lacak_klaim_kehilangan.svg
+    - assets/dummy/test1.pdf
     - assets/bank_logo/
     - assets/bank_logo/bjb.svg
     - assets/bank_logo/bss.svg

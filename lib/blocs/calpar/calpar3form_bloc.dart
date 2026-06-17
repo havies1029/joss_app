@@ -79,7 +79,6 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 			));
 		}
 
-		debugPrint("=== [BLOC END] CALPAR3 FORM TAMBAH ===\n");
 	}
 
 
@@ -87,27 +86,16 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 			Calpar3FormUbahEvent event,
 			Emitter<Calpar3FormState> emit,
 			) async {
-		debugPrint("=== [BLOC] CALPAR3 FORM UBAH ===");
-		debugPrint("Event diterima: Calpar3FormUbahEvent");
-		debugPrint("Record dikirim (toJson): ${event.record.toJson()}");
 
 		emit(state.copyWith(isSaving: true, isSaved: false));
 
 		try {
-			debugPrint("Memanggil repository.calpar3FormUbah...");
 			final ReturnDataAPI returnData =
 			await repository.calpar3FormUbah(event.record);
 
-			debugPrint("=== [API RESPONSE] CALPAR3 FORM UBAH ===");
-			debugPrint("Success   : ${returnData.success}");
-			debugPrint("Row Count : ${returnData.rowcount}");
-			debugPrint("Data      : ${returnData.data}");
-			debugPrint("=======================================");
 
 			final hasFailure = !returnData.success;
 
-			// ✅ kalau data ada → update id
-			// ✅ kalau data kosong → pertahankan id lama
 			final incomingId = returnData.data.trim();
 			final fixedId =
 			incomingId.isNotEmpty ? incomingId : event.record.calpar3Id;
@@ -123,11 +111,6 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 				returnData: returnData,
 			));
 		} catch (e, stack) {
-			debugPrint("=== [BLOC ERROR] CALPAR3 FORM UBAH ===");
-			debugPrint("Error : $e");
-			debugPrint("Stack : $stack");
-			debugPrint("======================================");
-
 			emit(state.copyWith(
 				isSaving: false,
 				isSaved: true,
@@ -135,8 +118,6 @@ class Calpar3FormBloc extends Bloc<Calpar3FormEvents, Calpar3FormState> {
 				record: null,
 			));
 		}
-
-		debugPrint("=== [BLOC END] CALPAR3 FORM UBAH ===\n");
 	}
 
 

@@ -28,7 +28,28 @@ class InvbayarvaFormBloc
 
     on<_VaPollingTick>(_onVaTick);
     on<_StatusPollingTick>(_onStatusTick);
+
+    on<InvoiceStatusPollingStarted>(_onStartStatusOnlyPolling);
   }
+
+  void _onStartStatusOnlyPolling(
+      InvoiceStatusPollingStarted event,
+      Emitter<InvbayarvaFormState> emit,
+      ) {
+    _stopAllTimers();
+
+    _statusAttempt = 0;
+
+    emit(state.copyWith(
+      isPollingVa: false,
+      isPollingStatus: true,
+      isInitialLoading: false,
+    ));
+
+    add(_StatusPollingTick(invoiceId: event.invoiceId));
+    _startStatusPolling(event.invoiceId, interval: event.interval);
+  }
+
   void _onStartPolling(
       InvbayarvaPollingStarted event,
       Emitter<InvbayarvaFormState> emit,
@@ -146,17 +167,18 @@ class InvbayarvaFormBloc
     return super.close();
   }
 
-  void _startStatusPolling(String invoiceId) {
+  void _startStatusPolling(
+      String invoiceId, {
+        Duration interval = const Duration(seconds: 5),
+      }) {
     if (!state.isPollingStatus) return;
 
-    _statusTimer = Timer(const Duration(seconds: 10), () async {
+    _statusTimer = Timer(interval, () {
       add(_StatusPollingTick(invoiceId: invoiceId));
 
-      // schedule lagi hanya jika masih polling
       if (state.isPollingStatus) {
-        _startStatusPolling(invoiceId);
+        _startStatusPolling(invoiceId, interval: interval);
       }
     });
   }
-
 }

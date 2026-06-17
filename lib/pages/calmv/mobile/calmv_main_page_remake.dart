@@ -541,9 +541,9 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
 
                         Row(
                           children: [
-                            Flexible(child: _buildFieldIsTbod()),
-                            const SizedBox(width: 8),
                             Flexible(child: _buildFieldIsAw()),
+                            const SizedBox(width: 8),
+                            const Expanded(child: SizedBox()),
                           ],
                         ),
 
@@ -785,7 +785,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
       isSrcc: toBoolean(fieldIsSrccController.text),
-      isTbod: toBoolean(fieldIsTbodController.text),
+      // isTbod: toBoolean(fieldIsTbodController.text),
+      isTbod: false,
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
       isAw: toBoolean(fieldIsAwController.text),
       pad: double.tryParse(fieldPadController.text.replaceAll(",", "")) ?? 0,

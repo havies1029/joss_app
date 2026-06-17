@@ -1088,7 +1088,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       isRsmdcc: toBoolean(fieldIsRsmdccController.text),
       kab2zonagempaId: _showZonaGempa
           ? fieldComboMKabZonaGempa?.mkabzonagempaId
-          : null,
+          : '',
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
     );

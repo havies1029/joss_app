@@ -39,3 +39,16 @@ class _StatusPollingTick extends InvbayarvaFormEvents {
   @override
   List<Object?> get props => [invoiceId];
 }
+
+class InvoiceStatusPollingStarted extends InvbayarvaFormEvents {
+  final String invoiceId;
+  final Duration interval;
+
+  const InvoiceStatusPollingStarted({
+    required this.invoiceId,
+    this.interval = const Duration(seconds: 10),
+  });
+
+  @override
+  List<Object?> get props => [invoiceId, interval];
+}

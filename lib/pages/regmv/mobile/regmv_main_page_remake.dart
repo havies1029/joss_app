@@ -881,9 +881,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                         Row(
                           children: [
-                            Flexible(child: _buildFieldIsTbod()),
-                            const SizedBox(width: 8),
                             Flexible(child: _buildFieldIsAw()),
+                            const SizedBox(width: 8),
+                            const Expanded(child: SizedBox()),
                           ],
                         ),
                         const SizedBox(height: hPadding),
@@ -1565,7 +1565,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       isEq: toBoolean(fieldIsEqController.text),
       isFlood: toBoolean(fieldIsFloodController.text),
       isSrcc: toBoolean(fieldIsSrccController.text),
-      isTbod: toBoolean(fieldIsTbodController.text),
+      // isTbod: toBoolean(fieldIsTbodController.text),
+      isTbod: false,
       isTerrorism: toBoolean(fieldIsTerrorismController.text),
       mmvjnscoverId: fieldComboMMvjnscover?.mmvjnscoverId,
       pad: double.tryParse(fieldPadController.text.replaceAll(',', '')) ?? 0,

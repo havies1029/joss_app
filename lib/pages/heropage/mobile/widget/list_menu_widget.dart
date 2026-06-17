@@ -6,6 +6,7 @@ import 'package:joss_app/common/constants.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../widgets/apptheme/example_nested_scrollable_table_page.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page2.dart';
+import '../../../klaim/mobile/klaimlacak/klaimlacak_page.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
@@ -380,7 +381,7 @@ class ListMenuWidget extends StatelessWidget {
       MenuItem(title: 'Lapor Klaim', iconPath: 'assets/icons/menu_lapor_klaim.svg',),
       MenuItem(title: 'Klaim', iconPath: 'assets/icons/menu_klaim.svg'),
       MenuItem(title: 'Polis', iconPath: 'assets/icons/menu_polis.svg'),
-      // MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
+      MenuItem(title: 'Test Page', iconPath: 'assets/icons/menu_beli_polis.svg',),
       MenuItem(title: 'Tagihan Pembayaran', iconPath: 'assets/icons/menu_tagihan_pembayaran.svg',),
     ];
   }
@@ -402,7 +403,7 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodPage(totalBayar: 3000000,curr: "IDR",)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimLacakPage(klaim1Id: '', statusDesc: '',)));
         break;
 
       case 'Klaim':

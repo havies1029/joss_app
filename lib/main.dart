@@ -15,6 +15,7 @@ import 'package:joss_app/repositories/gen_regmv/regmv7picker_repository.dart';
 import 'package:joss_app/repositories/klaimbatal/klaimbatalcrud_repository.dart';
 import 'package:joss_app/repositories/klaimlacak/klaimnilaicrud_repository.dart';
 import 'package:joss_app/repositories/login/forgot_password_repository.dart';
+import 'package:joss_app/repositories/payment/invoicestatuscard_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvbengkelcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvklaimcrud_repository.dart';
 import 'package:joss_app/repositories/perbaruiklaimmv/klaimmvpoliscrud_repository.dart';
@@ -188,6 +189,7 @@ import 'blocs/notif_read/notif_read_bloc.dart';
 import 'blocs/notifevent/notifeventcari_bloc.dart';
 import 'blocs/notiflog/logtrscari_bloc.dart';
 import 'blocs/notiflog/logtrscaritopx_bloc.dart';
+import 'blocs/payment/invoicestatuscard_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvaccordion_bloc.dart';
 import 'blocs/perbaruiklaimmv/klaimmvbengkelcrud_bloc.dart';
@@ -690,6 +692,9 @@ Future<void> main() async {
 
         //quotation pdf
         BlocProvider(create: (context) => QuotationPdfBloc()),
+
+        //invoice status credit card
+        BlocProvider(create: (context) => InvoiceStatusCardBloc(repository: InvoiceStatusCardRepository())),
       ],
       child: MultiBlocListener(
         listeners: [

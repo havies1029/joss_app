@@ -89,7 +89,6 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: hPadding * 1.5,
-                vertical: 10,
               ),
               child: AppButton.primary(
                 text: 'Ajukan Perubahan',

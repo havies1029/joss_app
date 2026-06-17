@@ -88,7 +88,7 @@ class _KlaimbatalcrudFormPageState extends State<KlaimbatalcrudFormPage> {
             onTap: () => FocusScope.of(context).unfocus(),
             child: Container(
               color: secondaryBlackColor,
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(
                 children: [
                   Expanded(

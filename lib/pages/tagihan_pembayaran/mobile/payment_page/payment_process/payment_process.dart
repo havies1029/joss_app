@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,6 +39,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
 
+  Timer? _countdownTimer;
+  DateTime _now = DateTime.now();
+
   final fieldBatasBayarController =
       TextEditingController(text: DateTime.now().toIso8601String());
   final fieldVaNoController = TextEditingController();
@@ -47,6 +52,13 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   void initState() {
     super.initState();
     invbayarvaFormBloc = context.read<InvbayarvaFormBloc>();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        _now = DateTime.now();
+      });
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -64,12 +76,26 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   @override
   void dispose() {
     invbayarvaFormBloc.add(const InvbayarvaPollingStopped());
-
+    _countdownTimer?.cancel();
     fieldBatasBayarController.dispose();
     fieldVaNoController.dispose();
     fieldTotalBayarController.dispose();
     fieldCurrController.dispose();
     super.dispose();
+  }
+
+  String formatCountdown(DateTime? batasBayar) {
+    if (batasBayar == null) return "-";
+
+    final diff = batasBayar.difference(_now);
+
+    if (diff.isNegative) return "00:00:00";
+
+    final hours = diff.inHours.toString().padLeft(2, '0');
+    final minutes = (diff.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (diff.inSeconds % 60).toString().padLeft(2, '0');
+
+    return "$hours:$minutes:$seconds";
   }
 
   void _dismissDialog() {
@@ -421,6 +447,8 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         ? "-"
         : DateFormat('dd/MM/yyyy HH:mm:ss').format(batasBayar);
 
+    final countdownText = formatCountdown(batasBayar);
+
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
@@ -437,6 +465,12 @@ class PaymentProcessFormState extends State<PaymentProcess> {
               "Pembayaran Berakhir pada:",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: hintGrey),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              countdownText,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, color: redPayment),
             ),
             const SizedBox(height: 4),
             Text(

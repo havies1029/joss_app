@@ -415,11 +415,11 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
           label: widget.cobKlaimId == "10002"
               ? "Nomor Polisi:"
               : "Alamat Risiko:",
-          value: widget.cobKlaimId == "10002"
-              ? fieldObjectAlamat1Controller.text
-              : "${fieldObjectAlamat1Controller.text},\n${fieldObjectAlamat2Controller.text}",
-          valueMultiline: widget.cobKlaimId != "10002",
-        ),
+            value: widget.cobKlaimId == "10002"
+                ? fieldObjectAlamat1Controller.text
+                : "${fieldObjectAlamat1Controller.text},\n${fieldObjectAlamat2Controller.text}",
+            valueMultiline: widget.cobKlaimId != "10002",
+          ),
         // const SizedBox(height: vPadding),
 
         _buildDetailRow(
