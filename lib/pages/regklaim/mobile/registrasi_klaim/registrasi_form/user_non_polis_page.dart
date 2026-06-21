@@ -481,6 +481,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     comboKey: comboMInsuranceKey,
     initItem: fieldComboMInsurance,
     isEnabled: !_isAutoInsurance,
+    useScrollableShowMorePopup: true,
     initialVisibleCount: _priorityInsuranceIds.length,
     expandText: (count) => "Lihat $count Kategori Lainnya",
     collapseText: "Tampilkan Lebih Sedikit",

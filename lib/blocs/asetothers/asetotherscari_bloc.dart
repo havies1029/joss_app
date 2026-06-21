@@ -230,16 +230,15 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 	}
 	 */
 
-	// -----------------------
-	// Selection utama
-	// -----------------------
 	Future<void> onSelectDetail(
 			SelectOthersDetailEvent event,
 			Emitter<AsetothersCariState> emit,
 			) async {
-		final updatedSelectedIds = <String>{event.asetOthersId};
-
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
+		emit(state.copyWith(
+			selectedIds: <String>{event.asetOthersId},
+			selectedId: event.asetOthersId,
+			activeAsetOthersId: event.asetOthersId,
+		));
 
 		_recomputeActiveAndFile(
 			emit,
@@ -251,14 +250,18 @@ class AsetothersCariBloc extends Bloc<AsetothersCariEvents, AsetothersCariState>
 			UnselectOthersDetailEvent event,
 			Emitter<AsetothersCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..remove(event.asetOthersId);
+		if (!state.selectedIds.contains(event.asetOthersId) &&
+				state.selectedId != event.asetOthersId &&
+				state.activeAsetOthersId != event.asetOthersId) {
+			return;
+		}
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		final preferFallback =
-		(state.activeAsetOthersId == event.asetOthersId) ? null : state.activeAsetOthersId;
-
-		_recomputeActiveAndFile(emit, preferId: preferFallback);
+		emit(state.copyWith(
+			selectedIds: <String>{},
+			selectedId: "",
+			activeAsetOthersId: "",
+			selectedFilePolisId: "",
+		));
 	}
 
 	Future<void> onClearSelection(

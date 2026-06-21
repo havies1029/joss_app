@@ -830,7 +830,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
           _buildDetailRowIcon("Banjir:", data.isFlood),
           _buildDetailRowIcon("Kerusuhan:", data.isSrcc),
           _buildDetailRowIcon("Terrorism:", data.isTerrorism),
-          _buildDetailRowIcon("Kerusakan Barang Pihak ketiga:", data.isTbod),
+          // _buildDetailRowIcon("Kerusakan Barang Pihak ketiga:", data.isTbod),
           _buildDetailRowIcon("Bengkel Resmi:", data.isAw),
           _buildDetailRow("Tanggung Jawab Penumpang:", toCurrency(data.pll)),
           _buildDetailRow("Tanggung Jawab Pihak Ketiga:", toCurrency(data.tpl)),

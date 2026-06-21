@@ -197,27 +197,34 @@ class AsetMvCariBloc extends Bloc<AsetMvCariEvents, AsetMvCariState> {
 			SelectMvDetailEvent event,
 			Emitter<AsetMvCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..add(event.asetMvId);
+		emit(state.copyWith(
+			selectedIds: <String>{event.asetMvId},
+			selectedId: event.asetMvId,
+			activeAsetMvId: event.asetMvId,
+		));
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		// id yang baru dipilih jadi active
-		_recomputeActiveAndFile(emit, preferId: event.asetMvId);
+		_recomputeActiveAndFile(
+			emit,
+			preferId: event.asetMvId,
+		);
 	}
 
 	Future<void> onUnselectDetail(
 			UnselectMvDetailEvent event,
 			Emitter<AsetMvCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..remove(event.asetMvId);
+		if (!state.selectedIds.contains(event.asetMvId) &&
+				state.selectedId != event.asetMvId &&
+				state.activeAsetMvId != event.asetMvId) {
+			return;
+		}
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		// kalau yang dihapus adalah active, otomatis fallback
-		final preferFallback =
-		(state.activeAsetMvId == event.asetMvId) ? null : state.activeAsetMvId;
-
-		_recomputeActiveAndFile(emit, preferId: preferFallback);
+		emit(state.copyWith(
+			selectedIds: <String>{},
+			selectedId: "",
+			activeAsetMvId: "",
+			selectedFilePolisId: "",
+		));
 	}
 
 	Future<void> onClearSelection(

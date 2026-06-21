@@ -51,6 +51,8 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
   final String Function(int hiddenCount)? expandText;
   final String collapseText;
 
+  final bool useScrollableShowMorePopup;
+
   const ReusableComboBoxV2({
     super.key,
     required this.hintText,
@@ -78,6 +80,7 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
     this.initialVisibleCount,
     this.expandText,
     this.collapseText = "Tampilkan Lebih Sedikit",
+    this.useScrollableShowMorePopup = false,
   });
 
   @override
@@ -95,28 +98,36 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   final ValueNotifier<int> _hiddenCountNotifier = ValueNotifier<int>(0);
   final ValueNotifier<bool> _isSearchingNotifier = ValueNotifier<bool>(false);
 
+  final TextEditingController _customSearchController = TextEditingController();
+  final ValueNotifier<bool> _customLoadingNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<int> _itemsVersionNotifier = ValueNotifier<int>(0);
+
+  bool get _showMoreEnabled => widget.initialVisibleCount != null;
+
+  bool get _useCustomScrollablePopup =>
+      widget.useScrollableShowMorePopup && _showMoreEnabled;
+
+  bool _hasLoadedOnce = false;
+
   void _syncPopupMeta(List<T> items, String q) {
     _currentPopupItems = items;
 
     final isSearching = q.isNotEmpty;
     _isSearchingNotifier.value = isSearching;
 
-    if (widget.initialVisibleCount == null || isSearching) {
+    if (!_showMoreEnabled || isSearching) {
       _hiddenCountNotifier.value = 0;
+      _itemsVersionNotifier.value++;
       return;
     }
 
     final limit = widget.initialVisibleCount!;
-    if (items.length <= limit) {
-      _hiddenCountNotifier.value = 0;
-      return;
-    }
-
-    _hiddenCountNotifier.value = items.length - limit;
+    _hiddenCountNotifier.value = items.length > limit ? items.length - limit : 0;
+    _itemsVersionNotifier.value++;
   }
 
   bool _isHiddenItem(T item, bool showAllItems) {
-    if (widget.initialVisibleCount == null) return false;
+    if (!_showMoreEnabled) return false;
     if (showAllItems) return false;
     if (_isSearchingNotifier.value) return false;
 
@@ -130,10 +141,17 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   }
 
   List<T> _visibleItems(bool showAllItems) {
-    if (widget.initialVisibleCount == null) return _currentPopupItems;
+    if (!_showMoreEnabled) return _currentPopupItems;
     if (showAllItems || _isSearchingNotifier.value) return _currentPopupItems;
 
     return _currentPopupItems.take(widget.initialVisibleCount!).toList();
+  }
+
+  bool _shouldShowToggle(bool showAllItems) {
+    if (!_showMoreEnabled) return false;
+    if (_isSearchingNotifier.value) return false;
+
+    return _hiddenCountNotifier.value > 0 || showAllItems;
   }
 
   @override
@@ -145,9 +163,11 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     if (dependencyChanged && widget.clearCacheOnDependencyChange) {
       _cachedItems = null;
       _currentPopupItems = [];
+      _customSearchController.clear();
       _showAllItemsNotifier.value = false;
       _hiddenCountNotifier.value = 0;
       _isSearchingNotifier.value = false;
+      _itemsVersionNotifier.value++;
 
       widget.comboKey?.currentState?.clear();
     }
@@ -156,6 +176,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _customSearchController.dispose();
+    _customLoadingNotifier.dispose();
+    _itemsVersionNotifier.dispose();
     _showAllItemsNotifier.dispose();
     _hiddenCountNotifier.dispose();
     _isSearchingNotifier.dispose();
@@ -169,6 +192,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       final items = await widget.loader(
         ComboQuery(searchText: '', params: widget.params),
       );
+
       _cachedItems = items;
       _syncPopupMeta(items, q);
       return items;
@@ -177,8 +201,10 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     if (q.isNotEmpty && q.length < widget.minSearchChars) {
       _cachedItems = const [];
       _currentPopupItems = [];
+      _showAllItemsNotifier.value = false;
       _hiddenCountNotifier.value = 0;
       _isSearchingNotifier.value = true;
+      _itemsVersionNotifier.value++;
       return const [];
     }
 
@@ -197,6 +223,11 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       }).toList();
 
       _cachedItems = baseItems;
+
+      if (q.isNotEmpty) {
+        _showAllItemsNotifier.value = false;
+      }
+
       _syncPopupMeta(filteredItems, q);
       return filteredItems;
     }
@@ -205,6 +236,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       final items = await widget.loader(
         ComboQuery(searchText: '', params: widget.params),
       );
+
       _cachedItems = items;
       _syncPopupMeta(items, q);
       return items;
@@ -212,6 +244,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
 
     final completer = Completer<List<T>>();
     _debounceTimer?.cancel();
+
     final int mySeq = ++_reqSeq;
 
     _debounceTimer = Timer(widget.searchDebounce, () async {
@@ -235,6 +268,22 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     });
 
     return completer.future;
+  }
+
+  Future<void> _customSearch(String value) async {
+    _customLoadingNotifier.value = true;
+
+    try {
+      await _loadItems(value);
+      _hasLoadedOnce = true;
+    } finally {
+      _customLoadingNotifier.value = false;
+    }
+  }
+
+  void _selectCustomItem(T item) {
+    widget.onChangedCallback?.call(item);
+    Navigator.of(context).maybePop();
   }
 
   @override
@@ -280,8 +329,8 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
             color: Colors.red,
             fontSize: 12,
           ),
-          errorText:
-          (widget.errorText != null && widget.errorText!.trim().isNotEmpty)
+          errorText: (widget.errorText != null &&
+              widget.errorText!.trim().isNotEmpty)
               ? widget.errorText
               : null,
         ),
@@ -312,84 +361,22 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         },
         constraints: BoxConstraints(maxHeight: widget.maxHeight),
         showSelectedItems: true,
-        showSearchBox: widget.enableSearch,
+        showSearchBox: _useCustomScrollablePopup ? false : widget.enableSearch,
         itemBuilder: widget.customItemBuilder ?? _defaultItemBuilderWithDivider,
         containerBuilder: (context, popupWidget) {
-          return Container(
-            decoration: BoxDecoration(
-              color: formGrey,
-              border: Border.all(color: sGrey),
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(cardBorderRadius),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(child: popupWidget),
-                ValueListenableBuilder<bool>(
-                  valueListenable: _isSearchingNotifier,
-                  builder: (context, isSearching, _) {
-                    if (isSearching) return const SizedBox.shrink();
+          if (_useCustomScrollablePopup) {
+            if (!_hasLoadedOnce && !_customLoadingNotifier.value) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _customSearch(_customSearchController.text);
+                }
+              });
+            }
 
-                    return ValueListenableBuilder<int>(
-                      valueListenable: _hiddenCountNotifier,
-                      builder: (context, hiddenCount, _) {
-                        return ValueListenableBuilder<bool>(
-                          valueListenable: _showAllItemsNotifier,
-                          builder: (context, showAllItems, _) {
-                            final showToggle =
-                                widget.initialVisibleCount != null &&
-                                    (hiddenCount > 0 || showAllItems);
+            return _buildCustomScrollablePopup();
+          }
 
-                            if (!showToggle) {
-                              return const SizedBox.shrink();
-                            }
-
-                            return InkWell(
-                              onTap: () {
-                                _showAllItemsNotifier.value = !showAllItems;
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 14),
-                                alignment: Alignment.center,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      showAllItems
-                                          ? Icons.keyboard_arrow_up
-                                          : Icons.keyboard_arrow_down,
-                                      size: 20,
-                                      color: primaryColor,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      showAllItems
-                                          ? widget.collapseText
-                                          : (widget.expandText
-                                          ?.call(hiddenCount) ??
-                                          "Lihat $hiddenCount Kategori Lainnya"),
-                                      style: bodyTextStyle(context).copyWith(
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
+          return _buildDefaultPopupLayer(popupWidget);
         },
         searchFieldProps: widget.enableSearch
             ? TextFieldProps(
@@ -421,12 +408,184 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         if (widget.errorText != null && widget.errorText!.trim().isNotEmpty) {
           return null;
         }
+
         if (widget.validatorCallback != null) {
           final result = widget.validatorCallback!(value);
           if (result != null && result.isNotEmpty) return result;
         }
+
         return null;
       },
+    );
+  }
+
+  Widget _buildDefaultPopupLayer(Widget popupWidget) {
+    return Container(
+      decoration: BoxDecoration(
+        color: formGrey,
+        border: Border.all(color: sGrey),
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(cardBorderRadius),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(child: popupWidget),
+          ValueListenableBuilder<bool>(
+            valueListenable: _showAllItemsNotifier,
+            builder: (context, showAllItems, _) {
+              return ValueListenableBuilder<int>(
+                valueListenable: _hiddenCountNotifier,
+                builder: (context, hiddenCount, _) {
+                  if (!_shouldShowToggle(showAllItems)) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return _buildShowMoreButton(showAllItems, hiddenCount);
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomScrollablePopup() {
+    return Container(
+      decoration: BoxDecoration(
+        color: formGrey,
+        border: Border.all(color: sGrey),
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(cardBorderRadius),
+        ),
+      ),
+      constraints: BoxConstraints(maxHeight: widget.maxHeight),
+      child: ValueListenableBuilder<bool>(
+        valueListenable: _customLoadingNotifier,
+        builder: (context, isLoading, __) {
+          return ValueListenableBuilder<int>(
+            valueListenable: _itemsVersionNotifier,
+            builder: (context, _, ___) {
+              return ValueListenableBuilder<bool>(
+                valueListenable: _showAllItemsNotifier,
+                builder: (context, showAllItems, ____) {
+                  final visibleItems = _visibleItems(showAllItems);
+                  final hiddenCount = _hiddenCountNotifier.value;
+                  final showToggle = _shouldShowToggle(showAllItems);
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (widget.enableSearch) _buildCustomSearchField(),
+
+                        if (isLoading || !_hasLoadedOnce)
+                          const Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Center(
+                              child: LoadingIndicator(),
+                            ),
+                          )
+                        else
+                          _buildCustomDataLayer(visibleItems),
+
+                        if (!isLoading &&
+                            _hasLoadedOnce &&
+                            showToggle)
+                          _buildShowMoreButton(
+                            showAllItems,
+                            hiddenCount,
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCustomSearchField() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _customLoadingNotifier,
+      builder: (context, isLoading, _) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _customSearchController,
+              style: inputTextStyle(context, color: hintGrey),
+              cursorColor: primaryLightColor,
+              onChanged: _customSearch,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: 'Cari ${widget.hintText}...',
+                hintStyle: inputTextStyle(context, color: hintGrey),
+                prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
+                suffixIcon: null,
+                filled: true,
+                fillColor: formGrey,
+                border: InputBorder.none,
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 40,
+                  minHeight: 20,
+                ),
+              ),
+            ),
+            kDivider(color: sGrey),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomDataLayer(List<T> items) {
+    if (items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(15),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Data tidak ditemukan',
+            style: bodyTextStyle(context).copyWith(color: hintGrey),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(items.length, (index) {
+        final item = items[index];
+        final isFirst = index == 0;
+        final isLast = index == items.length - 1;
+
+        return InkWell(
+          onTap: () => _selectCustomItem(item),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isFirst) kDivider(color: sGrey),
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.displayText(item),
+                    style: bodyTextStyle(context),
+                  ),
+                ),
+              ),
+              if (!isLast) kDivider(color: sGrey),
+            ],
+          ),
+        );
+      }),
     );
   }
 
@@ -450,6 +609,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
             widget.compareItems(item, visibleItems.last);
 
         return Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             if (isFirstItem) kDivider(color: sGrey),
             Padding(
@@ -466,6 +626,48 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildShowMoreButton(bool showAllItems, int hiddenCount) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        kDivider(color: sGrey),
+        InkWell(
+          onTap: () {
+            _showAllItemsNotifier.value = !showAllItems;
+          },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  showAllItems
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  size: 20,
+                  color: primaryColor,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  showAllItems
+                      ? widget.collapseText
+                      : (widget.expandText?.call(hiddenCount) ??
+                      "Lihat $hiddenCount Kategori Lainnya"),
+                  style: bodyTextStyle(context).copyWith(
+                    color: primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

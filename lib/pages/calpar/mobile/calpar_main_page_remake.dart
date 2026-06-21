@@ -620,8 +620,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                     isExpanded: expanded[1],
                     onToggle: (v) => setState(() => expanded[1] = v),
                     onRefresh: () {
-                      if (calpar2Id != null && calpar2Id!.isNotEmpty) {
-                        refreshForm2(recordId: calpar2Id);
+                      if (calpar1Id != null && calpar1Id!.isNotEmpty) {
+                        refreshForm2(recordId: calpar1Id);
                       }
                     },
                     child: Column(
@@ -662,8 +662,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                     isExpanded: expanded[2],
                     onToggle: (v) => setState(() => expanded[2] = v),
                     onRefresh: () {
-                      if (calpar3Id != null && calpar3Id!.isNotEmpty) {
-                        refreshForm3(recordId: calpar3Id);
+                      if (calpar1Id != null && calpar1Id!.isNotEmpty) {
+                        refreshForm3(recordId: calpar1Id);
                       }
                     },
                     child: Column(

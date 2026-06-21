@@ -267,32 +267,38 @@ class AsetHealthCariBloc extends Bloc<AsetHealthCariEvents, AsetHealthCariState>
 		}
 	}
 
-	// -----------------------
-	// Selection utama
-	// -----------------------
 	Future<void> onSelectDetail(
 			SelectHealthDetailEvent event,
 			Emitter<AsetHealthCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..add(event.asethealthId);
+		emit(state.copyWith(
+			selectedIds: <String>{event.asethealthId},
+			selectedId: event.asethealthId,
+			activeAsetHealthId: event.asethealthId,
+		));
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		_recomputeActiveAndFile(emit, preferId: event.asethealthId);
+		_recomputeActiveAndFile(
+			emit,
+			preferId: event.asethealthId,
+		);
 	}
 
 	Future<void> onUnselectDetail(
 			UnselectHealthDetailEvent event,
 			Emitter<AsetHealthCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..remove(event.asethealthId);
+		if (!state.selectedIds.contains(event.asethealthId) &&
+				state.selectedId != event.asethealthId &&
+				state.activeAsetHealthId != event.asethealthId) {
+			return;
+		}
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		final preferFallback =
-		(state.activeAsetHealthId == event.asethealthId) ? null : state.activeAsetHealthId;
-
-		_recomputeActiveAndFile(emit, preferId: preferFallback);
+		emit(state.copyWith(
+			selectedIds: <String>{},
+			selectedId: "",
+			activeAsetHealthId: "",
+			selectedFilePolisId: "",
+		));
 	}
 
 	Future<void> onClearSelection(

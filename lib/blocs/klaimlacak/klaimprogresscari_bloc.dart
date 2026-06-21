@@ -79,105 +79,105 @@ class KlaimprogresscariBloc
 
 	List<KlaimprogresscariModel> _dummyProgressItems() {
 		return [
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY001',
-				progressNama: 'Mobil Masuk Bengkel',
-				progressDesc:
-				'Unit kendaraan sudah diterima oleh bengkel rekanan untuk pengecekan awal.',
-				progressTgl: DateTime(2026, 5, 7, 9, 30),
-				fileUrl: null,
-				actioncode: '',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY002',
-				progressNama: 'Dokumen Klaim Diterima',
-				progressDesc:
-				'Dokumen klaim sudah diterima dan sedang dilakukan proses verifikasi.',
-				progressTgl: DateTime(2026, 5, 8, 10, 15),
-				fileUrl: 'assets/dummy/test1.pdf',
-				actioncode: 'file',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY006',
-				progressNama: 'Lampiran Estimasi Bengkel',
-				progressDesc:
-				'File estimasi biaya perbaikan dari bengkel rekanan.',
-				progressTgl: DateTime(2026, 5, 9, 13, 10),
-				fileUrl: 'assets/dummy/test1.pdf',
-				actioncode: 'file',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY003',
-				progressNama: 'Nilai Klaim',
-				progressDesc: '',
-				progressTgl: DateTime(2026, 5, 10, 14, 20),
-				fileUrl: null,
-				actioncode: 'nilai_klaim',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY004',
-				progressNama: 'Jadwal Pembayaran',
-				progressDesc: '',
-				progressTgl: DateTime(2026, 5, 12, 11, 0),
-				fileUrl: null,
-				actioncode: 'table_payment',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY005',
-				progressNama: 'Foto Progress Bengkel',
-				progressDesc:
-				'Foto progress pengerjaan kendaraan dari pihak bengkel.',
-				progressTgl: DateTime(2026, 5, 13, 15, 45),
-				fileUrl:
-				'https://dummyimage.com/900x600/2b2b2b/ffffff.png&text=Progress+Bengkel',
-				actioncode: 'image',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY007',
-				progressNama:
-				'Judul Progress Sangat Panjang Untuk Menguji Apakah Text Akan Turun Baris Dengan Aman Di Layar Mobile',
-				progressDesc:
-				'Deskripsi progress ini sengaja dibuat panjang untuk memastikan card tetap rapi, tidak overflow ke kanan, tidak menabrak timeline, dan tetap enak dibaca pada ukuran layar kecil maupun tablet.',
-				progressTgl: DateTime(2026, 5, 14, 8, 5),
-				fileUrl: null,
-				actioncode: '',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY008',
-				progressNama: 'File Lampiran Nama Panjang',
-				progressDesc:
-				'Testing card file dengan nama file panjang supaya overflow text bisa diuji.',
-				progressTgl: DateTime(2026, 5, 14, 10, 30),
-				fileUrl:
-				'Dokumen_Klaim_Kendaraan_Dengan_Nama_File_Sangat_Panjang_Final_Revisi_12_Tahun_2026.pdf',
-				actioncode: 'file',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: 'DUMMY009',
-				progressNama: 'Foto Dengan Deskripsi Panjang',
-				progressDesc:
-				'Testing layout ketika card punya gambar di kanan dan teks di kiri yang panjang. Ini penting karena di mobile ruang horizontal kecil.',
-				progressTgl: DateTime(2026, 5, 15, 13, 45),
-				fileUrl:
-				'https://dummyimage.com/900x600/2b2b2b/ffffff.png&text=Damage+Photo',
-				actioncode: 'image',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: '',
-				progressNama: 'Mobil Selesai',
-				progressDesc: '',
-				progressTgl: null,
-				fileUrl: null,
-				actioncode: '',
-			),
-			KlaimprogresscariModel(
-				klaimprogressId: '',
-				progressNama: 'Mobil Diambil atau Diantar oleh Klien',
-				progressDesc: '',
-				progressTgl: null,
-				fileUrl: null,
-				actioncode: '',
-			),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY001',
+			// 	progressNama: 'Mobil Masuk Bengkel',
+			// 	progressDesc:
+			// 	'Unit kendaraan sudah diterima oleh bengkel rekanan untuk pengecekan awal.',
+			// 	progressTgl: DateTime(2026, 5, 7, 9, 30),
+			// 	fileUrl: null,
+			// 	actioncode: '',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY002',
+			// 	progressNama: 'Dokumen Klaim Diterima',
+			// 	progressDesc:
+			// 	'Dokumen klaim sudah diterima dan sedang dilakukan proses verifikasi.',
+			// 	progressTgl: DateTime(2026, 5, 8, 10, 15),
+			// 	fileUrl: 'assets/dummy/test1.pdf',
+			// 	actioncode: 'file',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY006',
+			// 	progressNama: 'Lampiran Estimasi Bengkel',
+			// 	progressDesc:
+			// 	'File estimasi biaya perbaikan dari bengkel rekanan.',
+			// 	progressTgl: DateTime(2026, 5, 9, 13, 10),
+			// 	fileUrl: 'assets/dummy/test1.pdf',
+			// 	actioncode: 'file',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY003',
+			// 	progressNama: 'Nilai Klaim',
+			// 	progressDesc: '',
+			// 	progressTgl: DateTime(2026, 5, 10, 14, 20),
+			// 	fileUrl: null,
+			// 	actioncode: 'nilai_klaim',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY004',
+			// 	progressNama: 'Jadwal Pembayaran',
+			// 	progressDesc: '',
+			// 	progressTgl: DateTime(2026, 5, 12, 11, 0),
+			// 	fileUrl: null,
+			// 	actioncode: 'table_payment',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY005',
+			// 	progressNama: 'Foto Progress Bengkel',
+			// 	progressDesc:
+			// 	'Foto progress pengerjaan kendaraan dari pihak bengkel.',
+			// 	progressTgl: DateTime(2026, 5, 13, 15, 45),
+			// 	fileUrl:
+			// 	'https://dummyimage.com/900x600/2b2b2b/ffffff.png&text=Progress+Bengkel',
+			// 	actioncode: 'image',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY007',
+			// 	progressNama:
+			// 	'Judul Progress Sangat Panjang Untuk Menguji Apakah Text Akan Turun Baris Dengan Aman Di Layar Mobile',
+			// 	progressDesc:
+			// 	'Deskripsi progress ini sengaja dibuat panjang untuk memastikan card tetap rapi, tidak overflow ke kanan, tidak menabrak timeline, dan tetap enak dibaca pada ukuran layar kecil maupun tablet.',
+			// 	progressTgl: DateTime(2026, 5, 14, 8, 5),
+			// 	fileUrl: null,
+			// 	actioncode: '',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY008',
+			// 	progressNama: 'File Lampiran Nama Panjang',
+			// 	progressDesc:
+			// 	'Testing card file dengan nama file panjang supaya overflow text bisa diuji.',
+			// 	progressTgl: DateTime(2026, 5, 14, 10, 30),
+			// 	fileUrl:
+			// 	'Dokumen_Klaim_Kendaraan_Dengan_Nama_File_Sangat_Panjang_Final_Revisi_12_Tahun_2026.pdf',
+			// 	actioncode: 'file',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: 'DUMMY009',
+			// 	progressNama: 'Foto Dengan Deskripsi Panjang',
+			// 	progressDesc:
+			// 	'Testing layout ketika card punya gambar di kanan dan teks di kiri yang panjang. Ini penting karena di mobile ruang horizontal kecil.',
+			// 	progressTgl: DateTime(2026, 5, 15, 13, 45),
+			// 	fileUrl:
+			// 	'https://dummyimage.com/900x600/2b2b2b/ffffff.png&text=Damage+Photo',
+			// 	actioncode: 'image',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: '',
+			// 	progressNama: 'Mobil Selesai',
+			// 	progressDesc: '',
+			// 	progressTgl: null,
+			// 	fileUrl: null,
+			// 	actioncode: '',
+			// ),
+			// KlaimprogresscariModel(
+			// 	klaimprogressId: '',
+			// 	progressNama: 'Mobil Diambil atau Diantar oleh Klien',
+			// 	progressDesc: '',
+			// 	progressTgl: null,
+			// 	fileUrl: null,
+			// 	actioncode: '',
+			// ),
 		];
 	}
 

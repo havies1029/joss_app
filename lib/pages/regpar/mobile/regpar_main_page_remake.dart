@@ -99,56 +99,48 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Regpar5FormModel? form5Record;
   Regpar6FormModel? form6Record;
 
-  bool _lockCheckboxes = true;
+
+  bool _showZonaGempa = true;
+  bool _lockCheckboxes = false;
 
   void _setBool(TextEditingController c, bool v) {
     c.text = v.toString();
   }
 
   void _applyCoverParRule(String? mjnscoverparId) {
-    // default: tidak ada yg kecentang, tidak terkunci
-    if (mjnscoverparId == null) {
-      setState(() {
-        _lockCheckboxes = false;
-        _setBool(fieldIsEqController, false);
-        _setBool(fieldIsTsfwdController, false);
-        _setBool(fieldIsFlexasController, false);
-        _setBool(fieldIsOtherController, false);
-        _setBool(fieldIsRsmdccController, false);
-      });
-      return;
-    }
+    _lockCheckboxes = false;
+    _showZonaGempa = true;
+
+    _setBool(fieldIsEqController, false);
+    _setBool(fieldIsTsfwdController, false);
+    _setBool(fieldIsFlexasController, false);
+    _setBool(fieldIsOtherController, false);
+    _setBool(fieldIsRsmdccController, false);
 
     if (mjnscoverparId == "10") {
-      // dengan gempa: semua centang termasuk gempa
-      setState(() {
-        _lockCheckboxes = true;
-        _setBool(fieldIsEqController, true);
-        _setBool(fieldIsTsfwdController, true);
-        _setBool(fieldIsFlexasController, true);
-        _setBool(fieldIsOtherController, true);
-        _setBool(fieldIsRsmdccController, true);
-      });
+      // PAR Dengan Gempa
+      _lockCheckboxes = true;
+      _showZonaGempa = true;
+
+      _setBool(fieldIsEqController, true);
+      _setBool(fieldIsTsfwdController, true);
+      _setBool(fieldIsFlexasController, true);
+      _setBool(fieldIsOtherController, true);
+      _setBool(fieldIsRsmdccController, true);
     } else if (mjnscoverparId == "20") {
-      // tanpa gempa: semua centang selain gempa
-      setState(() {
-        _lockCheckboxes = true;
-        _setBool(fieldIsEqController, false);
-        _setBool(fieldIsTsfwdController, true);
-        _setBool(fieldIsFlexasController, true);
-        _setBool(fieldIsOtherController, true);
-        _setBool(fieldIsRsmdccController, true);
-      });
-    } else {
-      // id lain: balik ke default (atau sesuai kebutuhan)
-      setState(() {
-        _lockCheckboxes = false;
-        _setBool(fieldIsEqController, false);
-        _setBool(fieldIsTsfwdController, false);
-        _setBool(fieldIsFlexasController, false);
-        _setBool(fieldIsOtherController, false);
-        _setBool(fieldIsRsmdccController, false);
-      });
+      // PAR Tanpa Gempa
+      _lockCheckboxes = true;
+      _showZonaGempa = false;
+
+      _setBool(fieldIsEqController, false);
+      _setBool(fieldIsTsfwdController, true);
+      _setBool(fieldIsFlexasController, true);
+      _setBool(fieldIsOtherController, true);
+      _setBool(fieldIsRsmdccController, true);
+
+      fieldComboMKabZonaGempa = null;
+      comboMKabZonaGempaKey.currentState?.clear();
+      clearErr('form3.zonaGempa');
     }
   }
 
@@ -941,8 +933,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                         const SizedBox(height: hPadding),
                         buildFieldMwilayahId(),
                         const SizedBox(height: hPadding),
-                        buildFieldKab2zonagempaId(),
-                        const SizedBox(height: 15),
+                        if (_showZonaGempa) ...[
+                          buildFieldKab2zonagempaId(),
+                          const SizedBox(height: 15),
+                        ],
                       ],
                     ),
                   ),
@@ -1470,7 +1464,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       isOther: toBoolean(fieldIsOtherController.text),
       isRsmdcc: toBoolean(fieldIsRsmdccController.text),
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
-      kab2zonagempaId: fieldComboMKabZonaGempa?.mkabzonagempaId,
+      kab2zonagempaId: _showZonaGempa
+          ? fieldComboMKabZonaGempa?.mkabzonagempaId
+          : '',
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       regpar3Id: regpar1Id ?? "",
@@ -1684,11 +1680,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       ok = false;
     }
 
-    if (fieldComboMKabZonaGempa == null) {
+    if (_showZonaGempa && fieldComboMKabZonaGempa == null) {
       setErr('form3.zonaGempa', kStringNullError);
       ok = false;
     }
-
 
     if (!ok) openSection(RegparSection.form3);
 
@@ -2579,10 +2574,16 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       fieldComboMKecamatan != null &&
       fieldComboMKelurahan != null;
 
-  bool isForm3Complete() =>
-      fieldComboMJnscoverPar != null &&
-      fieldComboMWilayah != null &&
-      fieldComboMKabZonaGempa != null;
+  bool isForm3Complete() {
+    if (fieldComboMJnscoverPar == null) return false;
+    if (fieldComboMWilayah == null) return false;
+
+    if (_showZonaGempa && fieldComboMKabZonaGempa == null) {
+      return false;
+    }
+
+    return true;
+  }
 
   bool isForm4Complete() {
     if (fieldComboRMatauang == null) return false;

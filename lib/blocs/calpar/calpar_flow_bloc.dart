@@ -40,6 +40,36 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
     _wireListeners();
   }
 
+  void _logFlowState(String tag) {
+    final f1 = calpar1CrudBloc.state.record;
+    final f2 = calpar2FormBloc.state.record;
+    final f3 = calpar3FormBloc.state.record;
+
+    debugPrint("========== CALPAR FLOW DEBUG: $tag ==========");
+    debugPrint(
+      "FORM1 => id=${f1?.calpar1Id}, "
+          "saving=${calpar1CrudBloc.state.isSaving}, "
+          "saved=${calpar1CrudBloc.state.isSaved}, "
+          "failure=${calpar1CrudBloc.state.hasFailure}",
+    );
+    debugPrint(
+      "FORM2 => id=${f2?.calpar2Id}, "
+          "parent=${f2?.calpar1Id}, "
+          "saving=${calpar2FormBloc.state.isSaving}, "
+          "saved=${calpar2FormBloc.state.isSaved}, "
+          "failure=${calpar2FormBloc.state.hasFailure}",
+    );
+    debugPrint(
+      "FORM3 => id=${f3?.calpar3Id}, "
+          "parent=${f3?.calpar1Id}, "
+          "saving=${calpar3FormBloc.state.isSaving}, "
+          "saved=${calpar3FormBloc.state.isSaved}, "
+          "failure=${calpar3FormBloc.state.hasFailure}",
+    );
+    debugPrint("FLOW => $state");
+    debugPrint("============================================");
+  }
+
   void _wireListeners() {
     _subCalpar1 = calpar1CrudBloc.stream.listen((s) {
       final prev = _prev1;
@@ -68,12 +98,31 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
 
       final id = s.record?.calpar2Id ?? "";
 
+      debugPrint(
+        "[CALPAR2 STREAM] "
+            "prevSaving=${prev?.isSaving}, "
+            "saving=${s.isSaving}, "
+            "saved=${s.isSaved}, "
+            "failure=${s.hasFailure}, "
+            "id=$id, "
+            "parent=${s.record?.calpar1Id}",
+      );
+
       final justFinished =
           (prev?.isSaving == true) &&
               (s.isSaving == false) &&
               (s.isSaved == true) &&
               (s.hasFailure == false) &&
               id.isNotEmpty;
+
+      debugPrint(
+        "[CALPAR2 JUST_FINISHED] result=$justFinished | "
+            "prevSaving=${prev?.isSaving} "
+            "saving=${s.isSaving} "
+            "saved=${s.isSaved} "
+            "failure=${s.hasFailure} "
+            "idNotEmpty=${id.isNotEmpty}",
+      );
 
       if (justFinished && !state.step3Triggered) {
         debugPrint(
@@ -204,16 +253,46 @@ class CalparFlowBloc extends Bloc<CalparFlowEvent, CalparFlowState> {
 
   void _syncCalpar1IdToForm2And3(String calpar1Id) {
     final form2 = calpar2FormBloc.state.record!;
+    debugPrint(
+      "[SYNC BEFORE FORM2] "
+          "oldParent=${form2.calpar1Id}, "
+          "newParent=$calpar1Id, "
+          "calpar2Id=${form2.calpar2Id}",
+    );
+
     if (form2.calpar1Id != calpar1Id) {
+      final updatedForm2 = form2.copyWith(calpar1Id: calpar1Id);
+
+      debugPrint(
+        "[SYNC DISPATCH FORM2 DRAFT] "
+            "calpar2Id=${updatedForm2.calpar2Id}, "
+            "calpar1Id=${updatedForm2.calpar1Id}",
+      );
+
       calpar2FormBloc.add(
-        Calpar2DraftEvent(record: form2.copyWith(calpar1Id: calpar1Id)),
+        Calpar2DraftEvent(record: updatedForm2),
       );
     }
 
     final form3 = calpar3FormBloc.state.record!;
+    debugPrint(
+      "[SYNC BEFORE FORM3] "
+          "oldParent=${form3.calpar1Id}, "
+          "newParent=$calpar1Id, "
+          "calpar3Id=${form3.calpar3Id}",
+    );
+
     if (form3.calpar1Id != calpar1Id) {
+      final updatedForm3 = form3.copyWith(calpar1Id: calpar1Id);
+
+      debugPrint(
+        "[SYNC DISPATCH FORM3 DRAFT] "
+            "calpar3Id=${updatedForm3.calpar3Id}, "
+            "calpar1Id=${updatedForm3.calpar1Id}",
+      );
+
       calpar3FormBloc.add(
-        Calpar3DraftEvent(record: form3.copyWith(calpar1Id: calpar1Id)),
+        Calpar3DraftEvent(record: updatedForm3),
       );
     }
   }

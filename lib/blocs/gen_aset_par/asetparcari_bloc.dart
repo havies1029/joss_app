@@ -242,12 +242,12 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			SelectDetailEvent event,
 			Emitter<AsetParCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..add(event.asetParId);
+		emit(state.copyWith(
+			selectedIds: <String>{event.asetParId},
+			selectedId: event.asetParId,
+			activeAsetParId: event.asetParId,
+		));
 
-		// 1) simpan selectedIds dulu
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		// 2) jadikan id ini aktif dan turunkan filePar/fileEq dari items
 		_recomputeActiveAndFiles(emit, preferId: event.asetParId);
 	}
 
@@ -268,16 +268,13 @@ class AsetParCariBloc extends Bloc<AsetParCariEvents, AsetParCariState> {
 			UnselectDetailEvent event,
 			Emitter<AsetParCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..remove(event.asetParId);
-
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
-
-		// kalau yang dihapus adalah active, otomatis fallback ke sisa selection.
-		// kalau bukan active, tetap mempertahankan active.
-		final preferFallback =
-		(state.activeAsetParId == event.asetParId) ? null : state.activeAsetParId;
-
-		_recomputeActiveAndFiles(emit, preferId: preferFallback);
+		emit(state.copyWith(
+			selectedIds: <String>{},
+			selectedId: "",
+			activeAsetParId: "",
+			selectedFilePolisParId: "",
+			selectedFilePolisEqId: "",
+		));
 	}
 
 	Future<void> onUnselectDetailParId(

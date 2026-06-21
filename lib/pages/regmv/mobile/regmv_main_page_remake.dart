@@ -292,21 +292,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   void refreshForm4({required String? recordId}) {
-    debugPrint("🔄 refreshForm4 CALLED");
-    debugPrint("👉 recordId = $recordId");
-
     if (recordId == null || recordId.isEmpty) {
       debugPrint("❌ recordId null atau empty, RETURN");
       return;
     }
 
-    debugPrint("➡️ Dispatch RefreshRegmv4CariEvent");
-
     context.read<Regmv4CariBloc>().add(
       RefreshRegmv4CariEvent(regmv1Id: recordId),
     );
 
-    debugPrint("✅ RefreshRegmv4CariEvent SENT");
   }
 
 

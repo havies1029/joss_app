@@ -94,64 +94,131 @@ class Regklaim1CrudAPI {
 			String mjenisrugimvId,
 			String keterangan,
 			) async {
-		String lihatEndpoint =
-				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create4polisjps";
+		try {
+			String lihatEndpoint =
+					"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/create4polisjps";
 
-		Map<String, String> queryParams = {
-			'sppa1Id': sppa1Id,
-			'mjenisrugimvId': mjenisrugimvId,
-			'keterangan': keterangan,
-			'modul_id': 'regklaim1Tambah4PolisJpsAPI',
-		};
+			Map<String, String> queryParams = {
+				'sppa1Id': sppa1Id,
+				'mjenisrugimvId': mjenisrugimvId,
+				'keterangan': keterangan,
+				'modul_id': 'regklaim1Tambah4PolisJpsAPI',
+			};
 
-		var uri = AppData.uriHtpp(
-			AppData.httpAuthority,
-			lihatEndpoint,
-			queryParams,
-		);
+			var uri = AppData.uriHtpp(
+				AppData.httpAuthority,
+				lihatEndpoint,
+				queryParams,
+			);
 
-		final http.Response response = await http.get(
-			uri,
-			headers: <String, String>{
+			final headers = <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
 				'Authorization': 'Bearer ${AppData.userToken}',
-			},
-		);
+			};
 
-		if (response.statusCode == 200) {
-			return ReturnDataAPI.fromDatabaseJson(
-				jsonDecode(response.body),
+			debugPrint(
+					'================ REGKLAIM1 TAMBAH 4 POLIS JPS REQUEST ================');
+			debugPrint('ENDPOINT    : $lihatEndpoint');
+			debugPrint('QUERY PARAM : $queryParams');
+			debugPrint('URL         : $uri');
+			debugPrint('HEADERS     : $headers');
+
+			final http.Response response = await http.get(
+				uri,
+				headers: headers,
 			);
-		} else {
-			throw Exception("Failed to load data");
+
+			debugPrint(
+					'================ REGKLAIM1 TAMBAH 4 POLIS JPS RESPONSE ================');
+			debugPrint('STATUS CODE : ${response.statusCode}');
+			debugPrint('BODY        : ${response.body}');
+
+			if (response.statusCode == 200) {
+				final result = ReturnDataAPI.fromDatabaseJson(
+					jsonDecode(response.body),
+				);
+
+				debugPrint(
+						'================ REGKLAIM1 TAMBAH 4 POLIS JPS SUCCESS ================');
+				debugPrint('SUCCESS     : ${result.success}');
+				debugPrint('DATA        : ${result.data}');
+				debugPrint('ROWCOUNT    : ${result.rowcount}');
+
+				return result;
+			} else {
+				debugPrint(
+						'================ REGKLAIM1 TAMBAH 4 POLIS JPS FAILED ================');
+				debugPrint('STATUS CODE : ${response.statusCode}');
+				debugPrint('BODY        : ${response.body}');
+
+				throw Exception(
+					"Failed to load data. StatusCode=${response.statusCode}",
+				);
+			}
+		} catch (e, stackTrace) {
+			debugPrint(
+					'================ REGKLAIM1 TAMBAH 4 POLIS JPS ERROR ================');
+			debugPrint('ERROR       : $e');
+			debugPrint('STACKTRACE  : $stackTrace');
+
+			rethrow;
 		}
 	}
 
 	Future<ReturnDataAPI> regklaimToKlaimAPI(String regklaim1Id) async {
-		String lihatEndpoint =
-				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/regklaimtoklaim";
+		try {
+			String lihatEndpoint =
+					"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/regklaimtoklaim";
 
-		Map<String, String> queryParams = {
-			'regklaim1Id': regklaim1Id,
-			'modul_id': 'regklaimToKlaimAPI'
-		};
+			Map<String, String> queryParams = {
+				'regklaim1Id': regklaim1Id,
+				'modul_id': 'regklaimToKlaimAPI'
+			};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
+			var uri =
+			AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 
-		final http.Response response = await http.get(
-			uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-		);
+			debugPrint("========== regklaimToKlaimAPI REQUEST ==========");
+			debugPrint("URL      : $uri");
+			debugPrint("Method   : GET");
+			debugPrint("Params   : $queryParams");
+			debugPrint("Token    : ${AppData.userToken}");
+			debugPrint("===============================================");
 
-		if (response.statusCode == 200) {
-			return ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			throw Exception("Failed to load data");
+			final http.Response response = await http.get(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}'
+				},
+			);
+
+			debugPrint("========== regklaimToKlaimAPI RESPONSE =========");
+			debugPrint("Status   : ${response.statusCode}");
+			debugPrint("Body     : ${response.body}");
+			debugPrint("================================================");
+
+			if (response.statusCode == 200) {
+				return ReturnDataAPI.fromDatabaseJson(
+					jsonDecode(response.body),
+				);
+			} else {
+				debugPrint(
+					"regklaimToKlaimAPI ERROR : Status Code ${response.statusCode}",
+				);
+				throw Exception(
+					"Failed to load data. Status Code : ${response.statusCode}",
+				);
+			}
+		} catch (e, s) {
+			debugPrint("========== regklaimToKlaimAPI EXCEPTION ========");
+			debugPrint("Error    : $e");
+			debugPrint("Stack    : $s");
+			debugPrint("================================================");
+
+			rethrow;
 		}
 	}
 

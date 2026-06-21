@@ -141,7 +141,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Keluar dari Pembayaran?",
+                    "Batalkan Pembayaran?",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor,
@@ -151,7 +151,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Jika Anda keluar dari halaman metode pembayaran, data transaksi akan tersimpan di menu Riwayat Pembayaran.",
+                    "Pembayaran yang dibatalkan tidak dapat dilanjutkan kembali. Anda dapat membuat pembayaran baru kapan saja.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor.withOpacity(0.7),
@@ -176,7 +176,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                             ),
                             onPressed: () => Navigator.pop(context, false),
                             child: Text(
-                              "Tidak",
+                              "Kembali",
                               style: TextStyle(
                                 fontSize: getResponsiveFont(context, 16),
                                 fontWeight: FontWeight.w600,
@@ -200,7 +200,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                             ),
                             onPressed: () => Navigator.pop(context, true),
                             child: Text(
-                              "Iya, Keluar",
+                              "Iya, Batal",
                               style: TextStyle(
                                 fontSize: getResponsiveFont(context, 16),
                                 fontWeight: FontWeight.w700,
@@ -334,9 +334,22 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                         buildInstruksiPembayaran(state),
                         const SizedBox(height: hPadding),
 
-                        AppButton.primary(
-                          text: "Kembali",
-                          onPressed: () => _handleExit(context),
+                        // AppButton.primary(
+                        //   text: "Kembali",
+                        //   onPressed: () => _handleExit(context),
+                        // ),
+
+                        AppButton.iconLeft(
+                          text: 'Batal Pembayaran',
+                          backgroundColor: redPayment,
+                          icon: SvgPicture.asset(
+                            'assets/icons/gg_trash.svg',
+                            width: 18,
+                            height: 18,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                         ),
 
                         FormError(errors: errors, key: null),
@@ -462,7 +475,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
-              "Pembayaran Berakhir pada:",
+              "Sisa Waktu Pembayaran",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: hintGrey),
             ),
@@ -470,7 +483,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
             Text(
               countdownText,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, color: redPayment),
+              style: const TextStyle(fontSize: 20, color: redPayment),
             ),
             const SizedBox(height: 4),
             Text(
@@ -495,6 +508,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
     return buffer.toString().trim();
   }
+
 
   Widget buildFieldVaNo() {
     final rawVa = fieldVaNoController.text.trim();

@@ -314,6 +314,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     return appTextField(
       label: 'Tambahkan Catatan',
       keyboardType: TextInputType.multiline,
+      hint: "Jelaskan kebutuhan Anda terkait pembelian polis.",
       maxLines: 3,
       controller: fieldRemarkController,
       onChanged: (value) {

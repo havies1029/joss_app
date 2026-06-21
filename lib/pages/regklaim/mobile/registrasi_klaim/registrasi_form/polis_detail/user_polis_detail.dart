@@ -166,11 +166,8 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
                   // BOTTOM BUTTON (FIXED)
                   // =====================
                   Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      hPadding * 1.5,
-                      12,
-                      hPadding * 1.5,
-                      vPadding,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: hPadding * 1.5,
                     ),
                     child: AppButton.primary(
                       text: "Lapor Klaim",

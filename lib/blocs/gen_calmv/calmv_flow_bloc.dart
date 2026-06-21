@@ -124,10 +124,10 @@ class CalmvFlowBloc extends Bloc<CalmvFlowEvent, CalmvFlowState> {
     final form2 = calmv2FormBloc.state.record!;
     final form2WithParent = form2.copyWith(calmv1Id: form1.calmv1Id);
 
-    if (form2.calmv2Id.isEmpty) {
-      calmv2FormBloc.add(Calmv2FormTambahEvent(record: form2WithParent));
-      return;
-    }
+    // if (form2.calmv2Id.isEmpty) {
+    //   calmv2FormBloc.add(Calmv2FormTambahEvent(record: form2WithParent));
+    //   return;
+    // }
     calmv2FormBloc.add(Calmv2FormUbahEvent(record: form2WithParent));
   }
 

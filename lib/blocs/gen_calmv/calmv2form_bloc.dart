@@ -126,43 +126,62 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 			hasFailure: false,
 		));
 
-		debugPrint(
-			"[${DateTime.now().toIso8601String()}] Calmv2Ubah AFTER emit(isSaving=true)",
-		);
-
 		try {
-			final ok = await repository.calmv2FormUbah(event.record);
-			final hasFailure = !ok;
+			final ReturnDataAPI returnData =
+			await repository.calmv2FormUbah(event.record);
 
-			debugPrint(
-				"[${DateTime.now().toIso8601String()}] Calmv2Ubah REPO DONE ok=$ok",
+			final incomingId = returnData.data.toString().trim();
+
+			final fixedId = incomingId.isNotEmpty
+					? incomingId
+					: event.record.calmv2Id;
+
+			final fixedRecord = event.record.copyWith(
+				calmv2Id: fixedId,
 			);
 
 			emit(state.copyWith(
 				isSaving: false,
-				isSaved: !hasFailure,
-				hasFailure: hasFailure,
-				record: event.record,
+				isSaved: returnData.success,
+				hasFailure: !returnData.success,
+				record: fixedRecord,
+				returnData: returnData,
 			));
 
 			debugPrint(
 				"[${DateTime.now().toIso8601String()}] Calmv2Ubah END "
-						"emit(isSaving=false,isSaved=${!hasFailure},fail=$hasFailure)",
+						"success=${returnData.success} finalId=${fixedRecord.calmv2Id}",
 			);
 		} catch (e) {
-			debugPrint(
-				"[${DateTime.now().toIso8601String()}] Calmv2Ubah ERROR $e",
-			);
-			emit(state.copyWith(isSaving: false, isSaved: false, hasFailure: true));
+			debugPrint("[${DateTime.now().toIso8601String()}] Calmv2Ubah ERROR $e");
+
+			emit(state.copyWith(
+				isSaving: false,
+				isSaved: false,
+				hasFailure: true,
+			));
 		}
 	}
 
-
 	Future<void> onHapusCalmv2Form(
-		Calmv2FormHapusEvent event, Emitter<Calmv2FormState> emit) async {
-		emit(state.copyWith(isSaving: true, isSaved: false));
-		bool hasFailure = !await repository.calmv2FormHapus(event.recordId);
-		emit(state.copyWith(isSaving: false, isSaved: true, hasFailure: hasFailure));
+			Calmv2FormHapusEvent event,
+			Emitter<Calmv2FormState> emit,
+			) async {
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
+
+		final ReturnDataAPI returnData =
+		await repository.calmv2FormHapus(event.recordId);
+
+		emit(state.copyWith(
+			isSaving: false,
+			isSaved: true,
+			hasFailure: !returnData.success,
+			returnData: returnData,
+		));
 	}
 
 	Future<void> onLihatCalmv2Form(
@@ -313,41 +332,37 @@ class Calmv2FormBloc extends Bloc<Calmv2FormEvents, Calmv2FormState> {
 			return;
 		}
 
-		Calmv2FormModel? record = state.record;
-		if (record == null) {
+		final current = state.record;
+		if (current == null) {
 			debugPrint("CALMV2 AUTO SAVE ⛔ skip (record=null)");
 			return;
 		}
 
-		emit(state.copyWith(isSaving: true, isSaved: false, hasFailure: false));
+		emit(state.copyWith(
+			isSaving: true,
+			isSaved: false,
+			hasFailure: false,
+		));
 
 		try {
+			final ReturnDataAPI returnData =
+			await repository.calmv2FormUbah(current);
 
-			if (record.calmv2Id.trim().isEmpty) {
-				final ReturnDataAPI returnData = await repository.calmv2FormTambah(record);
+			final incomingId = returnData.data.toString().trim();
 
-				if (!returnData.success) {
-					emit(state.copyWith(
-						isSaving: false,
-						isSaved: false,
-						hasFailure: true,
-						isDirty: true,
-						returnData: returnData,
-					));
-					return;
-				}
-
-				record = record.copyWith(calmv2Id: returnData.data.toString());
-			}
-
-			final ok = await repository.calmv2FormUbah(record);
+			final fixedRecord = current.copyWith(
+				calmv2Id: incomingId.isNotEmpty
+						? incomingId
+						: current.calmv2Id,
+			);
 
 			emit(state.copyWith(
 				isSaving: false,
-				isSaved: ok,
-				hasFailure: !ok,
-				record: record,
-				isDirty: ok ? false : true,
+				isSaved: returnData.success,
+				hasFailure: !returnData.success,
+				record: fixedRecord,
+				isDirty: returnData.success ? false : true,
+				returnData: returnData,
 			));
 		} catch (e) {
 			emit(state.copyWith(

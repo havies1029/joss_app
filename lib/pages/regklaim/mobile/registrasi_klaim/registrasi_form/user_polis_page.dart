@@ -84,6 +84,14 @@ class _UserPolisPageState extends State<UserPolisPage> {
     super.dispose();
   }
 
+  List<String> splitObjectDesc(String? value) {
+    return (value ?? '')
+        .split(';')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -172,11 +180,24 @@ class _UserPolisPageState extends State<UserPolisPage> {
         final noSppa = clean(item.sppaNoRef);
         final detail = clean(item.objectDesc);
 
-        return "$noPolis - $noSppa - $detail";
+        return noPolis;
       },
       compareItems: (a, b) => itemKey(a) == itemKey(b),
       onChangedCallback: (value) {
         widget.onPolisChanged(value);
+
+        final parts = splitObjectDesc(value?.objectDesc);
+
+        final noPolisi = parts.length >= 3
+            ? parts[2].replaceFirst(RegExp(r'^Plat\s*:\s*', caseSensitive: false), '')
+            : '';
+
+        fieldKeteranganController.text = noPolisi;
+        widget.onKeteranganChanged(noPolisi);
+
+        if (noPolisi.trim().isNotEmpty) {
+          clearErr('form1.keterangan');
+        }
       },
       customItemBuilder: (context, item, isSelected, isDisabled) {
         final noPolis = clean(item.polisNo);
@@ -339,6 +360,7 @@ class _UserPolisPageState extends State<UserPolisPage> {
 
   Widget buildFieldLokasiResiko() => appTextField(
     label: widget.cobKlaimId == '10002' ? "Nomor Polisi" : "Keterangan",
+    enabled: false,
     controller: fieldKeteranganController,
     maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
     keyboardType: TextInputType.text,

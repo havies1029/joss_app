@@ -620,7 +620,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   );
 
   Widget buildFieldNamaDepanPemilikKartu() => appTextField(
-    label: "Nama Depan Pemilik Kartu",
+    label: "Nama Depan",
     controller: fieldNamaDepanPemilikKartuController,
     keyboardType: TextInputType.text,
     inputFormatters: [
@@ -634,7 +634,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   );
 
   Widget buildFieldNamaBelakangPemilikKartu() => appTextField(
-    label: "Nama Belakang Pemilik Kartu",
+    label: "Nama Belakang",
     controller: fieldNamaBelakangPemilikKartuController,
     keyboardType: TextInputType.text,
     inputFormatters: [

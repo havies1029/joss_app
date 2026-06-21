@@ -35,6 +35,12 @@ class BasePolisPage extends StatelessWidget {
     required this.onKeteranganChanged,
   });
 
+  void _resetUserPolisData() {
+    onPolisChanged(null);
+    onJenisKerugianChanged(null);
+    onKeteranganChanged('');
+  }
+
   @override
   Widget build(BuildContext context) {
     final jmlPolis =
@@ -42,48 +48,61 @@ class BasePolisPage extends StatelessWidget {
 
     if (jmlPolis == 0) {
       return UserNonPolisPage(
+        key: ValueKey('user_non_polis_${cobKlaimId}_jml0'),
         cobKlaimId: cobKlaimId,
         cobKlaimNama: cobKlaimNama,
       );
     }
 
-    return BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
-      builder: (context, state) {
-        Widget content;
-
-        switch (state.selectedPolissourceId) {
-          case "10":
-            content = UserPolisPage(
-              cobKlaimId: cobKlaimId,
-              cobKlaimNama: cobKlaimNama,
-              selectedPolis: selectedPolis,
-              onPolisChanged: onPolisChanged,
-              selectedJenisKerugian: selectedJenisKerugian,
-              onJenisKerugianChanged: onJenisKerugianChanged,
-              keterangan: keterangan,
-              onKeteranganChanged: onKeteranganChanged,
-            );
-            break;
-
-          case "20":
-            content = UserNonPolisPage(
-              cobKlaimId: cobKlaimId,
-              cobKlaimNama: cobKlaimNama,
-            );
-            break;
-
-          default:
-            content = const SizedBox.shrink();
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const ButtonPolisSourceWidget(),
-            content,
-          ],
-        );
+    return BlocListener<PolissourcecariBloc, PolissourcecariState>(
+      listenWhen: (previous, current) {
+        return previous.selectedPolissourceId != current.selectedPolissourceId;
       },
+      listener: (context, state) {
+        _resetUserPolisData();
+      },
+      child: BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
+        builder: (context, state) {
+          final currentSourceId = state.selectedPolissourceId;
+
+          Widget content;
+
+          switch (currentSourceId) {
+            case "10":
+              content = UserPolisPage(
+                key: ValueKey('user_polis_${cobKlaimId}_$currentSourceId'),
+                cobKlaimId: cobKlaimId,
+                cobKlaimNama: cobKlaimNama,
+                selectedPolis: selectedPolis,
+                onPolisChanged: onPolisChanged,
+                selectedJenisKerugian: selectedJenisKerugian,
+                onJenisKerugianChanged: onJenisKerugianChanged,
+                keterangan: keterangan,
+                onKeteranganChanged: onKeteranganChanged,
+              );
+              break;
+
+            case "20":
+              content = UserNonPolisPage(
+                key: ValueKey('user_non_polis_${cobKlaimId}_$currentSourceId'),
+                cobKlaimId: cobKlaimId,
+                cobKlaimNama: cobKlaimNama,
+              );
+              break;
+
+            default:
+              content = const SizedBox.shrink();
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const ButtonPolisSourceWidget(),
+              content,
+            ],
+          );
+        },
+      ),
     );
   }
 }

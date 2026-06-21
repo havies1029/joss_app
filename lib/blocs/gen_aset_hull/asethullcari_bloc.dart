@@ -275,25 +275,39 @@ class AsethullCariBloc extends Bloc<AsethullCariEvents, AsethullCariState> {
 			SelectHullDetailEvent event,
 			Emitter<AsethullCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..add(event.asetHullId);
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..add(event.asetHullId);
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
+		emit(state.copyWith(
+			selectedIds: updatedSelectedIds,
+		));
 
-		_recomputeActiveAndFile(emit, preferId: event.asetHullId);
+		_recomputeActiveAndFile(
+			emit,
+			preferId: event.asetHullId,
+		);
 	}
 
 	Future<void> onUnselectDetail(
 			UnselectHullDetailEvent event,
 			Emitter<AsethullCariState> emit,
 			) async {
-		final updatedSelectedIds = Set<String>.from(state.selectedIds)..remove(event.asetHullId);
+		final updatedSelectedIds = Set<String>.from(state.selectedIds)
+			..remove(event.asetHullId);
 
-		emit(state.copyWith(selectedIds: updatedSelectedIds));
+		emit(state.copyWith(
+			selectedIds: updatedSelectedIds,
+		));
 
 		final preferFallback =
-		(state.activeAsetHullId == event.asetHullId) ? null : state.activeAsetHullId;
+		(state.activeAsetHullId == event.asetHullId)
+				? null
+				: state.activeAsetHullId;
 
-		_recomputeActiveAndFile(emit, preferId: preferFallback);
+		_recomputeActiveAndFile(
+			emit,
+			preferId: preferFallback,
+		);
 	}
 
 	Future<void> onClearSelection(

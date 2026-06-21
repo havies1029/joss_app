@@ -9,10 +9,10 @@ class Calmv2FormRepository {
 	Future<ReturnDataAPI> calmv2FormTambah(Calmv2FormModel record) async {
 		return await api.calmv2FormTambahAPI(record);
 	}
-	Future<bool> calmv2FormUbah(Calmv2FormModel record) async {
+	Future<ReturnDataAPI> calmv2FormUbah(Calmv2FormModel record) async {
 		return await api.calmv2FormUbahAPI(record);
 	}
-	Future<bool> calmv2FormHapus(String calmv2Id) async {
+	Future<ReturnDataAPI> calmv2FormHapus(String calmv2Id) async {
 		return await api.calmv2FormHapusAPI(calmv2Id);
 	}
 	Future<Calmv2FormModel> calmv2FormLihat(String calmv2Id) async {

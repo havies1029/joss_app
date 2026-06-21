@@ -488,8 +488,8 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                     isExpanded: expanded[1],
                     //onToggle: (v) => setState(() => expanded[1] = v),
                     onRefresh: () {
-                      if (calmv2Id != null && calmv2Id!.isNotEmpty) {
-                        refreshForm2(recordId: calmv2Id);
+                      if (calmv1Id != null && calmv1Id!.isNotEmpty) {
+                        refreshForm2(recordId: calmv1Id);
                       }
                     },
                     child: Column(

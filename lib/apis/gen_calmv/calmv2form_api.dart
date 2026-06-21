@@ -49,15 +49,17 @@ class Calmv2FormAPI {
 		return returnData;
 	}
 
-	Future<bool> calmv2FormUbahAPI(Calmv2FormModel record) async {
+	Future<ReturnDataAPI> calmv2FormUbahAPI(Calmv2FormModel record) async {
 		String ubahEndpoint =
 				"${AppData.prefixEndPoint}/api/calmv/calmv2form/update";
 		Map<String, String> queryParams = {"modul_id": "calmv2FormUbahAPI"};
 
 		var uri = AppData.uriHtpp(
-				AppData.httpAuthority, ubahEndpoint, queryParams);
+			AppData.httpAuthority,
+			ubahEndpoint,
+			queryParams,
+		);
 
-		// 🔍 DEBUG REQUEST
 		debugPrint(
 			"[API] Calmv2Ubah REQUEST\n"
 					"URI: $uri\n"
@@ -69,49 +71,76 @@ class Calmv2FormAPI {
 			headers: <String, String>{
 				'Content-Type': 'application/json; odata=verbos',
 				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
+				'Authorization': 'Bearer ${AppData.userToken}',
 			},
 			body: jsonEncode(record.toJson()),
 		);
 
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData =
-					ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-		}
+		final ReturnDataAPI returnData;
 
-		// 🔍 DEBUG RESPONSE
-		debugPrint(
-			"[API] Calmv2Ubah RESPONSE status=${response.statusCode} "
-					"body=${response.body}",
-		);
-
-		return returnData.success;
-	}
-
-	Future<bool> calmv2FormHapusAPI(String calmv2Id) async {
-		String hapusEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv2form/delete";
-		Map<String, String> queryParams = {
-			'calmv2Id': calmv2Id,
-			'modul_id': 'calmv2FormHapusAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
-		final http.Response response =
-		await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
-		});
-
-		ReturnDataAPI returnData;
 		if (response.statusCode == 200) {
 			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
 		} else {
 			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
 		}
-		return returnData.success;
+
+		debugPrint(
+			"[API] Calmv2Ubah RESPONSE status=${response.statusCode} "
+					"body=${response.body} "
+					"success=${returnData.success} "
+					"data=${returnData.data}",
+		);
+
+		return returnData;
 	}
+
+	Future<ReturnDataAPI> calmv2FormHapusAPI(String calmv2Id) async {
+		String hapusEndpoint =
+				"${AppData.prefixEndPoint}/api/calmv/calmv2form/delete";
+
+		Map<String, String> queryParams = {
+			'calmv2Id': calmv2Id,
+			'modul_id': 'calmv2FormHapusAPI',
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			hapusEndpoint,
+			queryParams,
+		);
+
+		debugPrint(
+			"[API] Calmv2Hapus REQUEST\n"
+					"URI: $uri",
+		);
+
+		final http.Response response = await http.get(
+			uri,
+			headers: <String, String>{
+				'Content-Type': 'application/json; odata=verbos',
+				'Accept': 'application/json; odata=verbos',
+				'Authorization': 'Bearer ${AppData.userToken}',
+			},
+		);
+
+		final ReturnDataAPI returnData;
+
+		if (response.statusCode == 200) {
+			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+		} else {
+			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		}
+
+		debugPrint(
+			"[API] Calmv2Hapus RESPONSE status=${response.statusCode} "
+					"body=${response.body} "
+					"success=${returnData.success} "
+					"data=${returnData.data}",
+		);
+
+		return returnData;
+	}
+
 	Future<Calmv2FormModel> calmv2FormLihatAPI(String calmv1Id) async {
 		String lihatEndpoint = "${AppData.prefixEndPoint}/api/calmv/calmv2form/read";
 		Map<String, String> queryParams = {'calmv1Id': calmv1Id};
