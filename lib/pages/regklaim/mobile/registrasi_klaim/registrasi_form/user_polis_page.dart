@@ -132,6 +132,18 @@ class _UserPolisPageState extends State<UserPolisPage> {
     );
   }
 
+
+  String extractPlat(String? objectDesc) {
+    final text = objectDesc ?? '';
+
+    final match = RegExp(
+      r'Plat\s*:\s*([^;,\n]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    return match?.group(1)?.trim() ?? '';
+  }
+
   Widget buildFieldComboSppaPolis() {
     String clean(String? value) {
       final text = value?.trim() ?? '';
@@ -147,8 +159,18 @@ class _UserPolisPageState extends State<UserPolisPage> {
       ].join('|');
     }
 
+    debugPrint("========== BUILD SPPAPOLIS COMBO ==========");
+    debugPrint("BUILD cobKlaimId       : ${widget.cobKlaimId}");
+    debugPrint("BUILD selectedPolis    : ${widget.selectedPolis}");
+    debugPrint("BUILD selected sppaId  : ${widget.selectedPolis?.sppaId}");
+    debugPrint("BUILD selected polisNo : ${widget.selectedPolis?.polisNo}");
+    debugPrint("BUILD selected sppaRef : ${widget.selectedPolis?.sppaNoRef}");
+    debugPrint("BUILD selected object  : ${widget.selectedPolis?.objectDesc}");
+    debugPrint("BUILD keteranganCtrl   : ${fieldKeteranganController.text}");
+
     return ReusableComboBoxV2<SppapoliscariModel>(
       hintText: "No. Polis",
+      searchHintText: "Cari No Polis/No Sppa/Detail",
       initItem: widget.selectedPolis,
       params: {
         "cobKlaimId": widget.cobKlaimId,
@@ -157,9 +179,9 @@ class _UserPolisPageState extends State<UserPolisPage> {
         final cobKlaimId = query.params["cobKlaimId"]?.toString() ?? "";
         final searchText = query.searchText.trim();
 
-        debugPrint("========== COMBO QUERY ==========");
-        debugPrint("cobKlaimId : $cobKlaimId");
-        debugPrint("searchText : [$searchText]");
+        debugPrint("========== LOADER SPPAPOLIS ==========");
+        debugPrint("LOADER cobKlaimId : $cobKlaimId");
+        debugPrint("LOADER searchText : '$searchText'");
 
         if (cobKlaimId.isEmpty) {
           debugPrint("SPPAPOLIS SKIP: cobKlaimId empty");
@@ -171,7 +193,19 @@ class _UserPolisPageState extends State<UserPolisPage> {
           searchText,
         );
 
-        debugPrint("TOTAL RESULT : ${result.length}");
+        debugPrint("LOADER total result : ${result.length}");
+
+        for (var i = 0; i < result.length; i++) {
+          final item = result[i];
+
+          debugPrint(
+            "RESULT[$i] "
+                "sppaId='${item.sppaId}', "
+                "polisNo='${item.polisNo}', "
+                "sppaNoRef='${item.sppaNoRef}', "
+                "objectDesc='${item.objectDesc}'",
+          );
+        }
 
         return result;
       },
@@ -180,29 +214,72 @@ class _UserPolisPageState extends State<UserPolisPage> {
         final noSppa = clean(item.sppaNoRef);
         final detail = clean(item.objectDesc);
 
+        debugPrint("========== DISPLAY TEXT SPPAPOLIS ==========");
+        debugPrint("DISPLAY sppaId     : ${item.sppaId}");
+        debugPrint("DISPLAY polisNo    : $noPolis");
+        debugPrint("DISPLAY sppaNoRef  : $noSppa");
+        debugPrint("DISPLAY objectDesc : $detail");
+
         return noPolis;
       },
-      compareItems: (a, b) => itemKey(a) == itemKey(b),
+      compareItems: (a, b) {
+        final aId = a.sppaId.trim();
+        final bId = b.sppaId.trim();
+
+        final result = aId.isNotEmpty && bId.isNotEmpty
+            ? aId == bId
+            : itemKey(a) == itemKey(b);
+
+        debugPrint("========== COMPARE SPPAPOLIS ==========");
+        debugPrint("COMPARE a.sppaId : '$aId'");
+        debugPrint("COMPARE b.sppaId : '$bId'");
+        debugPrint("COMPARE a.key    : ${itemKey(a)}");
+        debugPrint("COMPARE b.key    : ${itemKey(b)}");
+        debugPrint("COMPARE result   : $result");
+
+        return result;
+      },
       onChangedCallback: (value) {
-        widget.onPolisChanged(value);
+        debugPrint("========== ON CHANGED SPPAPOLIS ==========");
+        debugPrint("ONCHANGE value        : $value");
+        debugPrint("ONCHANGE sppaId       : ${value?.sppaId}");
+        debugPrint("ONCHANGE polisNo      : ${value?.polisNo}");
+        debugPrint("ONCHANGE sppaNoRef    : ${value?.sppaNoRef}");
+        debugPrint("ONCHANGE objectDesc   : ${value?.objectDesc}");
+        debugPrint("ONCHANGE before ket   : ${fieldKeteranganController.text}");
 
-        final parts = splitObjectDesc(value?.objectDesc);
+        final noPolisi = extractPlat(value?.objectDesc);
 
-        final noPolisi = parts.length >= 3
-            ? parts[2].replaceFirst(RegExp(r'^Plat\s*:\s*', caseSensitive: false), '')
-            : '';
+        debugPrint("ONCHANGE extractPlat  : '$noPolisi'");
 
         fieldKeteranganController.text = noPolisi;
+
+        debugPrint("ONCHANGE after ket    : ${fieldKeteranganController.text}");
+        debugPrint("ONCHANGE call onKeteranganChanged");
         widget.onKeteranganChanged(noPolisi);
 
+        debugPrint("ONCHANGE call onPolisChanged");
+        widget.onPolisChanged(value);
+
         if (noPolisi.trim().isNotEmpty) {
+          debugPrint("ONCHANGE clear error form1.keterangan");
           clearErr('form1.keterangan');
         }
+
+        debugPrint("========== END ON CHANGED SPPAPOLIS ==========");
       },
       customItemBuilder: (context, item, isSelected, isDisabled) {
         final noPolis = clean(item.polisNo);
         final noSppa = clean(item.sppaNoRef);
         final detail = clean(item.objectDesc);
+
+        debugPrint("========== ITEM BUILDER SPPAPOLIS ==========");
+        debugPrint("ITEM sppaId     : ${item.sppaId}");
+        debugPrint("ITEM polisNo    : $noPolis");
+        debugPrint("ITEM sppaNoRef  : $noSppa");
+        debugPrint("ITEM objectDesc : $detail");
+        debugPrint("ITEM isSelected : $isSelected");
+        debugPrint("ITEM isDisabled : $isDisabled");
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -246,7 +323,13 @@ class _UserPolisPageState extends State<UserPolisPage> {
           ],
         );
       },
-      onSaveCallback: (SppapoliscariModel? value) {},
+      onSaveCallback: (SppapoliscariModel? value) {
+        debugPrint("========== ON SAVE SPPAPOLIS ==========");
+        debugPrint("ONSAVE value     : $value");
+        debugPrint("ONSAVE sppaId    : ${value?.sppaId}");
+        debugPrint("ONSAVE polisNo   : ${value?.polisNo}");
+        debugPrint("ONSAVE sppaNoRef : ${value?.sppaNoRef}");
+      },
     );
   }
 
@@ -360,7 +443,7 @@ class _UserPolisPageState extends State<UserPolisPage> {
 
   Widget buildFieldLokasiResiko() => appTextField(
     label: widget.cobKlaimId == '10002' ? "Nomor Polisi" : "Keterangan",
-    enabled: false,
+    enabled: widget.cobKlaimId != '10002',
     controller: fieldKeteranganController,
     maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
     keyboardType: TextInputType.text,

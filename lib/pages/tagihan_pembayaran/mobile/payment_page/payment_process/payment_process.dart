@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../../blocs/dashboard/sumdash_bloc.dart';
 import '../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
+import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../common/loading_indicator.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
@@ -198,7 +199,15 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                               ),
                               elevation: 0,
                             ),
-                            onPressed: () => Navigator.pop(context, true),
+                            onPressed: () {
+                              context.read<DnRekap2invBloc>().add(
+                                BatalInvByIdEvent(
+                                  invoiceId: widget.recordId,
+                                ),
+                              );
+
+                              Navigator.pop(context, true);
+                            },
                             child: Text(
                               "Iya, Batal",
                               style: TextStyle(
@@ -247,6 +256,18 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       );
     }
   }
+
+  Future<void> _handleExit2(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      context.read<SumdashBloc>().add(SumdashLihatEvent());
+      context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -287,7 +308,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
             return BaseBackgroundSidePage(
               title: bankNama,
               onBack: () => _handleExit(context),
-              onHome: () => _handleExit(context),
+              onHome: () => _handleExit2(context),
               child: Container(
                 color: secondaryBlackColor,
                 padding: const EdgeInsets.symmetric(
@@ -347,9 +368,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                             width: 18,
                             height: 18,
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                          onPressed: () => _handleExit(context),
                         ),
 
                         FormError(errors: errors, key: null),

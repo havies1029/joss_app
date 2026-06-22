@@ -52,6 +52,7 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
   final String collapseText;
 
   final bool useScrollableShowMorePopup;
+  final String? searchHintText;
 
   const ReusableComboBoxV2({
     super.key,
@@ -81,6 +82,7 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
     this.expandText,
     this.collapseText = "Tampilkan Lebih Sedikit",
     this.useScrollableShowMorePopup = false,
+    this.searchHintText,
   });
 
   @override
@@ -108,6 +110,11 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       widget.useScrollableShowMorePopup && _showMoreEnabled;
 
   bool _hasLoadedOnce = false;
+
+  String get _searchHintText =>
+      widget.searchHintText?.trim().isNotEmpty == true
+          ? widget.searchHintText!
+          : 'Cari ${widget.hintText}...';
 
   void _syncPopupMeta(List<T> items, String q) {
     _currentPopupItems = items;
@@ -384,7 +391,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
           cursorColor: primaryLightColor,
           decoration: InputDecoration(
             isDense: true,
-            hintText: 'Cari ${widget.hintText}...',
+            hintText: _searchHintText,
             hintStyle: inputTextStyle(context, color: hintGrey),
             prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
             filled: true,
@@ -524,7 +531,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
               onChanged: _customSearch,
               decoration: InputDecoration(
                 isDense: true,
-                hintText: 'Cari ${widget.hintText}...',
+                hintText: _searchHintText,
                 hintStyle: inputTextStyle(context, color: hintGrey),
                 prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
                 suffixIcon: null,

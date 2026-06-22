@@ -132,3 +132,14 @@ class Invoice2PaymentViaCardEvent extends DnRekap2invEvent {
   @override
   List<Object> get props => [record];
 }
+
+class BatalInvByIdEvent extends DnRekap2invEvent {
+  final String invoiceId;
+
+  const BatalInvByIdEvent({
+    required this.invoiceId,
+  });
+
+  @override
+  List<Object> get props => [invoiceId];
+}

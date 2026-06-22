@@ -89,7 +89,7 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
     return BlocConsumer<Regendors1FormBloc, Regendors1FormState>(
       builder: (context, state) {
         return BaseBackgroundSidePage(
-          title: 'Endorse Perubahan',
+          title: 'Endorse Polis',
           child: Scaffold(
             backgroundColor: secondaryBlackColor,
             bottomNavigationBar: Padding(
@@ -258,7 +258,7 @@ class EndorseFormPageFormState extends State<EndorseFormPage> {
   Widget buildFieldNotePerubahan() {
     return appTextField(
       label: "Deskripsi Perubahan",
-      hint: 'Contoh: "Perubahan alamat surat menyurat atau kontak penanggung.',
+      hint: 'Jelaskan perubahan yang ingin dilakukan pada polis Anda.',
       controller: fieldNotePerubahanController,
       keyboardType: TextInputType.multiline,
       maxLines: 12,

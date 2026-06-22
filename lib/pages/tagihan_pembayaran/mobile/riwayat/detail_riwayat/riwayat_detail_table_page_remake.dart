@@ -49,11 +49,8 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(color: sGrey),
       ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 400,
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
-        ),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -86,158 +83,136 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
 
             const Divider(height: 1),
 
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: hPadding * 1.5,
-                  vertical: hPadding,
-                ),
-                child: BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
-                  buildWhen: (p, c) =>
-                  p.selectedItem != c.selectedItem ||
-                      p.isDownloading != c.isDownloading,
-                  listenWhen: (prev, curr) =>
-                  prev.downloadPath != curr.downloadPath &&
-                      curr.downloadPath.isNotEmpty &&
-                      !curr.isDownloading,
-                  listener: (context, state) async {
-                    try {
-                      await PdfOpenHelper().openBase64Pdf(
-                        base64Pdf: state.downloadPath,
-                      );
-                    } catch (e) {
-                      debugPrint('Gagal buka PDF: $e');
-                    }
-                  },
-                  builder: (context, state) {
-                    final selected = state.selectedItem;
-                    if (selected == null) return const LoadingIndicator();
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: hPadding * 1.5,
+                vertical: hPadding,
+              ),
+              child: BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
+                buildWhen: (p, c) =>
+                p.selectedItem != c.selectedItem ||
+                    p.isDownloading != c.isDownloading,
+                listenWhen: (prev, curr) =>
+                prev.downloadPath != curr.downloadPath &&
+                    curr.downloadPath.isNotEmpty &&
+                    !curr.isDownloading,
+                listener: (context, state) async {
+                  try {
+                    await PdfOpenHelper().openBase64Pdf(
+                      base64Pdf: state.downloadPath,
+                    );
+                  } catch (e) {
+                    debugPrint('Gagal buka PDF: $e');
+                  }
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (_) => InvoicePreviewFromBase64Page(
+                  //       base64Pdf: state.downloadPath,
+                  //     ),
+                  //   ),
+                  // );
+                },
+                builder: (context, state) {
+                  final selected = state.selectedItem;
+                  if (selected == null) return const LoadingIndicator();
 
-                    return Stack(
-                      children: [
-                        SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildPay1SummaryFromModel(selected),
+                  return Stack(
+                    children: [
+                      // konten utama dialog
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildPay1SummaryFromModel(selected),
 
-                              const SizedBox(height: hPadding),
-                              const Divider(height: 1),
-                              const SizedBox(height: hPadding),
+                          const SizedBox(height: hPadding),
+                          const Divider(height: 1),
+                          const SizedBox(height: hPadding),
 
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  minHeight: 120,
-                                  maxHeight: 300,
-                                ),
-                                child: RiwayatTableWidgetRemake(),
-                              ),
-
-                              const SizedBox(height: hPadding),
-                              const Divider(height: 1),
-                              const SizedBox(height: hPadding),
-
-                              _buildTotalBayar(selected),
-
-                              const SizedBox(height: hPadding),
-
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: selected.stsInvId == '10002'
-                                    ? Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  alignment: WrapAlignment.end,
-                                  children: [
-                                    AppButton.iconLeft(
-                                      text: 'Batal Pembayaran',
-                                      backgroundColor: redPayment,
-                                      icon: SvgPicture.asset(
-                                        'assets/icons/gg_trash.svg',
-                                        width: 18,
-                                        height: 18,
-                                      ),
-                                      onPressed: () {
-                                        // TODO: tambahkan event batal pembayaran di sini
-                                      },
-                                    ),
-
-                                    AppButton.iconLeft(
-                                      text: 'Lanjut Pembayaran',
-                                      backgroundColor: primaryColor,
-                                      icon: SvgPicture.asset(
-                                        'assets/icons/unduh_invoice.svg',
-                                        width: 18,
-                                        height: 18,
-                                      ),
-                                      onPressed: () {
-                                        context.read<DnRekap2invBloc>().add(
-                                          SetPaymentSummaryEvent(
-                                            curr: '', // isi kalau ada currency
-                                            totalBayar: selected.totalBayar,
-                                          ),
-                                        );
-
-                                        context.read<DnRekap2invBloc>().add(
-                                          CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
-                                          // SetPaymentSummaryEvent(curr: state.)
-                                        );
-
-                                        // showDialog(
-                                        //   context: context,
-                                        //   barrierDismissible: true,
-                                        //   barrierColor: Colors.black.withOpacity(0.6),
-                                        //   builder: (dialogContext) => RegisterClientPopUp(
-                                        //     showIcon: false,
-                                        //     header: 'Fitur pembayaran belum tersedia.',
-                                        //     description:
-                                        //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-                                        //     buttonText: 'Mengerti',
-                                        //     onPressed: () {
-                                        //       Navigator.of(dialogContext).pop();
-                                        //     },
-                                        //   ),
-                                        // );
-                                      },
-                                    ),
-                                  ],
-                                )
-                                    : AppButton.iconLeft(
-                                  text: 'Unduh Invoice',
-                                  backgroundColor: greenforPayment,
-                                  icon: SvgPicture.asset(
-                                    'assets/icons/invoice.svg',
-                                    width: 18,
-                                    height: 18,
-                                  ),
-                                  onPressed: () {
-                                    context.read<HistorybayarCariBloc>().add(
-                                      DownloadInvoiceEvent(
-                                        noInv: selected.inv1Id,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+                          SingleChildScrollView(
+                            child: RiwayatTableWidgetRemake(),
                           ),
-                        ),
 
-                        if (state.isDownloading)
-                          Positioned.fill(
-                            child: AbsorbPointer(
-                              absorbing: true,
-                              child: Container(
-                                color: Colors.black45,
-                                alignment: Alignment.center,
-                                child: const LoadingIndicator(),
+                          const SizedBox(height: hPadding),
+                          const Divider(height: 1),
+                          const SizedBox(height: hPadding),
+
+                          _buildTotalBayar(selected),
+
+                          const SizedBox(height: hPadding),
+
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: AppButton.iconLeft(
+                              text: selected.stsInvId == '10002'
+                                  ? 'Lanjut Pembayaran'
+                                  : 'Unduh Invoice',
+                              backgroundColor: selected.stsInvId == '10002'
+                                  ? primaryColor
+                                  : greenforPayment,
+                              icon: SvgPicture.asset(
+                                selected.stsInvId == '10002'
+                                    ? 'assets/icons/unduh_invoice.svg'
+                                    : 'assets/icons/invoice.svg',
+                                width: 18,
+                                height: 18,
                               ),
+                              onPressed: () {
+                                if (selected.stsInvId == '10002') {
+                                  context.read<DnRekap2invBloc>().add(
+                                    SetPaymentSummaryEvent(
+                                      curr: '', // isi kalau ada currency
+                                      totalBayar: selected.totalBayar,
+                                    ),
+                                  );
+
+                                  context.read<DnRekap2invBloc>().add(
+                                    CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                                      // SetPaymentSummaryEvent(curr: state.)
+                                  );
+                                  // showDialog(
+                                  //   context: context,
+                                  //   barrierDismissible: true,
+                                  //   barrierColor: Colors.black.withOpacity(0.6),
+                                  //   builder: (dialogContext) => RegisterClientPopUp(
+                                  //     showIcon: false,
+                                  //     header: 'Fitur pembayaran belum tersedia.',
+                                  //     description:
+                                  //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                                  //     buttonText: 'Mengerti',
+                                  //     onPressed: () {
+                                  //       Navigator.of(dialogContext).pop();
+                                  //     },
+                                  //   ),
+                                  // );
+                                } else {
+                                  // klik -> event -> bloc set isDownloading=true -> loading langsung muncul
+                                  context.read<HistorybayarCariBloc>().add(
+                                    DownloadInvoiceEvent(noInv: selected.inv1Id),
+                                  );
+                                }
+                              },
                             ),
                           ),
+                        ],
+                      ),
+
+                      // overlay loading
+                      if (state.isDownloading) ...[
+                        Positioned.fill(
+                          child: AbsorbPointer(
+                            absorbing: true,
+                            child: Container(
+                              color: Colors.black45,
+                              alignment: Alignment.center,
+                              child: const LoadingIndicator(),
+                            ),
+                          ),
+                        ),
                       ],
-                    );
-                  },
-                ),
+                    ],
+                  );
+                },
               ),
             ),
           ],

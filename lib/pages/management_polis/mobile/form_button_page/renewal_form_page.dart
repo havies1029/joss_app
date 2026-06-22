@@ -244,7 +244,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   Widget buildFieldNotePerubahan() {
     return appTextField(
       label: "Deskripsi Perubahan",
-      hint: 'Contoh: "Perubahan alamat surat menyurat atau kontak penanggung.',
+      hint: 'Jelaskan kebutuhan perpanjangan polis Anda.',
       controller: fieldNotePerubahanController,
       keyboardType: TextInputType.multiline,
       maxLines: 12,

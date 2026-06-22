@@ -328,10 +328,20 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   ),
                 );
               } else if (state.paymentStatus == "91") {
-                //refreshData();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  errorSnackBar(
-                    'Proses pembayaran gagal. Silakan coba lagi.',
+                  successSnackBar(
+                    'Pembayaran berhasil dibatalkan.',
+                  ),
+                );
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentSuccess(
+                      display: "Pembayaran Berhasil Dibatalkan",
+                      description: "Tagihan pembayaran telah dibatalkan.",
+                      displayButton: "Kembali",
+                    ),
                   ),
                 );
               }

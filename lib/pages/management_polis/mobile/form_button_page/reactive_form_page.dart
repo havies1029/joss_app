@@ -82,7 +82,7 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
     return BlocConsumer<Regreaktif1Bloc, Regreaktif1State>(
       builder: (context, state) {
         return BaseBackgroundSidePage(
-          title: 'Perpanjangan Polis',
+          title: 'Aktifkan Kembali Polis',
           child: Scaffold(
             backgroundColor: secondaryBlackColor,
             bottomNavigationBar: Padding(
@@ -243,7 +243,7 @@ class ReaktifFormPageFormState extends State<ReaktifFormPage> {
   Widget buildFieldNotePerubahan() {
     return appTextField(
       label: "Deskripsi Perubahan",
-      hint: 'Contoh: "Perubahan alamat surat menyurat atau kontak penanggung.',
+      hint: 'Jelaskan alasan pengaktifan kembali polis Anda.',
       controller: fieldNotePerubahanController,
       keyboardType: TextInputType.multiline,
       maxLines: 12,

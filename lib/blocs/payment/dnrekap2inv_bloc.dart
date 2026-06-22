@@ -31,6 +31,7 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
     on<SetPaymentSummaryEvent>(onSetPaymentSummary);
     on<SetRecordInvoiceStatusEvent>(onSetRecordInvoiceStatus);
     on<Invoice2PaymentViaCardEvent>(onInvoice2PaymentViaCard);
+    on<BatalInvByIdEvent>(onBatalInvById);
   }
 
   Future<void> onSetPaymentSummary(
@@ -322,6 +323,40 @@ class DnRekap2invBloc extends Bloc<DnRekap2invEvent, DnRekap2invState> {
       PaymentDnAPI api = PaymentDnAPI();
       PaymentDnRepository repo = PaymentDnRepository(api: api);
       InvoiceStatusModel invoiceStatus = await repo.regPar2Inv(event.regpar1Id);
+
+      emit(state.copyWith(
+        isProcessing: false,
+        isProcessed: true,
+        invoiceId: invoiceStatus.invoiceId,
+        paymentStatus: invoiceStatus.status,
+        totalBayar: invoiceStatus.totalBayar,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isProcessing: false,
+        hasFailure: true,
+      ));
+    }
+  }
+
+  Future<void> onBatalInvById(
+      BatalInvByIdEvent event,
+      Emitter<DnRekap2invState> emit,
+      ) async {
+    if (state.isProcessing) return;
+
+    emit(state.copyWith(
+      isProcessing: true,
+      isProcessed: false,
+      hasFailure: false,
+    ));
+
+    try {
+      PaymentDnAPI api = PaymentDnAPI();
+      PaymentDnRepository repo = PaymentDnRepository(api: api);
+
+      InvoiceStatusModel invoiceStatus =
+      await repo.batalInvById(event.invoiceId);
 
       emit(state.copyWith(
         isProcessing: false,

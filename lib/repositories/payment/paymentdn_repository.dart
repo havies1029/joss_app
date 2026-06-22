@@ -52,5 +52,7 @@ class PaymentDnRepository {
     return await api.regPar2InvAPI(regpar1Id);
   }
 
-
+  Future<InvoiceStatusModel> batalInvById(String invoiceId) async {
+    return await api.batalInvByIdAPI(invoiceId);
+  }
 }

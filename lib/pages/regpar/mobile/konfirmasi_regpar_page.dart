@@ -347,10 +347,22 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 refreshData();
 
                 messenger.showSnackBar(
-                  errorSnackBar(
-                    "Pembayaran gagal diproses. Silakan coba lagi.",
+                  successSnackBar(
+                    "Pembayaran berhasil dibatalkan.",
                   ),
                 );
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentSuccess(
+                      display: "Pembayaran Berhasil Dibatalkan",
+                      description: "Tagihan pembayaran telah dibatalkan.",
+                      displayButton: "Kembali",
+                    ),
+                  ),
+                );
+
                 return;
               }
 
