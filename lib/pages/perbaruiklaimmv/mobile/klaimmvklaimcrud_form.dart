@@ -10,6 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import '../../../common/loading_indicator.dart';
+import '../../../models/combobox/combomjenisrugimv_model.dart';
+import '../../../repositories/combobox/combomjenisrugimv_repository.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
 
 class KlaimmvklaimcrudFormPage extends StatefulWidget {
@@ -42,6 +45,8 @@ class KlaimmvklaimcrudFormPageFormState
 	final fieldKlaimAmountController = TextEditingController();
 	final fieldKlaimBayarController = TextEditingController();
 	final fieldKronologisController = TextEditingController();
+	ComboMJenisrugimvModel? fieldComboMJenisrugimv;
+	late Future<List<ComboMJenisrugimvModel>> _futureJenisKerugian;
 
 	final Map<String, String?> fieldErrors = {};
 
@@ -69,6 +74,8 @@ class KlaimmvklaimcrudFormPageFormState
 	@override
 	void initState() {
 		super.initState();
+		_futureJenisKerugian =
+				ComboMJenisrugimvRepository().getComboMJenisrugimv();
 		Future.delayed(const Duration(milliseconds: 500), () {
 			loadData();
 		});
@@ -134,6 +141,8 @@ class KlaimmvklaimcrudFormPageFormState
 								buildFieldDol(),
 								const SizedBox(height: hPadding),
 								buildFieldKronologis(),
+								const SizedBox(height: hPadding),
+								buildFieldJenisKerugian(),
 								const SizedBox(height: hPadding),
 								buildFieldKlaimAmount(),
 								const SizedBox(height: hPadding),
@@ -207,6 +216,128 @@ class KlaimmvklaimcrudFormPageFormState
 				clearErr('form.dol');
 				fieldDolController.text = value.toIso8601String();
 				klaimmvklaimcrudBloc.add(FieldDolChangedEvent(dol: value));
+			},
+		);
+	}
+
+	Widget buildFieldJenisKerugian() {
+		return FutureBuilder<List<ComboMJenisrugimvModel>>(
+			future: _futureJenisKerugian,
+			builder: (context, snapshot) {
+				if (snapshot.connectionState == ConnectionState.waiting) {
+					return const Center(child: LoadingIndicator());
+				}
+
+				if (snapshot.hasError) {
+					return Text('Error: ${snapshot.error}');
+				}
+
+				final jenisKerugianList = snapshot.data ?? [];
+
+				if (jenisKerugianList.isEmpty) {
+					return const Text('Tidak ada data jenis kerugian');
+				}
+
+				return FormField<ComboMJenisrugimvModel>(
+					initialValue: fieldComboMJenisrugimv,
+					validator: (_) => err('form.mjenisrugimvId'),
+					builder: (fieldState) {
+						return Column(
+							crossAxisAlignment: CrossAxisAlignment.start,
+							children: [
+								Text(
+									'Jenis Kerugian',
+									style: bodyTextStyle(
+										context,
+										fontSize: getResponsiveFont(context, 18),
+									),
+								),
+								const SizedBox(height: hPadding),
+
+								Row(
+									children: jenisKerugianList.map((item) {
+										final isSelected =
+												fieldComboMJenisrugimv?.mjenisrugimvId ==
+														item.mjenisrugimvId;
+
+										return Expanded(
+											child: GestureDetector(
+												onTap: () {
+													setState(() {
+														fieldComboMJenisrugimv = item;
+													});
+
+													fieldState.didChange(item);
+
+													klaimmvklaimcrudBloc.add(
+														FieldMjenisrugimvIdChangedEvent(
+															mjenisrugimvId: item.mjenisrugimvId,
+														),
+													);
+
+													clearErr('form.mjenisrugimvId');
+												},
+												child: Row(
+													children: [
+														Container(
+															width: 20,
+															height: 20,
+															decoration: BoxDecoration(
+																shape: BoxShape.circle,
+																border: Border.all(
+																	color: isSelected
+																			? primaryColor
+																			: hintGrey,
+																),
+															),
+															child: isSelected
+																	? Center(
+																child: Container(
+																	width: 8,
+																	height: 8,
+																	decoration: const BoxDecoration(
+																		shape: BoxShape.circle,
+																		color: primaryColor,
+																	),
+																),
+															)
+																	: null,
+														),
+														const SizedBox(width: 8),
+														Flexible(
+															child: Text(
+																item.jenisrugiNama,
+																overflow: TextOverflow.ellipsis,
+																style: isSelected
+																		? inputTextStyle(context)
+																		: bodyTextStyle(context),
+															),
+														),
+													],
+												),
+											),
+										);
+									}).toList(),
+								),
+
+								if (fieldState.hasError ||
+										err('form.mjenisrugimvId') != null)
+									Padding(
+										padding: const EdgeInsets.only(top: 6),
+										child: Text(
+											fieldState.errorText ??
+													err('form.mjenisrugimvId') ??
+													'',
+											style: const TextStyle(
+												color: pRed,
+												fontSize: 12,
+											),
+										),
+									),
+							],
+						);
+					},
+				);
 			},
 		);
 	}

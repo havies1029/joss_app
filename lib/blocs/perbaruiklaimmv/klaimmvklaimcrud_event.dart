@@ -81,3 +81,12 @@ class KlaimmvklaimAutoSaveEvent extends KlaimmvklaimcrudEvents {
   @override
   List<Object> get props => [saveFrom];
 }
+
+class FieldMjenisrugimvIdChangedEvent extends KlaimmvklaimcrudEvents {
+	final String mjenisrugimvId;
+
+	const FieldMjenisrugimvIdChangedEvent({required this.mjenisrugimvId});
+
+	@override
+	List<Object> get props => [mjenisrugimvId];
+}

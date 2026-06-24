@@ -327,7 +327,7 @@ class FabActionExecutor {
         builder: (_) => DetailManagementPolisPage(
           data: item,
           cobId: cobId,
-          statusId: "",
+          statusId: "F",
         ),
       ),
     ).then((_) => onComplete?.call());

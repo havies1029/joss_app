@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../../../blocs/authentication/authentication_bloc.dart';
+import '../../../../../blocs/dashboard/sumdash_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
@@ -328,12 +329,13 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
 
   @override
   Widget build(BuildContext context) {
+    final jmlPolis = context.read<SumdashBloc>().state.record?.jmlpolis ?? 0;
+
     return SafeArea(
       child: BaseBackgroundSidePage(
         title: widget.cobKlaimNama,
         child: Scaffold(
           backgroundColor: secondaryBlackColor,
-
           body: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -353,44 +355,28 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                       "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),
 
-                    BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                      builder: (context, authState) {
-                        final userType = authState is AuthenticationAuthenticated
-                            ? authState.user.userType.toUpperCase()
-                            : '';
+                    if (jmlPolis > 0) const SizedBox(height: vPadding),
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            if (userType != 'U') const SizedBox(height: vPadding),
-
-                            BasePolisPage(
-                              cobKlaimId: widget.cobKlaimId,
-                              cobKlaimNama: widget.cobKlaimNama,
-
-                              selectedPolis: _selectedPolis,
-                              onPolisChanged: (value) {
-                                setState(() {
-                                  _selectedPolis = value;
-                                });
-                              },
-
-                              selectedJenisKerugian: _selectedJenisKerugian,
-                              onJenisKerugianChanged: (value) {
-                                setState(() {
-                                  _selectedJenisKerugian = value;
-                                });
-                              },
-
-                              keterangan: _keterangan,
-                              onKeteranganChanged: (value) {
-                                setState(() {
-                                  _keterangan = value;
-                                });
-                              },
-                            ),
-                          ],
-                        );
+                    BasePolisPage(
+                      cobKlaimId: widget.cobKlaimId,
+                      cobKlaimNama: widget.cobKlaimNama,
+                      selectedPolis: _selectedPolis,
+                      onPolisChanged: (value) {
+                        setState(() {
+                          _selectedPolis = value;
+                        });
+                      },
+                      selectedJenisKerugian: _selectedJenisKerugian,
+                      onJenisKerugianChanged: (value) {
+                        setState(() {
+                          _selectedJenisKerugian = value;
+                        });
+                      },
+                      keterangan: _keterangan,
+                      onKeteranganChanged: (value) {
+                        setState(() {
+                          _keterangan = value;
+                        });
                       },
                     ),
                   ],
@@ -398,46 +384,37 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
               ),
             ),
           ),
-
-          bottomNavigationBar: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-            builder: (context, authState) {
-              final userType = authState is AuthenticationAuthenticated
-                  ? authState.user.userType.toUpperCase()
-                  : '';
-
-              if (userType == 'U') {
+          bottomNavigationBar: BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
+            builder: (context, state) {
+              if (jmlPolis == 0) {
                 return const SizedBox.shrink();
               }
 
-              return BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
-                builder: (context, state) {
-                  if (state.selectedPolissourceId != "10") {
-                    return const SizedBox.shrink();
-                  }
+              if (state.selectedPolissourceId != "10") {
+                return const SizedBox.shrink();
+              }
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hPadding * 1.5,
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPadding * 1.5,
+                ),
+                child: SafeArea(
+                  child: AppButton.iconLeft(
+                    text: "Cari",
+                    icon: SvgPicture.asset(
+                      "assets/icons/zoom1.svg",
+                      width: 18,
+                      height: 18,
                     ),
-                    child: SafeArea(
-                      child: AppButton.iconLeft(
-                        text: "Cari",
-                        icon: SvgPicture.asset(
-                          "assets/icons/zoom1.svg",
-                          width: 18,
-                          height: 18,
-                        ),
-                        isLoading: _isCariPolisLoading,
-                        backgroundColor: _buttonColor,
-                        onPressed: _isCariPolisLoading
-                            ? null
-                            : () async {
-                                await _handleCariPressed();
-                              },
-                      ),
-                    ),
-                  );
-                },
+                    isLoading: _isCariPolisLoading,
+                    backgroundColor: _buttonColor,
+                    onPressed: _isCariPolisLoading
+                        ? null
+                        : () async {
+                      await _handleCariPressed();
+                    },
+                  ),
+                ),
               );
             },
           ),

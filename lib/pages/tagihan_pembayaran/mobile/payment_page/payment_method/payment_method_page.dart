@@ -453,7 +453,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
   Widget buildFormKartuKredit() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+      padding: const EdgeInsets.symmetric(
+        horizontal: hPadding * 1.5,
+        vertical: vPadding,
+      ),
       child: Column(
         children: [
           buildFieldNomorKartu(),

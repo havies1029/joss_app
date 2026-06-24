@@ -64,17 +64,17 @@ String _hintByCob(String cobId, String statusCobId) {
   switch (cobId) {
     case "10002":
       return statusCobId == "10002"
-          ? "No Proses/Tertanggung/No Polis"
-          : "Tertanggung/No Polis";
+          ? "No Proses/No Polis/Tertanggung"
+          : "No Polis/Tertanggung";
 
     case "10003":
       return statusCobId == "10002"
-          ? "No Proses/Tertanggung/No Polis"
-          : "Tertanggung/No Polis/Merk";
+          ? "No Proses/No Polis/Tertanggung/"
+          : "No Polis/Tertanggung";
 
     case "10004":
       return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
+          ? "No Proses/No Polis/No Polis/Tertanggung"
           : "No Polis/Tertanggung";
 
     case "10005":

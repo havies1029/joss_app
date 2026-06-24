@@ -221,7 +221,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   vertical: 14,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
                       "Cari Data Polis",

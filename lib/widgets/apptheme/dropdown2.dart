@@ -531,6 +531,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
               onChanged: _customSearch,
               decoration: InputDecoration(
                 isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                ),
                 hintText: _searchHintText,
                 hintStyle: inputTextStyle(context, color: hintGrey),
                 prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),

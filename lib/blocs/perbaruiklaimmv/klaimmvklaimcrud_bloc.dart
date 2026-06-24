@@ -21,6 +21,7 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
     on<FieldKlaimAmountChangedEvent>(onFieldKlaimAmountChanged);
     on<FieldKronologisChangedEvent>(onFieldKronologisChanged);
     on<KlaimmvklaimAutoSaveEvent>(onKlaimmvklaimAutoSave);
+    on<FieldMjenisrugimvIdChangedEvent>(onFieldMjenisrugimvIdChanged);
   }
 
   Future<void> onTambahKlaimmvklaimcrud(
@@ -154,6 +155,24 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
     }
   }
 
+  Future<void> onFieldMjenisrugimvIdChanged(
+      FieldMjenisrugimvIdChangedEvent event,
+      Emitter<KlaimmvklaimcrudState> emit,
+      ) async {
+    if (state.record != null) {
+      KlaimmvklaimcrudModel updatedRecord = state.record!.copyWith(
+        mjenisrugimvId: event.mjenisrugimvId,
+      );
+
+      emit(state.copyWith(
+        record: updatedRecord,
+        isDirty: true,
+        isValid: _validate(updatedRecord),
+        isComplete: _validate(updatedRecord),
+      ));
+    }
+  }
+
   Future<void> onKlaimmvklaimAutoSave(
       KlaimmvklaimAutoSaveEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
     if (state.record != null && state.isDirty) {
@@ -167,13 +186,12 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
   bool _validate(KlaimmvklaimcrudModel? record) {
     if (record == null) return false;
 
-    return
-      _isSameOrBeforeToday(record.dol) &&
-          record.klaimAmount > 0 &&
-          record.kronologis.trim().isNotEmpty &&
-          (record.currId?.isNotEmpty ?? false);
+    return _isSameOrBeforeToday(record.dol) &&
+        record.klaimAmount > 0 &&
+        record.kronologis.trim().isNotEmpty &&
+        (record.currId?.isNotEmpty ?? false) &&
+        (record.mjenisrugimvId?.isNotEmpty ?? false);
   }
-
 
   bool _isSameOrBeforeToday(DateTime date) {
     final today = DateTime.now();

@@ -102,9 +102,9 @@ class _TentangJPSPageState extends State<TentangJPSPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(
               hPadding * 1.5,
-              vPadding,
+              hPadding,
               hPadding * 1.5,
-              vPadding,
+              hPadding,
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,

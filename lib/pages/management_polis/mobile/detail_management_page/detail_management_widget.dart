@@ -304,6 +304,11 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     void goToManagementPolis() {
       final source = _currentProcessSource();
 
+      if (widget.statusId == "F") {
+        Navigator.of(context).pop();
+        return;
+      }
+
       if (source == "O") {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
