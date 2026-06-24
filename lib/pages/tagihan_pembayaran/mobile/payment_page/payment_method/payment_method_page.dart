@@ -480,6 +480,45 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     );
   }
 
+  bool validateFormKartuKredit() {
+    bool ok = true;
+
+    setState(() {
+      fieldErrors.removeWhere((key, value) => key.startsWith('kartuKredit.'));
+
+      final nomorKartu = fieldNomorKartuController.text.trim();
+      final cvn = fieldCvnController.text.trim();
+      final namaDepan = fieldNamaDepanPemilikKartuController.text.trim();
+      final namaBelakang = fieldNamaBelakangPemilikKartuController.text.trim();
+
+      if (nomorKartu.length < 12) {
+        setErr('kartuKredit.nomorKartu', kStringNullError);
+        ok = false;
+      }
+
+      if (namaDepan.isEmpty) {
+        setErr('kartuKredit.namaDepan', kStringNullError);
+        ok = false;
+      }
+
+      if (namaBelakang.isEmpty) {
+        setErr('kartuKredit.namaBelakang', kStringNullError);
+        ok = false;
+      }
+
+      if (fieldMasaBerlakuKartu == null) {
+        setErr('kartuKredit.masaBerlaku', kStringNullError);
+        ok = false;
+      }
+
+      if (cvn.length < 3) {
+        setErr('kartuKredit.cvn', kStringNullError);
+        ok = false;
+      }
+    });
+
+    return ok;
+  }
 
   void _onLanjutkanPressed({
     required bool isCreditCard,
