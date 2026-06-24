@@ -10,6 +10,7 @@ import '../../../../../blocs/payment/paymentmethodcari_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_event.dart';
 import '../../../../../blocs/payment/paymentmethodcari_state.dart';
 import '../../../../../common/constants.dart';
+import '../../../../../helper/creditcard_inputformatter.dart';
 import '../../../../../models/payment/paymentcard_model.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
@@ -226,6 +227,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
@@ -252,7 +254,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
               children: [
                 Container(
                   color: secondaryBlackColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                   child: Column(
                     children: [
                       Expanded(
@@ -382,36 +384,46 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
                       BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
                         builder: (context, state) {
-                          final sortedCategories = [...state.categories]
-                            ..sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
+                          return BlocSelector<InvoiceStatusCardBloc, InvoiceStatusCardState, bool>(
+                            selector: (cardState) => cardState.isLoading,
+                            builder: (context, cardLoading) {
+                              final sortedCategories = [...state.categories]
+                                ..sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
 
-                          final isCreditCardExpanded =
-                              _expandedIndex != null &&
-                                  sortedCategories[_expandedIndex!].categoryId.toString() == '20';
+                              final isCreditCardExpanded =
+                                  _expandedIndex != null &&
+                                      _expandedIndex! < sortedCategories.length &&
+                                      sortedCategories[_expandedIndex!].categoryId.toString() == '20';
 
-                          final canShowButton = isCreditCardExpanded || state.selectedMethodId != null;
+                              final canShowButton =
+                                  isCreditCardExpanded || state.selectedMethodId != null;
 
-                          if (!canShowButton) {
-                            return const SizedBox.shrink();
-                          }
+                              if (!canShowButton) {
+                                return const SizedBox.shrink();
+                              }
 
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: AppButton.primary(
-                              text: "Konfirmasi",
-                              onPressed: busy
-                                  ? null
-                                  : () {
-                                if (isCreditCardExpanded) {
-                                  final ok = validateFormKartuKredit();
-                                  if (!ok) return;
-                                }
+                              final submitBusy = busy || cardLoading;
 
-                                _onLanjutkanPressed(
-                                  isCreditCard: isCreditCardExpanded,
-                                );
-                              },
-                            ),
+                              return AppButton.primary(
+                                text: "Konfirmasi",
+                                isLoading: submitBusy,
+                                backgroundColor: submitBusy ? secondaryBlackColor : primaryColor,
+                                onPressed: submitBusy
+                                    ? null
+                                    : () {
+                                  if (submitBusy) return;
+
+                                  if (isCreditCardExpanded) {
+                                    final ok = validateFormKartuKredit();
+                                    if (!ok) return;
+                                  }
+
+                                  _onLanjutkanPressed(
+                                    isCreditCard: isCreditCardExpanded,
+                                  );
+                                },
+                              );
+                            },
                           );
                         },
                       ),
@@ -468,45 +480,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     );
   }
 
-  bool validateFormKartuKredit() {
-    bool ok = true;
-
-    setState(() {
-      fieldErrors.removeWhere((key, value) => key.startsWith('kartuKredit.'));
-
-      final nomorKartu = fieldNomorKartuController.text.trim();
-      final cvn = fieldCvnController.text.trim();
-      final namaDepan = fieldNamaDepanPemilikKartuController.text.trim();
-      final namaBelakang = fieldNamaBelakangPemilikKartuController.text.trim();
-
-      if (nomorKartu.length < 12) {
-        setErr('kartuKredit.nomorKartu', kStringNullError);
-        ok = false;
-      }
-
-      if (namaDepan.isEmpty) {
-        setErr('kartuKredit.namaDepan', kStringNullError);
-        ok = false;
-      }
-
-      if (namaBelakang.isEmpty) {
-        setErr('kartuKredit.namaBelakang', kStringNullError);
-        ok = false;
-      }
-
-      if (fieldMasaBerlakuKartu == null) {
-        setErr('kartuKredit.masaBerlaku', kStringNullError);
-        ok = false;
-      }
-
-      if (cvn.length < 3) {
-        setErr('kartuKredit.cvn', kStringNullError);
-        ok = false;
-      }
-    });
-
-    return ok;
-  }
 
   void _onLanjutkanPressed({
     required bool isCreditCard,
@@ -519,7 +492,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       context.read<InvoiceStatusCardBloc>().add(
         InvToBayarViaCardEvent(
           invoiceId: dnState.invoiceId,
-          cardNumber: fieldNomorKartuController.text.trim(),
+          cardNumber: fieldNomorKartuController.text.replaceAll(' ', ''),
           expiryMonth: expiryMonth,
           expiryYear: expiryYear,
           cvn: fieldCvnController.text.trim(),
@@ -551,11 +524,15 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     keyboardType: TextInputType.number,
     inputFormatters: [
       FilteringTextInputFormatter.digitsOnly,
+      LengthLimitingTextInputFormatter(19), // max 19 digit kartu
+      CreditCardInputFormatter(),
     ],
     errorText: err('kartuKredit.nomorKartu'),
     validator: (_) => err('kartuKredit.nomorKartu'),
     onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('kartuKredit.nomorKartu');
+      if (v.trim().isNotEmpty) {
+        clearErr('kartuKredit.nomorKartu');
+      }
     },
   );
 
@@ -595,11 +572,14 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     firstDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
     lastDate: DateTime(DateTime.now().year + 15, 12, 1),
     mode: AppDateFieldMode.monthYear,
+    errorText: err('kartuKredit.masaBerlaku'),
     validator: (_) => err('kartuKredit.masaBerlaku'),
     onChanged: (dt) {
       setState(() {
         fieldMasaBerlakuKartu = dt;
-        if (dt != null) clearErr('kartuKredit.masaBerlaku');
+        if (dt != null) {
+          fieldErrors.remove('kartuKredit.masaBerlaku');
+        }
       });
     },
   );

@@ -58,6 +58,16 @@ class _UserPolisPageState extends State<UserPolisPage> {
     setState(() => fieldErrors.remove(key));
   }
 
+  String buildKeteranganFromPolis(SppapoliscariModel? value) {
+    final objectDesc = value?.objectDesc?.trim() ?? '';
+
+    if (widget.cobKlaimId == '10002') {
+      return extractPlat(objectDesc);
+    }
+
+    return objectDesc;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -240,33 +250,16 @@ class _UserPolisPageState extends State<UserPolisPage> {
         return result;
       },
       onChangedCallback: (value) {
-        debugPrint("========== ON CHANGED SPPAPOLIS ==========");
-        debugPrint("ONCHANGE value        : $value");
-        debugPrint("ONCHANGE sppaId       : ${value?.sppaId}");
-        debugPrint("ONCHANGE polisNo      : ${value?.polisNo}");
-        debugPrint("ONCHANGE sppaNoRef    : ${value?.sppaNoRef}");
-        debugPrint("ONCHANGE objectDesc   : ${value?.objectDesc}");
-        debugPrint("ONCHANGE before ket   : ${fieldKeteranganController.text}");
+        final keterangan = buildKeteranganFromPolis(value);
 
-        final noPolisi = extractPlat(value?.objectDesc);
+        fieldKeteranganController.text = keterangan;
 
-        debugPrint("ONCHANGE extractPlat  : '$noPolisi'");
-
-        fieldKeteranganController.text = noPolisi;
-
-        debugPrint("ONCHANGE after ket    : ${fieldKeteranganController.text}");
-        debugPrint("ONCHANGE call onKeteranganChanged");
-        widget.onKeteranganChanged(noPolisi);
-
-        debugPrint("ONCHANGE call onPolisChanged");
+        widget.onKeteranganChanged(keterangan);
         widget.onPolisChanged(value);
 
-        if (noPolisi.trim().isNotEmpty) {
-          debugPrint("ONCHANGE clear error form1.keterangan");
+        if (keterangan.trim().isNotEmpty) {
           clearErr('form1.keterangan');
         }
-
-        debugPrint("========== END ON CHANGED SPPAPOLIS ==========");
       },
       customItemBuilder: (context, item, isSelected, isDisabled) {
         final noPolis = clean(item.polisNo);
@@ -442,8 +435,9 @@ class _UserPolisPageState extends State<UserPolisPage> {
   }
 
   Widget buildFieldLokasiResiko() => appTextField(
-    label: widget.cobKlaimId == '10002' ? "Nomor Polisi" : "Keterangan",
-    enabled: widget.cobKlaimId != '10002',
+    label: widget.cobKlaimId == '10002' ? "Nomor Polisi" : "Lokasi Risiko",
+    enabled: false,
+    // enabled: widget.cobKlaimId != '10002',
     controller: fieldKeteranganController,
     maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
     keyboardType: TextInputType.text,

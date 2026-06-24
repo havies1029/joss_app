@@ -151,8 +151,7 @@ class _CobCariPageState extends State<CobCariPage> {
           height: double.infinity,
           color: secondaryBlackColor,
           padding: const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 10,
+            horizontal: hPadding * 1.5,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

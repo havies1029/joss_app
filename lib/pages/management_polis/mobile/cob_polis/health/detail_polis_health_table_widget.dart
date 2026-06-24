@@ -65,7 +65,6 @@ class _DetailPolisHealthTableWidgetState
           normalFlex: 1.7,
           compactMinWidth: 150,
           compactMaxWidth: 210,
-          right: true,
         ),
         DetailPolisColumn<Sppa2healthCariModel>(
           title: "PREMI",
@@ -73,7 +72,6 @@ class _DetailPolisHealthTableWidgetState
           normalFlex: 1.5,
           compactMinWidth: 120,
           compactMaxWidth: 180,
-          right: true,
         ),
       ],
     );

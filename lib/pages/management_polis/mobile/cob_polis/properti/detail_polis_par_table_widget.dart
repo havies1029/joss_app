@@ -47,7 +47,6 @@ class _DetailPolisParTableWidgetState
           normalFlex: 1.8,
           compactMinWidth: 135,
           compactMaxWidth: 180,
-          right: true,
         ),
         DetailPolisColumn<Sppa2parCariModel>(
           title: 'PREMI',
@@ -55,7 +54,6 @@ class _DetailPolisParTableWidgetState
           normalFlex: 1.5,
           compactMinWidth: 115,
           compactMaxWidth: 160,
-          right: true,
         ),
         DetailPolisColumn<Sppa2parCariModel>(
           title: 'DESKRIPSI',

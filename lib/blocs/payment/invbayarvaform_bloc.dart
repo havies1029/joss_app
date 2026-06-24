@@ -30,6 +30,30 @@ class InvbayarvaFormBloc
     on<_StatusPollingTick>(_onStatusTick);
 
     on<InvoiceStatusPollingStarted>(_onStartStatusOnlyPolling);
+    on<CreditCardPaymentCheckingStarted>(_onStartCreditCardPaymentChecking);
+  }
+
+  void _onStartCreditCardPaymentChecking(
+      CreditCardPaymentCheckingStarted event,
+      Emitter<InvbayarvaFormState> emit,
+      ) {
+    _stopAllTimers();
+
+    _vaAttempt = 0;
+    _statusAttempt = 0;
+
+    emit(state.copyWith(
+      isPollingVa: false,
+      isPollingStatus: true,
+      isInitialLoading: false,
+    ));
+
+    add(_StatusPollingTick(invoiceId: event.invoiceId));
+
+    _startStatusPolling(
+      event.invoiceId,
+      interval: event.interval,
+    );
   }
 
   void _onStartStatusOnlyPolling(

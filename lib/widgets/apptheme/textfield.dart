@@ -172,6 +172,7 @@ class AppDateField extends StatefulWidget {
   final double? height;
   final bool enabled;
   final AppDateFieldMode mode;
+  final String? errorText;
 
   const AppDateField({
     super.key,
@@ -185,6 +186,7 @@ class AppDateField extends StatefulWidget {
     this.height,
     this.enabled = true,
     this.mode = AppDateFieldMode.date,
+    this.errorText,
   });
 
   @override
@@ -282,6 +284,7 @@ class _AppDateFieldState extends State<AppDateField> {
                             labelStyle: const TextStyle(
                               color: primaryLightColor,
                             ),
+                            errorText: widget.errorText,
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(cardBorderRadius),
                               borderSide: const BorderSide(color: sGrey),

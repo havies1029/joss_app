@@ -78,7 +78,6 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
           normalFlex: 1.7,
           compactMinWidth: 150,
           compactMaxWidth: 210,
-          right: true,
         ),
         DetailPolisColumn<Sppa2mvCariModel>(
           title: "PREMI",
@@ -86,7 +85,6 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
           normalFlex: 1.5,
           compactMinWidth: 120,
           compactMaxWidth: 180,
-          right: true,
         ),
       ],
     );

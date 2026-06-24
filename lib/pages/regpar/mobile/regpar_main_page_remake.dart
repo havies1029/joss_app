@@ -140,7 +140,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
       fieldComboMKabZonaGempa = null;
       comboMKabZonaGempaKey.currentState?.clear();
-      clearErr('form3.zonaGempa');
+      clearErr('form3.kab2zonagempaId');
     }
   }
 
@@ -1681,7 +1681,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     if (_showZonaGempa && fieldComboMKabZonaGempa == null) {
-      setErr('form3.zonaGempa', kStringNullError);
+      setErr('form3.kab2zonagempaId', kStringNullError);
       ok = false;
     }
 
@@ -2223,7 +2223,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               clearErr('form3.wilayah');
               fieldComboMKabZonaGempa = null;
               comboMKabZonaGempaKey.currentState?.clear();
-              clearErr('form3.zonaGempa');
+              clearErr('form3.kab2zonagempaId');
             }
           });
           if (v != null) {

@@ -52,3 +52,16 @@ class InvoiceStatusPollingStarted extends InvbayarvaFormEvents {
   @override
   List<Object?> get props => [invoiceId, interval];
 }
+
+class CreditCardPaymentCheckingStarted extends InvbayarvaFormEvents {
+  final String invoiceId;
+  final Duration interval;
+
+  const CreditCardPaymentCheckingStarted({
+    required this.invoiceId,
+    this.interval = const Duration(seconds: 5),
+  });
+
+  @override
+  List<Object?> get props => [invoiceId, interval];
+}

@@ -25,6 +25,7 @@ import '../../../models/gen_regmv/regmv2form_model.dart';
 import '../../../models/gen_regmv/regmv3form_model.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../tagihan_pembayaran/mobile/riwayat/riwayat_page_remake.dart';
 
 class KonfirmasiRegMvPage extends StatefulWidget {
   final String viewMode;
@@ -49,6 +50,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   String? globalMataUang;
   bool isSubmitting = false;
   bool isAgreementChecked = false;
+  bool _isCardWebViewOpen = false;
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -313,9 +315,15 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   ),
                 );
               } else if (state.paymentStatus == "40") {
+                if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                  _isCardWebViewOpen = false;
+                  Navigator.of(context).pop();
+                }
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   successSnackBar('Proses pembayaran Berhasil.'),
                 );
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -386,20 +394,29 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               return;
             }
 
-            await launchUrl(
-              Uri.parse(redirectUrl),
-              mode: LaunchMode.externalApplication,
-            );
-
             context.read<InvbayarvaFormBloc>().add(
-              InvoiceStatusPollingStarted(
+              CreditCardPaymentCheckingStarted(
                 invoiceId: state.record!.invoiceId,
                 interval: const Duration(seconds: 4),
               ),
             );
+
+            _isCardWebViewOpen = true;
+
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) {
+                return PaymentCardWebViewDialog(
+                  url: redirectUrl,
+                  invoiceId: state.record!.invoiceId,
+                );
+              },
+            );
+
+            _isCardWebViewOpen = false;
           },
         ),
-
 
         BlocListener<QuotationPdfBloc, QuotationPdfState>(
           listener: (context, state) async {

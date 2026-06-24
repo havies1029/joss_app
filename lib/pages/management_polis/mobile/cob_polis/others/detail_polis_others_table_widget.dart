@@ -59,7 +59,6 @@ class _DetailPolisOthersTableWidgetState
           normalFlex: 2.2,
           compactMinWidth: 170,
           compactMaxWidth: 240,
-          right: true,
         ),
         DetailPolisColumn<Sppa2othersCariModel>(
           title: "PREMI",
@@ -67,7 +66,6 @@ class _DetailPolisOthersTableWidgetState
           normalFlex: 2.0,
           compactMinWidth: 150,
           compactMaxWidth: 220,
-          right: true,
         ),
       ],
     );

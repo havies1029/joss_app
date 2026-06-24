@@ -702,7 +702,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   Widget buildFieldLokasiResiko() => appTextField(
     label: widget.cobKlaimId == '10002'
         ? "Nomor Polisi"
-        : "Keterangan",
+        : "Lokasi Risiko",
     controller: fieldLokasiObjectController,
     maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
     keyboardType: TextInputType.text,

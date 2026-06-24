@@ -152,7 +152,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         child: Container(
           color: secondaryBlackColor,
           padding: const EdgeInsets.symmetric(
-              horizontal: 15, vertical: 10),
+              horizontal: hPadding * 1.5),
           child: BlocConsumer<KlaimmvaccordionBloc, KlaimmvaccordionState>(
             builder: (context, acc) {
               return Column(
@@ -329,7 +329,6 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                     onPressed: () async {
                       if (_submitInProgress) return;
 
-                      debugPrint('=== BUTTON PERBARUI CLICKED ===');
 
                       FocusManager.instance.primaryFocus?.unfocus();
                       await Future.delayed(const Duration(milliseconds: 50));

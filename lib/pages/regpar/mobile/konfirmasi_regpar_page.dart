@@ -27,6 +27,7 @@ import '../../../models/regpar/regpar3form_model.dart';
 import '../../../models/regpar/regpar4form_model.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../tagihan_pembayaran/mobile/riwayat/riwayat_page_remake.dart';
 
 //micky 2026-02-27
 
@@ -54,6 +55,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
   String? globalMataUang;
   bool isSubmitting = false;
   bool isAgreementChecked = false;
+  bool _isCardWebViewOpen = false;
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -263,6 +265,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return BaseBackgroundSidePage(
@@ -323,6 +326,11 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               }
 
               if (state.paymentStatus == "40") {
+                if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                  _isCardWebViewOpen = false;
+                  Navigator.of(context).pop();
+                }
+
                 messenger.showSnackBar(
                   successSnackBar(
                     "Pembayaran berhasil diselesaikan.",
@@ -400,17 +408,27 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               return;
             }
 
-            await launchUrl(
-              Uri.parse(redirectUrl),
-              mode: LaunchMode.externalApplication,
-            );
-
             context.read<InvbayarvaFormBloc>().add(
-              InvoiceStatusPollingStarted(
+              CreditCardPaymentCheckingStarted(
                 invoiceId: state.record!.invoiceId,
                 interval: const Duration(seconds: 4),
               ),
             );
+
+            _isCardWebViewOpen = true;
+
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) {
+                return PaymentCardWebViewDialog(
+                  url: redirectUrl,
+                  invoiceId: state.record!.invoiceId,
+                );
+              },
+            );
+
+            _isCardWebViewOpen = false;
           },
         ),
 

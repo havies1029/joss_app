@@ -4,6 +4,7 @@ import 'package:joss_app/blocs/payment/historybayarcari_bloc.dart';
 // import 'package:joss_app/pages/payment/mobile/riwayat/riwayat_table_page_remake.dart';
 import 'package:joss_app/widgets/listpage_filter_bar_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../blocs/payment/invbayarvaform_bloc.dart';
@@ -34,6 +35,8 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
 
   late HistorybayarCariBloc historybayarCariBloc;
   final TextEditingController _searchController = TextEditingController();
+
+  bool _isCardWebViewOpen = false;
 
   @override
   void initState() {
@@ -83,9 +86,15 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               );
 
             } else if (state.paymentStatus == "40") {
+              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context).pop();
+              }
+
               ScaffoldMessenger.of(context).showSnackBar(
                 successSnackBar('Proses pembayaran berhasil.'),
               );
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -138,17 +147,27 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
               return;
             }
 
-            await launchUrl(
-              Uri.parse(redirectUrl),
-              mode: LaunchMode.externalApplication,
-            );
-
             context.read<InvbayarvaFormBloc>().add(
-              InvoiceStatusPollingStarted(
+              CreditCardPaymentCheckingStarted(
                 invoiceId: state.record!.invoiceId,
-                interval: const Duration(seconds: 4),
+                interval: const Duration(seconds: 5),
               ),
             );
+
+            _isCardWebViewOpen = true;
+
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) {
+                return PaymentCardWebViewDialog(
+                  url: redirectUrl,
+                  invoiceId: state.record!.invoiceId,
+                );
+              },
+            );
+
+            _isCardWebViewOpen = false;
           },
         ),
       ],
@@ -323,6 +342,112 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
           chip("Menunggu Pembayaran", RiwayatFilter.menunggu),
           chip("Selesai", RiwayatFilter.selesai),
         ],
+      ),
+    );
+  }
+}
+
+class PaymentCardWebViewDialog extends StatefulWidget {
+  final String url;
+  final String invoiceId;
+
+  const PaymentCardWebViewDialog({
+    super.key,
+    required this.url,
+    required this.invoiceId,
+  });
+
+  @override
+  State<PaymentCardWebViewDialog> createState() =>
+      _PaymentCardWebViewDialogState();
+}
+
+class _PaymentCardWebViewDialogState extends State<PaymentCardWebViewDialog> {
+  late final WebViewController _controller;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) {
+            if (!mounted) return;
+            setState(() => _isLoading = true);
+          },
+          onPageFinished: (_) {
+            if (!mounted) return;
+            setState(() => _isLoading = false);
+          },
+          onNavigationRequest: (request) {
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(widget.url));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      backgroundColor: secondaryBlackColor,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 56,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: secondaryBlackColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: sGrey,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Verifikasi Kartu Kredit",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: primaryLightColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.close,
+                      color: primaryLightColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  WebViewWidget(controller: _controller),
+                  if (_isLoading)
+                    const Center(
+                      child: LoadingIndicator(),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

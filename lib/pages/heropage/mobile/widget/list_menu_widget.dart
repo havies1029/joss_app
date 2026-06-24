@@ -403,7 +403,9 @@ class ListMenuWidget extends StatelessWidget {
         break;
 
       case 'Test Page':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimLacakPage(klaim1Id: '', statusDesc: '',)));
+        // Navigator.push(context, MaterialPageRoute(builder: (_) => KlaimLacakPage(klaim1Id: '', statusDesc: '',)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentMethodPage(curr: 'IDR', totalBayar: 100000,)));
+
         break;
 
       case 'Klaim':

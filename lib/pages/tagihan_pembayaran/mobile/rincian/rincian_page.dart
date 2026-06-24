@@ -22,6 +22,7 @@ import '../bayar_button.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_success/payment_success.dart';
+import '../riwayat/riwayat_page_remake.dart';
 import 'konfirmasi_detail_polis.dart';
 import 'rincian_grand_total_widget.dart';
 import 'rincian_tabel_page.dart';
@@ -44,6 +45,7 @@ class _RincianPageState extends State<RincianPage> {
   Mlayanan1CariBloc? mlayanan1cariBloc;
 
   bool _firstLoading = true;
+  bool _isCardWebViewOpen = false;
 
   Set<String> getSelectedCurrSet(DnRekap2invState state) {
     return state.rincianSOA.headers
@@ -134,9 +136,7 @@ class _RincianPageState extends State<RincianPage> {
               );
 
               onViewPaymentMethods(state.curr, state.totalBayar);
-
             } else if (state.paymentStatus == "30") {
-
               ScaffoldMessenger.of(context).showSnackBar(
                 infoSnackBar('Silakan lakukan pembayaran.'),
               );
@@ -150,8 +150,11 @@ class _RincianPageState extends State<RincianPage> {
                   ),
                 ),
               );
-
             } else if (state.paymentStatus == "40") {
+              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context).pop();
+              }
 
               ScaffoldMessenger.of(context).showSnackBar(
                 successSnackBar('Proses pembayaran berhasil.'),
@@ -167,7 +170,6 @@ class _RincianPageState extends State<RincianPage> {
                   ),
                 ),
               );
-
             } else if (state.paymentStatus == "91") {
               ScaffoldMessenger.of(context).showSnackBar(
                 successSnackBar('Pembayaran berhasil dibatalkan.'),
@@ -211,17 +213,27 @@ class _RincianPageState extends State<RincianPage> {
               return;
             }
 
-            await launchUrl(
-              Uri.parse(redirectUrl),
-              mode: LaunchMode.externalApplication,
-            );
-
             context.read<InvbayarvaFormBloc>().add(
-              InvoiceStatusPollingStarted(
+              CreditCardPaymentCheckingStarted(
                 invoiceId: state.record!.invoiceId,
                 interval: const Duration(seconds: 4),
               ),
             );
+
+            _isCardWebViewOpen = true;
+
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) {
+                return PaymentCardWebViewDialog(
+                  url: redirectUrl,
+                  invoiceId: state.record!.invoiceId,
+                );
+              },
+            );
+
+            _isCardWebViewOpen = false;
           },
         ),
       ],
