@@ -70,7 +70,7 @@ String _hintByCob(String cobId, String statusCobId) {
     case "10003":
       return statusCobId == "10002"
           ? "No Proses/Tertanggung/No Polis"
-          : "Tertanggung/No Polis/Merk";
+          : "Tertanggung/No Polis";
 
     case "10004":
       return statusCobId == "10002"
