@@ -54,6 +54,8 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
   final bool useScrollableShowMorePopup;
   final String? searchHintText;
 
+  final bool disableLocalFilter;
+
   const ReusableComboBoxV2({
     super.key,
     required this.hintText,
@@ -83,6 +85,7 @@ class ReusableComboBoxV2<T> extends StatefulWidget {
     this.collapseText = "Tampilkan Lebih Sedikit",
     this.useScrollableShowMorePopup = false,
     this.searchHintText,
+    this.disableLocalFilter = false,
   });
 
   @override
@@ -299,6 +302,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       key: widget.comboKey,
       enabled: widget.isEnabled,
       selectedItem: widget.initItem,
+      filterFn: widget.disableLocalFilter
+          ? (_, __) => true
+          : null,
       decoratorProps: DropDownDecoratorProps(
         baseStyle: bodyTextStyle(context),
         decoration: InputDecoration(

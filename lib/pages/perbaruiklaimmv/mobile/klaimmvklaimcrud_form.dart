@@ -133,12 +133,9 @@ class KlaimmvklaimcrudFormPageFormState
 			ok = false;
 		}
 
-		final isMv = widget.cobGroupId == "10002";
-
 		final kronologis = fieldKronologisController.text.trim();
 		if (kronologis.isEmpty) {
-			newErrors['form.kronologis'] =
-			isMv ? 'Nomor Polisi tidak boleh kosong' : 'Kronologis Kejadian tidak boleh kosong';
+			newErrors['form.kronologis'] = 'Kronologis Kejadian tidak boleh kosong';
 			ok = false;
 		}
 
@@ -432,18 +429,12 @@ class KlaimmvklaimcrudFormPageFormState
 	}
 
 	Widget buildFieldKronologis() {
-		final isMv = widget.cobGroupId == "10002";
-
 		return appTextField(
-			label: isMv ? 'Nomor Polisi' : 'Kronologis Kejadian',
-			keyboardType: isMv ? TextInputType.text : TextInputType.multiline,
-			maxLines: isMv ? 1 : 10,
+			label: 'Kronologis Kejadian',
+			keyboardType: TextInputType.multiline,
+			maxLines: 10,
 			controller: fieldKronologisController,
-			inputFormatters: isMv
-					? [
-				PlatNomorFormatter(),
-			]
-					: [
+			inputFormatters: [
 				FilteringTextInputFormatter.allow(
 					RegExp(r"[0-9a-zA-Z ,./\-#()]"),
 				),

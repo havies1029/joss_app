@@ -185,7 +185,18 @@ class _RincianPageState extends State<RincianPage> {
                   ),
                 ),
               );
-              } else if (state.paymentStatus == "93") {
+            } else if (state.paymentStatus == "92") {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                    'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.'),
+              );
+            } else if (state.paymentStatus == "93") {
                 if (_isCardWebViewOpen && Navigator.of(context, rootNavigator: true).canPop()) {
                   _isCardWebViewOpen = false;
                   Navigator.of(context, rootNavigator: true).pop();
@@ -216,9 +227,9 @@ class _RincianPageState extends State<RincianPage> {
             final redirectUrl = state.record!.redirectUrl.trim();
 
             if (redirectUrl.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
-              );
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
+              // );
               return;
             }
 

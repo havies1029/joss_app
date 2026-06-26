@@ -152,7 +152,7 @@ class InvbayarvaFormBloc
 
       final status = recordStatus.status;
 
-      if (status == "40" || status == "50"  || status == "91" ||
+      if (status == "40" || status == "50"  || status == "91" || status == "92" ||
       status == "93") {
         _statusTimer?.cancel();
         _statusTimer = null;

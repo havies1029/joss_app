@@ -44,7 +44,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   DateTime _now = DateTime.now();
 
   final fieldBatasBayarController =
-      TextEditingController(text: DateTime.now().toIso8601String());
+  TextEditingController(text: DateTime.now().toIso8601String());
   final fieldVaNoController = TextEditingController();
   final fieldTotalBayarController = TextEditingController();
   final fieldCurrController = TextEditingController();
@@ -52,12 +52,12 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   @override
   void initState() {
     super.initState();
+
     invbayarvaFormBloc = context.read<InvbayarvaFormBloc>();
+
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() {
-        _now = DateTime.now();
-      });
+      setState(() => _now = DateTime.now());
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,10 +78,12 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   void dispose() {
     invbayarvaFormBloc.add(const InvbayarvaPollingStopped());
     _countdownTimer?.cancel();
+
     fieldBatasBayarController.dispose();
     fieldVaNoController.dispose();
     fieldTotalBayarController.dispose();
     fieldCurrController.dispose();
+
     super.dispose();
   }
 
@@ -89,7 +91,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     if (batasBayar == null) return "-";
 
     final diff = batasBayar.difference(_now);
-
     if (diff.isNegative) return "00:00:00";
 
     final hours = diff.inHours.toString().padLeft(2, '0');
@@ -99,12 +100,113 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     return "$hours:$minutes:$seconds";
   }
 
-  void _dismissDialog() {
-    context.read<InvbayarvaFormBloc>().add(const InvbayarvaPollingStopped());
-    Navigator.pop(context);
+  void _refreshHeaderData() {
+    context.read<SumdashBloc>().add(SumdashLihatEvent());
+    context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
   }
 
-  Future<bool?> showExitConfirmDialog(BuildContext context) {
+  Future<bool?> showLeavePaymentDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Tutup",
+      barrierColor: Colors.black.withOpacity(0.6),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/Information2.svg',
+                    width: 40,
+                    height: 40,
+                    colorFilter: const ColorFilter.mode(
+                      primaryColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(height: hPadding),
+
+                  const Text(
+                    "Keluar dari Pembayaran?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: primaryLightColor,
+                    ),
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  const Text(
+                    "Pembayaran Anda belum selesai. Jika keluar dari halaman ini, Anda dapat melanjutkan pembayaran kapan saja melalui menu Riwayat Pembayaran selama pembayaran masih berlaku.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.35,
+                      color: dGrey,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton.primary(
+                          text: "Lanjutkan Pembayaran",
+                          backgroundColor: sGrey,
+                          borderside: BorderSide(color: sGrey),
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppButton.primary(
+                          text: "Iya, Keluar",
+                          backgroundColor: primaryColor,
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool?> showCancelPaymentDialog(BuildContext context) {
     return showGeneralDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -140,7 +242,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       fit: BoxFit.contain,
                     ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     "Batalkan Pembayaran?",
                     textAlign: TextAlign.center,
@@ -150,7 +254,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     "Pembayaran yang dibatalkan tidak dapat dilanjutkan kembali. Anda dapat membuat pembayaran baru kapan saja.",
                     textAlign: TextAlign.center,
@@ -160,7 +266,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       height: 1,
                     ),
                   ),
+
                   const SizedBox(height: 18),
+
                   Row(
                     children: [
                       Expanded(
@@ -171,7 +279,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                               backgroundColor: sGrey,
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                borderRadius: BorderRadius.circular(
+                                  cardBorderRadius,
+                                ),
                               ),
                               elevation: 0,
                             ),
@@ -195,7 +305,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                               backgroundColor: pSlowRed,
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                borderRadius: BorderRadius.circular(
+                                  cardBorderRadius,
+                                ),
                               ),
                               elevation: 0,
                             ),
@@ -241,12 +353,11 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     );
   }
 
-  Future<void> _handleExit(BuildContext context) async {
-    final shouldLeave = await showExitConfirmDialog(context);
+  Future<void> _handleBackExit(BuildContext context) async {
+    final shouldLeave = await showLeavePaymentDialog(context);
 
     if (shouldLeave == true) {
-      context.read<SumdashBloc>().add(SumdashLihatEvent());
-      context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
+      _refreshHeaderData();
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -257,15 +368,21 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     }
   }
 
-  Future<void> _handleExit2(BuildContext context) async {
-    final shouldLeave = await showExitConfirmDialog(context);
+  Future<void> _handleHomeExit(BuildContext context) async {
+    final shouldLeave = await showLeavePaymentDialog(context);
 
     if (shouldLeave == true) {
-      context.read<SumdashBloc>().add(SumdashLihatEvent());
-      context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
-
+      _refreshHeaderData();
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
+  }
+
+  Future<void> _handleCancelPayment(BuildContext context) async {
+    await showCancelPaymentDialog(context);
+
+    // Tidak perlu navigasi di sini.
+    // Setelah BatalInvByIdEvent sukses dan status 91 diterima,
+    // listener parent yang akan arahkan ke PaymentSuccess.
   }
 
   @override
@@ -274,7 +391,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        await _handleExit(context);
+        await _handleBackExit(context);
       },
       child: MultiBlocListener(
         listeners: [
@@ -288,11 +405,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
               fieldCurrController.text = r.curr.toString();
 
               final formatter = NumberFormat('#,###', 'id_ID');
-              fieldTotalBayarController.text =
-                  formatter.format(r.totalBayar);
+              fieldTotalBayarController.text = formatter.format(r.totalBayar);
 
-              fieldBatasBayarController.text =
-                  r.batasBayar.toString();
+              fieldBatasBayarController.text = r.batasBayar.toString();
             },
           ),
         ],
@@ -304,16 +419,17 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                 body: Center(child: LoadingIndicator()),
               );
             }
+
             final bankNama = state.record?.bankNama ?? "-";
+
             return BaseBackgroundSidePage(
               title: bankNama,
-              onBack: () => _handleExit(context),
-              onHome: () => _handleExit2(context),
+              onBack: () => _handleBackExit(context),
+              onHome: () => _handleHomeExit(context),
               child: Container(
                 color: secondaryBlackColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: hPadding * 1.5,
-                  // vertical: vPadding * 1.5,
                 ),
                 child: SingleChildScrollView(
                   child: Form(
@@ -322,7 +438,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       children: [
                         const SizedBox(height: hPadding),
 
-                        // LOGO
                         Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
@@ -347,18 +462,17 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
                         const SizedBox(height: hPadding),
                         buildFieldTotalBayar(),
+
                         const SizedBox(height: hPadding),
                         buildFieldVaNo(),
+
                         const SizedBox(height: hPadding),
                         buildFieldBatasBayar(),
+
                         const SizedBox(height: hPadding),
                         buildInstruksiPembayaran(state),
-                        const SizedBox(height: hPadding),
 
-                        // AppButton.primary(
-                        //   text: "Kembali",
-                        //   onPressed: () => _handleExit(context),
-                        // ),
+                        const SizedBox(height: hPadding),
 
                         AppButton.iconLeft(
                           text: 'Batal Pembayaran',
@@ -368,7 +482,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                             width: 18,
                             height: 18,
                           ),
-                          onPressed: () => _handleExit(context),
+                          onPressed: () => _handleCancelPayment(context),
                         ),
 
                         FormError(errors: errors, key: null),
@@ -382,7 +496,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         ),
       ),
     );
-  }
+  } 
 
   Widget _buildPaymentStatus(InvbayarvaFormState state) {
     final r = state.record;

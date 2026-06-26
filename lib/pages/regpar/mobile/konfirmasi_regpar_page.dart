@@ -283,6 +283,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 previous.hasFailure != current.hasFailure;
           },
             listener: (context, state) {
+              debugPrint('DnRekap2inv listener status: ${state.paymentStatus}');
               if (!state.isProcessed) return;
 
               final messenger = ScaffoldMessenger.of(context);
@@ -350,7 +351,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 );
                 return;
               }
-
               if (state.paymentStatus == "91") {
                 refreshData();
 
@@ -368,6 +368,24 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                       description: "Tagihan pembayaran telah dibatalkan.",
                       displayButton: "Kembali",
                     ),
+                  ),
+                );
+
+                return;
+              }
+
+              if (state.paymentStatus == "92") {
+                refreshData();
+
+                if (_isCardWebViewOpen &&
+                    Navigator.of(context, rootNavigator: true).canPop()) {
+                  _isCardWebViewOpen = false;
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+
+                messenger.showSnackBar(
+                  errorSnackBar(
+                    "Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.",
                   ),
                 );
 
@@ -398,9 +416,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 ),
               );
             }
+    ),
 
-
-        ),
 
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
           listenWhen: (previous, current) {
@@ -412,25 +429,93 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
 
             if (state.hasFailure) {
               messenger.showSnackBar(
-                errorSnackBar("Proses pembayaran kartu gagal. Silakan coba lagi."),
+                errorSnackBar(
+                  'Proses pembayaran kartu gagal. Silakan coba lagi.',
+                ),
               );
               return;
             }
 
             if (!state.isLoaded || state.record == null) return;
 
-            final redirectUrl = state.record!.redirectUrl.trim();
+            final record = state.record!;
+            final status = record.status.trim();
+            final redirectUrl = record.redirectUrl.trim();
+
+            if (status == "91") {
+              refreshData();
+
+              messenger.showSnackBar(
+                successSnackBar(
+                  "Pembayaran berhasil dibatalkan.",
+                ),
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PaymentSuccess(
+                    display: "Pembayaran Berhasil Dibatalkan",
+                    description: "Tagihan pembayaran telah dibatalkan.",
+                    displayButton: "Kembali",
+                  ),
+                ),
+              );
+
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+
+              return;
+            }
+
+            if (status == "92") {
+              messenger.showSnackBar(
+                errorSnackBar(
+                  'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
+                ),
+              );
+
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+
+              refreshData();
+              return;
+            }
+
+            if (status == "93") {
+              messenger.showSnackBar(
+                infoSnackBar(
+                  'Proses pembayaran kartu kredit dibatalkan.',
+                ),
+              );
+
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+
+              refreshData();
+              return;
+            }
 
             if (redirectUrl.isEmpty) {
               messenger.showSnackBar(
-                errorSnackBar("Redirect URL pembayaran tidak ditemukan."),
+                errorSnackBar(
+                  'Redirect URL pembayaran tidak ditemukan.',
+                ),
               );
+
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+
               return;
             }
 
             context.read<InvbayarvaFormBloc>().add(
               CreditCardPaymentCheckingStarted(
-                invoiceId: state.record!.invoiceId,
+                invoiceId: record.invoiceId,
                 interval: const Duration(seconds: 4),
               ),
             );
@@ -443,7 +528,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
               builder: (_) {
                 return PaymentCardWebViewDialog(
                   url: redirectUrl,
-                  invoiceId: state.record!.invoiceId,
+                  invoiceId: record.invoiceId,
                 );
               },
             );

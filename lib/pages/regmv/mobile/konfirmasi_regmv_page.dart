@@ -314,6 +314,22 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     ),
                   ),
                 );
+              } else if (state.paymentStatus == "92") {
+                if (_isCardWebViewOpen &&
+                    Navigator.of(context, rootNavigator: true).canPop()) {
+                  _isCardWebViewOpen = false;
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar(
+                    'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
+                  ),
+                );
+
+                if (mounted) {
+                  setState(() => isSubmitting = false);
+                }
               } else if (state.paymentStatus == "40") {
                 if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
                   _isCardWebViewOpen = false;
@@ -397,20 +413,64 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
 
             if (!state.isLoaded || state.record == null) return;
 
-            final redirectUrl = state.record!.redirectUrl.trim();
+            final record = state.record!;
+            final status = record.status.trim();
+            final redirectUrl = record.redirectUrl.trim();
 
-            if (redirectUrl.isEmpty) {
+            if (status == "91") {
+              // refreshData();
+
               messenger.showSnackBar(
-                errorSnackBar(
-                  'Redirect URL pembayaran tidak ditemukan.',
+                successSnackBar(
+                  "Pembayaran berhasil dibatalkan.",
                 ),
               );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentSuccess(
+                    display: "Pembayaran Berhasil Dibatalkan",
+                    description: "Tagihan pembayaran telah dibatalkan.",
+                    displayButton: "Kembali",
+                  ),
+                ),
+              );
+
+              return;
+            }
+
+            if (status == "92") {
+              // refreshData();
+
+              messenger.showSnackBar(
+                errorSnackBar(
+                  "Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.",
+                ),
+              );
+
+              return;
+            }
+
+            if (status == "93") {
+              // refreshData();
+
+              messenger.showSnackBar(
+                infoSnackBar(
+                  "Proses pembayaran kartu kredit dibatalkan.",
+                ),
+              );
+
+              return;
+            }
+
+            if (redirectUrl.isEmpty) {
               return;
             }
 
             context.read<InvbayarvaFormBloc>().add(
               CreditCardPaymentCheckingStarted(
-                invoiceId: state.record!.invoiceId,
+                invoiceId: record.invoiceId,
                 interval: const Duration(seconds: 4),
               ),
             );
@@ -423,7 +483,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               builder: (_) {
                 return PaymentCardWebViewDialog(
                   url: redirectUrl,
-                  invoiceId: state.record!.invoiceId,
+                  invoiceId: record.invoiceId,
                 );
               },
             );

@@ -185,13 +185,10 @@ class _UserPolisPageState extends State<UserPolisPage> {
       params: {
         "cobKlaimId": widget.cobKlaimId,
       },
+      disableLocalFilter: true,
       loader: (query) async {
         final cobKlaimId = query.params["cobKlaimId"]?.toString() ?? "";
         final searchText = query.searchText.trim();
-
-        debugPrint("========== LOADER SPPAPOLIS ==========");
-        debugPrint("LOADER cobKlaimId : $cobKlaimId");
-        debugPrint("LOADER searchText : '$searchText'");
 
         if (cobKlaimId.isEmpty) {
           debugPrint("SPPAPOLIS SKIP: cobKlaimId empty");
@@ -208,13 +205,6 @@ class _UserPolisPageState extends State<UserPolisPage> {
         for (var i = 0; i < result.length; i++) {
           final item = result[i];
 
-          debugPrint(
-            "RESULT[$i] "
-                "sppaId='${item.sppaId}', "
-                "polisNo='${item.polisNo}', "
-                "sppaNoRef='${item.sppaNoRef}', "
-                "objectDesc='${item.objectDesc}'",
-          );
         }
 
         return result;
@@ -223,12 +213,6 @@ class _UserPolisPageState extends State<UserPolisPage> {
         final noPolis = clean(item.polisNo);
         final noSppa = clean(item.sppaNoRef);
         final detail = clean(item.objectDesc);
-
-        debugPrint("========== DISPLAY TEXT SPPAPOLIS ==========");
-        debugPrint("DISPLAY sppaId     : ${item.sppaId}");
-        debugPrint("DISPLAY polisNo    : $noPolis");
-        debugPrint("DISPLAY sppaNoRef  : $noSppa");
-        debugPrint("DISPLAY objectDesc : $detail");
 
         return noPolis;
       },
@@ -239,13 +223,6 @@ class _UserPolisPageState extends State<UserPolisPage> {
         final result = aId.isNotEmpty && bId.isNotEmpty
             ? aId == bId
             : itemKey(a) == itemKey(b);
-
-        debugPrint("========== COMPARE SPPAPOLIS ==========");
-        debugPrint("COMPARE a.sppaId : '$aId'");
-        debugPrint("COMPARE b.sppaId : '$bId'");
-        debugPrint("COMPARE a.key    : ${itemKey(a)}");
-        debugPrint("COMPARE b.key    : ${itemKey(b)}");
-        debugPrint("COMPARE result   : $result");
 
         return result;
       },
@@ -265,14 +242,6 @@ class _UserPolisPageState extends State<UserPolisPage> {
         final noPolis = clean(item.polisNo);
         final noSppa = clean(item.sppaNoRef);
         final detail = clean(item.objectDesc);
-
-        debugPrint("========== ITEM BUILDER SPPAPOLIS ==========");
-        debugPrint("ITEM sppaId     : ${item.sppaId}");
-        debugPrint("ITEM polisNo    : $noPolis");
-        debugPrint("ITEM sppaNoRef  : $noSppa");
-        debugPrint("ITEM objectDesc : $detail");
-        debugPrint("ITEM isSelected : $isSelected");
-        debugPrint("ITEM isDisabled : $isDisabled");
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

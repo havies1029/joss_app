@@ -105,20 +105,29 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 ),
               );
-            } else if (state.paymentStatus == "91") {
-              ScaffoldMessenger.of(context).showSnackBar(
-                successSnackBar('Pembayaran berhasil dibatalkan.'),
-              );
+            } else if (state.paymentStatus == "91" && state.isProcessed) {
+              context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
 
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PaymentSuccess(
+                  builder: (_) => PaymentSuccess(
                     display: "Pembayaran Berhasil Dibatalkan",
                     description: "Tagihan pembayaran Anda telah dibatalkan.",
                     displayButton: "Kembali",
                   ),
                 ),
+              );
+            } else if (state.paymentStatus == "92") {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(
+                    'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.'),
               );
             } else if (state.paymentStatus == "93") {
               if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
@@ -150,9 +159,9 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
             final redirectUrl = state.record!.redirectUrl.trim();
 
             if (redirectUrl.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
-              );
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     errorSnackBar('Redirect URL pembayaran tidak ditemukan.'),
+            //   );
               return;
             }
 
