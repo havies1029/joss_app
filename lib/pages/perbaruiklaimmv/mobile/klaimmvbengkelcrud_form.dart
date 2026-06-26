@@ -177,11 +177,11 @@ class KlaimmvbengkelcrudFormPageFormState
 	}
 
 	void loadData() {
-		if (widget.viewMode == "ubah") {
-			klaimmvbengkelcrudBloc.add(
-				KlaimmvbengkelcrudLihatEvent(recordId: widget.recordId),
-			);
-		}
+		// if (widget.viewMode == "ubah") {
+		// 	klaimmvbengkelcrudBloc.add(
+		// 		KlaimmvbengkelcrudLihatEvent(recordId: widget.recordId),
+		// 	);
+		// }
 	}
 
 	Widget buildFieldMbengkelId() {

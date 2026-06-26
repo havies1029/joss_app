@@ -374,12 +374,32 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 return;
               }
 
+              if (state.paymentStatus == "93") {
+                refreshData();
+
+                if (_isCardWebViewOpen &&
+                    Navigator.of(context, rootNavigator: true).canPop()) {
+                  _isCardWebViewOpen = false;
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+
+                messenger.showSnackBar(
+                  infoSnackBar(
+                    "Proses pembayaran kartu kredit dibatalkan.",
+                  ),
+                );
+
+                return;
+              }
+
               messenger.showSnackBar(
                 errorSnackBar(
                   "Status pembayaran tidak dikenali. Silakan periksa kembali.",
                 ),
               );
             }
+
+
         ),
 
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(

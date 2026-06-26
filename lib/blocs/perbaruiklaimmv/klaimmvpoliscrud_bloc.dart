@@ -193,26 +193,40 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
   }
 
   Future<void> onKlaimmvPolisAutoSave(
-      KlaimmvPolisAutoSaveEvent event, Emitter<KlaimmvpoliscrudState> emit) async {
-
-    if (!state.isDirty) return;
+      KlaimmvPolisAutoSaveEvent event,
+      Emitter<KlaimmvpoliscrudState> emit,
+      ) async {
+    if (!state.isDirty && event.saveFrom != "button") return;
 
     KlaimmvpoliscrudModel? record = state.record;
-    if (record != null) {
-
-      bool hasFailure = true;
-      emit(state.copyWith(isSaving: true, isSaved: false));
-
-      hasFailure = !await repository.klaimmvpoliscrudUbah(record);
-
+    if (record == null) {
       emit(state.copyWith(
         isSaving: false,
-        isSaved: true,
-        hasFailure: hasFailure,
-        isDirty: false,
+        isSaved: false,
+        hasFailure: true,
         saveFrom: event.saveFrom,
       ));
+      return;
     }
+
+    bool hasFailure = true;
+
+    emit(state.copyWith(
+      isSaving: true,
+      isSaved: false,
+      hasFailure: false,
+      saveFrom: event.saveFrom,
+    ));
+
+    hasFailure = !await repository.klaimmvpoliscrudUbah(record);
+
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+      isDirty: false,
+      saveFrom: event.saveFrom,
+    ));
   }
 
   Future<void> onFieldPolisMulaiChanged(
@@ -245,22 +259,26 @@ class KlaimmvpoliscrudBloc extends Bloc<KlaimmvpoliscrudEvents, Klaimmvpoliscrud
     ));
   }
 
-  bool _validate(KlaimmvpoliscrudModel? record) {
-    if (record == null) return false;
+  // bool _validate(KlaimmvpoliscrudModel? record) {
+  //   if (record == null) return false;
+  //
+  //   if (record.isPolisJps) {
+  //     return
+  //         record.noChasis.isNotEmpty &&
+  //         record.noPlat.isNotEmpty;
+  //   }
+  //   else{
+  //     return record.insuredNama.isNotEmpty &&
+  //         record.noChasis.isNotEmpty &&
+  //         record.noPlat.isNotEmpty &&
+  //         record.polisNo.isNotEmpty &&
+  //         record.minsurerId?.isNotEmpty == true &&
+  //         record.mmvjnscoverId?.isNotEmpty == true;
+  //   }
+  // }
 
-    if (record.isPolisJps) {
-      return 
-          record.noChasis.isNotEmpty &&
-          record.noPlat.isNotEmpty;
-    }
-    else{
-      return record.insuredNama.isNotEmpty &&
-          record.noChasis.isNotEmpty &&
-          record.noPlat.isNotEmpty &&
-          record.polisNo.isNotEmpty &&
-          record.minsurerId?.isNotEmpty == true &&
-          record.mmvjnscoverId?.isNotEmpty == true;
-    }
+  bool _validate(KlaimmvpoliscrudModel? record) {
+    return record != null;
   }
 
 }

@@ -355,6 +355,20 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
               }
             }
 
+            else if (state.paymentStatus == "93") {
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                infoSnackBar(
+                  'Proses pembayaran kartu kredit dibatalkan.',
+                ),
+              );
+            }
+
             // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
             // if (state.hasFailure) {
             //   ScaffoldMessenger.of(context).showSnackBar(

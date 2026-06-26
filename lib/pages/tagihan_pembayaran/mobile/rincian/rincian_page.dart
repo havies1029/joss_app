@@ -185,7 +185,16 @@ class _RincianPageState extends State<RincianPage> {
                   ),
                 ),
               );
-            }
+              } else if (state.paymentStatus == "93") {
+                if (_isCardWebViewOpen && Navigator.of(context, rootNavigator: true).canPop()) {
+                  _isCardWebViewOpen = false;
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  infoSnackBar('Proses pembayaran kartu kredit dibatalkan.'),
+                );
+              }
           },
         ),
 

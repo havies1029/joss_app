@@ -168,8 +168,8 @@ class KlaimmvpoliscrudFormPageFormState
 
 	void loadData() {
 		if (widget.viewMode == "ubah") {
-			klaimmvpoliscrudBloc
-					.add(KlaimmvpoliscrudLihatEvent(recordId: widget.recordId));
+			// klaimmvpoliscrudBloc
+			// 		.add(KlaimmvpoliscrudLihatEvent(recordId: widget.recordId));
 		}
 
 		WidgetsBinding.instance.addPostFrameCallback((_) {

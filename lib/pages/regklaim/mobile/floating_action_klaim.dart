@@ -251,6 +251,7 @@ class FabActionKlaim extends StatelessWidget {
                           ? PerbaruiKlaimMvPage(
                         klaim1Id: selected.klaim1Id,
                         cobGroupNama: selected.cobNama,
+                        cobGroupId: selected.cobId,
                       )
                           : PerbaruiKlaimParPage(
                         klaim1Id: selected.klaim1Id,

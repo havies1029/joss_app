@@ -120,6 +120,15 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                   ),
                 ),
               );
+            } else if (state.paymentStatus == "93") {
+              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context).pop();
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                infoSnackBar('Proses pembayaran kartu kredit dibatalkan.'),
+              );
             }
           },
         ),
@@ -169,6 +178,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
 
             _isCardWebViewOpen = false;
           },
+
         ),
       ],
       child: Scaffold(
@@ -392,61 +402,57 @@ class _PaymentCardWebViewDialogState extends State<PaymentCardWebViewDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog.fullscreen(
-      backgroundColor: secondaryBlackColor,
-      child: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: secondaryBlackColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: sGrey,
-                    width: 1,
+    return PopScope(
+      canPop: false,
+      child: Dialog.fullscreen(
+        backgroundColor: secondaryBlackColor,
+        child: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: secondaryBlackColor,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: sGrey,
+                      width: 1,
+                    ),
                   ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      "Verifikasi Kartu Kredit",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: primaryLightColor,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "Verifikasi Kartu Kredit",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: primaryLightColor,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(
-                      Icons.close,
-                      color: primaryLightColor,
-                    ),
-                  ),
-                ],
+
+                    // close button dihapus supaya user tidak bisa tutup manual
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  WebViewWidget(controller: _controller),
-                  if (_isLoading)
-                    const Center(
-                      child: LoadingIndicator(),
-                    ),
-                ],
+              Expanded(
+                child: Stack(
+                  children: [
+                    WebViewWidget(controller: _controller),
+                    if (_isLoading)
+                      const Center(
+                        child: LoadingIndicator(),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

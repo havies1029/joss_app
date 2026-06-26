@@ -1,21 +1,21 @@
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 
 class KlaimmvklaimcrudModel {
-	DateTime dol;
-	double klaimAmount;
-	double klaimBayar;
-	String klaim1Id;
-	String kronologis;
+	DateTime? dol;
+	double? klaimAmount;
+	double? klaimBayar;
+	String? klaim1Id;
+	String? kronologis;
 	String? currId;
 	String? mjenisrugimvId;
 	ComboRMatauangModel? comboRMatauang;
 
 	KlaimmvklaimcrudModel({
-		required this.dol,
-		required this.klaimAmount,
-		required this.klaimBayar,
-		required this.klaim1Id,
-		required this.kronologis,
+		this.dol,
+		this.klaimAmount,
+		this.klaimBayar,
+		this.klaim1Id,
+		this.kronologis,
 		this.currId,
 		this.mjenisrugimvId,
 		this.comboRMatauang,
@@ -29,25 +29,27 @@ class KlaimmvklaimcrudModel {
 		}
 
 		return KlaimmvklaimcrudModel(
-			dol: DateTime.tryParse(data['dol'].toString()) ?? DateTime.now(),
-			klaimAmount: double.tryParse(data['klaimAmount'].toString()) ?? 0,
-			klaimBayar: double.tryParse(data['klaimBayar'].toString()) ?? 0,
-			klaim1Id: data['klaim1Id'] ?? '',
-			kronologis: data['kronologis'] ?? '',
-			currId: data['currId'] ?? '',
-			mjenisrugimvId: data['mjenisrugimvId'] ?? '',
+			dol: data['dol'] == null || data['dol'].toString().isEmpty
+					? null
+					: DateTime.tryParse(data['dol'].toString()),
+			klaimAmount: double.tryParse(data['klaimAmount']?.toString() ?? ''),
+			klaimBayar: double.tryParse(data['klaimBayar']?.toString() ?? ''),
+			klaim1Id: data['klaim1Id'],
+			kronologis: data['kronologis'],
+			currId: data['currId'],
+			mjenisrugimvId: data['mjenisrugimvId'],
 			comboRMatauang: comboRMatauang,
 		);
 	}
 
 	Map<String, dynamic> toJson() => {
-		'dol': dol.toIso8601String(),
-		'klaimAmount': klaimAmount.toString(),
-		'klaimBayar': klaimBayar.toString(),
-		'klaim1Id': klaim1Id,
-		'kronologis': kronologis,
-		'currId': currId,
-		'mjenisrugimvId': mjenisrugimvId,
+		'dol': dol?.toIso8601String(),
+		'klaimAmount': klaimAmount ?? 0,
+		'klaimBayar': klaimBayar ?? 0,
+		'klaim1Id': klaim1Id ?? '',
+		'kronologis': kronologis ?? '',
+		'currId': currId ?? '',
+		'mjenisrugimvId': mjenisrugimvId ?? '',
 		'comboRMatauang': comboRMatauang?.toJson(),
 	};
 
@@ -70,6 +72,19 @@ class KlaimmvklaimcrudModel {
 			currId: currId ?? this.currId,
 			mjenisrugimvId: mjenisrugimvId ?? this.mjenisrugimvId,
 			comboRMatauang: comboRMatauang ?? this.comboRMatauang,
+		);
+	}
+
+	factory KlaimmvklaimcrudModel.empty() {
+		return KlaimmvklaimcrudModel(
+			dol: null,
+			klaimAmount: null,
+			klaimBayar: null,
+			klaim1Id: '',
+			kronologis: '',
+			currId: '',
+			mjenisrugimvId: '',
+			comboRMatauang: null,
 		);
 	}
 }

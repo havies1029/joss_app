@@ -54,9 +54,13 @@ class InvoiceStatusCardAPI {
       debugPrint("BODY : ${response.body}");
 
       if (response.statusCode == 200) {
-        final result = InvoiceStatusCards.fromJson(
-          jsonDecode(response.body),
-        );
+        final decoded = response.body.trim().isEmpty
+            ? null
+            : jsonDecode(response.body);
+
+        final result = decoded is Map<String, dynamic>
+            ? InvoiceStatusCards.fromJson(decoded)
+            : InvoiceStatusCards.empty();
 
         debugPrint(
             "========== invToBayarViaCardAPI PARSED ==========");

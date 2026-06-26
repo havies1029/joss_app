@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
@@ -54,19 +55,22 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
 
   Future<void> onLihatKlaimmvklaimcrud(
       KlaimmvklaimcrudLihatEvent event,
-      Emitter<KlaimmvklaimcrudState> emit
+      Emitter<KlaimmvklaimcrudState> emit,
       ) async {
-
     emit(state.copyWith(isLoading: true, isLoaded: false));
 
     KlaimmvklaimcrudModel? record =
     await repository.klaimmvklaimcrudLihat(event.recordId);
 
+    record ??= KlaimmvklaimcrudModel.empty().copyWith(
+      klaim1Id: event.recordId,
+    );
+
     emit(state.copyWith(
       isLoading: false,
       isLoaded: true,
       record: record,
-      comboRMatauang: record?.comboRMatauang,
+      comboRMatauang: record.comboRMatauang,
       isValid: _validate(record),
       isComplete: _validate(record),
     ));
@@ -174,24 +178,58 @@ class KlaimmvklaimcrudBloc extends Bloc<KlaimmvklaimcrudEvents, Klaimmvklaimcrud
   }
 
   Future<void> onKlaimmvklaimAutoSave(
-      KlaimmvklaimAutoSaveEvent event, Emitter<KlaimmvklaimcrudState> emit) async {
-    if (state.record != null && state.isDirty) {
-      emit(state.copyWith(isSaving: true, isSaved: false));
-      bool hasFailure = !await repository.klaimmvklaimcrudUbah(state.record!);
-      emit(state.copyWith(isSaving: false, isSaved: true, 
-      hasFailure: hasFailure, isDirty: false, saveFrom: event.saveFrom));
+      KlaimmvklaimAutoSaveEvent event,
+      Emitter<KlaimmvklaimcrudState> emit,
+      ) async {
+    debugPrint("===== AUTO SAVE KLAIM MV =====");
+    debugPrint("saveFrom: ${event.saveFrom}");
+    debugPrint("record: ${state.record?.toJson()}");
+    debugPrint("isDirty: ${state.isDirty}");
+    debugPrint("==============================");
+
+    if (state.record == null || !state.isDirty) {
+      emit(state.copyWith(
+        isSaving: false,
+        isSaved: true,
+        hasFailure: false,
+        saveFrom: event.saveFrom,
+      ));
+      return;
     }
+
+    emit(state.copyWith(
+      isSaving: true,
+      isSaved: false,
+      hasFailure: false,
+      saveFrom: event.saveFrom,
+    ));
+
+    final hasFailure =
+    !await repository.klaimmvklaimcrudUbah(state.record!);
+
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+      isDirty: false,
+      saveFrom: event.saveFrom,
+    ));
   }
+
+  // bool _validate(KlaimmvklaimcrudModel? record) {
+  //   if (record == null) return false;
+  //
+  //   return
+  //     _isSameOrBeforeToday(record.dol) &&
+  //         record.klaimAmount > 0 &&
+  //         record.kronologis.trim().isNotEmpty &&
+  //         (record.currId?.isNotEmpty ?? false);
+  // }
 
   bool _validate(KlaimmvklaimcrudModel? record) {
-    if (record == null) return false;
-
-    return _isSameOrBeforeToday(record.dol) &&
-        record.klaimAmount > 0 &&
-        record.kronologis.trim().isNotEmpty &&
-        (record.currId?.isNotEmpty ?? false) &&
-        (record.mjenisrugimvId?.isNotEmpty ?? false);
+    return record != null;
   }
+
 
   bool _isSameOrBeforeToday(DateTime date) {
     final today = DateTime.now();

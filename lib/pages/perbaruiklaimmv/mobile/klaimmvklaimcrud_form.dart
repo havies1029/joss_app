@@ -11,6 +11,7 @@ import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../common/loading_indicator.dart';
+import '../../../common/plat_nomor_formatter.dart';
 import '../../../models/combobox/combomjenisrugimv_model.dart';
 import '../../../repositories/combobox/combomjenisrugimv_repository.dart';
 import '../../../widgets/apptheme/dropdown2.dart';
@@ -19,12 +20,14 @@ class KlaimmvklaimcrudFormPage extends StatefulWidget {
 	final String viewMode;
 	final String recordId;
 	final GlobalKey<FormState> formKey;
+	final String cobGroupId;
 
 	const KlaimmvklaimcrudFormPage({
 		super.key,
 		required this.viewMode,
 		required this.recordId,
 		required this.formKey,
+		required this.cobGroupId,
 	});
 
 	@override
@@ -71,11 +74,29 @@ class KlaimmvklaimcrudFormPageFormState
 		});
 	}
 
+	Future<void> _loadDefaultCurrency() async {
+		final currencies = await ComboRMatauangRepository().getComboRMatauang();
+
+		if (!mounted || currencies.isEmpty) return;
+
+		final idrCurrency = currencies.firstWhere(
+					(curr) => curr.rmatauangKode == '001' || curr.rmatauangSimbol == 'IDR',
+			orElse: () => currencies.first,
+		);
+
+		setState(() {
+			fieldComboRMatauang = idrCurrency;
+		});
+	}
+
 	@override
 	void initState() {
 		super.initState();
 		_futureJenisKerugian =
 				ComboMJenisrugimvRepository().getComboMJenisrugimv();
+
+		_loadDefaultCurrency();
+
 		Future.delayed(const Duration(milliseconds: 500), () {
 			loadData();
 		});
@@ -112,9 +133,12 @@ class KlaimmvklaimcrudFormPageFormState
 			ok = false;
 		}
 
+		final isMv = widget.cobGroupId == "10002";
+
 		final kronologis = fieldKronologisController.text.trim();
 		if (kronologis.isEmpty) {
-			newErrors['form.kronologis'] = 'Kronologis Kejadian tidak boleh kosong';
+			newErrors['form.kronologis'] =
+			isMv ? 'Nomor Polisi tidak boleh kosong' : 'Kronologis Kejadian tidak boleh kosong';
 			ok = false;
 		}
 
@@ -153,18 +177,45 @@ class KlaimmvklaimcrudFormPageFormState
 					),
 				);
 			},
-			listener: (context, state) {
+			listener: (context, state) async {
 				if (state.isLoaded) {
+					ComboMJenisrugimvModel? selectedJenisRugi;
+
+					if (state.record?.mjenisrugimvId?.isNotEmpty == true) {
+						final listJenisRugi = await _futureJenisKerugian;
+
+						for (final item in listJenisRugi) {
+							if (item.mjenisrugimvId == state.record!.mjenisrugimvId) {
+								selectedJenisRugi = item;
+								break;
+							}
+						}
+					}
+
+					if (!mounted) return;
+
 					setState(() {
 						if (state.record != null) {
-							fieldDolController.text = state.record!.dol.toIso8601String();
+							if (state.record!.dol != null) {
+								fieldDolController.text = state.record!.dol!.toIso8601String();
+							}
+
 							fieldKlaimAmountController.text =
 									NumberFormat("#,###").format(state.record!.klaimAmount);
+
 							fieldKlaimBayarController.text =
 									NumberFormat("#,###").format(state.record!.klaimBayar);
-							fieldKronologisController.text = state.record!.kronologis;
+
+
+							fieldKronologisController.text =
+									state.record?.kronologis ?? '';
+
+							fieldComboMJenisrugimv = selectedJenisRugi;
 						}
-						fieldComboRMatauang = state.comboRMatauang;
+
+						if (state.comboRMatauang != null) {
+							fieldComboRMatauang = state.comboRMatauang;
+						}
 					});
 				}
 			},
@@ -172,11 +223,11 @@ class KlaimmvklaimcrudFormPageFormState
 	}
 
 	void loadData() {
-		if (widget.viewMode == "ubah") {
-			klaimmvklaimcrudBloc.add(
-				KlaimmvklaimcrudLihatEvent(recordId: widget.recordId),
-			);
-		}
+		// if (widget.viewMode == "ubah") {
+		// 	klaimmvklaimcrudBloc.add(
+		// 		KlaimmvklaimcrudLihatEvent(recordId: widget.recordId),
+		// 	);
+		// }
 	}
 
 	Widget buildFieldCurrId() {
@@ -381,11 +432,22 @@ class KlaimmvklaimcrudFormPageFormState
 	}
 
 	Widget buildFieldKronologis() {
+		final isMv = widget.cobGroupId == "10002";
+
 		return appTextField(
-			label: 'Kronologis Kejadian',
-			keyboardType: TextInputType.multiline,
-			maxLines: 10,
+			label: isMv ? 'Nomor Polisi' : 'Kronologis Kejadian',
+			keyboardType: isMv ? TextInputType.text : TextInputType.multiline,
+			maxLines: isMv ? 1 : 10,
 			controller: fieldKronologisController,
+			inputFormatters: isMv
+					? [
+				PlatNomorFormatter(),
+			]
+					: [
+				FilteringTextInputFormatter.allow(
+					RegExp(r"[0-9a-zA-Z ,./\-#()]"),
+				),
+			],
 			errorText: err('form.kronologis'),
 			validator: (_) => err('form.kronologis'),
 			onChanged: (value) {

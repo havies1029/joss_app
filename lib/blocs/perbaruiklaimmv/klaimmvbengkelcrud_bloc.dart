@@ -196,20 +196,35 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
       KlaimmvbengkelAutoSaveEvent event,
       Emitter<KlaimmvbengkelcrudState> emit,
       ) async {
-    if (state.record != null && state.isDirty) {
-      emit(state.copyWith(isSaving: true, isSaved: false));
+    if (!state.isDirty && event.saveFrom != "button") return;
 
-      bool hasFailure =
-      !await repository.klaimmvbengkelcrudUbah(state.record!);
-
+    final record = state.record;
+    if (record == null) {
       emit(state.copyWith(
         isSaving: false,
-        isSaved: true,
-        hasFailure: hasFailure,
-        isDirty: false,
+        isSaved: false,
+        hasFailure: true,
         saveFrom: event.saveFrom,
       ));
+      return;
     }
+
+    emit(state.copyWith(
+      isSaving: true,
+      isSaved: false,
+      hasFailure: false,
+      saveFrom: event.saveFrom,
+    ));
+
+    final hasFailure = !await repository.klaimmvbengkelcrudUbah(record);
+
+    emit(state.copyWith(
+      isSaving: false,
+      isSaved: true,
+      hasFailure: hasFailure,
+      isDirty: false,
+      saveFrom: event.saveFrom,
+    ));
   }
 
   Future<void> onFieldNamaBengkelLainChanged(
@@ -236,26 +251,30 @@ class KlaimmvbengkelcrudBloc extends Bloc<KlaimmvbengkelcrudEvents, Klaimmvbengk
     ));
   }
 
+  // bool _validate(KlaimmvbengkelcrudModel? record) {
+  //   if (record == null) return false;
+  //
+  //   final mjns = record.mjnsbengkelId?.trim() ?? '';
+  //   if (mjns.isEmpty) return false;
+  //
+  //   if (mjns == '10') {
+  //     final wilayah = record.mwilayahbengkelId?.trim() ?? '';
+  //     final bengkel = record.mbengkelId?.trim() ?? '';
+  //
+  //     if (wilayah.isEmpty) return false;
+  //     if (bengkel.isEmpty) return false;
+  //   }
+  //
+  //   if (mjns == '20') {
+  //     final lain = record.namaBengkelLain.trim();
+  //
+  //     if (lain.isEmpty) return false;
+  //   }
+  //
+  //   return true;
+  // }
+
   bool _validate(KlaimmvbengkelcrudModel? record) {
-    if (record == null) return false;
-
-    final mjns = record.mjnsbengkelId?.trim() ?? '';
-    if (mjns.isEmpty) return false;
-
-    if (mjns == '10') {
-      final wilayah = record.mwilayahbengkelId?.trim() ?? '';
-      final bengkel = record.mbengkelId?.trim() ?? '';
-
-      if (wilayah.isEmpty) return false;
-      if (bengkel.isEmpty) return false;
-    }
-
-    if (mjns == '20') {
-      final lain = record.namaBengkelLain.trim();
-
-      if (lain.isEmpty) return false;
-    }
-
-    return true;
+    return record != null;
   }
 }
