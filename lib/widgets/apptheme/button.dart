@@ -334,23 +334,29 @@ class _AppButtonState extends State<AppButton>
 
   Widget _buildButtonChild() {
     if (widget.isLoading) {
-      return SizedBox(
-        height: 20,
-        width: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            widget.textColor ?? primaryColor,
-          ),
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          widget.text ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: _getTextStyle(),
         ),
       );
     }
 
     switch (widget.layoutType) {
       case ButtonLayoutType.textOnly:
-        return Text(
-          widget.text ?? '',
-          style: _getTextStyle(),
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            widget.text ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: _getTextStyle(),
+          ),
         );
 
       case ButtonLayoutType.iconOnly:

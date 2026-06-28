@@ -188,9 +188,9 @@ class _RiwayatTablePageRemakeState extends State<RiwayatTablePageRemake> {
         _tapWrap(d, _cell((index + 1).toString(), center: true)),
         _tapWrap(d, _cell(d.inv1Id)),
         _tapWrap(d, _cell(formatDate(d.invTgl))),
-        _tapWrap(d, _cell(d.jmlPolis.toString(), right: true)),
-        _tapWrap(d, _cell(d.status.toString())),
-        _tapWrap(d, _cell(formatNum(d.totalBayar), right: true)),
+        _tapWrap(d, _cell(d.jmlPolis.toString())),
+        _tapWrap(d, _cell(d.status)),
+        _tapWrap(d, _cell("${d.curr} ${formatNum(d.totalBayar)}")),
       ],
     );
   }

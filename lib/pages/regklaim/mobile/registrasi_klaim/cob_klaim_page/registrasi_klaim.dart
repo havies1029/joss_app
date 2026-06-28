@@ -339,6 +339,9 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
           body: Form(
             key: _formKey,
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
               padding: const EdgeInsets.only(bottom: vPadding),
               child: Padding(
                 padding: EdgeInsets.symmetric(

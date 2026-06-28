@@ -31,7 +31,7 @@ android {
         applicationId = "id.co.jayaproteksindo.proteksiplus"
         minSdk = 23
         targetSdk = 36
-        versionCode = 4
+        versionCode = 6
         versionName = "1.1"
     }
 

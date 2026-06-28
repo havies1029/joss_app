@@ -49,7 +49,7 @@ class KlaimProgressCariTileWidget extends StatelessWidget {
     };
     final title = item.progressNama.trim().isEmpty ? '(Tanpa Judul)' : item.progressNama.trim();
     final dateText = item.progressTgl != null
-        ? DateFormat('dd MMM yyyy, HH:mm:ss').format(item.progressTgl!)
+        ? DateFormat('dd MMM yyyy').format(item.progressTgl!)
         : '';
     final trimmedUrl = item.fileUrl?.trim();
     final imageUrl = (trimmedUrl == null || trimmedUrl.isEmpty) ? null : trimmedUrl;

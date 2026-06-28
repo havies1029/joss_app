@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:excel/excel.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:file_saver/file_saver.dart';
@@ -46,8 +47,13 @@ class ExportHelper {
     }
   }
 
-  static Future<void> export(String format, List<Map<String, dynamic>> data, CategoryType category) async {
+  static Future<void> export(
+      String format,
+      List<Map<String, dynamic>> data,
+      CategoryType category,
+      ) async {
     final categoryName = category.name;
+
     switch (format.toLowerCase()) {
       case 'excel':
         await _exportToExcel(data, categoryName);
@@ -58,25 +64,29 @@ class ExportHelper {
     }
   }
 
-  static Future<bool> _ensurePermission() async {
-    if (kIsWeb) return true;
-    final status = await Permission.storage.request();
-    return status.isGranted;
-  }
-
-  static Future<void> _exportToExcel(List<Map<String, dynamic>> data, String categoryName) async {
-    if (data.isEmpty || !(await _ensurePermission())) return;
+  static Future<void> _exportToExcel(
+      List<Map<String, dynamic>> data,
+      String categoryName,
+      ) async {
+    if (data.isEmpty) return;
 
     final excel = Excel.createExcel();
     final sheet = excel['Sheet1'];
     final headers = data.first.keys.toList();
+
     sheet.appendRow(headers);
+
     for (final row in data) {
-      sheet.appendRow(headers.map((h) => row[h]?.toString() ?? '').toList());
+      sheet.appendRow(
+        headers.map((h) => row[h]?.toString() ?? '').toList(),
+      );
     }
 
-    final fileBytes = excel.encode()!;
-    final filename = 'Data_${categoryName}_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    final fileBytes = excel.encode();
+    if (fileBytes == null) return;
+
+    final filename =
+        'Data_${categoryName}_${DateTime.now().millisecondsSinceEpoch}.xlsx';
 
     if (kIsWeb) {
       await FileSaver.instance.saveFile(
@@ -85,23 +95,25 @@ class ExportHelper {
         ext: 'xlsx',
         mimeType: MimeType.microsoftExcel,
       );
-    } else {
-      final filePath = await _getDownloadPath(filename);
-      final file = File(filePath);
-      await file.writeAsBytes(fileBytes);
-      await OpenFilex.open(file.path);
+      return;
     }
+
+    await _saveAndOpenFile(
+      fileName: filename,
+      bytes: Uint8List.fromList(fileBytes),
+    );
   }
 
   static Future<void> _exportToPdf(
       List<Map<String, dynamic>> data,
       CategoryType category,
       ) async {
-    if (data.isEmpty || !(await _ensurePermission())) return;
+    if (data.isEmpty) return;
 
     final pdf = pw.Document();
     final headers = data.first.keys.toList();
     final now = DateTime.now();
+
     final formattedDate =
         '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}';
 
@@ -122,7 +134,6 @@ class ExportHelper {
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(24),
         build: (context) => [
-          // HEADER ATAS
           pw.Container(
             padding: const pw.EdgeInsets.only(bottom: 16),
             child: pw.Row(
@@ -158,10 +169,7 @@ class ExportHelper {
               ],
             ),
           ),
-
           pw.SizedBox(height: 16),
-
-          // TABEL
           pw.Table(
             border: pw.TableBorder(
               horizontalInside: pw.BorderSide(color: borderColor, width: 0.5),
@@ -241,7 +249,8 @@ class ExportHelper {
     );
 
     final pdfBytes = await pdf.save();
-    final filename = 'Data_${category.name}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    final filename =
+        'Data_${category.name}_${DateTime.now().millisecondsSinceEpoch}.pdf';
 
     if (kIsWeb) {
       await FileSaver.instance.saveFile(
@@ -250,31 +259,26 @@ class ExportHelper {
         ext: 'pdf',
         mimeType: MimeType.pdf,
       );
-    } else {
-      final filePath = await _getDownloadPath(filename);
-      final file = File(filePath);
-      await file.writeAsBytes(pdfBytes);
-      await OpenFilex.open(file.path);
+      return;
     }
+
+    await _saveAndOpenFile(
+      fileName: filename,
+      bytes: Uint8List.fromList(pdfBytes),
+    );
   }
 
-  // Helper untuk format nama kategori
-  static String _formatCategoryName(String name) {
-    final Map<String, String> categoryLabels = {
-      'ringkasan': 'Ringkasan',
-      'properti': 'Properti',
-      'kendaraan': 'Kendaraan',
-      'kesehatan': 'Kesehatan',
-      'marineKargo': 'Marine & Kargo',
-      'sdm': 'Sumber Daya Manusia',
-      'lain_lain': 'Lain-lain',
-      'rincian': 'Rincian',
-      'klaimrasio': 'Rasio Klaim',
-    };
-    return categoryLabels[name] ?? name;
+  static Future<void> _saveAndOpenFile({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/$fileName');
+
+    await file.writeAsBytes(bytes, flush: true);
+    await OpenFilex.open(file.path);
   }
 
-  // Helper untuk format nama header
   static String _formatHeaderName(String header) {
     return header
         .replaceAll('_', ' ')
@@ -283,21 +287,15 @@ class ExportHelper {
         .join(' ');
   }
 
-  // Helper untuk dynamic column widths
   static Map<int, pw.TableColumnWidth> _getColumnWidths(List<String> headers) {
     final widths = <int, pw.TableColumnWidth>{};
+
     for (var i = 0; i < headers.length; i++) {
-      // Kolom pertama lebih lebar, sisanya flex
       widths[i] = i == 0
           ? const pw.FlexColumnWidth(2.5)
           : const pw.FlexColumnWidth(1.5);
     }
-    return widths;
-  }
 
-  static Future<String> _getDownloadPath(String filename) async {
-    final dir = await getExternalStorageDirectory();
-    final downloadsPath = dir?.path ?? '/storage/emulated/0/Download';
-    return '$downloadsPath/$filename';
+    return widths;
   }
 }

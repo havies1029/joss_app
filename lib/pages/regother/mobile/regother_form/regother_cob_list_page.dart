@@ -48,6 +48,7 @@ class _CobCariPageState extends State<CobCariPage> {
 
   void _refreshData() {
     setState(() {
+      _showAllCobItems = false;
       _futureData = _loadCobItems();
     });
   }
@@ -62,12 +63,67 @@ class _CobCariPageState extends State<CobCariPage> {
     );
   }
 
+  static const int _initialVisibleCount = 8;
+
+  bool _showAllCobItems = false;
+
+  static const _priorityCobIds = [
+    '21',
+    '17',
+    '47',
+    '52',
+    '03',
+    '46',
+    '14',
+    '02',
+  ];
+
+  // List<ComboMCobApp1Model> _filterExcludedCob(
+  //     List<ComboMCobApp1Model> items,
+  //     ) {
+  //   final filtered = items
+  //       .where((e) =>
+  //       e.mCobApp1Id != "14" &&
+  //       e.mCobApp1Id != "02")
+  //       .toList();
+  //
+  //   filtered.sort((a, b) {
+  //     final aIndex = _priorityCobIds.indexOf(a.mCobApp1Id);
+  //     final bIndex = _priorityCobIds.indexOf(b.mCobApp1Id);
+  //
+  //     final aPriority = aIndex == -1 ? 999 : aIndex;
+  //     final bPriority = bIndex == -1 ? 999 : bIndex;
+  //
+  //     if (aPriority != bPriority) {
+  //       return aPriority.compareTo(bPriority);
+  //     }
+  //
+  //     return a.cobNama.compareTo(b.cobNama);
+  //   });
+  //
+  //   return filtered;
+  // }
+
   List<ComboMCobApp1Model> _filterExcludedCob(
       List<ComboMCobApp1Model> items,
       ) {
-    return items
-        .where((e) => e.mCobApp1Id != "10002" && e.mCobApp1Id != "10003")
-        .toList();
+    final filtered = [...items];
+
+    filtered.sort((a, b) {
+      final aIndex = _priorityCobIds.indexOf(a.mCobApp1Id);
+      final bIndex = _priorityCobIds.indexOf(b.mCobApp1Id);
+
+      final aPriority = aIndex == -1 ? 999 : aIndex;
+      final bPriority = bIndex == -1 ? 999 : bIndex;
+
+      if (aPriority != bPriority) {
+        return aPriority.compareTo(bPriority);
+      }
+
+      return a.cobNama.compareTo(b.cobNama);
+    });
+
+    return filtered;
   }
 
   void _syncSelectedModel({
@@ -234,15 +290,64 @@ class _CobCariPageState extends State<CobCariPage> {
     required List<ComboMCobApp1Model> items,
     required String selectedId,
   }) {
+    final visibleItems = _showAllCobItems
+        ? items
+        : items.take(_initialVisibleCount).toList();
+
+    final hiddenCount = items.length - visibleItems.length;
+    final showToggle = items.length > _initialVisibleCount;
+
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: items.length,
+      itemCount: visibleItems.length + (showToggle ? 1 : 0),
       itemBuilder: (_, index) {
-        return _buildCobItem(
-          item: items[index],
-          selectedId: selectedId,
-        );
+        if (index < visibleItems.length) {
+          return _buildCobItem(
+            item: visibleItems[index],
+            selectedId: selectedId,
+          );
+        }
+
+        return _buildShowMoreButton(hiddenCount);
       },
+    );
+  }
+
+  Widget _buildShowMoreButton(int hiddenCount) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: hPadding,
+        horizontal: vPadding,
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _showAllCobItems = !_showAllCobItems;
+          });
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(
+              _showAllCobItems
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down,
+              size: 20,
+              color: primaryColor,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              _showAllCobItems
+                  ? "Tampilkan Lebih Sedikit"
+                  : "Lihat $hiddenCount Kategori Lainnya",
+              style: bodyTextStyle(context).copyWith(
+                color: primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

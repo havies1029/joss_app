@@ -267,7 +267,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text("Total Pembayaran:", style: title),
-        Text(_fmtNum(model.totalBayar), style: value),
+        Text("${model.curr} ${_fmtNum(model.totalBayar)}", style: value),
       ],
     );
   }

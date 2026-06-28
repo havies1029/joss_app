@@ -169,15 +169,6 @@ class _UserPolisPageState extends State<UserPolisPage> {
       ].join('|');
     }
 
-    debugPrint("========== BUILD SPPAPOLIS COMBO ==========");
-    debugPrint("BUILD cobKlaimId       : ${widget.cobKlaimId}");
-    debugPrint("BUILD selectedPolis    : ${widget.selectedPolis}");
-    debugPrint("BUILD selected sppaId  : ${widget.selectedPolis?.sppaId}");
-    debugPrint("BUILD selected polisNo : ${widget.selectedPolis?.polisNo}");
-    debugPrint("BUILD selected sppaRef : ${widget.selectedPolis?.sppaNoRef}");
-    debugPrint("BUILD selected object  : ${widget.selectedPolis?.objectDesc}");
-    debugPrint("BUILD keteranganCtrl   : ${fieldKeteranganController.text}");
-
     return ReusableComboBoxV2<SppapoliscariModel>(
       hintText: "No. Polis",
       searchHintText: "Cari No Polis/No Sppa/Detail",

@@ -167,24 +167,32 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                         child: AppButton.primary(
                           text: "Lanjutkan Pembayaran",
                           backgroundColor: sGrey,
-                          borderside: BorderSide(color: sGrey),
+                          borderside: const BorderSide(color: sGrey),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                          ),
                           onPressed: () {
                             Navigator.pop(context, false);
                           },
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: AppButton.primary(
                           text: "Iya, Keluar",
                           backgroundColor: primaryColor,
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                          ),
                           onPressed: () {
                             Navigator.pop(context, true);
                           },
                         ),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),

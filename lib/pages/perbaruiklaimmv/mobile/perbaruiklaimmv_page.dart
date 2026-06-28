@@ -118,11 +118,12 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
         title: widget.cobGroupNama,
         child: Container(
           color: secondaryBlackColor,
-          padding: EdgeInsets.symmetric(
-              horizontal: hPadding * 1.5),
+          padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
           child: BlocConsumer<KlaimmvaccordionBloc, KlaimmvaccordionState>(
-              builder: (context, acc) {
-                return Column(
+            builder: (context, acc) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
                   children: [
                     const SizedBox(height: hPadding * 1.5),
 
@@ -135,10 +136,11 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
                     const SizedBox(height: hPadding * 1.5),
 
-                    // progress (contoh: hitung completion dari tiap bloc)
                     BlocBuilder<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
-                      builder: (_, polis) => BlocBuilder<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
-                        builder: (_, klaim) => BlocBuilder<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
+                      builder: (_, polis) => BlocBuilder<KlaimmvklaimcrudBloc,
+                          KlaimmvklaimcrudState>(
+                        builder: (_, klaim) => BlocBuilder<
+                            KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
                           builder: (_, beng) {
                             final done = [
                               polis.isComplete,
@@ -151,14 +153,12 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                             return Row(
                               children: [
                                 Expanded(
-                                    child: CustomProgressBar(
-                                      progress: progress,
-                                      barColor: primaryColor,
-                                      borderRadius: cardBorderRadius,
-                                    )),
-                                // Expanded(child: LinearProgressIndicator(value: progress)),
-                                // const SizedBox(width: 12),
-                                // Text('${(progress * 100).round()}%'),
+                                  child: CustomProgressBar(
+                                    progress: progress,
+                                    barColor: primaryColor,
+                                    borderRadius: cardBorderRadius,
+                                  ),
+                                ),
                               ],
                             );
                           },
@@ -168,82 +168,73 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
                     const SizedBox(height: hPadding * 1.5),
 
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Klaimmvaccordioncard(
-                              title: 'Data Polis',
-                              isOpen: acc.openedIndex == 0,
-                              onTap: () {
-                                context.read<KlaimmvaccordionBloc>().add(
-                                  KlaimmvaccordionToggleEvent(index: 0),
-                                );
-                              },
-                              child: KlaimmvpoliscrudFormPage(
-                                key: polisPageKey,
-                                recordId: widget.klaim1Id,
-                                viewMode: "ubah",
-                                formKey: polisFormKey,
-                              ),
-                            ),
-                            Klaimmvaccordioncard(
-                              title: 'Data Klaim',
-                              isOpen: acc.openedIndex == 1,
-                              onTap: () {
-                                context.read<KlaimmvaccordionBloc>().add(
-                                  KlaimmvaccordionToggleEvent(index: 1),
-                                );
-                              },
-                              child: KlaimmvklaimcrudFormPage(
-                                cobGroupId: widget.cobGroupId,
-                                key: klaimPageKey,
-                                recordId: widget.klaim1Id,
-                                viewMode: "ubah",
-                                formKey: klaimFormKey,
-                              ),
-                            ),
-                            Klaimmvaccordioncard(
-                              title: 'Dokumen Klaim',
-                              isOpen: acc.openedIndex == 2,
-                              onTap: () {
-                                context.read<KlaimmvaccordionBloc>().add(
-                                  KlaimmvaccordionToggleEvent(index: 2),
-                                );
-                              },
-                              child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
-                            ),
-                            Klaimmvaccordioncard(
-                              title: 'Kesimpulan Status Klaim',
-                              isOpen: acc.openedIndex == 3,
-                              onTap: () {
-                                context.read<KlaimmvaccordionBloc>().add(
-                                  KlaimmvaccordionToggleEvent(index: 3),
-                                );
-                              },
-                              child:
-                              KlaimmvstatuscariPage(klaim1Id: widget.klaim1Id),
-                            ),
-                            Klaimmvaccordioncard(
-                              title: 'Bengkel yang dipilih',
-                              isOpen: acc.openedIndex == 4,
-                              onTap: () {
-                                context.read<KlaimmvaccordionBloc>().add(
-                                  KlaimmvaccordionToggleEvent(index: 4),
-                                );
-                              },
-                              child: KlaimmvbengkelcrudFormPage(
-                                key: bengkelPageKey,
-                                recordId: widget.klaim1Id,
-                                viewMode: "ubah",
-                                formKey: bengkelFormKey,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
+                    Klaimmvaccordioncard(
+                      title: 'Data Polis',
+                      isOpen: acc.openedIndex == 0,
+                      onTap: () {
+                        context.read<KlaimmvaccordionBloc>().add(
+                          KlaimmvaccordionToggleEvent(index: 0),
+                        );
+                      },
+                      child: KlaimmvpoliscrudFormPage(
+                        key: polisPageKey,
+                        recordId: widget.klaim1Id,
+                        viewMode: "ubah",
+                        formKey: polisFormKey,
                       ),
                     ),
+                    Klaimmvaccordioncard(
+                      title: 'Data Klaim',
+                      isOpen: acc.openedIndex == 1,
+                      onTap: () {
+                        context.read<KlaimmvaccordionBloc>().add(
+                          KlaimmvaccordionToggleEvent(index: 1),
+                        );
+                      },
+                      child: KlaimmvklaimcrudFormPage(
+                        cobGroupId: widget.cobGroupId,
+                        key: klaimPageKey,
+                        recordId: widget.klaim1Id,
+                        viewMode: "ubah",
+                        formKey: klaimFormKey,
+                      ),
+                    ),
+                    Klaimmvaccordioncard(
+                      title: 'Dokumen Klaim',
+                      isOpen: acc.openedIndex == 2,
+                      onTap: () {
+                        context.read<KlaimmvaccordionBloc>().add(
+                          KlaimmvaccordionToggleEvent(index: 2),
+                        );
+                      },
+                      child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
+                    ),
+                    Klaimmvaccordioncard(
+                      title: 'Kesimpulan Status Klaim',
+                      isOpen: acc.openedIndex == 3,
+                      onTap: () {
+                        context.read<KlaimmvaccordionBloc>().add(
+                          KlaimmvaccordionToggleEvent(index: 3),
+                        );
+                      },
+                      child: KlaimmvstatuscariPage(klaim1Id: widget.klaim1Id),
+                    ),
+                    Klaimmvaccordioncard(
+                      title: 'Bengkel yang dipilih',
+                      isOpen: acc.openedIndex == 4,
+                      onTap: () {
+                        context.read<KlaimmvaccordionBloc>().add(
+                          KlaimmvaccordionToggleEvent(index: 4),
+                        );
+                      },
+                      child: KlaimmvbengkelcrudFormPage(
+                        key: bengkelPageKey,
+                        recordId: widget.klaim1Id,
+                        viewMode: "ubah",
+                        formKey: bengkelFormKey,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
 
                     AppButton.primary(
                       onPressed: () async {
@@ -281,52 +272,56 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       text: 'Perbarui',
                       textStyle: headingStyle(context, fontSize: 18),
                     ),
+
+                    const SizedBox(height: 24),
                   ],
-                );
-              },
-              listener: (BuildContext context, KlaimmvaccordionState state) async {
-                if (state.previousIndex == null ||
-                    state.previousIndex == state.openedIndex) {
-                  return;
-                }
-
-                FocusManager.instance.primaryFocus?.unfocus();
-                await Future.delayed(const Duration(milliseconds: 50));
-
-                switch (state.previousIndex) {
-                  case 0:
-                    final polisState = klaimmvpoliscrudBloc.state;
-                    if (polisState.isDirty) {
-                      klaimmvpoliscrudBloc.add(
-                        KlaimmvPolisAutoSaveEvent(saveFrom: "accordion"),
-                      );
-                    }
-                    break;
-
-                  case 1:
-                    final klaimState = klaimmvklaimcrudBloc.state;
-                    if (klaimState.isDirty) {
-                      klaimmvklaimcrudBloc.add(
-                        KlaimmvklaimAutoSaveEvent(saveFrom: "accordion"),
-                      );
-                    }
-                    break;
-
-                  case 4:
-                    final bengkelState = klaimmvbengkelcrudBloc.state;
-                    if (bengkelState.isDirty) {
-                      klaimmvbengkelcrudBloc.add(
-                        KlaimmvbengkelAutoSaveEvent(saveFrom: "accordion"),
-                      );
-                    }
-                    break;
-                }
+                ),
+              );
+            },
+            listener: (BuildContext context, KlaimmvaccordionState state) async {
+              if (state.previousIndex == null ||
+                  state.previousIndex == state.openedIndex) {
+                return;
               }
+
+              FocusManager.instance.primaryFocus?.unfocus();
+              await Future.delayed(const Duration(milliseconds: 50));
+
+              switch (state.previousIndex) {
+                case 0:
+                  final polisState = klaimmvpoliscrudBloc.state;
+                  if (polisState.isDirty) {
+                    klaimmvpoliscrudBloc.add(
+                      KlaimmvPolisAutoSaveEvent(saveFrom: "accordion"),
+                    );
+                  }
+                  break;
+
+                case 1:
+                  final klaimState = klaimmvklaimcrudBloc.state;
+                  if (klaimState.isDirty) {
+                    klaimmvklaimcrudBloc.add(
+                      KlaimmvklaimAutoSaveEvent(saveFrom: "accordion"),
+                    );
+                  }
+                  break;
+
+                case 4:
+                  final bengkelState = klaimmvbengkelcrudBloc.state;
+                  if (bengkelState.isDirty) {
+                    klaimmvbengkelcrudBloc.add(
+                      KlaimmvbengkelAutoSaveEvent(saveFrom: "accordion"),
+                    );
+                  }
+                  break;
+              }
+            },
           ),
         ),
       ),
     );
   }
+
   void _checkSubmitCompleted(BuildContext context) {
     if (!_submitInProgress || _successShown) return;
 

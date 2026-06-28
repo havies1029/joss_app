@@ -150,12 +150,8 @@ class RingkasanPageState extends State<RingkasanPage> {
                         return const Center(child: Text("Data kosong"));
                       }
 
-                      return FractionallySizedBox(
-                        heightFactor: 0.85,
-                        alignment: Alignment.topCenter,
-                        child: RingkasanTablePage(
-                          items: state.items,
-                        ),
+                      return RingkasanTablePage(
+                        items: state.items,
                       );
                     },
                   ),
@@ -164,11 +160,12 @@ class RingkasanPageState extends State<RingkasanPage> {
                 const SizedBox(height: hPadding),
 
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: hPadding * 1.5,
+                  ),
                   child: buildInfoNote(context),
                 ),
 
-                const SizedBox(height: 10),
               ],
             ),
 
