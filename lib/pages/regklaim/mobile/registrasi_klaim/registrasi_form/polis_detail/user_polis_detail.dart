@@ -410,7 +410,7 @@ class _UserPolisDetailState extends State<UserPolisDetail> {
 
         _buildDetailRow(
           label: widget.cobKlaimId == "10002"
-              ? "Nomor Polisi:"
+              ? "No Plat:"
               : "Alamat Risiko:",
             value: widget.cobKlaimId == "10002"
                 ? fieldObjectAlamat1Controller.text

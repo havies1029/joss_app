@@ -1243,7 +1243,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
                   if (canShowLanjutkan) ...[
                     AppButton.iconRight(
-                      text: "Lanjutkan",
+                      text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
                       icon: Icon(Icons.arrow_forward),
                       isLoading: _isLanjutkanLoading,
                       onPressed: _isLanjutkanLoading
@@ -2416,7 +2416,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   );
 
   Widget _buildFieldPlatNo() => appTextField(
-    label: "No Polisi",
+    label: "No Plat",
     controller: fieldPlatNoController,
     keyboardType: TextInputType.text,
     inputFormatters: [

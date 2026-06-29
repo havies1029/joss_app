@@ -56,34 +56,39 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
             });
           }
 
-          return Wrap(
-            spacing: hPadding,
-            runSpacing: hPadding,
-            children: items.map((item) {
-              final isSelected = state.selectedPolissourceId == item.polissourceId;
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: items.map((item) {
+                final isSelected = state.selectedPolissourceId == item.polissourceId;
 
-              return SizedBox(
-                width: (MediaQuery.of(context).size.width -
-                    (hPadding * 1.5 * 2) -
-                    hPadding) /
-                    2,
-                child: AppButton.primary(
-                  text: item.sourceNama,
-                  backgroundColor: isSelected ? primaryColor : formGrey,
-                  textColor: primaryLightColor,
-                  borderRadius: cardBorderRadius,
-                  elevation: 0,
-                  isOutlined: false,
-                  onPressed: () {
-                    context.read<PolissourcecariBloc>().add(
-                      SelectPolissourcecariEvent(
-                        polissourceId: item.polissourceId,
-                      ),
-                    );
-                  },
-                ),
-              );
-            }).toList(),
+                return Padding(
+                  padding: const EdgeInsets.only(right: hPadding),
+                  child: SizedBox(
+                    width: (MediaQuery.of(context).size.width -
+                        (hPadding * 1.5 * 2) -
+                        hPadding) /
+                        2,
+                    child: AppButton.primary(
+                      text: item.sourceNama,
+                      backgroundColor: isSelected ? primaryColor : formGrey,
+                      textColor: primaryLightColor,
+                      borderRadius: cardBorderRadius,
+                      elevation: 0,
+                      isOutlined: false,
+                      onPressed: () {
+                        context.read<PolissourcecariBloc>().add(
+                          SelectPolissourcecariEvent(
+                            polissourceId: item.polissourceId,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           );
         }
 

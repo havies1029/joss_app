@@ -291,7 +291,7 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
           pageBuilder: (context, animation, secondaryAnimation) {
             return _ValidationDialog(
               title: "Data Belum Lengkap",
-              message: "Silakan isi nomor polisi terlebih dahulu.",
+              message: "Silakan isi no plat terlebih dahulu.",
             );
           },
         );

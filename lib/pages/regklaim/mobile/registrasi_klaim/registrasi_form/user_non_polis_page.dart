@@ -314,6 +314,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
           ? fieldComboMJenisrugimv?.mjenisrugimvId ?? ''
           : '',
       regklaim1Id: regklaim1Id,
+      keterangan: fieldLokasiObjectController.text.trim(),
     );
 
     final mjenisClient =
@@ -434,7 +435,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       setErr(
         'form1.alamatTertanggung',
         widget.cobKlaimId == '10002'
-            ? 'Nomor Polisi wajib diisi'
+            ? 'No Plat wajib diisi'
             : kAddressNullError,
       );
       ok = false;
@@ -701,7 +702,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
   Widget buildFieldLokasiResiko() => appTextField(
     label: widget.cobKlaimId == '10002'
-        ? "Nomor Polisi"
+        ? "No Plat"
         : "Lokasi Risiko",
     controller: fieldLokasiObjectController,
     maxLines: widget.cobKlaimId == '10002' ? 1 : 4,

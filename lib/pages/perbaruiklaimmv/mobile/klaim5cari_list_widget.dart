@@ -11,6 +11,7 @@ import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pdfx/pdfx.dart';
 
+import '../../../common/app_data.dart';
 import '../../../common/loading_indicator.dart';
 import 'klaim5cari_tile_widget.dart';
 import 'klaim5tambahfile_widget.dart';
@@ -558,42 +559,144 @@ Future<void> showPreviewDialog({
   }
 
 
+  bool _isRemoteUrl(String value) {
+    final uri = Uri.tryParse(value);
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  String? _detectMime(Klaim5cariModel it, String path) {
+    final fromModel = it.mimeType?.trim();
+    if (fromModel != null && fromModel.isNotEmpty) return fromModel;
+
+    return lookupMimeType(path);
+  }
+
+  Map<String, String> get _authHeaders => {
+    'Authorization': 'Bearer ${AppData.userToken}',
+  };
+
   Future<void> _preview(Klaim5cariModel it) async {
-    if (it.fileUrl == null && it.localPath == null) return;
+    final localPath = it.localPath?.trim();
+    final fileUrl = it.fileUrl?.trim();
 
-    final path = it.localPath ?? it.fileUrl ?? '';
+    if ((localPath == null || localPath.isEmpty) &&
+        (fileUrl == null || fileUrl.isEmpty)) {
+      return;
+    }
 
-    final mime = lookupMimeType(path);
+    final bool isLocal = localPath != null && localPath.isNotEmpty;
+    final String source = isLocal ? localPath! : fileUrl!;
 
-    if (mime != null && mime.startsWith('image/')) {
-      showDialog(
+    final mime = _detectMime(it, source)?.toLowerCase() ?? '';
+    final lowerSource = source.toLowerCase();
+
+    final isImage = mime.startsWith('image/') ||
+        lowerSource.endsWith('.jpg') ||
+        lowerSource.endsWith('.jpeg') ||
+        lowerSource.endsWith('.png') ||
+        lowerSource.endsWith('.webp');
+
+    final isPdf = mime.contains('pdf') || lowerSource.endsWith('.pdf');
+
+    if (isImage) {
+      await showDialog(
         context: context,
         builder: (_) => Dialog(
           backgroundColor: Colors.black,
-          child: InteractiveViewer(
-            child: Image.file(File(path)),
+          insetPadding: const EdgeInsets.all(16),
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  child: isLocal
+                      ? Image.file(
+                    File(source),
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Gambar lokal tidak bisa dibuka',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                      : Image.network(
+                    source,
+                    headers: _authHeaders,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, error, ___) => Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        'Gambar dari server tidak bisa dibuka\n$error',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+
+                      return const SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close, color: Colors.white),
+                ),
+              ),
+            ],
           ),
         ),
       );
       return;
     }
 
-    if (mime != null && mime.contains('pdf')) {
-      Navigator.push(
+    if (isPdf) {
+      if (!isLocal) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Preview PDF dari URL belum didukung.'),
+          ),
+        );
+        return;
+      }
+
+      final controller = PdfController(
+        document: PdfDocument.openFile(source),
+      );
+
+      await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => Scaffold(
-            appBar: AppBar(title: const Text("Preview PDF")),
-            body: PdfView(
-              controller: PdfController(
-                document: PdfDocument.openFile(path),
-              ),
-            ),
+            appBar: AppBar(title: const Text('Preview PDF')),
+            body: PdfView(controller: controller),
           ),
         ),
       );
       return;
     }
-    await OpenFilex.open(path);
+
+    if (isLocal) {
+      await OpenFilex.open(source);
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Preview file dari URL belum didukung.'),
+      ),
+    );
   }
 }

@@ -968,7 +968,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             data.comboMWilayah?.wilayahNama ?? "-",
           ),
 
-          _buildDetailRow("No Polisi:", data.platNo),
+          _buildDetailRow("No Plat:", data.platNo),
 
           _buildDetailRow("No Mesin:", data.mesinNo),
 

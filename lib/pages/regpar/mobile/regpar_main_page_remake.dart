@@ -1165,7 +1165,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
                   if (canShowLanjutkan) ...[
                     AppButton.iconRight(
-                      text: "Lanjutkan",
+                      text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
                       icon: Icon(Icons.arrow_forward),
                       isLoading: _isLanjutkanLoading,
                       onPressed: _isLanjutkanLoading

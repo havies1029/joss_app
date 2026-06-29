@@ -59,7 +59,7 @@ class _DetailPolisMvTableWidgetState extends State<DetailPolisMvTableWidget> {
       emptyText: "Data polis tidak ditemukan.",
       columns: [
         DetailPolisColumn<Sppa2mvCariModel>(
-          title: "NO POLISI",
+          title: "NO PLAT",
           valueGetter: (d) => d.polisiNo.isNotEmpty ? d.polisiNo : "-",
           normalFlex: 1.1,
           compactMinWidth: 110,

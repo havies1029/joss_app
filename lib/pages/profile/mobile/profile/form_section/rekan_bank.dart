@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_profile/mrekanbankcrud_bloc.dart';
 import 'package:joss_app/models/gen_profile/mrekanbankcrud_model.dart';
@@ -252,7 +253,10 @@ class MRekanBankCrudFormPageFormState extends State<MRekanBankCrudFormPage> {
     return appTextField(
       label: "Nomor Rekening",
       controller: fieldRekNoController,
-      keyboardType: TextInputType.phone,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+      ],
       validator: (value) {
         if (value == null || value.isEmpty) {
           return kStringNullError;

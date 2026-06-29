@@ -75,7 +75,7 @@ class PolisDetailCard extends StatelessWidget {
           MapEntry("Tertanggung", s("tertanggung")),
           MapEntry("Periode", periode()),
           MapEntry("Merk", s("merk")),
-          MapEntry("Nomor Polisi", s("noPolisi")),
+          MapEntry("No Plat", s("noPolisi")),
           MapEntry("Nilai Pertanggungan", money("sumInsured")),
           MapEntry("Premi", money("premi")),
         ];

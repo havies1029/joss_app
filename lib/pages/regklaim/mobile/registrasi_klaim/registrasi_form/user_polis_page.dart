@@ -395,7 +395,7 @@ class _UserPolisPageState extends State<UserPolisPage> {
   }
 
   Widget buildFieldLokasiResiko() => appTextField(
-    label: widget.cobKlaimId == '10002' ? "Nomor Polisi" : "Lokasi Risiko",
+    label: widget.cobKlaimId == '10002' ? "No Plat" : "Lokasi Risiko",
     enabled: false,
     // enabled: widget.cobKlaimId != '10002',
     controller: fieldKeteranganController,

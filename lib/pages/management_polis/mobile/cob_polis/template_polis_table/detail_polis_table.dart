@@ -135,8 +135,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
                         ),
                         SizedBox(
                           height: bodyHeight,
-                          child: useVerticalScroll
-                              ? ScrollbarTheme(
+                          child: ScrollbarTheme(
                             data: _scrollbarTheme(),
                             child: Scrollbar(
                               controller: _verticalController,
@@ -150,10 +149,6 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
                                 ),
                               ),
                             ),
-                          )
-                              : _bodyTable(
-                            widths,
-                            compact: true,
                           ),
                         ),
                       ],
@@ -173,22 +168,30 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         decoration: _boxDecoration(),
-        child: SingleChildScrollView(
-          controller: _verticalController,
-          child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            border: _tableBorder(),
-            columnWidths: _normalColumnWidths(),
-            children: [
-              _headerRow(),
-              ...widget.items.asMap().entries.map(
-                    (e) => _row(
-                  e.value,
-                  e.key,
-                  compact: false,
-                ),
+        child: ScrollbarTheme(
+          data: _scrollbarTheme(),
+          child: Scrollbar(
+            controller: _verticalController,
+            thumbVisibility: true,
+            trackVisibility: true,
+            child: SingleChildScrollView(
+              controller: _verticalController,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: _tableBorder(),
+                columnWidths: _normalColumnWidths(),
+                children: [
+                  _headerRow(),
+                  ...widget.items.asMap().entries.map(
+                        (e) => _row(
+                      e.value,
+                      e.key,
+                      compact: false,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

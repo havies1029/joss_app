@@ -342,6 +342,7 @@ class _CobCariPageState extends State<CobCariPage> {
                   : "Lihat $hiddenCount Kategori Lainnya",
               style: bodyTextStyle(context).copyWith(
                 color: primaryColor,
+                fontSize: getResponsiveFont(context, 16),
                 fontWeight: FontWeight.w600,
               ),
             ),
