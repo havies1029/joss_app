@@ -112,8 +112,8 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 context,
                 MaterialPageRoute(
                   builder: (_) => PaymentSuccess(
-                    display: "Pembayaran Berhasil Dibatalkan",
-                    description: "Tagihan pembayaran Anda telah dibatalkan.",
+                    display: "Pengajuan Tidak Dilanjutkan",
+                    description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
                     displayButton: "Kembali",
                   ),
                 ),

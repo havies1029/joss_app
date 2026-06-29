@@ -364,8 +364,8 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => PaymentSuccess(
-                      display: "Pembayaran Berhasil Dibatalkan",
-                      description: "Tagihan pembayaran telah dibatalkan.",
+                      display: "Pengajuan Tidak Dilanjutkan",
+                      description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
                       displayButton: "Kembali",
                     ),
                   ),
