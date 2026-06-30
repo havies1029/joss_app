@@ -1,7 +1,7 @@
 name: joss_app
 description: "Proteksi Plus mobile application."
 publish_to: 'none'
-version: 1.0.0+8
+version: 1.0.0+12
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -24,7 +24,7 @@ dependencies:
   docx_template: ^0.4.0
   dropdown_search: ^6.0.1  
   equatable: ^2.0.3
-  flex_color_scheme: ^8.0.2
+  flex_color_scheme: ^8.4.0
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4  
   file_picker: ^8.0.0+1
