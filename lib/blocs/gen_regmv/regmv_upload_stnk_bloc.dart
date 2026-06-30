@@ -52,8 +52,7 @@ class RegmvUploadStnkBloc
   static const String _lockedMsg =
       "Sedang menghitung premi, foto tidak bisa diubah dulu.";
 
-  bool get _isActionLocked =>
-      state.isUploadingAll || state.isClearing;
+  bool get _isActionLocked => state.isUploadingAll || state.isClearing;
 
   void _emitLockedToast(Emitter<Regmv4UploadFotoObjectState> emit) {
     _emitToast(emit, _lockedMsg);
@@ -65,18 +64,17 @@ class RegmvUploadStnkBloc
   }
 
   void _emitMaxToast(Emitter<Regmv4UploadFotoObjectState> emit) {
-    _emitToast(emit, "Maksimal $_maxItems file.");
+    _emitToast(emit, "Anda hanya dapat mengunggah maksimal $_maxItems foto.");
   }
 
   void _emitOverPickedToast(Emitter<Regmv4UploadFotoObjectState> emit) {
-    _emitToast(emit, "Maksimal foto $_maxItems. Sisanya tidak ditambahkan.");
+    _emitToast(emit, "Anda hanya dapat mengunggah maksimal $_maxItems foto.");
   }
 
-
   Future<void> _onPickCamera(
-      Regmv4StoragePickImageFromCamera event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4StoragePickImageFromCamera event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -94,9 +92,9 @@ class RegmvUploadStnkBloc
   }
 
   Future<void> _onPickFiles(
-      Regmv4StoragePickFilesFromStorage event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4StoragePickFilesFromStorage event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -123,9 +121,9 @@ class RegmvUploadStnkBloc
   // ============== MANUAL SELECT (PATH/NAME) ==============
 
   Future<void> _onSelectedOne(
-      Regmv4UploadFotoObjectSelected event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4UploadFotoObjectSelected event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -138,9 +136,9 @@ class RegmvUploadStnkBloc
   }
 
   Future<void> _onSelectedList(
-      Regmv4UploadFotoObjectSelectedList event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4UploadFotoObjectSelectedList event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -170,9 +168,9 @@ class RegmvUploadStnkBloc
   // ============== RESET ==============
 
   Future<void> _onResetPreview(
-      Regmv4UploadFotoObjectResetPreview event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4UploadFotoObjectResetPreview event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     emit(state.copyWith(isClearing: true, items: const []));
     emit(state.copyWith(isClearing: false));
   }
@@ -180,9 +178,9 @@ class RegmvUploadStnkBloc
   // ============== REMOVE ==============
 
   Future<void> _onRemove(
-      Regmv4StorageRemoveAttachment event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4StorageRemoveAttachment event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -209,9 +207,9 @@ class RegmvUploadStnkBloc
   // ============== SUBMIT HELPERS ==============
 
   Future<void> _onBatchSubmit(
-      Regmv4UploadFotoObjectBatchSubmit event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4UploadFotoObjectBatchSubmit event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (event.filePaths.isEmpty || event.names.isEmpty) {
       _emitToast(emit, "Minimal pilih 1 file atau foto");
       return;
@@ -254,9 +252,9 @@ class RegmvUploadStnkBloc
   }
 
   Future<void> _onSubmittedUploadAll(
-      Regmv4UploadFotoObjectSubmitted event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4UploadFotoObjectSubmitted event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (state.items.isEmpty) {
       _emitToast(emit, "Minimal pilih 1 file atau foto");
       return;
@@ -291,9 +289,9 @@ class RegmvUploadStnkBloc
   // ============== UPLOAD MANY (from localIds) ==============
 
   Future<void> _onUploadMany(
-      Regmv4StorageUploadMany event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4StorageUploadMany event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     if (event.localIds.isEmpty) {
       _emitToast(emit, "Minimal pilih 1 file atau foto");
       return;
@@ -317,14 +315,15 @@ class RegmvUploadStnkBloc
   // ============== UPLOAD ONE (event-driven) ==============
 
   Future<void> _onUploadOne(
-      Regmv4UploadFotoObjectUploadOne event,
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      ) async {
+    Regmv4UploadFotoObjectUploadOne event,
+    Emitter<Regmv4UploadFotoObjectState> emit,
+  ) async {
     // kalau item gak ada, kita tetap bisa upload (tapi biasanya UI butuh item untuk progress)
     // jadi kita pastikan ada itemnya dulu.
     final idx = state.items.indexWhere((e) => e.localId == event.localId);
     if (idx < 0) {
-      final m = await _modelFromPath(event.filePath, event.fileName, localId: event.localId);
+      final m = await _modelFromPath(event.filePath, event.fileName,
+          localId: event.localId);
       if (m != null) {
         emit(state.copyWith(items: [...state.items, m]));
       }
@@ -363,20 +362,26 @@ class RegmvUploadStnkBloc
     final name = (overrideName ?? current.name);
 
     if (path.isEmpty || name.isEmpty) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: "File path / fileName kosong",
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: "File path / fileName kosong",
+              ));
       return;
     }
 
-    _updateItem(emit, localId, (x) => x.copyWith(
-      status: UploadStatus.uploading,
-      progress: 0.0,
-      errorMessage: null,
-      // kalau butuh reset saat retry:
-      // clearServerId: true,
-    ));
+    _updateItem(
+        emit,
+        localId,
+        (x) => x.copyWith(
+              status: UploadStatus.uploading,
+              progress: 0.0,
+              errorMessage: null,
+              // kalau butuh reset saat retry:
+              // clearServerId: true,
+            ));
 
     // siapkan cancel token (kalau nanti repository api pakai Dio cancelToken)
     final token = CancelToken();
@@ -395,22 +400,31 @@ class RegmvUploadStnkBloc
 
       if (returnData.success == true) {
         final serverId = returnData.data.toString();
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.success,
-          progress: 1.0,
-          serverId: serverId,
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.success,
+                  progress: 1.0,
+                  serverId: serverId,
+                ));
       } else {
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.failed,
-          errorMessage: "Upload gagal",
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.failed,
+                  errorMessage: "Upload gagal",
+                ));
       }
     } catch (e) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: e.toString(),
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: e.toString(),
+              ));
     } finally {
       _cancelTokens.remove(localId);
     }
@@ -419,26 +433,27 @@ class RegmvUploadStnkBloc
   // ============== STATE HELPERS ==============
 
   void _updateItem(
-      Emitter<Regmv4UploadFotoObjectState> emit,
-      String localId,
-      Regmv4UploadModel Function(Regmv4UploadModel) map,
-      ) {
+    Emitter<Regmv4UploadFotoObjectState> emit,
+    String localId,
+    Regmv4UploadModel Function(Regmv4UploadModel) map,
+  ) {
     final updated =
-    state.items.map((e) => e.localId == localId ? map(e) : e).toList();
+        state.items.map((e) => e.localId == localId ? map(e) : e).toList();
     emit(state.copyWith(items: updated));
   }
 
-  List<(String, String)> _zipPathsNames(List<String> paths, List<String> names) {
+  List<(String, String)> _zipPathsNames(
+      List<String> paths, List<String> names) {
     final n = paths.length < names.length ? paths.length : names.length;
     if (n <= 0) return [];
     return List.generate(n, (i) => (paths[i], names[i]));
   }
 
   Future<Regmv4UploadModel?> _modelFromPath(
-      String filePath,
-      String fileName, {
-        String? localId,
-      }) async {
+    String filePath,
+    String fileName, {
+    String? localId,
+  }) async {
     if (filePath.isEmpty) return null;
 
     try {

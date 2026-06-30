@@ -118,7 +118,7 @@ class _PropertyCobTableState extends State<PropertyCobTable> {
 
         CobPolicyColumn<AsetParCariModel>(
           title: "NO POLIS",
-          valueGetter: (d) => d.polisNo,
+          valueGetter: (d) => cobPolicyTextOrDash(d.polisNo),
           normalFlex: showColumn ? 1.2 : 1.6,
           compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,

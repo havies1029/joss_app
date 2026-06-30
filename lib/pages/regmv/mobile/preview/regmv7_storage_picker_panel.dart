@@ -41,12 +41,12 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 160,
+            height: 168,
             child: isLoading
                 ? const Center(
               child: SizedBox(
@@ -64,18 +64,19 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(width: 6),
               itemBuilder: (context, i) {
                 final item = items[i];
-                return _ThumbCard(
-                  item: item,
-                  locked: locked,
-                  onLockedTap: onLockedTap,
-                  onRemove: () => onRemove(item.localId),
-                  onTap: () => onTapItem(item),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 22),
+                  child: _ThumbCard(
+                    item: item,
+                    locked: locked,
+                    onLockedTap: onLockedTap,
+                    onRemove: () => onRemove(item.localId),
+                    onTap: () => onTapItem(item),
+                  ),
                 );
               },
             ),
           ),
-          const SizedBox(height: 8),
-
           if (showRequiredError) ...[
             Align(
               alignment: Alignment.centerLeft,
@@ -100,7 +101,10 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
                     "assets/icons/gallery_img.svg",
                     width: 18,
                     height: 18,
-                    color: Colors.white,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   backgroundColor: const Color(0xFF4A4A4A),
                   onPressed: locked ? onLockedTap : onPickFile,
@@ -114,7 +118,10 @@ class Regmv7StoragePickerPanel extends StatelessWidget {
                     "assets/icons/photo_img.svg",
                     width: 18,
                     height: 18,
-                    color: Colors.white,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   backgroundColor: const Color(0xFFF28C28),
                   onPressed: locked ? onLockedTap : onPickPhoto,

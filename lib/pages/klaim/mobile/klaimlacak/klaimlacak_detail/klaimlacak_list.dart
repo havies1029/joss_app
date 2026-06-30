@@ -115,7 +115,7 @@ class _KlaimLacakListState
             : item.progressNama.trim();
 
         final dateText = item.progressTgl != null
-            ? DateFormat('dd MMM yyyy, HH:mm:ss').format(item.progressTgl!)
+            ? DateFormat('dd MMM yyyy').format(item.progressTgl!)
             : '';
 
         final trimmedUrl = item.fileUrl?.trim();

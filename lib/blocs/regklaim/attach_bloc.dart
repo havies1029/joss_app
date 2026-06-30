@@ -33,7 +33,7 @@ class AttachBloc extends Bloc<AttachEvent, AttachState> {
 
   void _emitMaxToast(Emitter<AttachState> emit) {
     emit(state.copyWith(
-      toast: "Maksimal $_maxItems file.",
+      toast: "Anda hanya dapat mengunggah maksimal $_maxItems foto.",
     ));
     emit(state.copyWith(clearToast: true));
   }
@@ -72,7 +72,7 @@ class AttachBloc extends Bloc<AttachEvent, AttachState> {
     emit(state.copyWith(items: [...state.items, ...accepted]));
 
     if (picked.length > accepted.length) {
-      emit(state.copyWith(toast: "Maksimal $_maxItems file. Sisanya tidak ditambahkan."));
+      emit(state.copyWith(toast: "Anda hanya dapat mengunggah maksimal $_maxItems foto."));
       emit(state.copyWith(clearToast: true));
     }
   }

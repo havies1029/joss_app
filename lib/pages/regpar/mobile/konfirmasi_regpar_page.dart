@@ -27,6 +27,7 @@ import '../../../models/regpar/regpar3form_model.dart';
 import '../../../models/regpar/regpar4form_model.dart';
 import '../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../base/base_background_sidepage.dart';
+import '../../heropage/mobile/widget/transaksi_page.dart';
 import '../../tagihan_pembayaran/mobile/riwayat/riwayat_page_remake.dart';
 
 //micky 2026-02-27
@@ -367,6 +368,14 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                       display: "Pengajuan Tidak Dilanjutkan",
                       description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
                       displayButton: "Kembali",
+                      onButtonPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => const TransaksiPage(),
+                          ),
+                              (route) => route.isFirst,
+                        );
+                      },
                     ),
                   ),
                 );
@@ -458,6 +467,14 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     display: "Pembayaran Berhasil Dibatalkan",
                     description: "Tagihan pembayaran telah dibatalkan.",
                     displayButton: "Kembali",
+                    onButtonPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const TransaksiPage(),
+                        ),
+                            (route) => route.isFirst,
+                      );
+                    },
                   ),
                 ),
               );

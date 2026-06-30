@@ -60,12 +60,14 @@ class FloatingActionMenuWidget extends StatefulWidget {
   final List<ActionMenuItem> availableActions;
   final Function(ActionType type, List<dynamic> selectedItems) onActionTap;
   final List<dynamic> selectedItems;
+  final Object? autoCollapseKey;
 
   const FloatingActionMenuWidget({
     super.key,
     required this.availableActions,
     required this.onActionTap,
     required this.selectedItems,
+    this.autoCollapseKey,
   });
 
   @override
@@ -76,13 +78,9 @@ class FloatingActionMenuWidget extends StatefulWidget {
 class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _rotateAnimation;
   late Animation<double> _scaleAnimation;
 
   bool _isExpanded = false;
-
-  bool get _hasEnabledAction =>
-      widget.availableActions.any((action) => action.isEnabled);
 
   @override
   void initState() {
@@ -91,10 +89,6 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
-    );
-
-    _rotateAnimation = Tween<double>(begin: 0, end: 0.125).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
     _scaleAnimation = CurvedAnimation(
@@ -107,38 +101,9 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
   void didUpdateWidget(covariant FloatingActionMenuWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final actionsChanged =
-        oldWidget.availableActions.length != widget.availableActions.length ||
-            !_sameActionStates(oldWidget.availableActions, widget.availableActions);
-
-    final selectionChanged =
-        oldWidget.selectedItems.length != widget.selectedItems.length;
-
-    if (actionsChanged || selectionChanged) {
-      if (_isExpanded) {
-        _toggleMenu();
-      }
+    if (oldWidget.autoCollapseKey != widget.autoCollapseKey) {
+      _collapseMenu();
     }
-  }
-
-  bool _sameActionStates(
-      List<ActionMenuItem> oldActions,
-      List<ActionMenuItem> newActions,
-      ) {
-    if (oldActions.length != newActions.length) return false;
-
-    for (var i = 0; i < oldActions.length; i++) {
-      final oldAction = oldActions[i];
-      final newAction = newActions[i];
-
-      if (oldAction.type != newAction.type ||
-          oldAction.isEnabled != newAction.isEnabled ||
-          oldAction.label != newAction.label) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   @override
@@ -157,6 +122,15 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
       } else {
         _animationController.reverse();
       }
+    });
+  }
+
+  void _collapseMenu() {
+    if (!_isExpanded) return;
+
+    setState(() {
+      _isExpanded = false;
+      _animationController.reverse();
     });
   }
 
@@ -192,40 +166,35 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 : const SizedBox.shrink(),
           ),
         ),
-
         if (_isExpanded) const SizedBox(height: 7),
-
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: RotationTransition(
-            turns: _rotateAnimation,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  width: 0.8,
-                  color: mainFabBorderColor,
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                width: 0.8,
+                color: mainFabBorderColor,
               ),
-              child: FloatingActionButton(
-                elevation: 0,
-                highlightElevation: 0,
-                backgroundColor: mainFabColor,
-                onPressed: _toggleMenu,
-                shape: const CircleBorder(),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
-                  transitionBuilder: (child, animation) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    );
-                  },
-                  child: Icon(
-                    _isExpanded ? Icons.close : Icons.add,
-                    key: ValueKey<bool>(_isExpanded),
-                    color: primaryLightColor,
-                  ),
+            ),
+            child: FloatingActionButton(
+              elevation: 0,
+              highlightElevation: 0,
+              backgroundColor: mainFabColor,
+              onPressed: _toggleMenu,
+              shape: const CircleBorder(),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                transitionBuilder: (child, animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  );
+                },
+                child: Icon(
+                  _isExpanded ? Icons.close : Icons.add,
+                  key: ValueKey<bool>(_isExpanded),
+                  color: primaryLightColor,
                 ),
               ),
             ),
@@ -235,14 +204,11 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
     );
   }
 
-
-
   Widget _buildActionButton(ActionMenuItem action) {
     final isDisabled = !action.isEnabled;
-    final canTriggerGuardWhenDisabled =
-        isDisabled &&
-            (action.type == ActionType.perpanjangan ||
-                action.type == ActionType.aktifkanKembali);
+    final canTriggerGuardWhenDisabled = isDisabled &&
+        (action.type == ActionType.perpanjangan ||
+            action.type == ActionType.aktifkanKembali);
     return Opacity(
       opacity: isDisabled ? 0.55 : 1,
       child: Row(
@@ -281,7 +247,8 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                     ),
               border: Border.all(
                 width: 0.8,
-                color: isDisabled ? const Color(0xFF5D5D5D) : action.borderColor,
+                color:
+                    isDisabled ? const Color(0xFF5D5D5D) : action.borderColor,
               ),
             ),
             child: Material(
@@ -308,18 +275,18 @@ class _FloatingActionMenuWidgetState extends State<FloatingActionMenuWidget>
                 onTap: (isDisabled && !canTriggerGuardWhenDisabled)
                     ? null
                     : () {
-                  debugPrint(
-                    'FAB ITEM CLICK => type=${action.type}, '
-                        'label=${action.label}, '
-                        'enabled=${action.isEnabled}, '
-                        'selectedItems=${widget.selectedItems.length}',
-                  );
+                        debugPrint(
+                          'FAB ITEM CLICK => type=${action.type}, '
+                          'label=${action.label}, '
+                          'enabled=${action.isEnabled}, '
+                          'selectedItems=${widget.selectedItems.length}',
+                        );
 
-                  _toggleMenu();
-                  widget.onActionTap(action.type, widget.selectedItems);
+                        _toggleMenu();
+                        widget.onActionTap(action.type, widget.selectedItems);
 
-                  debugPrint('FAB ITEM CLICK => callback sent to parent');
-                },
+                        debugPrint('FAB ITEM CLICK => callback sent to parent');
+                      },
                 customBorder: const CircleBorder(),
                 child: Container(
                   width: 45,

@@ -304,7 +304,7 @@ class _CobPolicyTableState<T> extends State<CobPolicyTable<T>> {
       decoration: const BoxDecoration(color: formGrey),
       children: [
         const SizedBox(),
-        ...['No', ...widget.columns.map((e) => e.title)].map((title) {
+        ...['NO', ...widget.columns.map((e) => e.title)].map((title) {
           final center = title.toUpperCase() == 'NO';
           final child = Text(
             title,
@@ -506,4 +506,9 @@ String cobPolicyFormatDate(DateTime? date) {
 
 String cobPolicyFormatNum(num? value) {
   return NumberFormat('#,##0.00', 'id_ID').format(value ?? 0);
+}
+
+String cobPolicyTextOrDash(String? value) {
+  final text = value?.trim() ?? '';
+  return text.isEmpty ? '-' : text;
 }

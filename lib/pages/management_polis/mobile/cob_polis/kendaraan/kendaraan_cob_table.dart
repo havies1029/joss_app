@@ -111,7 +111,7 @@ class _KendaraanCobTableState extends State<KendaraanCobTable> {
 
         CobPolicyColumn<AsetMvCariModel>(
           title: "NO POLIS",
-          valueGetter: (d) => d.polisNo,
+          valueGetter: (d) => cobPolicyTextOrDash(d.polisNo),
           normalFlex: showColumn ? 1.2 : 2.0,
           compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,

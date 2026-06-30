@@ -18,9 +18,14 @@ class RingkasanDetailTableList extends StatelessWidget {
     return NumberFormat.decimalPattern().format(value);
   }
 
+  String textOrDash(String? value) {
+    final text = value?.trim() ?? "";
+    return text.isEmpty ? "-" : text;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return  ClipRRect(
+    return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
         decoration: BoxDecoration(
@@ -37,17 +42,17 @@ class RingkasanDetailTableList extends StatelessWidget {
               verticalInside: BorderSide(color: sGrey),
             ),
             columnWidths: const {
-              0: FixedColumnWidth(50),   // NO
-              1: FixedColumnWidth(150),  // NO POLIS (klik)
-              2: FixedColumnWidth(180),  // PERIODE
-              3: FixedColumnWidth(60),   // CURR
-              4: FixedColumnWidth(120),  // PREMI
+              0: FixedColumnWidth(50), // NO
+              1: FixedColumnWidth(150), // NO POLIS (klik)
+              2: FixedColumnWidth(180), // PERIODE
+              3: FixedColumnWidth(60), // CURR
+              4: FixedColumnWidth(120), // PREMI
             },
             children: [
               _tableHeader(context),
               ...items.asMap().entries.map(
                     (e) => _detailRow(context, e.key, e.value),
-              ),
+                  ),
             ],
           ),
         ),
@@ -73,7 +78,7 @@ class RingkasanDetailTableList extends StatelessWidget {
 
   Widget _headerCell(BuildContext context, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical:15),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
       child: Text(
         text,
         style: bodyTextStyle(context, fontSize: 15),
@@ -85,10 +90,10 @@ class RingkasanDetailTableList extends StatelessWidget {
   // ROW
   // =========================
   TableRow _detailRow(
-      BuildContext context,
-      int index,
-      DnsppaCariModel row,
-      ) {
+    BuildContext context,
+    int index,
+    DnsppaCariModel row,
+  ) {
     final DateFormat dateFmt = DateFormat("dd/MM/yyyy");
 
     return TableRow(
@@ -116,6 +121,7 @@ class RingkasanDetailTableList extends StatelessWidget {
 
   Widget _polisCell(BuildContext context, DnsppaCariModel row) {
     final dateFmt = DateFormat("dd/MM/yyyy");
+    final noPolis = textOrDash(row.noPolis);
 
     return Padding(
       padding: const EdgeInsets.all(6),
@@ -125,10 +131,11 @@ class RingkasanDetailTableList extends StatelessWidget {
             context,
             title: "Detail Polis",
             items: [
-              DetailItem(label: "NO POLIS", value: row.noPolis),
+              DetailItem(label: "NO POLIS", value: noPolis),
               DetailItem(
                 label: "PERIODE",
-                value: "${dateFmt.format(row.polisMulai)} - ${dateFmt.format(row.polisAkhir)}",
+                value:
+                    "${dateFmt.format(row.polisMulai)} - ${dateFmt.format(row.polisAkhir)}",
               ),
               DetailItem(label: "CURR", value: row.currSimbol),
               DetailItem(label: "PREMI", value: formatNum(row.dnOs)),
@@ -139,7 +146,7 @@ class RingkasanDetailTableList extends StatelessWidget {
           );
         },
         child: Text(
-          row.noPolis,
+          noPolis,
           style: bodyTextStyle(context, fontSize: 15).copyWith(
             color: Colors.blue,
             fontWeight: FontWeight.w600,
@@ -151,7 +158,6 @@ class RingkasanDetailTableList extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _cell(BuildContext context, String text) {
     return Padding(

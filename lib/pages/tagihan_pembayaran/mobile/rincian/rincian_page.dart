@@ -17,6 +17,7 @@ import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../../../../widgets/apptheme/register_client_pop_up.dart';
 import '../../../../widgets/listpage_filter_bar_ui.dart';
+import '../../../heropage/mobile/widget/transaksi_page.dart';
 import '../../fab_pembayaran.dart';
 import '../bayar_button.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
@@ -39,8 +40,7 @@ class _RincianPageState extends State<RincianPage> {
   late DnRekap2invBloc dn2invBloc;
   late DnrekapcobCariBloc dnrekapcobCariBloc;
 
-  final TextEditingController _searchController =
-  TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   Mlayanan1CariBloc? mlayanan1cariBloc;
 
@@ -92,7 +92,8 @@ class _RincianPageState extends State<RincianPage> {
         mlayanan1Id: "03",
       ),
     );
-    dn2invBloc.add(GetRincianSOACustomerEvent(searchText: _searchController.text));
+    dn2invBloc
+        .add(GetRincianSOACustomerEvent(searchText: _searchController.text));
   }
 
   IconButton buildSearchButton() {
@@ -180,8 +181,17 @@ class _RincianPageState extends State<RincianPage> {
                 MaterialPageRoute(
                   builder: (context) => PaymentSuccess(
                     display: "Pengajuan Tidak Dilanjutkan",
-                    description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kemba",
+                    description:
+                        "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kemba",
                     displayButton: "Kembali",
+                    onButtonPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const TransaksiPage(),
+                        ),
+                            (route) => route.isFirst,
+                      );
+                    },
                   ),
                 ),
               );
@@ -197,18 +207,18 @@ class _RincianPageState extends State<RincianPage> {
                     'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.'),
               );
             } else if (state.paymentStatus == "93") {
-                if (_isCardWebViewOpen && Navigator.of(context, rootNavigator: true).canPop()) {
-                  _isCardWebViewOpen = false;
-                  Navigator.of(context, rootNavigator: true).pop();
-                }
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  infoSnackBar('Proses pembayaran kartu kredit dibatalkan.'),
-                );
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
               }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                infoSnackBar('Proses pembayaran kartu kredit dibatalkan.'),
+              );
+            }
           },
         ),
-
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
           listenWhen: (previous, current) {
             return previous.isLoaded != current.isLoaded ||
@@ -217,7 +227,8 @@ class _RincianPageState extends State<RincianPage> {
           listener: (BuildContext context, InvoiceStatusCardState state) async {
             if (state.hasFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar('Proses pembayaran kartu gagal. Silakan coba lagi.'),
+                errorSnackBar(
+                    'Proses pembayaran kartu gagal. Silakan coba lagi.'),
               );
               return;
             }
@@ -234,11 +245,11 @@ class _RincianPageState extends State<RincianPage> {
             }
 
             context.read<InvbayarvaFormBloc>().add(
-              CreditCardPaymentCheckingStarted(
-                invoiceId: state.record!.invoiceId,
-                interval: const Duration(seconds: 4),
-              ),
-            );
+                  CreditCardPaymentCheckingStarted(
+                    invoiceId: state.record!.invoiceId,
+                    interval: const Duration(seconds: 4),
+                  ),
+                );
 
             _isCardWebViewOpen = true;
 
@@ -284,18 +295,14 @@ class _RincianPageState extends State<RincianPage> {
                           hintText: "No Polis",
                         ),
                       ),
-
                       const SizedBox(width: 8),
-
                       BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
                         buildWhen: (previous, current) {
                           return previous.rincianSOA.headers !=
                               current.rincianSOA.headers;
                         },
                         builder: (context, state) {
-
-                          final bool isEmpty =
-                              state.rincianSOA.headers.isEmpty;
+                          final bool isEmpty = state.rincianSOA.headers.isEmpty;
 
                           return PolisButton(
                             assetPath: "assets/icons/unduh.svg",
@@ -310,26 +317,20 @@ class _RincianPageState extends State<RincianPage> {
                           );
                         },
                       ),
-
                       const SizedBox(width: 8),
-
                       BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
                         buildWhen: (previous, current) {
                           return previous.rincianSOA.headers !=
                               current.rincianSOA.headers;
                         },
                         builder: (context, state) {
-
-                          final bool isEmpty =
-                              state.rincianSOA.headers.isEmpty;
+                          final bool isEmpty = state.rincianSOA.headers.isEmpty;
 
                           return PolisButton(
                             assetPath: "assets/icons/bagikan.svg",
                             bgColor: const Color(0xFF295EFF),
                             borderColor: const Color(0xFF5D86FF),
-                            onTap: isEmpty
-                                ? null
-                                : () => _onShare(context),
+                            onTap: isEmpty ? null : () => _onShare(context),
                             iconSize: 16,
                             height: 36,
                             width: 36,
@@ -349,8 +350,7 @@ class _RincianPageState extends State<RincianPage> {
                         );
                       }
 
-                      final bool isEmpty =
-                          state.rincianSOA.headers.isEmpty;
+                      final bool isEmpty = state.rincianSOA.headers.isEmpty;
 
                       if (state.isProcessing) {
                         return const Center(
@@ -366,7 +366,7 @@ class _RincianPageState extends State<RincianPage> {
                               iconPath: 'assets/icons/belipolis_no_file.svg',
                               title: 'Tidak ada Rincian Tagihan',
                               description:
-                              'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
+                                  'Detail tagihan pembayaran akan muncul di sini ketika tersedia.',
                             ),
                           ),
                         );
@@ -374,7 +374,7 @@ class _RincianPageState extends State<RincianPage> {
 
                       return SingleChildScrollView(
                         keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
+                            ScrollViewKeyboardDismissBehavior.onDrag,
                         child: Column(
                           children: [
                             RincianTablePage(
@@ -400,9 +400,7 @@ class _RincianPageState extends State<RincianPage> {
             ),
             BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
               builder: (context, state) {
-
-                final bool isEmpty =
-                    state.rincianSOA.headers.isEmpty;
+                final bool isEmpty = state.rincianSOA.headers.isEmpty;
 
                 if (isEmpty) {
                   return const SizedBox.shrink();
@@ -410,14 +408,13 @@ class _RincianPageState extends State<RincianPage> {
 
                 return FabPembayaran(
                   isEnabled: state.selectedIds.isNotEmpty,
-
                   onBayarTap: () {
                     final selectedCurrSet = getSelectedCurrSet(state);
 
                     debugPrint("SELECTED CURR SET : $selectedCurrSet");
 
-                    final isAllIdr =
-                        selectedCurrSet.length == 1 && selectedCurrSet.contains('IDR');
+                    final isAllIdr = selectedCurrSet.length == 1 &&
+                        selectedCurrSet.contains('IDR');
 
                     if (!isAllIdr) {
                       showDialog(
@@ -429,10 +426,11 @@ class _RincianPageState extends State<RincianPage> {
                           showHeaderIcon: false,
                           header: 'Pembayaran Mata Uang Asing',
                           description:
-                          'Untuk pembayaran selain IDR atau Rupiah belum bisa dilakukan. Segera hubungi bagian keuangan kami.',
+                              'Untuk pembayaran selain IDR atau Rupiah belum bisa dilakukan. Segera hubungi bagian keuangan kami.',
                           buttonText: 'Hubungi',
                           onPressed: () async {
-                            final layananState = context.read<Mlayanan1CariBloc>().state;
+                            final layananState =
+                                context.read<Mlayanan1CariBloc>().state;
 
                             if (layananState.items.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -483,46 +481,38 @@ class _RincianPageState extends State<RincianPage> {
                       ),
                     );
                   },
-
                   onHubungiKeuTap: () async {
-
                     final layananState =
                         context.read<Mlayanan1CariBloc>().state;
 
                     if (layananState.items.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content:
-                          Text("Data layanan tidak ditemukan"),
+                          content: Text("Data layanan tidak ditemukan"),
                         ),
                       );
                       return;
                     }
 
-                    final layanan1 =
-                        layananState.items.first;
+                    final layanan1 = layananState.items.first;
 
                     if (layanan1.mLayanan2.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content:
-                          Text("Detail layanan kosong"),
+                          content: Text("Detail layanan kosong"),
                         ),
                       );
                       return;
                     }
 
-                    final layanan =
-                        layanan1.mLayanan2.first;
+                    final layanan = layanan1.mLayanan2.first;
 
-                    final link =
-                        layanan.linkLayanan;
+                    final link = layanan.linkLayanan;
 
                     if (link.trim().isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content:
-                          Text("Link layanan tidak tersedia"),
+                          content: Text("Link layanan tidak tersedia"),
                         ),
                       );
                       return;
@@ -543,7 +533,8 @@ class _RincianPageState extends State<RincianPage> {
     final state = dn2invBloc.state;
 
     if (state.selectedIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
       return;
     }
 
@@ -565,7 +556,7 @@ class _RincianPageState extends State<RincianPage> {
               button2Text: "PDF",
               onExportSelected: (format) async {
                 final allDetails =
-                state.rincianSOA.headers.expand((h) => h.details).toList();
+                    state.rincianSOA.headers.expand((h) => h.details).toList();
 
                 final selectedDetails = allDetails
                     .where((d) => state.selectedIds.contains(d.dn1Id))
@@ -573,13 +564,13 @@ class _RincianPageState extends State<RincianPage> {
 
                 if (selectedDetails.isEmpty) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(errorSnackBar("Tidak ada data yang dipilih"));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar("Tidak ada data yang dipilih"));
                   return;
                 }
 
                 final data =
-                selectedDetails.map((d) => _detailToExportMap(d)).toList();
+                    selectedDetails.map((d) => _detailToExportMap(d)).toList();
 
                 Navigator.pop(context);
                 await _exportDataRincian(context, format, data);
@@ -588,7 +579,8 @@ class _RincianPageState extends State<RincianPage> {
           ),
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
+      transitionBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(
         opacity: animation,
         child: ScaleTransition(
           scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
@@ -606,6 +598,11 @@ class _RincianPageState extends State<RincianPage> {
     return '$y-$m-$d';
   }
 
+  String textOrDash(String? value) {
+    final text = value?.trim() ?? "";
+    return text.isEmpty ? "-" : text;
+  }
+
   String formatPeriode(DateTime? mulai, DateTime? akhir) {
     if (mulai == null && akhir == null) return '-';
     return "${formatDateNullable(mulai)} - ${formatDateNullable(akhir)}";
@@ -615,7 +612,7 @@ class _RincianPageState extends State<RincianPage> {
     // ganti dynamic -> DnDetailSppaModel kalau importnya ada di file ini
     return {
       "No": d.rownumber,
-      "No Polis": d.noPolis,
+      "No Polis": textOrDash(d.noPolis),
       "Periode": formatPeriode(d.polisMulai, d.polisAkhir),
       "Curr": d.currSimbol,
       "DN OS": d.dnOs,
@@ -624,17 +621,18 @@ class _RincianPageState extends State<RincianPage> {
   }
 
   Future<void> _exportDataRincian(
-      BuildContext context,
-      ExportFormat format,
-      List<Map<String, dynamic>> data,
-      ) async {
+    BuildContext context,
+    ExportFormat format,
+    List<Map<String, dynamic>> data,
+  ) async {
     final fileName =
         "DN_Rincian_${DateTime.now().millisecondsSinceEpoch}.${format == ExportFormat.excel ? "xlsx" : "pdf"}";
 
     try {
       if (format == ExportFormat.excel) {
         if (kIsWeb) {
-          await ExportHelper.export("excel", data, CategoryType.rincian); // bikin enum ini / sesuaikan
+          await ExportHelper.export("excel", data,
+              CategoryType.rincian); // bikin enum ini / sesuaikan
         } else {
           await MobileDownloadHelper.download(
             context: context,
@@ -665,17 +663,17 @@ class _RincianPageState extends State<RincianPage> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar("Gagal ekspor: $e"));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(errorSnackBar("Gagal ekspor: $e"));
       }
     }
   }
-
 
   Future<void> _onShare(BuildContext context) async {
     final state = dn2invBloc.state;
 
     final allDetails =
-    state.rincianSOA.headers.expand((h) => h.details).toList();
+        state.rincianSOA.headers.expand((h) => h.details).toList();
 
     if (allDetails.isEmpty) {
       ScaffoldMessenger.of(context)
@@ -690,14 +688,11 @@ class _RincianPageState extends State<RincianPage> {
     }
 
     // kalau select all → ambil semua
-    final bool isSelectAll =
-        state.selectedIds.length == allDetails.length;
+    final bool isSelectAll = state.selectedIds.length == allDetails.length;
 
     final selectedDetails = isSelectAll
         ? allDetails
-        : allDetails
-        .where((d) => state.selectedIds.contains(d.dn1Id))
-        .toList();
+        : allDetails.where((d) => state.selectedIds.contains(d.dn1Id)).toList();
 
     if (selectedDetails.isEmpty) {
       ScaffoldMessenger.of(context)
@@ -707,7 +702,7 @@ class _RincianPageState extends State<RincianPage> {
 
     try {
       final exportData =
-      selectedDetails.map((e) => e.toExportMap()).toList();
+          selectedDetails.map((e) => _detailToExportMap(e)).toList();
 
       if (kIsWeb) {
         await ExportHelper.export(
@@ -719,9 +714,7 @@ class _RincianPageState extends State<RincianPage> {
       }
 
       final fileName =
-          "Rincian_Polis_${DateTime
-          .now()
-          .millisecondsSinceEpoch}.pdf";
+          "Rincian_Polis_${DateTime.now().millisecondsSinceEpoch}.pdf";
 
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,

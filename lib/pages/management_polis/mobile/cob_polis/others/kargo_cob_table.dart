@@ -121,7 +121,7 @@ class _KargoCobTableState extends State<KargoCobTable> {
 
         CobPolicyColumn<AsetothersCariModel>(
           title: "NO POLIS",
-          valueGetter: (d) => d.polisNo,
+          valueGetter: (d) => cobPolicyTextOrDash(d.polisNo),
           normalFlex: showColumn ? 1.2 : 2.2,
           compactWidth: showColumn ? 120 : 160,
           normalMaxLines: 1,

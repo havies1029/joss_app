@@ -136,7 +136,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                     padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: FormSectionHeader(
                       iconPath: iconPath,
-                      title: "Polis ${widget.cobGroupNama}",
+                      title: "Klaim ${widget.cobGroupNama}",
                       subtitle:
                       "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),

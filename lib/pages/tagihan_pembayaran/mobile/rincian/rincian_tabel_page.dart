@@ -37,14 +37,17 @@ class _RincianTablePageState extends State<RincianTablePage> {
     return NumberFormat.decimalPattern().format(value);
   }
 
+  String textOrDash(String? value) {
+    final text = value?.trim() ?? "";
+    return text.isEmpty ? "-" : text;
+  }
+
   List<DnDetailSppaModel> _filteredDetails(
-      List<DnDetailSppaModel> details,
-      ) {
+    List<DnDetailSppaModel> details,
+  ) {
     if (!widget.readOnly) return details;
 
-    return details
-        .where((d) => widget.selectedIds.contains(d.dn1Id))
-        .toList();
+    return details.where((d) => widget.selectedIds.contains(d.dn1Id)).toList();
   }
 
   @override
@@ -54,10 +57,10 @@ class _RincianTablePageState extends State<RincianTablePage> {
   }
 
   double _measureTextWidth(
-      BuildContext context,
-      String text, {
-        TextStyle? style,
-      }) {
+    BuildContext context,
+    String text, {
+    TextStyle? style,
+  }) {
     final effectiveStyle = style ??
         bodyTextStyle(context, fontSize: 14).copyWith(
           color: primaryLightColor,
@@ -74,13 +77,13 @@ class _RincianTablePageState extends State<RincianTablePage> {
   }
 
   double _columnWidthFromLongest(
-      BuildContext context,
-      Iterable<String> values, {
-        required double min,
-        required double max,
-        double padding = 20, // ruang cell (biar ga mepet)
-        TextStyle? style,
-      }) {
+    BuildContext context,
+    Iterable<String> values, {
+    required double min,
+    required double max,
+    double padding = 20, // ruang cell (biar ga mepet)
+    TextStyle? style,
+  }) {
     var longest = 0.0;
     for (final v in values) {
       final w = _measureTextWidth(context, v, style: style);
@@ -90,15 +93,15 @@ class _RincianTablePageState extends State<RincianTablePage> {
     return target.clamp(min, max);
   }
 
-
   Map<int, TableColumnWidth> _compactColumnWidths(
-      BuildContext context,
-      List<DnDetailSppaModel> details,
-      ) {
+    BuildContext context,
+    List<DnDetailSppaModel> details,
+  ) {
     final selectW = widget.readOnly ? 0.0 : 40.0;
 
-    final noPolisValues = details.map((d) => d.noPolis);
-    final periodeValues = details.map((d) => formatPeriode(d.polisMulai, d.polisAkhir));
+    final noPolisValues = details.map((d) => textOrDash(d.noPolis));
+    final periodeValues =
+        details.map((d) => formatPeriode(d.polisMulai, d.polisAkhir));
     /*
     final periodeValues = details.map(
           (d) => "${d.polisMulai.toString().substring(0, 10)} → ${d.polisAkhir.toString().substring(0, 10)}",
@@ -107,10 +110,14 @@ class _RincianTablePageState extends State<RincianTablePage> {
     final currValues = details.map((d) => d.currSimbol);
     final premiValues = details.map((d) => formatNum(d.dnOs));
 
-    final wNoPolis = _columnWidthFromLongest(context, noPolisValues, min: 140, max: 220);
-    final wPeriode = _columnWidthFromLongest(context, periodeValues, min: 170, max: 260);
-    final wCurr = _columnWidthFromLongest(context, currValues, min: 60, max: 90, padding: 16);
-    final wPremi = _columnWidthFromLongest(context, premiValues, min: 110, max: 160);
+    final wNoPolis =
+        _columnWidthFromLongest(context, noPolisValues, min: 140, max: 220);
+    final wPeriode =
+        _columnWidthFromLongest(context, periodeValues, min: 170, max: 260);
+    final wCurr = _columnWidthFromLongest(context, currValues,
+        min: 60, max: 90, padding: 16);
+    final wPremi =
+        _columnWidthFromLongest(context, premiValues, min: 110, max: 160);
     final agingValues = details.map((d) => d.aging.toString());
     final wAging = _columnWidthFromLongest(
       context,
@@ -170,13 +177,14 @@ class _RincianTablePageState extends State<RincianTablePage> {
 
     final visibleHeaders = widget.readOnly
         ? widget.headers.where((header) {
-      final filteredDetails = _filteredDetails(header.details);
-      return filteredDetails.isNotEmpty;
-    }).toList()
+            final filteredDetails = _filteredDetails(header.details);
+            return filteredDetails.isNotEmpty;
+          }).toList()
         : widget.headers;
 
     return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),//ini buat matiin scrol biar parent yang scroll,
+      physics:
+          const NeverScrollableScrollPhysics(), //ini buat matiin scrol biar parent yang scroll,
       shrinkWrap: true, //ini buat matiin scrol biar parent yang scroll,
       itemCount: visibleHeaders.length,
       padding: EdgeInsets.symmetric(
@@ -191,11 +199,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
           children: [
             _buildHeaderTitle(context, header),
             const SizedBox(height: hPadding),
-
             isNarrow
                 ? _buildDetailTableCompact(filteredDetails)
                 : _buildDetailTableNormal(filteredDetails),
-
             if (widget.showFooter) ...[
               _buildFooterTable(header.footers),
               const SizedBox(height: vPadding),
@@ -339,11 +345,11 @@ class _RincianTablePageState extends State<RincianTablePage> {
           children: [
             ...details.asMap().entries.map(
                   (e) => _detailRowWithCheckbox(
-                e.value,
-                e.key,
-                compact: true,
-              ),
-            ),
+                    e.value,
+                    e.key,
+                    compact: true,
+                  ),
+                ),
           ],
         );
 
@@ -351,9 +357,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
           borderRadius: widget.readOnly
               ? BorderRadius.circular(cardBorderRadius)
               : BorderRadius.only(
-            topLeft: Radius.circular(cardBorderRadius),
-            topRight: Radius.circular(cardBorderRadius),
-          ),
+                  topLeft: Radius.circular(cardBorderRadius),
+                  topRight: Radius.circular(cardBorderRadius),
+                ),
           child: Container(
             decoration: BoxDecoration(
               color: formGrey,
@@ -389,9 +395,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
                             height: finalBodyHeight,
                             child: useVerticalScroll
                                 ? SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: bodyTable,
-                            )
+                                    scrollDirection: Axis.vertical,
+                                    child: bodyTable,
+                                  )
                                 : bodyTable,
                           ),
                         ],
@@ -414,10 +420,9 @@ class _RincianTablePageState extends State<RincianTablePage> {
       borderRadius: widget.readOnly
           ? BorderRadius.circular(cardBorderRadius)
           : BorderRadius.only(
-        topLeft: Radius.circular(cardBorderRadius),
-        topRight: Radius.circular(cardBorderRadius),
-      ),
-
+              topLeft: Radius.circular(cardBorderRadius),
+              topRight: Radius.circular(cardBorderRadius),
+            ),
       child: Container(
         decoration: BoxDecoration(
           color: formGrey,
@@ -459,14 +464,13 @@ class _RincianTablePageState extends State<RincianTablePage> {
               "PREMI",
               "AGING",
             ]),
-
             ...details.asMap().entries.map(
                   (e) => _detailRowWithCheckbox(
-                e.value,
-                e.key,
-                compact: false,
-              ),
-            ),
+                    e.value,
+                    e.key,
+                    compact: false,
+                  ),
+                ),
           ],
         ),
       ),
@@ -506,8 +510,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
           },
           children: [
             ...footers.map(
-                  (f) => TableRow(
-
+              (f) => TableRow(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(10),
@@ -566,20 +569,19 @@ class _RincianTablePageState extends State<RincianTablePage> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
           child: isNo
               ? Center(
-            child: Text(
-              text,
-              style: bodyTextStyle(context, fontSize: 15),
-            ),
-          )
+                  child: Text(
+                    text,
+                    style: bodyTextStyle(context, fontSize: 15),
+                  ),
+                )
               : Text(
-            text,
-            style: bodyTextStyle(context, fontSize: 15),
-          ),
+                  text,
+                  style: bodyTextStyle(context, fontSize: 15),
+                ),
         );
       }).toList(),
     );
   }
-
 
   void _showDetailPopup(BuildContext context, DnDetailSppaModel d) {
     DialogDetailPolis.show(
@@ -592,7 +594,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
         ),
         DetailItem(
           label: "NO POLIS",
-          value: d.noPolis,
+          value: textOrDash(d.noPolis),
         ),
         DetailItem(
           label: "Tanggal Mulai",
@@ -606,7 +608,6 @@ class _RincianTablePageState extends State<RincianTablePage> {
           label: "Total Premi",
           value: "${d.currSimbol} ${formatNum(d.dnOs)}",
         ),
-
         DetailItem(
           label: "AGING",
           value: d.aging.toString(),
@@ -616,10 +617,10 @@ class _RincianTablePageState extends State<RincianTablePage> {
   }
 
   TableRow _detailRowWithCheckbox(
-      DnDetailSppaModel d,
-      int index, {
-        required bool compact,
-      }) {
+    DnDetailSppaModel d,
+    int index, {
+    required bool compact,
+  }) {
     final isSelected = widget.selectedIds.contains(d.dn1Id);
 
     return TableRow(
@@ -646,10 +647,10 @@ class _RincianTablePageState extends State<RincianTablePage> {
                   borderRadius: BorderRadius.circular(cardBorderRadius / 2),
                 ),
                 side: WidgetStateBorderSide.resolveWith(
-                      (states) => const BorderSide(color: sGrey),
+                  (states) => const BorderSide(color: sGrey),
                 ),
                 fillColor: WidgetStateProperty.resolveWith(
-                      (states) => states.contains(WidgetState.selected)
+                  (states) => states.contains(WidgetState.selected)
                       ? primaryColor
                       : Colors.transparent,
                 ),
@@ -675,7 +676,7 @@ class _RincianTablePageState extends State<RincianTablePage> {
           context: context,
           data: d,
           child: Text(
-            d.noPolis,
+            textOrDash(d.noPolis),
             maxLines: compact ? 3 : null,
             overflow: compact ? TextOverflow.ellipsis : TextOverflow.visible,
             style: TextStyle(color: primaryLightColor),

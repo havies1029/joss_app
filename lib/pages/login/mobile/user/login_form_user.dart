@@ -113,7 +113,6 @@ class _LoginFormUserState extends State<LoginFormUser>
     if (!_formKey.currentState!.validate()) return;
 
     final input = _emailOrPhoneController.text.trim();
-    final isEmail = EmailValidator.validate(input);
 
     context.read<EmailVerificationBloc>().add(
       FieldEmailVerificationChangedEvent(email: input),
@@ -430,10 +429,16 @@ class _LoginFormUserState extends State<LoginFormUser>
       // 5) Kirim ke BLoC / flow kamu (contoh kamu: EmailVerificationBloc)
       if (!context.mounted) return;
 
+      final googleEmail = user.email ?? googleUser.email;
+
+      context.read<EmailVerificationBloc>().add(
+        FieldEmailVerificationChangedEvent(email: googleEmail),
+      );
+
       context.read<EmailVerificationBloc>().add(
         EmailVerificationTambahEvent(
           record: EmailVerificationModel(
-            email: user.email ?? googleUser.email,
+            email: googleEmail,
             requestFrom: 'google',
           ),
         ),

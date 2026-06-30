@@ -5,6 +5,7 @@ import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/
 import '../../../../../../blocs/regklaim/attach_bloc.dart';
 import '../../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../../models/regklaim/attachment_item.dart';
+import '../../../../../../common/constants.dart';
 import 'attachment_picker_panel.dart';
 
 class UploadSectionWidget extends StatefulWidget {
@@ -70,10 +71,7 @@ class _UploadSectionWidgetState extends State<UploadSectionWidget> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                SnackBar(
-                  content: Text(msg),
-                  duration: const Duration(seconds: 2),
-                ),
+                errorSnackBar(msg),
               );
           },
         ),

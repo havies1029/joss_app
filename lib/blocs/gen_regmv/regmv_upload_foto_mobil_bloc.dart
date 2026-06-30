@@ -54,8 +54,7 @@ class RegmvUploadFotoMobilBloc
   static const String _lockedMsg =
       "Sedang menghitung premi, foto tidak bisa diubah dulu.";
 
-  bool get _isActionLocked =>
-      state.isUploadingAll || state.isClearing;
+  bool get _isActionLocked => state.isUploadingAll || state.isClearing;
 
   void _emitLockedToast(Emitter<Regmv5UploadFotoObjectState> emit) {
     _emitToast(emit, _lockedMsg);
@@ -67,19 +66,19 @@ class RegmvUploadFotoMobilBloc
   }
 
   void _emitMaxToast(Emitter<Regmv5UploadFotoObjectState> emit) {
-    _emitToast(emit, "Maksimal $_maxItems file.");
+    _emitToast(emit, "Anda hanya dapat mengunggah maksimal $_maxItems foto.");
   }
 
   void _emitOverPickedToast(Emitter<Regmv5UploadFotoObjectState> emit) {
-    _emitToast(emit, "Maksimal foto $_maxItems. Sisanya tidak ditambahkan.");
+    _emitToast(emit, "Anda hanya dapat mengunggah maksimal $_maxItems foto.");
   }
 
   // ================= PICKERS =================
 
   Future<void> _onPickCamera(
-      Regmv5StoragePickImageFromCamera event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5StoragePickImageFromCamera event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -97,9 +96,9 @@ class RegmvUploadFotoMobilBloc
   }
 
   Future<void> _onPickFiles(
-      Regmv5StoragePickFilesFromStorage event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5StoragePickFilesFromStorage event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -126,9 +125,9 @@ class RegmvUploadFotoMobilBloc
   // ================= MANUAL SELECT (PATH/NAME) =================
 
   Future<void> _onSelectedOne(
-      Regmv5UploadFotoObjectSelected event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5UploadFotoObjectSelected event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -141,9 +140,9 @@ class RegmvUploadFotoMobilBloc
   }
 
   Future<void> _onSelectedList(
-      Regmv5UploadFotoObjectSelectedList event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5UploadFotoObjectSelectedList event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (_isMaxReached) {
       _emitMaxToast(emit);
       return;
@@ -173,9 +172,9 @@ class RegmvUploadFotoMobilBloc
   // ================= RESET =================
 
   Future<void> _onResetPreview(
-      Regmv5UploadFotoObjectResetPreview event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5UploadFotoObjectResetPreview event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     emit(state.copyWith(isClearing: true, items: const []));
     emit(state.copyWith(isClearing: false));
   }
@@ -183,9 +182,9 @@ class RegmvUploadFotoMobilBloc
   // ================= REMOVE =================
 
   Future<void> _onRemove(
-      Regmv5StorageRemoveAttachment event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5StorageRemoveAttachment event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -212,9 +211,9 @@ class RegmvUploadFotoMobilBloc
   // ================= SUBMIT HELPERS =================
 
   Future<void> _onBatchSubmit(
-      Regmv5UploadFotoObjectBatchSubmit event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5UploadFotoObjectBatchSubmit event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (event.filePaths.isEmpty || event.names.isEmpty) {
       _emitToast(emit, "Minimal pilih 1 file atau foto");
       return;
@@ -255,9 +254,9 @@ class RegmvUploadFotoMobilBloc
   }
 
   Future<void> _onSubmittedUploadAll(
-      Regmv5UploadFotoObjectSubmitted event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5UploadFotoObjectSubmitted event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (state.items.isEmpty) {
       _emitToast(emit, "Minimal pilih 1 file atau foto");
       return;
@@ -291,9 +290,9 @@ class RegmvUploadFotoMobilBloc
   // ================= UPLOAD MANY =================
 
   Future<void> _onUploadMany(
-      Regmv5StorageUploadMany event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5StorageUploadMany event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     if (event.localIds.isEmpty) {
       _emitToast(emit, "Minimal pilih 1 file atau foto");
       return;
@@ -317,9 +316,9 @@ class RegmvUploadFotoMobilBloc
   // ================= UPLOAD ONE =================
 
   Future<void> _onUploadOne(
-      Regmv5UploadFotoObjectUploadOne event,
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      ) async {
+    Regmv5UploadFotoObjectUploadOne event,
+    Emitter<Regmv5UploadFotoObjectState> emit,
+  ) async {
     final idx = state.items.indexWhere((e) => e.localId == event.localId);
     if (idx < 0) {
       final m = await _modelFromPath(
@@ -364,18 +363,24 @@ class RegmvUploadFotoMobilBloc
     final name = (overrideName ?? current.name);
 
     if (path.isEmpty || name.isEmpty) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: "File path / fileName kosong",
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: "File path / fileName kosong",
+              ));
       return;
     }
 
-    _updateItem(emit, localId, (x) => x.copyWith(
-      status: UploadStatus.uploading,
-      progress: 0.0,
-      errorMessage: null,
-    ));
+    _updateItem(
+        emit,
+        localId,
+        (x) => x.copyWith(
+              status: UploadStatus.uploading,
+              progress: 0.0,
+              errorMessage: null,
+            ));
 
     final token = CancelToken();
     _cancelTokens[localId]?.cancel("Replaced");
@@ -393,22 +398,31 @@ class RegmvUploadFotoMobilBloc
 
       if (returnData.success == true) {
         final serverId = returnData.data.toString();
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.success,
-          progress: 1.0,
-          serverId: serverId,
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.success,
+                  progress: 1.0,
+                  serverId: serverId,
+                ));
       } else {
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.failed,
-          errorMessage: "Upload gagal",
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.failed,
+                  errorMessage: "Upload gagal",
+                ));
       }
     } catch (e) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: e.toString(),
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: e.toString(),
+              ));
     } finally {
       _cancelTokens.remove(localId);
     }
@@ -417,26 +431,27 @@ class RegmvUploadFotoMobilBloc
   // ================= HELPERS =================
 
   void _updateItem(
-      Emitter<Regmv5UploadFotoObjectState> emit,
-      String localId,
-      Regmv5UploadModel Function(Regmv5UploadModel) map,
-      ) {
+    Emitter<Regmv5UploadFotoObjectState> emit,
+    String localId,
+    Regmv5UploadModel Function(Regmv5UploadModel) map,
+  ) {
     final updated =
-    state.items.map((e) => e.localId == localId ? map(e) : e).toList();
+        state.items.map((e) => e.localId == localId ? map(e) : e).toList();
     emit(state.copyWith(items: updated));
   }
 
-  List<(String, String)> _zipPathsNames(List<String> paths, List<String> names) {
+  List<(String, String)> _zipPathsNames(
+      List<String> paths, List<String> names) {
     final n = paths.length < names.length ? paths.length : names.length;
     if (n <= 0) return [];
     return List.generate(n, (i) => (paths[i], names[i]));
   }
 
   Future<Regmv5UploadModel?> _modelFromPath(
-      String filePath,
-      String fileName, {
-        String? localId,
-      }) async {
+    String filePath,
+    String fileName, {
+    String? localId,
+  }) async {
     if (filePath.isEmpty) return null;
 
     try {

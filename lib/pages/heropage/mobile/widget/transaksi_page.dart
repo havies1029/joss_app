@@ -62,11 +62,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
   }
 
   void _loadData() {
-    Future.delayed(const Duration(milliseconds: 300), () {
-      context.read<LogtrscariBloc>().add(
-        RefreshLogtrscariEvent(groupLogId: _groupLogId),
-      );
-    });
+    context.read<LogtrscariBloc>().add(
+      RefreshLogtrscariEvent(groupLogId: _groupLogId),
+    );
   }
 
   @override

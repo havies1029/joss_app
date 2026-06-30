@@ -129,7 +129,7 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
                     FormSectionHeader(
                       iconPath: "assets/icons/kendaraan.svg",
-                      title: "Polis Kendaraan",
+                      title: "Klaim ${widget.cobGroupNama}",
                       subtitle:
                       "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),

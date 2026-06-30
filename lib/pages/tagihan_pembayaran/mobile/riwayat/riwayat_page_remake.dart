@@ -12,6 +12,7 @@ import '../../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../../common/constants.dart';
 import '../../../../common/loading_indicator.dart';
 import '../../../../widgets/apptheme/empty_state_page.dart';
+import '../../../heropage/mobile/widget/transaksi_page.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
 import '../payment_page/payment_success/payment_success.dart';
@@ -113,8 +114,17 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 MaterialPageRoute(
                   builder: (_) => PaymentSuccess(
                     display: "Pengajuan Tidak Dilanjutkan",
-                    description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+                    description:
+                    "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
                     displayButton: "Kembali",
+                    onButtonPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const TransaksiPage(),
+                        ),
+                            (route) => route.isFirst,
+                      );
+                    },
                   ),
                 ),
               );

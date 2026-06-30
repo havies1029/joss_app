@@ -51,17 +51,17 @@ class RegparUploadFotoObjectBloc
   }
 
   void _emitMaxToast(Emitter<RegParUploadFotoObjectState> emit) {
-    _emitToast(emit, "Maksimal $_maxItems file.");
+    _emitToast(emit, "Anda hanya dapat mengunggah maksimal $_maxItems foto.");
   }
 
   void _emitOverPickedToast(Emitter<RegParUploadFotoObjectState> emit) {
-    _emitToast(emit, "Maksimal foto $_maxItems. Sisanya tidak ditambahkan.");
+    _emitToast(emit, "Anda hanya dapat mengunggah maksimal $_maxItems foto.");
   }
 
   Future<void> _onPickCamera(
-      RegparStoragePickImageFromCamera event,
-      Emitter<RegParUploadFotoObjectState> emit,
-      ) async {
+    RegparStoragePickImageFromCamera event,
+    Emitter<RegParUploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -79,9 +79,9 @@ class RegparUploadFotoObjectBloc
   }
 
   Future<void> _onPickFiles(
-      RegparStoragePickFilesFromStorage event,
-      Emitter<RegParUploadFotoObjectState> emit,
-      ) async {
+    RegparStoragePickFilesFromStorage event,
+    Emitter<RegParUploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -106,9 +106,9 @@ class RegparUploadFotoObjectBloc
   }
 
   Future<void> _onRemove(
-      RegparStorageRemoveAttachment event,
-      Emitter<RegParUploadFotoObjectState> emit,
-      ) async {
+    RegparStorageRemoveAttachment event,
+    Emitter<RegParUploadFotoObjectState> emit,
+  ) async {
     if (_isActionLocked) {
       _emitLockedToast(emit);
       return;
@@ -134,9 +134,9 @@ class RegparUploadFotoObjectBloc
   }
 
   Future<void> _onUploadMany(
-      RegparStorageUploadMany event,
-      Emitter<RegParUploadFotoObjectState> emit,
-      ) async {
+    RegparStorageUploadMany event,
+    Emitter<RegParUploadFotoObjectState> emit,
+  ) async {
     if (event.localIds.isEmpty) {
       emit(state.copyWith(toast: "Minimal pilih 1 file atau foto"));
       emit(state.copyWith(clearToast: true));
@@ -145,15 +145,16 @@ class RegparUploadFotoObjectBloc
 
     for (final localId in event.localIds) {
       await _uploadOneInternalAwait(localId, event.regpar1Id, emit);
-      await Future.delayed(const Duration(milliseconds: 150)); // optional, bantu server
+      await Future.delayed(
+          const Duration(milliseconds: 150)); // optional, bantu server
     }
   }
 
   Future<void> _uploadOneInternalAwait(
-      String localId,
-      String regpar1Id,
-      Emitter<RegParUploadFotoObjectState> emit,
-      ) async {
+    String localId,
+    String regpar1Id,
+    Emitter<RegParUploadFotoObjectState> emit,
+  ) async {
     final idx = state.items.indexWhere((e) => e.localId == localId);
     if (idx < 0) return;
 
@@ -164,18 +165,24 @@ class RegparUploadFotoObjectBloc
 
     // model kamu String non-null, tapi tetap aman
     if (current.path.isEmpty || current.name.isEmpty) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: "File path / fileName kosong",
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: "File path / fileName kosong",
+              ));
       return;
     }
 
-    _updateItem(emit, localId, (x) => x.copyWith(
-      status: UploadStatus.uploading,
-      progress: 0.0,
-      errorMessage: null,
-    ));
+    _updateItem(
+        emit,
+        localId,
+        (x) => x.copyWith(
+              status: UploadStatus.uploading,
+              progress: 0.0,
+              errorMessage: null,
+            ));
 
     try {
       final returnData = await repository.uploadFotoObjectByPath(
@@ -187,22 +194,31 @@ class RegparUploadFotoObjectBloc
 
       if (returnData.success == true) {
         final serverId = returnData.data.toString();
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.success,
-          progress: 1,
-          serverId: serverId,
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.success,
+                  progress: 1,
+                  serverId: serverId,
+                ));
       } else {
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.failed,
-          errorMessage: "Upload gagal",
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.failed,
+                  errorMessage: "Upload gagal",
+                ));
       }
     } catch (e) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: e.toString(),
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: e.toString(),
+              ));
     }
   }
   //
@@ -234,12 +250,12 @@ class RegparUploadFotoObjectBloc
   // }
 
   void _updateItem(
-      Emitter<RegParUploadFotoObjectState> emit,
-      String localId,
-      Regpar6UploadModel Function(Regpar6UploadModel) map,
-      ) {
+    Emitter<RegParUploadFotoObjectState> emit,
+    String localId,
+    Regpar6UploadModel Function(Regpar6UploadModel) map,
+  ) {
     final updated =
-    state.items.map((e) => e.localId == localId ? map(e) : e).toList();
+        state.items.map((e) => e.localId == localId ? map(e) : e).toList();
     emit(state.copyWith(items: updated));
   }
 
@@ -253,19 +269,22 @@ class RegparUploadFotoObjectBloc
   }
 
   Future<void> _onUploadOne(
-      RegparUploadFotoObjectUploadOne event,
-      Emitter<RegParUploadFotoObjectState> emit,
-      ) async {
+    RegparUploadFotoObjectUploadOne event,
+    Emitter<RegParUploadFotoObjectState> emit,
+  ) async {
     final localId = event.localId;
 
     // 1) set uploading
-    _updateItem(emit, localId, (x) => x.copyWith(
-      status: UploadStatus.uploading,
-      progress: 0,
-      errorMessage: null,
-      // kalau mau reset id lama saat retry:
-      // clearServerId: true,
-    ));
+    _updateItem(
+        emit,
+        localId,
+        (x) => x.copyWith(
+              status: UploadStatus.uploading,
+              progress: 0,
+              errorMessage: null,
+              // kalau mau reset id lama saat retry:
+              // clearServerId: true,
+            ));
 
     try {
       // ⬇️ ubah repository supaya return returnData (success + data)
@@ -280,26 +299,35 @@ class RegparUploadFotoObjectBloc
       if (success) {
         final serverId = returnData.data.toString(); // ✅ tangkap serverId
 
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.success,
-          progress: 1,
-          serverId: serverId,
-          // serverUrl: returnData.url?.toString(), // kalau ada
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.success,
+                  progress: 1,
+                  serverId: serverId,
+                  // serverUrl: returnData.url?.toString(), // kalau ada
+                ));
 
         // emit(state.copyWith(toast: "Upload berhasil cihuy"));
         emit(state.copyWith(clearToast: true));
       } else {
-        _updateItem(emit, localId, (x) => x.copyWith(
-          status: UploadStatus.failed,
-          errorMessage: "Upload gagal atau URL tidak ditemukan.",
-        ));
+        _updateItem(
+            emit,
+            localId,
+            (x) => x.copyWith(
+                  status: UploadStatus.failed,
+                  errorMessage: "Upload gagal atau URL tidak ditemukan.",
+                ));
       }
     } catch (e) {
-      _updateItem(emit, localId, (x) => x.copyWith(
-        status: UploadStatus.failed,
-        errorMessage: e.toString(),
-      ));
+      _updateItem(
+          emit,
+          localId,
+          (x) => x.copyWith(
+                status: UploadStatus.failed,
+                errorMessage: e.toString(),
+              ));
     }
   }
 }

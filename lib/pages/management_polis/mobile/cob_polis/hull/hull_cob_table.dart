@@ -119,7 +119,7 @@ class _HullCobTableState extends State<HullCobTable> {
 
         CobPolicyColumn<AsethullCariModel>(
           title: "NO POLIS",
-          valueGetter: (d) => d.polisNo,
+          valueGetter: (d) => cobPolicyTextOrDash(d.polisNo),
           normalFlex: showColumn ? 1.2 : 2.0,
           compactWidth: showColumn ? 120 : 140,
           normalMaxLines: 1,

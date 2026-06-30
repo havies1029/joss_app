@@ -12,12 +12,19 @@ class RiwayatTableWidgetRemake extends StatefulWidget {
   const RiwayatTableWidgetRemake({super.key});
 
   @override
-  State<RiwayatTableWidgetRemake> createState() => _RiwayatTableWidgetRemakeState();
+  State<RiwayatTableWidgetRemake> createState() =>
+      _RiwayatTableWidgetRemakeState();
 }
+
 class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
   late Historybayar2CariBloc historybayar2cariBloc;
 
   String formatNum(num value) => NumberFormat.decimalPattern().format(value);
+  String textOrDash(String? value) {
+    final text = value?.trim() ?? "";
+    return text.isEmpty ? "-" : text;
+  }
+
   //final ScrollController hController = ScrollController();
 
   @override
@@ -30,24 +37,22 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
   Widget build(BuildContext context) {
     historybayar2cariBloc = context.read<Historybayar2CariBloc>();
 
-
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
     return BlocConsumer<Historybayar2CariBloc, Historybayar2CariState>(
-      listenWhen: (p, c) =>
-      p.status != c.status || p.items != c.items,
+      listenWhen: (p, c) => p.status != c.status || p.items != c.items,
       listener: (context, state) {
         if (state.status == ListStatus.success && state.items.isNotEmpty) {
           final d = state.items.first;
           context.read<DnRekap2invBloc>().add(
-            SetPaymentSummaryEvent(
-              curr: d.curr,
-              totalBayar: d.nilaiBayar,
-            ),
-          );
-          debugPrint(" curr: d.curr,= ${d.curr}" );
-          debugPrint("totalBayar: d.nilaiBayar, = ${d.nilaiBayar}" );
+                SetPaymentSummaryEvent(
+                  curr: d.curr,
+                  totalBayar: d.nilaiBayar,
+                ),
+              );
+          debugPrint(" curr: d.curr,= ${d.curr}");
+          debugPrint("totalBayar: d.nilaiBayar, = ${d.nilaiBayar}");
         }
       },
       buildWhen: (p, c) => p.status != c.status || p.items != c.items,
@@ -60,7 +65,6 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
         return isNarrow ? _buildTableCompact(items) : _buildTableNormal(items);
       },
     );
-
   }
 
   // ========= TABLE COMPACT (NARROW) =========
@@ -94,7 +98,8 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                     child: IntrinsicWidth(
                       // bikin "ngikut isi" kalau nggak muat (jadi melebar & bisa scroll)
                       child: Table(
-                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
                         border: _tableBorder(),
                         columnWidths: const {
                           0: IntrinsicColumnWidth(), // NO
@@ -107,7 +112,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                           _headerRow(),
                           ...items.asMap().entries.map(
                                 (e) => _row(e.value, e.key, compact: true),
-                          ),
+                              ),
                         ],
                       ),
                     ),
@@ -120,7 +125,6 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
       ),
     );
   }
-
 
   // ========= TABLE NORMAL =========
   Widget _buildTableNormal(List<Historybayar2CariModel> items) {
@@ -146,7 +150,7 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
                   _headerRow(),
                   ...items.asMap().entries.map(
                         (e) => _row(e.value, e.key, compact: false),
-                  ),
+                      ),
                 ],
               ),
             );
@@ -191,15 +195,15 @@ class _RiwayatTableWidgetRemakeState extends State<RiwayatTableWidgetRemake> {
 
   void _onSelect(Historybayar2CariModel d) {
     context.read<DnRekap2invBloc>().add(
-      SetPaymentSummaryEvent(
-        curr: d.curr,
-        totalBayar: d.nilaiBayar,
-      ),
-    );
+          SetPaymentSummaryEvent(
+            curr: d.curr,
+            totalBayar: d.nilaiBayar,
+          ),
+        );
   }
 
   TableRow _row(Historybayar2CariModel d, int index, {required bool compact}) {
-    final polisNo = d.polisNo.isNotEmpty ? d.polisNo : "-";
+    final polisNo = textOrDash(d.polisNo);
     final premi = "${d.curr} ${formatNum(d.nilaiBayar)}";
     final periode = "${d.periodeMulai.toString().substring(0, 10)} → "
         "${d.periodeAkhir.toString().substring(0, 10)}";
@@ -263,15 +267,15 @@ class _headerCell extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
       child: center
           ? Center(
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 15, color: primaryLightColor),
-        ),
-      )
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 15, color: primaryLightColor),
+              ),
+            )
           : Text(
-        text,
-        style: TextStyle(fontSize: 15, color: primaryLightColor),
-      ),
+              text,
+              style: TextStyle(fontSize: 15, color: primaryLightColor),
+            ),
     );
   }
 }

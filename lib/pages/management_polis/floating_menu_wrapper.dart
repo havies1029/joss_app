@@ -48,8 +48,8 @@ class FloatingMenuWrapper extends StatelessWidget {
         builder: (context) {
           final cobId =
               context.select((CobManPolBloc b) => b.state.selectedCOBId);
-          final statusId =
-              context.select((StatusAsetCariBloc b) => b.state.selectedStatusId);
+          final statusId = context
+              .select((StatusAsetCariBloc b) => b.state.selectedStatusId);
 
           final selectedItem = _selectedItemByCob(context, cobId);
 
@@ -59,21 +59,22 @@ class FloatingMenuWrapper extends StatelessWidget {
             selectedItem: selectedItem,
           );
 
-          final selectedItems =
-              selectedItem == null ? const <dynamic>[] : <dynamic>[selectedItem];
+          final selectedItems = selectedItem == null
+              ? const <dynamic>[]
+              : <dynamic>[selectedItem];
 
           return FloatingActionMenuWidget(
             availableActions: actions,
             selectedItems: selectedItems,
+            autoCollapseKey: '$cobId|$statusId',
             onActionTap: (actionType, _) {
               debugPrint(
                 'WRAPPER onActionTap => actionType=$actionType, '
                 'selectedItemNull=${selectedItem == null}',
               );
 
-              final needsSelectedItem =
-                  actionType != ActionType.beliPolis &&
-                      actionType != ActionType.hubungiJps;
+              final needsSelectedItem = actionType != ActionType.beliPolis &&
+                  actionType != ActionType.hubungiJps;
 
               if (needsSelectedItem && selectedItem == null) {
                 debugPrint('WRAPPER blocked => selectedItem required');
@@ -164,38 +165,40 @@ class FloatingMenuWrapper extends StatelessWidget {
 
     if (cobId == "10002") {
       context.read<AsetParCariBloc>().add(
-        RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cobId == "10003") {
       context.read<AsetMvCariBloc>().add(
-        RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cobId == "10004") {
       context.read<AsethullCariBloc>().add(
-        RefreshAsethullCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsethullCariEvent(
+                statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cobId == "10005") {
       context.read<AsetHealthCariBloc>().add(
-        RefreshAsetHealthCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetHealthCariEvent(
+                statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     context.read<AsetothersCariBloc>().add(
-      RefreshAsetothersCariEvent(
-        statusId: statusId,
-        searchText: searchText,
-        cobId: cobId,
-      ),
-    );
+          RefreshAsetothersCariEvent(
+            statusId: statusId,
+            searchText: searchText,
+            cobId: cobId,
+          ),
+        );
   }
 }

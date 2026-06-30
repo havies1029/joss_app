@@ -40,18 +40,21 @@ class AttachmentPickerPanel extends StatelessWidget {
           items.isEmpty
               ? _emptyState(context)
               : SizedBox(
-            height: 160,
+            height: 148,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: EdgeInsets.zero,
               itemCount: items.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, i) {
                 final item = items[i];
-                return _ThumbCard(
-                  item: item,
-                  onRemove: () => onRemove(item.localId),
-                  onTap: () => onTapItem(item),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 22),
+                  child: _ThumbCard(
+                    item: item,
+                    onRemove: () => onRemove(item.localId),
+                    onTap: () => onTapItem(item),
+                  ),
                 );
               },
             ),
@@ -68,7 +71,10 @@ class AttachmentPickerPanel extends StatelessWidget {
                       "assets/icons/gallery_img.svg",
                       width: 18,
                       height: 18,
-                      color: Colors.white,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     backgroundColor: const Color(0xFF4A4A4A),
                     onPressed: onPickFile,
@@ -82,7 +88,10 @@ class AttachmentPickerPanel extends StatelessWidget {
                       "assets/icons/photo_img.svg",
                       width: 18,
                       height: 18,
-                      color: Colors.white,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     backgroundColor: const Color(0xFFF28C28),
                     onPressed: onPickPhoto,

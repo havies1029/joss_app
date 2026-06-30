@@ -92,11 +92,14 @@ class MRekanGeneralIdvPopUpPageFormState
       navigator.pop();
       navigator.pop();
       regUserBloc.add(ClearRequestFromEvent());
-    } else if (regUserBloc.state.requestFrom == 'regother_page') {
+    }
+    else if (regUserBloc.state.requestFrom == 'regother_page') {
       debugPrint("navigator2x");
       navigator.pop();
       navigator.pop();
-    }else if (regUserBloc.state.requestFrom == 'daftarclient_page') {
+      navigator.pop();
+    }
+    else if (regUserBloc.state.requestFrom == 'daftarclient_page') {
       debugPrint("navigator1x");
       navigator.pop();
     } else {

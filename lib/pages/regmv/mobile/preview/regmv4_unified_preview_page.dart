@@ -28,7 +28,7 @@ class Regmv4StoragePickerSectionWidget extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                errorSnackBar(msg ?? 'Terjadi kesalahan'),
+                errorSnackBar(msg),
               );
           },
         ),
