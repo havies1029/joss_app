@@ -199,7 +199,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
     //     ),
     //   ),
     // );
-    showDialog(
+    showDialog(g
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.6),
