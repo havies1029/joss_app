@@ -9,12 +9,30 @@ import 'klaimlacak_typedata/klaimlacak_jadwal.dart';
 import 'klaimlacak_typedata/klaimlacak_nilai.dart';
 import 'klaimlacak_typedata/klaimlacak_file.dart';
 
+enum KlaimActivecardAttachmentKind { image, file }
+
+class KlaimActivecardAttachment {
+  final String name;
+  final String url;
+  final KlaimActivecardAttachmentKind kind;
+  final VoidCallback? onTap;
+
+  const KlaimActivecardAttachment({
+    required this.name,
+    required this.url,
+    required this.kind,
+    this.onTap,
+  });
+}
+
 class KlaimActivecardPage extends StatelessWidget {
   final String progressNama;
   final String progressDesc;
   final String dateText;
 
   final String? imageUrl;
+  final String? fileUrl;
+  final List<KlaimActivecardAttachment> attachments;
   final Map<String, String> headers;
 
   final Color cardBg;
@@ -30,6 +48,7 @@ class KlaimActivecardPage extends StatelessWidget {
   final KlaimProgressInfoModel? klaimProgressInfo;
 
   final bool showFile;
+  final VoidCallback? onOpenImage;
   final VoidCallback? onOpenFile;
 
   const KlaimActivecardPage({
@@ -38,6 +57,8 @@ class KlaimActivecardPage extends StatelessWidget {
     required this.progressDesc,
     required this.dateText,
     required this.imageUrl,
+    this.fileUrl,
+    this.attachments = const [],
     required this.headers,
     required this.cardBg,
     required this.border,
@@ -48,15 +69,34 @@ class KlaimActivecardPage extends StatelessWidget {
     required this.showMetodeGantiKlaim,
     required this.klaimProgressInfo,
     required this.showFile,
+    this.onOpenImage,
     this.onOpenFile,
   });
 
   @override
   Widget build(BuildContext context) {
-    const double thumbW = 108;
-    const double thumbH = 78;
+    const double thumbW = 124;
+    const double thumbH = 90;
 
     final hasThumb = (imageUrl != null && imageUrl!.trim().isNotEmpty);
+    final visibleAttachments = attachments.isNotEmpty
+        ? attachments
+        : [
+            if (hasThumb)
+              KlaimActivecardAttachment(
+                name: 'Lampiran Klaim',
+                url: imageUrl!,
+                kind: KlaimActivecardAttachmentKind.image,
+                onTap: onOpenImage,
+              ),
+            if (showFile && fileUrl != null && fileUrl!.trim().isNotEmpty)
+              KlaimActivecardAttachment(
+                name: 'Lampiran Klaim',
+                url: fileUrl!,
+                kind: KlaimActivecardAttachmentKind.file,
+                onTap: onOpenFile,
+              ),
+          ];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -69,52 +109,35 @@ class KlaimActivecardPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          Row(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      progressNama,
-                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 16)),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      dateText.isEmpty ? '-' : dateText,
-                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context,14))
-                          .copyWith(color: hintGrey),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      progressDesc,
-                      softWrap: true,
-                      style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 14)),
-                    ),
-
-                  ],
+              Text(
+                progressNama,
+                style: bodyTextStyle(
+                  context,
+                  fontSize: getResponsiveFont(context, 16),
                 ),
               ),
-
-              if (hasThumb) ...[
-                const SizedBox(width: 12),
-                SizedBox(
-                  width: thumbW,
-                  height: thumbH,
-                  child: KlaimLacakImage(
-                    url: imageUrl,
-                    headers: headers,
-                    width: thumbW,
-                    height: thumbH,
-                  ),
+              const SizedBox(height: 2),
+              Text(
+                dateText.isEmpty ? '-' : dateText,
+                style: bodyTextStyle(
+                  context,
+                  fontSize: getResponsiveFont(context, 14),
+                ).copyWith(color: hintGrey),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                progressDesc,
+                softWrap: true,
+                style: bodyTextStyle(
+                  context,
+                  fontSize: getResponsiveFont(context, 14),
                 ),
-              ],
+              ),
             ],
           ),
-
           if (showNilaiKlaim && infoNilaiKlaim != null) ...[
             const SizedBox(height: 12),
             KlaimLacakNilai(
@@ -122,17 +145,36 @@ class KlaimActivecardPage extends StatelessWidget {
               klaimAmount: infoNilaiKlaim!.klaimAmount,
             ),
           ],
-
           if (showJadwalBayar && (jadwalBayarItems?.isNotEmpty ?? false)) ...[
             const SizedBox(height: 12),
             KlaimLacakJadwal(items: jadwalBayarItems!),
           ],
-
-          if (showFile && imageUrl != null && imageUrl!.trim().isNotEmpty) ...[
+          if (visibleAttachments.isNotEmpty) ...[
             const SizedBox(height: 12),
-            KlaimLacakFile(
-              fileUrl: imageUrl!,
-              onTap: onOpenFile,
+            ...visibleAttachments.map(
+              (attachment) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: attachment.kind == KlaimActivecardAttachmentKind.image
+                    ? InkWell(
+                        onTap: attachment.onTap,
+                        borderRadius: BorderRadius.circular(14),
+                        child: SizedBox(
+                          width: thumbW,
+                          height: thumbH,
+                          child: KlaimLacakImage(
+                            url: attachment.url,
+                            headers: headers,
+                            width: thumbW,
+                            height: thumbH,
+                          ),
+                        ),
+                      )
+                    : KlaimLacakFile(
+                        fileUrl: attachment.url,
+                        fileName: attachment.name,
+                        onTap: attachment.onTap,
+                      ),
+              ),
             ),
           ],
         ],

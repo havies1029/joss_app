@@ -32,7 +32,7 @@ class PerbaruiKlaimParPage extends StatefulWidget {
 class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
   final GlobalKey<FormState> klaimFormKey = GlobalKey<FormState>();
   final GlobalKey<KlaimparklaimcrudFormPageFormState> klaimPageKey =
-  GlobalKey<KlaimparklaimcrudFormPageFormState>();
+      GlobalKey<KlaimparklaimcrudFormPageFormState>();
 
   void _showMessage(String message) {
     if (!mounted) return;
@@ -44,8 +44,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
 
   void _openAccordion(int index) {
     context.read<KlaimparaccordionBloc>().add(
-      KlaimparaccordionToggleEvent(index: index),
-    );
+          KlaimparaccordionToggleEvent(index: index),
+        );
   }
 
   Future<void> _autoSaveSection(int? index) async {
@@ -57,8 +57,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
 
         if (klaimState.isDirty) {
           context.read<KlaimparklaimcrudBloc>().add(
-            KlaimparklaimcrudAutoSaveEvent(),
-          );
+                KlaimparklaimcrudAutoSaveEvent(),
+              );
 
           await Future.delayed(const Duration(milliseconds: 150));
         }
@@ -69,7 +69,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
     }
   }
 
-  Future<void> _handleAccordionTap(int index, KlaimparaccordionState acc) async {
+  Future<void> _handleAccordionTap(
+      int index, KlaimparaccordionState acc) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     await _autoSaveSection(acc.openedIndex);
@@ -99,6 +100,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
           display: "Klaim Berhasil Diperbarui",
           description: "Data klaim telah berhasil diperbarui.",
           displayButton: "Kembali",
+          klaimMainInitialTab: 1,
         ),
       ),
     );
@@ -133,12 +135,13 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                 children: [
                   const SizedBox(height: hPadding * 1.5),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: FormSectionHeader(
                       iconPath: iconPath,
                       title: "Klaim ${widget.cobGroupNama}",
                       subtitle:
-                      "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
+                          "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),
                   ),
                   const SizedBox(height: hPadding * 1.5),
@@ -146,10 +149,6 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                     builder: (_, klaim) {
                       return BlocBuilder<Klaim5cariBloc, Klaim5cariState>(
                         builder: (_, dok) {
-                          for (int i = 0; i < dok.items.length; i++) {
-                            final x = dok.items[i];
-                          }
-
                           final done = [
                             klaim.isComplete,
                             dok.isComplete,
@@ -176,7 +175,7 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                   ),
                   Padding(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
                     child: Column(
                       children: [
                         const SizedBox(height: hPadding * 1.5),
@@ -199,7 +198,8 @@ class PerbaruiKlaimParPageState extends State<PerbaruiKlaimParPage> {
                           child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
                         ),
                         const SizedBox(height: 24),
-                        BlocBuilder<KlaimparklaimcrudBloc, KlaimparklaimcrudState>(
+                        BlocBuilder<KlaimparklaimcrudBloc,
+                            KlaimparklaimcrudState>(
                           builder: (context, state) {
                             return AppButton.primary(
                               onPressed: state.isSaving

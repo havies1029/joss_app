@@ -9,8 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/widgets/apptheme/custom_progress_bar.dart';
 import 'package:joss_app/widgets/apptheme/header_card_polis.dart';
 
-// import 'klaim5cari_list.dart';
-import '../../../blocs/perbaruiklaimmv/klaim5cari_bloc.dart';
 import '../../perbaruiklaimpar/mobile/perbaruisuccess_page.dart';
 import 'klaim5cari_list.dart';
 import 'klaimmvaccordioncard.dart';
@@ -24,14 +22,17 @@ class PerbaruiKlaimMvPage extends StatefulWidget {
   final String cobGroupNama;
   final String klaim1Id;
   final String cobGroupId;
-  const PerbaruiKlaimMvPage({super.key, required this.klaim1Id, required this.cobGroupNama, required this.cobGroupId});
+  const PerbaruiKlaimMvPage(
+      {super.key,
+      required this.klaim1Id,
+      required this.cobGroupNama,
+      required this.cobGroupId});
 
   @override
   PerbaruiKlaimMvPageState createState() => PerbaruiKlaimMvPageState();
 }
 
 class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
-
   bool _submitInProgress = false;
   bool _successShown = false;
 
@@ -40,13 +41,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   final GlobalKey<FormState> bengkelFormKey = GlobalKey<FormState>();
 
   final GlobalKey<KlaimmvpoliscrudFormPageFormState> polisPageKey =
-  GlobalKey<KlaimmvpoliscrudFormPageFormState>();
+      GlobalKey<KlaimmvpoliscrudFormPageFormState>();
 
   final GlobalKey<KlaimmvklaimcrudFormPageFormState> klaimPageKey =
-  GlobalKey<KlaimmvklaimcrudFormPageFormState>();
+      GlobalKey<KlaimmvklaimcrudFormPageFormState>();
 
   final GlobalKey<KlaimmvbengkelcrudFormPageFormState> bengkelPageKey =
-  GlobalKey<KlaimmvbengkelcrudFormPageFormState>();
+      GlobalKey<KlaimmvbengkelcrudFormPageFormState>();
 
   @override
   void initState() {
@@ -54,16 +55,16 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<KlaimmvpoliscrudBloc>().add(
-        KlaimmvpoliscrudLihatEvent(recordId: widget.klaim1Id),
-      );
+            KlaimmvpoliscrudLihatEvent(recordId: widget.klaim1Id),
+          );
 
       context.read<KlaimmvklaimcrudBloc>().add(
-        KlaimmvklaimcrudLihatEvent(recordId: widget.klaim1Id),
-      );
+            KlaimmvklaimcrudLihatEvent(recordId: widget.klaim1Id),
+          );
 
       context.read<KlaimmvbengkelcrudBloc>().add(
-        KlaimmvbengkelcrudLihatEvent(recordId: widget.klaim1Id),
-      );
+            KlaimmvbengkelcrudLihatEvent(recordId: widget.klaim1Id),
+          );
     });
   }
 
@@ -71,7 +72,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
   Widget build(BuildContext context) {
     var klaimmvpoliscrudBloc = BlocProvider.of<KlaimmvpoliscrudBloc>(context);
     var klaimmvklaimcrudBloc = BlocProvider.of<KlaimmvklaimcrudBloc>(context);
-    var klaimmvbengkelcrudBloc = BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
+    var klaimmvbengkelcrudBloc =
+        BlocProvider.of<KlaimmvbengkelcrudBloc>(context);
 
     return MultiBlocListener(
       listeners: [
@@ -87,7 +89,6 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
             _checkSubmitCompleted(context);
           },
         ),
-
         BlocListener<KlaimmvklaimcrudBloc, KlaimmvklaimcrudState>(
           listener: (context, state) {
             if (_submitInProgress && state.hasFailure) {
@@ -100,7 +101,6 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
             _checkSubmitCompleted(context);
           },
         ),
-
         BlocListener<KlaimmvbengkelcrudBloc, KlaimmvbengkelcrudState>(
           listener: (context, state) {
             if (_submitInProgress && state.hasFailure) {
@@ -126,16 +126,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: hPadding * 1.5),
-
                     FormSectionHeader(
                       iconPath: "assets/icons/kendaraan.svg",
                       title: "Klaim ${widget.cobGroupNama}",
                       subtitle:
-                      "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
+                          "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),
-
                     const SizedBox(height: hPadding * 1.5),
-
                     BlocBuilder<KlaimmvpoliscrudBloc, KlaimmvpoliscrudState>(
                       builder: (_, polis) => BlocBuilder<KlaimmvklaimcrudBloc,
                           KlaimmvklaimcrudState>(
@@ -165,16 +162,14 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: hPadding * 1.5),
-
                     Klaimmvaccordioncard(
                       title: 'Data Polis',
                       isOpen: acc.openedIndex == 0,
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
-                          KlaimmvaccordionToggleEvent(index: 0),
-                        );
+                              KlaimmvaccordionToggleEvent(index: 0),
+                            );
                       },
                       child: KlaimmvpoliscrudFormPage(
                         key: polisPageKey,
@@ -188,8 +183,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       isOpen: acc.openedIndex == 1,
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
-                          KlaimmvaccordionToggleEvent(index: 1),
-                        );
+                              KlaimmvaccordionToggleEvent(index: 1),
+                            );
                       },
                       child: KlaimmvklaimcrudFormPage(
                         cobGroupId: widget.cobGroupId,
@@ -204,8 +199,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       isOpen: acc.openedIndex == 2,
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
-                          KlaimmvaccordionToggleEvent(index: 2),
-                        );
+                              KlaimmvaccordionToggleEvent(index: 2),
+                            );
                       },
                       child: Klaim5cariPage(klaim1Id: widget.klaim1Id),
                     ),
@@ -214,8 +209,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       isOpen: acc.openedIndex == 3,
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
-                          KlaimmvaccordionToggleEvent(index: 3),
-                        );
+                              KlaimmvaccordionToggleEvent(index: 3),
+                            );
                       },
                       child: KlaimmvstatuscariPage(klaim1Id: widget.klaim1Id),
                     ),
@@ -224,8 +219,8 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       isOpen: acc.openedIndex == 4,
                       onTap: () {
                         context.read<KlaimmvaccordionBloc>().add(
-                          KlaimmvaccordionToggleEvent(index: 4),
-                        );
+                              KlaimmvaccordionToggleEvent(index: 4),
+                            );
                       },
                       child: KlaimmvbengkelcrudFormPage(
                         key: bengkelPageKey,
@@ -235,50 +230,54 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
                     AppButton.primary(
                       onPressed: () async {
                         if (_submitInProgress) return;
 
                         debugPrint('=== BUTTON PERBARUI CLICKED ===');
 
+                        final polisBloc = context.read<KlaimmvpoliscrudBloc>();
+                        final klaimBloc = context.read<KlaimmvklaimcrudBloc>();
+                        final bengkelBloc =
+                            context.read<KlaimmvbengkelcrudBloc>();
+
                         FocusManager.instance.primaryFocus?.unfocus();
                         await Future.delayed(const Duration(milliseconds: 50));
 
-                        if (!mounted) return;
+                        if (!context.mounted) return;
 
                         setState(() {
                           _submitInProgress = true;
                           _successShown = false;
                         });
 
-                        context.read<KlaimmvpoliscrudBloc>().add(
+                        polisBloc.add(
                           KlaimmvPolisAutoSaveEvent(saveFrom: "button"),
                         );
 
-                        context.read<KlaimmvklaimcrudBloc>().add(
+                        klaimBloc.add(
                           KlaimmvklaimAutoSaveEvent(saveFrom: "button"),
                         );
 
-                        context.read<KlaimmvbengkelcrudBloc>().add(
+                        bengkelBloc.add(
                           KlaimmvbengkelAutoSaveEvent(saveFrom: "button"),
                         );
 
                         Future.delayed(const Duration(milliseconds: 300), () {
-                          if (!mounted) return;
+                          if (!context.mounted) return;
                           _checkSubmitCompleted(context);
                         });
                       },
                       text: 'Perbarui',
                       textStyle: headingStyle(context, fontSize: 18),
                     ),
-
                     const SizedBox(height: 24),
                   ],
                 ),
               );
             },
-            listener: (BuildContext context, KlaimmvaccordionState state) async {
+            listener:
+                (BuildContext context, KlaimmvaccordionState state) async {
               if (state.previousIndex == null ||
                   state.previousIndex == state.openedIndex) {
                 return;
@@ -330,21 +329,23 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
     final bengkelState = context.read<KlaimmvbengkelcrudBloc>().state;
 
     debugPrint("===== CHECK SUBMIT =====");
-    debugPrint("POLIS   saving:${polisState.isSaving}, dirty:${polisState.isDirty}, failure:${polisState.hasFailure}");
-    debugPrint("KLAIM   saving:${klaimState.isSaving}, dirty:${klaimState.isDirty}, failure:${klaimState.hasFailure}, recordNull:${klaimState.record == null}");
-    debugPrint("BENGKEL saving:${bengkelState.isSaving}, dirty:${bengkelState.isDirty}, failure:${bengkelState.hasFailure}");
+    debugPrint(
+        "POLIS   saving:${polisState.isSaving}, dirty:${polisState.isDirty}, failure:${polisState.hasFailure}");
+    debugPrint(
+        "KLAIM   saving:${klaimState.isSaving}, dirty:${klaimState.isDirty}, failure:${klaimState.hasFailure}, recordNull:${klaimState.record == null}");
+    debugPrint(
+        "BENGKEL saving:${bengkelState.isSaving}, dirty:${bengkelState.isDirty}, failure:${bengkelState.hasFailure}");
     debugPrint("========================");
 
-    final allDone =
-        !polisState.isSaving &&
-            !klaimState.isSaving &&
-            !bengkelState.isSaving &&
-            !polisState.isDirty &&
-            !klaimState.isDirty &&
-            !bengkelState.isDirty &&
-            !polisState.hasFailure &&
-            !bengkelState.hasFailure &&
-            !(klaimState.hasFailure && klaimState.isDirty);
+    final allDone = !polisState.isSaving &&
+        !klaimState.isSaving &&
+        !bengkelState.isSaving &&
+        !polisState.isDirty &&
+        !klaimState.isDirty &&
+        !bengkelState.isDirty &&
+        !polisState.hasFailure &&
+        !bengkelState.hasFailure &&
+        !(klaimState.hasFailure && klaimState.isDirty);
 
     if (!allDone) return;
 
@@ -357,12 +358,13 @@ class PerbaruiKlaimMvPageState extends State<PerbaruiKlaimMvPage> {
           display: "Klaim Berhasil Diperbarui",
           description: "Data klaim telah berhasil diperbarui.",
           displayButton: "Kembali",
+          klaimMainInitialTab: 1,
           onButtonPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (_) => const KlaimMainPage(),
+                builder: (_) => const KlaimMainPage(initialTab: 1),
               ),
-                  (route) => route.isFirst,
+              (route) => route.isFirst,
             );
           },
         ),

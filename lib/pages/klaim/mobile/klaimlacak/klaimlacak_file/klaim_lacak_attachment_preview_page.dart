@@ -3,6 +3,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:joss_app/common/loading_indicator.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:pdfx/pdfx.dart';
 
 import 'package:joss_app/common/constants.dart';
@@ -39,6 +41,7 @@ class _KlaimLacakAttachmentPreviewPageState
     extends State<KlaimLacakAttachmentPreviewPage> {
   late Future<KlaimLacakAttachmentLocalFile> _future;
   PdfControllerPinch? _pdfController;
+  bool _externalOpenRequested = false;
 
   @override
   void initState() {
@@ -56,6 +59,21 @@ class _KlaimLacakAttachmentPreviewPageState
     _pdfController ??= PdfControllerPinch(
       document: PdfDocument.openFile(path),
     );
+  }
+
+  Future<void> _openExternal(KlaimLacakAttachmentLocalFile file) async {
+    final result = await OpenFilex.open(file.path);
+    if (!mounted) return;
+
+    if (result.type != ResultType.done) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          result.message.isNotEmpty
+              ? result.message
+              : 'Tidak ada aplikasi yang dapat membuka file ini.',
+        ),
+      );
+    }
   }
 
   @override
@@ -76,15 +94,18 @@ class _KlaimLacakAttachmentPreviewPageState
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           }
 
           if (snap.hasError || !snap.hasData) {
             return Center(
-              child: Text(
-                'Gagal membuka file: ${snap.error}',
-                style: const TextStyle(color: Colors.white70),
-                textAlign: TextAlign.center,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Gagal membuka file: ${snap.error}',
+                  style: const TextStyle(color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
               ),
             );
           }
@@ -107,16 +128,50 @@ class _KlaimLacakAttachmentPreviewPageState
               onDocumentError: (error) {
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Gagal membuka PDF: $error')),
+                  errorSnackBar('Gagal membuka PDF: $error'),
                 );
               },
             );
           }
 
-          return const Center(
-            child: Text(
-              'Format file belum didukung untuk preview.',
-              style: TextStyle(color: Colors.white70),
+          if (!_externalOpenRequested) {
+            _externalOpenRequested = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _openExternal(file);
+            });
+          }
+
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.insert_drive_file_outlined,
+                    color: primaryLightColor,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    file.name,
+                    textAlign: TextAlign.center,
+                    style: bodyTextStyle(context),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'File akan dibuka dengan aplikasi yang tersedia di perangkat.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton.primary(
+                    text: 'Buka File',
+                    onPressed: () => _openExternal(file),
+                  ),
+                ],
+              ),
             ),
           );
         },

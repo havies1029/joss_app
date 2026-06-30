@@ -47,10 +47,7 @@ import 'klaimlacak_detail/klaimlacak_list.dart';
 
     void _refreshData() {
       _klaimProgressCariBloc.add(
-      //   RefreshKlaimprogresscariEvent(
-      //     klaim1Id: widget.klaim1Id,
-      //   ),
-        InjectDummyKlaimprogresscariEvent(
+        RefreshKlaimprogresscariEvent(
           klaim1Id: widget.klaim1Id,
         ),
       );

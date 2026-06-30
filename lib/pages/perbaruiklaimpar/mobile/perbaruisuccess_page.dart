@@ -13,19 +13,20 @@ import 'package:confetti/confetti.dart';
 
 import 'package:joss_app/pages/regklaim/mobile/main_page/klaim_main_page.dart';
 
-
 class PerbaruiSuccessPage extends StatefulWidget {
   final String display;
   final String description;
   final String displayButton;
   final VoidCallback? onButtonPressed;
+  final int klaimMainInitialTab;
 
   const PerbaruiSuccessPage({
     super.key,
     required this.display,
     required this.description,
     required this.displayButton,
-    this.onButtonPressed
+    this.onButtonPressed,
+    this.klaimMainInitialTab = 0,
   });
 
   @override
@@ -55,8 +56,10 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
 
   void _goToMain() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const KlaimMainPage()),
-          (route) => false,
+      MaterialPageRoute(
+        builder: (_) => KlaimMainPage(initialTab: widget.klaimMainInitialTab),
+      ),
+      (route) => false,
     );
   }
 
@@ -67,12 +70,15 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
     _controllerRight.dispose();
     super.dispose();
   }
+
   void _defaultButtonAction() {
     context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
     // Navigator.popUntil(context, (route) => route.isFirst);
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const KlaimMainPage()),
-          (route) => route.isFirst,
+      MaterialPageRoute(
+        builder: (_) => KlaimMainPage(initialTab: widget.klaimMainInitialTab),
+      ),
+      (route) => route.isFirst,
     );
   }
 
@@ -148,7 +154,9 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
                         onPressed: () {
                           Navigator.pop(context);
                           context.read<SumdashBloc>().add(SumdashLihatEvent());
-                          context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
+                          context
+                              .read<LogtrscaritopxBloc>()
+                              .add(RefreshLogtrscaritopxEvent());
                           onPressed.call();
                         },
                       ),

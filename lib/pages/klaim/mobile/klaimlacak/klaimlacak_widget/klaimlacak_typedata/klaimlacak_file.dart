@@ -5,17 +5,21 @@ import 'package:joss_app/common/constants.dart';
 
 class KlaimLacakFile extends StatelessWidget {
   final String fileUrl;
+  final String? fileName;
   final VoidCallback? onTap;
 
   const KlaimLacakFile({
     super.key,
     required this.fileUrl,
+    this.fileName,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final fileName = fileUrl.split('/').last;
+    final displayName = (fileName ?? '').trim().isEmpty
+        ? fileUrl.split('/').last
+        : fileName!.trim();
 
     return InkWell(
       onTap: onTap,
@@ -38,7 +42,7 @@ class KlaimLacakFile extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                fileName.isEmpty ? 'Lihat File Lampiran' : fileName,
+                displayName.isEmpty ? 'Lihat File Lampiran' : displayName,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: bodyTextStyle(context, fontSize: 13),

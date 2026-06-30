@@ -8,7 +8,12 @@ import 'klaim_rincian_tab.dart';
 import 'klaim_ringkasan_tab.dart';
 
 class KlaimMainPage extends StatefulWidget {
-  const KlaimMainPage({super.key});
+  final int initialTab;
+
+  const KlaimMainPage({
+    super.key,
+    this.initialTab = 0,
+  });
 
   @override
   KlaimMainPageState createState() => KlaimMainPageState();
@@ -21,12 +26,13 @@ class KlaimMainPageState extends State<KlaimMainPage>
 
   final _formKey = GlobalKey<FormState>();
 
-  int selectedTab = 0;
+  late int selectedTab;
 
   final List<Map<String, dynamic>> tabItems = [
     {'label': 'Ringkasan', 'page': const KlaimRingkasanTab()},
     {
-      'label': 'Rincian', 'page': const KlaimRincianTab(),
+      'label': 'Rincian',
+      'page': const KlaimRincianTab(),
     },
     // {'label': 'Rasio', 'page': const KlaimRasioTab()},
   ];
@@ -34,6 +40,7 @@ class KlaimMainPageState extends State<KlaimMainPage>
   @override
   void initState() {
     super.initState();
+    selectedTab = widget.initialTab.clamp(0, tabItems.length - 1).toInt();
     _animationController = AnimationController(
       duration: defaultDuration,
       vsync: this,
@@ -64,8 +71,7 @@ class KlaimMainPageState extends State<KlaimMainPage>
                     const HeaderCard(
                       iconPath: "assets/icons/menu_klaim.svg",
                       title: "Klaim",
-                      subtitle:
-                      "Lihat dan kelola semua klaim anda di sini.",
+                      subtitle: "Lihat dan kelola semua klaim anda di sini.",
                     ),
                     SafeArea(
                       child: ClipRRect(
@@ -95,7 +101,9 @@ class KlaimMainPageState extends State<KlaimMainPage>
                                     decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
-                                          color: isActive ? primaryColor : unselectedColor,
+                                          color: isActive
+                                              ? primaryColor
+                                              : unselectedColor,
                                           width: 1.5,
                                         ),
                                       ),
@@ -103,7 +111,9 @@ class KlaimMainPageState extends State<KlaimMainPage>
                                     child: Text(
                                       tabItems[i]['label'],
                                       style: bodyTextStyle(context).copyWith(
-                                        color: isActive ? primaryColor : unselectedColor,
+                                        color: isActive
+                                            ? primaryColor
+                                            : unselectedColor,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -132,7 +142,6 @@ class KlaimMainPageState extends State<KlaimMainPage>
       floatingActionButton: FabActionKlaim(
         selectedTab: selectedTab,
       ),
-
     );
   }
 }
