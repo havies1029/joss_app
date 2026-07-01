@@ -980,27 +980,6 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     ) &&
         ok;
 
-    if (ok) {
-      final tpl = parseOrZeroAutoFill(fieldTplController);
-      final pad = parseOrZeroAutoFill(fieldPadController);
-      final pap = parseOrZeroAutoFill(fieldPapController);
-      final pll = parseOrZeroAutoFill(fieldPllController);
-
-      final anyGreaterThanZero =
-          tpl > 0 || pad > 0 || pap > 0 || pll > 0;
-
-      if (!anyGreaterThanZero) {
-        const msg = "Minimal salah satu nilai harus lebih dari 0";
-
-        setErr('form2.tpl', msg);
-        setErr('form2.pad', msg);
-        setErr('form2.pap', msg);
-        setErr('form2.pll', msg);
-
-        ok = false;
-      }
-    }
-
     return ok;
   }
 

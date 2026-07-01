@@ -46,6 +46,7 @@ class _RincianPageState extends State<RincianPage> {
 
   bool _firstLoading = true;
   bool _isCardWebViewOpen = false;
+  bool _hasHandledPaymentCancel = false;
 
   Set<String> getSelectedCurrSet(DnRekap2invState state) {
     return state.rincianSOA.headers
@@ -172,6 +173,9 @@ class _RincianPageState extends State<RincianPage> {
                 ),
               );
             } else if (state.paymentStatus == "91") {
+              if (_hasHandledPaymentCancel) return;
+              _hasHandledPaymentCancel = true;
+
               ScaffoldMessenger.of(context).showSnackBar(
                 successSnackBar('Pembayaran berhasil dibatalkan.'),
               );

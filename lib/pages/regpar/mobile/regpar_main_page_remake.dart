@@ -2591,17 +2591,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   bool isForm4Complete() {
     if (fieldComboRMatauang == null) return false;
 
-    double n(TextEditingController c) =>
-        double.tryParse(c.text.replaceAll(',', '').trim()) ?? 0;
-
-    // minimal salah satu SI > 0 (atau aturan kamu)
-    final a = n(fieldSiBuildingController);
-    final b = n(fieldSiContentController);
-    final c1 = n(fieldSiMachineryController);
-    final d = n(fieldSiStockController);
-    final e = n(fieldSiOtherController);
-
-    return (a > 0 || b > 0 || c1 > 0 || d > 0 || e > 0);
+    return true;
   }
 
   bool isForm6Complete() {

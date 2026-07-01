@@ -1243,26 +1243,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     ok = optionalPositiveNumAutoZero(fieldSiStockController, 'form2.siStock') && ok;
     ok = optionalPositiveNumAutoZero(fieldSiOtherController, 'form2.siOther') && ok;
 
-    if (ok) {
-      final vMachinery = parseOrZeroAutoFill(fieldSiMachineryController);
-      final vBuilding = parseOrZeroAutoFill(fieldSiBuildingController);
-      final vContent = parseOrZeroAutoFill(fieldSiContentController);
-      final vStock = parseOrZeroAutoFill(fieldSiStockController);
-      final vOther = parseOrZeroAutoFill(fieldSiOtherController);
-
-      final anyGreaterThanZero =
-          vMachinery > 0 ||
-              vBuilding > 0 ||
-              vContent > 0 ||
-              vStock > 0 ||
-              vOther > 0;
-
-      if (!anyGreaterThanZero) {
-        setErr('form2.siMachinery', 'Minimal salah satu nilai harus lebih dari 0');
-        ok = false;
-      }
-    }
-
     if (!ok) {
       setState(() => expanded[1] = true);
     }

@@ -11,6 +11,7 @@ import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/models/klaimlacak/klaim_lacak_attachment_item.dart';
 import 'package:joss_app/pages/klaimlacak/mobile/klaimnilaicrud_form.dart';
 
+import '../../klaimnilai/klaimnilai_page.dart';
 import '../klaimlacak_file/klaim_lacak_attachment_preview_page.dart';
 import '../klaimlacak_widget/klaim_activecard_widget.dart';
 import '../klaimlacak_widget/klaim_placeholder_widget.dart';
@@ -221,7 +222,7 @@ class _KlaimLacakListState extends State<KlaimLacakList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => KlaimnilaicrudFormPage(
+                        builder: (_) => KlaimNilaiPage(
                           klaim1Id: widget.klaim1Id,
                         ),
                       ),

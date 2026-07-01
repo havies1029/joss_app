@@ -4,7 +4,7 @@ abstract class KlaimparklaimcrudEvents extends Equatable {
   const KlaimparklaimcrudEvents();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class KlaimparklaimcrudTambahEvent extends KlaimparklaimcrudEvents {
@@ -62,12 +62,12 @@ class ComboRMatauangChangedEvent extends KlaimparklaimcrudEvents {
 }
 
 class FieldDolChangedEvent extends KlaimparklaimcrudEvents {
-  final DateTime dol;
+  final DateTime? dol;
 
   const FieldDolChangedEvent({required this.dol});
 
   @override
-  List<Object> get props => [dol];
+  List<Object?> get props => [dol];
 }
 
 class FieldKeteranganChangedEvent extends KlaimparklaimcrudEvents {
@@ -80,21 +80,21 @@ class FieldKeteranganChangedEvent extends KlaimparklaimcrudEvents {
 }
 
 class FieldLaporAsuransiChangedEvent extends KlaimparklaimcrudEvents {
-  final DateTime laporAsuransi;
+  final DateTime? laporAsuransi;
 
   const FieldLaporAsuransiChangedEvent({required this.laporAsuransi});
 
   @override
-  List<Object> get props => [laporAsuransi];
+  List<Object?> get props => [laporAsuransi];
 }
 
 class FieldLaporJpsChangedEvent extends KlaimparklaimcrudEvents {
-  final DateTime laporJps;
+  final DateTime? laporJps;
 
   const FieldLaporJpsChangedEvent({required this.laporJps});
 
   @override
-  List<Object> get props => [laporJps];
+  List<Object?> get props => [laporJps];
 }
 
 class FieldPenyebabChangedEvent extends KlaimparklaimcrudEvents {

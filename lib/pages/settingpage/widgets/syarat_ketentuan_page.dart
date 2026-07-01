@@ -7,8 +7,7 @@ class SyaratKetentuanPage extends StatefulWidget {
   const SyaratKetentuanPage({super.key});
 
   @override
-  State<SyaratKetentuanPage> createState() =>
-      _SyaratKetentuanPageState();
+  State<SyaratKetentuanPage> createState() => _SyaratKetentuanPageState();
 }
 
 class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
@@ -62,73 +61,66 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
       title: "Syarat & Ketentuan",
       child: Container(
         color: secondaryBlackColor,
-        padding:
-        const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: pGrey,
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                  border: Border.all(color: sGrey)
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: BorderRadius.circular(10),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: pGrey,
+                      borderRadius: BorderRadius.circular(cardBorderRadius),
+                      border: Border.all(color: sGrey)),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: SvgPicture.asset(
+                          "assets/icons/shield.svg",
+                          width: 25,
+                          height: 25,
+                        ),
                       ),
-                      child: SvgPicture.asset(
-                        "assets/icons/shield.svg",
-                        width: 25,
-                        height: 25,
-                      ),
-                    ),
 
-                    const SizedBox(width: 13),
+                      const SizedBox(width: 13),
 
-                    // TEXT
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Perlindungan Data Asuransi',
-                            style: headingStyle(context, fontSize: 18),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Komitmen kami melindungi data sensitif nasabah asuransi.',
-                            style: bodyTextStyle(
-                              context,
-                              fontSize: 16,
-                            ).copyWith(color: hintGrey),
-                          ),
-                        ],
+                      // TEXT
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Perlindungan Data Asuransi',
+                              style: headingStyle(context, fontSize: 20),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Komitmen kami melindungi data sensitif nasabah asuransi.',
+                              style: bodyTextStyle(
+                                context,
+                                fontSize: 18,
+                              ).copyWith(color: hintGrey),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              ),
+                    ],
+                  )),
               const SizedBox(height: 14),
-
               _alertWidget(context),
-
               const SizedBox(height: 14),
-
               ...List.generate(items.length, (i) {
                 final item = items[i];
                 final isExpanded = expandedIndex == i;
 
                 return Container(
-                  margin:
-                  const EdgeInsets.only(bottom: 14),
+                  margin: const EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [
@@ -136,25 +128,20 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                         Color(0xFF1E1E1E),
                       ],
                     ),
-                    borderRadius:
-                    BorderRadius.circular(14),
-                    border: Border.all(
-                        color: const Color(0xFF3A3A3A)),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFF3A3A3A)),
                   ),
                   child: Column(
                     children: [
                       InkWell(
-                        borderRadius:
-                        BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14),
                         onTap: () {
                           setState(() {
-                            expandedIndex =
-                            isExpanded ? null : i;
+                            expandedIndex = isExpanded ? null : i;
                           });
                         },
                         child: Padding(
-                          padding:
-                          const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
                               SizedBox(
@@ -169,39 +156,23 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                               Expanded(
                                 child: Text(
                                   item.title,
-                                  style: bodyTextStyle(
-                                      context,
-                                      fontSize: 16)
-                                      .copyWith(
-                                      fontWeight:
-                                      FontWeight
-                                          .w600),
+                                  style: bodyTextStyle(context, fontSize: 18)
+                                      .copyWith(fontWeight: FontWeight.w600),
                                 ),
                               ),
                               Container(
                                 width: 34,
                                 height: 34,
-                                decoration:
-                                BoxDecoration(
-                                  color: const Color(
-                                      0xFF3A3A3A),
-                                  borderRadius:
-                                  BorderRadius
-                                      .circular(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF3A3A3A),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: AnimatedRotation(
-                                  duration:
-                                  const Duration(
-                                      milliseconds:
-                                      250),
-                                  turns: isExpanded
-                                      ? 0.5
-                                      : 0,
+                                  duration: const Duration(milliseconds: 250),
+                                  turns: isExpanded ? 0.5 : 0,
                                   child: const Icon(
-                                    Icons
-                                        .keyboard_arrow_down,
-                                    color:
-                                    Colors.white,
+                                    Icons.keyboard_arrow_down,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
@@ -209,7 +180,6 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                           ),
                         ),
                       ),
-
                       ClipRect(
                         child: AnimatedAlign(
                           duration: const Duration(milliseconds: 350),
@@ -228,8 +198,9 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Text(
                                       point,
-                                      style: bodyTextStyle(context, fontSize: 14)
-                                          .copyWith(color: hintGrey),
+                                      style:
+                                          bodyTextStyle(context, fontSize: 16)
+                                              .copyWith(color: hintGrey),
                                     ),
                                   );
                                 }).toList(),
@@ -255,8 +226,7 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
       decoration: BoxDecoration(
         color: const Color(0xFF432C1B),
         // border: Border.all(color: primaryColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,38 +243,30 @@ class _SyaratKetentuanPageState extends State<SyaratKetentuanPage> {
           const SizedBox(width: 10),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Perhatian Penting',
-                  style: bodyTextStyle(context)
-                      .copyWith(
-                      color: primaryColor),
+                  style: bodyTextStyle(context, fontSize: 20)
+                      .copyWith(color: primaryColor),
                 ),
                 const SizedBox(height: 4),
                 Wrap(
                   children: [
                     Text(
                       'Kebijakan ini berlaku untuk semua produk asuransi dan telah disesuaikan dengan regulasi ',
-                      style: bodyTextStyle(context,
-                          fontSize: 14)
-                          .copyWith(
-                          color: hintGrey),
+                      style: bodyTextStyle(context, fontSize: 16)
+                          .copyWith(color: hintGrey),
                     ),
                     Text(
                       'Otoritas Jasa Keuangan (OJK)',
-                      style: headingStyle(context,
-                          fontSize: 14)
-                          .copyWith(
-                          color: hintGrey),
+                      style: headingStyle(context, fontSize: 16)
+                          .copyWith(color: hintGrey),
                     ),
                     Text(
                       ' Indonesia. Mohon baca dengan seksama.',
-                      style: bodyTextStyle(context,
-                          fontSize: 14)
-                          .copyWith(
-                          color: hintGrey),
+                      style: bodyTextStyle(context, fontSize: 16)
+                          .copyWith(color: hintGrey),
                     ),
                   ],
                 ),

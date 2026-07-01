@@ -37,8 +37,9 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
 
   void _loadMoreItems(int totalItems) {
     setState(() {
-      _displayedItems =
-      (_displayedItems + 10 > totalItems) ? totalItems : _displayedItems + 10;
+      _displayedItems = (_displayedItems + 10 > totalItems)
+          ? totalItems
+          : _displayedItems + 10;
     });
   }
 
@@ -71,27 +72,27 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
 
                 return widget.isPageMode
                     ? SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(context),
-                      const SizedBox(height: 16),
-                      _buildGridView(context, items),
-                      if (_displayedItems < items.length)
-                        _buildLoadMoreButton(items.length),
-                    ],
-                  ),
-                )
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(context),
+                            const SizedBox(height: 16),
+                            _buildGridView(context, items),
+                            if (_displayedItems < items.length)
+                              _buildLoadMoreButton(items.length),
+                          ],
+                        ),
+                      )
                     : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildHeader(context),
-                    const SizedBox(height: 16),
-                    _buildCarouselView(context, items),
-                    SizedBox(height: isMobile(context) ? 10.0 : 15.0),
-                    _buildNavigationControls(context, items),
-                  ],
-                );
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildHeader(context),
+                          const SizedBox(height: 16),
+                          _buildCarouselView(context, items),
+                          SizedBox(height: isMobile(context) ? 10.0 : 15.0),
+                          _buildNavigationControls(context, items),
+                        ],
+                      );
               },
             ),
           ),
@@ -104,7 +105,9 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: vPadding,),
+        const SizedBox(
+          height: vPadding,
+        ),
         Row(
           children: [
             SvgPicture.asset('assets/icons/quote.svg', height: 24),
@@ -141,7 +144,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
           crossAxisCount: crossAxisCount,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: mobile ? 1.7 : 1.6,
+          childAspectRatio: mobile ? 2.0 : 1.88,
         ),
         itemCount: itemsToShow.length,
         itemBuilder: (context, index) {
@@ -149,7 +152,6 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
         },
       ),
     );
-
   }
 
   Widget _buildCarouselView(BuildContext context, List<ReviewCariModel> items) {
@@ -183,26 +185,24 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
   }
 
   Widget _buildTestimonialCards(
-      BuildContext context,
-      List<ReviewCariModel> items,
-      ) {
+    BuildContext context,
+    List<ReviewCariModel> items,
+  ) {
     final width = MediaQuery.of(context).size.width;
 
-    final int itemsPerPage =
-    width < 600 ? 1 : (width < 1000 ? 2 : 3);
+    final int itemsPerPage = width < 600 ? 1 : (width < 1000 ? 2 : 3);
 
     final totalPages = (items.length / itemsPerPage).ceil();
 
     return SizedBox(
-      height: 260,
+      height: 220,
       child: PageView.builder(
         controller: _pageController,
         onPageChanged: (int page) => setState(() => _currentPage = page),
         itemCount: totalPages,
         itemBuilder: (context, pageIndex) {
           final startIndex = pageIndex * itemsPerPage;
-          final endIndex =
-          (startIndex + itemsPerPage > items.length)
+          final endIndex = (startIndex + itemsPerPage > items.length)
               ? items.length
               : startIndex + itemsPerPage;
 
@@ -216,13 +216,12 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
                     items[i],
                   ),
                 ),
-                if (i < endIndex - 1)
-                  const SizedBox(width: 16),
+                if (i < endIndex - 1) const SizedBox(width: 16),
               ],
               if (endIndex - startIndex < itemsPerPage)
                 ...List.generate(
                   itemsPerPage - (endIndex - startIndex),
-                      (_) => const Expanded(
+                  (_) => const Expanded(
                     child: SizedBox(),
                   ),
                 ),
@@ -234,9 +233,9 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
   }
 
   Widget _buildTestimonialCard(
-      BuildContext context,
-      ReviewCariModel item,
-      ) {
+    BuildContext context,
+    ReviewCariModel item,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -247,33 +246,22 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            runSpacing: 8,
+          Row(
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "${formatTanggalIndonesia(item.reviewTgl)} · ",
-                    style: bodyTextStyle(
-                      context,
-                      fontSize: 14,
-                    ).copyWith(
-                      color: hintGrey,
-                    ),
+              Expanded(
+                child: Text(
+                  "${formatTanggalIndonesia(item.reviewTgl)} · ${formatJam(item.reviewTgl)}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: bodyTextStyle(
+                    context,
+                    fontSize: 16,
+                  ).copyWith(
+                    color: hintGrey,
                   ),
-                  Text(
-                    formatJam(item.reviewTgl),
-                    style: bodyTextStyle(
-                      context,
-                      fontSize: 14,
-                    ).copyWith(
-                      color: hintGrey,
-                    ),
-                  ),
-                ],
+                ),
               ),
+              const SizedBox(width: 12),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -295,28 +283,26 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
                           item.nilai.toStringAsFixed(1),
                           style: const TextStyle(
                             color: pYellow,
-                            fontSize: 13,
+                            fontSize: 16,
                           ),
                         ),
                         Text(
                           ' /${item.skala.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: hintGrey,
-                            fontSize: 13,
+                            fontSize: 16,
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 6),
-                  _buildStarRating(item.nilai, 16),
+                  _buildStarRating(item.nilai, 22),
                 ],
               ),
             ],
           ),
-
           const SizedBox(height: 15),
-
           Row(
             children: [
               Expanded(
@@ -329,7 +315,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
                       overflow: TextOverflow.ellipsis,
                       style: bodyTextStyle(
                         context,
-                        fontSize: 18,
+                        fontSize: 16,
                       ),
                     ),
                     Text(
@@ -338,7 +324,7 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
                       overflow: TextOverflow.ellipsis,
                       style: bodyTextStyle(
                         context,
-                        fontSize: 14,
+                        fontSize: 16,
                       ).copyWith(
                         color: hintGrey,
                       ),
@@ -346,17 +332,30 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/logo_testimonial.svg',
+                    height: 18,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Testimonial',
+                    style: bodyTextStyle(context, fontSize: 16),
+                  ),
+                ],
+              ),
             ],
           ),
-
-          const SizedBox(height: 15),
-
+          const SizedBox(height: hPadding),
           Expanded(
             child: Text(
               '"${item.komentar}"',
               maxLines: 5,
               overflow: TextOverflow.ellipsis,
-              style: bodyTextStyle(context),
+              style: bodyTextStyle(context, fontSize: 16),
             ),
           ),
         ],
@@ -367,8 +366,18 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
   String formatTanggalIndonesia(DateTime dt) {
     const bulan = [
       '',
-      'Jan','Feb','Mar','Apr','Mei','Jun',
-      'Jul','Agu','Sep','Okt','Nov','Des'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des'
     ];
 
     return "${dt.day} ${bulan[dt.month]} ${dt.year}";
@@ -380,7 +389,8 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
     return "$hour:$minute";
   }
 
-  Widget _buildNavigationControls(BuildContext context, List<ReviewCariModel> items) {
+  Widget _buildNavigationControls(
+      BuildContext context, List<ReviewCariModel> items) {
     if (items.isEmpty) return const SizedBox.shrink();
 
     final mobile = isMobile(context);
@@ -415,9 +425,9 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
         ElevatedButton(
           onPressed: _currentPage > 0
               ? () => _pageController.previousPage(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          )
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  )
               : null,
           style: buttonStyle,
           child: SvgPicture.asset('assets/icons/arrow_left.svg', height: 16),
@@ -426,9 +436,9 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
         ElevatedButton(
           onPressed: _currentPage < totalPages - 1
               ? () => _pageController.nextPage(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          )
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  )
               : null,
           style: buttonStyle,
           child: SvgPicture.asset('assets/icons/arrow_right.svg', height: 16),
@@ -470,7 +480,6 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
           height: 50,
         ),
         const SizedBox(height: 20),
-
         Text(
           'Tidak ada Review tersedia',
           style: TextStyle(
@@ -479,7 +488,6 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
           ),
         ),
         const SizedBox(height: 6),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
@@ -496,53 +504,60 @@ class TestimonialWidget1State extends State<TestimonialWidget1> {
   }
 }
 
-
 class DummyReviewData {
   static List<ReviewCariModel> get items => [
-    ReviewCariModel(
-      reviewer: "Budi Santoso",
-      instansi: "PT Nusantara Teknologi",
-      komentar:
-      "Pelayanan sangat cepat dan profesional. Tim JPS sangat membantu proses kami.",
-      nilai: 4.5,
-      skala: 5,
-      reviewTgl: DateTime(2024, 6, 12, 14, 21), isAktif: false, review1Id: '',
-    ),
-    ReviewCariModel(
-      reviewer: "Siti Rahma",
-      instansi: "Universitas Indonesia",
-      komentar:
-      "Sistemnya sangat mudah digunakan dan supportnya responsif.",
-      nilai: 4.8,
-      skala: 5,
-      reviewTgl: DateTime(2024, 6, 12, 14, 21), isAktif: false, review1Id: '',
-    ),
-    ReviewCariModel(
-      reviewer: "Ahmad Fauzi",
-      instansi: "PT Global Logistik",
-      komentar:
-      "Layanan yang diberikan sangat memuaskan dan terpercaya.",
-      nilai: 4.3,
-      skala: 5,
-      reviewTgl: DateTime(2024, 5, 20, 9, 30), isAktif: false, review1Id: '',
-    ),
-    ReviewCariModel(
-      reviewer: "Dewi Lestari",
-      instansi: "Bank Mandiri",
-      komentar:
-      "Implementasi berjalan lancar dan tim sangat kooperatif.",
-      nilai: 4.7,
-      skala: 5,
-      reviewTgl: DateTime(2024, 5, 20, 9, 30), isAktif: false, review1Id: '',
-    ),
-    ReviewCariModel(
-      reviewer: "Rizky Pratama",
-      instansi: "Startup Digital ID",
-      komentar:
-      "Pengalaman kerja sama yang sangat baik. Highly recommended.",
-      nilai: 4.6,
-      skala: 5,
-      reviewTgl: DateTime(2024, 4, 10, 16, 45), isAktif: true, review1Id: '',
-    ),
-  ];
+        ReviewCariModel(
+          reviewer: "Budi Santoso",
+          instansi: "PT Nusantara Teknologi",
+          komentar:
+              "Pelayanan sangat cepat dan profesional. Tim JPS sangat membantu proses kami.",
+          nilai: 4.5,
+          skala: 5,
+          reviewTgl: DateTime(2024, 6, 12, 14, 21),
+          isAktif: false,
+          review1Id: '',
+        ),
+        ReviewCariModel(
+          reviewer: "Siti Rahma",
+          instansi: "Universitas Indonesia",
+          komentar:
+              "Sistemnya sangat mudah digunakan dan supportnya responsif.",
+          nilai: 4.8,
+          skala: 5,
+          reviewTgl: DateTime(2024, 6, 12, 14, 21),
+          isAktif: false,
+          review1Id: '',
+        ),
+        ReviewCariModel(
+          reviewer: "Ahmad Fauzi",
+          instansi: "PT Global Logistik",
+          komentar: "Layanan yang diberikan sangat memuaskan dan terpercaya.",
+          nilai: 4.3,
+          skala: 5,
+          reviewTgl: DateTime(2024, 5, 20, 9, 30),
+          isAktif: false,
+          review1Id: '',
+        ),
+        ReviewCariModel(
+          reviewer: "Dewi Lestari",
+          instansi: "Bank Mandiri",
+          komentar: "Implementasi berjalan lancar dan tim sangat kooperatif.",
+          nilai: 4.7,
+          skala: 5,
+          reviewTgl: DateTime(2024, 5, 20, 9, 30),
+          isAktif: false,
+          review1Id: '',
+        ),
+        ReviewCariModel(
+          reviewer: "Rizky Pratama",
+          instansi: "Startup Digital ID",
+          komentar:
+              "Pengalaman kerja sama yang sangat baik. Highly recommended.",
+          nilai: 4.6,
+          skala: 5,
+          reviewTgl: DateTime(2024, 4, 10, 16, 45),
+          isAktif: true,
+          review1Id: '',
+        ),
+      ];
 }

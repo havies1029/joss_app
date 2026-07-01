@@ -9,120 +9,334 @@ import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/perbaruiklaimpar/klaimparklaimcrud_model.dart';
 
 class KlaimparklaimcrudAPI {
+	Map<String, String> get _headers => <String, String>{
+		'Content-Type': 'application/json; odata=verbos',
+		'Accept': 'application/json; odata=verbos',
+		'Authorization': 'Bearer ${AppData.userToken}',
+	};
 
-	Future<ReturnDataAPI> klaimparklaimcrudTambahAPI(KlaimparklaimcrudModel record) async {
-		String tambahEndpoint =
-			"${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/create";
-		Map<String, String> queryParams = {"modul_id": "klaimparklaimcrudTambahAPI"};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, tambahEndpoint, queryParams);
+	void _debugRequest({
+		required String methodName,
+		required String httpMethod,
+		required Uri uri,
+		Object? body,
+		Map<String, String>? params,
+	}) {
+		debugPrint("========== $methodName REQUEST ==========");
+		debugPrint("METHOD : $httpMethod");
+		debugPrint("URL    : $uri");
 
-		ReturnDataAPI returnData;
-		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
-
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		if (params != null && params.isNotEmpty) {
+			debugPrint("PARAMS : $params");
 		}
-		return returnData;
-	}
-	Future<bool> klaimparklaimcrudUbahAPI(KlaimparklaimcrudModel record) async {
-		String ubahEndpoint =
-			"${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/update";
-		Map<String, String> queryParams = {"modul_id": "klaimparklaimcrudUbahAPI"};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
-
-		final http.Response response = await http.post(uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: jsonEncode(record.toJson()));
-
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
-		}
-		return returnData.success;
-	}
-	Future<bool> klaimparklaimcrudHapusAPI(String klaim1Id) async {
-		String hapusEndpoint = "${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/delete";
-		Map<String, String> queryParams = {
-			'klaim1Id': klaim1Id,
-			'modul_id': 'klaimparklaimcrudHapusAPI'};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, hapusEndpoint, queryParams);
-		final http.Response response =
-			await http.get(uri, headers: <String, String>{
-			'Content-Type': 'application/json; odata=verbos',
-			'Accept': 'application/json; odata=verbos',
-			'Authorization': 'Bearer ${AppData.userToken}'
+		debugPrint("HEADERS:");
+		_headers.forEach((key, value) {
+			debugPrint("$key : $value");
 		});
 
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+		if (body != null) {
+			debugPrint("BODY   : ${jsonEncode(body)}");
 		}
-		return returnData.success;
-	}
-	Future<KlaimparklaimcrudModel?> klaimparklaimcrudLihatAPI(String klaim1Id) async {
-		String lihatEndpoint = "${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/read";
-		Map<String, String> queryParams = {'klaim1Id': klaim1Id};
-		var uri = AppData.uriHtpp(AppData.httpAuthority, lihatEndpoint, queryParams);
 
-		debugPrint("===== [API CALL] klaimparklaimcrudLihatAPI =====");
-		debugPrint("URL       : $uri");
-		debugPrint("klaim1Id  : $klaim1Id");
+		debugPrint("=========================================");
+	}
+
+	void _debugResponse({
+		required String methodName,
+		required http.Response response,
+	}) {
+		debugPrint("========== $methodName RESPONSE ==========");
+		debugPrint("STATUS : ${response.statusCode}");
+		debugPrint("BODY   : ${response.body}");
+		debugPrint("==========================================");
+	}
+
+	void _debugReturnData({
+		required String methodName,
+		required ReturnDataAPI returnData,
+	}) {
+		debugPrint("========== $methodName RETURN DATA ==========");
+		debugPrint("SUCCESS  : ${returnData.success}");
+		debugPrint("DATA     : ${returnData.data}");
+		debugPrint("ROWCOUNT : ${returnData.rowcount}");
+		debugPrint("=============================================");
+	}
+
+	void _debugError({
+		required String methodName,
+		required Object error,
+		StackTrace? stackTrace,
+	}) {
+		debugPrint("========== $methodName ERROR ==========");
+		debugPrint("ERROR : $error");
+
+		if (stackTrace != null) {
+			debugPrint("STACKTRACE : $stackTrace");
+		}
+
+		debugPrint("=======================================");
+	}
+
+	ReturnDataAPI _parseReturnData({
+		required String methodName,
+		required http.Response response,
+	}) {
+		if (response.statusCode == 200) {
+			final returnData =
+			ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
+
+			_debugReturnData(
+				methodName: methodName,
+				returnData: returnData,
+			);
+
+			return returnData;
+		}
+
+		debugPrint("========== $methodName HTTP ERROR ==========");
+		debugPrint("STATUS : ${response.statusCode}");
+		debugPrint("BODY   : ${response.body}");
+		debugPrint("============================================");
+
+		return ReturnDataAPI(
+			success: false,
+			data: "",
+			rowcount: 0,
+		);
+	}
+
+	Future<ReturnDataAPI> klaimparklaimcrudTambahAPI(
+			KlaimparklaimcrudModel record,
+			) async {
+		const String methodName = "klaimparklaimcrudTambahAPI";
+
+		String tambahEndpoint =
+				"${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/create";
+
+		Map<String, String> queryParams = {
+			"modul_id": methodName,
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			tambahEndpoint,
+			queryParams,
+		);
+
+		final body = record.toJson();
+
+		_debugRequest(
+			methodName: methodName,
+			httpMethod: "POST",
+			uri: uri,
+			params: queryParams,
+			body: body,
+		);
+
+		try {
+			final http.Response response = await http.post(
+				uri,
+				headers: _headers,
+				body: jsonEncode(body),
+			);
+
+			_debugResponse(
+				methodName: methodName,
+				response: response,
+			);
+
+			return _parseReturnData(
+				methodName: methodName,
+				response: response,
+			);
+		} catch (e, stackTrace) {
+			_debugError(
+				methodName: methodName,
+				error: e,
+				stackTrace: stackTrace,
+			);
+			rethrow;
+		}
+	}
+
+	Future<bool> klaimparklaimcrudUbahAPI(
+			KlaimparklaimcrudModel record,
+			) async {
+		const String methodName = "klaimparklaimcrudUbahAPI";
+
+		String ubahEndpoint =
+				"${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/update";
+
+		Map<String, String> queryParams = {
+			"modul_id": methodName,
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			ubahEndpoint,
+			queryParams,
+		);
+
+		final body = record.toJson();
+
+		_debugRequest(
+			methodName: methodName,
+			httpMethod: "POST",
+			uri: uri,
+			params: queryParams,
+			body: body,
+		);
+
+		try {
+			final http.Response response = await http.post(
+				uri,
+				headers: _headers,
+				body: jsonEncode(body),
+			);
+
+			_debugResponse(
+				methodName: methodName,
+				response: response,
+			);
+
+			final returnData = _parseReturnData(
+				methodName: methodName,
+				response: response,
+			);
+
+			return returnData.success;
+		} catch (e, stackTrace) {
+			_debugError(
+				methodName: methodName,
+				error: e,
+				stackTrace: stackTrace,
+			);
+			rethrow;
+		}
+	}
+
+	Future<bool> klaimparklaimcrudHapusAPI(String klaim1Id) async {
+		const String methodName = "klaimparklaimcrudHapusAPI";
+
+		String hapusEndpoint =
+				"${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/delete";
+
+		Map<String, String> queryParams = {
+			'klaim1Id': klaim1Id,
+			'modul_id': methodName,
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			hapusEndpoint,
+			queryParams,
+		);
+
+		_debugRequest(
+			methodName: methodName,
+			httpMethod: "GET",
+			uri: uri,
+			params: queryParams,
+		);
 
 		try {
 			final http.Response response = await http.get(
 				uri,
-				headers: <String, String>{
-					'Content-Type': 'application/json; odata=verbos',
-					'Accept': 'application/json; odata=verbos',
-					'Authorization': 'Bearer ${AppData.userToken}'
-				},
+				headers: _headers,
 			);
 
-			debugPrint("----- [RESPONSE] -----");
-			debugPrint("Status Code : ${response.statusCode}");
-			debugPrint("Body Raw    : ${response.body}");
+			_debugResponse(
+				methodName: methodName,
+				response: response,
+			);
+
+			final returnData = _parseReturnData(
+				methodName: methodName,
+				response: response,
+			);
+
+			return returnData.success;
+		} catch (e, stackTrace) {
+			_debugError(
+				methodName: methodName,
+				error: e,
+				stackTrace: stackTrace,
+			);
+			rethrow;
+		}
+	}
+
+	Future<KlaimparklaimcrudModel?> klaimparklaimcrudLihatAPI(
+			String klaim1Id,
+			) async {
+		const String methodName = "klaimparklaimcrudLihatAPI";
+
+		String lihatEndpoint =
+				"${AppData.prefixEndPoint}/api/perbaruiklaimpar/klaimparklaimcrud/read";
+
+		Map<String, String> queryParams = {
+			'klaim1Id': klaim1Id,
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			lihatEndpoint,
+			queryParams,
+		);
+
+		_debugRequest(
+			methodName: methodName,
+			httpMethod: "GET",
+			uri: uri,
+			params: queryParams,
+		);
+
+		try {
+			final http.Response response = await http.get(
+				uri,
+				headers: _headers,
+			);
+
+			_debugResponse(
+				methodName: methodName,
+				response: response,
+			);
 
 			if (response.statusCode == 200) {
 				final json = jsonDecode(response.body);
 
-				debugPrint("Parsed JSON : $json");
+				debugPrint("========== $methodName PARSED JSON ==========");
+				debugPrint("$json");
+				debugPrint("=============================================");
 
-				var returnData = KlaimparklaimcrudModel.fromJson(json);
+				final returnData = KlaimparklaimcrudModel.fromJson(json);
 
-				debugPrint("Parsed Model (laporAsuransi): ${returnData.laporAsuransi}");
-				debugPrint("Parsed Model (isPolisJps)   : ${returnData.isPolisJps}");
+				debugPrint("========== $methodName READ SUCCESS ==========");
+				debugPrint("laporAsuransi : ${returnData.laporAsuransi}");
+				debugPrint("isPolisJps    : ${returnData.isPolisJps}");
+				debugPrint("==============================================");
 
 				return returnData;
 			}
 
 			if (response.statusCode == 404) {
-				debugPrint("Result: DATA NOT FOUND (404)");
+				debugPrint("========== $methodName NOT FOUND ==========");
+				debugPrint("klaim1Id : $klaim1Id");
+				debugPrint("===========================================");
 				return null;
 			}
 
-			debugPrint("ERROR RESPONSE: ${response.body}");
-			throw HttpException('HTTP ${response.statusCode}: ${response.body}');
-		} catch (e, stack) {
-			debugPrint("!!!!! ERROR klaimparklaimcrudLihatAPI !!!!!");
-			debugPrint("Error : $e");
-			debugPrint("Stack : $stack");
+			throw HttpException(
+				'HTTP ${response.statusCode}: ${response.body}',
+			);
+		} catch (e, stackTrace) {
+			_debugError(
+				methodName: methodName,
+				error: e,
+				stackTrace: stackTrace,
+			);
+
 			throw Exception("Failed to load data: $e");
 		}
 	}

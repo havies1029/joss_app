@@ -309,6 +309,7 @@ class _TransaksiListWidgetState extends State<TransaksiListWidget>
         return pRed;
       case "diproses":
         return pBlue;
+
       default:
         return pGrey;
     }

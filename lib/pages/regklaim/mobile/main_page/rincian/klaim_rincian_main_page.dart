@@ -64,18 +64,17 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
         BlocListener<MstatusrinciCariBloc, MstatusrinciCariState>(
           listener: (context, state) {
             context.read<GroupcobCariBloc>().add(
-              RefreshGroupcobCariEvent(
-                statusId: state.selectedStatusId,
-                searchText: state.searchText,
-              ),
-            );
+                  RefreshGroupcobCariEvent(
+                    statusId: state.selectedStatusId,
+                    searchText: state.searchText,
+                  ),
+                );
           },
           listenWhen: (previous, current) {
             return ((previous.selectedStatusId != current.selectedStatusId) ||
                 (previous.searchText != current.searchText));
           },
         ),
-
         BlocListener<KlaimbatalcrudBloc, KlaimbatalcrudState>(
           listener: (context, state) {
             if (state.isSaved) {
@@ -150,7 +149,7 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
     return Expanded(
       child: BlocBuilder<GroupcobCariBloc, GroupcobCariState>(
         buildWhen: (previous, current) =>
-        current.status != previous.status ||
+            current.status != previous.status ||
             current.items != previous.items,
         builder: (context, state) {
           if (state.status == ListStatus.initial ||
@@ -172,7 +171,8 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
               child: EmptyStatePage(
                 iconPath: 'assets/icons/belipolis_no_file.svg',
                 title: 'Tidak ada Rincian Klaim',
-                description: 'Detail klaim akan muncul di sini ketika tersedia.',
+                description:
+                    'Detail klaim akan muncul di sini ketika tersedia.',
               ),
             );
           }
@@ -191,18 +191,20 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
 
     if (state.status != ListStatus.success) return [];
 
-    final selectedId = state.selectedId?.trim();
+    final selectedId = state.selectedId.trim();
+    var rowNo = 0;
 
     return state.items.expand((cob) {
       final isLainnya = cob.cobNama.toLowerCase() == "lainnya";
 
-      final details = selectedId != null && selectedId.isNotEmpty
+      final details = selectedId.isNotEmpty
           ? cob.details.where((d) => d.klaim1Id == selectedId)
           : cob.details;
 
       return details.map(
-            (d) => _detailToExportMap(
+        (d) => _detailToExportMap(
           d,
+          no: ++rowNo,
           isLainnya: isLainnya,
         ),
       );
@@ -240,25 +242,31 @@ class _KlaimRincianMainPageState extends State<KlaimRincianMainPage> {
   }
 
   Map<String, dynamic> _detailToExportMap(
-      KlaimdetailCariModel d, {
-        required bool isLainnya,
-      }) {
+    KlaimdetailCariModel d, {
+    required int no,
+    required bool isLainnya,
+  }) {
     return {
-      "No": d.nourut,
+      "No": no,
       "No Klaim": d.klaim1Id,
       "No Polis": d.noPolis,
       if (isLainnya) "COB Desc": d.cobDesc,
-      "Tanggal Kejadian": DateFormat('yyyy-MM-dd').format(d.tglKejadian),
+      "Tanggal Kejadian": _formatTanggalKejadian(d.tglKejadian),
       "Curr": d.curr,
       "Nilai Klaim": d.klaimAmount,
     };
   }
 
+  String _formatTanggalKejadian(DateTime? value) {
+    if (value == null) return "-";
+    return DateFormat('yyyy-MM-dd').format(value);
+  }
+
   Future<void> _exportData(
-      BuildContext context,
-      ExportFormat format,
-      List<Map<String, dynamic>> data,
-      ) async {
+    BuildContext context,
+    ExportFormat format,
+    List<Map<String, dynamic>> data,
+  ) async {
     final ext = format == ExportFormat.excel ? "xlsx" : "pdf";
     final fileName =
         "KlaimRincian_${DateTime.now().millisecondsSinceEpoch}.$ext";

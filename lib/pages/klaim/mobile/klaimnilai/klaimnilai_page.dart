@@ -101,7 +101,7 @@ class KlaimNilaiPageFormState extends State<KlaimNilaiPage> {
         return BaseBackgroundSidePage(
           title: 'Beri Penilaianmu',
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5,),
             color: secondaryBlackColor,
             child: Column(
               children: [
@@ -229,7 +229,6 @@ class KlaimNilaiPageFormState extends State<KlaimNilaiPage> {
                     text: isSaving ? 'Menyimpan...' : 'Selesai',
                     isLoading: isSaving,
                     onPressed: isSaving ? null : onSaveForm,
-                    height: 45,
                     backgroundColor:
                     isSaving ? secondaryBlackColor : primaryColor,
                   ),

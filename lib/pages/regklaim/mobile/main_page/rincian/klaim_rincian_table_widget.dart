@@ -112,12 +112,12 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   }
 
   Widget _buildDetailTable(
-      BuildContext context,
-      List<KlaimdetailCariModel> details,
-      String? selectedId, {
-        required bool isLainnya,
-        required bool compact,
-      }) {
+    BuildContext context,
+    List<KlaimdetailCariModel> details,
+    String? selectedId, {
+    required bool isLainnya,
+    required bool compact,
+  }) {
     if (details.isEmpty) {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
@@ -215,17 +215,17 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
       child: _tableShell(
         child: compact
             ? LayoutBuilder(
-          builder: (context, constraints) {
-            return HScrollAlwaysThumb(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: constraints.maxWidth,
-                ),
-                child: tableContent,
-              ),
-            );
-          },
-        )
+                builder: (context, constraints) {
+                  return HScrollAlwaysThumb(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: tableContent,
+                    ),
+                  );
+                },
+              )
             : tableContent,
       ),
     );
@@ -270,35 +270,35 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   }
 
   TableBorder get _tableBorder => const TableBorder(
-    horizontalInside: BorderSide(color: sGrey, width: 1),
-    verticalInside: BorderSide(color: sGrey, width: 1),
-  );
+        horizontalInside: BorderSide(color: sGrey, width: 1),
+        verticalInside: BorderSide(color: sGrey, width: 1),
+      );
 
   Map<int, TableColumnWidth> _buildColumnWidths(
-      BuildContext context,
-      List<KlaimdetailCariModel> details, {
-        required bool isLainnya,
-        required bool compact,
-      }) {
+    BuildContext context,
+    List<KlaimdetailCariModel> details, {
+    required bool isLainnya,
+    required bool compact,
+  }) {
     if (!compact) {
       return isLainnya
           ? const {
-        0: FixedColumnWidth(50),
-        1: FixedColumnWidth(50),
-        2: FlexColumnWidth(1.4),
-        3: FlexColumnWidth(1.6),
-        4: FlexColumnWidth(1.4),
-        5: FlexColumnWidth(1.3),
-        6: FlexColumnWidth(1.4),
-      }
+              0: FixedColumnWidth(50),
+              1: FixedColumnWidth(50),
+              2: FlexColumnWidth(1.4),
+              3: FlexColumnWidth(1.6),
+              4: FlexColumnWidth(1.4),
+              5: FlexColumnWidth(1.3),
+              6: FlexColumnWidth(1.4),
+            }
           : const {
-        0: FixedColumnWidth(50),
-        1: FixedColumnWidth(50),
-        2: FlexColumnWidth(1.5),
-        3: FlexColumnWidth(1.8),
-        4: FlexColumnWidth(1.3),
-        5: FlexColumnWidth(1.5),
-      };
+              0: FixedColumnWidth(50),
+              1: FixedColumnWidth(50),
+              2: FlexColumnWidth(1.5),
+              3: FlexColumnWidth(1.8),
+              4: FlexColumnWidth(1.3),
+              5: FlexColumnWidth(1.5),
+            };
     }
 
     final map = <int, TableColumnWidth>{
@@ -359,27 +359,27 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
           vertical: 15,
           child: isNo
               ? Center(
-            child: Text(
-              text,
-              style: bodyTextStyle(context, fontSize: 13),
-            ),
-          )
+                  child: Text(
+                    text,
+                    style: bodyTextStyle(context, fontSize: 13),
+                  ),
+                )
               : Text(
-            text,
-            style: bodyTextStyle(context, fontSize: 13),
-          ),
+                  text,
+                  style: bodyTextStyle(context, fontSize: 13),
+                ),
         );
       }).toList(),
     );
   }
 
   TableRow _detailRow(
-      KlaimdetailCariModel d,
-      int index,
-      String? selectedId, {
-        required bool compact,
-        required bool isLainnya,
-      }) {
+    KlaimdetailCariModel d,
+    int index,
+    String? selectedId, {
+    required bool compact,
+    required bool isLainnya,
+  }) {
     final isSelected = selectedId == d.klaim1Id;
 
     return TableRow(
@@ -425,7 +425,7 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
             softWrap: compact,
           ),
         _textCell(
-          DateFormat('yyyy-MM-dd').format(d.tglKejadian),
+          _formatTanggalKejadian(d.tglKejadian),
           maxLines: compact ? 2 : 1,
           softWrap: compact,
         ),
@@ -438,12 +438,17 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     );
   }
 
+  String _formatTanggalKejadian(DateTime? value) {
+    if (value == null) return "-";
+    return DateFormat('yyyy-MM-dd').format(value);
+  }
+
   Widget _textCell(
-      String text, {
-        int maxLines = 1,
-        bool center = false,
-        bool softWrap = true,
-      }) {
+    String text, {
+    int maxLines = 1,
+    bool center = false,
+    bool softWrap = true,
+  }) {
     final child = Text(
       text,
       maxLines: maxLines,
@@ -472,10 +477,10 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   }
 
   double _measureTextWidth(
-      BuildContext context,
-      String text, {
-        TextStyle? style,
-      }) {
+    BuildContext context,
+    String text, {
+    TextStyle? style,
+  }) {
     final effectiveStyle = style ??
         bodyTextStyle(context, fontSize: 13).copyWith(
           color: primaryLightColor,
@@ -492,13 +497,13 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
   }
 
   double _columnWidthFromLongest(
-      BuildContext context,
-      Iterable<String> values, {
-        required double min,
-        required double max,
-        double padding = 24,
-        TextStyle? style,
-      }) {
+    BuildContext context,
+    Iterable<String> values, {
+    required double min,
+    required double max,
+    double padding = 24,
+    TextStyle? style,
+  }) {
     var longest = 0.0;
 
     for (final value in values) {

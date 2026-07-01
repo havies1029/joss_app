@@ -2765,13 +2765,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     double n(TextEditingController c) =>
         double.tryParse(c.text.replaceAll(',', '').trim()) ?? 0;
 
-    final tpl = n(fieldTplController);
-    final pad = n(fieldPadController);
-    final pap = n(fieldPapController);
-    final pll = n(fieldPllController);
-
-    // pilih salah satu rule:
-    return (tpl > 0) || (pad > 0) || (pap > 0) || (pll > 0);
+    return true;
   }
 
   bool isForm3Complete() {

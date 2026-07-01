@@ -38,6 +38,7 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
   final TextEditingController _searchController = TextEditingController();
 
   bool _isCardWebViewOpen = false;
+  bool _hasHandledPaymentCancel = false;
 
   @override
   void initState() {
@@ -107,7 +108,15 @@ class RiwayatPageRemakeState extends State<RiwayatPageRemake> {
                 ),
               );
             } else if (state.paymentStatus == "91" && state.isProcessed) {
+              if (_hasHandledPaymentCancel) return;
+              _hasHandledPaymentCancel = true;
+
               context.read<DnRekap2invBloc>().add(InitializeDnRekap2invEvent());
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar('Pembayaran berhasil dibatalkan.'),
+              );
+
 
               Navigator.pushReplacement(
                 context,

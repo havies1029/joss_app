@@ -52,6 +52,7 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
   bool isSubmitting = false;
   bool isAgreementChecked = false;
   bool _isCardWebViewOpen = false;
+  bool _hasHandledPaymentCancel = false;
 
   String toCurrency(double value) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
@@ -352,32 +353,27 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                     ),
                   ),
                 );
-              } else if (state.paymentStatus == "91") {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar(
-                    'Pembayaran berhasil dibatalkan.',
-                  ),
-                );
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentSuccess(
-                      display: "Pengajuan Tidak Dilanjutkan",
-                      description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
-                      displayButton: "Kembali",
-                      onButtonPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (_) => const TransaksiPage(),
-                          ),
-                              (route) => route.isFirst,
-                        );
-                      },
-                    ),
-                  ),
-                );
               }
+              // else if (state.paymentStatus == "91") {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //       builder: (context) => PaymentSuccess(
+              //         display: "Pengajuan Tidak Dilanjutkan",
+              //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+              //         displayButton: "Kembali",
+              //         onButtonPressed: () {
+              //           Navigator.of(context).pushAndRemoveUntil(
+              //             MaterialPageRoute(
+              //               builder: (_) => const TransaksiPage(),
+              //             ),
+              //                 (route) => route.isFirst,
+              //           );
+              //         },
+              //       ),
+              //     ),
+              //   );
+              // }
             }
 
             else if (state.paymentStatus == "93") {
@@ -427,12 +423,12 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             final redirectUrl = record.redirectUrl.trim();
 
             if (status == "91") {
-              // refreshData();
+              if (_hasHandledPaymentCancel) return;
+              _hasHandledPaymentCancel = true;
 
-              messenger.showSnackBar(
-                successSnackBar(
-                  "Pembayaran berhasil dibatalkan.",
-                ),
+              // refreshData();
+              ScaffoldMessenger.of(context).showSnackBar(
+                successSnackBar('Pembayaran berhasil dibatalkan.'),
               );
 
               Navigator.push(

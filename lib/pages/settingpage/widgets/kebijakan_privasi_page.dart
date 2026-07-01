@@ -45,7 +45,6 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// HEADER CARD
               Container(
                 padding: const EdgeInsets.all(10),
@@ -70,21 +69,20 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
                       ),
                     ),
                     const SizedBox(width: 13),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Kebijakan dan Privasi Asuransi',
-                            style: headingStyle(context, fontSize: 18),
+                            style: headingStyle(context, fontSize: 20),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Komitmen kami melindungi data dan layanan nasabah asuransi.',
                             style: bodyTextStyle(
                               context,
-                              fontSize: 16,
+                              fontSize: 18,
                             ).copyWith(color: hintGrey),
                           ),
                         ],
@@ -120,7 +118,6 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
                   ),
                   child: Column(
                     children: [
-
                       /// HEADER
                       InkWell(
                         borderRadius: BorderRadius.circular(14),
@@ -133,20 +130,19 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
-
                               /// ICON
                               SizedBox(
                                 width: 40,
                                 height: 40,
                                 child: item.icon.toLowerCase().endsWith('.png')
                                     ? Image.asset(
-                                  item.icon,
-                                  fit: BoxFit.contain,
-                                )
+                                        item.icon,
+                                        fit: BoxFit.contain,
+                                      )
                                     : SvgPicture.asset(
-                                  item.icon,
-                                  fit: BoxFit.contain,
-                                ),
+                                        item.icon,
+                                        fit: BoxFit.contain,
+                                      ),
                               ),
 
                               const SizedBox(width: 14),
@@ -154,7 +150,7 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
                               Expanded(
                                 child: Text(
                                   item.title,
-                                  style: bodyTextStyle(context, fontSize: 16)
+                                  style: bodyTextStyle(context, fontSize: 18)
                                       .copyWith(fontWeight: FontWeight.w600),
                                 ),
                               ),
@@ -192,8 +188,9 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Text(
                                       point,
-                                      style: bodyTextStyle(context, fontSize: 14)
-                                          .copyWith(color: hintGrey),
+                                      style:
+                                          bodyTextStyle(context, fontSize: 16)
+                                              .copyWith(color: hintGrey),
                                     ),
                                   );
                                 }).toList(),
@@ -234,20 +231,19 @@ class _KebijakanPrivasiPageState extends State<KebijakanPrivasiPage> {
             ),
           ),
           const SizedBox(width: 10),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Perhatian Penting',
-                  style: bodyTextStyle(context)
+                  style: bodyTextStyle(context, fontSize: 20)
                       .copyWith(color: primaryColor),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Kebijakan ini berlaku untuk seluruh layanan asuransi yang tersedia di aplikasi. Mohon membaca dengan seksama agar pengguna memahami hak, kewajiban, serta ketentuan yang berlaku.',
-                  style: bodyTextStyle(context, fontSize: 14)
+                  style: bodyTextStyle(context, fontSize: 16)
                       .copyWith(color: hintGrey),
                 ),
               ],

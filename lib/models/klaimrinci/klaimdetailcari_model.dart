@@ -1,59 +1,66 @@
 class KlaimdetailCariModel {
-	String cobId;
-	String cobNama;
-	String cobDesc;
-	String curr;
-	double klaimAmount;
-	String klaim1Id;
-	String noPolis;
-	int nourut;
-	String statusDesc;
-	DateTime tglKejadian;
-	bool isLacak;
+  String cobId;
+  String cobNama;
+  String cobDesc;
+  String curr;
+  double klaimAmount;
+  String klaim1Id;
+  String noPolis;
+  int nourut;
+  String statusDesc;
+  DateTime? tglKejadian;
+  bool isLacak;
 
-	KlaimdetailCariModel({
-		required this.cobId,
-		required this.cobNama,
-		required this.cobDesc,
-		required this.curr,
-		required this.klaimAmount,
-		required this.klaim1Id,
-		required this.noPolis,
-		required this.nourut,
-		required this.statusDesc,
-		required this.tglKejadian,
-		required this.isLacak,
-	});
+  KlaimdetailCariModel({
+    required this.cobId,
+    required this.cobNama,
+    required this.cobDesc,
+    required this.curr,
+    required this.klaimAmount,
+    required this.klaim1Id,
+    required this.noPolis,
+    required this.nourut,
+    required this.statusDesc,
+    this.tglKejadian,
+    required this.isLacak,
+  });
 
-	factory KlaimdetailCariModel.fromJson(Map<String, dynamic> data) {
-		return KlaimdetailCariModel(
-			cobId: data['cobId'] ?? '',
-			cobNama: data['cobNama'] ?? '',
-			cobDesc: data['cobDesc'] ?? '',
-			curr: data['curr'] ?? '',
-			klaimAmount: double.tryParse(data['klaimAmount'].toString()) ?? 0,
-			klaim1Id: data['klaim1Id'] ?? '',
-			noPolis: data['noPolis'] ?? '',
-			nourut: int.tryParse(data['nourut'].toString()) ?? 0,
-			statusDesc: data['statusDesc'] ?? '',
-			tglKejadian: DateTime.tryParse(
-				data['tglKejadian'].toString(),
-			) ?? DateTime.now(),
-			isLacak: data['isLacak'] == true,
-		);
-	}
+  factory KlaimdetailCariModel.fromJson(Map<String, dynamic> data) {
+    return KlaimdetailCariModel(
+      cobId: data['cobId'] ?? '',
+      cobNama: data['cobNama'] ?? '',
+      cobDesc: data['cobDesc'] ?? '',
+      curr: data['curr'] ?? '',
+      klaimAmount: double.tryParse(data['klaimAmount'].toString()) ?? 0,
+      klaim1Id: data['klaim1Id'] ?? '',
+      noPolis: data['noPolis'] ?? '',
+      nourut: int.tryParse(data['nourut'].toString()) ?? 0,
+      statusDesc: data['statusDesc'] ?? '',
+      tglKejadian: _parseNullableDate(data['tglKejadian']),
+      isLacak: data['isLacak'] == true,
+    );
+  }
 
-	Map<String, dynamic> toJson() => {
-		'cobId': cobId,
-		'cobNama': cobNama,
-		'cobDesc': cobDesc,
-		'curr': curr,
-		'klaimAmount': klaimAmount.toString(),
-		'klaim1Id': klaim1Id,
-		'noPolis': noPolis,
-		'nourut': nourut.toString(),
-		'statusDesc': statusDesc,
-		'tglKejadian': tglKejadian.toIso8601String(),
-		'isLacak': isLacak,
-	};
+  Map<String, dynamic> toJson() => {
+        'cobId': cobId,
+        'cobNama': cobNama,
+        'cobDesc': cobDesc,
+        'curr': curr,
+        'klaimAmount': klaimAmount.toString(),
+        'klaim1Id': klaim1Id,
+        'noPolis': noPolis,
+        'nourut': nourut.toString(),
+        'statusDesc': statusDesc,
+        'tglKejadian': tglKejadian?.toIso8601String(),
+        'isLacak': isLacak,
+      };
+}
+
+DateTime? _parseNullableDate(dynamic value) {
+  if (value == null) return null;
+
+  final text = value.toString().trim();
+  if (text.isEmpty || text.toLowerCase() == 'null') return null;
+
+  return DateTime.tryParse(text);
 }

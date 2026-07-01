@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:joss_app/models/responseAPI/returndataapi_model.dart';
 import 'package:joss_app/models/combobox/combomjenisrugi_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:joss_app/models/perbaruiklaimpar/klaimparklaimcrud_model.dart';
@@ -39,9 +37,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onTambahKlaimparklaimcrud(
-      KlaimparklaimcrudTambahEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    KlaimparklaimcrudTambahEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     emit(state.copyWith(isSaving: true, isSaved: false));
 
     final returnData = await repository.klaimparklaimcrudTambah(event.record);
@@ -55,9 +53,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onUbahKlaimparklaimcrud(
-      KlaimparklaimcrudUbahEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    KlaimparklaimcrudUbahEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     emit(state.copyWith(isSaving: true, isSaved: false));
 
     final hasFailure = !await repository.klaimparklaimcrudUbah(event.record);
@@ -70,9 +68,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onHapusKlaimparklaimcrud(
-      KlaimparklaimcrudHapusEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    KlaimparklaimcrudHapusEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     emit(state.copyWith(isSaving: true, isSaved: false));
 
     final hasFailure = !await repository.klaimparklaimcrudHapus(event.recordId);
@@ -85,9 +83,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onLihatKlaimparklaimcrud(
-      KlaimparklaimcrudLihatEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    KlaimparklaimcrudLihatEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     emit(state.copyWith(isLoading: true, isLoaded: false));
 
     final record = await repository.klaimparklaimcrudLihat(event.recordId);
@@ -103,9 +101,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onComboMJenisrugiChanged(
-      ComboMJenisrugiChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    ComboMJenisrugiChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     KlaimparklaimcrudModel? record = state.record;
 
     if (record != null) {
@@ -124,9 +122,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onComboRMatauangChanged(
-      ComboRMatauangChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    ComboRMatauangChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     KlaimparklaimcrudModel? record = state.record;
 
     if (record != null) {
@@ -145,9 +143,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldCurrIdChanged(
-      FieldCurrIdChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldCurrIdChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(currId: event.currId);
 
     emit(state.copyWith(
@@ -158,9 +156,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldDolChanged(
-      FieldDolChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldDolChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(dol: event.dol);
 
     emit(state.copyWith(
@@ -171,9 +169,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldKeteranganChanged(
-      FieldKeteranganChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldKeteranganChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(keterangan: event.keterangan);
 
     emit(state.copyWith(
@@ -184,9 +182,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldLaporJpsChanged(
-      FieldLaporJpsChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldLaporJpsChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(laporJps: event.laporJps);
 
     emit(state.copyWith(
@@ -197,11 +195,10 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldLaporAsuransiChanged(
-      FieldLaporAsuransiChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
-    final record =
-    state.record?.copyWith(laporAsuransi: event.laporAsuransi);
+    FieldLaporAsuransiChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
+    final record = state.record?.copyWith(laporAsuransi: event.laporAsuransi);
 
     emit(state.copyWith(
       record: record,
@@ -211,9 +208,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldPenyebabChanged(
-      FieldPenyebabChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldPenyebabChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(penyebab: event.penyebab);
 
     emit(state.copyWith(
@@ -224,9 +221,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldPicEmailChanged(
-      FieldPicEmailChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldPicEmailChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(picEmail: event.picEmail);
 
     emit(state.copyWith(
@@ -237,9 +234,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldPicJabatanChanged(
-      FieldPicJabatanChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldPicJabatanChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(picJabatan: event.picJabatan);
 
     emit(state.copyWith(
@@ -250,9 +247,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldPicNamaChanged(
-      FieldPicNamaChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldPicNamaChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(picNama: event.picNama);
 
     emit(state.copyWith(
@@ -263,9 +260,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldPicTelpChanged(
-      FieldPicTelpChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldPicTelpChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(picTelp: event.picTelp);
 
     emit(state.copyWith(
@@ -276,9 +273,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onFieldKlaimAmountChanged(
-      FieldKlaimAmountChangedEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    FieldKlaimAmountChangedEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     final record = state.record?.copyWith(klaimAmount: event.klaimAmount);
 
     emit(state.copyWith(
@@ -289,9 +286,9 @@ class KlaimparklaimcrudBloc
   }
 
   Future<void> onAutoSave(
-      KlaimparklaimcrudAutoSaveEvent event,
-      Emitter<KlaimparklaimcrudState> emit,
-      ) async {
+    KlaimparklaimcrudAutoSaveEvent event,
+    Emitter<KlaimparklaimcrudState> emit,
+  ) async {
     if (!state.isDirty || state.record == null) return;
 
     emit(state.copyWith(isSaving: true, isSaved: false));
@@ -309,11 +306,7 @@ class KlaimparklaimcrudBloc
   bool _isComplete(KlaimparklaimcrudModel? record) {
     if (record == null) return false;
 
-
-
-
-    return _hasDate(record.dol) &&
-        _hasValue(record.mjenisrugiId) &&
+    return _hasValue(record.mjenisrugiId) &&
         _hasText(record.keterangan) &&
         _hasText(record.penyebab) &&
         _hasText(record.picNama) &&
@@ -324,13 +317,6 @@ class KlaimparklaimcrudBloc
         record.klaimAmount > 0;
   }
 
-  bool _isValid(KlaimparklaimcrudModel? record) {
-    if (record == null) return false;
-    if (!_isComplete(record)) return false;
-
-    return _isSameOrBeforeToday(record.dol);
-  }
-
   bool _hasText(String? value) {
     return value != null && value.trim().isNotEmpty;
   }
@@ -339,19 +325,5 @@ class KlaimparklaimcrudBloc
     if (value == null) return false;
     if (value is String) return value.trim().isNotEmpty;
     return true;
-  }
-
-  bool _hasDate(DateTime? value) {
-    return value != null;
-  }
-
-  bool _isSameOrBeforeToday(DateTime? date) {
-    if (date == null) return false;
-
-    final today = DateTime.now();
-    final d1 = DateTime(date.year, date.month, date.day);
-    final d2 = DateTime(today.year, today.month, today.day);
-
-    return !d1.isAfter(d2);
   }
 }

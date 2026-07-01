@@ -169,7 +169,7 @@ class ArticleCardWidget extends StatelessWidget {
           judul,
           style: bodyTextStyle(context),
           maxLines: 2,
-          overflow: TextOverflow.fade,
+          overflow: TextOverflow.ellipsis,
         ),
         if (subjudul != null && subjudul!.isNotEmpty) ...[
           const SizedBox(height: 8),
