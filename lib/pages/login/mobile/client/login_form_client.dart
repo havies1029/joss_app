@@ -30,6 +30,7 @@ class _LoginFormClientState extends State<LoginFormClient>
   bool _rememberPassword = true;
   bool isSubmitting = false;
   bool _isInitialEmailApplied = false;
+  int _submitAttempt = 0;
 
   void _applyInitialEmailFromState() {
     final emailState = context.read<EmailVerificationBloc>().state.email.trim();
@@ -46,8 +47,8 @@ class _LoginFormClientState extends State<LoginFormClient>
     _isInitialEmailApplied = false;
 
     context.read<EmailVerificationBloc>().add(
-      const FieldEmailVerificationChangedEvent(email: ''),
-    );
+          const FieldEmailVerificationChangedEvent(email: ''),
+        );
   }
 
   @override
@@ -129,8 +130,8 @@ class _LoginFormClientState extends State<LoginFormClient>
           color: sGrey,
           size: 22,
         ),
-        onPressed:
-            () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+        onPressed: () =>
+            setState(() => _isPasswordVisible = !_isPasswordVisible),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -155,18 +156,35 @@ class _LoginFormClientState extends State<LoginFormClient>
       onPressed: isSubmitting
           ? null
           : () async {
-        if (!_formKey.currentState!.validate()) return;
+              if (!_formKey.currentState!.validate()) return;
 
-        if (mounted) {
-          setState(() {
-            isSubmitting = true;
-          });
-        }
+              if (mounted) {
+                setState(() {
+                  isSubmitting = true;
+                });
+              }
+              _startSubmitTimeout();
 
-        _animationController.forward(from: 0);
-        onLoginButtonPressed();
-      },
+              _animationController.forward(from: 0);
+              onLoginButtonPressed();
+            },
     );
+  }
+
+  void _startSubmitTimeout() {
+    final attempt = ++_submitAttempt;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted || attempt != _submitAttempt || !isSubmitting) return;
+
+      setState(() {
+        isSubmitting = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
+    });
   }
 
   void onLoginButtonPressed() {
@@ -221,7 +239,8 @@ class _LoginFormClientState extends State<LoginFormClient>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 15, vertical: vPadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -231,13 +250,13 @@ class _LoginFormClientState extends State<LoginFormClient>
                           height: isDesktop(context)
                               ? 56
                               : isTablet(context)
-                              ? 48
-                              : 42,
+                                  ? 48
+                                  : 42,
                           width: isDesktop(context)
                               ? 180
                               : isTablet(context)
-                              ? 140
-                              : 120,
+                                  ? 140
+                                  : 120,
                         ),
                         SizedBox(height: hPadding),
                         WelcomeHeader(type: "login_client"),
@@ -283,7 +302,8 @@ class _LoginFormClientState extends State<LoginFormClient>
                                       child: GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            _rememberPassword = !_rememberPassword;
+                                            _rememberPassword =
+                                                !_rememberPassword;
                                           });
                                         },
                                         child: Row(
@@ -293,12 +313,14 @@ class _LoginFormClientState extends State<LoginFormClient>
                                               activeColor: primaryColor,
                                               checkColor: primaryLightColor,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
+                                                borderRadius:
+                                                    BorderRadius.circular(
                                                   checkboxBorderRadius,
                                                 ),
                                               ),
                                               onChanged: (value) => setState(
-                                                    () => _rememberPassword = value ?? false,
+                                                () => _rememberPassword =
+                                                    value ?? false,
                                               ),
                                             ),
                                             Flexible(
@@ -319,8 +341,11 @@ class _LoginFormClientState extends State<LoginFormClient>
                                         onTap: () {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
-                                              builder: (_) => ForgotPasswordPage(
-                                                initialEmail: _usernameController.text.trim(),
+                                              builder: (_) =>
+                                                  ForgotPasswordPage(
+                                                initialEmail:
+                                                    _usernameController.text
+                                                        .trim(),
                                                 onSubmit: (email) {
                                                   return Future.value(true);
                                                 },
@@ -328,9 +353,11 @@ class _LoginFormClientState extends State<LoginFormClient>
                                             ),
                                           );
                                         },
-                                        styleBuilder: (isHovering) => inputTextStyle(
+                                        styleBuilder: (isHovering) =>
+                                            inputTextStyle(
                                           context,
-                                          color: isHovering ? pBlue : primaryColor,
+                                          color:
+                                              isHovering ? pBlue : primaryColor,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -345,21 +372,25 @@ class _LoginFormClientState extends State<LoginFormClient>
                                   children: [
                                     Text(
                                       "Belum Punya Akun? ",
-                                      style: bodyTextStyle(context).copyWith(color: hintGrey),
+                                      style: bodyTextStyle(context)
+                                          .copyWith(color: hintGrey),
                                     ),
                                     GestureDetector(
                                       onTap: () {
                                         _clearEmailStateAndController();
-                                        context.read<EmailVerificationBloc>().add(
-                                          ClearEmailVerificationEvent(),
-                                        );
+                                        context
+                                            .read<EmailVerificationBloc>()
+                                            .add(
+                                              ClearEmailVerificationEvent(),
+                                            );
                                         context.read<AuthenticationBloc>().add(
-                                          RequireLoginUser(),
-                                        );
+                                              RequireLoginUser(),
+                                            );
                                       },
                                       child: Text(
                                         "Masuk Sebagai Pengguna",
-                                        style: bodyTextStyle(context).copyWith(color: primaryColor),
+                                        style: bodyTextStyle(context)
+                                            .copyWith(color: primaryColor),
                                       ),
                                     ),
                                   ],

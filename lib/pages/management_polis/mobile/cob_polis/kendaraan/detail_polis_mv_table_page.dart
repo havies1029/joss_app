@@ -102,7 +102,7 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
               child: ListPageFilterBarUIWidget(
                 searchController: searchController,
                 searchButton: buildSearchButton(),
-                hintText: "No Plat/Rangka/Mesin",
+                hintText: "No Plat/Merk Kendaraan",
               ),
             ),
             const Divider(height: 1),

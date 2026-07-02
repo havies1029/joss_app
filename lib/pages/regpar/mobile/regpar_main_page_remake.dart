@@ -9,7 +9,6 @@ import 'package:joss_app/blocs/regpar/regpar_upload_foto_object_bloc.dart';
 import 'package:joss_app/pages/regpar/mobile/preview/regpar6_unified_preview_page.dart';
 import 'package:string_validator/string_validator.dart';
 
-
 import '../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_event.dart';
 import '../../../blocs/gen_regmv/polis_tanggal_state.dart';
@@ -56,7 +55,7 @@ import '../../../widgets/hitung_premi_widget.dart';
 import '../../base/base_background_sidepage.dart';
 import 'konfirmasi_regpar_page.dart';
 
-enum RegparSection { form1, form2, form3, form4, form6, form5 } 
+enum RegparSection { form1, form2, form3, form4, form6, form5 }
 // urutan sesuai UI kamu sekarang: 1,2,3,4,6,5 (premi terakhir)
 
 class RegparFormMainRemake extends StatefulWidget {
@@ -75,7 +74,6 @@ class RegparFormMainRemake extends StatefulWidget {
 
 class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   late List<bool> expanded;
-
 
   String? regpar1Id;
   String? regpar2Id;
@@ -98,7 +96,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Regpar4FormModel? form4Record;
   Regpar5FormModel? form5Record;
   Regpar6FormModel? form6Record;
-
 
   bool _showZonaGempa = true;
   bool _lockCheckboxes = false;
@@ -169,21 +166,27 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldPolisMulaiController = TextEditingController();
 
   ComboRKonstruksiojkModel? fieldComboRKonstruksiojk;
-  final comboRKonstruksiojkKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
+  final comboRKonstruksiojkKey =
+      GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
   ComboROkupasiModel? fieldComboROkupasi;
   final comboROkupasiKey = GlobalKey<DropdownSearchState<ComboROkupasiModel>>();
   ComboMKecamatanModel? fieldComboMKecamatan;
-  final comboMKecamatanKey = GlobalKey<DropdownSearchState<ComboMKecamatanModel>>();
+  final comboMKecamatanKey =
+      GlobalKey<DropdownSearchState<ComboMKecamatanModel>>();
   ComboMKelurahanModel? fieldComboMKelurahan;
-  final comboMKelurahanKey = GlobalKey<DropdownSearchState<ComboMKelurahanModel>>();
+  final comboMKelurahanKey =
+      GlobalKey<DropdownSearchState<ComboMKelurahanModel>>();
   ComboMKotaModel? fieldComboMKota;
   final comboMKotaKey = GlobalKey<DropdownSearchState<ComboMKotaModel>>();
   ComboMPropinsiModel? fieldComboMPropinsi;
-  final comboMPropinsiKey = GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
+  final comboMPropinsiKey =
+      GlobalKey<DropdownSearchState<ComboMPropinsiModel>>();
   DateTime? kejadianMulaiTgl;
-  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final _today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime? kejadianBerakhirTgl;
-  final _years = DateTime(DateTime.now().year+1, DateTime.now().month, DateTime.now().day);
+  final _years = DateTime(
+      DateTime.now().year + 1, DateTime.now().month, DateTime.now().day);
   //form2
 
   //form3
@@ -194,9 +197,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldIsTsfwdController = TextEditingController();
 
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
-  final comboMKabZonaGempaKey = GlobalKey<DropdownSearchState<ComboMKabZonaGempaModel>>();
+  final comboMKabZonaGempaKey =
+      GlobalKey<DropdownSearchState<ComboMKabZonaGempaModel>>();
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
-  final comboMJnscoverParKey = GlobalKey<DropdownSearchState<ComboMJnscoverParModel>>();
+  final comboMJnscoverParKey =
+      GlobalKey<DropdownSearchState<ComboMJnscoverParModel>>();
   ComboMWilayahModel? fieldComboMWilayah;
   final comboMWilayahKey = GlobalKey<DropdownSearchState<ComboMWilayahModel>>();
   //form3
@@ -208,7 +213,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   final fieldSiOtherController = TextEditingController();
   final fieldSiStockController = TextEditingController();
   ComboRMatauangModel? fieldComboRMatauang;
-  final comboRMatauangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
+  final comboRMatauangKey =
+      GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
   //form4
 
   //form5
@@ -240,7 +246,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     expanded = List.filled(RegparSection.values.length, false);
     expanded[sectionIndex(RegparSection.form1)] = true;
 
-    final regpar1 = context.read<Regpar1CrudBloc>().state.record?.regpar1Id ?? "";
+    final regpar1 =
+        context.read<Regpar1CrudBloc>().state.record?.regpar1Id ?? "";
     regpar1Id = widget.regpar1Id ?? regpar1;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -307,37 +314,36 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   void refreshForm1({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regpar1CrudBloc>().add(
-      Regpar1CrudLihatEvent(recordId: recordId),
-    );
+          Regpar1CrudLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm2({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regpar2FormBloc>().add(
-      Regpar2FormLihatEvent(recordId: recordId),
-    );
+          Regpar2FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm3({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regpar3FormBloc>().add(
-      Regpar3FormLihatEvent(recordId: recordId),
-    );
+          Regpar3FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm4({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regpar4FormBloc>().add(
-      Regpar4FormLihatEvent(recordId: recordId),
-    );
+          Regpar4FormLihatEvent(recordId: recordId),
+        );
   }
-
 
   void refreshForm5({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regpar5FormBloc>().add(
-      Regpar5FormLihatEvent(recordId: recordId),
-    );
+          Regpar5FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm6({required String? recordId}) {
@@ -345,8 +351,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       return;
     }
     context.read<Regpar6CariBloc>().add(
-      RefreshRegpar6CariEvent(regpar1Id: recordId),
-    );
+          RefreshRegpar6CariEvent(regpar1Id: recordId),
+        );
   }
 
   void _payloadform1(Regpar1CrudModel record) {
@@ -380,14 +386,16 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           a.year == b.year && a.month == b.month && a.day == b.day;
 
       if (sameDay(mulai, akhir)) {
-        debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
+        debugPrint(
+            '⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
       }
 
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
-        DateTime(mulai.year, mulai.month, mulai.day), // normalize
-      ));
+            DateTime(mulai.year, mulai.month, mulai.day), // normalize
+          ));
 
-      if (fieldComboRKonstruksiojk == null && record.comboRKonstruksiojk != null) {
+      if (fieldComboRKonstruksiojk == null &&
+          record.comboRKonstruksiojk != null) {
         fieldComboRKonstruksiojk = record.comboRKonstruksiojk;
       }
 
@@ -410,7 +418,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       if (fieldComboMKelurahan == null && record.comboMKelurahan != null) {
         fieldComboMKelurahan = record.comboMKelurahan;
       }
-
     });
   }
 
@@ -436,10 +443,10 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     }
 
     setState(() {
-      if (fieldComboMKabZonaGempa == null && record.comboMKabZonaGempa != null) {
+      if (fieldComboMKabZonaGempa == null &&
+          record.comboMKabZonaGempa != null) {
         fieldComboMKabZonaGempa = record.comboMKabZonaGempa;
       }
-
 
       final jnsCoverPar = record.comboMJnscoverPar;
       if (fieldComboMJnscoverPar == null && jnsCoverPar != null) {
@@ -576,7 +583,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -601,7 +608,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -644,8 +651,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     if (shouldLeave == true) {
       context.read<Regpar1CrudBloc>().add(
-        Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
-      );
+            Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
+          );
       Navigator.pop(context);
     }
   }
@@ -655,8 +662,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     if (shouldLeave == true) {
       context.read<Regpar1CrudBloc>().add(
-        Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
-      );
+            Regpar1CrudHapusEvent(recordId: regpar1Id ?? ""),
+          );
 
       final homeState = homeTabKey.currentState;
 
@@ -699,7 +706,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               }
             },
           ),
-
           BlocListener<Regpar2FormBloc, Regpar2FormState>(
             listener: (context, state) {
               if (state.isSaved && !state.hasFailure && state.record != null) {
@@ -712,7 +718,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               }
             },
           ),
-
           BlocListener<Regpar3FormBloc, Regpar3FormState>(
             listener: (context, state) {
               if (state.isSaved && !state.hasFailure && state.record != null) {
@@ -725,12 +730,11 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               }
             },
           ),
-
           BlocListener<Regpar4FormBloc, Regpar4FormState>(
             listener: (context, state) {
               if (state.isSaved && !state.hasFailure && state.record != null) {
                 setState(() {
-                  regpar4Id = state.record!.regpar1Id;//anomali
+                  regpar4Id = state.record!.regpar1Id; //anomali
                 });
               }
               if (state.isLoaded && !state.hasFailure && state.record != null) {
@@ -738,10 +742,9 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
               }
             },
           ),
-
           BlocListener<Regpar5FormBloc, Regpar5FormState>(
             listenWhen: (prev, curr) =>
-            prev.isCalculated != curr.isCalculated ||
+                prev.isCalculated != curr.isCalculated ||
                 prev.hasFailure != curr.hasFailure,
             listener: (context, state) {
               if (state.hasFailure) {
@@ -798,28 +801,23 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: hPadding * 1.5),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: const FormSectionHeader(
                 iconPath: "assets/icons/properti.svg",
                 title: "Polis Properti",
                 subtitle:
-                "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
+                    "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
               ),
             ),
-
             const SizedBox(height: hPadding * 1.5),
-
             CustomProgressBar(
               progress: getProgressValue(),
               horizontalPadding: hPadding * 1.5,
               barColor: primaryColor,
               borderRadius: cardBorderRadius,
             ),
-
             const SizedBox(height: hPadding * 1.5),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
               child: Column(
@@ -844,7 +842,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     ),
                   ),
                   const SizedBox(height: hPadding),
-
                   Form2Page(
                     context: context,
                     title: "Informasi Polis",
@@ -859,11 +856,15 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                         Row(
                           children: [
                             Flexible(child: buildFieldPolisMulai()),
-                            const SizedBox(width: hPadding,),
+                            const SizedBox(
+                              width: hPadding,
+                            ),
                             Flexible(child: buildFieldPolisBerakhir()),
                           ],
                         ),
-                        const SizedBox(height: hPadding,),
+                        const SizedBox(
+                          height: hPadding,
+                        ),
                         buildFieldRokupasiId(),
                         const SizedBox(height: hPadding),
                         buildFieldRkonstruksiojkId(),
@@ -881,9 +882,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form3Page(
                     context: context,
                     title: "Pertanggungan",
@@ -905,7 +904,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                           ),
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: buildFieldIsFlexas()),
@@ -914,7 +912,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: buildFieldIsRsmdcc()),
@@ -943,9 +940,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form4Page(
                     context: context,
                     title: "Nilai Pertanggungan",
@@ -984,9 +979,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form6Page(
                     context: context,
                     title: "Upload Foto Bangunan",
@@ -998,7 +991,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        BlocBuilder<RegparUploadFotoObjectBloc, RegParUploadFotoObjectState>(
+                        BlocBuilder<RegparUploadFotoObjectBloc,
+                            RegParUploadFotoObjectState>(
                           buildWhen: (p, c) => p.items.length != c.items.length,
                           builder: (context, state) {
                             if (_showVal6 && state.items.isNotEmpty) {
@@ -1008,164 +1002,171 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                             }
 
                             return Regpar6StoragePickerSectionWidget(
-                              showRequiredError: _showVal6 && state.items.isEmpty,
+                              showRequiredError:
+                                  _showVal6 && state.items.isEmpty,
                             );
                           },
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   buildButtonHitungPremi(),
-
                   const SizedBox(height: hPadding),
-
                   Form5Page(
                     context: context,
                     title: "Premi",
                     isExpanded: expanded[5],
                     child: (hasForm5Record)
                         ? Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "RATE",
-                            style: bodyTextStyle(context).copyWith(
-                              color: primaryLightColor,
-                              fontSize: getResponsiveFont(context, 20),
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "RATE",
+                                  style: bodyTextStyle(context).copyWith(
+                                    color: primaryLightColor,
+                                    fontSize: getResponsiveFont(context, 20),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              HitungPremiWidget(
+                                rows: [
+                                  HitungPremiRow(
+                                    label: "Kebakaran:",
+                                    controller: fieldRateParController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Kerusuhan:",
+                                    controller: fieldRateRsmdccController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Banjir:",
+                                    controller: fieldRateTsfwdController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Gempa Bumi:",
+                                    controller: fieldRateEqvetController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Lain-Lain:",
+                                    controller: fieldRateOtherController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Total Rate:",
+                                    controller: fieldRateTotalController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              const Divider(
+                                thickness: 1,
+                                color: sGrey,
+                              ),
+                              const SizedBox(height: 2),
+                              HitungPremiWidget(
+                                rows: [
+                                  HitungPremiRow(
+                                    label:
+                                        "PERHITUNGAN PREMI\n(Asuransi PAR Termasuk EQVET)",
+                                    description:
+                                        "${fieldComboRMatauang?.rmatauangSimbol} ${formatControllerNumber(fieldSumInsuredController)} x ${fieldRateTotalController.text}% =",
+                                    controller: fieldPremiTotalController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "DISKON",
+                                    controller: fieldDiskonNilaiController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "BIAYA POLIS",
+                                    controller: fieldBiayaPolisController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "BIAYA MATERAI",
+                                    controller: fieldBiayaMateraiController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  // HitungPremiRow(
+                                  //   label: "TOTAL TAGIHAN",
+                                  //   controller: fieldPremiNetController,
+                                  //   layoutType: HitungPremiLayoutType.vertical,
+                                  //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                                  //   showValueBorder: true,
+                                  //   formatNumber: true,
+                                  // ),
+                                  HitungPremiRow(
+                                    // label: "TOTAL PREMI",
+                                    label: "TOTAL TAGIHAN",
+                                    controller: fieldTotalTagihanController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                ],
+                              ),
+                              // buildFieldPremiEqvet(),
+                              //                         // const SizedBox(height: hPadding),
+                              //                         // buildFieldDiskonNilai(),
+                              //                         // const SizedBox(height: hPadding),
+                              //                         // buildFieldPremiNet(),
+                            ],
+                          )
+                        : const SizedBox(
+                            height: 40,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "Klik Hitung Premi untuk melihat hasil."),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        HitungPremiWidget(
-                          rows: [
-                            HitungPremiRow(
-                              label: "Kebakaran:",
-                              controller: fieldRateParController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Kerusuhan:",
-                              controller: fieldRateRsmdccController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Banjir:",
-                              controller: fieldRateTsfwdController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Gempa Bumi:",
-                              controller: fieldRateEqvetController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Lain-Lain:",
-                              controller: fieldRateOtherController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Total Rate:",
-                              controller: fieldRateTotalController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                          ],
-
-                        ),
-                        const SizedBox(height: 2),
-                        const Divider(
-                          thickness: 1,
-                          color: sGrey,
-                        ),
-                        const SizedBox(height: 2),
-                        HitungPremiWidget(
-                          rows: [
-                            HitungPremiRow(
-                              label: "PERHITUNGAN PREMI\n(Asuransi PAR Termasuk EQVET)",
-                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${formatControllerNumber(fieldSumInsuredController)} x ${fieldRateTotalController.text}% =",
-                              controller: fieldPremiTotalController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "DISKON",
-                              controller: fieldDiskonNilaiController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "BIAYA POLIS",
-                              controller: fieldBiayaPolisController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "BIAYA MATERAI",
-                              controller: fieldBiayaMateraiController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            // HitungPremiRow(
-                            //   label: "TOTAL TAGIHAN",
-                            //   controller: fieldPremiNetController,
-                            //   layoutType: HitungPremiLayoutType.vertical,
-                            //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                            //   showValueBorder: true,
-                            //   formatNumber: true,
-                            // ),
-                            HitungPremiRow(
-                              // label: "TOTAL PREMI",
-                              label: "TOTAL TAGIHAN",
-                              controller: fieldTotalTagihanController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                          ],
-
-                        ),
-                        // buildFieldPremiEqvet(),
-                        //                         // const SizedBox(height: hPadding),
-                        //                         // buildFieldDiskonNilai(),
-                        //                         // const SizedBox(height: hPadding),
-                        //                         // buildFieldPremiNet(),
-                      ],
-                    )
-                        : const SizedBox(
-                      height: 40,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Klik Hitung Premi untuk melihat hasil."),
-                      ),
-                    ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   if (canShowLanjutkan) ...[
                     AppButton.iconRight(
                       text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
@@ -1174,40 +1175,42 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
-                        setState(() {
-                          _isLanjutkanLoading = true;
-                        });
+                              setState(() {
+                                _isLanjutkanLoading = true;
+                              });
 
-                        try {
+                              try {
+                                draftForm1ToBloc(context);
+                                draftForm2ToBloc(context);
+                                draftForm3ToBloc(context);
+                                draftForm4ToBloc(context);
 
-                          draftForm1ToBloc(context);
-                          draftForm2ToBloc(context);
-                          draftForm3ToBloc(context);
-                          draftForm4ToBloc(context);
+                                context
+                                    .read<RegparFlowBloc>()
+                                    .add(RegparFlowStartEvent());
 
-                          context.read<RegparFlowBloc>().add(RegparFlowStartEvent());
+                                await Future.delayed(
+                                    const Duration(seconds: 2));
 
-                          await Future.delayed(const Duration(seconds: 2));
+                                if (!mounted) return;
 
-                          if (!mounted) return;
-
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => KonfirmasiRegParPage(
-                                recordId: regpar1Id ?? '',
-                                viewMode: 'ubah',
-                              ),
-                            ),
-                          );
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isLanjutkanLoading = false;
-                            });
-                          }
-                        }
-                      },
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => KonfirmasiRegParPage(
+                                      recordId: regpar1Id ?? '',
+                                      viewMode: 'ubah',
+                                    ),
+                                  ),
+                                );
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    _isLanjutkanLoading = false;
+                                  });
+                                }
+                              }
+                            },
                     ),
                   ],
                   const SizedBox(height: 25),
@@ -1242,7 +1245,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             onTap: () {
               tryOpenSection(RegparSection.form1, onRefresh: onRefresh);
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1276,7 +1278,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             onTap: () {
               tryOpenSection(RegparSection.form2, onRefresh: onRefresh);
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1310,7 +1311,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             onTap: () {
               tryOpenSection(RegparSection.form3, onRefresh: onRefresh);
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1344,7 +1344,6 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
             onTap: () {
               tryOpenSection(RegparSection.form4, onRefresh: onRefresh);
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1435,8 +1434,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     debugPrint("[draftForm1ToBloc] record => ${record.toJson()}");
 
     context.read<Regpar1CrudBloc>().add(
-      Regpar1DraftEvent(record: record),
-    );
+          Regpar1DraftEvent(record: record),
+        );
   }
 
   void draftForm2ToBloc(BuildContext context) {
@@ -1467,9 +1466,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       isOther: toBoolean(fieldIsOtherController.text),
       isRsmdcc: toBoolean(fieldIsRsmdccController.text),
       isTsfwd: toBoolean(fieldIsTsfwdController.text),
-      kab2zonagempaId: _showZonaGempa
-          ? fieldComboMKabZonaGempa?.mkabzonagempaId
-          : '',
+      kab2zonagempaId:
+          _showZonaGempa ? fieldComboMKabZonaGempa?.mkabzonagempaId : '',
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
       regpar3Id: regpar1Id ?? "",
@@ -1484,9 +1482,12 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     final record = Regpar4FormModel(
       regpar1Id: regpar1Id ?? "",
       currId: fieldComboRMatauang?.rmatauangKode,
-      siBuilding: double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
-      siContent: double.parse(fieldSiContentController.text.replaceAll(',', '')),
-      siMachinery: double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
+      siBuilding:
+          double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
+      siContent:
+          double.parse(fieldSiContentController.text.replaceAll(',', '')),
+      siMachinery:
+          double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
       siOther: double.parse(fieldSiOtherController.text.replaceAll(',', '')),
       siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
     );
@@ -1497,21 +1498,22 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+  int _hitungPremiAttempt = 0;
 
   Widget buildButtonHitungPremi() => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 4),
-    child: AppButton.primary(
-      text: "Hitung Premi",
-      isLoading: _isHitungPremiLoading,
-      backgroundColor:
-      _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
-      onPressed: _isHitungPremiLoading
-          ? null
-          : () async {
-        await onHitungPremi();
-      },
-    ),
-  );
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: AppButton.primary(
+          text: "Hitung Premi",
+          isLoading: _isHitungPremiLoading,
+          backgroundColor:
+              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+          onPressed: _isHitungPremiLoading
+              ? null
+              : () async {
+                  await onHitungPremi();
+                },
+        ),
+      );
 
   Future<void> onHitungPremi() async {
     final okForm1 = validateForm1();
@@ -1556,15 +1558,16 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         _isHitungPremiLoading = true;
       });
     }
+    _startHitungPremiTimeout();
 
     final localIds6 = form6State.items.map((e) => e.localId).toList();
 
     context.read<RegparUploadFotoObjectBloc>().add(
-      RegparStorageUploadMany(
-        regpar1Id: regpar1Id!,
-        localIds: localIds6,
-      ),
-    );
+          RegparStorageUploadMany(
+            regpar1Id: regpar1Id!,
+            localIds: localIds6,
+          ),
+        );
 
     draftForm1ToBloc(context);
     draftForm2ToBloc(context);
@@ -1574,31 +1577,55 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     context.read<RegparFlowBloc>().add(RegparFlowStartEvent());
   }
 
+  void _startHitungPremiTimeout() {
+    final attempt = ++_hitungPremiAttempt;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted ||
+          attempt != _hitungPremiAttempt ||
+          !_isHitungPremiLoading) {
+        return;
+      }
+
+      setState(() {
+        _isHitungPremiLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
+    });
+  }
+
   void openForm1({required String? recordId}) =>
-    openSection(RegparSection.form1, onRefresh: () => refreshForm1(recordId: recordId));
+      openSection(RegparSection.form1,
+          onRefresh: () => refreshForm1(recordId: recordId));
 
   void openForm2({required String? recordId}) =>
-      openSection(RegparSection.form2, onRefresh: () => refreshForm2(recordId: recordId));
+      openSection(RegparSection.form2,
+          onRefresh: () => refreshForm2(recordId: recordId));
 
   void openForm3({required String? recordId}) =>
-      openSection(RegparSection.form3, onRefresh: () => refreshForm3(recordId: recordId));
+      openSection(RegparSection.form3,
+          onRefresh: () => refreshForm3(recordId: recordId));
 
   void openForm4({required String? recordId}) =>
-      openSection(RegparSection.form4, onRefresh: () => refreshForm4(recordId: recordId));
+      openSection(RegparSection.form4,
+          onRefresh: () => refreshForm4(recordId: recordId));
 
-  void openUploadFotoSection({required String? recordId}) =>
-      openSection(RegparSection.form6, onRefresh: () => refreshForm6(recordId: recordId)); // catatan: ini Form6
+  void openUploadFotoSection({required String? recordId}) => openSection(
+      RegparSection.form6,
+      onRefresh: () => refreshForm6(recordId: recordId)); // catatan: ini Form6
 
-  void openPremiSection({required String? recordId}) =>
-    openSection(
-      RegparSection.form5,
-      onRefresh: () {
-        final st = context.read<Regpar5FormBloc>().state;
-        if (st.record == null) {
-          refreshForm5(recordId: recordId);
-        }
-      },
-    );
+  void openPremiSection({required String? recordId}) => openSection(
+        RegparSection.form5,
+        onRefresh: () {
+          final st = context.read<Regpar5FormBloc>().state;
+          if (st.record == null) {
+            refreshForm5(recordId: recordId);
+          }
+        },
+      );
 
   bool validateForm1() {
     clearErrsByPrefix('form1.');
@@ -1781,32 +1808,32 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   //form1
   Widget buildFieldTtgNama() => appTextField(
-    label: "Nama Tertanggung",
-    controller: fieldTtgNamaController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-    ],
-    errorText: err('form1.namaTertanggung'),
-    validator: (_) => err('form1.namaTertanggung'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
-    },
-  );
+        label: "Nama Tertanggung",
+        controller: fieldTtgNamaController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+        ],
+        errorText: err('form1.namaTertanggung'),
+        validator: (_) => err('form1.namaTertanggung'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
+        },
+      );
 
   Widget buildFieldTtgAlamat() => appTextField(
-    label: "Alamat Tertanggung",
-    controller: fieldTtgAlamatController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
-    ],
-    errorText: err('form1.alamatTertanggung'),
-    validator: (_) => err('form1.alamatTertanggung'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
-    },
-  );
+        label: "Alamat Tertanggung",
+        controller: fieldTtgAlamatController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
+        ],
+        errorText: err('form1.alamatTertanggung'),
+        validator: (_) => err('form1.alamatTertanggung'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
+        },
+      );
   //form1
 
   //form2
@@ -1814,7 +1841,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
       buildWhen: (prev, curr) => prev.mulai != curr.mulai,
       builder: (context, state) {
-        final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        final today = DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
         return AppDateField(
           label: 'Tanggal Mulai',
@@ -1958,8 +1986,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );
 
-  Widget buildFieldRokupasiId() =>
-      ReusableComboBoxV2<ComboROkupasiModel>(
+  Widget buildFieldRokupasiId() => ReusableComboBoxV2<ComboROkupasiModel>(
         hintText: "Okupasi",
         comboKey: comboROkupasiKey,
         initItem: fieldComboROkupasi,
@@ -1988,28 +2015,29 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       );
 
   Widget buildFieldObjectAlamat() => appTextField(
-    label: "Alamat lokasi Risiko",
-    controller: fieldObjectAlamatController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
-    ],
+        label: "Alamat lokasi Risiko",
+        controller: fieldObjectAlamatController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
+        ],
 
-    // error-map pattern
-    errorText: err('form2.alamatRumah'),
-    validator: (_) => err('form2.alamatRumah'),
+        // error-map pattern
+        errorText: err('form2.alamatRumah'),
+        validator: (_) => err('form2.alamatRumah'),
 
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form2.alamatRumah');
-    },
-  );
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form2.alamatRumah');
+        },
+      );
 
   Widget buildFieldObjectPropinsiId() =>
       ReusableComboBoxV2<ComboMPropinsiModel>(
         hintText: "Provinsi",
         comboKey: comboMPropinsiKey,
         initItem: fieldComboMPropinsi,
-        loader: (q) => ComboMPropinsiRepository().getComboMPropinsi(q.searchText),
+        loader: (q) =>
+            ComboMPropinsiRepository().getComboMPropinsi(q.searchText),
         displayText: (i) => i.propinsiNama,
         compareItems: (a, b) => a.mpropinsiId == b.mpropinsiId,
         validatorCallback: (v) => v == null ? kStringNullError : null,
@@ -2039,8 +2067,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onSaveCallback: (value) => fieldComboMPropinsi = value,
       );
 
-  Widget buildFieldObjectKotaId() =>
-      ReusableComboBoxV2<ComboMKotaModel>(
+  Widget buildFieldObjectKotaId() => ReusableComboBoxV2<ComboMKotaModel>(
         hintText: "Kota",
         comboKey: comboMKotaKey,
         initItem: fieldComboMKota,
@@ -2147,45 +2174,45 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   //form2
 
   //form3
-  Widget  buildFieldIsEq() => CheckboxWidget(
-    rightLabel: "Gempa Bumi",
-    initialValue: toBoolean(fieldIsEqController.text),
-    callback: (v) => fieldIsEqController.text = v.toString(),
-    leftLabel: "",
-    enabled: !_lockCheckboxes,
-  );
+  Widget buildFieldIsEq() => CheckboxWidget(
+        rightLabel: "Gempa Bumi",
+        initialValue: toBoolean(fieldIsEqController.text),
+        callback: (v) => fieldIsEqController.text = v.toString(),
+        leftLabel: "",
+        enabled: !_lockCheckboxes,
+      );
 
   Widget buildFieldIsFlexas() => CheckboxWidget(
-    leftLabel: "",
-    rightLabel: "Kebakaran/Petir",
-    initialValue: toBoolean(fieldIsFlexasController.text),
-    callback: (v) => fieldIsFlexasController.text = v.toString(),
-    enabled: !_lockCheckboxes,
-  );
+        leftLabel: "",
+        rightLabel: "Kebakaran/Petir",
+        initialValue: toBoolean(fieldIsFlexasController.text),
+        callback: (v) => fieldIsFlexasController.text = v.toString(),
+        enabled: !_lockCheckboxes,
+      );
 
   Widget buildFieldIsOther() => CheckboxWidget(
-    leftLabel: "",
-    rightLabel: "Lain-Lain",
-    initialValue: toBoolean(fieldIsOtherController.text),
-    callback: (v) => fieldIsOtherController.text = v.toString(),
-    enabled: !_lockCheckboxes,
-  );
+        leftLabel: "",
+        rightLabel: "Lain-Lain",
+        initialValue: toBoolean(fieldIsOtherController.text),
+        callback: (v) => fieldIsOtherController.text = v.toString(),
+        enabled: !_lockCheckboxes,
+      );
 
   Widget buildFieldIsRsmdcc() => CheckboxWidget(
-    leftLabel: "",
-    rightLabel: "Kerusuhan",
-    initialValue: toBoolean(fieldIsRsmdccController.text),
-    callback: (v) => fieldIsRsmdccController.text = v.toString(),
-    enabled: !_lockCheckboxes,
-  );
+        leftLabel: "",
+        rightLabel: "Kerusuhan",
+        initialValue: toBoolean(fieldIsRsmdccController.text),
+        callback: (v) => fieldIsRsmdccController.text = v.toString(),
+        enabled: !_lockCheckboxes,
+      );
 
   Widget buildFieldIsTsfwd() => CheckboxWidget(
-    leftLabel: "",
-    rightLabel: "Banjir",
-    initialValue: toBoolean(fieldIsTsfwdController.text),
-    callback: (v) => fieldIsTsfwdController.text = v.toString(),
-    enabled: !_lockCheckboxes,
-  );
+        leftLabel: "",
+        rightLabel: "Banjir",
+        initialValue: toBoolean(fieldIsTsfwdController.text),
+        callback: (v) => fieldIsTsfwdController.text = v.toString(),
+        enabled: !_lockCheckboxes,
+      );
 
   Widget buildFieldMjnscoverparId() =>
       ReusableComboBoxV2<ComboMJnscoverParModel>(
@@ -2209,8 +2236,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onSaveCallback: (value) => fieldComboMJnscoverPar = value,
       );
 
-  Widget buildFieldMwilayahId() =>
-      ReusableComboBoxV2<ComboMWilayahModel>(
+  Widget buildFieldMwilayahId() => ReusableComboBoxV2<ComboMWilayahModel>(
         hintText: "Wilayah",
         initItem: fieldComboMWilayah,
         loader: (q) => ComboMWilayahRepository().getComboMWilayah(),
@@ -2267,8 +2293,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   //form3
 
   //form4
-  Widget _buildComboCurddId() =>
-      ReusableComboBoxV2<ComboRMatauangModel>(
+  Widget _buildComboCurddId() => ReusableComboBoxV2<ComboRMatauangModel>(
         hintText: "Mata Uang",
         initItem: fieldComboRMatauang,
         loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
@@ -2289,236 +2314,236 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
       );
 
   Widget buildFieldSiBuilding() => appTextField(
-    label: "Bangunan",
-    controller: fieldSiBuildingController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
+        label: "Bangunan",
+        controller: fieldSiBuildingController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
 
-    // error-map pattern
-    errorText: err('form4.siBuilding'),
-    validator: (_) => err('form4.siBuilding'),
+        // error-map pattern
+        errorText: err('form4.siBuilding'),
+        validator: (_) => err('form4.siBuilding'),
 
-    onChanged: (v) => _clearIfNonNegativeNumber('form4.siBuilding', v),
-  );
+        onChanged: (v) => _clearIfNonNegativeNumber('form4.siBuilding', v),
+      );
 
   Widget buildFieldSiContent() => appTextField(
-    label: "Inventaris",
-    controller: fieldSiContentController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form4.siContent'),
-    validator: (_) => err('form4.siContent'),
-    onChanged: (v) => _clearIfNonNegativeNumber('form4.siContent', v),
-  );
+        label: "Inventaris",
+        controller: fieldSiContentController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form4.siContent'),
+        validator: (_) => err('form4.siContent'),
+        onChanged: (v) => _clearIfNonNegativeNumber('form4.siContent', v),
+      );
 
   Widget buildFieldSiMachinery() => appTextField(
-    label: "Mesin",
-    controller: fieldSiMachineryController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form4.siMachinery'),
-    validator: (_) => err('form4.siMachinery'),
-    onChanged: (v) => _clearIfNonNegativeNumber('form4.siMachinery', v),
-  );
+        label: "Mesin",
+        controller: fieldSiMachineryController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form4.siMachinery'),
+        validator: (_) => err('form4.siMachinery'),
+        onChanged: (v) => _clearIfNonNegativeNumber('form4.siMachinery', v),
+      );
 
   Widget buildFieldSiOther() => appTextField(
-    label: "Total",
-    controller: fieldSiOtherController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form4.siOther'),
-    validator: (_) => err('form4.siOther'),
-    onChanged: (v) => _clearIfNonNegativeNumber('form4.siOther', v),
-  );
+        label: "Total",
+        controller: fieldSiOtherController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form4.siOther'),
+        validator: (_) => err('form4.siOther'),
+        onChanged: (v) => _clearIfNonNegativeNumber('form4.siOther', v),
+      );
 
   Widget buildFieldSiStock() => appTextField(
-    label: "Stok",
-    controller: fieldSiStockController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form4.siStock'),
-    validator: (_) => err('form4.siStock'),
-    onChanged: (v) => _clearIfNonNegativeNumber('form4.siStock', v),
-  );
+        label: "Stok",
+        controller: fieldSiStockController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form4.siStock'),
+        validator: (_) => err('form4.siStock'),
+        onChanged: (v) => _clearIfNonNegativeNumber('form4.siStock', v),
+      );
   //form4
 
   //form5
   Widget buildFieldDiskonNilai() => appTextField(
-    label: "Diskon Nilai",
-    controller: fieldDiskonNilaiController,
-    keyboardType: TextInputType.number,
-    enabled: false,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.diskonNilai'),
-    validator: (_) => err('form7.diskonNilai'),
-    onChanged: (v) => _clearIfNotEmpty('form7.diskonNilai', v),
-  );
+        label: "Diskon Nilai",
+        controller: fieldDiskonNilaiController,
+        keyboardType: TextInputType.number,
+        enabled: false,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.diskonNilai'),
+        validator: (_) => err('form7.diskonNilai'),
+        onChanged: (v) => _clearIfNotEmpty('form7.diskonNilai', v),
+      );
 
   Widget buildFieldDiskonPersen() => appTextField(
-    label: "Diskon Persen",
-    controller: fieldDiskonPersenController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.diskonPersen'),
-    validator: (_) => err('form7.diskonPersen'),
-    onChanged: (v) => _clearIfNotEmpty('form7.diskonPersen', v),
-  );
+        label: "Diskon Persen",
+        controller: fieldDiskonPersenController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.diskonPersen'),
+        validator: (_) => err('form7.diskonPersen'),
+        onChanged: (v) => _clearIfNotEmpty('form7.diskonPersen', v),
+      );
 
   Widget buildFieldPremiEqvet() => appTextField(
-    label: "Premi EQVET",
-    controller: fieldPremiEqvetController,
-    keyboardType: TextInputType.number,
-    enabled: false,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiEqvet'),
-    validator: (_) => err('form7.premiEqvet'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiEqvet', v),
-  );
+        label: "Premi EQVET",
+        controller: fieldPremiEqvetController,
+        keyboardType: TextInputType.number,
+        enabled: false,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiEqvet'),
+        validator: (_) => err('form7.premiEqvet'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiEqvet', v),
+      );
 
   Widget buildFieldPremiNet() => appTextField(
-    label: "Premi Net",
-    controller: fieldPremiNetController,
-    keyboardType: TextInputType.number,
-    enabled: false,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiNet'),
-    validator: (_) => err('form7.premiNet'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiNet', v),
-  );
+        label: "Premi Net",
+        controller: fieldPremiNetController,
+        keyboardType: TextInputType.number,
+        enabled: false,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiNet'),
+        validator: (_) => err('form7.premiNet'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiNet', v),
+      );
 
   Widget buildFieldPremiOther() => appTextField(
-    label: "Premi Lain-lain",
-    controller: fieldPremiOtherController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiOther'),
-    validator: (_) => err('form7.premiOther'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiOther', v),
-  );
+        label: "Premi Lain-lain",
+        controller: fieldPremiOtherController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiOther'),
+        validator: (_) => err('form7.premiOther'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiOther', v),
+      );
 
   Widget buildFieldPremiPar() => appTextField(
-    label: "Premi PAR",
-    controller: fieldPremiParController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiPar'),
-    validator: (_) => err('form7.premiPar'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiPar', v),
-  );
+        label: "Premi PAR",
+        controller: fieldPremiParController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiPar'),
+        validator: (_) => err('form7.premiPar'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiPar', v),
+      );
 
   Widget buildFieldPremiRsmdcc() => appTextField(
-    label: "Premi RSMDCC",
-    controller: fieldPremiRsmdccController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiRsmdcc'),
-    validator: (_) => err('form7.premiRsmdcc'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiRsmdcc', v),
-  );
+        label: "Premi RSMDCC",
+        controller: fieldPremiRsmdccController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiRsmdcc'),
+        validator: (_) => err('form7.premiRsmdcc'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiRsmdcc', v),
+      );
 
   Widget buildFieldPremiTsfwd() => appTextField(
-    label: "Premi TSFWD",
-    controller: fieldPremiTsfwdController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiTsfwd'),
-    validator: (_) => err('form7.premiTsfwd'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiTsfwd', v),
-  );
+        label: "Premi TSFWD",
+        controller: fieldPremiTsfwdController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiTsfwd'),
+        validator: (_) => err('form7.premiTsfwd'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiTsfwd', v),
+      );
 
   Widget buildFieldPremiTotal() => appTextField(
-    label: "Premi Total",
-    controller: fieldPremiTotalController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form7.premiTotal'),
-    validator: (_) => err('form7.premiTotal'),
-    onChanged: (v) => _clearIfNotEmpty('form7.premiTotal', v),
-  );
+        label: "Premi Total",
+        controller: fieldPremiTotalController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form7.premiTotal'),
+        validator: (_) => err('form7.premiTotal'),
+        onChanged: (v) => _clearIfNotEmpty('form7.premiTotal', v),
+      );
 
   //form5
 
@@ -2528,17 +2553,18 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
     if (angka != null && angka >= 0) clearErr(key);
   }
 
-
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
 
   void setErr(String key, String? msg) {
     setState(() => fieldErrors[key] = msg);
   }
+
   void clearErr(String key) {
     if (!fieldErrors.containsKey(key)) return;
     setState(() => fieldErrors.remove(key));
   }
+
   void clearErrsByPrefix(String prefix) {
     setState(() {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
@@ -2565,8 +2591,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   }
 
   bool isForm1Complete() =>
-    fieldTtgNamaController.text.trim().isNotEmpty &&
-    fieldTtgAlamatController.text.trim().isNotEmpty;
+      fieldTtgNamaController.text.trim().isNotEmpty &&
+      fieldTtgAlamatController.text.trim().isNotEmpty;
 
   bool isForm2Complete() =>
       fieldComboRKonstruksiojk != null &&
@@ -2650,5 +2676,4 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
     openSection(target, onRefresh: onRefresh);
   }
-
 }

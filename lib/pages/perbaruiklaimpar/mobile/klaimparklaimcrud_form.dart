@@ -355,6 +355,7 @@ class KlaimparklaimcrudFormPageFormState
       label: 'Tanggal Kejadian',
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      enabled: !isPolisJps,
       initialValue: DateTime.tryParse(fieldDolController.text),
       validator: (_) => err('form.dol'),
       onChanged: (value) {
@@ -407,6 +408,7 @@ class KlaimparklaimcrudFormPageFormState
       label: 'Tanggal ke JPS',
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      enabled: !isPolisJps,
       initialValue: DateTime.tryParse(fieldLaporJpsController.text),
       validator: (_) => err('form.laporJps'),
       onChanged: (value) {

@@ -188,6 +188,7 @@ class _RincianPageState extends State<RincianPage> {
                     description:
                         "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kemba",
                     displayButton: "Kembali",
+                    assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(

@@ -17,7 +17,6 @@ import '../../../../helper/auth_input_router.dart';
 import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/login/emailverification_model.dart';
 
-
 class LoginFormUser extends StatefulWidget {
   const LoginFormUser({super.key});
 
@@ -27,7 +26,6 @@ class LoginFormUser extends StatefulWidget {
 
 class _LoginFormUserState extends State<LoginFormUser>
     with SingleTickerProviderStateMixin {
-
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>['email'],
   );
@@ -39,6 +37,7 @@ class _LoginFormUserState extends State<LoginFormUser>
   bool _rememberPassword = true;
   bool isSigningIn = false;
   bool isGoogleSigningIn = false;
+  int _signInAttempt = 0;
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class _LoginFormUserState extends State<LoginFormUser>
     _animationController = AnimationController(
       vsync: this,
       duration: defaultDuration,
-    );    
+    );
   }
 
   @override
@@ -94,19 +93,36 @@ class _LoginFormUserState extends State<LoginFormUser>
       onPressed: isSigningIn
           ? null
           : () async {
-        if (!_formKey.currentState!.validate()) return;
+              if (!_formKey.currentState!.validate()) return;
 
-        if (mounted) {
-          setState(() {
-            isSigningIn = true;
-          });
-        }
+              if (mounted) {
+                setState(() {
+                  isSigningIn = true;
+                });
+              }
+              _startSignInTimeout();
 
-        _animationController.forward(from: 0);
+              _animationController.forward(from: 0);
 
-        onRegisterButtonPressed(context);
-      },
+              onRegisterButtonPressed(context);
+            },
     );
+  }
+
+  void _startSignInTimeout() {
+    final attempt = ++_signInAttempt;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted || attempt != _signInAttempt || !isSigningIn) return;
+
+      setState(() {
+        isSigningIn = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
+    });
   }
 
   void onRegisterButtonPressed(BuildContext context) {
@@ -115,13 +131,11 @@ class _LoginFormUserState extends State<LoginFormUser>
     final input = _emailOrPhoneController.text.trim();
 
     context.read<EmailVerificationBloc>().add(
-      FieldEmailVerificationChangedEvent(email: input),
-    );
+          FieldEmailVerificationChangedEvent(email: input),
+        );
 
     AuthInputRouter.handleInput(context, input);
   }
-
-
 
   Widget footerLoginText(BuildContext context) {
     return Row(
@@ -148,10 +162,8 @@ class _LoginFormUserState extends State<LoginFormUser>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return MultiBlocListener(
       listeners: [
         BlocListener<LoginBloc, LoginState>(
@@ -165,7 +177,7 @@ class _LoginFormUserState extends State<LoginFormUser>
         ),
         BlocListener<EmailVerificationBloc, EmailVerificationState>(
           listenWhen: (previous, current) =>
-          previous.hasFailure != current.hasFailure ||
+              previous.hasFailure != current.hasFailure ||
               previous.errors != current.errors ||
               previous.successMessage != current.successMessage ||
               previous.isLoaded != current.isLoaded,
@@ -186,9 +198,14 @@ class _LoginFormUserState extends State<LoginFormUser>
             }
 
             if (state.hasFailure) {
-              final errorText = state.errors
-                  .where((e) => e.trim().isNotEmpty)
-                  .join("\n");
+              if (mounted) {
+                setState(() {
+                  isSigningIn = false;
+                });
+              }
+
+              final errorText =
+                  state.errors.where((e) => e.trim().isNotEmpty).join("\n");
 
               ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar(
@@ -205,193 +222,217 @@ class _LoginFormUserState extends State<LoginFormUser>
         builder: (context, state) {
           return ((state is LoginInitial) || (state is LoginFailure))
               ? Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // Header Section
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/images/logo.png',
-                              gaplessPlayback: true,
-                              height:
-                              isDesktop(context)
-                                  ? 56
-                                  : isTablet(context)
-                                  ? 48
-                                  : 42,
-                              width:
-                              isDesktop(context)
-                                  ? 180
-                                  : isTablet(context)
-                                  ? 140
-                                  : 120,
-                            ),
-                            SizedBox(height: hPadding,),
-                            WelcomeHeader(type: "login_user"),
-                          ],
-                        ),
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height,
                       ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            // Header Section
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: vPadding),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/logo.png',
+                                    gaplessPlayback: true,
+                                    height: isDesktop(context)
+                                        ? 56
+                                        : isTablet(context)
+                                            ? 48
+                                            : 42,
+                                    width: isDesktop(context)
+                                        ? 180
+                                        : isTablet(context)
+                                            ? 140
+                                            : 120,
+                                  ),
+                                  SizedBox(
+                                    height: hPadding,
+                                  ),
+                                  WelcomeHeader(type: "login_user"),
+                                ],
+                              ),
+                            ),
 
-                      // Card Section
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: cardBorderGradient,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              color: secondaryBlackColor,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Card(
-                              color: secondaryBlackColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                            // Card Section
+                            Expanded(
                               child: Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5, vertical : vPadding),
-                                child: Column(
-                                  children: [
-                                    _buildEmailOrPhoneField(),
-                                    SizedBox(height: 10),
-                                    // Row dengan checkbox dan forgot password
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _rememberPassword = !_rememberPassword;
-                                              });
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Checkbox(
-                                                  value: _rememberPassword,
-                                                  activeColor: primaryColor,
-                                                  checkColor: primaryLightColor,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(
-                                                      checkboxBorderRadius,
-                                                    ),
-                                                  ),
-                                                  onChanged: (value) => setState(
-                                                        () => _rememberPassword = value ?? false,
+                                decoration: BoxDecoration(
+                                  gradient: cardBorderGradient,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    color: secondaryBlackColor,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
+                                  ),
+                                  child: Card(
+                                    color: secondaryBlackColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: hPadding * 1.5,
+                                          vertical: vPadding),
+                                      child: Column(
+                                        children: [
+                                          _buildEmailOrPhoneField(),
+                                          SizedBox(height: 10),
+                                          // Row dengan checkbox dan forgot password
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      _rememberPassword =
+                                                          !_rememberPassword;
+                                                    });
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      Checkbox(
+                                                        value:
+                                                            _rememberPassword,
+                                                        activeColor:
+                                                            primaryColor,
+                                                        checkColor:
+                                                            primaryLightColor,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            checkboxBorderRadius,
+                                                          ),
+                                                        ),
+                                                        onChanged: (value) =>
+                                                            setState(
+                                                          () =>
+                                                              _rememberPassword =
+                                                                  value ??
+                                                                      false,
+                                                        ),
+                                                      ),
+                                                      Flexible(
+                                                        child: Text(
+                                                          "Simpan Sesi Login",
+                                                          style: bodyTextStyle(
+                                                            context,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                Flexible(
-                                                  child: Text(
-                                                    "Simpan Sesi Login",
-                                                    style: bodyTextStyle(
-                                                      context,
-                                                    ),
-                                                    overflow:
-                                                    TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10),
+                                          _buildSignInButton(),
+                                          SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                  child: kDivider(
+                                                      color: hintGrey)),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0),
+                                                child: Text(
+                                                  "atau",
+                                                  style: TextStyle(
+                                                    fontSize: getResponsiveFont(
+                                                        context, 18),
+                                                    color: Colors.white70,
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                              Expanded(
+                                                  child: kDivider(
+                                                      color: hintGrey)),
+                                            ],
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    _buildSignInButton(),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            child: kDivider(color: hintGrey)
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: Text(
-                                            "atau",
-                                            style: TextStyle(
-                                              fontSize: getResponsiveFont(context, 18),
-                                              color: Colors.white70,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                            child: kDivider(color: hintGrey)
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
+                                          SizedBox(height: 10),
 
-                                    
-                                    // Tombol Google
-                                    AppButton.iconLeft(
-                                      text: 'Masuk Dengan Google',
-                                      icon: SvgPicture.asset(
-                                        'assets/icons/google-icon.svg',
-                                        width: 20,
-                                        height: 20,
+                                          // Tombol Google
+                                          AppButton.iconLeft(
+                                            text: 'Masuk Dengan Google',
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/google-icon.svg',
+                                              width: 20,
+                                              height: 20,
+                                            ),
+                                            isLoading: isGoogleSigningIn,
+                                            backgroundColor: isGoogleSigningIn
+                                                ? secondaryBlackColor
+                                                : pGrey,
+                                            onPressed: isGoogleSigningIn
+                                                ? null
+                                                : () async {
+                                                    setState(() {
+                                                      isGoogleSigningIn = true;
+                                                    });
+
+                                                    try {
+                                                      _handleGmailRegisterForMobile(
+                                                          context);
+
+                                                      await Future.delayed(
+                                                          const Duration(
+                                                              seconds: 2));
+                                                    } finally {
+                                                      if (mounted) {
+                                                        setState(() {
+                                                          isGoogleSigningIn =
+                                                              false;
+                                                        });
+                                                      }
+                                                    }
+                                                  },
+                                          ),
+
+                                          SizedBox(
+                                            height: vPadding,
+                                          ),
+                                          footerLoginText(context),
+
+                                          SizedBox(height: 10),
+                                        ],
                                       ),
-                                      isLoading: isGoogleSigningIn,
-                                      backgroundColor: isGoogleSigningIn ? secondaryBlackColor : pGrey,
-                                      onPressed: isGoogleSigningIn
-                                          ? null
-                                          : () async {
-                                        setState(() {
-                                          isGoogleSigningIn = true;
-                                        });
-
-                                        try {
-                                          _handleGmailRegisterForMobile(context);
-
-                                          await Future.delayed(const Duration(seconds: 2));
-                                        } finally {
-                                          if (mounted) {
-                                            setState(() {
-                                              isGoogleSigningIn = false;
-                                            });
-                                          }
-                                        }
-                                      },
                                     ),
-
-                                    SizedBox(height: vPadding,),
-                                    footerLoginText(context),
-
-                                    SizedBox(height: 10),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-          )
+                )
               : const Center(child: LoadingIndicator());
         },
       ),
@@ -432,18 +473,17 @@ class _LoginFormUserState extends State<LoginFormUser>
       final googleEmail = user.email ?? googleUser.email;
 
       context.read<EmailVerificationBloc>().add(
-        FieldEmailVerificationChangedEvent(email: googleEmail),
-      );
+            FieldEmailVerificationChangedEvent(email: googleEmail),
+          );
 
       context.read<EmailVerificationBloc>().add(
-        EmailVerificationTambahEvent(
-          record: EmailVerificationModel(
-            email: googleEmail,
-            requestFrom: 'google',
-          ),
-        ),
-      );
-
+            EmailVerificationTambahEvent(
+              record: EmailVerificationModel(
+                email: googleEmail,
+                requestFrom: 'google',
+              ),
+            ),
+          );
     } catch (e) {
       debugPrint('[GMAIL] ERROR: $e');
       if (!context.mounted) return;

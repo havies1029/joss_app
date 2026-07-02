@@ -88,6 +88,8 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons/Logo_Gagal1.svg
+    - assets/icons/Logo_Berhasil1.svg
     - assets/icons/logo_testimonial.svg
     - assets/icons/gg_trash.svg
     - assets/icons/lacak_klaim_kehilangan.svg

@@ -129,12 +129,10 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     }
 
     const rowHeight = 52.0;
-    const headerHeight = 54.0;
     const maxVisibleRows = 8;
 
     final useVerticalScroll = details.length > maxVisibleRows;
-    final bodyHeight = maxVisibleRows * rowHeight;
-    final tableHeight = headerHeight + bodyHeight;
+    final maxBodyHeight = maxVisibleRows * rowHeight;
 
     final columnWidths = _buildColumnWidths(
       context,
@@ -178,27 +176,23 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     Widget tableContent;
 
     if (useVerticalScroll) {
-      tableContent = SizedBox(
-        height: tableHeight,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: headerHeight,
-              child: headerTable,
+      tableContent = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          headerTable,
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: maxBodyHeight,
             ),
-            SizedBox(
-              height: bodyHeight,
-              child: _verticalScrollbar(
-                child: SingleChildScrollView(
-                  controller: vController,
-                  scrollDirection: Axis.vertical,
-                  child: bodyTable,
-                ),
+            child: _verticalScrollbar(
+              child: SingleChildScrollView(
+                controller: vController,
+                scrollDirection: Axis.vertical,
+                child: bodyTable,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     } else {
       tableContent = Column(

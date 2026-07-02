@@ -221,37 +221,96 @@ class Regklaim1CrudAPI {
 			rethrow;
 		}
 	}
-
 	Future<bool> regklaim1CrudUbahAPI(Regklaim1CrudModel record) async {
 		String ubahEndpoint =
 				"${AppData.prefixEndPoint}/api/regklaim/regklaim1crud/update";
-		Map<String, String> queryParams = {"modul_id": "regklaim1CrudUbahAPI"};
 
-		var uri = AppData.uriHtpp(AppData.httpAuthority, ubahEndpoint, queryParams);
+		Map<String, String> queryParams = {
+			"modul_id": "regklaim1CrudUbahAPI",
+		};
+
+		var uri = AppData.uriHtpp(
+			AppData.httpAuthority,
+			ubahEndpoint,
+			queryParams,
+		);
 
 		final requestBody = jsonEncode(record.toJson());
 
-		final http.Response response = await http.post(
-			uri,
-			headers: <String, String>{
-				'Content-Type': 'application/json; odata=verbos',
-				'Accept': 'application/json; odata=verbos',
-				'Authorization': 'Bearer ${AppData.userToken}'
-			},
-			body: requestBody,
-		);
+		try {
+			debugPrint("========== regklaim1CrudUbahAPI REQUEST ==========");
+			debugPrint("URL: $uri");
+			debugPrint("Endpoint: $ubahEndpoint");
+			debugPrint("Query Params: $queryParams");
+			debugPrint("Request Body: $requestBody");
+			debugPrint("Token exists: ${AppData.userToken.isNotEmpty}");
+			debugPrint("===================================================");
 
-		ReturnDataAPI returnData;
-		if (response.statusCode == 200) {
-			returnData = ReturnDataAPI.fromDatabaseJson(jsonDecode(response.body));
-		} else {
-			returnData = ReturnDataAPI(success: false, data: "", rowcount: 0);
+			final http.Response response = await http.post(
+				uri,
+				headers: <String, String>{
+					'Content-Type': 'application/json; odata=verbos',
+					'Accept': 'application/json; odata=verbos',
+					'Authorization': 'Bearer ${AppData.userToken}',
+				},
+				body: requestBody,
+			);
+
+			debugPrint("========== regklaim1CrudUbahAPI RESPONSE ==========");
+			debugPrint("Status Code: ${response.statusCode}");
+			debugPrint("Response Body: ${response.body}");
+			debugPrint("====================================================");
+
+			ReturnDataAPI returnData;
+
+			if (response.statusCode == 200) {
+				try {
+					returnData = ReturnDataAPI.fromDatabaseJson(
+						jsonDecode(response.body),
+					);
+
+					debugPrint("========== regklaim1CrudUbahAPI PARSED ==========");
+					debugPrint("Parsed success: ${returnData.success}");
+					debugPrint("Parsed data: ${returnData.data}");
+					debugPrint("Parsed rowcount: ${returnData.rowcount}");
+					debugPrint("==================================================");
+				} catch (e, stackTrace) {
+					debugPrint("========== regklaim1CrudUbahAPI PARSE ERROR ==========");
+					debugPrint("Parse Error: $e");
+					debugPrint("StackTrace: $stackTrace");
+					debugPrint("Raw Response Body: ${response.body}");
+					debugPrint("=======================================================");
+
+					returnData = ReturnDataAPI(
+						success: false,
+						data: "",
+						rowcount: 0,
+					);
+				}
+			} else {
+				debugPrint("========== regklaim1CrudUbahAPI HTTP ERROR ==========");
+				debugPrint("HTTP Error Status: ${response.statusCode}");
+				debugPrint("HTTP Error Body: ${response.body}");
+				debugPrint("=====================================================");
+
+				returnData = ReturnDataAPI(
+					success: false,
+					data: "",
+					rowcount: 0,
+				);
+			}
+
+			return returnData.success;
+		} catch (e, stackTrace) {
+			debugPrint("========== regklaim1CrudUbahAPI EXCEPTION ==========");
+			debugPrint("Exception: $e");
+			debugPrint("StackTrace: $stackTrace");
+			debugPrint("Request URL: $uri");
+			debugPrint("Request Body: $requestBody");
+			debugPrint("====================================================");
+
+			return false;
 		}
-
-		// OPTIONAL: debug hasil parsing (biar jelas successnya dari mana)
-		debugPrint("Parsed success: ${returnData.success}");
-
-		return returnData.success;
 	}
 
 	Future<bool> regklaim1CrudHapusAPI(String regklaim1Id) async {

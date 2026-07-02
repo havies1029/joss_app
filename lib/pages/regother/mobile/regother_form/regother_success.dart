@@ -75,7 +75,7 @@ class _RegotherSucessState extends State<RegotherSucess> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset(
-                      "assets/icons/logo_berhasil.svg",
+                      "assets/icons/Logo_Berhasil1.svg",
                       width: 120,
                       height: 120,
                     ),

@@ -151,30 +151,43 @@ class KlaimActivecardPage extends StatelessWidget {
           ],
           if (visibleAttachments.isNotEmpty) ...[
             const SizedBox(height: 12),
-            ...visibleAttachments.map(
-              (attachment) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: attachment.kind == KlaimActivecardAttachmentKind.image
-                    ? InkWell(
-                        onTap: attachment.onTap,
-                        borderRadius: BorderRadius.circular(14),
-                        child: SizedBox(
-                          width: thumbW,
-                          height: thumbH,
+            Builder(
+              builder: (context) {
+                final screenWidth = MediaQuery.sizeOf(context).width;
+
+                final useTwoColumns =
+                    screenWidth >= 390 && visibleAttachments.length > 1;
+
+                final widthFactor = useTwoColumns ? 0.48 : 1.0;
+                final itemAspectRatio = useTwoColumns ? 1.35 : 2.8;
+
+                return Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: visibleAttachments.map((attachment) {
+                    return FractionallySizedBox(
+                      widthFactor: widthFactor,
+                      child: AspectRatio(
+                        aspectRatio: itemAspectRatio,
+                        child: attachment.kind == KlaimActivecardAttachmentKind.image
+                            ? InkWell(
+                          onTap: attachment.onTap,
+                          borderRadius: BorderRadius.circular(14),
                           child: KlaimLacakImage(
                             url: attachment.url,
                             headers: headers,
-                            width: thumbW,
-                            height: thumbH,
                           ),
+                        )
+                            : KlaimLacakFile(
+                          fileUrl: attachment.url,
+                          fileName: attachment.name,
+                          onTap: attachment.onTap,
                         ),
-                      )
-                    : KlaimLacakFile(
-                        fileUrl: attachment.url,
-                        fileName: attachment.name,
-                        onTap: attachment.onTap,
                       ),
-              ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
           ],
         ],

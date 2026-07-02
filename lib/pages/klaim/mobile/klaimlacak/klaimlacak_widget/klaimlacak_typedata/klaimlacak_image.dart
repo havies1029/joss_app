@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../../../common/loading_indicator.dart';
+
 class KlaimLacakImage extends StatelessWidget {
   final String? url;
   final Map<String, String> headers;
@@ -12,8 +14,8 @@ class KlaimLacakImage extends StatelessWidget {
     super.key,
     required this.url,
     required this.headers,
-    this.width = 108,
-    this.height = 78,
+    this.width = double.infinity,
+    this.height = double.infinity,
   });
 
   Future<Uint8List> _fetchBytes(String url) async {
@@ -38,7 +40,10 @@ class KlaimLacakImage extends StatelessWidget {
           builder: (context, snap) {
             if (snap.connectionState != ConnectionState.done) {
               return const Center(
-                child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: LoadingIndicator()),
               );
             }
             if (snap.hasError || !snap.hasData) return _placeholder();
@@ -50,6 +55,7 @@ class KlaimLacakImage extends StatelessWidget {
   }
 
   Widget _placeholder() => Center(
-    child: Icon(Icons.image_outlined, color: Colors.white.withOpacity(0.35), size: 22),
-  );
+        child: Icon(Icons.image_outlined,
+            color: Colors.white.withOpacity(0.35), size: 22),
+      );
 }

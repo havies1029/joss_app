@@ -60,32 +60,32 @@ class _ManagementPolisFilterState extends State<ManagementPolisFilter> {
     super.dispose();
   }
 
-String _hintByCob(String cobId, String statusCobId) {
-  switch (cobId) {
-    case "10002":
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+  String _hintByCob(String cobId, String statusCobId) {
+    switch (cobId) {
+      case "10002":
+        return statusCobId == "10002"
+            ? "No Proses/No Polis/Tertanggung"
+            : "No Polis/Tertanggung";
 
-    case "10003":
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      case "10003":
+        return statusCobId == "10002"
+            ? "No Proses/No Polis/Tertanggung"
+            : "No Polis/Tertanggung";
 
-    case "10004":
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      case "10004":
+        return statusCobId == "10002"
+            ? "No Proses/No Polis/Tertanggung"
+            : "No Polis/Tertanggung";
 
-    case "10005":
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      case "10005":
+        return statusCobId == "10002"
+            ? "No Proses/No Polis/Tertanggung"
+            : "No Polis/Tertanggung";
 
-    default:
-      return statusCobId == "10002"
-          ? "No Proses/No Polis/Tertanggung"
-          : "No Polis/Tertanggung";
+      default:
+        return statusCobId == "10002"
+            ? "No Proses/No Polis/Tertanggung"
+            : "No Polis/Tertanggung";
     }
   }
 
@@ -115,14 +115,16 @@ String _hintByCob(String cobId, String statusCobId) {
         MultiBlocListener(
           listeners: [
             BlocListener<StatusAsetCariBloc, StatusAsetCariState>(
-              listenWhen: (prev, curr) => prev.selectedStatusId != curr.selectedStatusId,
+              listenWhen: (prev, curr) =>
+                  prev.selectedStatusId != curr.selectedStatusId,
               listener: (context, state) {
                 if (!_bootstrapped) return;
                 refreshData(); // ini akan memanggil LoadingFlowStart
               },
             ),
             BlocListener<CobManPolBloc, CobManPolState>(
-              listenWhen: (prev, curr) => prev.selectedCOBId != curr.selectedCOBId,
+              listenWhen: (prev, curr) =>
+                  prev.selectedCOBId != curr.selectedCOBId,
               listener: (context, state) {
                 if (!_bootstrapped) return;
                 if (state.selectedCOBId.isNotEmpty) refreshData();
@@ -167,7 +169,6 @@ String _hintByCob(String cobId, String statusCobId) {
           children: [
             const ButtonGroupCobAsetWidget(),
             const SizedBox(height: hPadding),
-
             BlocSelector<CobManPolBloc, CobManPolState, String>(
               selector: (state) => state.selectedCOBId,
               builder: (context, selectedCobId) {
@@ -205,20 +206,23 @@ String _hintByCob(String cobId, String statusCobId) {
                       width: 36,
                     ),
                     const SizedBox(width: 8),
-                    PolisButton(
-                      assetPath: "assets/icons/bagikan.svg",
-                      bgColor: bBlue,
-                      borderColor: bdBlue,
-                      onTap: () => _onShare(context),
-                      iconSize: 16,
-                      height: 36,
-                      width: 36,
+                    Builder(
+                      builder: (shareButtonContext) {
+                        return PolisButton(
+                          assetPath: "assets/icons/bagikan.svg",
+                          bgColor: bBlue,
+                          borderColor: bdBlue,
+                          onTap: () => _onShare(shareButtonContext),
+                          iconSize: 16,
+                          height: 36,
+                          width: 36,
+                        );
+                      },
                     ),
                   ],
                 );
               },
             ),
-
             const SizedBox(height: hPadding),
             const ButtonGroupStatusAsetWidget(),
           ],
@@ -252,7 +256,7 @@ String _hintByCob(String cobId, String statusCobId) {
       case "10005":
         return SizedBox(height: 400, child: _buildHealthTable(context));
       default:
-      // selain 10001-10005 => Others/Kargo
+        // selain 10001-10005 => Others/Kargo
         return SizedBox(height: 400, child: _buildOthersTable(context));
     }
   }
@@ -285,7 +289,8 @@ String _hintByCob(String cobId, String statusCobId) {
   Widget _buildRingkasanTable(BuildContext context) {
     return BlocBuilder<AsetRingkasanCariBloc, AsetRingkasanCariState>(
       builder: (context, s) {
-        final statusId = context.select<StatusAsetCariBloc, String>((b) => b.state.selectedStatusId);
+        final statusId = context.select<StatusAsetCariBloc, String>(
+            (b) => b.state.selectedStatusId);
 
         return _guardList(
           status: s.status,
@@ -300,7 +305,8 @@ String _hintByCob(String cobId, String statusCobId) {
   Widget _buildParTable(BuildContext context) {
     return BlocBuilder<AsetParCariBloc, AsetParCariState>(
       builder: (context, s) {
-        final statusId = context.select<StatusAsetCariBloc, String>((b) => b.state.selectedStatusId);
+        final statusId = context.select<StatusAsetCariBloc, String>(
+            (b) => b.state.selectedStatusId);
 
         return _guardList(
           status: s.status,
@@ -312,7 +318,9 @@ String _hintByCob(String cobId, String statusCobId) {
             selectedItem: s.selectedItem,
             statusId: statusId,
             onSelectItem: (item) {
-              context.read<AsetParCariBloc>().add(SelectParCariEvent(selectedItem: item));
+              context
+                  .read<AsetParCariBloc>()
+                  .add(SelectParCariEvent(selectedItem: item));
             },
             onClearSelectedItem: () {
               context.read<AsetParCariBloc>().add(ClearSelectedItemEvent());
@@ -330,14 +338,18 @@ String _hintByCob(String cobId, String statusCobId) {
               bloc.add(UnselectDetailEvent(id));
               bloc.add(UnselectSingleParDetailEvent(id));
             },
-            onSelectFilePolisParId: (id) =>
-                context.read<AsetParCariBloc>().add(SelectPolisParDetailEvent(id)),
-            onUnselectFilePolisParId: (id) =>
-                context.read<AsetParCariBloc>().add(UnselectPolisParDetailEvent(id)),
-            onSelectFilePolisEqId: (id) =>
-                context.read<AsetParCariBloc>().add(SelectPolisEqDetailEvent(id)),
-            onUnselectFilePolisEqId: (id) =>
-                context.read<AsetParCariBloc>().add(UnselectPolisEqDetailEvent(id)),
+            onSelectFilePolisParId: (id) => context
+                .read<AsetParCariBloc>()
+                .add(SelectPolisParDetailEvent(id)),
+            onUnselectFilePolisParId: (id) => context
+                .read<AsetParCariBloc>()
+                .add(UnselectPolisParDetailEvent(id)),
+            onSelectFilePolisEqId: (id) => context
+                .read<AsetParCariBloc>()
+                .add(SelectPolisEqDetailEvent(id)),
+            onUnselectFilePolisEqId: (id) => context
+                .read<AsetParCariBloc>()
+                .add(UnselectPolisEqDetailEvent(id)),
             readOnly: false,
           ),
         );
@@ -348,7 +360,8 @@ String _hintByCob(String cobId, String statusCobId) {
   Widget _buildMvTable(BuildContext context) {
     return BlocBuilder<AsetMvCariBloc, AsetMvCariState>(
       builder: (context, s) {
-        final statusId = context.select<StatusAsetCariBloc, String>((b) => b.state.selectedStatusId);
+        final statusId = context.select<StatusAsetCariBloc, String>(
+            (b) => b.state.selectedStatusId);
 
         return _guardList(
           status: s.status,
@@ -363,7 +376,9 @@ String _hintByCob(String cobId, String statusCobId) {
               context.read<AsetMvCariBloc>().add(ClearSelectedMvItemEvent());
             },
             onSelectItem: (item) {
-              context.read<AsetMvCariBloc>().add(SelectMvCariEvent(selectedItem: item));
+              context
+                  .read<AsetMvCariBloc>()
+                  .add(SelectMvCariEvent(selectedItem: item));
             },
             selectedProsesId: (id) {
               context.read<AsetMvCariBloc>().add(SelectProsesMvIdEvent(id));
@@ -378,10 +393,12 @@ String _hintByCob(String cobId, String statusCobId) {
               bloc.add(UnselectMvDetailEvent(id));
               bloc.add(UnselectSingleMvDetailEvent(id));
             },
-            onSelectFilePolisMvId: (id) =>
-                context.read<AsetMvCariBloc>().add(SelectPolisMvDetailEvent(id)),
-            onUnselectFilePolisMvId: (id) =>
-                context.read<AsetMvCariBloc>().add(UnselectPolisMvDetailEvent(id)),
+            onSelectFilePolisMvId: (id) => context
+                .read<AsetMvCariBloc>()
+                .add(SelectPolisMvDetailEvent(id)),
+            onUnselectFilePolisMvId: (id) => context
+                .read<AsetMvCariBloc>()
+                .add(UnselectPolisMvDetailEvent(id)),
             readOnly: false,
           ),
         );
@@ -392,7 +409,8 @@ String _hintByCob(String cobId, String statusCobId) {
   Widget _buildHullTable(BuildContext context) {
     return BlocBuilder<AsethullCariBloc, AsethullCariState>(
       builder: (context, s) {
-        final statusId = context.select<StatusAsetCariBloc, String>((b) => b.state.selectedStatusId);
+        final statusId = context.select<StatusAsetCariBloc, String>(
+            (b) => b.state.selectedStatusId);
 
         return _guardList(
           status: s.status,
@@ -404,10 +422,14 @@ String _hintByCob(String cobId, String statusCobId) {
             selectedItem: s.selectedItem,
             statusId: statusId,
             onClearSelectedItem: () {
-              context.read<AsethullCariBloc>().add(ClearSelectedHullItemEvent());
+              context
+                  .read<AsethullCariBloc>()
+                  .add(ClearSelectedHullItemEvent());
             },
             onSelectItem: (item) {
-              context.read<AsethullCariBloc>().add(SelectHullCariEvent(selectedItem: item));
+              context
+                  .read<AsethullCariBloc>()
+                  .add(SelectHullCariEvent(selectedItem: item));
             },
             selectedProsesId: (id) {
               context.read<AsethullCariBloc>().add(SelectProsesHullIdEvent(id));
@@ -422,10 +444,12 @@ String _hintByCob(String cobId, String statusCobId) {
               bloc.add(UnselectHullDetailEvent(id));
               bloc.add(UnselectSingleHullDetailEvent(id));
             },
-            onSelectFilePolisHullId: (id) =>
-                context.read<AsethullCariBloc>().add(SelectPolisHullDetailEvent(id)),
-            onUnselectFilePolisHullId: (id) =>
-                context.read<AsethullCariBloc>().add(UnselectPolisHullDetailEvent(id)),
+            onSelectFilePolisHullId: (id) => context
+                .read<AsethullCariBloc>()
+                .add(SelectPolisHullDetailEvent(id)),
+            onUnselectFilePolisHullId: (id) => context
+                .read<AsethullCariBloc>()
+                .add(UnselectPolisHullDetailEvent(id)),
             readOnly: false,
           ),
         );
@@ -436,7 +460,8 @@ String _hintByCob(String cobId, String statusCobId) {
   Widget _buildHealthTable(BuildContext context) {
     return BlocBuilder<AsetHealthCariBloc, AsetHealthCariState>(
       builder: (context, s) {
-        final statusId = context.select<StatusAsetCariBloc, String>((b) => b.state.selectedStatusId);
+        final statusId = context.select<StatusAsetCariBloc, String>(
+            (b) => b.state.selectedStatusId);
 
         return _guardList(
           status: s.status,
@@ -448,13 +473,19 @@ String _hintByCob(String cobId, String statusCobId) {
             selectedItem: s.selectedItem,
             statusId: statusId,
             onClearSelectedItem: () {
-              context.read<AsetHealthCariBloc>().add(ClearSelectedHealthItemEvent());
+              context
+                  .read<AsetHealthCariBloc>()
+                  .add(ClearSelectedHealthItemEvent());
             },
             onSelectItem: (item) {
-              context.read<AsetHealthCariBloc>().add(SelectHealthCariEvent(selectedItem: item));
+              context
+                  .read<AsetHealthCariBloc>()
+                  .add(SelectHealthCariEvent(selectedItem: item));
             },
             selectedProsesId: (id) {
-              context.read<AsetHealthCariBloc>().add(SelectProsesHealthIdEvent(id));
+              context
+                  .read<AsetHealthCariBloc>()
+                  .add(SelectProsesHealthIdEvent(id));
             },
             onSelect: (id) {
               final bloc = context.read<AsetHealthCariBloc>();
@@ -466,10 +497,12 @@ String _hintByCob(String cobId, String statusCobId) {
               bloc.add(UnselectHealthDetailEvent(id));
               bloc.add(UnselectSingleHealthDetailEvent(id));
             },
-            onSelectFilePolisHealthId: (id) =>
-                context.read<AsetHealthCariBloc>().add(SelectPolisHealthDetailEvent(id)),
-            onUnselectFilePolisHealthId: (id) =>
-                context.read<AsetHealthCariBloc>().add(UnselectPolisHealthDetailEvent(id)),
+            onSelectFilePolisHealthId: (id) => context
+                .read<AsetHealthCariBloc>()
+                .add(SelectPolisHealthDetailEvent(id)),
+            onUnselectFilePolisHealthId: (id) => context
+                .read<AsetHealthCariBloc>()
+                .add(UnselectPolisHealthDetailEvent(id)),
             readOnly: false,
           ),
         );
@@ -480,7 +513,8 @@ String _hintByCob(String cobId, String statusCobId) {
   Widget _buildOthersTable(BuildContext context) {
     return BlocBuilder<AsetothersCariBloc, AsetothersCariState>(
       builder: (context, s) {
-        final statusId = context.select<StatusAsetCariBloc, String>((b) => b.state.selectedStatusId);
+        final statusId = context.select<StatusAsetCariBloc, String>(
+            (b) => b.state.selectedStatusId);
 
         return _guardList(
           status: s.status,
@@ -492,13 +526,19 @@ String _hintByCob(String cobId, String statusCobId) {
             selectedItem: s.selectedItem,
             statusId: statusId,
             onClearSelectedItem: () {
-              context.read<AsetothersCariBloc>().add(ClearSelectedOthersItemEvent());
+              context
+                  .read<AsetothersCariBloc>()
+                  .add(ClearSelectedOthersItemEvent());
             },
             onSelectItem: (item) {
-              context.read<AsetothersCariBloc>().add(SelectOthersCariEvent(selectedItem: item));
+              context
+                  .read<AsetothersCariBloc>()
+                  .add(SelectOthersCariEvent(selectedItem: item));
             },
             selectedProsesId: (id) {
-              context.read<AsetothersCariBloc>().add(SelectProsesOthersIdEvent(id));
+              context
+                  .read<AsetothersCariBloc>()
+                  .add(SelectProsesOthersIdEvent(id));
             },
             onSelect: (id) {
               final bloc = context.read<AsetothersCariBloc>();
@@ -510,10 +550,12 @@ String _hintByCob(String cobId, String statusCobId) {
               bloc.add(UnselectOthersDetailEvent(id));
               bloc.add(UnselectSingleOthersDetailEvent(id));
             },
-            onSelectFilePolisHealthId: (id) =>
-                context.read<AsetothersCariBloc>().add(SelectPolisOthersDetailEvent(id)),
-            onUnselectFilePolisHealthId: (id) =>
-                context.read<AsetothersCariBloc>().add(UnselectPolisOthersDetailEvent(id)),
+            onSelectFilePolisHealthId: (id) => context
+                .read<AsetothersCariBloc>()
+                .add(SelectPolisOthersDetailEvent(id)),
+            onUnselectFilePolisHealthId: (id) => context
+                .read<AsetothersCariBloc>()
+                .add(UnselectPolisOthersDetailEvent(id)),
             readOnly: false,
           ),
         );
@@ -527,6 +569,7 @@ String _hintByCob(String cobId, String statusCobId) {
       onPressed: refreshData,
     );
   }
+
   void refreshData() {
     final cobId = context.read<CobManPolBloc>().state.selectedCOBId;
     final statusId = context.read<StatusAsetCariBloc>().state.selectedStatusId;
@@ -539,69 +582,81 @@ String _hintByCob(String cobId, String statusCobId) {
     final cleanCobId = cobId.trim();
 
     context.read<LoadingFlowBloc>().add(
-      LoadingFlowStartEvent(
-        cobId: cleanCobId,
-        statusId: statusId,
-        searchText: searchText,
-        timeoutMs: 15000,
-      ),
-    );
+          LoadingFlowStartEvent(
+            cobId: cleanCobId,
+            statusId: statusId,
+            searchText: searchText,
+            timeoutMs: 15000,
+          ),
+        );
 
     if (cleanCobId == "10001") {
       context.read<AsetRingkasanCariBloc>().add(
-        RefreshAsetRingkasanCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetRingkasanCariEvent(
+                statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cleanCobId == "10002") {
       context.read<AsetParCariBloc>().add(
-        RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetParCariEvent(statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cleanCobId == "10003") {
       context.read<AsetMvCariBloc>().add(
-        RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetMvCariEvent(statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cleanCobId == "10004") {
       context.read<AsethullCariBloc>().add(
-        RefreshAsethullCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsethullCariEvent(
+                statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     if (cleanCobId == "10005") {
       context.read<AsetHealthCariBloc>().add(
-        RefreshAsetHealthCariEvent(statusId: statusId, searchText: searchText),
-      );
+            RefreshAsetHealthCariEvent(
+                statusId: statusId, searchText: searchText),
+          );
       return;
     }
 
     context.read<AsetothersCariBloc>().add(
-      RefreshAsetothersCariEvent(
-        statusId: statusId,
-        searchText: searchText,
-        cobId: cleanCobId,
-      ),
-    );
+          RefreshAsetothersCariEvent(
+            statusId: statusId,
+            searchText: searchText,
+            cobId: cleanCobId,
+          ),
+        );
   }
 
   bool hasSelected(BuildContext context) {
     final cobId = _cobId();
 
-    if (cobId == "10002") return context.select((AsetParCariBloc b) => b.state.selectedIds.isNotEmpty);
-    if (cobId == "10003") return context.select((AsetMvCariBloc b) => b.state.selectedIds.isNotEmpty);
-    if (cobId == "10004") return context.select((AsethullCariBloc b) => b.state.selectedIds.isNotEmpty);
-    if (cobId == "10005") return context.select((AsetHealthCariBloc b) => b.state.selectedIds.isNotEmpty);
+    if (cobId == "10002")
+      return context
+          .select((AsetParCariBloc b) => b.state.selectedIds.isNotEmpty);
+    if (cobId == "10003")
+      return context
+          .select((AsetMvCariBloc b) => b.state.selectedIds.isNotEmpty);
+    if (cobId == "10004")
+      return context
+          .select((AsethullCariBloc b) => b.state.selectedIds.isNotEmpty);
+    if (cobId == "10005")
+      return context
+          .select((AsetHealthCariBloc b) => b.state.selectedIds.isNotEmpty);
 
     // ringkasan 10001 (kalau nanti kamu punya selectedIds di ringkasan, tinggal tambah)
     // default => others
-    return context.select((AsetothersCariBloc b) => b.state.selectedIds.isNotEmpty);
+    return context
+        .select((AsetothersCariBloc b) => b.state.selectedIds.isNotEmpty);
   }
 
   String fmtDate(DateTime? v) =>
@@ -610,8 +665,7 @@ String _hintByCob(String cobId, String statusCobId) {
   String formatNum(num? value) =>
       NumberFormat("#,##0.00", "id_ID").format(value ?? 0);
 
-  String fmtMoney(String curr, num? value) =>
-      "$curr ${formatNum(value)}";
+  String fmtMoney(String curr, num? value) => "$curr ${formatNum(value)}";
 
   List<Map<String, dynamic>> _exportRows() {
     final cobId = _cobId();
@@ -623,15 +677,18 @@ String _hintByCob(String cobId, String statusCobId) {
           ? st.items.where((x) => st.selectedIds.contains(x.asetParId))
           : st.items;
 
-      return dataSource.map((d) => {
-        "No": d.nomor,
-        "Polis No": d.polisNo,
-        "Jumlah Objek": d.jmlObject,
-        "Tertanggung": d.tertanggung,
-        "Periode": "${fmtDate(d.periodeMulai)} - ${fmtDate(d.periodeAkhir)}",
-        "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
-        "Premi": fmtMoney(d.curr, d.premi),
-      }).toList();
+      return dataSource
+          .map((d) => {
+                "No": d.nomor,
+                "Polis No": d.polisNo,
+                "Jumlah Objek": d.jmlObject,
+                "Tertanggung": d.tertanggung,
+                "Periode":
+                    "${fmtDate(d.periodeMulai)} - ${fmtDate(d.periodeAkhir)}",
+                "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
+                "Premi": fmtMoney(d.curr, d.premi),
+              })
+          .toList();
     }
 
     if (cobId == "10003") {
@@ -641,15 +698,18 @@ String _hintByCob(String cobId, String statusCobId) {
           ? st.items.where((x) => st.selectedIds.contains(x.asetMvId))
           : st.items;
 
-      return dataSource.map((d) => {
-        "No": d.nomor,
-        "No Polis": d.polisNo,
-        "Jumlah Objek": d.jmlObject,
-        "Tertanggung": d.tertanggung,
-        "Periode": "${fmtDate(d.periodeMulai)} - ${fmtDate(d.periodeAkhir)}",
-        "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
-        "Premi": fmtMoney(d.curr, d.premi),
-      }).toList();
+      return dataSource
+          .map((d) => {
+                "No": d.nomor,
+                "No Polis": d.polisNo,
+                "Jumlah Objek": d.jmlObject,
+                "Tertanggung": d.tertanggung,
+                "Periode":
+                    "${fmtDate(d.periodeMulai)} - ${fmtDate(d.periodeAkhir)}",
+                "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
+                "Premi": fmtMoney(d.curr, d.premi),
+              })
+          .toList();
     }
 
     if (cobId == "10004") {
@@ -659,14 +719,16 @@ String _hintByCob(String cobId, String statusCobId) {
           ? st.items.where((x) => st.selectedIds.contains(x.asetHullId))
           : st.items;
 
-      return dataSource.map((d) => {
-        "No": st.items.indexOf(d) + 1,
-        "No Polis": d.polisNo,
-        "Jumlah Objek": d.jmlObject,
-        "Tertanggung": d.tertanggung,
-        "Nilai Pertanggungan": fmtMoney(d.curr, d.tsi),
-        "Premi": fmtMoney(d.curr, d.premi),
-      }).toList();
+      return dataSource
+          .map((d) => {
+                "No": st.items.indexOf(d) + 1,
+                "No Polis": d.polisNo,
+                "Jumlah Objek": d.jmlObject,
+                "Tertanggung": d.tertanggung,
+                "Nilai Pertanggungan": fmtMoney(d.curr, d.tsi),
+                "Premi": fmtMoney(d.curr, d.premi),
+              })
+          .toList();
     }
 
     if (cobId == "10005") {
@@ -676,24 +738,28 @@ String _hintByCob(String cobId, String statusCobId) {
           ? st.items.where((x) => st.selectedIds.contains(x.asethealthId))
           : st.items;
 
-      return dataSource.map((d) => {
-        "No": d.nomor,
-        // "No Polis": d.polisNo,
-        "Nilai Pertanggungan": d.jmlObject,
-        "Status": d.status ?? "-",
-      }).toList();
+      return dataSource
+          .map((d) => {
+                "No": d.nomor,
+                // "No Polis": d.polisNo,
+                "Nilai Pertanggungan": d.jmlObject,
+                "Status": d.status ?? "-",
+              })
+          .toList();
     }
 
     if (cobId == "10001") {
       final st = context.read<AsetRingkasanCariBloc>().state;
 
-      return st.items.map((d) => {
-        "No": st.items.indexOf(d) + 1,
-        "Jenis Polis": d.asetNama,
-        "Jumlah Polis": d.jmlPolis,
-        "Nilai Pertanggungan": fmtMoney(d.curr, d.nilaiAset),
-        "Total Premi": fmtMoney(d.curr, d.nilaiPremi),
-      }).toList();
+      return st.items
+          .map((d) => {
+                "No": st.items.indexOf(d) + 1,
+                "Jenis Polis": d.asetNama,
+                "Jumlah Polis": d.jmlPolis,
+                "Nilai Pertanggungan": fmtMoney(d.curr, d.nilaiAset),
+                "Total Premi": fmtMoney(d.curr, d.nilaiPremi),
+              })
+          .toList();
     }
 
     final st = context.read<AsetothersCariBloc>().state;
@@ -702,13 +768,15 @@ String _hintByCob(String cobId, String statusCobId) {
         ? st.items.where((x) => st.selectedIds.contains(x.asetOthersId))
         : st.items;
 
-    return dataSource.map((d) => {
-      "No": d.nomor,
-      "No Polis": d.polisNo,
-      "Jumlah Objek": d.jmlObject,
-      "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
-      "Premi": fmtMoney(d.curr, d.premi),
-    }).toList();
+    return dataSource
+        .map((d) => {
+              "No": d.nomor,
+              "No Polis": d.polisNo,
+              "Jumlah Objek": d.jmlObject,
+              "Nilai Pertanggungan": fmtMoney(d.curr, d.sumInsured),
+              "Premi": fmtMoney(d.curr, d.premi),
+            })
+        .toList();
   }
 
   String _exportLabel() {
@@ -763,7 +831,8 @@ String _hintByCob(String cobId, String statusCobId) {
           ),
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
+      transitionBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(
         opacity: animation,
         child: ScaleTransition(
           scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
@@ -773,7 +842,8 @@ String _hintByCob(String cobId, String statusCobId) {
     );
   }
 
-  List<Map<String, dynamic>> _stripTimeFromDateValues(List<Map<String, dynamic>> rows) {
+  List<Map<String, dynamic>> _stripTimeFromDateValues(
+      List<Map<String, dynamic>> rows) {
     String dateOnly(DateTime d) => DateFormat('dd/MM/yyyy').format(d);
 
     dynamic normalize(dynamic v) {
@@ -790,19 +860,22 @@ String _hintByCob(String cobId, String statusCobId) {
       return v;
     }
 
-    return rows.map((row) => row.map((k, v) => MapEntry(k, normalize(v)))).toList();
+    return rows
+        .map((row) => row.map((k, v) => MapEntry(k, normalize(v))))
+        .toList();
   }
 
   Future<void> _exportData(
-      BuildContext context,
-      ExportFormat format,
-      List<Map<String, dynamic>> rows,
-      ) async {
+    BuildContext context,
+    ExportFormat format,
+    List<Map<String, dynamic>> rows,
+  ) async {
     final cleanedRows = _stripTimeFromDateValues(rows);
 
     final ext = (format == ExportFormat.excel) ? "xlsx" : "pdf";
     final exportFormat = (format == ExportFormat.excel) ? "excel" : "pdf";
-    final fileName = "Aset_${_exportLabel()}_${DateTime.now().millisecondsSinceEpoch}.$ext";
+    final fileName =
+        "Aset_${_exportLabel()}_${DateTime.now().millisecondsSinceEpoch}.$ext";
 
     try {
       if (kIsWeb) {
@@ -863,7 +936,6 @@ String _hintByCob(String cobId, String statusCobId) {
         reportTitle: "Polis",
       );
 
-
       debugPrint("PDF saved at: ${file.path}");
       if (!context.mounted) return;
 
@@ -874,6 +946,7 @@ String _hintByCob(String cobId, String statusCobId) {
         text: rows.length == 1
             ? "Berikut terlampir rincian ${_exportLabel()}."
             : "Berikut terlampir ${rows.length} data ${_exportLabel()} terpilih.",
+        sharePositionOrigin: _sharePositionOrigin(context),
       );
     } catch (e) {
       if (context.mounted) {
@@ -881,5 +954,27 @@ String _hintByCob(String cobId, String statusCobId) {
             .showSnackBar(errorSnackBar("Gagal membagikan file: $e"));
       }
     }
+  }
+
+  Rect _sharePositionOrigin(BuildContext context) {
+    final renderObject = context.findRenderObject();
+    if (renderObject is RenderBox &&
+        renderObject.hasSize &&
+        renderObject.size.width > 0 &&
+        renderObject.size.height > 0) {
+      return renderObject.localToGlobal(Offset.zero) & renderObject.size;
+    }
+
+    final mediaSize = MediaQuery.maybeOf(context)?.size;
+    if (mediaSize != null && mediaSize.width > 0 && mediaSize.height > 0) {
+      return Rect.fromLTWH(
+        mediaSize.width / 2,
+        mediaSize.height / 2,
+        1,
+        1,
+      );
+    }
+
+    return const Rect.fromLTWH(1, 1, 1, 1);
   }
 }

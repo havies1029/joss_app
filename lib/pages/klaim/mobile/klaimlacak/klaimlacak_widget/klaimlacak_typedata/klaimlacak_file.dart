@@ -1,5 +1,3 @@
-// klaimlacak_typedata/klaimlacak_file.dart
-
 import 'package:flutter/material.dart';
 import 'package:joss_app/common/constants.dart';
 
@@ -21,40 +19,49 @@ class KlaimLacakFile extends StatelessWidget {
         ? fileUrl.split('/').last
         : fileName!.trim();
 
+    final safeDisplayName =
+    displayName.isEmpty ? 'Lihat File Lampiran' : displayName;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(12),
+        height: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: sGrey),
         ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.insert_drive_file_outlined,
-              color: primaryLightColor,
-              size: 28,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                displayName.isEmpty ? 'Lihat File Lampiran' : displayName,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: bodyTextStyle(context, fontSize: 13),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: const Icon(
+                  Icons.insert_drive_file_outlined,
+                  color: primaryLightColor,
+                  size: 22,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.open_in_new,
-              color: hintGrey,
-              size: 18,
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                safeDisplayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: bodyTextStyle(context, fontSize: 16),
+              ),
+            ],
+          ),
         ),
       ),
     );

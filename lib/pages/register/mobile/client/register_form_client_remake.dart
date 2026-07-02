@@ -16,18 +16,16 @@ import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
 import '../../../../common/constants.dart';
 
-
 class RegisterFormClientRemake extends StatefulWidget {
   final String requestFrom;
   const RegisterFormClientRemake({super.key, required this.requestFrom});
 
   @override
-  State<RegisterFormClientRemake> createState() => _RegisterFormClientRemakeState();
+  State<RegisterFormClientRemake> createState() =>
+      _RegisterFormClientRemakeState();
 }
 
-
-class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
-{
+class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   var lastLoginBy = "";
   final fieldNameController = TextEditingController();
   final fieldPasswordController = TextEditingController();
@@ -39,6 +37,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool isSubmitting = false;
+  int _submitAttempt = 0;
 
   late EmailVerificationBloc emailVerificationBloc;
   late AuthenticationBloc authenticationBloc;
@@ -52,7 +51,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   }
 
   @override
-  void dispose(){
+  void dispose() {
     fieldNameController.dispose();
     fieldPasswordController.dispose();
     fieldTeleponController.dispose();
@@ -137,115 +136,111 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   }
 
   Widget _buildNameField() => appTextField(
-    label: "Nama Lengkap",
-    controller: fieldNameController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,.]")),
-    ],
-    errorText: err('form1.nama'),
-    validator: (_) => err('form1.nama'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.nama');
-    },
-  );
+        label: "Nama Lengkap",
+        controller: fieldNameController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,.]")),
+        ],
+        errorText: err('form1.nama'),
+        validator: (_) => err('form1.nama'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.nama');
+        },
+      );
 
   Widget _buildPasswordField() => appTextField(
-    label: "Kata Sandi",
-    hint: "Masukkan Kata Sandi",
-    controller: fieldPasswordController,
-    keyboardType: TextInputType.visiblePassword,
-    obscureText: _obscurePassword,
-    inputFormatters: [
-      FilteringTextInputFormatter.deny(RegExp(r'\s')),
-    ],
-    errorText: err('form1.password'),
-    validator: (_) => err('form1.password'),
-    suffixIcon: IconButton(
-      icon: Icon(
-        _obscurePassword
-            ? Icons.visibility_off
-            : Icons.visibility,
-        color: sGrey,
-        size: 22,
-      ),
-      onPressed: () {
-        setState(() {
-          _obscurePassword = !_obscurePassword;
-        });
-      },
-    ),
-    onChanged: (v) {
-      clearErr('form1.password');
-    },
-  );
+        label: "Kata Sandi",
+        hint: "Masukkan Kata Sandi",
+        controller: fieldPasswordController,
+        keyboardType: TextInputType.visiblePassword,
+        obscureText: _obscurePassword,
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+        ],
+        errorText: err('form1.password'),
+        validator: (_) => err('form1.password'),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+            color: sGrey,
+            size: 22,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+        onChanged: (v) {
+          clearErr('form1.password');
+        },
+      );
 
   Widget _buildKonfirmasiPasswordField() => appTextField(
-    label: "Konfirmasi Kata Sandi",
-    hint: "Masukkan konfirmasi Kata Sandi",
-    controller: fieldKonfirmasiPasswordController,
-    keyboardType: TextInputType.visiblePassword,
-    obscureText: _obscureConfirm,
-    errorText: err('form1.konfirmasiPassword'),
-    validator: (_) => err('form1.konfirmasiPassword'),
-    inputFormatters: [
-      FilteringTextInputFormatter.deny(RegExp(r'\s')),
-    ],
-    suffixIcon: IconButton(
-      icon: Icon(
-        _obscureConfirm
-            ? Icons.visibility_off
-            : Icons.visibility,
-        color: sGrey,
-        size: 22,
-      ),
-      onPressed: () {
-        setState(() {
-          _obscureConfirm = !_obscureConfirm;
-        });
-      },
-    ),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) {
-        clearErr('form1.konfirmasiPassword');
-      }
-    },
-  );
+        label: "Konfirmasi Kata Sandi",
+        hint: "Masukkan konfirmasi Kata Sandi",
+        controller: fieldKonfirmasiPasswordController,
+        keyboardType: TextInputType.visiblePassword,
+        obscureText: _obscureConfirm,
+        errorText: err('form1.konfirmasiPassword'),
+        validator: (_) => err('form1.konfirmasiPassword'),
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+        ],
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+            color: sGrey,
+            size: 22,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscureConfirm = !_obscureConfirm;
+            });
+          },
+        ),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) {
+            clearErr('form1.konfirmasiPassword');
+          }
+        },
+      );
 
   Widget _buildTeleponField() => appTextField(
-    label: "No. HP",
-    hint: "Masukkan nomor telepon",
-    controller: fieldTeleponController,
-    keyboardType: TextInputType.phone,
-    prefix: Text(
-      "+62 | ",
-      style: inputTextStyle(context, color: primaryLightColor),
-    ),
-    errorText: err('form1.telepon'),
-    validator: (_) => err('form1.telepon'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) {
-        clearErr('form1.telepon');
-      }
-    },
-  );
+        label: "No. HP",
+        hint: "Masukkan nomor telepon",
+        controller: fieldTeleponController,
+        keyboardType: TextInputType.phone,
+        prefix: Text(
+          "+62 | ",
+          style: inputTextStyle(context, color: primaryLightColor),
+        ),
+        errorText: err('form1.telepon'),
+        validator: (_) => err('form1.telepon'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) {
+            clearErr('form1.telepon');
+          }
+        },
+      );
 
   Widget _buildEmailField() => appTextField(
-    label: "Email",
-    hint: "Masukkan alamat email",
-    controller: fieldEmailController,
-    keyboardType: TextInputType.emailAddress,
-    inputFormatters: [
-      FilteringTextInputFormatter.deny(RegExp(r"\s")),
-    ],
-    errorText: err('form1.email'),
-    validator: (_) => err('form1.email'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) {
-        clearErr('form1.email');
-      }
-    },
-  );
+        label: "Email",
+        hint: "Masukkan alamat email",
+        controller: fieldEmailController,
+        keyboardType: TextInputType.emailAddress,
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(RegExp(r"\s")),
+        ],
+        errorText: err('form1.email'),
+        validator: (_) => err('form1.email'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) {
+            clearErr('form1.email');
+          }
+        },
+      );
 
   Widget buildFieldComboMJnsclient() =>
       ReusableComboBoxV2<ComboMJnsclientModel>(
@@ -301,6 +296,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
         },
         listener: (context, state) {
           if (state.hasFailure && state.errors.isNotEmpty) {
+            if (mounted) {
+              setState(() {
+                isSubmitting = false;
+              });
+            }
+
             final msg = state.errors.first;
             ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
             return;
@@ -319,6 +320,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                 ),
               ),
             );
+            if (mounted) {
+              setState(() {
+                isSubmitting = false;
+              });
+            }
           }
         },
         builder: (context, state) {
@@ -344,16 +350,15 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                             height: isDesktop(context)
                                 ? 56
                                 : isTablet(context)
-                                ? 48
-                                : 42,
+                                    ? 48
+                                    : 42,
                             width: isDesktop(context)
                                 ? 180
                                 : isTablet(context)
-                                ? 140
-                                : 120,
+                                    ? 140
+                                    : 120,
                           ),
                           SizedBox(height: vPadding * 0.6),
-
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Padding(
@@ -364,7 +369,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                   padding: EdgeInsets.zero,
                                   minimumSize: const Size(0, 0),
                                   tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 icon: Icon(
                                   Icons.arrow_back_ios_new,
@@ -379,13 +384,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                               ),
                             ),
                           ),
-
                           SizedBox(height: vPadding * 0.8),
                           WelcomeHeader(type: "register_client"),
                         ],
                       ),
                     ),
-
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
@@ -417,7 +420,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                 children: [
                                   _buildNameField(),
                                   SizedBox(height: vPadding),
-
                                   if (lastLoginBy == 'email') ...[
                                     _buildTeleponField(),
                                     SizedBox(height: vPadding),
@@ -425,21 +427,15 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                     _buildEmailField(),
                                     SizedBox(height: vPadding),
                                   ],
-
                                   _buildPasswordField(),
                                   SizedBox(height: vPadding),
-
                                   _PasswordRequirementRow(
                                       controller: fieldPasswordController),
-
                                   SizedBox(height: vPadding),
-
                                   _buildKonfirmasiPasswordField(),
                                   SizedBox(height: vPadding),
-
                                   buildFieldComboMJnsclient(),
                                   SizedBox(height: vPadding),
-
                                   AppButton.primary(
                                     text: "Simpan",
                                     isLoading: isSubmitting,
@@ -449,21 +445,16 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
                                     onPressed: isSubmitting
                                         ? null
                                         : () async {
-                                      setState(() {
-                                        isSubmitting = true;
-                                      });
+                                            if (!validateForm1()) return;
 
-                                      onSubmit();
+                                            setState(() {
+                                              isSubmitting = true;
+                                            });
+                                            _startSubmitTimeout();
 
-                                      await Future.delayed(
-                                          const Duration(seconds: 4));
-
-                                      setState(() {
-                                        isSubmitting = false;
-                                      });
-                                    },
+                                            onSubmit();
+                                          },
                                   ),
-
                                   const Spacer(),
                                 ],
                               ),
@@ -490,11 +481,11 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
 
     final bool fromEmail = lastLoginBy == 'email';
 
-    final String email = fromEmail
-        ? user.email??''
-        : fieldEmailController.text.trim();
+    final String email =
+        fromEmail ? user.email ?? '' : fieldEmailController.text.trim();
 
-    String telepon = fromEmail ? fieldTeleponController.text.trim() : user.email??'';
+    String telepon =
+        fromEmail ? fieldTeleponController.text.trim() : user.email ?? '';
 
     if (lastLoginBy == 'email') {
       var phoneRes = IndoPhoneHelper.normalize(telepon);
@@ -514,13 +505,29 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
     context.read<RegUserBloc>().add(ClearRequestFromEvent());
 
     context.read<RegUserBloc>().add(
-      RegUserTambahEvent(
-        record: record,
-        requestFrom: widget.requestFrom,
-        pinSentTo: fromEmail ? telepon : email,
-        pinSentVia: fromEmail ? "hp" : "email",
-      ),
-    );
+          RegUserTambahEvent(
+            record: record,
+            requestFrom: widget.requestFrom,
+            pinSentTo: fromEmail ? telepon : email,
+            pinSentVia: fromEmail ? "hp" : "email",
+          ),
+        );
+  }
+
+  void _startSubmitTimeout() {
+    final attempt = ++_submitAttempt;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted || attempt != _submitAttempt || !isSubmitting) return;
+
+      setState(() {
+        isSubmitting = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
+    });
   }
 
   final Map<String, String?> fieldErrors = {};
@@ -529,10 +536,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake>
   void setErr(String key, String? msg) {
     setState(() => fieldErrors[key] = msg);
   }
+
   void clearErr(String key) {
     if (!fieldErrors.containsKey(key)) return;
     setState(() => fieldErrors.remove(key));
   }
+
   void clearErrsByPrefix(String prefix) {
     setState(() {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
@@ -553,24 +562,26 @@ class _PasswordRequirementRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextStyle style(bool active) => TextStyle(
-      fontSize: 13.7,
-      color: active ? primaryColor : hintGrey,
-      fontWeight: FontWeight.w500,
-    );
+          fontSize: 13.7,
+          color: active ? primaryColor : hintGrey,
+          fontWeight: FontWeight.w500,
+        );
     Widget item(bool checked, String text) => IntrinsicWidth(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            checked ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-            size: 15,
-            color: checked ? primaryColor : hintGrey,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                checked
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                size: 15,
+                color: checked ? primaryColor : hintGrey,
+              ),
+              const SizedBox(width: 4),
+              Text(text, style: style(checked)),
+            ],
           ),
-          const SizedBox(width: 4),
-          Text(text, style: style(checked)),
-        ],
-      ),
-    );
+        );
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {

@@ -15,6 +15,7 @@ class PaymentSuccess extends StatefulWidget {
   final String display;
   final String description;
   final String displayButton;
+  final String assetPath;
   final VoidCallback? onButtonPressed;
 
   const PaymentSuccess({
@@ -22,7 +23,8 @@ class PaymentSuccess extends StatefulWidget {
     required this.display,
     required this.description,
     required this.displayButton,
-    this.onButtonPressed
+    this.assetPath = "assets/icons/Logo_Berhasil1.svg",
+    this.onButtonPressed,
   });
 
   @override
@@ -100,7 +102,7 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset(
-                        "assets/icons/logo_berhasil.svg",
+                        widget.assetPath,
                         width: 120,
                         height: 120,
                       ),

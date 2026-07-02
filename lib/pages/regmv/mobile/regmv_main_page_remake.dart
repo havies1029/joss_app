@@ -137,13 +137,17 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   final fieldPllController = TextEditingController();
   final fieldTplController = TextEditingController();
   ComboRMatauangModel? fieldComboRMatauang;
-  final comboRMatauangKey = GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
+  final comboRMatauangKey =
+      GlobalKey<DropdownSearchState<ComboRMatauangModel>>();
   ComboMMvjnscoverModel? fieldComboMMvjnscover;
-  final comboMMvjnscoverKey = GlobalKey<DropdownSearchState<ComboMMvjnscoverModel>>();
+  final comboMMvjnscoverKey =
+      GlobalKey<DropdownSearchState<ComboMMvjnscoverModel>>();
   DateTime? kejadianMulaiTgl;
-  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final _today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime? kejadianBerakhirTgl;
-  final _years = DateTime(DateTime.now().year+1, DateTime.now().month, DateTime.now().day);
+  final _years = DateTime(
+      DateTime.now().year + 1, DateTime.now().month, DateTime.now().day);
   String selectedPassengerCount = "";
   //form2
 
@@ -211,7 +215,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     //form1
     fieldCalmv1IdController.dispose();
     fieldTtgAlamatController.dispose();
@@ -273,22 +277,22 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   void refreshForm1({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv1CrudBloc>().add(
-      Regmv1CrudLihatEvent(recordId: recordId),
-    );
+          Regmv1CrudLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm2({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv2FormBloc>().add(
-      Regmv2FormLihatEvent(recordId: recordId),
-    );
+          Regmv2FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm3({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv3FormBloc>().add(
-      Regmv3FormLihatEvent(recordId: recordId),
-    );
+          Regmv3FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm4({required String? recordId}) {
@@ -298,31 +302,29 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     }
 
     context.read<Regmv4CariBloc>().add(
-      RefreshRegmv4CariEvent(regmv1Id: recordId),
-    );
-
+          RefreshRegmv4CariEvent(regmv1Id: recordId),
+        );
   }
-
 
   void refreshForm5({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv5CariBloc>().add(
-      RefreshRegmv5CariEvent(regmv1Id: recordId),
-    );
+          RefreshRegmv5CariEvent(regmv1Id: recordId),
+        );
   }
 
   void refreshForm6({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv6FormBloc>().add(
-      Regmv6FormLihatEvent(recordId: recordId),
-    );
+          Regmv6FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm7({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Regmv7CariBloc>().add(
-      RefreshRegmv7CariEvent(regmv1Id: recordId),
-    );
+          RefreshRegmv7CariEvent(regmv1Id: recordId),
+        );
   }
 
   void _payloadform1(Regmv1CrudModel record) {
@@ -392,12 +394,13 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           a.year == b.year && a.month == b.month && a.day == b.day;
 
       if (sameDay(mulai, akhir)) {
-        debugPrint('⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
+        debugPrint(
+            '⚠️ Polis invalid dari backend (mulai==akhir). Abaikan polisAkhir backend.');
       }
 
       context.read<PolisTanggalBloc>().add(PolisMulaiChanged(
-        DateTime(mulai.year, mulai.month, mulai.day), // normalize
-      ));
+            DateTime(mulai.year, mulai.month, mulai.day), // normalize
+          ));
       if (selectedPassengerCount.trim().isEmpty) {
         final v = record.passangerCount.toString();
         if (v.isNotEmpty) selectedPassengerCount = v;
@@ -411,7 +414,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         fieldComboMMvjnscover = record.comboMMvjnscover;
       }
     });
-
   }
 
   void _payloadform3(Regmv3FormModel record) {
@@ -567,7 +569,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -592,7 +594,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -635,8 +637,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     if (shouldLeave == true) {
       context.read<Regmv1CrudBloc>().add(
-        Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
-      );
+            Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
+          );
       Navigator.pop(context);
     }
   }
@@ -646,8 +648,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
     if (shouldLeave == true) {
       context.read<Regmv1CrudBloc>().add(
-        Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
-      );
+            Regmv1CrudHapusEvent(recordId: regmv1Id ?? ""),
+          );
       final homeState = homeTabKey.currentState;
 
       if (homeState != null) {
@@ -690,7 +692,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               }
             },
           ),
-
           BlocListener<Regmv2FormBloc, Regmv2FormState>(
             listener: (context, state) {
               if (state.isSaved && !state.hasFailure && state.record != null) {
@@ -703,7 +704,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               }
             },
           ),
-
           BlocListener<Regmv3FormBloc, Regmv3FormState>(
             listener: (context, state) {
               if (state.isSaved && !state.hasFailure && state.record != null) {
@@ -755,8 +755,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         isForm4Complete() &&
         isForm5Complete() &&
         isForm6Complete();
-        // &&
-        // isForm7Complete();
+    // &&
+    // isForm7Complete();
   }
 
   Widget _buildForm() {
@@ -771,27 +771,23 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: hPadding * 1.5),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
                 title: "Kendaraan",
-                subtitle: "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
+                subtitle:
+                    "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
             ),
-
             const SizedBox(height: hPadding * 1.5),
-
             CustomProgressBar(
               progress: getProgressValue(),
               horizontalPadding: hPadding * 1.5,
               barColor: primaryColor,
               borderRadius: cardBorderRadius,
             ),
-
             const SizedBox(height: hPadding * 1.5),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
               child: Column(
@@ -803,7 +799,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     isExpanded: expanded[0],
                     onToggle: (v) => setState(() => expanded[0] = v),
                     onRefresh: () {
-                      debugPrint("regmv1Id : $regmv1Id + widget.regmv1Id : ${widget.regmv1Id}");
+                      debugPrint(
+                          "regmv1Id : $regmv1Id + widget.regmv1Id : ${widget.regmv1Id}");
                       if (regmv1Id != null && regmv1Id!.isNotEmpty) {
                         refreshForm1(recordId: regmv1Id);
                       }
@@ -819,9 +816,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form2Page(
                     context: context,
                     title: "Data Polis",
@@ -842,7 +837,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildComboCurddId()),
@@ -851,10 +845,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         _buildComboMMvjnscover(),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldIsEq()),
@@ -863,7 +855,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldIsSrcc()),
@@ -872,7 +863,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldIsAw()),
@@ -881,7 +871,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldPLL()),
@@ -890,7 +879,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldPAD()),
@@ -899,7 +887,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldPassengerCountCombo()),
@@ -911,9 +898,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form3Page(
                     context: context,
                     title: "Data Kendaraan",
@@ -934,28 +919,20 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         _buildComboMWilayah(),
                         const SizedBox(height: hPadding),
-
                         _buildFieldPlatNo(),
                         const SizedBox(height: hPadding),
-
                         _buildFieldRangkaNo(),
                         const SizedBox(height: hPadding),
-
                         _buildFieldMesinNo(),
                         const SizedBox(height: hPadding),
-
                         _buildFieldMmvmerkId(),
                         const SizedBox(height: hPadding),
-
                         _buildComboTipeId(),
                         const SizedBox(height: hPadding),
-
                         _buildFieldMmvmodelId(),
                         const SizedBox(height: hPadding),
-
                         Row(
                           children: [
                             Flexible(child: _buildFieldMmvsubmodelId()),
@@ -964,15 +941,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                           ],
                         ),
                         const SizedBox(height: hPadding),
-
                         _buildFieldAksesoris(),
                         const SizedBox(height: hPadding),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: hPadding,),
-
+                  const SizedBox(
+                    height: hPadding,
+                  ),
                   Form4Page(
                     context: context,
                     title: "Foto STNK",
@@ -985,7 +961,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        BlocBuilder<RegmvUploadStnkBloc, Regmv4UploadFotoObjectState>(
+                        BlocBuilder<RegmvUploadStnkBloc,
+                            Regmv4UploadFotoObjectState>(
                           buildWhen: (p, c) => p.items.length != c.items.length,
                           builder: (context, state) {
                             if (_showVal4 && state.items.isNotEmpty) {
@@ -995,16 +972,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                             }
 
                             return Regmv4StoragePickerSectionWidget(
-                              showRequiredError: _showVal4 && state.items.isEmpty,
+                              showRequiredError:
+                                  _showVal4 && state.items.isEmpty,
                             );
                           },
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form5Page(
                     context: context,
                     title: "Foto Kendaraan",
@@ -1017,7 +993,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        BlocBuilder<RegmvUploadFotoMobilBloc, Regmv5UploadFotoObjectState>(
+                        BlocBuilder<RegmvUploadFotoMobilBloc,
+                            Regmv5UploadFotoObjectState>(
                           buildWhen: (p, c) => p.items.length != c.items.length,
                           builder: (context, state) {
                             if (_showVal5 && state.items.isNotEmpty) {
@@ -1027,16 +1004,15 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                             }
 
                             return Regmv5StoragePickerSectionWidget(
-                              showRequiredError: _showVal5 && state.items.isEmpty,
+                              showRequiredError:
+                                  _showVal5 && state.items.isEmpty,
                             );
                           },
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form7Page(
                     context: context,
                     title: "Foto Aksesoris",
@@ -1049,7 +1025,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     },
                     child: Column(
                       children: [
-                        BlocBuilder<RegmvUploadFotoAccBloc, Regmv7UploadFotoObjectState>(
+                        BlocBuilder<RegmvUploadFotoAccBloc,
+                            Regmv7UploadFotoObjectState>(
                           buildWhen: (p, c) => p.items.length != c.items.length,
                           builder: (context, state) {
                             if (_showVal7 && state.items.isNotEmpty) {
@@ -1059,20 +1036,17 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                             }
 
                             return Regmv7StoragePickerSectionWidget(
-                              showRequiredError: _showVal7 && state.items.isEmpty,
+                              showRequiredError:
+                                  _showVal7 && state.items.isEmpty,
                             );
                           },
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   buildButtonHitungPremi(),
-
                   const SizedBox(height: hPadding),
-
                   Form6Page(
                     context: context,
                     title: "Premi",
@@ -1080,167 +1054,181 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                     onToggle: (v) => setState(() => expanded[6] = v),
                     child: (hasForm6Record)
                         ? Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "RATE",
-                            style: bodyTextStyle(context).copyWith(
-                              color: primaryLightColor,
-                              fontSize: getResponsiveFont(context, 20),
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "RATE",
+                                  style: bodyTextStyle(context).copyWith(
+                                    color: primaryLightColor,
+                                    fontSize: getResponsiveFont(context, 20),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              HitungPremiWidget(
+                                rows: [
+                                  HitungPremiRow(
+                                    label:
+                                        "${fieldComboMMvjnscover?.coverName ?? '-'}:",
+                                    controller: fieldRateDasarController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Loading:",
+                                    controller: fieldRateLoadingController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Kerusuhan:",
+                                    controller: fieldRateSrccController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Terorisme & Sabotase:",
+                                    controller: fieldRateTerrorismController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Banjir:",
+                                    controller: fieldRateFloodController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Gempa Bumi:",
+                                    controller: fieldRateEqController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Bengkel Resmi:",
+                                    controller: fieldRateAwController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    // showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Total Rate:",
+                                    controller: fieldRateTotalController,
+                                    layoutType:
+                                        HitungPremiLayoutType.horizontal,
+                                    showValueBorder: true,
+                                    valueSuffix: "%",
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              const Divider(
+                                thickness: 1,
+                                color: sGrey,
+                              ),
+                              const SizedBox(height: 2),
+                              HitungPremiWidget(
+                                rows: [
+                                  HitungPremiRow(
+                                    label: "PREMI TAHUNAN",
+                                    description:
+                                        "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController.text} x ${fieldRateTotalController.text}% =",
+                                    controller: fieldPremiCascoController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "PREMI TAMBAHAN",
+                                    description: "(For TPL & PAD & PAP)",
+                                    controller: fieldPremiAddController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "DISKON",
+                                    controller: fieldPremiDiskonController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "BIAYA POLIS",
+                                    controller: fieldBiayaPolisController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  HitungPremiRow(
+                                    label: "BIAYA MATERAI",
+                                    controller: fieldBiayaMateraiController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                  // HitungPremiRow(
+                                  //   // label: "TOTAL PREMI",
+                                  //   label: "TOTAL TAGIHAN",
+                                  //   controller: fieldPremiNetController,
+                                  //   layoutType: HitungPremiLayoutType.vertical,
+                                  //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
+                                  //   showValueBorder: true,
+                                  //   formatNumber: true,
+                                  // ),
+                                  HitungPremiRow(
+                                    // label: "TOTAL PREMI",
+                                    label: "TOTAL TAGIHAN",
+                                    controller: fieldTotalTagihanController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                  ),
+                                ],
+                              ),
+                              // buildFieldPremiNet(),
+                              // const SizedBox(height: hPadding),
+                              // buildFieldPremiDiskon(),
+                              // const SizedBox(height: hPadding),
+                              // buildFieldPremiSubtotal(),
+                            ],
+                          )
+                        : const SizedBox(
+                            height: 40,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "Klik Hitung Premi untuk melihat hasil."),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        HitungPremiWidget(
-                          rows: [
-                            HitungPremiRow(
-                              label: "${fieldComboMMvjnscover?.coverName ?? '-'}:",
-                              controller: fieldRateDasarController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Loading:",
-                              controller: fieldRateLoadingController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Kerusuhan:",
-                              controller: fieldRateSrccController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Terorisme & Sabotase:",
-                              controller: fieldRateTerrorismController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Banjir:",
-                              controller: fieldRateFloodController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Gempa Bumi:",
-                              controller: fieldRateEqController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Bengkel Resmi:",
-                              controller: fieldRateAwController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              // showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                            HitungPremiRow(
-                              label: "Total Rate:",
-                              controller: fieldRateTotalController,
-                              layoutType: HitungPremiLayoutType.horizontal,
-                              showValueBorder: true,
-                              valueSuffix: "%",
-                            ),
-                          ],
-
-                        ),
-                        const SizedBox(height: 2),
-                        const Divider(
-                          thickness: 1,
-                          color: sGrey,
-                        ),
-                        const SizedBox(height: 2),
-                        HitungPremiWidget(
-                          rows: [
-                            HitungPremiRow(
-                              label: "PREMI TAHUNAN",
-                              description: "${fieldComboRMatauang?.rmatauangSimbol} ${fieldSumInsuredController.text} x ${fieldRateTotalController.text}% =",
-                              controller: fieldPremiCascoController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "PREMI TAMBAHAN",
-                              description: "(For TPL & PAD & PAP)",
-                              controller: fieldPremiAddController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "DISKON",
-                              controller: fieldPremiDiskonController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "BIAYA POLIS",
-                              controller: fieldBiayaPolisController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            HitungPremiRow(
-                              label: "BIAYA MATERAI",
-                              controller: fieldBiayaMateraiController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                            // HitungPremiRow(
-                            //   // label: "TOTAL PREMI",
-                            //   label: "TOTAL TAGIHAN",
-                            //   controller: fieldPremiNetController,
-                            //   layoutType: HitungPremiLayoutType.vertical,
-                            //   valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                            //   showValueBorder: true,
-                            //   formatNumber: true,
-                            // ),
-                            HitungPremiRow(
-                              // label: "TOTAL PREMI",
-                              label: "TOTAL TAGIHAN",
-                              controller: fieldTotalTagihanController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol,
-                              showValueBorder: true,
-                              formatNumber: true,
-                            ),
-                          ],
-                        ),
-                        // buildFieldPremiNet(),
-                        // const SizedBox(height: hPadding),
-                        // buildFieldPremiDiskon(),
-                        // const SizedBox(height: hPadding),
-                        // buildFieldPremiSubtotal(),
-                      ],
-                    )
-                        : const SizedBox(
-                      height: 40,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Klik Hitung Premi untuk melihat hasil."),
-                      ),
-                    ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   if (canShowLanjutkan) ...[
                     AppButton.iconRight(
                       text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
@@ -1249,42 +1237,43 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
-                        setState(() {
-                          _isLanjutkanLoading = true;
-                        });
+                              setState(() {
+                                _isLanjutkanLoading = true;
+                              });
 
-                        try {
+                              try {
+                                draftForm1ToBloc(context);
+                                draftForm2ToBloc(context);
+                                draftForm3ToBloc(context);
 
-                          draftForm1ToBloc(context);
-                          draftForm2ToBloc(context);
-                          draftForm3ToBloc(context);
+                                context
+                                    .read<RegmvFlowBloc>()
+                                    .add(RegmvFlowStartEvent());
 
-                          context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
+                                await Future.delayed(
+                                    const Duration(seconds: 2));
 
-                          await Future.delayed(const Duration(seconds: 2));
+                                if (!mounted) return;
 
-                          if (!mounted) return;
-
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => KonfirmasiRegMvPage(
-                                recordId: regmv1Id ?? '',
-                                viewMode: 'ubah',
-                              ),
-                            ),
-                          );
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isLanjutkanLoading = false;
-                            });
-                          }
-                        }
-                      },
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => KonfirmasiRegMvPage(
+                                      recordId: regmv1Id ?? '',
+                                      viewMode: 'ubah',
+                                    ),
+                                  ),
+                                );
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    _isLanjutkanLoading = false;
+                                  });
+                                }
+                              }
+                            },
                     ),
                   ],
-
                   const SizedBox(height: 25),
                 ],
               ),
@@ -1318,7 +1307,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
             onTap: () {
               tryOpenSection(RegmvFormSection.form1, onRefresh: onRefresh);
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1351,9 +1339,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form2, onRefresh: onRefresh); // untuk Form2
+              tryOpenSection(RegmvFormSection.form2,
+                  onRefresh: onRefresh); // untuk Form2
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1386,9 +1374,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
             onTap: () {
-              tryOpenSection(RegmvFormSection.form3, onRefresh: onRefresh); // untuk Form3
+              tryOpenSection(RegmvFormSection.form3,
+                  onRefresh: onRefresh); // untuk Form3
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -1420,9 +1408,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-          onTap: () {
-            tryOpenSection(RegmvFormSection.form4, onRefresh: onRefresh); // untuk Form4
-          },
+            onTap: () {
+              tryOpenSection(RegmvFormSection.form4,
+                  onRefresh: onRefresh); // untuk Form4
+            },
           ),
           if (isExpanded)
             Padding(
@@ -1454,9 +1443,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-          onTap: () {
-            tryOpenSection(RegmvFormSection.form5, onRefresh: onRefresh); // untuk Form5
-          },
+            onTap: () {
+              tryOpenSection(RegmvFormSection.form5,
+                  onRefresh: onRefresh); // untuk Form5
+            },
           ),
           if (isExpanded)
             Padding(
@@ -1488,10 +1478,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-          onTap: () {
-            tryOpenSection(RegmvFormSection.form6, onRefresh: onRefresh); // untuk Form6
-          },
-
+            onTap: () {
+              tryOpenSection(RegmvFormSection.form6,
+                  onRefresh: onRefresh); // untuk Form6
+            },
           ),
           if (isExpanded)
             Padding(
@@ -1523,9 +1513,10 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-          onTap: () {
-            tryOpenSection(RegmvFormSection.form7, onRefresh: onRefresh); // untuk Form7
-          },
+            onTap: () {
+              tryOpenSection(RegmvFormSection.form7,
+                  onRefresh: onRefresh); // untuk Form7
+            },
           ),
           if (isExpanded)
             Padding(
@@ -1546,8 +1537,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     );
 
     context.read<Regmv1CrudBloc>().add(
-      Regmv1DraftEvent(record: record),
-    );
+          Regmv1DraftEvent(record: record),
+        );
   }
 
   void draftForm2ToBloc(BuildContext context) {
@@ -1577,8 +1568,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     context.read<Regmv2FormBloc>().add(Regmv2DraftEvent(record: record));
   }
 
-
-  void draftForm3ToBloc(BuildContext context){
+  void draftForm3ToBloc(BuildContext context) {
     final record = Regmv3FormModel(
       regmv1Id: regmv1Id ?? "",
       aksesoris: fieldAksesorisController.text.trim(),
@@ -1599,21 +1589,22 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   bool _isHitungPremiLoading = false;
+  int _hitungPremiAttempt = 0;
 
   Widget buildButtonHitungPremi() => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 4),
-    child: AppButton.primary(
-      text: "Hitung Premi",
-      isLoading: _isHitungPremiLoading,
-      backgroundColor:
-      _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
-      onPressed: _isHitungPremiLoading
-          ? null
-          : () async {
-        await onHitungPremi();
-      },
-    ),
-  );
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: AppButton.primary(
+          text: "Hitung Premi",
+          isLoading: _isHitungPremiLoading,
+          backgroundColor:
+              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+          onPressed: _isHitungPremiLoading
+              ? null
+              : () async {
+                  await onHitungPremi();
+                },
+        ),
+      );
 
   Future<void> onHitungPremi() async {
     final okForm1 = validateForm1();
@@ -1643,7 +1634,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     // final okForm7 = accState.items.isNotEmpty; //optional
 
     // if (!okForm4 || !okForm5 || !okForm7) {
-    if (!okForm4 || !okForm5) { //opsional
+    if (!okForm4 || !okForm5) {
+      //opsional
       if (mounted) {
         setState(() {
           _showVal4 = !okForm4;
@@ -1670,32 +1662,33 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         _isHitungPremiLoading = true;
       });
     }
+    _startHitungPremiTimeout();
 
     final localIds4 = stnkState.items.map((e) => e.localId).toList();
     final localIds5 = mobilState.items.map((e) => e.localId).toList();
     final localIds7 = accState.items.map((e) => e.localId).toList();
 
     context.read<RegmvUploadStnkBloc>().add(
-      Regmv4StorageUploadMany(
-        regmv1Id: regmv1Id!,
-        localIds: localIds4,
-      ),
-    );
+          Regmv4StorageUploadMany(
+            regmv1Id: regmv1Id!,
+            localIds: localIds4,
+          ),
+        );
 
     context.read<RegmvUploadFotoMobilBloc>().add(
-      Regmv5StorageUploadMany(
-        regmv1Id: regmv1Id!,
-        localIds: localIds5,
-      ),
-    );
+          Regmv5StorageUploadMany(
+            regmv1Id: regmv1Id!,
+            localIds: localIds5,
+          ),
+        );
 
     if (localIds7.isNotEmpty) {
       context.read<RegmvUploadFotoAccBloc>().add(
-        Regmv7StorageUploadMany(
-          regmv1Id: regmv1Id!,
-          localIds: localIds7,
-        ),
-      );
+            Regmv7StorageUploadMany(
+              regmv1Id: regmv1Id!,
+              localIds: localIds7,
+            ),
+          );
     }
 
     draftForm1ToBloc(context);
@@ -1703,6 +1696,26 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     draftForm3ToBloc(context);
 
     context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
+  }
+
+  void _startHitungPremiTimeout() {
+    final attempt = ++_hitungPremiAttempt;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted ||
+          attempt != _hitungPremiAttempt ||
+          !_isHitungPremiLoading) {
+        return;
+      }
+
+      setState(() {
+        _isHitungPremiLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+        ),
+      );
+    });
   }
 
   void openForm1({required String? recordId}) {
@@ -2074,47 +2087,46 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     return ok;
   }
 
-
   //form1
   Widget buildFieldCalmv1Id() => appTextField(
-    label: "No SPPA",
-    controller: fieldCalmv1IdController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-    ],
-    enabled: false,
-    errorText: err('form1.noSppa'),
-    validator: (_) => err('form1.noSppa'),
-  );
+        label: "No SPPA",
+        controller: fieldCalmv1IdController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+        ],
+        enabled: false,
+        errorText: err('form1.noSppa'),
+        validator: (_) => err('form1.noSppa'),
+      );
 
   Widget buildFieldTtgAlamat() => appTextField(
-    label: "Alamat Tertanggung",
-    controller: fieldTtgAlamatController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
-    ],
-    errorText: err('form1.alamatTertanggung'),
-    validator: (_) => err('form1.alamatTertanggung'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
-    },
-  );
+        label: "Alamat Tertanggung",
+        controller: fieldTtgAlamatController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,./\-#()]")),
+        ],
+        errorText: err('form1.alamatTertanggung'),
+        validator: (_) => err('form1.alamatTertanggung'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
+        },
+      );
 
   Widget buildFieldTtgNama() => appTextField(
-    label: "Nama Tertanggung",
-    controller: fieldTtgNamaController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,.]")),
-    ],
-    errorText: err('form1.namaTertanggung'),
-    validator: (_) => err('form1.namaTertanggung'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
-    },
-  );
+        label: "Nama Tertanggung",
+        controller: fieldTtgNamaController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9a-zA-Z ,.]")),
+        ],
+        errorText: err('form1.namaTertanggung'),
+        validator: (_) => err('form1.namaTertanggung'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
+        },
+      );
   //form1
 
   //form2
@@ -2122,7 +2134,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
       buildWhen: (prev, curr) => prev.mulai != curr.mulai,
       builder: (context, state) {
-        final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        final today = DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day);
         return AppDateField(
           label: 'Tanggal Mulai',
           initialValue: state.mulai,
@@ -2131,13 +2144,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           validator: (_) => null,
           onChanged: (dt) {
             if (dt == null) return;
-            context.read<PolisTanggalBloc>().add(PolisMulaiChanged(dt)); // <- trigger event aja
+            context
+                .read<PolisTanggalBloc>()
+                .add(PolisMulaiChanged(dt)); // <- trigger event aja
           },
         );
       },
     );
   }
-
 
   Widget buildFieldPolisBerakhir() {
     return BlocBuilder<PolisTanggalBloc, PolisTanggalState>(
@@ -2157,170 +2171,170 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     );
   }
 
-
   Widget _buildComboCurddId() => ReusableComboBoxV2<ComboRMatauangModel>(
-    hintText: "Mata Uang",
-    initItem: fieldComboRMatauang,
-    loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
-    clientSideSearch: true,
-    displayText: (item) => item.rmatauangSimbol,
-    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form2.mataUang'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboRMatauang = v;
-        if (v != null) clearErr('form2.mataUang');
-      });
-    },
-    onSaveCallback: (value) => fieldComboRMatauang = value,
-  );
+        hintText: "Mata Uang",
+        initItem: fieldComboRMatauang,
+        loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
+        clientSideSearch: true,
+        displayText: (item) => item.rmatauangSimbol,
+        compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.mataUang'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboRMatauang = v;
+            if (v != null) clearErr('form2.mataUang');
+          });
+        },
+        onSaveCallback: (value) => fieldComboRMatauang = value,
+      );
 
   Widget _buildComboMMvjnscover() => ReusableComboBoxV2<ComboMMvjnscoverModel>(
-    hintText: "Jenis Cover",
-    initItem: fieldComboMMvjnscover,
-    loader: (q) => ComboMMvjnscoverRepository().getComboMMvjnscover(),
-    clientSideSearch: true,
-    displayText: (i) => i.coverName,
-    compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form2.jenisCover'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMMvjnscover = v;
-        if (v != null) clearErr('form2.jenisCover');
-      });
-    },
-    onSaveCallback: (value) => fieldComboMMvjnscover = value,
-  );
+        hintText: "Jenis Cover",
+        initItem: fieldComboMMvjnscover,
+        loader: (q) => ComboMMvjnscoverRepository().getComboMMvjnscover(),
+        clientSideSearch: true,
+        displayText: (i) => i.coverName,
+        compareItems: (a, b) => a.mmvjnscoverId == b.mmvjnscoverId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form2.jenisCover'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvjnscover = v;
+            if (v != null) clearErr('form2.jenisCover');
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvjnscover = value,
+      );
 
   Widget _buildFieldIsEq() => CheckboxWidget(
-    rightLabel: "Gempa Bumi",
-    initialValue: toBoolean(fieldIsEqController.text),
-    callback: (v) => fieldIsEqController.text = v.toString(),
-    leftLabel: "",
-  );
+        rightLabel: "Gempa Bumi",
+        initialValue: toBoolean(fieldIsEqController.text),
+        callback: (v) => fieldIsEqController.text = v.toString(),
+        leftLabel: "",
+      );
 
   Widget _buildFieldIsFlood() => CheckboxWidget(
-    rightLabel: "Banjir",
-    initialValue: toBoolean(fieldIsFloodController.text),
-    callback: (v) => fieldIsFloodController.text = v.toString(),
-    leftLabel: "",
-  );
+        rightLabel: "Banjir",
+        initialValue: toBoolean(fieldIsFloodController.text),
+        callback: (v) => fieldIsFloodController.text = v.toString(),
+        leftLabel: "",
+      );
 
   Widget _buildFieldIsSrcc() => CheckboxWidget(
-    rightLabel: "Kerusuhan",
-    initialValue: toBoolean(fieldIsSrccController.text),
-    callback: (v) => fieldIsSrccController.text = v.toString(),
-    leftLabel: "",
-  );
+        rightLabel: "Kerusuhan",
+        initialValue: toBoolean(fieldIsSrccController.text),
+        callback: (v) => fieldIsSrccController.text = v.toString(),
+        leftLabel: "",
+      );
 
   Widget _buildFieldIsTbod() => CheckboxWidget(
-    rightLabel: "Pencurian Barang oleh Supir",
-    initialValue: toBoolean(fieldIsTbodController.text),
-    callback: (v) => fieldIsTbodController.text = v.toString(),
-    leftLabel: "",
-  );
+        rightLabel: "Pencurian Barang oleh Supir",
+        initialValue: toBoolean(fieldIsTbodController.text),
+        callback: (v) => fieldIsTbodController.text = v.toString(),
+        leftLabel: "",
+      );
 
   Widget _buildFieldIsTerrorism() => CheckboxWidget(
-    rightLabel: "Terorisme",
-    initialValue: toBoolean(fieldIsTerrorismController.text),
-    callback: (v) => fieldIsTerrorismController.text = v.toString(),
-    leftLabel: "",
-  );
+        rightLabel: "Terorisme",
+        initialValue: toBoolean(fieldIsTerrorismController.text),
+        callback: (v) => fieldIsTerrorismController.text = v.toString(),
+        leftLabel: "",
+      );
 
   Widget _buildFieldIsAw() => CheckboxWidget(
-    rightLabel: "Bengkel Resmi",
-    initialValue: toBoolean(fieldIsAwController.text),
-    callback: (v) => fieldIsAwController.text = v.toString(),
-    leftLabel: "",
-  );
+        rightLabel: "Bengkel Resmi",
+        initialValue: toBoolean(fieldIsAwController.text),
+        callback: (v) => fieldIsAwController.text = v.toString(),
+        leftLabel: "",
+      );
 
   Widget _buildFieldPLL() => appTextField(
-    label: "Tanggung Jawab Penumpang",
-    controller: fieldPllController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    validator: (v) {
-      if (v == null || v.isEmpty) return null;
-      final clean = v.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) return "Tidak boleh minus";
-      return null;
-    },
-  );
+        label: "Tanggung Jawab Penumpang",
+        controller: fieldPllController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        validator: (v) {
+          if (v == null || v.isEmpty) return null;
+          final clean = v.replaceAll(",", "");
+          final angka = double.tryParse(clean);
+          if (angka == null || angka < 0) return "Tidak boleh minus";
+          return null;
+        },
+      );
 
   Widget _buildFieldTPL() => appTextField(
-    label: "Tanggung Jawab Pihak Ketiga",
-    controller: fieldTplController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    validator: (v) {
-      if (v == null || v.isEmpty) return null;
-      final clean = v.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) return "Tidak boleh minus";
-      return null;
-    },
-  );
+        label: "Tanggung Jawab Pihak Ketiga",
+        controller: fieldTplController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        validator: (v) {
+          if (v == null || v.isEmpty) return null;
+          final clean = v.replaceAll(",", "");
+          final angka = double.tryParse(clean);
+          if (angka == null || angka < 0) return "Tidak boleh minus";
+          return null;
+        },
+      );
 
   Widget _buildFieldPAD() => appTextField(
-    label: "Kecelakaan Diri Pengemudi",
-    controller: fieldPadController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    validator: (v) {
-      if (v == null || v.isEmpty) return null;
-      final clean = v.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) return "Tidak boleh minus";
-      return null;
-    },
-  );
+        label: "Kecelakaan Diri Pengemudi",
+        controller: fieldPadController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        validator: (v) {
+          if (v == null || v.isEmpty) return null;
+          final clean = v.replaceAll(",", "");
+          final angka = double.tryParse(clean);
+          if (angka == null || angka < 0) return "Tidak boleh minus";
+          return null;
+        },
+      );
 
   Widget _buildFieldPAP() => appTextField(
-    label: "Kecelakaan Diri Penumpang",
-    controller: fieldPapController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    validator: (v) {
-      if (v == null || v.isEmpty) return null;
-      final clean = v.replaceAll(",", "");
-      final angka = double.tryParse(clean);
-      if (angka == null || angka < 0) return "Tidak boleh minus";
-      return null;
-    },
-  );
+        label: "Kecelakaan Diri Penumpang",
+        controller: fieldPapController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        validator: (v) {
+          if (v == null || v.isEmpty) return null;
+          final clean = v.replaceAll(",", "");
+          final angka = double.tryParse(clean);
+          if (angka == null || angka < 0) return "Tidak boleh minus";
+          return null;
+        },
+      );
   Widget _buildFieldPassengerCountCombo() {
     final counts = List<String>.generate(7, (i) => (i + 1).toString());
 
     return ReusableComboBoxV2<String>(
       hintText: "Jumlah Penumpang",
-      initItem: selectedPassengerCount.isNotEmpty ? selectedPassengerCount : null,
+      initItem:
+          selectedPassengerCount.isNotEmpty ? selectedPassengerCount : null,
       clientSideSearch: true,
       loader: (q) async => counts,
       displayText: (item) => item,
@@ -2349,7 +2363,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final yearNow = DateTime.now().year;
     final years = List<String>.generate(
       yearNow - 1980 + 1,
-          (i) => (yearNow - i).toString(),
+      (i) => (yearNow - i).toString(),
     );
 
     return ReusableComboBoxV2<String>(
@@ -2369,7 +2383,6 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
           }
         });
       },
-
       onSaveCallback: (value) {
         selectedYearform3 = value ?? "";
       },
@@ -2377,347 +2390,346 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   Widget _buildHargaMobil() => appTextField(
-    label: "Harga Mobil",
-    controller: fieldHargaController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form3.hargaMobil'),
-    validator: (_) => err('form3.hargaMobil'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) clearErr('form3.hargaMobil');
-    },
-  );
+        label: "Harga Mobil",
+        controller: fieldHargaController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form3.hargaMobil'),
+        validator: (_) => err('form3.hargaMobil'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka > 0) clearErr('form3.hargaMobil');
+        },
+      );
 
   Widget _buildComboMWilayah() => ReusableComboBoxV2<ComboMWilayahModel>(
-    hintText: "Wilayah",
-    initItem: fieldComboMWilayah,
-    loader: (q) => ComboMWilayahRepository().getComboMWilayah(),
-    clientSideSearch: true,
-    displayText: (i) => i.wilayahNama,
-    compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.wilayah'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMWilayah = v;
+        hintText: "Wilayah",
+        initItem: fieldComboMWilayah,
+        loader: (q) => ComboMWilayahRepository().getComboMWilayah(),
+        clientSideSearch: true,
+        displayText: (i) => i.wilayahNama,
+        compareItems: (a, b) => a.mwilayahId == b.mwilayahId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.wilayah'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMWilayah = v;
 
-        if (v != null) {
-          clearErr('form3.wilayah');
-        }
-      });
-    },
-
-    onSaveCallback: (value) => fieldComboMWilayah = value,
-  );
+            if (v != null) {
+              clearErr('form3.wilayah');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMWilayah = value,
+      );
 
   Widget _buildFieldPlatNo() => appTextField(
-    label: "No Plat",
-    controller: fieldPlatNoController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      PlatNomorFormatter(),
-    ],
-    errorText: err('form3.platNo'),
-    validator: (_) => err('form3.platNo'),
-    onChanged: (v) {
-      final t = v.trim();
-      if (t.isEmpty) return;
+        label: "No Plat",
+        controller: fieldPlatNoController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          PlatNomorFormatter(),
+        ],
+        errorText: err('form3.platNo'),
+        validator: (_) => err('form3.platNo'),
+        onChanged: (v) {
+          final t = v.trim();
+          if (t.isEmpty) return;
 
-      final cleaned = t.replaceAll(' ', '');
-      if (cleaned.length >= 3 && cleaned.length <= 9) {
-        clearErr('form3.platNo');
-      }
-    },
-  );
+          final cleaned = t.replaceAll(' ', '');
+          if (cleaned.length >= 3 && cleaned.length <= 9) {
+            clearErr('form3.platNo');
+          }
+        },
+      );
 
   Widget _buildFieldRangkaNo() => appTextField(
-    label: "No Rangka",
-    controller: fieldRangkaNoController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      RangkaNoFormatter(),
-    ],
-    errorText: err('form3.rangkaNo'),
-    validator: (_) => err('form3.rangkaNo'),
-    onChanged: (v) {
-      final t = v.trim();
-      if (t.isNotEmpty && t.length >= 5) clearErr('form3.rangkaNo');
-    },
-  );
+        label: "No Rangka",
+        controller: fieldRangkaNoController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          RangkaNoFormatter(),
+        ],
+        errorText: err('form3.rangkaNo'),
+        validator: (_) => err('form3.rangkaNo'),
+        onChanged: (v) {
+          final t = v.trim();
+          if (t.isNotEmpty && t.length >= 5) clearErr('form3.rangkaNo');
+        },
+      );
 
   Widget _buildFieldMesinNo() => appTextField(
-    label: "No Mesin",
-    controller: fieldMesinNoController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      RangkaNoFormatter(),
-    ],
-    errorText: err('form3.mesinNo'),
-    validator: (_) => err('form3.mesinNo'),
-    onChanged: (v) {
-      final t = v.trim();
-      if (t.isNotEmpty && t.length >= 5) clearErr('form3.mesinNo');
-    },
-  );
+        label: "No Mesin",
+        controller: fieldMesinNoController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          RangkaNoFormatter(),
+        ],
+        errorText: err('form3.mesinNo'),
+        validator: (_) => err('form3.mesinNo'),
+        onChanged: (v) {
+          final t = v.trim();
+          if (t.isNotEmpty && t.length >= 5) clearErr('form3.mesinNo');
+        },
+      );
 
   Widget _buildFieldMmvmerkId() => ReusableComboBoxV2<ComboMMvmerkModel>(
-    hintText: "Merek",
-    comboKey: comboMMvmerkKey,
-    initItem: fieldComboMMvmerk,
-    loader: (q) => ComboMMvmerkRepository().getComboMMvmerk(q.searchText),
-    displayText: (item) => item.nmMerk,
-    compareItems: (a, b) => a.mmvmerkId == b.mmvmerkId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.merek'),
-    onChangedCallback: (v) {
-      debugPrint("[MMVMERK] onChanged -> ${v == null ? 'NULL' : '${v.mmvmerkId} | ${v.nmMerk}'}");
-      setState(() {
-        fieldComboMMvmerk = v;
-        fieldComboMMvtipe = null;
-        fieldComboMMvmodel = null;
-        if (v != null) {
-          clearErr('form3.merek');
-          regmv3formbloc?.add(ComboMMvmerkChangedEvent(comboMMvmerk: v));
-        }
-        comboMMvtipeKey.currentState?.clear();
-        comboMMvmodelKey.currentState?.clear();
-      });
-    },
-    onSaveCallback: (value) => fieldComboMMvmerk = value,
-  );
+        hintText: "Merek",
+        comboKey: comboMMvmerkKey,
+        initItem: fieldComboMMvmerk,
+        loader: (q) => ComboMMvmerkRepository().getComboMMvmerk(q.searchText),
+        displayText: (item) => item.nmMerk,
+        compareItems: (a, b) => a.mmvmerkId == b.mmvmerkId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.merek'),
+        onChangedCallback: (v) {
+          debugPrint(
+              "[MMVMERK] onChanged -> ${v == null ? 'NULL' : '${v.mmvmerkId} | ${v.nmMerk}'}");
+          setState(() {
+            fieldComboMMvmerk = v;
+            fieldComboMMvtipe = null;
+            fieldComboMMvmodel = null;
+            if (v != null) {
+              clearErr('form3.merek');
+              regmv3formbloc?.add(ComboMMvmerkChangedEvent(comboMMvmerk: v));
+            }
+            comboMMvtipeKey.currentState?.clear();
+            comboMMvmodelKey.currentState?.clear();
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvmerk = value,
+      );
 
   Widget _buildComboTipeId() => ReusableComboBoxV2<ComboMMvtipeModel>(
-    hintText: "Model",
-    comboKey: comboMMvtipeKey,
-    initItem: fieldComboMMvtipe,
-    params: {
-      "mmvmerkId": fieldComboMMvmerk?.mmvmerkId ?? "",
-    },
-    loader: (q) {
-      final mmvmerkId = q.get<String>("mmvmerkId") ?? "";
-      return ComboMMvtipeRepository().getComboMMvtipe(
-        mmvmerkId,
-        q.searchText,
+        hintText: "Model",
+        comboKey: comboMMvtipeKey,
+        initItem: fieldComboMMvtipe,
+        params: {
+          "mmvmerkId": fieldComboMMvmerk?.mmvmerkId ?? "",
+        },
+        loader: (q) {
+          final mmvmerkId = q.get<String>("mmvmerkId") ?? "";
+          return ComboMMvtipeRepository().getComboMMvtipe(
+            mmvmerkId,
+            q.searchText,
+          );
+        },
+        displayText: (item) => item.nmTipe,
+        compareItems: (a, b) => a.mmvtipeId == b.mmvtipeId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.model'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvtipe = v;
+            fieldComboMMvmodel = null;
+            if (v != null) {
+              clearErr('form3.model');
+              regmv3formbloc?.add(ComboMMvtipeChangedEvent(comboMMvtipe: v));
+            }
+            comboMMvmodelKey.currentState?.clear();
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvtipe = value,
       );
-    },
-    displayText: (item) => item.nmTipe,
-    compareItems: (a, b) => a.mmvtipeId == b.mmvtipeId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.model'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMMvtipe = v;
-        fieldComboMMvmodel = null;
-        if (v != null) {
-          clearErr('form3.model');
-          regmv3formbloc?.add(ComboMMvtipeChangedEvent(comboMMvtipe: v));
-        }
-        comboMMvmodelKey.currentState?.clear();
-      });
-    },
-    onSaveCallback: (value) => fieldComboMMvtipe = value,
-  );
 
   Widget _buildFieldMmvmodelId() => ReusableComboBoxV2<ComboMMvmodelModel>(
-    hintText: "Sub Model",
-    comboKey: comboMMvmodelKey,
-    initItem: fieldComboMMvmodel,
-    params: {
-      "mmvtipeId": fieldComboMMvtipe?.mmvtipeId ?? "",
-    },
-    loader: (q) {
-      final mmvtipeId = q.get<String>("mmvtipeId") ?? "";
-      return ComboMMvmodelRepository().getComboMMvmodel(
-        mmvtipeId,
-        q.searchText,
+        hintText: "Sub Model",
+        comboKey: comboMMvmodelKey,
+        initItem: fieldComboMMvmodel,
+        params: {
+          "mmvtipeId": fieldComboMMvtipe?.mmvtipeId ?? "",
+        },
+        loader: (q) {
+          final mmvtipeId = q.get<String>("mmvtipeId") ?? "";
+          return ComboMMvmodelRepository().getComboMMvmodel(
+            mmvtipeId,
+            q.searchText,
+          );
+        },
+        displayText: (item) => item.nmModel,
+        compareItems: (a, b) => a.mmvmodelId == b.mmvmodelId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.subModel'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvmodel = v;
+            if (v != null) {
+              clearErr('form3.subModel');
+              regmv3formbloc?.add(ComboMMvmodelChangedEvent(comboMMvmodel: v));
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvmodel = value,
       );
-    },
-    displayText: (item) => item.nmModel,
-    compareItems: (a, b) => a.mmvmodelId == b.mmvmodelId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.subModel'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMMvmodel = v;
-        if (v != null) {
-          clearErr('form3.subModel');
-          regmv3formbloc?.add(ComboMMvmodelChangedEvent(comboMMvmodel: v));
-        }
-      });
-    },
-    onSaveCallback: (value) => fieldComboMMvmodel = value,
-  );
 
   Widget _buildFieldMmvsubmodelId() => ReusableComboBoxV2<ComboMMvpakaiModel>(
-    hintText: "Penggunaan",
-    comboKey: comboMMvpakaiKey,
-    initItem: fieldComboMMvpakai,
-    loader: (q) => ComboMMvpakaiRepository().getComboMMvpakai(),
-    clientSideSearch: true,
-    displayText: (i) => i.pakaiNama,
-    compareItems: (a, b) => a.mmvpakaiId == b.mmvpakaiId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.penggunaan'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMMvpakai = v;
-        if (v != null) {
-          clearErr('form3.penggunaan');
-          regmv3formbloc?.add(ComboMMvpakaiChangedEvent(comboMMvpakai: v));
-        }
-      });
-    },
-    onSaveCallback: (value) => fieldComboMMvpakai = value,
-  );
+        hintText: "Penggunaan",
+        comboKey: comboMMvpakaiKey,
+        initItem: fieldComboMMvpakai,
+        loader: (q) => ComboMMvpakaiRepository().getComboMMvpakai(),
+        clientSideSearch: true,
+        displayText: (i) => i.pakaiNama,
+        compareItems: (a, b) => a.mmvpakaiId == b.mmvpakaiId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.penggunaan'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMMvpakai = v;
+            if (v != null) {
+              clearErr('form3.penggunaan');
+              regmv3formbloc?.add(ComboMMvpakaiChangedEvent(comboMMvpakai: v));
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMMvpakai = value,
+      );
 
   Widget _buildComboWarnaId() => ReusableComboBoxV2<ComboMWarnaModel>(
-    hintText: "Warna",
-    comboKey: comboMWarnaKey,
-    initItem: fieldComboMWarna,
-    loader: (q) => ComboMWarnaRepository().getComboMWarna(q.searchText),
-    displayText: (i) => i.warnaDesc,
-    compareItems: (a, b) => a.mwarnaId == b.mwarnaId,
-    validatorCallback: (v) => v == null ? kStringNullError : null,
-    errorText: err('form3.warna'),
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMWarna = v;
-        if (v != null) {
-          clearErr('form3.warna');
-          regmv3formbloc?.add(ComboMWarnaChangedEvent(comboMWarna: v));
-        }
-      });
-    },
-    onSaveCallback: (value) => fieldComboMWarna = value,
-  );
+        hintText: "Warna",
+        comboKey: comboMWarnaKey,
+        initItem: fieldComboMWarna,
+        loader: (q) => ComboMWarnaRepository().getComboMWarna(q.searchText),
+        displayText: (i) => i.warnaDesc,
+        compareItems: (a, b) => a.mwarnaId == b.mwarnaId,
+        validatorCallback: (v) => v == null ? kStringNullError : null,
+        errorText: err('form3.warna'),
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMWarna = v;
+            if (v != null) {
+              clearErr('form3.warna');
+              regmv3formbloc?.add(ComboMWarnaChangedEvent(comboMWarna: v));
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMWarna = value,
+      );
 
   Widget _buildFieldAksesoris() => appTextField(
-    label: "Aksesoris (opsional)",
-    controller: fieldAksesorisController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-    ],
-    errorText: err('form3.aksesoris'),
-    validator: (_) => err('form3.aksesoris'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form3.aksesoris');
-    },
-  );
+        label: "Aksesoris (opsional)",
+        controller: fieldAksesorisController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+        ],
+        errorText: err('form3.aksesoris'),
+        validator: (_) => err('form3.aksesoris'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form3.aksesoris');
+        },
+      );
   //form3
 
   //form6
   Widget buildFieldDiskonPersen() => appTextField(
-    label: "diskonPersen",
-    controller: fieldDiskonPersenController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form7.diskonPersen'),
-    validator: (_) => err('form7.diskonPersen'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.diskonPersen');
-    },
-  );
+        label: "diskonPersen",
+        controller: fieldDiskonPersenController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form7.diskonPersen'),
+        validator: (_) => err('form7.diskonPersen'),
+        onChanged: (value) {
+          final clean = value.replaceAll(",", "").trim();
+          final x = double.tryParse(clean);
+          if (x != null) clearErr('form7.diskonPersen');
+        },
+      );
 
   Widget buildFieldPremiAdd() => appTextField(
-    label: "premiAdd",
-    controller: fieldPremiAddController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form7.premiAdd'),
-    validator: (_) => err('form7.premiAdd'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiAdd');
-    },
-  );
+        label: "premiAdd",
+        controller: fieldPremiAddController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form7.premiAdd'),
+        validator: (_) => err('form7.premiAdd'),
+        onChanged: (value) {
+          final clean = value.replaceAll(",", "").trim();
+          final x = double.tryParse(clean);
+          if (x != null) clearErr('form7.premiAdd');
+        },
+      );
 
   Widget buildFieldPremiCasco() => appTextField(
-    label: "premiCasco",
-    controller: fieldPremiCascoController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form7.premiCasco'),
-    validator: (_) => err('form7.premiCasco'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiCasco');
-    },
-  );
+        label: "premiCasco",
+        controller: fieldPremiCascoController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form7.premiCasco'),
+        validator: (_) => err('form7.premiCasco'),
+        onChanged: (value) {
+          final clean = value.replaceAll(",", "").trim();
+          final x = double.tryParse(clean);
+          if (x != null) clearErr('form7.premiCasco');
+        },
+      );
 
   Widget buildFieldPremiDiskon() => appTextField(
-    label: "premiDiskon",
-    controller: fieldPremiDiskonController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    enabled: false,
-    errorText: err('form7.premiDiskon'),
-    validator: (_) => err('form7.premiDiskon'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiDiskon');
-    },
-  );
+        label: "premiDiskon",
+        controller: fieldPremiDiskonController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        enabled: false,
+        errorText: err('form7.premiDiskon'),
+        validator: (_) => err('form7.premiDiskon'),
+        onChanged: (value) {
+          final clean = value.replaceAll(",", "").trim();
+          final x = double.tryParse(clean);
+          if (x != null) clearErr('form7.premiDiskon');
+        },
+      );
 
   Widget buildFieldPremiNet() => appTextField(
-    label: "premiNet",
-    controller: fieldPremiNetController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    enabled: false,
-    errorText: err('form7.premiNet'),
-    validator: (_) => err('form7.premiNet'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiNet');
-    },
-  );
+        label: "premiNet",
+        controller: fieldPremiNetController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        enabled: false,
+        errorText: err('form7.premiNet'),
+        validator: (_) => err('form7.premiNet'),
+        onChanged: (value) {
+          final clean = value.replaceAll(",", "").trim();
+          final x = double.tryParse(clean);
+          if (x != null) clearErr('form7.premiNet');
+        },
+      );
 
   Widget buildFieldPremiSubtotal() => appTextField(
-    label: "premiSubtotal",
-    controller: fieldPremiSubtotalController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    enabled: false,
-    errorText: err('form7.premiSubtotal'),
-    validator: (_) => err('form7.premiSubtotal'),
-    onChanged: (value) {
-      final clean = value.replaceAll(",", "").trim();
-      final x = double.tryParse(clean);
-      if (x != null) clearErr('form7.premiSubtotal');
-    },
-  );
+        label: "premiSubtotal",
+        controller: fieldPremiSubtotalController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        enabled: false,
+        errorText: err('form7.premiSubtotal'),
+        validator: (_) => err('form7.premiSubtotal'),
+        onChanged: (value) {
+          final clean = value.replaceAll(",", "").trim();
+          final x = double.tryParse(clean);
+          if (x != null) clearErr('form7.premiSubtotal');
+        },
+      );
   //form6
-
 
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
@@ -2725,10 +2737,12 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   void setErr(String key, String? msg) {
     setState(() => fieldErrors[key] = msg);
   }
+
   void clearErr(String key) {
     if (!fieldErrors.containsKey(key)) return;
     setState(() => fieldErrors.remove(key));
   }
+
   void clearErrsByPrefix(String prefix) {
     setState(() {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
@@ -2769,7 +2783,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   }
 
   bool isForm3Complete() {
-    final harga = double.tryParse(fieldHargaController.text.replaceAll(',', '').trim()) ?? 0;
+    final harga =
+        double.tryParse(fieldHargaController.text.replaceAll(',', '').trim()) ??
+            0;
 
     return selectedYearform3.trim().isNotEmpty &&
         harga > 0 &&
@@ -2781,12 +2797,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         fieldComboMMvtipe != null &&
         fieldComboMMvmodel != null &&
         fieldComboMMvpakai != null &&
-        fieldComboMWarna != null ;
-        //&& fieldAksesorisController.text.trim().isNotEmpty;
+        fieldComboMWarna != null;
+    //&& fieldAksesorisController.text.trim().isNotEmpty;
   }
 
-  bool isForm4Complete() => context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
-  bool isForm5Complete() => context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
+  bool isForm4Complete() =>
+      context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
+  bool isForm5Complete() =>
+      context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
   // bool isForm7Complete() => context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
   bool isForm7Complete() => true;
   // form6 = premi sudah terhitung
@@ -2804,14 +2822,21 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     final section = RegmvFormSection.values[opened];
 
     switch (section) {
-      case RegmvFormSection.form1: return validateForm1();
-      case RegmvFormSection.form2: return validateForm2();
-      case RegmvFormSection.form3: return validateForm3();
-      case RegmvFormSection.form4: return context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
-      case RegmvFormSection.form5: return context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
+      case RegmvFormSection.form1:
+        return validateForm1();
+      case RegmvFormSection.form2:
+        return validateForm2();
+      case RegmvFormSection.form3:
+        return validateForm3();
+      case RegmvFormSection.form4:
+        return context.read<RegmvUploadStnkBloc>().state.items.isNotEmpty;
+      case RegmvFormSection.form5:
+        return context.read<RegmvUploadFotoMobilBloc>().state.items.isNotEmpty;
       // case RegmvFormSection.form7: return context.read<RegmvUploadFotoAccBloc>().state.items.isNotEmpty;
-      case RegmvFormSection.form7: return true; //opsional
-      case RegmvFormSection.form6: return true;
+      case RegmvFormSection.form7:
+        return true; //opsional
+      case RegmvFormSection.form6:
+        return true;
     }
   }
 
@@ -2847,8 +2872,14 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
     _showVal7 = false;
 
     // clear state items di masing2 bloc (butuh event "Clear/Reset" di bloc)
-    context.read<RegmvUploadStnkBloc>().add(Regmv4UploadFotoObjectResetPreview());
-    context.read<RegmvUploadFotoMobilBloc>().add(Regmv5UploadFotoObjectResetPreview());
-    context.read<RegmvUploadFotoAccBloc>().add(Regmv7UploadFotoObjectResetPreview());
+    context
+        .read<RegmvUploadStnkBloc>()
+        .add(Regmv4UploadFotoObjectResetPreview());
+    context
+        .read<RegmvUploadFotoMobilBloc>()
+        .add(Regmv5UploadFotoObjectResetPreview());
+    context
+        .read<RegmvUploadFotoAccBloc>()
+        .add(Regmv7UploadFotoObjectResetPreview());
   }
 }

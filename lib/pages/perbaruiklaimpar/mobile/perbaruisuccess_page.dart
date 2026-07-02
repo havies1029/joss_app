@@ -128,7 +128,7 @@ class _PerbaruiSuccessPageState extends State<PerbaruiSuccessPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset(
-                        "assets/icons/logo_berhasil.svg",
+                        "assets/icons/Logo_Berhasil1.svg",
                         width: 120,
                         height: 120,
                       ),

@@ -463,6 +463,7 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                     display: "Pembayaran Berhasil Dibatalkan",
                     description: "Tagihan pembayaran telah dibatalkan.",
                     displayButton: "Kembali",
+                    assetPath: "assets/icons/Logo_Gagal1.svg",
                     onButtonPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(

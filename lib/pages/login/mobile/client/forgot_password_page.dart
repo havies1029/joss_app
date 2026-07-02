@@ -100,23 +100,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: primaryBlackColor,
+        backgroundColor: secondaryBlackColor,
         body: BaseBackgroundFirstPage(
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    /// HEADER SECTION (SAMA SEPERTI LOGIN)
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: vPadding),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hPadding * 1.5,
+                        vertical: vPadding,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           const SizedBox(height: 6),
 
                           Image.asset(
@@ -143,12 +142,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.chevron_left, color: primaryColor),
+                                const Icon(
+                                  Icons.chevron_left,
+                                  color: primaryColor,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   "Kembali",
-                                  style: bodyTextStyle(context)
-                                      .copyWith(color: primaryColor),
+                                  style: bodyTextStyle(context).copyWith(
+                                    color: primaryColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -165,14 +168,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                           Text(
                             "Masukkan email terdaftar untuk mengatur ulang kata sandi.",
-                            style: bodyTextStyle(context, fontSize: 16)
-                                .copyWith(color: hintGrey),
+                            style: bodyTextStyle(context, fontSize: 16).copyWith(
+                              color: hintGrey,
+                            ),
                           ),
                         ],
                       ),
                     ),
+                  ),
 
-                    Container(
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Container(
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         gradient: cardBorderGradient,
                         borderRadius: const BorderRadius.only(
@@ -181,93 +189,101 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                       child: Container(
-                        margin: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(
+                          top: 1,
+                          left: 1,
+                          right: 1,
+                        ),
+                        decoration: const BoxDecoration(
                           color: secondaryBlackColor,
-                          borderRadius: const BorderRadius.only(
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20),
                           ),
                         ),
-                        child: Card(
-                          color: secondaryBlackColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: hPadding * 1.5,
+                            vertical: vPadding,
                           ),
-                          child: Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: hPadding * 1.5,
-                                vertical: vPadding),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  appTextField(
-                                    label: "Email",
-                                    hint: "Masukkan email kamu",
-                                    controller: _emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: (value) {
-                                      final v = (value ?? "").trim();
-                                      if (v.isEmpty) return "Mohon isi email";
-                                      if (!EmailValidator.validate(v)) {
-                                        return "Masukkan format email yang valid";
-                                      }
-                                      return null;
-                                    },
-                                    onTap: () {},
-                                  ),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                appTextField(
+                                  label: "Email",
+                                  hint: "Masukkan email kamu",
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  validator: (value) {
+                                    final v = (value ?? "").trim();
 
-                                  const SizedBox(height: 14),
+                                    if (v.isEmpty) {
+                                      return "Mohon isi email";
+                                    }
 
-                                  BlocBuilder<ForgotPasswordBloc,
-                                      ForgotPasswordState>(
-                                    buildWhen: (prev, curr) =>
-                                    prev.isLoading != curr.isLoading,
-                                    builder: (context, state) {
-                                      return AppButton.primary(
-                                        text: "Kirim",
-                                        isLoading: isSubmitting,
-                                        width: double.infinity,
-                                        backgroundColor: isSubmitting
-                                            ? secondaryBlackColor
-                                            : const Color(0xFFF28A2E),
-                                        textStyle: headingStyle(context,
-                                            fontSize: 16)
-                                            .copyWith(color: Colors.white),
-                                        onPressed: isSubmitting
-                                            ? null
-                                            : () async {
+                                    if (!EmailValidator.validate(v)) {
+                                      return "Masukkan format email yang valid";
+                                    }
+
+                                    return null;
+                                  },
+                                  onTap: () {},
+                                ),
+
+                                const SizedBox(height: 14),
+
+                                BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
+                                  buildWhen: (prev, curr) =>
+                                  prev.isLoading != curr.isLoading,
+                                  builder: (context, state) {
+                                    return AppButton.primary(
+                                      text: "Kirim",
+                                      isLoading: isSubmitting,
+                                      width: double.infinity,
+                                      backgroundColor: isSubmitting
+                                          ? secondaryBlackColor
+                                          : const Color(0xFFF28A2E),
+                                      textStyle: headingStyle(
+                                        context,
+                                        fontSize: 16,
+                                      ).copyWith(
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: isSubmitting
+                                          ? null
+                                          : () async {
+                                        setState(() {
+                                          isSubmitting = true;
+                                        });
+
+                                        await _submit();
+
+                                        await Future.delayed(
+                                          const Duration(seconds: 2),
+                                        );
+
+                                        if (mounted) {
                                           setState(() {
-                                            isSubmitting = true;
+                                            isSubmitting = false;
                                           });
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
 
-                                          _submit();
-
-                                          await Future.delayed(
-                                              const Duration(seconds: 2));
-
-                                          if (mounted) {
-                                            setState(() {
-                                              isSubmitting = false;
-                                            });
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-
-                                  const SizedBox(height: 28),
-                                ],
-                              ),
+                                const SizedBox(height: 28),
+                              ],
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
