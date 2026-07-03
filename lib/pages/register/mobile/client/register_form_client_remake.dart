@@ -32,6 +32,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   final fieldTeleponController = TextEditingController();
   final fieldKonfirmasiPasswordController = TextEditingController();
   final fieldEmailController = TextEditingController();
+  final fieldReferralController = TextEditingController();
   ComboMJnsclientModel? fieldComboJnsClient;
 
   bool _obscurePassword = true;
@@ -57,6 +58,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     fieldTeleponController.dispose();
     fieldEmailController.dispose();
     fieldKonfirmasiPasswordController.dispose();
+    fieldReferralController.dispose();
     super.dispose();
   }
 
@@ -263,6 +265,21 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         onSaveCallback: (value) => fieldComboJnsClient = value,
       );
 
+  Widget _buildReferralField() => appTextField(
+    label: "Kode Referral (Opsional)",
+    hint: "Masukkan Kode Referral",
+    controller: fieldReferralController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.digitsOnly,
+    ],
+    errorText: err('form1.referral'),
+    validator: (_) => err('form1.referral'),
+    onChanged: (v) {
+      if (v.trim().isNotEmpty) clearErr('form1.referral');
+    },
+  );
+
   void handleBack() {
     if (singlePopPages.contains(widget.requestFrom)) {
       Navigator.pop(context);
@@ -436,6 +453,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                   SizedBox(height: vPadding),
                                   buildFieldComboMJnsclient(),
                                   SizedBox(height: vPadding),
+                                  _buildReferralField(),
+                                  SizedBox(height: vPadding),
                                   AppButton.primary(
                                     text: "Simpan",
                                     isLoading: isSubmitting,
@@ -500,6 +519,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       email: email,
       userNama: fieldNameController.text.trim(),
       sendOtpVia: fromEmail ? "hp" : "email",
+      referral: fieldReferralController.text.trim().isEmpty ? null :  fieldReferralController.text.trim(),
     );
 
     context.read<RegUserBloc>().add(ClearRequestFromEvent());

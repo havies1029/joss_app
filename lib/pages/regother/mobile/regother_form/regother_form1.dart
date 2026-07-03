@@ -1,6 +1,5 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
@@ -9,7 +8,6 @@ import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
 import 'package:joss_app/models/regother/regother1crud_model.dart';
 import 'package:joss_app/models/combobox/combormatauang_model.dart';
 import 'package:intl/intl.dart';
-import 'package:joss_app/common/thousand_separator_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_cob_list_page.dart';
 import 'package:joss_app/pages/regother/mobile/regother_form/regother_success.dart';
@@ -47,6 +45,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
   bool _isKonfirmasiLoading = false;
+  bool _pendingAutoConfirm = false;
 
   ComboRMatauangModel? fieldComboRMatauang;
   ComboMCobApp1Model? fieldComboMCobApp1;
@@ -64,6 +63,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   void initState() {
     super.initState();
 
+    context.read<Regother1CrudBloc>().add(
+          const ResetSelectedCobEvent(),
+        );
+
     _loadDefaultCurrency();
 
     regUserBloc = context.read<RegUserBloc>();
@@ -74,12 +77,12 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
 
     if (mjenisClient == "10") {
       context.read<MRekanGeneralIdvCrudBloc>().add(
-        MRekanGeneralIdvCrudLihatEvent(),
-      );
+            MRekanGeneralIdvCrudLihatEvent(),
+          );
     } else if (mjenisClient == "20") {
       context.read<MRekanGeneralCmpCrudBloc>().add(
-        MRekanGeneralCmpCrudLihatEvent(),
-      );
+            MRekanGeneralCmpCrudLihatEvent(),
+          );
     }
 
     loadData();
@@ -89,7 +92,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     final currencies = await ComboRMatauangRepository().getComboRMatauang();
 
     final idrCurrency = currencies.firstWhere(
-          (curr) => curr.rmatauangSimbol == 'IDR',
+      (curr) => curr.rmatauangSimbol == 'IDR',
       orElse: () => currencies.first,
     );
 
@@ -102,121 +105,149 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   Widget build(BuildContext context) {
     regother1CrudBloc = BlocProvider.of<Regother1CrudBloc>(context);
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+          listenWhen: (previous, current) =>
+              previous.isLoaded != current.isLoaded && current.isLoaded,
+          listener: (context, state) => _tryAutoConfirm(),
+        ),
+        BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+          listenWhen: (previous, current) =>
+              previous.isLoaded != current.isLoaded && current.isLoaded,
+          listener: (context, state) => _tryAutoConfirm(),
+        ),
+      ],
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
 
-        if (regUserBloc.state.requestFrom.isNotEmpty){
-          authenticationBloc.add(
-            LoggedIn(user: AppData.user),
+          if (regUserBloc.state.requestFrom.isNotEmpty) {
+            authenticationBloc.add(
+              LoggedIn(user: AppData.user),
+            );
+            regUserBloc.add(ClearRequestFromEvent());
+          }
+          regother1CrudBloc.add(
+            const ResetSelectedCobEvent(),
           );
-          regUserBloc.add(ClearRequestFromEvent());
-        }
-        Navigator.pop(context);
-      },
-      child: BlocConsumer<Regother1CrudBloc, Regother1CrudState>(
-        builder: (context, state) {
-          return BaseBackgroundSidePage(
-            title: 'Lainnya',
-            onBack: () async {
-              if (regUserBloc.state.requestFrom.isNotEmpty){
-                authenticationBloc.add(
-                  LoggedIn(user: AppData.user),
+          Navigator.pop(context);
+        },
+        child: BlocConsumer<Regother1CrudBloc, Regother1CrudState>(
+          builder: (context, state) {
+            return BaseBackgroundSidePage(
+              title: 'Lainnya',
+              onHome: () async {
+                regother1CrudBloc.add(
+                  const ResetSelectedCobEvent(),
                 );
-                regUserBloc.add(ClearRequestFromEvent());
-              }
-              Navigator.pop(context);
-            },
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Container(
-                color: secondaryBlackColor,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: Text(
-                          "Pilih jenis asuransi yang ingin Anda beli. Sesuaikan dengan kebutuhan perlindungan Anda.",
-                          style: bodyTextStyle(context),
+              },
+              onBack: () async {
+                if (regUserBloc.state.requestFrom.isNotEmpty) {
+                  authenticationBloc.add(
+                    LoggedIn(user: AppData.user),
+                  );
+                  regUserBloc.add(ClearRequestFromEvent());
+                  regother1CrudBloc.add(
+                    const ResetSelectedCobEvent(),
+                  );
+                }
+                Navigator.pop(context);
+              },
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Container(
+                  color: secondaryBlackColor,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Text(
+                            "Pilih jenis asuransi yang ingin Anda beli. Sesuaikan dengan kebutuhan perlindungan Anda.",
+                            style: bodyTextStyle(context),
+                          ),
                         ),
-                      ),
-                      buildFieldMcobId(),
-                      const SizedBox(height: 12),
-                      buildFieldTsi(),
-                      const SizedBox(height: 12),
-                      buildFieldRemark(),
-                      const SizedBox(height: 25),
-                      BlocBuilder<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
-                        builder: (context, idvState) {
-                          return BlocBuilder<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
-                            builder: (context, cmpState) {
-                              return AppButton.primary(
-                                text: "Konfirmasi",
-                                isLoading: _isKonfirmasiLoading,
-                                backgroundColor: _isKonfirmasiLoading
-                                    ? secondaryBlackColor
-                                    : primaryColor,
-                                onPressed: _isKonfirmasiLoading
-                                    ? null
-                                    : () async {
-                                  setState(() {
-                                    _isKonfirmasiLoading = true;
-                                  });
+                        buildFieldMcobId(),
+                        const SizedBox(height: 12),
+                        buildFieldTsi(),
+                        const SizedBox(height: 12),
+                        buildFieldRemark(),
+                        const SizedBox(height: 25),
+                        BlocBuilder<MRekanGeneralIdvCrudBloc,
+                            MRekanGeneralIdvCrudState>(
+                          builder: (context, idvState) {
+                            return BlocBuilder<MRekanGeneralCmpCrudBloc,
+                                MRekanGeneralCmpCrudState>(
+                              builder: (context, cmpState) {
+                                return AppButton.primary(
+                                  text: "Konfirmasi",
+                                  isLoading: _isKonfirmasiLoading,
+                                  backgroundColor: _isKonfirmasiLoading
+                                      ? secondaryBlackColor
+                                      : primaryColor,
+                                  onPressed: _isKonfirmasiLoading
+                                      ? null
+                                      : () async {
+                                          setState(() {
+                                            _isKonfirmasiLoading = true;
+                                          });
 
-                                  onSaveForm(
-                                    idvState: idvState,
-                                    cmpState: cmpState,
-                                  );
+                                          onSaveForm(
+                                            idvState: idvState,
+                                            cmpState: cmpState,
+                                          );
 
-                                  await Future.delayed(const Duration(seconds: 2));
+                                          await Future.delayed(
+                                              const Duration(seconds: 2));
 
-                                  if (mounted) {
-                                    setState(() {
-                                      _isKonfirmasiLoading = false;
-                                    });
-                                  }
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
+                                          if (mounted) {
+                                            setState(() {
+                                              _isKonfirmasiLoading = false;
+                                            });
+                                          }
+                                        },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
-        listener: (context, state) {
-          if (state.isLoaded && state.record != null) {
-            setState(() {
-              fieldRemarkController.text = state.record!.remark;
-              fieldTsiController.text =
-                  NumberFormat("#,###").format(state.record!.tsi);
-
-              fieldComboRMatauang = state.comboRMatauang;
-              fieldComboMCobApp1 = state.comboMCobApp1;
-            });
-          }
-
-          if (state.isSaved) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => RegotherSucess(
-                  display: "Berhasil dikirim!",
-                  purpose: "O",
-                ),
-              ),
             );
-            _resetForm();
-          }
-        },
+          },
+          listener: (context, state) {
+            if (state.isLoaded && state.record != null) {
+              setState(() {
+                fieldRemarkController.text = state.record!.remark;
+                fieldTsiController.text =
+                    NumberFormat("#,###").format(state.record!.tsi);
+
+                fieldComboRMatauang = state.comboRMatauang;
+                fieldComboMCobApp1 = state.comboMCobApp1;
+              });
+            }
+
+            if (state.isSaved) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RegotherSucess(
+                    display: "Berhasil dikirim!",
+                    purpose: "O",
+                  ),
+                ),
+              );
+              _resetForm();
+            }
+          },
+        ),
       ),
     );
   }
@@ -252,60 +283,78 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   // );
 
   Widget buildFieldMcobId() {
-    return GestureDetector(
-      onTap: () async {
-        final ComboMCobApp1Model? selected =
-        await Navigator.push<ComboMCobApp1Model>(
-          context,
-          MaterialPageRoute(builder: (_) => const CobCariPage()),
-        );
-
-        if (selected != null) {
-          context.read<Regother1CrudBloc>().add(
-            ComboMCobApp1ChangedEvent(comboMCobApp1: selected),
+    return FormField<ComboMCobApp1Model>(
+      initialValue: fieldComboMCobApp1,
+      validator: (_) => fieldComboMCobApp1 == null ? kStringNullError : null,
+      builder: (fieldState) => GestureDetector(
+        onTap: () async {
+          final ComboMCobApp1Model? selected =
+              await Navigator.push<ComboMCobApp1Model>(
+            context,
+            MaterialPageRoute(builder: (_) => const CobCariPage()),
           );
 
-          setState(() => fieldComboMCobApp1 = selected);
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-            decoration: BoxDecoration(
-              color: formGrey,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: sGrey,
+          if (!mounted) return;
+
+          if (selected != null) {
+            context.read<Regother1CrudBloc>().add(
+                  ComboMCobApp1ChangedEvent(comboMCobApp1: selected),
+                );
+
+            fieldState.didChange(selected);
+            setState(() => fieldComboMCobApp1 = selected);
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: fieldState.hasError ? Colors.red : sGrey,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    fieldComboMCobApp1 == null
-                        ? "Pilih Kategori Asuransi"
-                        : fieldComboMCobApp1!.cobNama,
-                    style: bodyTextStyle(context).copyWith(
-                      color: fieldComboMCobApp1 == null
-                          ? primaryColor
-                          : primaryLightColor,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      fieldComboMCobApp1 == null
+                          ? "Pilih Kategori Asuransi"
+                          : fieldComboMCobApp1!.cobNama,
+                      style: bodyTextStyle(context).copyWith(
+                        color: fieldComboMCobApp1 == null
+                            ? primaryColor
+                            : primaryLightColor,
+                      ),
                     ),
                   ),
-                ),
-                SvgPicture.asset(
-                  "assets/icons/dropdown.svg",
-                  width: 16,
-                  colorFilter: const ColorFilter.mode(
-                    primaryLightColor,
-                    BlendMode.srcIn,
+                  SvgPicture.asset(
+                    "assets/icons/dropdown.svg",
+                    width: 16,
+                    colorFilter: const ColorFilter.mode(
+                      primaryLightColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (fieldState.hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 10, top: 4),
+                child: Text(
+                  fieldState.errorText ?? '',
+                  style: bodyTextStyle(context).copyWith(
+                    color: Colors.red,
+                    fontSize: 12,
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -318,8 +367,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
       maxLines: 3,
       controller: fieldRemarkController,
       onChanged: (value) {
-        if (value.isNotEmpty) {
-        }
+        if (value.isNotEmpty) {}
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -363,9 +411,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
         builder: (context) => RegisterClientPopUp(
           header: 'Data Klien Belum Terdaftar!',
           description:
-          'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+              'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
           buttonText: 'Daftar Klien',
           onPressed: () {
+            _pendingAutoConfirm = true;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -399,9 +448,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           builder: (context) => RegisterClientPopUp(
             header: 'Isi Data Pribadi Anda',
             description:
-            'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
             buttonText: 'Lengkapi Data Pribadi',
             onPressed: () {
+              _pendingAutoConfirm = true;
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -431,9 +481,10 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           builder: (context) => RegisterClientPopUp(
             header: 'Isi Data Perusahaan Anda',
             description:
-            'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',
+                'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',
             buttonText: 'Lengkapi Data Perusahaan',
             onPressed: () {
+              _pendingAutoConfirm = true;
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -493,25 +544,34 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      Regother1CrudModel record = Regother1CrudModel(
-        currId: fieldComboRMatauang?.rmatauangKode,
-        regother1Id: '',
-        comboMCobApp1: fieldComboMCobApp1,
-        mcobId: fieldComboMCobApp1!.mCobApp1Id,
-        remark: fieldRemarkController.text,
-        tsi: double.parse(fieldTsiController.text.replaceAll(',', '')),
-      );
+      _saveRegother();
+    }
+  }
 
-      regother1CrudBloc.add(
-        const ResetSelectedCobEvent(),
-      );
+  void _executeSaveSilently() {
+    if (!_isFormFilledSilently()) return;
+    _saveRegother();
+  }
 
-      if (widget.viewMode == "tambah") {
-        regother1CrudBloc.add(Regother1CrudTambahEvent(record: record));
-      } else if (widget.viewMode == "ubah") {
-        record.regother1Id = regother1CrudBloc.state.record!.regother1Id;
-        regother1CrudBloc.add(Regother1CrudUbahEvent(record: record));
-      }
+  void _saveRegother() {
+    Regother1CrudModel record = Regother1CrudModel(
+      currId: fieldComboRMatauang?.rmatauangKode,
+      regother1Id: '',
+      comboMCobApp1: fieldComboMCobApp1,
+      mcobId: fieldComboMCobApp1!.mCobApp1Id,
+      remark: fieldRemarkController.text,
+      tsi: double.parse(fieldTsiController.text.replaceAll(',', '')),
+    );
+
+    regother1CrudBloc.add(
+      const ResetSelectedCobEvent(),
+    );
+
+    if (widget.viewMode == "tambah") {
+      regother1CrudBloc.add(Regother1CrudTambahEvent(record: record));
+    } else if (widget.viewMode == "ubah") {
+      record.regother1Id = regother1CrudBloc.state.record!.regother1Id;
+      regother1CrudBloc.add(Regother1CrudUbahEvent(record: record));
     }
   }
 
@@ -519,21 +579,52 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     required MRekanGeneralIdvCrudState idvState,
     required MRekanGeneralCmpCrudState cmpState,
   }) {
-    if (fieldComboMCobApp1 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar(
-          'Silakan pilih Kategori Asuransi sebelum menyimpan.',
-        ),
-      );
-      return;
-    }
-
     if (_formKey.currentState!.validate()) {
       _showPengajuanDialog(
         idvState: idvState,
         cmpState: cmpState,
       );
     }
+  }
+
+  bool _isFormFilledSilently() {
+    return fieldComboMCobApp1 != null &&
+        fieldComboRMatauang != null &&
+        fieldTsiController.text.trim().isNotEmpty &&
+        fieldRemarkController.text.trim().isNotEmpty;
+  }
+
+  void _tryAutoConfirm() {
+    if (!_pendingAutoConfirm || !_isFormFilledSilently()) return;
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+    final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
+    final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
+
+    if (mjenisClient == "10" &&
+        (idvState.isLoading ||
+            !idvState.isLoaded ||
+            !idvState.isDataComplete)) {
+      return;
+    }
+
+    if (mjenisClient == "20" &&
+        (cmpState.isLoading ||
+            !cmpState.isLoaded ||
+            !cmpState.isDataComplete)) {
+      return;
+    }
+
+    if (mjenisClient != "10" && mjenisClient != "20") return;
+
+    _pendingAutoConfirm = false;
+    if (mounted) {
+      setState(() {
+        _isKonfirmasiLoading = true;
+      });
+    }
+    _executeSaveSilently();
   }
 }
 
@@ -555,65 +646,84 @@ class AppCurrencyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 50,
-          decoration: BoxDecoration(
-            color: formGrey,
-            borderRadius: BorderRadius.circular(cardBorderRadius),
-            border: Border.all(color: sGrey),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(5),
-                child: SizedBox(
-                  width: 100,
-                  child: ReusableComboBoxV2<ComboRMatauangModel>(
-                    hintText: "",
-                    initItem: currency,
-                    loader: (q) =>
-                        ComboRMatauangRepository().getComboRMatauang(),
-                    clientSideSearch: true,
-                    displayText: (m) => m.rmatauangSimbol,
-                    compareItems: (a, b) => a.rmatauangKode == b.rmatauangKode,
-                    enableSearch: false,
-                    onChangedCallback: onCurrencyChanged,
-                    onSaveCallback: onCurrencyChanged,
-                    maxHeight: 200,
-                  ),
+    return FormField<String>(
+      validator: (_) => validator?.call(valueController.text),
+      builder: (fieldState) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: formGrey,
+                borderRadius: BorderRadius.circular(cardBorderRadius),
+                border: Border.all(
+                  color: fieldState.hasError ? Colors.red : sGrey,
                 ),
               ),
-              Container(width: 1, height: 30, color: sGrey),
-              Expanded(
-                child: TextFormField(
-                  controller: valueController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    CurrencyTextInputFormatter.currency(
-                      locale: 'en',
-                      decimalDigits: 0,
-                      symbol: '',
+              child: Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: SizedBox(
+                      width: 100,
+                      child: ReusableComboBoxV2<ComboRMatauangModel>(
+                        hintText: "",
+                        initItem: currency,
+                        loader: (q) =>
+                            ComboRMatauangRepository().getComboRMatauang(),
+                        clientSideSearch: true,
+                        displayText: (m) => m.rmatauangSimbol,
+                        compareItems: (a, b) =>
+                            a.rmatauangKode == b.rmatauangKode,
+                        enableSearch: false,
+                        onChangedCallback: onCurrencyChanged,
+                        onSaveCallback: onCurrencyChanged,
+                        maxHeight: 200,
+                      ),
                     ),
-                  ],
-                  validator: validator,
-                  cursorColor: primaryLightColor,
-                  style: bodyTextStyle(context),
-                  decoration: const InputDecoration(
-                    hintText: "Nilai Pertanggungan",
-                    hintStyle: TextStyle(color: primaryColor),
-                    border: InputBorder.none,
-                    contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  Container(width: 1, height: 30, color: sGrey),
+                  Expanded(
+                    child: TextFormField(
+                      controller: valueController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        CurrencyTextInputFormatter.currency(
+                          locale: 'en',
+                          decimalDigits: 0,
+                          symbol: '',
+                        ),
+                      ],
+                      onChanged: fieldState.didChange,
+                      cursorColor: primaryLightColor,
+                      style: bodyTextStyle(context),
+                      decoration: const InputDecoration(
+                        hintText: "Nilai Pertanggungan",
+                        hintStyle: TextStyle(color: primaryColor),
+                        border: InputBorder.none,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (fieldState.hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 10, top: 4),
+                child: Text(
+                  fieldState.errorText ?? '',
+                  style: bodyTextStyle(context).copyWith(
+                    color: Colors.red,
+                    fontSize: 12,
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

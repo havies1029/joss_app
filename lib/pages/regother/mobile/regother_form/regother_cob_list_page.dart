@@ -105,8 +105,8 @@ class _CobCariPageState extends State<CobCariPage> {
   // }
 
   List<ComboMCobApp1Model> _filterExcludedCob(
-      List<ComboMCobApp1Model> items,
-      ) {
+    List<ComboMCobApp1Model> items,
+  ) {
     final filtered = [...items];
 
     filtered.sort((a, b) {
@@ -145,11 +145,11 @@ class _CobCariPageState extends State<CobCariPage> {
     });
 
     context.read<Regother1CrudBloc>().add(
-      SelectButton(
-        item.mCobApp1Id,
-        item.cobNama,
-      ),
-    );
+          SelectButton(
+            item.mCobApp1Id,
+            item.cobNama,
+          ),
+        );
   }
 
   void _submitSelectedCob() {
@@ -166,7 +166,7 @@ class _CobCariPageState extends State<CobCariPage> {
   @override
   Widget build(BuildContext context) {
     final selectedId = context.select<Regother1CrudBloc, String>(
-          (bloc) => bloc.state.selectedCOBId,
+      (bloc) => bloc.state.selectedCOBId,
     );
 
     return PopScope(
@@ -175,8 +175,8 @@ class _CobCariPageState extends State<CobCariPage> {
         if (didPop) return;
 
         context.read<Regother1CrudBloc>().add(
-          const ResetSelectedCobEvent(),
-        );
+              const ResetSelectedCobEvent(),
+            );
 
         Navigator.pop(context);
       },
@@ -184,15 +184,15 @@ class _CobCariPageState extends State<CobCariPage> {
         title: "Kategori Asuransi",
         onBack: () {
           context.read<Regother1CrudBloc>().add(
-            const ResetSelectedCobEvent(),
-          );
+                const ResetSelectedCobEvent(),
+              );
 
           Navigator.pop(context);
         },
         onHome: () {
           context.read<Regother1CrudBloc>().add(
-            const ResetSelectedCobEvent(),
-          );
+                const ResetSelectedCobEvent(),
+              );
 
           final homeState = homeTabKey.currentState;
 
@@ -217,9 +217,7 @@ class _CobCariPageState extends State<CobCariPage> {
                 searchButton: _buildSearchButton(),
                 hintText: "Cari kategori asuransi...",
               ),
-
               const SizedBox(height: 12),
-
               Expanded(
                 child: FutureBuilder<List<ComboMCobApp1Model>>(
                   future: _futureData,
@@ -250,9 +248,7 @@ class _CobCariPageState extends State<CobCariPage> {
                   },
                 ),
               ),
-
               const SizedBox(height: vPadding),
-
               _buildSubmitButton(),
             ],
           ),
@@ -282,7 +278,8 @@ class _CobCariPageState extends State<CobCariPage> {
   Widget _buildEmpty() {
     return const EmptyStatePage(
       title: "Kategori Asuransi tidak tersedia",
-      description: "Coba gunakan kata kunci lain atau muat ulang data kategori.",
+      description:
+          "Coba gunakan kata kunci lain atau muat ulang data kategori.",
     );
   }
 
@@ -290,9 +287,8 @@ class _CobCariPageState extends State<CobCariPage> {
     required List<ComboMCobApp1Model> items,
     required String selectedId,
   }) {
-    final visibleItems = _showAllCobItems
-        ? items
-        : items.take(_initialVisibleCount).toList();
+    final visibleItems =
+        _showAllCobItems ? items : items.take(_initialVisibleCount).toList();
 
     final hiddenCount = items.length - visibleItems.length;
     final showToggle = items.length > _initialVisibleCount;
@@ -359,16 +355,6 @@ class _CobCariPageState extends State<CobCariPage> {
     );
   }
 
-  void _resetSelectedCob() {
-    setState(() {
-      _selectedCobModel = null;
-    });
-
-    context.read<Regother1CrudBloc>().add(
-      SelectButton('', ''),
-    );
-  }
-
   Widget _buildCobItem({
     required ComboMCobApp1Model item,
     required String selectedId,
@@ -385,9 +371,7 @@ class _CobCariPageState extends State<CobCariPage> {
               isSelected: isSelected,
               onTap: () => _selectCob(item),
             ),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Text(
                 item.cobNama,

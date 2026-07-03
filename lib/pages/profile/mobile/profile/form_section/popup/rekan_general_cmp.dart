@@ -95,6 +95,7 @@ class MRekanGeneralCmpPopUpPageFormState
       navigator.pop();
       navigator.pop();
       navigator.pop();
+      regUserBloc.add(ClearRequestFromEvent());
     }
     else if (regUserBloc.state.requestFrom == 'daftarclient_page') {
       debugPrint("navigator1x");
