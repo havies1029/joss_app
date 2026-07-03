@@ -136,17 +136,20 @@ class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
                 ),
               ),
               errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(cardBorderRadius),
                 borderSide: const BorderSide(
-                  color: Colors.redAccent,
+                  color: Colors.red,
                 ),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(cardBorderRadius),
                 borderSide: const BorderSide(
-                  color: Colors.redAccent,
-                  width: 1.5,
+                  color: Colors.red,
                 ),
+              ),
+              errorStyle: bodyTextStyle(context).copyWith(
+                color: Colors.red,
+                fontSize: 12,
               ),
             ),
           ),
@@ -199,6 +202,7 @@ class _Klaim5TambahDokumenFormState extends State<Klaim5TambahDokumenForm> {
     );
   }
 }
+
 class _FormButton extends StatelessWidget {
   final String label;
   final Widget icon;
@@ -219,11 +223,11 @@ class _FormButton extends StatelessWidget {
   });
 
   bool _isOverflow(
-      String text,
-      double maxWidth,
-      TextStyle style,
-      BuildContext context,
-      ) {
+    String text,
+    double maxWidth,
+    TextStyle style,
+    BuildContext context,
+  ) {
     if (maxWidth <= 0) return true;
 
     final textPainter = TextPainter(
@@ -280,35 +284,35 @@ class _FormButton extends StatelessWidget {
             ),
             child: isLoading
                 ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-                : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (showIcon) ...[
-                  SizedBox(
                     width: 18,
                     height: 18,
-                    child: icon,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (showIcon) ...[
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: icon,
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: textStyle,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                ],
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: textStyle,
-                  ),
-                ),
-              ],
-            ),
           ),
         );
       },

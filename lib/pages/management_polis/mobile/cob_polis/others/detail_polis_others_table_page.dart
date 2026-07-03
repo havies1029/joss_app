@@ -29,17 +29,6 @@ class _DetailPolisOthersTablePageState
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
 
-  double _tableHeight(int itemCount) {
-    const double headerHeight = 48;
-    const double rowHeight = 48;
-    const int maxVisibleRows = 7;
-    const double borderBuffer = 4;
-
-    final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
-
-    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -111,7 +100,7 @@ class _DetailPolisOthersTablePageState
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2othersCariBloc, Sppa2othersCariState>(
                 buildWhen: (p, c) =>
-                p.status != c.status ||
+                    p.status != c.status ||
                     p.items != c.items ||
                     p.hasReachedMax != c.hasReachedMax ||
                     p.isFetching != c.isFetching,
@@ -137,19 +126,16 @@ class _DetailPolisOthersTablePageState
                     );
                   }
 
-                  return SizedBox(
-                    height: _tableHeight(state.items.length),
-                    child: DetailPolisOthersTableWidget(
-                      items: state.items,
-                      isLoadingMore: state.isFetching,
-                      onLoadMore: () {
-                        if (!state.hasReachedMax && !state.isFetching) {
-                          context
-                              .read<Sppa2othersCariBloc>()
-                              .add(FetchSppa2othersCariEvent());
-                        }
-                      },
-                    ),
+                  return DetailPolisOthersTableWidget(
+                    items: state.items,
+                    isLoadingMore: state.isFetching,
+                    onLoadMore: () {
+                      if (!state.hasReachedMax && !state.isFetching) {
+                        context
+                            .read<Sppa2othersCariBloc>()
+                            .add(FetchSppa2othersCariEvent());
+                      }
+                    },
                   );
                 },
               ),

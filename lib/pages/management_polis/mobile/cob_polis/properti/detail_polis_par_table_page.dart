@@ -22,22 +22,11 @@ class DetailPolisParTablePage extends StatefulWidget {
       _DetailPolisParTablePageState();
 }
 
-class _DetailPolisParTablePageState
-    extends State<DetailPolisParTablePage> {
+class _DetailPolisParTablePageState extends State<DetailPolisParTablePage> {
   late final Sppa2parCariBloc sppa2parCariBloc;
 
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
-  double _tableHeight(int itemCount) {
-    const double headerHeight = 48;
-    const double rowHeight = 48;
-    const int maxVisibleRows = 7;
-    const double borderBuffer = 4;
-
-    final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
-
-    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
-  }
   @override
   void initState() {
     super.initState();
@@ -95,9 +84,7 @@ class _DetailPolisParTablePageState
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(context),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: ListPageFilterBarUIWidget(
@@ -106,14 +93,12 @@ class _DetailPolisParTablePageState
                 hintText: "Lokasi/Deskripsi",
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2parCariBloc, Sppa2parCariState>(
                 buildWhen: (p, c) =>
-                p.status != c.status ||
+                    p.status != c.status ||
                     p.items != c.items ||
                     p.hasReachedMax != c.hasReachedMax ||
                     p.isFetching != c.isFetching,
@@ -139,17 +124,16 @@ class _DetailPolisParTablePageState
                     );
                   }
 
-                  return SizedBox(
-                    height: _tableHeight(state.items.length),
-                    child: DetailPolisParTableWidget(
-                      items: state.items,
-                      isLoadingMore: state.isFetching,
-                      onLoadMore: () {
-                        if (!state.hasReachedMax && !state.isFetching) {
-                          context.read<Sppa2parCariBloc>().add(FetchSppa2parCariEvent());
-                        }
-                      },
-                    ),
+                  return DetailPolisParTableWidget(
+                    items: state.items,
+                    isLoadingMore: state.isFetching,
+                    onLoadMore: () {
+                      if (!state.hasReachedMax && !state.isFetching) {
+                        context
+                            .read<Sppa2parCariBloc>()
+                            .add(FetchSppa2parCariEvent());
+                      }
+                    },
                   );
                 },
               ),

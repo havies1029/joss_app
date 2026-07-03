@@ -473,7 +473,7 @@ class _AppButtonState extends State<AppButton>
       foregroundColor: widget.textColor ?? Colors.white,
 
       disabledBackgroundColor:
-      widget.isLoading ? null : backgroundColor,
+      widget.isLoading ? sGrey : backgroundColor,
 
       disabledForegroundColor:
       widget.isLoading

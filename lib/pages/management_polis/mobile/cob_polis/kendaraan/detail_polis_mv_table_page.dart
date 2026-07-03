@@ -18,8 +18,7 @@ class DetailPolisMvTablePage extends StatefulWidget {
   });
 
   @override
-  State<DetailPolisMvTablePage> createState() =>
-      _DetailPolisMvTablePageState();
+  State<DetailPolisMvTablePage> createState() => _DetailPolisMvTablePageState();
 }
 
 class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
@@ -27,17 +26,6 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
 
   final TextEditingController searchController = TextEditingController();
   Timer? _searchTimer;
-
-  double _tableHeight(int itemCount) {
-    const double headerHeight = 48;
-    const double rowHeight = 48;
-    const int maxVisibleRows = 7;
-    const double borderBuffer = 4;
-
-    final visibleRows = itemCount > maxVisibleRows ? maxVisibleRows : itemCount;
-
-    return headerHeight + (visibleRows * rowHeight) + borderBuffer;
-  }
 
   @override
   void initState() {
@@ -110,7 +98,7 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
               padding: const EdgeInsets.all(hPadding),
               child: BlocBuilder<Sppa2mvCariBloc, Sppa2mvCariState>(
                 buildWhen: (p, c) =>
-                p.status != c.status ||
+                    p.status != c.status ||
                     p.items != c.items ||
                     p.hasReachedMax != c.hasReachedMax ||
                     p.isFetching != c.isFetching,
@@ -136,19 +124,16 @@ class _DetailPolisMvTablePageState extends State<DetailPolisMvTablePage> {
                     );
                   }
 
-                  return SizedBox(
-                    height: _tableHeight(state.items.length),
-                    child: DetailPolisMvTableWidget(
-                      items: state.items,
-                      isLoadingMore: state.isFetching,
-                      onLoadMore: () {
-                        if (!state.hasReachedMax && !state.isFetching) {
-                          context
-                              .read<Sppa2mvCariBloc>()
-                              .add(FetchSppa2mvCariEvent());
-                        }
-                      },
-                    ),
+                  return DetailPolisMvTableWidget(
+                    items: state.items,
+                    isLoadingMore: state.isFetching,
+                    onLoadMore: () {
+                      if (!state.hasReachedMax && !state.isFetching) {
+                        context
+                            .read<Sppa2mvCariBloc>()
+                            .add(FetchSppa2mvCariEvent());
+                      }
+                    },
                   );
                 },
               ),

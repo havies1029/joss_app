@@ -24,7 +24,7 @@ class DetailPolisTable<T> extends StatefulWidget {
     this.narrowBreakpoint = 900,
     this.headerHeight = 48,
     this.rowHeight = 48,
-    this.maxVisibleRows = 7,
+    this.maxVisibleRows = 6,
   });
 
   @override
@@ -92,18 +92,14 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   Widget _buildCompactTable() {
     final widths = _compactColumnWidths(context, widget.items);
 
-    final visibleRows = widget.items.length > widget.maxVisibleRows
-        ? widget.maxVisibleRows
-        : widget.items.length;
-
-    final bodyHeight = visibleRows * widget.rowHeight;
-    final tableHeight = widget.headerHeight + bodyHeight + 12;
     final useVerticalScroll = widget.items.length > widget.maxVisibleRows;
+    final bodyHeight = widget.maxVisibleRows * widget.rowHeight;
+    final tableHeight = widget.headerHeight + bodyHeight + 12;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
-        height: tableHeight,
+        height: useVerticalScroll ? tableHeight : null,
         decoration: _boxDecoration(),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -127,30 +123,36 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
                           height: widget.headerHeight,
                           child: Table(
                             defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
+                                TableCellVerticalAlignment.middle,
                             border: _tableBorder(),
                             columnWidths: widths,
                             children: [_headerRow()],
                           ),
                         ),
-                        SizedBox(
-                          height: bodyHeight,
-                          child: ScrollbarTheme(
-                            data: _scrollbarTheme(),
-                            child: Scrollbar(
-                              controller: _verticalController,
-                              thumbVisibility: true,
-                              trackVisibility: true,
-                              child: SingleChildScrollView(
+                        if (useVerticalScroll)
+                          SizedBox(
+                            height: bodyHeight,
+                            child: ScrollbarTheme(
+                              data: _scrollbarTheme(),
+                              child: Scrollbar(
                                 controller: _verticalController,
-                                child: _bodyTable(
-                                  widths,
-                                  compact: true,
+                                thumbVisibility: true,
+                                trackVisibility: true,
+                                child: SingleChildScrollView(
+                                  controller: _verticalController,
+                                  child: _bodyTable(
+                                    widths,
+                                    compact: true,
+                                  ),
                                 ),
                               ),
                             ),
+                          )
+                        else
+                          _bodyTable(
+                            widths,
+                            compact: true,
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -164,44 +166,52 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   Widget _buildNormalTable() {
+    final useVerticalScroll = widget.items.length > widget.maxVisibleRows;
+    final tableHeight =
+        widget.headerHeight + (widget.maxVisibleRows * widget.rowHeight) + 12;
+    final table = Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      border: _tableBorder(),
+      columnWidths: _normalColumnWidths(),
+      children: [
+        _headerRow(),
+        ...widget.items.asMap().entries.map(
+              (e) => _row(
+                e.value,
+                e.key,
+                compact: false,
+              ),
+            ),
+      ],
+    );
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
+        height: useVerticalScroll ? tableHeight : null,
         decoration: _boxDecoration(),
-        child: ScrollbarTheme(
-          data: _scrollbarTheme(),
-          child: Scrollbar(
-            controller: _verticalController,
-            thumbVisibility: true,
-            trackVisibility: true,
-            child: SingleChildScrollView(
-              controller: _verticalController,
-              child: Table(
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                border: _tableBorder(),
-                columnWidths: _normalColumnWidths(),
-                children: [
-                  _headerRow(),
-                  ...widget.items.asMap().entries.map(
-                        (e) => _row(
-                      e.value,
-                      e.key,
-                      compact: false,
-                    ),
+        child: useVerticalScroll
+            ? ScrollbarTheme(
+                data: _scrollbarTheme(),
+                child: Scrollbar(
+                  controller: _verticalController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SingleChildScrollView(
+                    controller: _verticalController,
+                    child: table,
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
+                ),
+              )
+            : table,
       ),
     );
   }
 
   Table _bodyTable(
-      Map<int, TableColumnWidth> widths, {
-        required bool compact,
-      }) {
+    Map<int, TableColumnWidth> widths, {
+    required bool compact,
+  }) {
     return Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       border: _tableBorder(),
@@ -209,11 +219,11 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       children: [
         ...widget.items.asMap().entries.map(
               (e) => _row(
-            e.value,
-            e.key,
-            compact: compact,
-          ),
-        ),
+                e.value,
+                e.key,
+                compact: compact,
+              ),
+            ),
       ],
     );
   }
@@ -224,7 +234,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       children: [
         _headerCell('NO', center: true),
         ...widget.columns.map(
-              (col) => _headerCell(
+          (col) => _headerCell(
             col.title,
             center: col.center,
             right: col.right,
@@ -235,10 +245,10 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   TableRow _row(
-      T item,
-      int index, {
-        required bool compact,
-      }) {
+    T item,
+    int index, {
+    required bool compact,
+  }) {
     return TableRow(
       decoration: BoxDecoration(
         color: index.isEven ? pGrey : formGrey,
@@ -246,7 +256,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       children: [
         _cellCenter((index + 1).toString()),
         ...widget.columns.map(
-              (col) {
+          (col) {
             final value = col.valueGetter(item);
             final key = '$index-${col.title}';
 
@@ -274,10 +284,10 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   Widget _headerCell(
-      String text, {
-        bool center = false,
-        bool right = false,
-      }) {
+    String text, {
+    bool center = false,
+    bool right = false,
+  }) {
     Widget child = Text(
       text,
       maxLines: 2,
@@ -305,10 +315,10 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   Widget _cellText(
-      String text, {
-        required bool compact,
-        bool center = false,
-      }) {
+    String text, {
+    required bool compact,
+    bool center = false,
+  }) {
     final maxLines = compact ? 4 : 3;
 
     Widget child = Text(
@@ -333,15 +343,14 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   Widget _cellExpandable(
-      String text, {
-        required String key,
-        required bool compact,
-      }) {
+    String text, {
+    required String key,
+    required bool compact,
+  }) {
     final isExpanded = _expandedKeys.contains(key);
 
-    final words = text.trim().isEmpty
-        ? <String>[]
-        : text.trim().split(RegExp(r'\s+'));
+    final words =
+        text.trim().isEmpty ? <String>[] : text.trim().split(RegExp(r'\s+'));
 
     final canExpand = words.length > 22;
 
@@ -378,17 +387,17 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       child: canExpand
           ? InkWell(
-        onTap: () {
-          setState(() {
-            if (isExpanded) {
-              _expandedKeys.remove(key);
-            } else {
-              _expandedKeys.add(key);
-            }
-          });
-        },
-        child: content,
-      )
+              onTap: () {
+                setState(() {
+                  if (isExpanded) {
+                    _expandedKeys.remove(key);
+                  } else {
+                    _expandedKeys.add(key);
+                  }
+                });
+              },
+              child: content,
+            )
           : content,
     );
   }
@@ -446,9 +455,9 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   Map<int, TableColumnWidth> _compactColumnWidths(
-      BuildContext context,
-      List<T> items,
-      ) {
+    BuildContext context,
+    List<T> items,
+  ) {
     final map = <int, TableColumnWidth>{
       0: const FixedColumnWidth(48),
     };
@@ -471,10 +480,10 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   double _measureTextWidth(
-      BuildContext context,
-      String text, {
-        TextStyle? style,
-      }) {
+    BuildContext context,
+    String text, {
+    TextStyle? style,
+  }) {
     final effectiveStyle = style ??
         bodyTextStyle(context, fontSize: 12).copyWith(
           color: primaryLightColor,
@@ -491,12 +500,12 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
   }
 
   double _columnWidthFromLongest(
-      BuildContext context,
-      Iterable<String> values, {
-        required double min,
-        required double max,
-        double padding = 24,
-      }) {
+    BuildContext context,
+    Iterable<String> values, {
+    required double min,
+    required double max,
+    double padding = 24,
+  }) {
     var longest = 0.0;
 
     for (final value in values) {
