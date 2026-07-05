@@ -47,6 +47,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   bool _isKonfirmasiLoading = false;
   bool _pendingAutoConfirm = false;
 
+
   ComboRMatauangModel? fieldComboRMatauang;
   ComboMCobApp1Model? fieldComboMCobApp1;
   final comboRMatauangKey =
