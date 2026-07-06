@@ -843,26 +843,30 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                   //   ),
                   // ),
                   Padding(
-                      padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                      child: AppButton.primary(
-                        text: "Pembayaran",
-                        isLoading: isSubmitting,
-                        backgroundColor:
-                        isAgreementChecked ? primaryColor : sGrey,
-                        onPressed: isSubmitting || !isAgreementChecked
-                            ? null
-                            : () async {
-                          if (mounted) {
-                            setState(() => isSubmitting = true);
-                          }
-
-                          context.read<DnRekap2invBloc>().add(
-                                      RegMv2InvoiceEvent(
-                                        regmv1Id: widget.recordId ?? "",
-                                      ),
-                                    );
-                        },
-                      )
+                    padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: AppButton.primary(
+                      text: "Pembayaran",
+                      isLoading: isSubmitting,
+                      backgroundColor:
+                      isAgreementChecked ? primaryColor : sGrey,
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierColor: Colors.black.withOpacity(0.6),
+                          builder: (dialogContext) => RegisterClientPopUp(
+                            showIcon: false,
+                            header: 'Fitur pembayaran belum tersedia.',
+                            description:
+                            'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                            buttonText: 'Mengerti',
+                            onPressed: () {
+                              // Navigator.of(dialogContext).pop();
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

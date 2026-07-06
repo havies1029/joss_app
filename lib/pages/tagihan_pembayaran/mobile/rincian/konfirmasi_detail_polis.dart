@@ -52,49 +52,49 @@ import '../../../base/base_background_sidepage.dart';
                   showFooter: false,
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: AppButton.primary(
-                  text: "Lanjut Pembayaran",
-                  onPressed: () {
-                    final dnBloc = context.read<DnRekap2invBloc>();
-                    final curr = _resolveCurrFromRincian(dnBloc.state, selectedDnIds);
-
-                    context.read<DnRekap2invBloc>().add(
-                      DnToInvByListDnProcessEvent(
-                        listDn: selectedDnIds.join(";"),
-                        curr: curr.isEmpty ? null : curr,
-                      ),
-                    );
-                  },
-                ),
-              ),
               // Padding(
               //   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               //   child: AppButton.primary(
               //     text: "Lanjut Pembayaran",
               //     onPressed: () {
               //       final dnBloc = context.read<DnRekap2invBloc>();
+              //       final curr = _resolveCurrFromRincian(dnBloc.state, selectedDnIds);
               //
-              //       showDialog(
-              //         context: context,
-              //         barrierDismissible: true,
-              //         barrierColor: Colors.black.withOpacity(0.6),
-              //         builder: (dialogContext) => RegisterClientPopUp(
-              //           header: 'Fitur pembayaran belum tersedia.',
-              //           showIcon: false,
-              //           description:
-              //           'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-              //           buttonText: 'Mengerti',
-              //           onPressed: () {
-              //             // Navigator.of(dialogContext).pop();
-              //           },
+              //       context.read<DnRekap2invBloc>().add(
+              //         DnToInvByListDnProcessEvent(
+              //           listDn: selectedDnIds.join(";"),
+              //           curr: curr.isEmpty ? null : curr,
               //         ),
               //       );
               //     },
-              //
               //   ),
               // ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                child: AppButton.primary(
+                  text: "Lanjut Pembayaran",
+                  onPressed: () {
+                    final dnBloc = context.read<DnRekap2invBloc>();
+
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      barrierColor: Colors.black.withOpacity(0.6),
+                      builder: (dialogContext) => RegisterClientPopUp(
+                        header: 'Fitur pembayaran belum tersedia.',
+                        showIcon: false,
+                        description:
+                        'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                        buttonText: 'Mengerti',
+                        onPressed: () {
+                          // Navigator.of(dialogContext).pop();
+                        },
+                      ),
+                    );
+                  },
+
+                ),
+              ),
             ],
           ),
         )
