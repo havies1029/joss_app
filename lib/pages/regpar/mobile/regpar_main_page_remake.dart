@@ -1579,7 +1579,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   void _startHitungPremiTimeout() {
     final attempt = ++_hitungPremiAttempt;
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (!mounted ||
           attempt != _hitungPremiAttempt ||
           !_isHitungPremiLoading) {

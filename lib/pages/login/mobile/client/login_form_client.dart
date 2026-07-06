@@ -173,7 +173,7 @@ class _LoginFormClientState extends State<LoginFormClient>
 
   void _startSubmitTimeout() {
     final attempt = ++_submitAttempt;
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (!mounted || attempt != _submitAttempt || !isSubmitting) return;
 
       setState(() {

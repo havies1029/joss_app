@@ -453,8 +453,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                   SizedBox(height: vPadding),
                                   buildFieldComboMJnsclient(),
                                   SizedBox(height: vPadding),
-                                  _buildReferralField(),
-                                  SizedBox(height: vPadding),
+                                  // _buildReferralField(),
+                                  // SizedBox(height: vPadding),
                                   AppButton.primary(
                                     text: "Simpan",
                                     isLoading: isSubmitting,
@@ -536,7 +536,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
 
   void _startSubmitTimeout() {
     final attempt = ++_submitAttempt;
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (!mounted || attempt != _submitAttempt || !isSubmitting) return;
 
       setState(() {

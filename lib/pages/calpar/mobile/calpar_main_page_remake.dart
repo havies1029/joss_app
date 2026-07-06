@@ -52,7 +52,6 @@ import '../../regpar/mobile/regpar_main_page_remake.dart';
 enum CalparFormSection { form1, form2, form3, form4 }
 
 class CalparMainPageRemake extends StatefulWidget {
-
   const CalparMainPageRemake({
     super.key,
   });
@@ -60,7 +59,6 @@ class CalparMainPageRemake extends StatefulWidget {
   @override
   State<CalparMainPageRemake> createState() => _CalparMainPageRemakeState();
 }
-
 
 class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   List<bool> expanded = List.filled(CalparFormSection.values.length, false);
@@ -83,6 +81,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   late RegUserBloc regUserBloc;
   late AuthenticationBloc authenticationBloc;
+  bool _pendingAutoConfirm = false;
 
   bool _lockCheckboxes = true;
   bool _showZonaGempa = true;
@@ -150,7 +149,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   final fieldCoverBulanController = TextEditingController();
   ComboRKonstruksiojkModel? previousKonstruksi;
   ComboRKonstruksiojkModel? fieldComboRKonstruksiojk;
-  final konstruksiKey = GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
+  final konstruksiKey =
+      GlobalKey<DropdownSearchState<ComboRKonstruksiojkModel>>();
   ComboROkupasiModel? fieldComboROkupasi;
   //form1
 
@@ -176,7 +176,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   final fieldIsRsmdccController = TextEditingController();
   ComboMJnscoverParModel? fieldComboMJnscoverPar;
   ComboMKabZonaGempaModel? fieldComboMKabZonaGempa;
-  final comboMKabZonaGempaKey = GlobalKey<DropdownSearchState<ComboMKabZonaGempaModel>>();
+  final comboMKabZonaGempaKey =
+      GlobalKey<DropdownSearchState<ComboMKabZonaGempaModel>>();
 
   final ComboMWilayah = GlobalKey<DropdownSearchState<ComboMWilayahModel>>();
   ComboMWilayahModel? fieldComboMWilayah;
@@ -217,7 +218,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mjenisClient == "10") {
         mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
-      }else if (mjenisClient == "20"){
+      } else if (mjenisClient == "20") {
         mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
       }
     });
@@ -271,22 +272,22 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   void refreshForm1({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Calpar1CrudBloc>().add(
-      Calpar1CrudLihatEvent(recordId: recordId),
-    );
+          Calpar1CrudLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm2({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Calpar2FormBloc>().add(
-      Calpar2FormLihatEvent(recordId: recordId),
-    );
+          Calpar2FormLihatEvent(recordId: recordId),
+        );
   }
 
   void refreshForm3({required String? recordId}) {
     if (recordId == null || recordId.isEmpty) return;
     context.read<Calpar3FormBloc>().add(
-      Calpar3FormLihatEvent(recordId: recordId),
-    );
+          Calpar3FormLihatEvent(recordId: recordId),
+        );
   }
 
   void _payloadform1(Calpar1CrudModel record) {
@@ -422,7 +423,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        if (regUserBloc.state.requestFrom.isNotEmpty){
+        if (regUserBloc.state.requestFrom.isNotEmpty) {
           authenticationBloc.add(
             LoggedIn(user: AppData.user),
           );
@@ -433,7 +434,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       child: BaseBackgroundSidePage(
         title: "Properti",
         onBack: () async {
-          if (regUserBloc.state.requestFrom.isNotEmpty){
+          if (regUserBloc.state.requestFrom.isNotEmpty) {
             authenticationBloc.add(
               LoggedIn(user: AppData.user),
             );
@@ -504,6 +505,16 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               }
             },
           ),
+          BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+            listenWhen: (previous, current) =>
+                previous.isLoaded != current.isLoaded && current.isLoaded,
+            listener: (context, state) => _tryAutoConfirm(),
+          ),
+          BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+            listenWhen: (previous, current) =>
+                previous.isLoaded != current.isLoaded && current.isLoaded,
+            listener: (context, state) => _tryAutoConfirm(),
+          ),
           BlocListener<Calpar4FormBloc, Calpar4FormState>(
             listener: (context, state) {
               if (state.hasFailure) {
@@ -563,28 +574,23 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: hPadding * 1.5),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: const FormSectionHeader(
                 iconPath: "assets/icons/properti.svg",
                 title: "Properti",
                 subtitle:
-                "Isi semua detail untuk menghitung premi secara otomatis.",
+                    "Isi semua detail untuk menghitung premi secara otomatis.",
               ),
             ),
-
             const SizedBox(height: hPadding * 1.5),
-
             CustomProgressBar(
               progress: getProgressValue(),
               horizontalPadding: hPadding * 1.5,
               barColor: primaryColor,
               borderRadius: cardBorderRadius,
             ),
-
             const SizedBox(height: hPadding * 1.5),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
               child: Column(
@@ -611,9 +617,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form2Page(
                     context: context,
                     title: "Nilai Pertanggungan",
@@ -653,9 +657,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   Form3Page(
                     context: context,
                     title: "Perhitungan Tarif",
@@ -705,13 +707,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   buildButtonHitungPremi(),
-
                   const SizedBox(height: hPadding),
-
                   Form4Page(
                     context: context,
                     title: "Perhitungan Premi",
@@ -719,53 +717,58 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                     onToggle: (v) => setState(() => expanded[3] = v),
                     child: (calpar4Id?.isNotEmpty == true)
                         ? Column(
-                      children: [
-                        HitungPremiWidget(
-                          rows: [
-                            HitungPremiRow(
-                              label: "Premi",
-                              controller: filedPremiTotalController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              showValueBorder: true,
-                              formatNumber: true,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol ?? "",
-                            ),
-                            HitungPremiRow(
-                              label: "Diskon",
-                              controller: fieldDiscNilaiController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              showValueBorder: true,
-                              formatNumber: true,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol ?? "",
-                            ),
-                            HitungPremiRow(
-                              label: "Net Premi",
-                              controller: fieldPremiNetController,
-                              layoutType: HitungPremiLayoutType.vertical,
-                              showValueBorder: true,
-                              formatNumber: true,
-                              valuePrefix: fieldComboRMatauang?.rmatauangSimbol ?? "",
-                            ),
-                          ],
-                        ),
-                        // buildFieldPremiNet(),
-                        // const SizedBox(height: hPadding),
-                        // buildFieldDiscNilai(),
-                        // const SizedBox(height: hPadding),
-                        // buildFieldPremiOther(),
-                      ],
-                    )
+                            children: [
+                              HitungPremiWidget(
+                                rows: [
+                                  HitungPremiRow(
+                                    label: "Premi",
+                                    controller: filedPremiTotalController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol ??
+                                            "",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Diskon",
+                                    controller: fieldDiscNilaiController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol ??
+                                            "",
+                                  ),
+                                  HitungPremiRow(
+                                    label: "Net Premi",
+                                    controller: fieldPremiNetController,
+                                    layoutType: HitungPremiLayoutType.vertical,
+                                    showValueBorder: true,
+                                    formatNumber: true,
+                                    valuePrefix:
+                                        fieldComboRMatauang?.rmatauangSimbol ??
+                                            "",
+                                  ),
+                                ],
+                              ),
+                              // buildFieldPremiNet(),
+                              // const SizedBox(height: hPadding),
+                              // buildFieldDiscNilai(),
+                              // const SizedBox(height: hPadding),
+                              // buildFieldPremiOther(),
+                            ],
+                          )
                         : const SizedBox(
-                      height: 40,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Klik Hitung Premi untuk melihat hasil."),
-                      ),
-                    ),
+                            height: 40,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "Klik Hitung Premi untuk melihat hasil."),
+                            ),
+                          ),
                   ),
-
                   const SizedBox(height: hPadding),
-
                   if (calpar4Id?.isNotEmpty == true) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -783,9 +786,13 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                               ),
                               const SizedBox(height: hPadding),
                               AppButton.primary(
-                                text: state.isProcessing ? "Memproses..." : "Lanjutkan",
+                                text: state.isProcessing
+                                    ? "Memproses..."
+                                    : "Lanjutkan",
                                 isLoading: state.isProcessing,
-                                onPressed: state.isProcessing ? null : onLanjutkanPressed,
+                                onPressed: state.isProcessing
+                                    ? null
+                                    : onLanjutkanPressed,
                               ),
                             ],
                           );
@@ -793,7 +800,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                       ),
                     ),
                   ],
-
                   const SizedBox(height: 25),
                 ],
               ),
@@ -827,7 +833,6 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             onTap: () {
               tryOpenSection(CalparFormSection.form1, onRefresh: onRefresh);
             },
-
           ),
           if (isExpanded)
             Padding(
@@ -859,9 +864,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               duration: const Duration(milliseconds: 250),
               child: SvgPicture.asset("assets/icons/dropdown.svg", width: 16),
             ),
-          onTap: () {
-            tryOpenSection(CalparFormSection.form2, onRefresh: onRefresh);
-          },
+            onTap: () {
+              tryOpenSection(CalparFormSection.form2, onRefresh: onRefresh);
+            },
           ),
           if (isExpanded)
             Padding(
@@ -952,19 +957,15 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
-    if (context
-        .read<Calpar1ListBloc>()
-        .state
-        .isProcessing) {
+    if (context.read<Calpar1ListBloc>().state.isProcessing) {
       return;
     }
 
-    if (context
-        .read<AuthenticationBloc>()
-        .state is AuthenticationAuthenticated) {
-      User user = (context
-          .read<AuthenticationBloc>()
-          .state as AuthenticationAuthenticated).user;
+    if (context.read<AuthenticationBloc>().state
+        is AuthenticationAuthenticated) {
+      User user = (context.read<AuthenticationBloc>().state
+              as AuthenticationAuthenticated)
+          .user;
       if (user.userType == "C") {
         if (mjenisClient == "10") {
           final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
@@ -978,9 +979,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
-                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                    'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
                 buttonText: 'Lengkapi Data Pribadi',
                 onPressed: () {
+                  _pendingAutoConfirm = true;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -992,8 +994,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             );
             return;
           }
-        }
-        else if (mjenisClient == "20") {
+        } else if (mjenisClient == "20") {
           final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
 
           if (!cmpState.isDataComplete) {
@@ -1004,9 +1005,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               builder: (context) => RegisterClientPopUp(
                 header: 'Isi Data Pribadi Anda',
                 description:
-                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+                    'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
                 buttonText: 'Lengkapi Data Pribadi',
                 onPressed: () {
+                  _pendingAutoConfirm = true;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -1019,26 +1021,25 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             return;
           }
         }
-        context.read<Calpar1ListBloc>().add(
-          CalPar2RegParEvent(calpar1Id: calpar1Id!),
-        );
-      }
-      else {
+        _continueToRegPar();
+      } else {
         showDialog(
           context: context,
           barrierDismissible: true, // klik luar = close
-          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
+          barrierColor:
+              Colors.black.withOpacity(0.6), // background gelap transparan
           builder: (context) => RegisterClientPopUp(
             header: 'Data Klien Belum Terdaftar!',
             description:
-            'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
+                'Untuk melanjutkan ke proses Registrasi, Anda perlu mendaftarkan data klien terlebih dahulu.',
             buttonText: 'Daftar Klien',
             onPressed: () {
+              _pendingAutoConfirm = true;
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => RegisterClient(requestFrom: 'calpar_page')
-                ),
+                    builder: (context) =>
+                        RegisterClient(requestFrom: 'calpar_page')),
               );
             },
           ),
@@ -1049,10 +1050,59 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     }
   }
 
+  void _continueToRegPar() {
+    if (calpar1Id == null || calpar1Id!.isEmpty) return;
+    context.read<Calpar1ListBloc>().add(
+          CalPar2RegParEvent(calpar1Id: calpar1Id!),
+        );
+  }
+
+  void _tryAutoConfirm() {
+    final isProcessing = context.read<Calpar1ListBloc>().state.isProcessing;
+    final authState = context.read<AuthenticationBloc>().state;
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+    final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
+    final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
+    final requestFrom = regUserBloc.state.requestFrom;
+    final shouldAutoConfirm =
+        _pendingAutoConfirm || requestFrom == 'calpar_page';
+
+    if (!shouldAutoConfirm) return;
+
+    _pendingAutoConfirm = true;
+
+    if (isProcessing) return;
+    if (authState is! AuthenticationAuthenticated) return;
+    if (authState.user.userType != "C") return;
+
+    if (mjenisClient == "10" &&
+        (idvState.isLoading ||
+            !idvState.isLoaded ||
+            !idvState.isDataComplete)) {
+      return;
+    }
+
+    if (mjenisClient == "20" &&
+        (cmpState.isLoading ||
+            !cmpState.isLoaded ||
+            !cmpState.isDataComplete)) {
+      return;
+    }
+
+    if (mjenisClient != "10" && mjenisClient != "20") return;
+
+    _pendingAutoConfirm = false;
+    regUserBloc.add(ClearRequestFromEvent());
+    _continueToRegPar();
+  }
+
   void draftForm1ToBloc(BuildContext context) {
     final record = Calpar1CrudModel(
       calpar1Id: calpar1Id ?? "",
-      coverBulan: int.tryParse(fieldCoverBulanController.text.replaceAll(",", "")) ?? 12,
+      coverBulan:
+          int.tryParse(fieldCoverBulanController.text.replaceAll(",", "")) ??
+              12,
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       rkonstruksiojkId: fieldComboRKonstruksiojk?.rkonstruksiojkId,
       rokupasiId: fieldComboROkupasi?.rokupasiId,
@@ -1064,15 +1114,23 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     final record = Calpar2FormModel(
       calpar2Id: calpar2Id ?? "",
       calpar1Id: calpar1Id ?? "",
-      biIndexRate: double.tryParse(fieldBiIndexRateController.text.replaceAll(',', '')) ?? 0,
-      biTotal: double.tryParse(fieldBiTotalController.text.replaceAll(',', '')) ?? 0,
+      biIndexRate: double.tryParse(
+              fieldBiIndexRateController.text.replaceAll(',', '')) ??
+          0,
+      biTotal:
+          double.tryParse(fieldBiTotalController.text.replaceAll(',', '')) ?? 0,
       siBi: double.tryParse(fieldSiBiController.text.replaceAll(',', '')) ?? 0,
-      stockAdjustable: double.tryParse(fieldStockAdjustableController.text.replaceAll(',', '')) ?? 0,
+      stockAdjustable: double.tryParse(
+              fieldStockAdjustableController.text.replaceAll(',', '')) ??
+          0,
       mbiindemnityojkId: fieldComboMBiindemnityOjk?.mbiindemnityojkId,
       rmatauangKode: fieldComboRMatauang?.rmatauangKode,
-      siBuilding: double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
-      siContent: double.parse(fieldSiContentController.text.replaceAll(',', '')),
-      siMachinery: double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
+      siBuilding:
+          double.parse(fieldSiBuildingController.text.replaceAll(',', '')),
+      siContent:
+          double.parse(fieldSiContentController.text.replaceAll(',', '')),
+      siMachinery:
+          double.parse(fieldSiMachineryController.text.replaceAll(',', '')),
       siOther: double.parse(fieldSiOtherController.text.replaceAll(',', '')),
       siStock: double.parse(fieldSiStockController.text.replaceAll(',', '')),
     );
@@ -1089,9 +1147,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       isFlexas: toBoolean(fieldIsFlexasController.text),
       isOther: toBoolean(fieldIsOtherController.text),
       isRsmdcc: toBoolean(fieldIsRsmdccController.text),
-      kab2zonagempaId: _showZonaGempa
-          ? fieldComboMKabZonaGempa?.mkabzonagempaId
-          : '',
+      kab2zonagempaId:
+          _showZonaGempa ? fieldComboMKabZonaGempa?.mkabzonagempaId : '',
       mjnscoverparId: fieldComboMJnscoverPar?.mjnscoverparId,
       mwilayahId: fieldComboMWilayah?.mwilayahId,
     );
@@ -1102,19 +1159,19 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   bool _isHitungPremiLoading = false;
 
   Widget buildButtonHitungPremi() => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 4),
-    child: AppButton.primary(
-      text: "Hitung Premi",
-      isLoading: _isHitungPremiLoading,
-      backgroundColor:
-      _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
-      onPressed: _isHitungPremiLoading
-          ? null
-          : () async {
-        await onHitungPremi();
-      },
-    ),
-  );
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: AppButton.primary(
+          text: "Hitung Premi",
+          isLoading: _isHitungPremiLoading,
+          backgroundColor:
+              _isHitungPremiLoading ? secondaryBlackColor : primaryColor,
+          onPressed: _isHitungPremiLoading
+              ? null
+              : () async {
+                  await onHitungPremi();
+                },
+        ),
+      );
 
   Future<void> onHitungPremi() async {
     final okForm1 = validateForm1();
@@ -1193,6 +1250,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
     return ok;
   }
+
   bool hasLeadingZero(String raw) {
     return raw.length > 1 && raw.startsWith('0');
   }
@@ -1237,11 +1295,19 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       ok = false;
     }
 
-    ok = optionalPositiveNumAutoZero(fieldSiMachineryController, 'form2.siMachinery') && ok;
-    ok = optionalPositiveNumAutoZero(fieldSiBuildingController, 'form2.siBuilding') && ok;
-    ok = optionalPositiveNumAutoZero(fieldSiContentController, 'form2.siContent') && ok;
-    ok = optionalPositiveNumAutoZero(fieldSiStockController, 'form2.siStock') && ok;
-    ok = optionalPositiveNumAutoZero(fieldSiOtherController, 'form2.siOther') && ok;
+    ok = optionalPositiveNumAutoZero(
+            fieldSiMachineryController, 'form2.siMachinery') &&
+        ok;
+    ok = optionalPositiveNumAutoZero(
+            fieldSiBuildingController, 'form2.siBuilding') &&
+        ok;
+    ok = optionalPositiveNumAutoZero(
+            fieldSiContentController, 'form2.siContent') &&
+        ok;
+    ok = optionalPositiveNumAutoZero(fieldSiStockController, 'form2.siStock') &&
+        ok;
+    ok = optionalPositiveNumAutoZero(fieldSiOtherController, 'form2.siOther') &&
+        ok;
 
     if (ok) {
       final vMachinery = parseOrZeroAutoFill(fieldSiMachineryController);
@@ -1250,15 +1316,15 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       final vStock = parseOrZeroAutoFill(fieldSiStockController);
       final vOther = parseOrZeroAutoFill(fieldSiOtherController);
 
-      final anyGreaterThanZero =
-          vMachinery > 0 ||
-              vBuilding > 0 ||
-              vContent > 0 ||
-              vStock > 0 ||
-              vOther > 0;
+      final anyGreaterThanZero = vMachinery > 0 ||
+          vBuilding > 0 ||
+          vContent > 0 ||
+          vStock > 0 ||
+          vOther > 0;
 
       if (!anyGreaterThanZero) {
-        setErr('form2.siMachinery', 'Minimal salah satu nilai harus lebih dari 0');
+        setErr(
+            'form2.siMachinery', 'Minimal salah satu nilai harus lebih dari 0');
         ok = false;
       }
     }
@@ -1297,34 +1363,32 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     return ok;
   }
 
-
-
   //form1
   Widget buildFieldCoverBulan() => appTextField(
-    label: "Lama Cover",
-    controller: fieldCoverBulanController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    suffixIcon: Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: Center(
-        widthFactor: 1.0,
-        child: Text(
-          "Bulan",
-          style: TextStyle(
-            color: primaryLightColor,
-            fontSize: getResponsiveFont(context, 14),
+        label: "Lama Cover",
+        controller: fieldCoverBulanController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Center(
+            widthFactor: 1.0,
+            child: Text(
+              "Bulan",
+              style: TextStyle(
+                color: primaryLightColor,
+                fontSize: getResponsiveFont(context, 14),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-    errorText: err('form1.coverBulan'),
-    validator: (_) => err('form1.coverBulan'),
-    enabled: false,
-  );
+        errorText: err('form1.coverBulan'),
+        validator: (_) => err('form1.coverBulan'),
+        enabled: false,
+      );
 
   Widget buildFieldRkonstruksiojkId() =>
       ReusableComboBoxV2<ComboRKonstruksiojkModel>(
@@ -1336,8 +1400,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         params: {
           "rokupasiId": fieldComboROkupasi?.rokupasiId,
         },
-        loader: (q) {          
-          return ComboRKonstruksiojkRepository().getComboRKonstruksiojk(q.get<String>("rokupasiId")??"");
+        loader: (q) {
+          return ComboRKonstruksiojkRepository()
+              .getComboRKonstruksiojk(q.get<String>("rokupasiId") ?? "");
         },
         displayText: (i) => i.kelasNama,
         compareItems: (a, b) => a.rkonstruksiojkId == b.rkonstruksiojkId,
@@ -1418,12 +1483,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             });
           }
         },
-
         onSaveCallback: (value) => fieldComboRKonstruksiojk = value,
       );
 
-  Widget buildFieldRokupasiId() =>
-      ReusableComboBoxV2<ComboROkupasiModel>(
+  Widget buildFieldRokupasiId() => ReusableComboBoxV2<ComboROkupasiModel>(
         hintText: "Okupasi",
         initItem: fieldComboROkupasi,
         loader: (q) => ComboROkupasiRepository().getComboROkupasi(q.searchText),
@@ -1447,8 +1510,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
 
   //form2
 
-  Widget buildFieldRmatauangKode() =>
-      ReusableComboBoxV2<ComboRMatauangModel>(
+  Widget buildFieldRmatauangKode() => ReusableComboBoxV2<ComboRMatauangModel>(
         hintText: "Mata Uang",
         initItem: fieldComboRMatauang,
         loader: (q) => ComboRMatauangRepository().getComboRMatauang(),
@@ -1469,148 +1531,146 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       );
 
   Widget buildFieldSiBuilding() => appTextField(
-    label: "Bangunan",
-    controller: fieldSiBuildingController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form2.siBuilding'),
-    validator: (_) => err('form2.siBuilding'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) clearErr('form2.siBuilding');
-    },
-  );
+        label: "Bangunan",
+        controller: fieldSiBuildingController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form2.siBuilding'),
+        validator: (_) => err('form2.siBuilding'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka > 0) clearErr('form2.siBuilding');
+        },
+      );
 
   Widget buildFieldSiContent() => appTextField(
-    label: "Inventaris",
-    controller: fieldSiContentController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form2.siContent'),
-    validator: (_) => err('form2.siContent'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) clearErr('form2.siContent');
-    },
-  );
+        label: "Inventaris",
+        controller: fieldSiContentController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form2.siContent'),
+        validator: (_) => err('form2.siContent'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka > 0) clearErr('form2.siContent');
+        },
+      );
 
   Widget buildFieldSiMachinery() => appTextField(
-    label: "Mesin",
-    controller: fieldSiMachineryController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form2.siMachinery'),
-    validator: (_) => err('form2.siMachinery'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) clearErr('form2.siMachinery');
-    },
-  );
-
+        label: "Mesin",
+        controller: fieldSiMachineryController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form2.siMachinery'),
+        validator: (_) => err('form2.siMachinery'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka > 0) clearErr('form2.siMachinery');
+        },
+      );
 
   Widget buildFieldSiOther() => appTextField(
-    label: "Lainnya",
-    controller: fieldSiOtherController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form2.siOther'),
-    validator: (_) => err('form2.siOther'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) clearErr('form2.siOther');
-    },
-  );
+        label: "Lainnya",
+        controller: fieldSiOtherController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form2.siOther'),
+        validator: (_) => err('form2.siOther'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka > 0) clearErr('form2.siOther');
+        },
+      );
 
   Widget buildFieldSiStock() => appTextField(
-    label: "Stok",
-    controller: fieldSiStockController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      CurrencyTextInputFormatter.currency(
-        locale: 'en',
-        decimalDigits: 0,
-        symbol: '',
-      ),
-    ],
-    errorText: err('form2.siStock'),
-    validator: (_) => err('form2.siStock'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka > 0) clearErr('form2.siStock');
-    },
-  );
+        label: "Stok",
+        controller: fieldSiStockController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          CurrencyTextInputFormatter.currency(
+            locale: 'en',
+            decimalDigits: 0,
+            symbol: '',
+          ),
+        ],
+        errorText: err('form2.siStock'),
+        validator: (_) => err('form2.siStock'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka > 0) clearErr('form2.siStock');
+        },
+      );
   //form2
 
   //form3
-  Widget buildFieldIsEq()=> CheckboxWidget(
-    rightLabel: "Gempa Bumi",
-    initialValue: toBoolean(fieldIsEqController.text),
-    callback: (v) => fieldIsEqController.text = v.toString(),
-    leftLabel: "",
-    enabled: !_lockCheckboxes,
-  );
+  Widget buildFieldIsEq() => CheckboxWidget(
+        rightLabel: "Gempa Bumi",
+        initialValue: toBoolean(fieldIsEqController.text),
+        callback: (v) => fieldIsEqController.text = v.toString(),
+        leftLabel: "",
+        enabled: !_lockCheckboxes,
+      );
 
-  Widget buildFieldIsTsfwd()=> CheckboxWidget(
-    rightLabel: "Banjir",
-    initialValue: toBoolean(fieldIsTsfwdController.text),
-    callback: (v) => fieldIsTsfwdController.text = v.toString(),
-    leftLabel: "",
-    enabled: !_lockCheckboxes,
-  );
+  Widget buildFieldIsTsfwd() => CheckboxWidget(
+        rightLabel: "Banjir",
+        initialValue: toBoolean(fieldIsTsfwdController.text),
+        callback: (v) => fieldIsTsfwdController.text = v.toString(),
+        leftLabel: "",
+        enabled: !_lockCheckboxes,
+      );
 
-  Widget buildFieldIsFlexas()=> CheckboxWidget(
-    rightLabel: "Kebakaran/Petir",
-    initialValue: toBoolean(fieldIsFlexasController.text),
-    callback: (v) => fieldIsFlexasController.text = v.toString(),
-    leftLabel: "",
-    enabled: !_lockCheckboxes,
-  );
+  Widget buildFieldIsFlexas() => CheckboxWidget(
+        rightLabel: "Kebakaran/Petir",
+        initialValue: toBoolean(fieldIsFlexasController.text),
+        callback: (v) => fieldIsFlexasController.text = v.toString(),
+        leftLabel: "",
+        enabled: !_lockCheckboxes,
+      );
 
-  Widget buildFieldIsOther()=> CheckboxWidget(
-    rightLabel: "Lain-Lain",
-    initialValue: toBoolean(fieldIsOtherController.text),
-    callback: (v) => fieldIsOtherController.text = v.toString(),
-    leftLabel: "",
-    enabled: !_lockCheckboxes,
-  );
+  Widget buildFieldIsOther() => CheckboxWidget(
+        rightLabel: "Lain-Lain",
+        initialValue: toBoolean(fieldIsOtherController.text),
+        callback: (v) => fieldIsOtherController.text = v.toString(),
+        leftLabel: "",
+        enabled: !_lockCheckboxes,
+      );
 
-  Widget buildFieldIsRsmdcc()=> CheckboxWidget(
-    rightLabel: "Huru Hara/Kerusuhan",
-    initialValue: toBoolean(fieldIsRsmdccController.text),
-    callback: (v) => fieldIsRsmdccController.text = v.toString(),
-    leftLabel: "",
-    enabled: !_lockCheckboxes,
-
-  );
+  Widget buildFieldIsRsmdcc() => CheckboxWidget(
+        rightLabel: "Huru Hara/Kerusuhan",
+        initialValue: toBoolean(fieldIsRsmdccController.text),
+        callback: (v) => fieldIsRsmdccController.text = v.toString(),
+        leftLabel: "",
+        enabled: !_lockCheckboxes,
+      );
 
   Widget buildFieldMjnscoverparId() =>
       ReusableComboBoxV2<ComboMJnscoverParModel>(
@@ -1621,10 +1681,8 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         clientSideSearch: true,
         displayText: (i) => i.jenisNama,
         compareItems: (a, b) => a.mjnscoverparId == b.mjnscoverparId,
-
         validatorCallback: (v) => v == null ? kStringNullError : null,
         errorText: err('form3.mjnscoverparId'),
-
         onChangedCallback: (v) {
           setState(() {
             fieldComboMJnscoverPar = v;
@@ -1636,12 +1694,10 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
             _applyCoverParRule(v?.mjnscoverparId);
           });
         },
-
         onSaveCallback: (value) => fieldComboMJnscoverPar = value,
       );
 
-  Widget buildFieldMwilayahId() =>
-      ReusableComboBoxV2<ComboMWilayahModel>(
+  Widget buildFieldMwilayahId() => ReusableComboBoxV2<ComboMWilayahModel>(
         hintText: "Wilayah",
         initItem: fieldComboMWilayah,
         maxHeight: 150,
@@ -1669,195 +1725,195 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         onSaveCallback: (value) => fieldComboMWilayah = value,
       );
 
-  Widget buildFieldKab2zonagempaId() => ReusableComboBoxV2<ComboMKabZonaGempaModel>(
-    hintText: "Zona Gempa Bumi",
-    initItem: fieldComboMKabZonaGempa,
-    comboKey: comboMKabZonaGempaKey,
-    params: {
-      "mwilayahId": fieldComboMWilayah?.mwilayahId ?? "",
-    },
-    loader: (query) {
-      return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(query.params["mwilayahId"] ?? "", query.searchText);
-    },
-    displayText: (i) => i.kabupaten,
-    compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
-    validatorCallback: (v) {
-      if (!_showZonaGempa) return null;
-      return v == null ? kStringNullError : null;
-    },
-    errorText: err('form3.kab2zonagempaId'),
-    onChangedCallback: (v) {
-      fieldComboMKabZonaGempa = v;
-      if (v != null) clearErr('form3.kab2zonagempaId');
-    },
-    onSaveCallback: (value) => fieldComboMKabZonaGempa = value, 
-  );
+  Widget buildFieldKab2zonagempaId() =>
+      ReusableComboBoxV2<ComboMKabZonaGempaModel>(
+        hintText: "Zona Gempa Bumi",
+        initItem: fieldComboMKabZonaGempa,
+        comboKey: comboMKabZonaGempaKey,
+        params: {
+          "mwilayahId": fieldComboMWilayah?.mwilayahId ?? "",
+        },
+        loader: (query) {
+          return ComboMKabZonaGempaRepository().getComboMKabZonaGempa(
+              query.params["mwilayahId"] ?? "", query.searchText);
+        },
+        displayText: (i) => i.kabupaten,
+        compareItems: (a, b) => a.mkabzonagempaId == b.mkabzonagempaId,
+        validatorCallback: (v) {
+          if (!_showZonaGempa) return null;
+          return v == null ? kStringNullError : null;
+        },
+        errorText: err('form3.kab2zonagempaId'),
+        onChangedCallback: (v) {
+          fieldComboMKabZonaGempa = v;
+          if (v != null) clearErr('form3.kab2zonagempaId');
+        },
+        onSaveCallback: (value) => fieldComboMKabZonaGempa = value,
+      );
 
   //form3
 
-
   //form4
   Widget buildFieldDiscNilai() => appTextField(
-    label: "Disc Nilai",
-    controller: fieldDiscNilaiController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.discNilai'),
-    validator: (_) => err('form4.discNilai'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.discNilai');
-    },
-  );
+        label: "Disc Nilai",
+        controller: fieldDiscNilaiController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.discNilai'),
+        validator: (_) => err('form4.discNilai'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.discNilai');
+        },
+      );
 
   Widget buildFieldDiscPersen() => appTextField(
-    label: "Disc Persen",
-    controller: fieldDiscPersenController,
-    keyboardType: TextInputType.numberWithOptions(decimal: true),
-    suffix: Text("%", style: bodyTextStyle(context)),
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-      TextInputFormatter.withFunction((oldValue, newValue) {
-        if (newValue.text.isEmpty) return newValue;
-        final x = double.tryParse(newValue.text);
-        if (x == null) return newValue;
-        if (x > 100) return oldValue;
-        return newValue;
-      }),
-    ],
-    errorText: err('form4.discPersen'),
-    validator: (_) => err('form4.discPersen'),
-    onChanged: (v) {
-      final x = double.tryParse(v.trim());
-      if (x != null && x >= 0 && x <= 100) clearErr('form4.discPersen');
-    },
-  );
+        label: "Disc Persen",
+        controller: fieldDiscPersenController,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
+        suffix: Text("%", style: bodyTextStyle(context)),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+          TextInputFormatter.withFunction((oldValue, newValue) {
+            if (newValue.text.isEmpty) return newValue;
+            final x = double.tryParse(newValue.text);
+            if (x == null) return newValue;
+            if (x > 100) return oldValue;
+            return newValue;
+          }),
+        ],
+        errorText: err('form4.discPersen'),
+        validator: (_) => err('form4.discPersen'),
+        onChanged: (v) {
+          final x = double.tryParse(v.trim());
+          if (x != null && x >= 0 && x <= 100) clearErr('form4.discPersen');
+        },
+      );
 
   Widget buildFieldPremiBi() => appTextField(
-    label: "Premi BI",
-    controller: fieldPremiBiController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiBi'),
-    validator: (_) => err('form4.premiBi'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiBi');
-    },
-  );
+        label: "Premi BI",
+        controller: fieldPremiBiController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiBi'),
+        validator: (_) => err('form4.premiBi'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiBi');
+        },
+      );
 
   Widget buildFieldPremiEqvet() => appTextField(
-    label: "Premi EQVET",
-    controller: fieldPremiEqvetController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiEqvet'),
-    validator: (_) => err('form4.premiEqvet'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiEqvet');
-    },
-  );
+        label: "Premi EQVET",
+        controller: fieldPremiEqvetController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiEqvet'),
+        validator: (_) => err('form4.premiEqvet'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiEqvet');
+        },
+      );
 
   Widget buildFieldPremiNet() => appTextField(
-    label: "Premi Net",
-    controller: fieldPremiNetController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiNet'),
-    validator: (_) => err('form4.premiNet'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiNet');
-    },
-  );
+        label: "Premi Net",
+        controller: fieldPremiNetController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiNet'),
+        validator: (_) => err('form4.premiNet'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiNet');
+        },
+      );
 
   Widget buildFieldPremiOther() => appTextField(
-    label: "Premi Other",
-    controller: fieldPremiOtherController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiOther'),
-    validator: (_) => err('form4.premiOther'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiOther');
-    },
-  );
+        label: "Premi Other",
+        controller: fieldPremiOtherController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiOther'),
+        validator: (_) => err('form4.premiOther'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiOther');
+        },
+      );
 
   Widget buildFieldPremiPar() => appTextField(
-    label: "Premi PAR",
-    controller: fieldPremiParController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiPar'),
-    validator: (_) => err('form4.premiPar'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiPar');
-    },
-  );
+        label: "Premi PAR",
+        controller: fieldPremiParController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiPar'),
+        validator: (_) => err('form4.premiPar'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiPar');
+        },
+      );
 
   Widget buildFieldPremiRsmdcc() => appTextField(
-    label: "Premi RSMDCC",
-    controller: fieldPremiRsmdccController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiRsmdcc'),
-    validator: (_) => err('form4.premiRsmdcc'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiRsmdcc');
-    },
-  );
+        label: "Premi RSMDCC",
+        controller: fieldPremiRsmdccController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiRsmdcc'),
+        validator: (_) => err('form4.premiRsmdcc'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiRsmdcc');
+        },
+      );
 
   Widget buildFieldPremiTsfwd() => appTextField(
-    label: "Premi TSFWD",
-    controller: fieldPremiTsfwdController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ThousandsSeparatorInputFormatter(),
-    ],
-    errorText: err('form4.premiTsfwd'),
-    validator: (_) => err('form4.premiTsfwd'),
-    onChanged: (v) {
-      final clean = v.replaceAll(",", "").trim();
-      final angka = double.tryParse(clean);
-      if (angka != null && angka >= 0) clearErr('form4.premiTsfwd');
-    },
-  );
+        label: "Premi TSFWD",
+        controller: fieldPremiTsfwdController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ThousandsSeparatorInputFormatter(),
+        ],
+        errorText: err('form4.premiTsfwd'),
+        validator: (_) => err('form4.premiTsfwd'),
+        onChanged: (v) {
+          final clean = v.replaceAll(",", "").trim();
+          final angka = double.tryParse(clean);
+          if (angka != null && angka >= 0) clearErr('form4.premiTsfwd');
+        },
+      );
 
   //form4
-
 
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
@@ -1865,10 +1921,12 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   void setErr(String key, String? msg) {
     setState(() => fieldErrors[key] = msg);
   }
+
   void clearErr(String key) {
     if (!fieldErrors.containsKey(key)) return;
     setState(() => fieldErrors.remove(key));
   }
+
   void clearErrsByPrefix(String prefix) {
     setState(() {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
@@ -1883,10 +1941,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     final section = CalparFormSection.values[opened];
 
     switch (section) {
-      case CalparFormSection.form1: return validateForm1();
-      case CalparFormSection.form2: return validateForm2();
-      case CalparFormSection.form3: return validateForm3();
-      case CalparFormSection.form4: return true; // hasil saja
+      case CalparFormSection.form1:
+        return validateForm1();
+      case CalparFormSection.form2:
+        return validateForm2();
+      case CalparFormSection.form3:
+        return validateForm3();
+      case CalparFormSection.form4:
+        return true; // hasil saja
     }
   }
 
@@ -1925,9 +1987,9 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   }
 
   bool isForm1Complete() =>
-    fieldCoverBulanController.text.trim().isNotEmpty &&
-    fieldComboRKonstruksiojk != null &&
-    fieldComboROkupasi != null;
+      fieldCoverBulanController.text.trim().isNotEmpty &&
+      fieldComboRKonstruksiojk != null &&
+      fieldComboROkupasi != null;
 
   bool isForm2Complete() {
     if (fieldComboRMatauang == null) return false;
@@ -1936,12 +1998,16 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         double.tryParse(c.text.replaceAll(',', '').trim()) ?? 0;
 
     final vMachinery = n(fieldSiMachineryController);
-    final vBuilding  = n(fieldSiBuildingController);
-    final vContent   = n(fieldSiContentController);
-    final vStock     = n(fieldSiStockController);
-    final vOther     = n(fieldSiOtherController);
+    final vBuilding = n(fieldSiBuildingController);
+    final vContent = n(fieldSiContentController);
+    final vStock = n(fieldSiStockController);
+    final vOther = n(fieldSiOtherController);
 
-    return (vMachinery > 0 || vBuilding > 0 || vContent > 0 || vStock > 0 || vOther > 0);
+    return (vMachinery > 0 ||
+        vBuilding > 0 ||
+        vContent > 0 ||
+        vStock > 0 ||
+        vOther > 0);
   }
 
   bool isForm3Complete() =>
@@ -1950,5 +2016,4 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
       fieldComboMKabZonaGempa != null;
 
   bool isForm4Complete() => (calpar4Id?.isNotEmpty == true);
-
 }

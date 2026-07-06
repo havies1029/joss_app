@@ -9,11 +9,7 @@ import 'package:joss_app/pages/regklaim/mobile/registrasi_klaim/registrasi_form/
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
-import '../../../../../blocs/gen_regmv/polis_tanggal_bloc.dart';
-import '../../../../../blocs/gen_regmv/polis_tanggal_event.dart';
-import '../../../../../blocs/gen_regmv/polis_tanggal_state.dart';
 import '../../../../../blocs/regklaim/attach_bloc.dart';
-import '../../../../../blocs/regklaim/polissourcecari_bloc.dart';
 import '../../../../../blocs/regklaim/regklaim1crud_bloc.dart';
 import '../../../../../common/app_data.dart';
 import '../../../../../common/constants.dart';
@@ -23,7 +19,6 @@ import '../../../../../models/combobox/combominsurance_model.dart';
 import '../../../../../models/combobox/combomjenisrugimv_model.dart';
 import '../../../../../models/regklaim/attachment_item.dart';
 import '../../../../../models/regklaim/regklaim1crud_model.dart';
-import '../../../../../models/user/user_model.dart';
 import '../../../../../repositories/combobox/combominsurance_repository.dart';
 import '../../../../../repositories/combobox/combomjenisrugimv_repository.dart';
 import '../../../../../repositories/regklaim/picker_repository.dart';
@@ -60,9 +55,12 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
   final fieldInsuredNamaController = TextEditingController();
   ComboMInsuranceModel? fieldComboMInsurance;
-  final comboMInsuranceKey = GlobalKey<DropdownSearchState<ComboMInsuranceModel>>();
-  final fieldPolisAkhirController = TextEditingController(text: DateTime.now().toIso8601String());
-  final fieldPolisMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
+  final comboMInsuranceKey =
+      GlobalKey<DropdownSearchState<ComboMInsuranceModel>>();
+  final fieldPolisAkhirController =
+      TextEditingController(text: DateTime.now().toIso8601String());
+  final fieldPolisMulaiController =
+      TextEditingController(text: DateTime.now().toIso8601String());
   final fieldPolisNoController = TextEditingController();
   final fieldLokasiObjectController = TextEditingController();
   ComboMJenisrugimvModel? fieldComboMJenisrugimv;
@@ -70,17 +68,17 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   late Future<List<ComboMJenisrugimvModel>> _futureJenisKerugian;
 
   final comboMJenisrugimvKey =
-  GlobalKey<DropdownSearchState<ComboMJenisrugimvModel>>();
+      GlobalKey<DropdownSearchState<ComboMJenisrugimvModel>>();
 
   DateTime? fieldPolisMulai;
   DateTime? fieldPolisBerakhir;
 
   bool _toKlaimTriggered = false;
+  bool _pendingAutoConfirm = false;
 
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   bool _insuranceInitialized = false;
-
 
   Color get _submitButtonColor {
     if (widget.cobKlaimId == '10002') return pBlue;
@@ -123,8 +121,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       uploadRepo: UploadRepositoryImpl(_dio),
     );
 
-    _futureJenisKerugian =
-        ComboMJenisrugimvRepository().getComboMJenisrugimv();
+    _futureJenisKerugian = ComboMJenisrugimvRepository().getComboMJenisrugimv();
 
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   final now = DateTime.now();
@@ -141,7 +138,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mjenisClient == "10") {
         mRekanGeneralIdvCrudBloc.add(MRekanGeneralIdvCrudLihatEvent());
-      }else if (mjenisClient == "20"){
+      } else if (mjenisClient == "20") {
         mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
       }
     });
@@ -180,7 +177,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
               for (final item in attachBloc.state.items) {
                 if (item.status == UploadStatus.queued) {
-                  attachBloc.add(UploadOne(localId: item.localId, regklaim1Id: id));
+                  attachBloc
+                      .add(UploadOne(localId: item.localId, regklaim1Id: id));
                 }
               }
 
@@ -191,19 +189,30 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   builder: (_) => PaymentSuccess(
                     displayButton: "Kembali",
                     description:
-                    "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
+                        "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
                     display: "Klaim Kamu Berhasil Didaftarkan!",
                     onButtonPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const KlaimMainPage()),
-                            (route) => route.isFirst,
+                        MaterialPageRoute(
+                            builder: (_) => const KlaimMainPage()),
+                        (route) => route.isFirst,
                       );
                     },
                   ),
                 ),
               );
             },
+          ),
+          BlocListener<MRekanGeneralIdvCrudBloc, MRekanGeneralIdvCrudState>(
+            listenWhen: (previous, current) =>
+                previous.isLoaded != current.isLoaded && current.isLoaded,
+            listener: (context, state) => _tryAutoConfirm(),
+          ),
+          BlocListener<MRekanGeneralCmpCrudBloc, MRekanGeneralCmpCrudState>(
+            listenWhen: (previous, current) =>
+                previous.isLoaded != current.isLoaded && current.isLoaded,
+            listener: (context, state) => _tryAutoConfirm(),
           ),
         ],
         child: Padding(
@@ -262,25 +271,26 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                 child: AppButton.primary(
                   text: "Masukan Data Polis",
                   isLoading: _isCariPolisLoading,
-                  backgroundColor:
-                  _isCariPolisLoading ? secondaryBlackColor : _submitButtonColor,
+                  backgroundColor: _isCariPolisLoading
+                      ? secondaryBlackColor
+                      : _submitButtonColor,
                   onPressed: _isCariPolisLoading
                       ? null
                       : () async {
-                    setState(() {
-                      _isCariPolisLoading = true;
-                    });
+                          setState(() {
+                            _isCariPolisLoading = true;
+                          });
 
-                    onPressCariPolis();
+                          onPressCariPolis();
 
-                    await Future.delayed(const Duration(seconds: 2));
+                          await Future.delayed(const Duration(seconds: 2));
 
-                    if (mounted) {
-                      setState(() {
-                        _isCariPolisLoading = false;
-                      });
-                    }
-                  },
+                          if (mounted) {
+                            setState(() {
+                              _isCariPolisLoading = false;
+                            });
+                          }
+                        },
                 ),
               ),
             ],
@@ -291,19 +301,40 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   void onPressCariPolis() {
-    final polis = context.read<PolisTanggalBloc>().state;
-
-    final attachState = _attachBloc.state;
-
     final ok = validateForm1();
     if (!ok) return;
 
-    if (attachState.items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('Lampiran wajib diisi minimal 1 file/foto'));
+    if (!_hasRequiredAttachment()) return;
+
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) return;
+
+    final user = authState.user;
+    if (user.userType != "C") {
+      _showRegisterClientDialog();
       return;
     }
 
-    final record = Regklaim1CrudModel(
+    if (!_canSubmitWithCompleteGeneralData()) return;
+
+    _submitRegklaim(_buildRegklaimRecord());
+  }
+
+  bool _hasRequiredAttachment() {
+    final attachState = _attachBloc.state;
+
+    if (attachState.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar('Lampiran wajib diisi minimal 1 file/foto'),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  Regklaim1CrudModel _buildRegklaimRecord() {
+    return Regklaim1CrudModel(
       insuredNama: fieldInsuredNamaController.text.trim(),
       lokasiObject: fieldLokasiObjectController.text.trim(),
       minsuranceId: fieldComboMInsurance?.minsuranceId ?? '',
@@ -316,93 +347,168 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       regklaim1Id: regklaim1Id,
       keterangan: fieldLokasiObjectController.text.trim(),
     );
+  }
 
+  bool _canSubmitWithCompleteGeneralData() {
     final mjenisClient =
         context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
 
-    if (context.read<AuthenticationBloc>().state is AuthenticationAuthenticated) {
-      User user = (context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user;
-      if (user.userType == "C"){
-        if (mjenisClient == "10") {
-          final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
+    if (mjenisClient == "10") {
+      final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
 
-          if (!idvState.isDataComplete) {
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.6),
-              builder: (context) => RegisterClientPopUp(
-                header: 'Isi Data Pribadi Anda',
-                description:
-                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
-                buttonText: 'Lengkapi Data Pribadi',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MRekanGeneralIdvPopUpPage(),
-                    ),
-                  );
-                },
-              ),
-            );
-            return;
-          }
-        }
-        else if (mjenisClient == "20") {
-          final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
-
-          if (!cmpState.isDataComplete) {
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.6),
-              builder: (context) => RegisterClientPopUp(
-                header: 'Isi Data Pribadi Anda',
-                description:
-                'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
-                buttonText: 'Lengkapi Data Pribadi',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MRekanGeneralCmpPopUpPage(),
-                    ),
-                  );
-                },
-              ),
-            );
-            return;
-          }
-        }
-        if (regklaim1Id.isNotEmpty) {
-          regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
-        } else {
-          regklaim1formBloc.add(Regklaim1CrudTambahEvent(record: record));
-        }
-      }
-      else {
-        showDialog(
-          context: context,
-          barrierDismissible: true, // klik luar = close
-          barrierColor: Colors.black.withOpacity(0.6), // background gelap transparan
-          builder: (context) => RegisterClientPopUp(
-            header: 'Data Klien Belum Terdaftar!',
-            description:
-            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
-            buttonText: 'Daftar Klien',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => RegisterClient(requestFrom: 'regisnonpolis_page')
-                ),
-              );
-            },
-          ),
+      if (idvState.isLoading || !idvState.isLoaded) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('Data pribadi masih dimuat. Silakan coba lagi.'),
         );
+        return false;
+      }
+
+      if (!idvState.isDataComplete) {
+        _showCompleteIndividualDataDialog();
+        return false;
+      }
+    } else if (mjenisClient == "20") {
+      final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
+
+      if (cmpState.isLoading || !cmpState.isLoaded) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('Data perusahaan masih dimuat. Silakan coba lagi.'),
+        );
+        return false;
+      }
+
+      if (!cmpState.isDataComplete) {
+        _showCompleteCompanyDataDialog();
+        return false;
       }
     }
+
+    return true;
+  }
+
+  void _showCompleteIndividualDataDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) => RegisterClientPopUp(
+        header: 'Isi Data Pribadi Anda',
+        description:
+            'Lengkapi data pribadi Anda terlebih dahulu untuk melanjutkan proses ini.',
+        buttonText: 'Lengkapi Data Pribadi',
+        onPressed: () {
+          _pendingAutoConfirm = true;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MRekanGeneralIdvPopUpPage(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showCompleteCompanyDataDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) => RegisterClientPopUp(
+        header: 'Isi Data Perusahaan Anda',
+        description:
+            'Lengkapi data perusahaan Anda terlebih dahulu untuk melanjutkan proses ini.',
+        buttonText: 'Lengkapi Data Perusahaan',
+        onPressed: () {
+          _pendingAutoConfirm = true;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MRekanGeneralCmpPopUpPage(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showRegisterClientDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) => RegisterClientPopUp(
+        header: 'Data Klien Belum Terdaftar!',
+        description:
+            'Untuk melanjutkan ke proses Klaim Baru, Anda perlu mendaftarkan data klien terlebih dahulu.',
+        buttonText: 'Daftar Klien',
+        onPressed: () {
+          _pendingAutoConfirm = true;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RegisterClient(
+                requestFrom: 'regisnonpolis_page',
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _submitRegklaim(Regklaim1CrudModel record) {
+    if (regklaim1Id.isNotEmpty) {
+      regklaim1formBloc.add(Regklaim1CrudUbahEvent(record: record));
+    } else {
+      regklaim1formBloc.add(Regklaim1CrudTambahEvent(record: record));
+    }
+  }
+
+  bool _isFormFilledSilently() {
+    return fieldComboMInsurance != null &&
+        fieldInsuredNamaController.text.trim().isNotEmpty &&
+        fieldLokasiObjectController.text.trim().isNotEmpty &&
+        (widget.cobKlaimId != '10002' || fieldComboMJenisrugimv != null) &&
+        _attachBloc.state.items.isNotEmpty;
+  }
+
+  void _tryAutoConfirm() {
+    if (!_pendingAutoConfirm || !_isFormFilledSilently()) return;
+
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) return;
+    if (authState.user.userType != "C") return;
+
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
+    final idvState = context.read<MRekanGeneralIdvCrudBloc>().state;
+    final cmpState = context.read<MRekanGeneralCmpCrudBloc>().state;
+
+    if (mjenisClient == "10" &&
+        (idvState.isLoading ||
+            !idvState.isLoaded ||
+            !idvState.isDataComplete)) {
+      return;
+    }
+
+    if (mjenisClient == "20" &&
+        (cmpState.isLoading ||
+            !cmpState.isLoaded ||
+            !cmpState.isDataComplete)) {
+      return;
+    }
+
+    if (mjenisClient != "10" && mjenisClient != "20") return;
+
+    _pendingAutoConfirm = false;
+    if (mounted) {
+      setState(() {
+        _isCariPolisLoading = true;
+      });
+    }
+
+    _submitRegklaim(_buildRegklaimRecord());
   }
 
   bool validateForm1() {
@@ -445,19 +551,19 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   List<ComboMInsuranceModel> _filterInsurance(
-      List<ComboMInsuranceModel> data,
-      ) {
-    // 10001 → hanya tampil 14
+    List<ComboMInsuranceModel> data,
+  ) {
+    // 10001 Ã¢â€ â€™ hanya tampil 14
     if (widget.cobKlaimId == '10001') {
       return data.where((e) => e.minsuranceId == '14').toList();
     }
 
-    // 10002 → hanya tampil 02
+    // 10002 Ã¢â€ â€™ hanya tampil 02
     if (widget.cobKlaimId == '10002') {
       return data.where((e) => e.minsuranceId == '02').toList();
     }
 
-    // selain itu → buang 14 & 02
+    // selain itu Ã¢â€ â€™ buang 14 & 02
     return data
         .where((e) => e.minsuranceId != '14' && e.minsuranceId != '02')
         .toList();
@@ -477,62 +583,56 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   ];
 
   Widget buildFieldMinsuranceId() => ReusableComboBoxV2<ComboMInsuranceModel>(
-    key: ValueKey('minsurance_${widget.cobKlaimId}'),
-    hintText: "Kategori Asuransi",
-    comboKey: comboMInsuranceKey,
-    initItem: fieldComboMInsurance,
-    isEnabled: !_isAutoInsurance,
-    useScrollableShowMorePopup: true,
-    initialVisibleCount: _priorityInsuranceIds.length,
-    expandText: (count) => "Lihat $count Kategori Lainnya",
-    collapseText: "Tampilkan Lebih Sedikit",
-    loader: (q) async {
-      final data = await ComboMInsuranceRepository().getComboMInsurance(
-        q.searchText,
+        key: ValueKey('minsurance_${widget.cobKlaimId}'),
+        hintText: "Kategori Asuransi",
+        comboKey: comboMInsuranceKey,
+        initItem: fieldComboMInsurance,
+        isEnabled: !_isAutoInsurance,
+        useScrollableShowMorePopup: true,
+        initialVisibleCount: _priorityInsuranceIds.length,
+        expandText: (count) => "Lihat $count Kategori Lainnya",
+        collapseText: "Tampilkan Lebih Sedikit",
+        loader: (q) async {
+          final data = await ComboMInsuranceRepository().getComboMInsurance(
+            q.searchText,
+          );
+          return _filterInsurance(data);
+        },
+        clientSideSearch: true,
+        displayText: (item) => item.insuranceName,
+        compareItems: (a, b) => a.minsuranceId == b.minsuranceId,
+        errorText: err('form1.kategoryInsurance'),
+        validatorCallback: (value) {
+          if (value == null) {
+            return kStringNullError;
+          }
+          return null;
+        },
+        onChangedCallback: (v) {
+          setState(() {
+            fieldComboMInsurance = v;
+
+            if (v != null) {
+              clearErr('form1.kategoryInsurance');
+            }
+          });
+        },
+        onSaveCallback: (value) {
+          fieldComboMInsurance = value;
+        },
       );
-      return _filterInsurance(data);
-    },
-
-    clientSideSearch: true,
-
-    displayText: (item) => item.insuranceName,
-    compareItems: (a, b) => a.minsuranceId == b.minsuranceId,
-
-    errorText: err('form1.kategoryInsurance'),
-
-    validatorCallback: (value) {
-      if (value == null) {
-        return kStringNullError;
-      }
-      return null;
-    },
-
-    onChangedCallback: (v) {
-      setState(() {
-        fieldComboMInsurance = v;
-
-        if (v != null) {
-          clearErr('form1.kategoryInsurance');
-        }
-      });
-    },
-
-    onSaveCallback: (value) {
-      fieldComboMInsurance = value;
-    },
-  );
 
   Widget buildFieldPolisNo() => appTextField(
-    label: "No Polis",
-    controller: fieldPolisNoController,
-    keyboardType: TextInputType.text,
-    errorText: err('form1.noPolis'),
-    // validator: (_) => err('form1.noPolis'),
-    validator: (_) => null,
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.noPolis');
-    },
-  );
+        label: "No Polis",
+        controller: fieldPolisNoController,
+        keyboardType: TextInputType.text,
+        errorText: err('form1.noPolis'),
+        // validator: (_) => err('form1.noPolis'),
+        validator: (_) => null,
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.noPolis');
+        },
+      );
 
   Widget buildFieldPolisMulai() {
     final today = DateTime(
@@ -579,18 +679,18 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   Widget buildFieldInsuredNama() => appTextField(
-    label: "Nama Tertanggung",
-    controller: fieldInsuredNamaController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
-    ],
-    errorText: err('form1.namaTertanggung'),
-    validator: (_) => err('form1.namaTertanggung'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
-    },
-  );
+        label: "Nama Tertanggung",
+        controller: fieldInsuredNamaController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z ,.]')),
+        ],
+        errorText: err('form1.namaTertanggung'),
+        validator: (_) => err('form1.namaTertanggung'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.namaTertanggung');
+        },
+      );
 
   Widget buildFieldJenisKerugian() {
     return FutureBuilder<List<ComboMJenisrugimvModel>>(
@@ -625,14 +725,14 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               children: [
                 Text(
                   'Jenis Kerugian',
-                  style: bodyTextStyle(context, fontSize: getResponsiveFont(context, 18)),
+                  style: bodyTextStyle(context,
+                      fontSize: getResponsiveFont(context, 18)),
                 ),
                 const SizedBox(height: hPadding),
                 Row(
                   children: jenisKerugianList.map((item) {
-                    final isSelected =
-                        fieldComboMJenisrugimv?.mjenisrugimvId ==
-                            item.mjenisrugimvId;
+                    final isSelected = fieldComboMJenisrugimv?.mjenisrugimvId ==
+                        item.mjenisrugimvId;
 
                     return Expanded(
                       child: GestureDetector(
@@ -659,15 +759,15 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                               ),
                               child: isSelected
                                   ? Center(
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              )
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 8),
@@ -701,28 +801,26 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   }
 
   Widget buildFieldLokasiResiko() => appTextField(
-    label: widget.cobKlaimId == '10002'
-        ? "No Plat"
-        : "Lokasi Risiko",
-    controller: fieldLokasiObjectController,
-    maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
-    keyboardType: TextInputType.text,
-    inputFormatters: widget.cobKlaimId == '10002'
-        ? [
-      PlatNomorFormatter(),
-    ]
-        : [
-      FilteringTextInputFormatter.allow(
-        RegExp(r"[0-9a-zA-Z ,./\-#()]"),
-      ),
-    ],
-    errorText: err('form1.alamatTertanggung'),
-    // validator: (_) => err('form1.alamatTertanggung'),
-    validator: (_) => null,
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
-    },
-  );
+        label: widget.cobKlaimId == '10002' ? "No Plat" : "Lokasi Risiko",
+        controller: fieldLokasiObjectController,
+        maxLines: widget.cobKlaimId == '10002' ? 1 : 4,
+        keyboardType: TextInputType.text,
+        inputFormatters: widget.cobKlaimId == '10002'
+            ? [
+                PlatNomorFormatter(),
+              ]
+            : [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r"[0-9a-zA-Z ,./\-#()]"),
+                ),
+              ],
+        errorText: err('form1.alamatTertanggung'),
+        // validator: (_) => err('form1.alamatTertanggung'),
+        validator: (_) => null,
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('form1.alamatTertanggung');
+        },
+      );
 
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
