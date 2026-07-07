@@ -17,6 +17,7 @@ import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../models/combobox/combommvgrupojk_model.dart';
 import '../../../models/combobox/combommvjnscover_model.dart';
@@ -275,6 +276,36 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
     fieldPremiSubtotalController.text = cleanNum(record.premiSubtotal);
   }
 
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -292,7 +323,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         Navigator.pop(context);
       },
       child: BaseBackgroundSidePage(
-        title: "Kendaraan",
+        title: "Polis Kendaraan",
         onBack: () async {
           if (regUserBloc.state.requestFrom.isNotEmpty) {
             authenticationBloc.add(
@@ -306,12 +337,16 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
           BlocListener<Calmv1ListBloc, Calmv1ListState>(
             listenWhen: (prev, curr) {
               return prev.processMessage != curr.processMessage &&
-                  (curr.processMessage).isNotEmpty;
+                  curr.processMessage.isNotEmpty;
             },
             listener: (context, state) {
+              _hideGlobalLoading();
+
               final calmv1Id =
                   context.read<Calmv1CrudBloc>().state.record?.calmv1Id ?? "";
+
               context.read<Calmv1ListBloc>().add(ClearProcessMessageEvent());
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -321,6 +356,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                   ),
                 ),
               );
+
               if (calmv1Id.isNotEmpty) {
                 context
                     .read<Calmv1CrudBloc>()
@@ -628,13 +664,14 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
                               ),
                               const SizedBox(height: hPadding),
                               AppButton.primary(
-                                text: state.isProcessing
-                                    ? "Memproses..."
-                                    : "Lanjutkan",
+                                text: state.isProcessing ? "Memproses..." : "Lanjutkan",
                                 isLoading: state.isProcessing,
                                 onPressed: state.isProcessing
                                     ? null
-                                    : onLanjutkanPressed,
+                                    : () {
+                                  _showGlobalLoading();
+                                  onLanjutkanPressed();
+                                },
                               ),
                             ],
                           );
@@ -1166,7 +1203,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
         onSaveCallback: (value) => fieldComboMMvgrupOjk = value,
       );
   Widget _buildComboMMvjnscover() => ReusableComboBoxV2<ComboMMvjnscoverModel>(
-        hintText: "Jenis Cover",
+        hintText: "Jenis Jaminan",
         initItem: fieldComboMMvjnscover,
         loader: (q) => ComboMMvjnscoverRepository().getComboMMvjnscover(),
         clientSideSearch: true,

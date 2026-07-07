@@ -43,6 +43,8 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
 
     _controllerLeft.play();
     _controllerRight.play();
+    context.read<SumdashBloc>().add(SumdashLihatEvent());
+    context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
   }
 
   @override
@@ -71,7 +73,6 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
           backgroundColor: Colors.transparent,
           body: Stack(
             children: [
-              // Confetti kiri–atas
               Align(
                 alignment: const Alignment(-1, -1),
                 child: ConfettiWidget(
@@ -126,8 +127,8 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
                         borderside: BorderSide(color: sGrey),
                         width: 245,
                         onPressed: () {
-                          context.read<SumdashBloc>().add(SumdashLihatEvent());
-                          context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
+                          // context.read<SumdashBloc>().add(SumdashLihatEvent());
+                          // context.read<LogtrscaritopxBloc>().add(RefreshLogtrscaritopxEvent());
                           onPressed.call();
                         },
                       ),

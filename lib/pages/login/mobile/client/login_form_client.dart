@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/login/login_bloc.dart';
-import 'package:joss_app/pages/login/mobile/client/forgot_password_page.dart';
+import 'package:joss_app/pages/login/mobile/forgot/forgot_password_page.dart';
 import 'package:joss_app/pages/login/welcome_header.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../common/constants.dart';
+import '../../../../common/loading_indicator.dart';
 import '../../../../helper/indo_phone_result.dart';
 
 class LoginFormClient extends StatefulWidget {
@@ -31,6 +32,36 @@ class _LoginFormClientState extends State<LoginFormClient>
   bool isSubmitting = false;
   bool _isInitialEmailApplied = false;
   int _submitAttempt = 0;
+
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
 
   void _applyInitialEmailFromState() {
     final emailState = context.read<EmailVerificationBloc>().state.email.trim();
@@ -156,29 +187,36 @@ class _LoginFormClientState extends State<LoginFormClient>
       onPressed: isSubmitting
           ? null
           : () async {
-              if (!_formKey.currentState!.validate()) return;
+        if (!_formKey.currentState!.validate()) return;
 
-              if (mounted) {
-                setState(() {
-                  isSubmitting = true;
-                });
-              }
-              _startSubmitTimeout();
+        if (mounted) {
+          setState(() {
+            isSubmitting = true;
+          });
+        }
 
-              _animationController.forward(from: 0);
-              onLoginButtonPressed();
-            },
+        _showGlobalLoading();
+
+        _startSubmitTimeout();
+
+        _animationController.forward(from: 0);
+        onLoginButtonPressed();
+      },
     );
   }
 
   void _startSubmitTimeout() {
     final attempt = ++_submitAttempt;
+
     Future.delayed(const Duration(seconds: 10), () {
       if (!mounted || attempt != _submitAttempt || !isSubmitting) return;
+
+      _hideGlobalLoading();
 
       setState(() {
         isSubmitting = false;
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(
           "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
@@ -204,6 +242,8 @@ class _LoginFormClientState extends State<LoginFormClient>
         BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginFailure) {
+              _hideGlobalLoading();
+
               if (mounted) {
                 setState(() {
                   isSubmitting = false;
@@ -217,6 +257,8 @@ class _LoginFormClientState extends State<LoginFormClient>
             }
 
             if (state is LoginPostAuthenticate) {
+              _hideGlobalLoading();
+
               if (mounted) {
                 setState(() {
                   isSubmitting = false;

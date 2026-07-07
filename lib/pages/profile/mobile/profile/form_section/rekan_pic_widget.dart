@@ -311,12 +311,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
               valueStyle,
             ),
             _cardRow(
-              'Email:',
-              it.picEmail.isEmpty ? '-' : it.picEmail,
-              labelStyle,
-              valueStyle,
-            ),
-            _cardRow(
               'Nama:',
               it.picNama.isEmpty ? '-' : it.picNama,
               labelStyle,
@@ -325,6 +319,12 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
             _cardRow(
               'Alamat:',
               it.alamat1.isEmpty ? '-' : it.alamat1,
+              labelStyle,
+              valueStyle,
+            ),
+            _cardRow(
+              'Email:',
+              it.picEmail.isEmpty ? '-' : it.picEmail,
               labelStyle,
               valueStyle,
             ),

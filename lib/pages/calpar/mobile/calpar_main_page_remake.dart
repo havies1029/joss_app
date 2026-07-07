@@ -20,6 +20,7 @@ import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../blocs/reguser/reguser_bloc.dart';
 import '../../../common/app_data.dart';
 import '../../../common/constants.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../models/calpar/calpar1crud_model.dart';
 import '../../../models/calpar/calpar2form_model.dart';
@@ -416,6 +417,36 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
     filedPremiTotalController.text = record.premiTotal.toString();
   }
 
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -432,7 +463,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
         Navigator.pop(context);
       },
       child: BaseBackgroundSidePage(
-        title: "Properti",
+        title: "Polis Properti",
         onBack: () async {
           if (regUserBloc.state.requestFrom.isNotEmpty) {
             authenticationBloc.add(
@@ -446,12 +477,16 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
           BlocListener<Calpar1ListBloc, Calpar1ListState>(
             listenWhen: (prev, curr) {
               return prev.processMessage != curr.processMessage &&
-                  (curr.processMessage).isNotEmpty;
+                  curr.processMessage.isNotEmpty;
             },
             listener: (context, state) {
+              _hideGlobalLoading();
+
               final calpar1 =
                   context.read<Calpar1CrudBloc>().state.record?.calpar1Id ?? "";
+
               context.read<Calpar1ListBloc>().add(ClearProcessMessageEvent());
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -786,13 +821,14 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
                               ),
                               const SizedBox(height: hPadding),
                               AppButton.primary(
-                                text: state.isProcessing
-                                    ? "Memproses..."
-                                    : "Lanjutkan",
+                                text: state.isProcessing ? "Memproses..." : "Lanjutkan",
                                 isLoading: state.isProcessing,
                                 onPressed: state.isProcessing
                                     ? null
-                                    : onLanjutkanPressed,
+                                    : () {
+                                  _showGlobalLoading();
+                                  onLanjutkanPressed();
+                                },
                               ),
                             ],
                           );

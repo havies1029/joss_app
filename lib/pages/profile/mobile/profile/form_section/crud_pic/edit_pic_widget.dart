@@ -1,4 +1,3 @@
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,7 +32,6 @@ class EditPicWidget extends StatefulWidget {
 }
 
 class _EditPicWidgetState extends State<EditPicWidget> {
-
   bool _saving = false;
 
   MRekanPicCrudModel? _initialRecord;
@@ -116,7 +114,6 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     return res.phone62 ?? '';
   }
 
-
   Future<void> _openCobPicker() async {
     await Navigator.push(
       context,
@@ -144,17 +141,18 @@ class _EditPicWidgetState extends State<EditPicWidget> {
 
     final selectedCobItems = cobBloc.state.selectedItems;
     if (selectedCobItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'));
+      ScaffoldMessenger.of(context).showSnackBar(
+          infoSnackBar('Silakan pilih minimal 1 COB sebelum menyimpan.'));
       return;
     }
 
     final mjnsclientId = context.read<RegUserBloc>().state.record?.jnsClientId;
 
-    final jabatanDesc = (mjnsclientId == '10')
-        ? ''
-        : _jabatanDesc.text.trim();
+    final jabatanDesc = (mjnsclientId == '10') ? '' : _jabatanDesc.text.trim();
 
     final hpNormalized = _toNormalizedPhone62(_hp.text.trim());
+    final mjabatanId =
+        (_jabatan?.mjabatanId ?? _initialRecord?.mjabatanId ?? '').trim();
 
     final record = MRekanPicCrudModel(
       mrekanpicId: widget.mrekanpicId,
@@ -162,7 +160,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       picEmail: _email.text.trim().toLowerCase(),
       picHp: hpNormalized,
       jabatanDesc: jabatanDesc,
-      mjabatanId: _jabatan?.mjabatanId,
+      mjabatanId: mjabatanId,
       alamat1: _alamat.text.trim(),
       alamat2: '',
       isDefault: _isDefault,
@@ -175,10 +173,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       final listCheckbox = selectedCobItems
           .map(
             (e) => RekanPicCobCariCheckboxModel(
-          mcobId: e.mcobId,
-          isChecked: e.isChecked,
-        ),
-      )
+              mcobId: e.mcobId,
+              isChecked: e.isChecked,
+            ),
+          )
           .toList();
 
       final cobResult = await cobRepo.rekanPicCobUpdateList(
@@ -191,12 +189,14 @@ class _EditPicWidgetState extends State<EditPicWidget> {
       setState(() => _saving = false);
 
       if (cobResult.success) {
-        ScaffoldMessenger.of(context).showSnackBar(successSnackBar('PIC & ${listCheckbox.length} COB berhasil disimpan!'));
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar(
+            'PIC & ${listCheckbox.length} COB berhasil disimpan!'));
         listBloc.add(FetchMRekanPicListEvent());
         hakaksesCrudBloc.add(HakaksesCrudLihatEvent());
         Navigator.pop(context, true);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
+        ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar('PIC tersimpan, tapi gagal update COB.'));
       }
       return;
     }
@@ -215,6 +215,11 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     _isDefault = record.isDefault ?? false;
     _jabatan = record.comboMJabatan;
     setState(() {});
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _comboKey.currentState?.changeSelectedItem(_jabatan);
+    });
   }
 
   @override
@@ -245,14 +250,15 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                   _initialRecord = MRekanPicCrudModel(
                     mrekanpicId: (state.record!.mrekanpicId ?? '').trim(),
                     picNama: (state.record!.picNama ?? '').trim(),
-                    picEmail: (state.record!.picEmail ?? '').trim().toLowerCase(),
-                    picHp: _toNormalizedPhone62((state.record!.picHp ?? '').trim()),
+                    picEmail:
+                        (state.record!.picEmail ?? '').trim().toLowerCase(),
+                    picHp: _toNormalizedPhone62(
+                        (state.record!.picHp ?? '').trim()),
                     jabatanDesc: (state.record!.jabatanDesc ?? '').trim(),
                     mjabatanId: (state.record!.mjabatanId ?? ''),
                     alamat1: (state.record!.alamat1 ?? '').trim(),
                     alamat2: (state.record!.alamat2 ?? '').trim(),
                     isDefault: state.record!.isDefault ?? false,
-
                   );
 
                   _payloadInjected = true;
@@ -282,10 +288,10 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                     final listCheckbox = selectedCobItems
                         .map(
                           (e) => RekanPicCobCariCheckboxModel(
-                        mcobId: e.mcobId,
-                        isChecked: e.isChecked,
-                      ),
-                    )
+                            mcobId: e.mcobId,
+                            isChecked: e.isChecked,
+                          ),
+                        )
                         .toList();
 
                     final cobResult = await cobRepo.rekanPicCobUpdateList(
@@ -319,7 +325,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                     setState(() => _saving = false);
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar('PIC tersimpan, tapi terjadi error saat update COB.'),
+                      errorSnackBar(
+                          'PIC tersimpan, tapi terjadi error saat update COB.'),
                     );
                   }
 
@@ -348,7 +355,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final mjnsclientId = context.select(
-                      (RegUserBloc b) => b.state.record?.jnsClientId,
+                  (RegUserBloc b) => b.state.record?.jnsClientId,
                 );
 
                 return SingleChildScrollView(
@@ -356,7 +363,8 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                     bottom: MediaQuery.of(context).viewInsets.bottom + 20,
                   ),
                   child: Container(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
                     color: secondaryBlackColor,
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(
@@ -383,7 +391,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                               color: pGrey,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                                 side: const BorderSide(color: sGrey),
                               ),
                               child: Padding(
@@ -395,12 +403,13 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                       : AutovalidateMode.disabled,
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.stretch,
+                                        CrossAxisAlignment.stretch,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         'Form Edit PIC',
-                                        style: headingStyle(context, fontSize: 20),
+                                        style:
+                                            headingStyle(context, fontSize: 20),
                                       ),
                                       const SizedBox(height: vPadding),
 
@@ -446,21 +455,21 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                         onTap: _openCobPicker,
                                         child: Row(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
                                                 color: Colors.grey.shade800,
                                                 borderRadius:
-                                                BorderRadius.circular(10),
+                                                    BorderRadius.circular(10),
                                               ),
                                               child: SvgPicture.asset(
                                                 'assets/icons/list_cob_icon.svg',
                                                 width: 20,
                                                 height: 20,
                                                 colorFilter:
-                                                const ColorFilter.mode(
+                                                    const ColorFilter.mode(
                                                   Colors.white,
                                                   BlendMode.srcIn,
                                                 ),
@@ -470,12 +479,13 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'COB yang bisa diakses:',
-                                                    style: bodyTextStyle(context)
-                                                        .copyWith(
+                                                    style:
+                                                        bodyTextStyle(context)
+                                                            .copyWith(
                                                       color: Colors.white70,
                                                       fontSize: 13,
                                                     ),
@@ -484,29 +494,35 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                   BlocBuilder<
                                                       RekanPicCobCariBloc,
                                                       RekanPicCobCariState>(
-                                                    builder: (context, cobState) {
+                                                    builder:
+                                                        (context, cobState) {
                                                       final isInitialLoading =
-                                                          cobState.status == ListStatus.initial &&
-                                                              cobState.items.isEmpty &&
-                                                              cobState.selectedItems.isEmpty;
+                                                          cobState.status ==
+                                                                  ListStatus
+                                                                      .initial &&
+                                                              cobState.items
+                                                                  .isEmpty &&
+                                                              cobState
+                                                                  .selectedItems
+                                                                  .isEmpty;
 
-                                                      if (cobState
-                                                          .selectedItems.isEmpty) {
+                                                      if (cobState.selectedItems
+                                                          .isEmpty) {
                                                         return const Text(
                                                           'Pilih Daftar COB',
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             fontSize: 15,
                                                           ),
                                                         );
                                                       }
 
-
                                                       if (isInitialLoading) {
                                                         return const Center(
-                                                          child: LoadingIndicator(),
+                                                          child:
+                                                              LoadingIndicator(),
                                                         );
                                                       }
 
@@ -517,38 +533,40 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                                             .selectedItems
                                                             .map(
                                                               (e) => Container(
-                                                            padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                              horizontal: 10,
-                                                              vertical: 6,
-                                                            ),
-                                                            decoration:
-                                                            BoxDecoration(
-                                                              color:
-                                                              const Color(
-                                                                0xFFFF9D00,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .symmetric(
+                                                                  horizontal:
+                                                                      10,
+                                                                  vertical: 6,
+                                                                ),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color:
+                                                                      const Color(
+                                                                    0xFFFF9D00,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                    8,
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  e.cobNama,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
                                                               ),
-                                                              borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                8,
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              e.cobNama,
-                                                              style:
-                                                              const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 13,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .w500,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        )
+                                                            )
                                                             .toList(),
                                                       );
                                                     },
@@ -567,11 +585,13 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                           Expanded(
                                             child: AppButton.primary(
                                               text: "Batal",
-                                              backgroundColor: sGrey.withOpacity(0.25),
+                                              backgroundColor:
+                                                  sGrey.withOpacity(0.25),
                                               textColor: primaryLightColor,
                                               onPressed: _saving
                                                   ? null
-                                                  : () => Navigator.pop(context, false),
+                                                  : () => Navigator.pop(
+                                                      context, false),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
@@ -579,8 +599,9 @@ class _EditPicWidgetState extends State<EditPicWidget> {
                                             child: AppButton.primary(
                                               text: "Simpan",
                                               isLoading: _saving,
-                                              backgroundColor:
-                                              _saving ? secondaryBlackColor : primaryColor,
+                                              backgroundColor: _saving
+                                                  ? secondaryBlackColor
+                                                  : primaryColor,
                                               onPressed: _saving ? null : _save,
                                             ),
                                           ),
@@ -612,6 +633,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
             (b.picEmail ?? '').trim().toLowerCase() &&
         (a.picHp ?? '').trim() == (b.picHp ?? '').trim() &&
         (a.jabatanDesc ?? '').trim() == (b.jabatanDesc ?? '').trim() &&
+        (a.mjabatanId ?? '').trim() == (b.mjabatanId ?? '').trim() &&
         (a.alamat1 ?? '').trim() == (b.alamat1 ?? '').trim() &&
         (a.isDefault ?? false) == (b.isDefault ?? false);
   }
@@ -644,7 +666,6 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
-
   Widget buildFieldjabatanDesc() {
     return appTextField(
       label: 'Jabatan',
@@ -659,7 +680,7 @@ class _EditPicWidgetState extends State<EditPicWidget> {
     );
   }
 
-  Widget buildFieldJabatan(){
+  Widget buildFieldJabatan() {
     return ReusableComboBox<ComboMJabatanModel>(
       hintText: "Peran",
       comboKey: _comboKey,

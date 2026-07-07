@@ -75,7 +75,7 @@ class CheckboxWidgetState extends State<CheckboxWidget> {
                   ),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: _checkbox ? const Icon(Icons.check, size: 14) : null,
+                child: _checkbox ? Icon(Icons.check, size: 14, color: primaryLightColor) : null,
               ),
             ),
           ),

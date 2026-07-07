@@ -39,6 +39,38 @@ class _LoginFormUserState extends State<LoginFormUser>
   bool isGoogleSigningIn = false;
   int _signInAttempt = 0;
 
+  bool get _isBlockingSignIn => isSigningIn || isGoogleSigningIn;
+
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -93,30 +125,35 @@ class _LoginFormUserState extends State<LoginFormUser>
       onPressed: isSigningIn
           ? null
           : () async {
-              if (!_formKey.currentState!.validate()) return;
+        if (!_formKey.currentState!.validate()) return;
 
-              if (mounted) {
-                setState(() {
-                  isSigningIn = true;
-                });
-              }
-              _startSignInTimeout();
+        setState(() {
+          isSigningIn = true;
+        });
 
-              _animationController.forward(from: 0);
+        _showGlobalLoading();
 
-              onRegisterButtonPressed(context);
-            },
+        _startSignInTimeout();
+
+        _animationController.forward(from: 0);
+
+        onRegisterButtonPressed(context);
+      },
     );
   }
 
   void _startSignInTimeout() {
     final attempt = ++_signInAttempt;
+
     Future.delayed(const Duration(seconds: 10), () {
       if (!mounted || attempt != _signInAttempt || !isSigningIn) return;
+
+      _hideGlobalLoading();
 
       setState(() {
         isSigningIn = false;
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(
           "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
@@ -183,9 +220,12 @@ class _LoginFormUserState extends State<LoginFormUser>
               previous.isLoaded != current.isLoaded,
           listener: (context, state) {
             if (state.isLoaded && !state.hasFailure) {
+              _hideGlobalLoading();
+
               if (mounted) {
                 setState(() {
                   isSigningIn = false;
+                  isGoogleSigningIn = false;
                 });
               }
             }
@@ -198,9 +238,12 @@ class _LoginFormUserState extends State<LoginFormUser>
             }
 
             if (state.hasFailure) {
+              _hideGlobalLoading();
+
               if (mounted) {
                 setState(() {
                   isSigningIn = false;
+                  isGoogleSigningIn = false;
                 });
               }
 
@@ -377,7 +420,6 @@ class _LoginFormUserState extends State<LoginFormUser>
                                           ),
                                           SizedBox(height: 10),
 
-                                          // Tombol Google
                                           AppButton.iconLeft(
                                             text: 'Masuk Dengan Google',
                                             icon: SvgPicture.asset(
@@ -385,33 +427,20 @@ class _LoginFormUserState extends State<LoginFormUser>
                                               width: 20,
                                               height: 20,
                                             ),
-                                            isLoading: isGoogleSigningIn,
                                             backgroundColor: isGoogleSigningIn
                                                 ? secondaryBlackColor
                                                 : pGrey,
                                             onPressed: isGoogleSigningIn
                                                 ? null
                                                 : () async {
-                                                    setState(() {
-                                                      isGoogleSigningIn = true;
-                                                    });
+                                              setState(() {
+                                                isGoogleSigningIn = true;
+                                              });
 
-                                                    try {
-                                                      _handleGmailRegisterForMobile(
-                                                          context);
+                                              _showGlobalLoading();
 
-                                                      await Future.delayed(
-                                                          const Duration(
-                                                              seconds: 2));
-                                                    } finally {
-                                                      if (mounted) {
-                                                        setState(() {
-                                                          isGoogleSigningIn =
-                                                              false;
-                                                        });
-                                                      }
-                                                    }
-                                                  },
+                                              await _handleGmailRegisterForMobile(context);
+                                            },
                                           ),
 
                                           SizedBox(
@@ -441,24 +470,26 @@ class _LoginFormUserState extends State<LoginFormUser>
 
   Future<void> _handleGmailRegisterForMobile(BuildContext context) async {
     try {
-      // 1) Pilih akun Google (interactive)
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        // user cancel
+        _hideGlobalLoading();
+
+        if (mounted) {
+          setState(() {
+            isGoogleSigningIn = false;
+          });
+        }
         return;
       }
 
-      // 2) Ambil auth token dari Google
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      // 3) Buat credential untuk Firebase
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // 4) Login ke FirebaseAuth
       final userCred =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
@@ -485,8 +516,18 @@ class _LoginFormUserState extends State<LoginFormUser>
             ),
           );
     } catch (e) {
+      _hideGlobalLoading();
+
+      if (mounted) {
+        setState(() {
+          isGoogleSigningIn = false;
+        });
+      }
+
       debugPrint('[GMAIL] ERROR: $e');
+
       if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login Google gagal: $e')),
       );

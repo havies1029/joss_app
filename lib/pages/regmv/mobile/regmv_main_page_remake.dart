@@ -24,6 +24,7 @@ import '../../../blocs/gen_regmv/regmv_flow_bloc.dart';
 import '../../../blocs/gen_regmv/regmv_upload_foto_acc_bloc.dart';
 import '../../../blocs/gen_regmv/regmv_upload_stnk_bloc.dart';
 import '../../../common/constants.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../common/plat_nomor_formatter.dart';
 import '../../../common/rangka_no_formatter.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
@@ -662,6 +663,36 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   bool _isLanjutkanLoading = false;
 
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -678,7 +709,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
         onHome: () async {
           await _handleExit2(context);
         },
-        title: "Kendaraan",
+        title: "Polis Kendaraan",
         blocListeners: [
           BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
             listener: (context, state) {
@@ -1237,41 +1268,44 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
-                              setState(() {
-                                _isLanjutkanLoading = true;
-                              });
+                        setState(() {
+                          _isLanjutkanLoading = true;
+                        });
 
-                              try {
-                                draftForm1ToBloc(context);
-                                draftForm2ToBloc(context);
-                                draftForm3ToBloc(context);
+                        _showGlobalLoading();
 
-                                context
-                                    .read<RegmvFlowBloc>()
-                                    .add(RegmvFlowStartEvent());
+                        try {
+                          draftForm1ToBloc(context);
+                          draftForm2ToBloc(context);
+                          draftForm3ToBloc(context);
 
-                                await Future.delayed(
-                                    const Duration(seconds: 2));
+                          context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
 
-                                if (!mounted) return;
+                          await Future.delayed(const Duration(seconds: 2));
 
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => KonfirmasiRegMvPage(
-                                      recordId: regmv1Id ?? '',
-                                      viewMode: 'ubah',
-                                    ),
-                                  ),
-                                );
-                              } finally {
-                                if (mounted) {
-                                  setState(() {
-                                    _isLanjutkanLoading = false;
-                                  });
-                                }
-                              }
-                            },
+                          if (!mounted) return;
+
+                          _hideGlobalLoading();
+
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KonfirmasiRegMvPage(
+                                recordId: regmv1Id ?? '',
+                                viewMode: 'ubah',
+                              ),
+                            ),
+                          );
+                        } finally {
+                          _hideGlobalLoading();
+
+                          if (mounted) {
+                            setState(() {
+                              _isLanjutkanLoading = false;
+                            });
+                          }
+                        }
+                      },
                     ),
                   ],
                   const SizedBox(height: 25),
@@ -2190,7 +2224,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
       );
 
   Widget _buildComboMMvjnscover() => ReusableComboBoxV2<ComboMMvjnscoverModel>(
-        hintText: "Jenis Cover",
+        hintText: "Jenis Jaminan",
         initItem: fieldComboMMvjnscover,
         loader: (q) => ComboMMvjnscoverRepository().getComboMMvjnscover(),
         clientSideSearch: true,

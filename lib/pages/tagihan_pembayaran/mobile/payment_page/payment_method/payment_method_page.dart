@@ -89,111 +89,89 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: "Tutup",
-      barrierColor: Colors.black.withOpacity(0.45),
+      barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 220),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Center(
           child: Material(
             color: Colors.transparent,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24),
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
               decoration: BoxDecoration(
                 color: formGrey,
                 borderRadius: BorderRadius.circular(cardBorderRadius),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.35),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    width: 38,
-                    height: 38,
-                    child: SvgPicture.asset(
-                      "assets/icons/bi_exclamation-circle.svg",
-                      fit: BoxFit.contain,
+                  SvgPicture.asset(
+                    'assets/icons/Information2.svg',
+                    width: 40,
+                    height: 40,
+                    colorFilter: const ColorFilter.mode(
+                      primaryColor,
+                      BlendMode.srcIn,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Keluar dari Metode Pembayaran?",
+                  const SizedBox(height: hPadding),
+
+                  const Text(
+                    "Keluar dari Pembayaran?",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: primaryLightColor,
-                      fontSize: getResponsiveFont(context, 18),
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
+                      color: primaryLightColor,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Jika Anda keluar dari halaman metode pembayaran, data transaksi akan tersimpan di menu Riwayat Pembayaran.",
+
+                  const SizedBox(height: 6),
+
+                  const Text(
+                    "Pembayaran Anda belum selesai. Jika keluar dari halaman ini, Anda dapat melanjutkan pembayaran kapan saja melalui menu Riwayat Pembayaran selama pembayaran masih berlaku.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: primaryLightColor.withOpacity(0.7),
-                      fontSize: getResponsiveFont(context, 16),
-                      height: 1,
+                      fontSize: 14,
+                      height: 1.35,
+                      color: dGrey,
                     ),
                   ),
-                  const SizedBox(height: 18),
+
+                  const SizedBox(height: 16),
+
                   Row(
                     children: [
                       Expanded(
-                        child: SizedBox(
-                          height: 46,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: sGrey,
-                              foregroundColor: primaryLightColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
-                              ),
-                              elevation: 0,
-                            ),
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text(
-                              "Tidak",
-                              style: TextStyle(
-                                fontSize: getResponsiveFont(context, 16),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                        child: AppButton.primary(
+                          text: "Lanjutkan Pembayaran",
+                          backgroundColor: sGrey,
+                          borderside: const BorderSide(color: sGrey),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
                           ),
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       Expanded(
-                        child: SizedBox(
-                          height: 46,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: pSlowRed,
-                              foregroundColor: primaryLightColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
-                              ),
-                              elevation: 0,
-                            ),
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(
-                              "Iya, Keluar",
-                              style: TextStyle(
-                                fontSize: getResponsiveFont(context, 16),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                        child: AppButton.primary(
+                          text: "Iya, Keluar",
+                          backgroundColor: primaryColor,
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
                           ),
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
                         ),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -228,6 +206,15 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     }
   }
 
+
+  Future<void> _handleHomeExit(BuildContext context) async {
+    final shouldLeave = await showExitConfirmDialog(context);
+
+    if (shouldLeave == true) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DnRekap2invBloc, DnRekap2invState>(
@@ -247,7 +234,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             },
             onHome:  () {
               if (busy) return;
-              _handleExit(context);
+              _handleHomeExit(context);
             },
             title: "Metode Pembayaran",
             child: Stack(

@@ -20,6 +20,7 @@ import '../../../blocs/regpar/regpar5form_bloc.dart';
 import '../../../blocs/regpar/regpar6cari_bloc.dart';
 import '../../../blocs/regpar/regpar_flow_bloc.dart';
 import '../../../common/constants.dart';
+import '../../../common/loading_indicator.dart';
 import '../../../common/thousand_separator_input_formatter.dart';
 import '../../../helper/navigation_keys.dart';
 import '../../../models/combobox/combomjnscoverpar_model.dart';
@@ -677,6 +678,36 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   bool _isLanjutkanLoading = false;
 
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -692,7 +723,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
         onHome: () async {
           await _handleExit2(context);
         },
-        title: "Properti",
+        title: "Polis Properti",
         blocListeners: [
           BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
             listener: (context, state) {
@@ -1175,42 +1206,47 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
-                              setState(() {
-                                _isLanjutkanLoading = true;
-                              });
+                        setState(() {
+                          _isLanjutkanLoading = true;
+                        });
 
-                              try {
-                                draftForm1ToBloc(context);
-                                draftForm2ToBloc(context);
-                                draftForm3ToBloc(context);
-                                draftForm4ToBloc(context);
+                        _showGlobalLoading();
 
-                                context
-                                    .read<RegparFlowBloc>()
-                                    .add(RegparFlowStartEvent());
+                        try {
+                          draftForm1ToBloc(context);
+                          draftForm2ToBloc(context);
+                          draftForm3ToBloc(context);
+                          draftForm4ToBloc(context);
 
-                                await Future.delayed(
-                                    const Duration(seconds: 2));
+                          context.read<RegparFlowBloc>().add(
+                            RegparFlowStartEvent(),
+                          );
 
-                                if (!mounted) return;
+                          await Future.delayed(const Duration(seconds: 2));
 
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => KonfirmasiRegParPage(
-                                      recordId: regpar1Id ?? '',
-                                      viewMode: 'ubah',
-                                    ),
-                                  ),
-                                );
-                              } finally {
-                                if (mounted) {
-                                  setState(() {
-                                    _isLanjutkanLoading = false;
-                                  });
-                                }
-                              }
-                            },
+                          if (!mounted) return;
+
+                          _hideGlobalLoading();
+
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KonfirmasiRegParPage(
+                                recordId: regpar1Id ?? '',
+                                viewMode: 'ubah',
+                              ),
+                            ),
+                          );
+                        } finally {
+                          _hideGlobalLoading();
+
+                          if (mounted) {
+                            setState(() {
+                              _isLanjutkanLoading = false;
+                            });
+                          }
+                        }
+                      },
                     ),
                   ],
                   const SizedBox(height: 25),

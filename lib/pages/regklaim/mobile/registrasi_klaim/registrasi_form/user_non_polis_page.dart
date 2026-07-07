@@ -80,6 +80,36 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
   bool _insuranceInitialized = false;
 
+  bool _isDialogLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   Color get _submitButtonColor {
     if (widget.cobKlaimId == '10002') return pBlue;
     if (widget.cobKlaimId == '10001') return pGreen2;
@@ -164,10 +194,32 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
       child: MultiBlocListener(
         listeners: [
           BlocListener<Regklaim1CrudBloc, Regklaim1CrudState>(
-            listenWhen: (prev, curr) => curr.isSaved,
+            listenWhen: (prev, curr) =>
+            prev.isSaved != curr.isSaved ||
+                prev.hasFailure != curr.hasFailure,
             listener: (context, state) {
               if (!mounted) return;
-              if (state.hasFailure) return;
+
+              if (state.hasFailure) {
+                _hideGlobalLoading();
+
+                setState(() {
+                  _isCariPolisLoading = false;
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar("Gagal menyimpan data klaim."),
+                );
+                return;
+              }
+
+              if (!state.isSaved) return;
+
+              _hideGlobalLoading();
+
+              setState(() {
+                _isCariPolisLoading = false;
+              });
 
               if (_toKlaimTriggered) return;
               _toKlaimTriggered = true;
@@ -177,8 +229,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
               for (final item in attachBloc.state.items) {
                 if (item.status == UploadStatus.queued) {
-                  attachBloc
-                      .add(UploadOne(localId: item.localId, regklaim1Id: id));
+                  attachBloc.add(
+                    UploadOne(localId: item.localId, regklaim1Id: id),
+                  );
                 }
               }
 
@@ -189,14 +242,13 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   builder: (_) => PaymentSuccess(
                     displayButton: "Kembali",
                     description:
-                        "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
+                    "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
                     display: "Klaim Kamu Berhasil Didaftarkan!",
                     onButtonPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(
-                            builder: (_) => const KlaimMainPage()),
-                        (route) => route.isFirst,
+                        MaterialPageRoute(builder: (_) => const KlaimMainPage()),
+                            (route) => route.isFirst,
                       );
                     },
                   ),
@@ -234,6 +286,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   children: [
                     Text(
                       "Cari Data Polis",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: primaryLightColor,
                         fontSize: getResponsiveFont(context, 18),
@@ -269,7 +322,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
               SizedBox(
                 width: double.infinity,
                 child: AppButton.primary(
-                  text: "Masukan Data Polis",
+                  text: "Masukkan Data Polis",
                   isLoading: _isCariPolisLoading,
                   backgroundColor: _isCariPolisLoading
                       ? secondaryBlackColor
@@ -277,20 +330,30 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   onPressed: _isCariPolisLoading
                       ? null
                       : () async {
-                          setState(() {
-                            _isCariPolisLoading = true;
-                          });
+                    setState(() {
+                      _isCariPolisLoading = true;
+                    });
 
-                          onPressCariPolis();
+                    _showGlobalLoading();
 
-                          await Future.delayed(const Duration(seconds: 2));
+                    onPressCariPolis();
 
-                          if (mounted) {
-                            setState(() {
-                              _isCariPolisLoading = false;
-                            });
-                          }
-                        },
+                    Future.delayed(const Duration(seconds: 12), () {
+                      if (!mounted || !_isCariPolisLoading) return;
+
+                      _hideGlobalLoading();
+
+                      setState(() {
+                        _isCariPolisLoading = false;
+                      });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(
+                          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
+                        ),
+                      );
+                    });
+                  },
                 ),
               ),
             ],
