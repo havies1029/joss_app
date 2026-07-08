@@ -1539,7 +1539,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: AppButton.primary(
-          text: "Hitung Premi",
+          text: _isHitungPremiLoading ? "Hitung Premi" : "Lanjutkan",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
               _isHitungPremiLoading ? secondaryBlackColor : primaryColor,

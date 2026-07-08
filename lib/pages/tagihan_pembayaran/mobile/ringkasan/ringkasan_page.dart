@@ -195,7 +195,7 @@ class RingkasanPageState extends State<RingkasanPage> {
         Expanded(
           child: Text(
             "Apabila Anda melakukan pembayaran melalui bagian keuangan internal kami, "
-                "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate.",
+                "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate. Tagihan ini tidak termasuk Marine Cargo dan Bonding.",
             style: bodyTextStyle(context, fontSize: 15),
           ),
         ),

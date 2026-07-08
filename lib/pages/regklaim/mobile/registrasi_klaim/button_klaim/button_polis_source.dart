@@ -3,13 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../../common/constants.dart';
 import '../../../../../../blocs/regklaim/polissourcecari_bloc.dart';
+import '../../../../../../models/regklaim/polissourcecari_model.dart';
 import '../../../../../common/loading_indicator.dart';
 
 class ButtonPolisSourceWidget extends StatefulWidget {
   const ButtonPolisSourceWidget({super.key});
 
   @override
-  State<ButtonPolisSourceWidget> createState() => _ButtonPolisSourceWidgetState();
+  State<ButtonPolisSourceWidget> createState() =>
+      _ButtonPolisSourceWidgetState();
 }
 
 class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
@@ -41,19 +43,26 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
         }
 
         if (state.status == ListStatus.success) {
-          final items = state.items;
+          final items = _supportedItems(state.items);
           if (items.isEmpty) return const SizedBox.shrink();
 
-          if (state.selectedPolissourceId.isEmpty) {
-            final hasDefault10 = items.any((e) => e.polissourceId == "10");
-            final defaultId = hasDefault10 ? "10" : items.first.polissourceId;
+          final hasSelectedItem = items.any(
+            (e) => e.polissourceId == state.selectedPolissourceId,
+          );
 
+          if (!hasSelectedItem) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
               context.read<PolissourcecariBloc>().add(
-                SelectPolissourcecariEvent(polissourceId: defaultId),
-              );
+                    SelectPolissourcecariEvent(
+                      polissourceId: items.first.polissourceId,
+                    ),
+                  );
             });
+          }
+
+          if (items.length == 1) {
+            return const SizedBox.shrink();
           }
 
           return SingleChildScrollView(
@@ -61,14 +70,15 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: items.map((item) {
-                final isSelected = state.selectedPolissourceId == item.polissourceId;
+                final isSelected =
+                    state.selectedPolissourceId == item.polissourceId;
 
                 return Padding(
                   padding: const EdgeInsets.only(right: hPadding),
                   child: SizedBox(
                     width: (MediaQuery.of(context).size.width -
-                        (hPadding * 1.5 * 2) -
-                        hPadding) /
+                            (hPadding * 1.5 * 2) -
+                            hPadding) /
                         2,
                     child: AppButton.primary(
                       text: item.sourceNama,
@@ -79,10 +89,10 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
                       isOutlined: false,
                       onPressed: () {
                         context.read<PolissourcecariBloc>().add(
-                          SelectPolissourcecariEvent(
-                            polissourceId: item.polissourceId,
-                          ),
-                        );
+                              SelectPolissourcecariEvent(
+                                polissourceId: item.polissourceId,
+                              ),
+                            );
                       },
                     ),
                   ),
@@ -95,5 +105,20 @@ class _ButtonPolisSourceWidgetState extends State<ButtonPolisSourceWidget> {
         return const SizedBox.shrink();
       },
     );
+  }
+
+  List<PolissourcecariModel> _supportedItems(
+    List<PolissourcecariModel> items,
+  ) {
+    final result = <PolissourcecariModel>[];
+
+    for (final sourceId in const ["10", "20"]) {
+      final matches = items.where((e) => e.polissourceId == sourceId);
+      if (matches.isNotEmpty) {
+        result.add(matches.first);
+      }
+    }
+
+    return result;
   }
 }

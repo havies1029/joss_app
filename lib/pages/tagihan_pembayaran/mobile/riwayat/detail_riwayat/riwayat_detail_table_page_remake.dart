@@ -41,6 +41,33 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
     });
   }
 
+  bool _isGlobalLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isGlobalLoadingShown) return;
+
+    _isGlobalLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(
+          child: LoadingIndicator(),
+        ),
+      ),
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isGlobalLoadingShown) return;
+
+    _isGlobalLoadingShown = false;
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -88,15 +115,23 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                 horizontal: hPadding * 1.5,
                 vertical: hPadding,
               ),
-              child: BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
+              child:
+              BlocConsumer<HistorybayarCariBloc, HistorybayarCariState>(
                 buildWhen: (p, c) =>
-                p.selectedItem != c.selectedItem ||
-                    p.isDownloading != c.isDownloading,
+                p.selectedItem != c.selectedItem,
                 listenWhen: (prev, curr) =>
-                prev.downloadPath != curr.downloadPath &&
-                    curr.downloadPath.isNotEmpty &&
-                    !curr.isDownloading,
+                prev.isDownloading != curr.isDownloading ||
+                    prev.downloadPath != curr.downloadPath,
                 listener: (context, state) async {
+                  if (state.isDownloading) {
+                    _showGlobalLoading();
+                    return;
+                  }
+
+                  _hideGlobalLoading();
+
+                  if (state.downloadPath.isEmpty) return;
+
                   try {
                     await PdfOpenHelper().openBase64Pdf(
                       base64Pdf: state.downloadPath,
@@ -104,6 +139,7 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                   } catch (e) {
                     debugPrint('Gagal buka PDF: $e');
                   }
+
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(
@@ -117,99 +153,82 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                   final selected = state.selectedItem;
                   if (selected == null) return const LoadingIndicator();
 
-                  return Stack(
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // konten utama dialog
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildPay1SummaryFromModel(selected),
+                      _buildPay1SummaryFromModel(selected),
 
-                          const SizedBox(height: hPadding),
-                          const Divider(height: 1),
-                          const SizedBox(height: hPadding),
+                      const SizedBox(height: hPadding),
+                      const Divider(height: 1),
+                      const SizedBox(height: hPadding),
 
-                          SingleChildScrollView(
-                            child: RiwayatTableWidgetRemake(),
-                          ),
-
-                          const SizedBox(height: hPadding),
-                          const Divider(height: 1),
-                          const SizedBox(height: hPadding),
-
-                          _buildTotalBayar(selected),
-
-                          const SizedBox(height: hPadding),
-
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: AppButton.iconLeft(
-                              text: selected.stsInvId == '10002'
-                                  ? 'Lanjut Pembayaran'
-                                  : 'Unduh Invoice',
-                              backgroundColor: selected.stsInvId == '10002'
-                                  ? primaryColor
-                                  : greenforPayment,
-                              icon: SvgPicture.asset(
-                                selected.stsInvId == '10002'
-                                    ? 'assets/icons/unduh_invoice.svg'
-                                    : 'assets/icons/invoice.svg',
-                                width: 18,
-                                height: 18,
-                              ),
-                              onPressed: () {
-                                if (selected.stsInvId == '10002') {
-                                  context.read<DnRekap2invBloc>().add(
-                                    SetPaymentSummaryEvent(
-                                      curr: '', // isi kalau ada currency
-                                      totalBayar: selected.totalBayar,
-                                    ),
-                                  );
-
-                                  context.read<DnRekap2invBloc>().add(
-                                    CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
-                                      // SetPaymentSummaryEvent(curr: state.)
-                                  );
-                                  // showDialog(
-                                  //   context: context,
-                                  //   barrierDismissible: true,
-                                  //   barrierColor: Colors.black.withOpacity(0.6),
-                                  //   builder: (dialogContext) => RegisterClientPopUp(
-                                  //     showIcon: false,
-                                  //     header: 'Fitur pembayaran belum tersedia.',
-                                  //     description:
-                                  //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-                                  //     buttonText: 'Mengerti',
-                                  //     onPressed: () {
-                                  //       Navigator.of(dialogContext).pop();
-                                  //     },
-                                  //   ),
-                                  // );
-                                } else {
-                                  // klik -> event -> bloc set isDownloading=true -> loading langsung muncul
-                                  context.read<HistorybayarCariBloc>().add(
-                                    DownloadInvoiceEvent(noInv: selected.inv1Id),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ],
+                      SingleChildScrollView(
+                        child: RiwayatTableWidgetRemake(),
                       ),
 
-                      // overlay loading
-                      if (state.isDownloading) ...[
-                        Positioned.fill(
-                          child: AbsorbPointer(
-                            absorbing: true,
-                            child: Container(
-                              color: Colors.black45,
-                              alignment: Alignment.center,
-                              child: const LoadingIndicator(),
-                            ),
+                      const SizedBox(height: hPadding),
+                      const Divider(height: 1),
+                      const SizedBox(height: hPadding),
+
+                      _buildTotalBayar(selected),
+
+                      const SizedBox(height: hPadding),
+
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: AppButton.iconLeft(
+                          text: selected.stsInvId == '10002'
+                              ? 'Lanjut Pembayaran'
+                              : 'Unduh Invoice',
+                          backgroundColor: selected.stsInvId == '10002'
+                              ? primaryColor
+                              : greenforPayment,
+                          icon: SvgPicture.asset(
+                            selected.stsInvId == '10002'
+                                ? 'assets/icons/unduh_invoice.svg'
+                                : 'assets/icons/invoice.svg',
+                            width: 18,
+                            height: 18,
                           ),
+                          onPressed: () {
+                            if (selected.stsInvId == '10002') {
+                              context.read<DnRekap2invBloc>().add(
+                                SetPaymentSummaryEvent(
+                                  curr: '', // isi kalau ada currency
+                                  totalBayar: selected.totalBayar,
+                                ),
+                              );
+
+                              context.read<DnRekap2invBloc>().add(
+                                CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                                // SetPaymentSummaryEvent(curr: state.)
+                              );
+                              // showDialog(
+                              //   context: context,
+                              //   barrierDismissible: true,
+                              //   barrierColor: Colors.black.withOpacity(0.6),
+                              //   builder: (dialogContext) => RegisterClientPopUp(
+                              //     showIcon: false,
+                              //     header: 'Fitur pembayaran belum tersedia.',
+                              //     description:
+                              //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                              //     buttonText: 'Mengerti',
+                              //     onPressed: () {
+                              //       Navigator.of(dialogContext).pop();
+                              //     },
+                              //   ),
+                              // );
+                            } else {
+                              _showGlobalLoading();
+
+                              // klik -> event -> bloc set isDownloading=true -> loading langsung muncul
+                              context.read<HistorybayarCariBloc>().add(
+                                DownloadInvoiceEvent(noInv: selected.inv1Id),
+                              );
+                            }
+                          },
                         ),
-                      ],
+                      ),
                     ],
                   );
                 },

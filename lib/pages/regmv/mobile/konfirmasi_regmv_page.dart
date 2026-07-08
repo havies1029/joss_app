@@ -63,6 +63,33 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
     return '${value.toStringAsFixed(2)}%';
   }
 
+  bool _isGlobalLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isGlobalLoadingShown) return;
+
+    _isGlobalLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(
+          child: LoadingIndicator(),
+        ),
+      ),
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isGlobalLoadingShown) return;
+
+    _isGlobalLoadingShown = false;
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -282,122 +309,132 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
       },
       blocListeners: [
         BlocListener<DnRekap2invBloc, DnRekap2invState>(
-          listenWhen: (previous, current) {
-            return previous.isProcessed != current.isProcessed ||
-                previous.hasFailure != current.hasFailure;
-          },
-          listener: (context, state) {
-            if (state.isProcessed) {
-              if (state.paymentStatus == "20") {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar(
-                    'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
-                  ),
-                );
-                final curr = (state.curr.isEmpty)
-                    ? globalMataUang ?? ""
-                    : state.curr;
-                onViewPaymentMethods(curr, state.totalBayar);
-              } else if (state.paymentStatus == "30") {
-                if (mounted) {
-                  setState(() => isSubmitting = false);
-                }
+        listenWhen: (previous, current) {
+          return previous.isProcessed != current.isProcessed ||
+              previous.hasFailure != current.hasFailure;
+        },
+        listener: (context, state) {
+          if (state.isProcessed || state.hasFailure) {
+            _hideGlobalLoading();
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar('Silakan lakukan pembayaran.'),
-                );
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentProcess(
-                      viewMode: "ubah",
-                      recordId: state.invoiceId,
-                    ),
-                  ),
-                );
-              } else if (state.paymentStatus == "92") {
-                if (_isCardWebViewOpen &&
-                    Navigator.of(context, rootNavigator: true).canPop()) {
-                  _isCardWebViewOpen = false;
-                  Navigator.of(context, rootNavigator: true).pop();
-                }
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  errorSnackBar(
-                    'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
-                  ),
-                );
-
-                if (mounted) {
-                  setState(() => isSubmitting = false);
-                }
-              } else if (state.paymentStatus == "40") {
-                if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
-                  _isCardWebViewOpen = false;
-                  Navigator.of(context).pop();
-                }
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  successSnackBar('Proses pembayaran Berhasil.'),
-                );
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentSuccess(
-                      display: "Pembayaran berhasil!",
-                      description:
-                      "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
-                      displayButton: "Kembali",
-                    ),
-                  ),
-                );
-              }
-              // else if (state.paymentStatus == "91") {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => PaymentSuccess(
-              //         display: "Pengajuan Tidak Dilanjutkan",
-              //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
-              //         displayButton: "Kembali",
-              //         onButtonPressed: () {
-              //           Navigator.of(context).pushAndRemoveUntil(
-              //             MaterialPageRoute(
-              //               builder: (_) => const TransaksiPage(),
-              //             ),
-              //                 (route) => route.isFirst,
-              //           );
-              //         },
-              //       ),
-              //     ),
-              //   );
-              // }
+            if (mounted) {
+              setState(() => isSubmitting = false);
             }
+          }
 
-            else if (state.paymentStatus == "93") {
-              if (_isCardWebViewOpen &&
-                  Navigator.of(context, rootNavigator: true).canPop()) {
-                _isCardWebViewOpen = false;
-                Navigator.of(context, rootNavigator: true).pop();
-              }
+          if (state.hasFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(
+                'Gagal memproses pembayaran. Silakan coba lagi.',
+              ),
+            );
+            return;
+          }
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                infoSnackBar(
-                  'Proses pembayaran kartu kredit dibatalkan.',
+          if (!state.isProcessed) return;
+
+          if (state.paymentStatus == "20") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              successSnackBar(
+                'Proses pembayaran berhasil. Silakan lanjutkan ke metode pembayaran.',
+              ),
+            );
+
+            final curr = (state.curr.isEmpty)
+                ? globalMataUang ?? ""
+                : state.curr;
+
+            onViewPaymentMethods(curr, state.totalBayar);
+          } else if (state.paymentStatus == "30") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              successSnackBar('Silakan lakukan pembayaran.'),
+            );
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentProcess(
+                  viewMode: "ubah",
+                  recordId: state.invoiceId,
                 ),
-              );
+              ),
+            );
+          } else if (state.paymentStatus == "92") {
+            if (_isCardWebViewOpen &&
+                Navigator.of(context, rootNavigator: true).canPop()) {
+              _isCardWebViewOpen = false;
+              Navigator.of(context, rootNavigator: true).pop();
             }
 
-            // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
-            // if (state.hasFailure) {
-            //   ScaffoldMessenger.of(context).showSnackBar(
-            //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
-            //   );
-            // }
-          },
-        ),
+            ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(
+                'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
+              ),
+            );
+          } else if (state.paymentStatus == "40") {
+            if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+              _isCardWebViewOpen = false;
+              Navigator.of(context).pop();
+            }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              successSnackBar('Proses pembayaran Berhasil.'),
+            );
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentSuccess(
+                  display: "Pembayaran berhasil!",
+                  description:
+                  "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
+                  displayButton: "Kembali",
+                ),
+              ),
+            );
+          } else if (state.paymentStatus == "93") {
+            if (_isCardWebViewOpen &&
+                Navigator.of(context, rootNavigator: true).canPop()) {
+              _isCardWebViewOpen = false;
+              Navigator.of(context, rootNavigator: true).pop();
+            }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              infoSnackBar(
+                'Proses pembayaran kartu kredit dibatalkan.',
+              ),
+            );
+          }
+
+          // else if (state.paymentStatus == "91") {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => PaymentSuccess(
+          //         display: "Pengajuan Tidak Dilanjutkan",
+          //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+          //         displayButton: "Kembali",
+          //         onButtonPressed: () {
+          //           Navigator.of(context).pushAndRemoveUntil(
+          //             MaterialPageRoute(
+          //               builder: (_) => const TransaksiPage(),
+          //             ),
+          //                 (route) => route.isFirst,
+          //           );
+          //         },
+          //       ),
+          //     ),
+          //   );
+          // }
+
+          // optional: kalau kamu punya flag hasFailure dan mau tampilkan error umumnya
+          // if (state.hasFailure) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text(state.failureMessage ?? 'Terjadi kesalahan')),
+          //   );
+          // }
+        },
+      ),
 
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
           listenWhen: (previous, current) {
@@ -408,6 +445,10 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             final messenger = ScaffoldMessenger.of(context);
 
             if (state.hasFailure) {
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+
               messenger.showSnackBar(
                 errorSnackBar(
                   'Proses pembayaran kartu gagal. Silakan coba lagi.',
@@ -417,6 +458,10 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
             }
 
             if (!state.isLoaded || state.record == null) return;
+
+            if (mounted) {
+              setState(() => isSubmitting = false);
+            }
 
             final record = state.record!;
             final status = record.status.trim();
@@ -856,11 +901,13 @@ class _KonfirmasiRegMvPageState extends State<KonfirmasiRegMvPage> {
                             setState(() => isSubmitting = true);
                           }
 
+                          _showGlobalLoading();
+
                           context.read<DnRekap2invBloc>().add(
-                                      RegMv2InvoiceEvent(
-                                        regmv1Id: widget.recordId ?? "",
-                                      ),
-                                    );
+                            RegMv2InvoiceEvent(
+                              regmv1Id: widget.recordId ?? "",
+                            ),
+                          );
                         },
                       )
                   ),

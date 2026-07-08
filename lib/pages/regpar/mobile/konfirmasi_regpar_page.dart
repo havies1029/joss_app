@@ -267,6 +267,32 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
     }
   }
 
+  bool _isGlobalLoadingShown = false;
+
+  void _showGlobalLoading() {
+    if (!mounted || _isGlobalLoadingShown) return;
+
+    _isGlobalLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(
+          child: LoadingIndicator(),
+        ),
+      ),
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isGlobalLoadingShown) return;
+
+    _isGlobalLoadingShown = false;
+    Navigator.of(context, rootNavigator: true).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -284,144 +310,158 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             return previous.isProcessed != current.isProcessed ||
                 previous.hasFailure != current.hasFailure;
           },
-            listener: (context, state) {
-              debugPrint('DnRekap2inv listener status: ${state.paymentStatus}');
-              if (!state.isProcessed) return;
+          listener: (context, state) {
+            debugPrint('DnRekap2inv listener status: ${state.paymentStatus}');
 
-              final messenger = ScaffoldMessenger.of(context);
+            if (state.isProcessed || state.hasFailure) {
+              _hideGlobalLoading();
 
-              if (state.paymentStatus == "20") {
-                messenger.showSnackBar(
-                  successSnackBar(
-                    "Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.",
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+            }
+
+            final messenger = ScaffoldMessenger.of(context);
+
+            if (state.hasFailure) {
+              messenger.showSnackBar(
+                errorSnackBar(
+                  "Gagal memproses pembayaran. Silakan coba lagi.",
+                ),
+              );
+              return;
+            }
+
+            if (!state.isProcessed) return;
+
+            if (state.paymentStatus == "20") {
+              messenger.showSnackBar(
+                successSnackBar(
+                  "Invoice berhasil dibuat. Silakan lanjut ke metode pembayaran.",
+                ),
+              );
+
+              final curr = (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
+              onViewPaymentMethods(curr, state.totalBayar);
+              return;
+            }
+
+            if (state.paymentStatus == "30") {
+              refreshData();
+
+              messenger.showSnackBar(
+                successSnackBar(
+                  "Silakan lanjutkan proses pembayaran Anda.",
+                ),
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentProcess(
+                    viewMode: "ubah",
+                    recordId: state.invoiceId,
                   ),
-                );
+                ),
+              );
 
-                final curr = (state.curr.isEmpty) ? globalMataUang ?? "" : state.curr;
-                onViewPaymentMethods(curr, state.totalBayar);
-                return;
+              return;
+            }
+
+            if (state.paymentStatus == "40") {
+              if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context).pop();
               }
 
-              if (state.paymentStatus == "30") {
-                if (mounted) {
-                  setState(() => isSubmitting = false);
-                }
+              messenger.showSnackBar(
+                successSnackBar(
+                  "Pembayaran berhasil diselesaikan.",
+                ),
+              );
 
-                refreshData();
-
-                messenger.showSnackBar(
-                  successSnackBar(
-                    "Silakan lanjutkan proses pembayaran Anda.",
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentSuccess(
+                    display: "Pembayaran berhasil!",
+                    displayButton: "Kembali",
+                    description:
+                    "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
                   ),
-                );
+                ),
+              );
+              return;
+            }
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentProcess(
-                      viewMode: "ubah",
-                      recordId: state.invoiceId,
-                    ),
-                  ),
-                );
+            // if (state.paymentStatus == "91") {
+            //   refreshData();
+            //
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => PaymentSuccess(
+            //         display: "Pengajuan Tidak Dilanjutkan",
+            //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
+            //         displayButton: "Kembali",
+            //         onButtonPressed: () {
+            //           Navigator.of(context).pushAndRemoveUntil(
+            //             MaterialPageRoute(
+            //               builder: (_) => const TransaksiPage(),
+            //             ),
+            //                 (route) => route.isFirst,
+            //           );
+            //         },
+            //       ),
+            //     ),
+            //   );
+            //
+            //   return;
+            // }
 
-                return;
-              }
+            if (state.paymentStatus == "92") {
+              refreshData();
 
-              if (state.paymentStatus == "40") {
-                if (_isCardWebViewOpen && Navigator.of(context).canPop()) {
-                  _isCardWebViewOpen = false;
-                  Navigator.of(context).pop();
-                }
-
-                messenger.showSnackBar(
-                  successSnackBar(
-                    "Pembayaran berhasil diselesaikan.",
-                  ),
-                );
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentSuccess(
-                      display: "Pembayaran berhasil!",
-                      displayButton: "Kembali",
-                      description:
-                      "Selamat! Perlindungan kendaraan Anda resmi dimulai.",
-                    ),
-                  ),
-                );
-                return;
-              }
-              // if (state.paymentStatus == "91") {
-              //   refreshData();
-              //
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => PaymentSuccess(
-              //         display: "Pengajuan Tidak Dilanjutkan",
-              //         description: "Karena proses pembayaran dibatalkan, pengajuan polis Anda juga telah dibatalkan. Untuk membeli polis, silakan lakukan pengajuan kembali.",
-              //         displayButton: "Kembali",
-              //         onButtonPressed: () {
-              //           Navigator.of(context).pushAndRemoveUntil(
-              //             MaterialPageRoute(
-              //               builder: (_) => const TransaksiPage(),
-              //             ),
-              //                 (route) => route.isFirst,
-              //           );
-              //         },
-              //       ),
-              //     ),
-              //   );
-              //
-              //   return;
-              // }
-
-              if (state.paymentStatus == "92") {
-                refreshData();
-
-                if (_isCardWebViewOpen &&
-                    Navigator.of(context, rootNavigator: true).canPop()) {
-                  _isCardWebViewOpen = false;
-                  Navigator.of(context, rootNavigator: true).pop();
-                }
-
-                messenger.showSnackBar(
-                  errorSnackBar(
-                    "Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.",
-                  ),
-                );
-
-                return;
-              }
-
-              if (state.paymentStatus == "93") {
-                refreshData();
-
-                if (_isCardWebViewOpen &&
-                    Navigator.of(context, rootNavigator: true).canPop()) {
-                  _isCardWebViewOpen = false;
-                  Navigator.of(context, rootNavigator: true).pop();
-                }
-
-                messenger.showSnackBar(
-                  infoSnackBar(
-                    "Proses pembayaran kartu kredit dibatalkan.",
-                  ),
-                );
-
-                return;
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
               }
 
               messenger.showSnackBar(
                 errorSnackBar(
-                  "Status pembayaran tidak dikenali. Silakan periksa kembali.",
+                  "Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.",
                 ),
               );
-            }
-    ),
 
+              return;
+            }
+
+            if (state.paymentStatus == "93") {
+              refreshData();
+
+              if (_isCardWebViewOpen &&
+                  Navigator.of(context, rootNavigator: true).canPop()) {
+                _isCardWebViewOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+
+              messenger.showSnackBar(
+                infoSnackBar(
+                  "Proses pembayaran kartu kredit dibatalkan.",
+                ),
+              );
+
+              return;
+            }
+
+            messenger.showSnackBar(
+              errorSnackBar(
+                "Status pembayaran tidak dikenali. Silakan periksa kembali.",
+              ),
+            );
+          },
+        ),
 
         BlocListener<InvoiceStatusCardBloc, InvoiceStatusCardState>(
           listenWhen: (previous, current) {
@@ -432,6 +472,12 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             final messenger = ScaffoldMessenger.of(context);
 
             if (state.hasFailure) {
+              _hideGlobalLoading();
+
+              if (mounted) {
+                setState(() => isSubmitting = false);
+              }
+
               messenger.showSnackBar(
                 errorSnackBar(
                   'Proses pembayaran kartu gagal. Silakan coba lagi.',
@@ -441,6 +487,12 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
             }
 
             if (!state.isLoaded || state.record == null) return;
+
+            _hideGlobalLoading();
+
+            if (mounted) {
+              setState(() => isSubmitting = false);
+            }
 
             final record = state.record!;
             final status = record.status.trim();
@@ -476,10 +528,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 ),
               );
 
-              if (mounted) {
-                setState(() => isSubmitting = false);
-              }
-
               return;
             }
 
@@ -489,10 +537,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   'Nomor kartu kredit salah. Silakan masukkan ulang kartu yang benar.',
                 ),
               );
-
-              if (mounted) {
-                setState(() => isSubmitting = false);
-              }
 
               refreshData();
               return;
@@ -505,10 +549,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 ),
               );
 
-              if (mounted) {
-                setState(() => isSubmitting = false);
-              }
-
               refreshData();
               return;
             }
@@ -519,10 +559,6 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                   'Redirect URL pembayaran tidak ditemukan.',
                 ),
               );
-
-              if (mounted) {
-                setState(() => isSubmitting = false);
-              }
 
               return;
             }
@@ -924,19 +960,21 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                         isLoading: isSubmitting,
                         backgroundColor:
                         isAgreementChecked ? primaryColor : sGrey,
-                        onPressed: isSubmitting || !isAgreementChecked
-                            ? null
-                            : () async {
-                          if (mounted) {
-                            setState(() => isSubmitting = true);
-                          }
+                          onPressed: isSubmitting || !isAgreementChecked
+                              ? null
+                              : () async {
+                            if (mounted) {
+                              setState(() => isSubmitting = true);
+                            }
 
-                          context.read<DnRekap2invBloc>().add(
-                            RegPar2InvoiceEvent(
-                              regpar1Id: widget.recordId ?? "",
-                            ),
-                          );
-                        },
+                            _showGlobalLoading();
+
+                            context.read<DnRekap2invBloc>().add(
+                              RegPar2InvoiceEvent(
+                                regpar1Id: widget.recordId ?? "",
+                              ),
+                            );
+                          },
                       )
                   ),
                 ],

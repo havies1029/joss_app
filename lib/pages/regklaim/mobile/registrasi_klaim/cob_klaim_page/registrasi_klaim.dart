@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../../blocs/authentication/authentication_bloc.dart';
-import '../../../../../blocs/dashboard/sumdash_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
@@ -55,9 +53,34 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
 
   String get _headerTitle => "Klaim ${widget.cobKlaimNama}";
 
+  String _resolvePolisSourceId(PolissourcecariState state) {
+    final sourceIds = state.items
+        .map((e) => e.polissourceId)
+        .where((id) => id == "10" || id == "20")
+        .toSet();
+
+    if (sourceIds.length == 1) {
+      return sourceIds.first;
+    }
+
+    if (sourceIds.contains(state.selectedPolissourceId)) {
+      return state.selectedPolissourceId;
+    }
+
+    if (sourceIds.contains("10")) {
+      return "10";
+    }
+
+    if (sourceIds.contains("20")) {
+      return "20";
+    }
+
+    return "";
+  }
+
   late MRekanGeneralCmpCrudBloc mRekanGeneralCmpCrudBloc;
   late MRekanGeneralIdvCrudBloc mRekanGeneralIdvCrudBloc;
-  Widget _ValidationDialog({
+  Widget _validationDialog({
     required String title,
     required String message,
   }) {
@@ -272,7 +295,7 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
           barrierColor: Colors.black.withOpacity(0.45),
           transitionDuration: const Duration(milliseconds: 220),
           pageBuilder: (context, animation, secondaryAnimation) {
-            return _ValidationDialog(
+            return _validationDialog(
               title: "Data Belum Lengkap",
               message: "Silakan pilih penyebab kerugian terlebih dahulu.",
             );
@@ -289,7 +312,7 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
           barrierColor: Colors.black.withOpacity(0.45),
           transitionDuration: const Duration(milliseconds: 220),
           pageBuilder: (context, animation, secondaryAnimation) {
-            return _ValidationDialog(
+            return _validationDialog(
               title: "Data Belum Lengkap",
               message: "Silakan isi no plat terlebih dahulu.",
             );
@@ -329,8 +352,6 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
 
   @override
   Widget build(BuildContext context) {
-    final jmlPolis = context.read<SumdashBloc>().state.record?.jmlpolis ?? 0;
-
     return SafeArea(
       child: BaseBackgroundSidePage(
         title: widget.cobKlaimNama,
@@ -355,11 +376,9 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                       iconPath: _iconPath,
                       title: _headerTitle,
                       subtitle:
-                      "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
+                          "Sebelum lanjut, pastikan data kamu sudah lengkap, ya!",
                     ),
-
-                    if (jmlPolis > 0) const SizedBox(height: vPadding),
-
+                    const SizedBox(height: vPadding),
                     BasePolisPage(
                       cobKlaimId: widget.cobKlaimId,
                       cobKlaimNama: widget.cobKlaimNama,
@@ -387,13 +406,14 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
               ),
             ),
           ),
-          bottomNavigationBar: BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
+          bottomNavigationBar:
+              BlocBuilder<PolissourcecariBloc, PolissourcecariState>(
             builder: (context, state) {
-              if (jmlPolis == 0) {
+              if (state.status != ListStatus.success) {
                 return const SizedBox.shrink();
               }
 
-              if (state.selectedPolissourceId != "10") {
+              if (_resolvePolisSourceId(state) != "10") {
                 return const SizedBox.shrink();
               }
 
@@ -414,8 +434,8 @@ class _RegistrasiKlaimState extends State<RegistrasiKlaim> {
                     onPressed: _isCariPolisLoading
                         ? null
                         : () async {
-                      await _handleCariPressed();
-                    },
+                            await _handleCariPressed();
+                          },
                   ),
                 ),
               );

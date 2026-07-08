@@ -104,7 +104,7 @@ class _HubungiCsState extends State<HubungiCs> with TickerProviderStateMixin {
                               data.titleText,
                               style: const TextStyle(
                                 color: primaryLightColor,
-                                fontSize: 14,
+                                fontSize: 16,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -112,7 +112,7 @@ class _HubungiCsState extends State<HubungiCs> with TickerProviderStateMixin {
                               data.descText,
                               style: const TextStyle(
                                 color: Color(0xFFB8B8B8),
-                                fontSize: 14,
+                                fontSize: 16,
                               ),
                             ),
                             const SizedBox(height: vPadding),

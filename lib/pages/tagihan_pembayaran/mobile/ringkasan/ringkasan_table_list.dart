@@ -53,8 +53,8 @@
 //     final bool isNarrow = width < 900;
 //
 //     return ListView.builder(
-//       itemCount: widget.items.length,
-//       padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+//       itemCount: widget.items.length + 1,
+//       padding: const EdgeInsets.only(bottom: hPadding),
 //       itemBuilder: (context, index) {
 //         final item = widget.items[index];
 //
@@ -368,7 +368,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
-import 'package:joss_app/helper/hscroll_always_thumb_helper.dart';
 import 'package:joss_app/models/payment/dnrekapcobcari_model.dart';
 
 class RingkasanTablePage extends StatefulWidget {
@@ -384,8 +383,16 @@ class RingkasanTablePage extends StatefulWidget {
 }
 
 class _RingkasanTablePageState extends State<RingkasanTablePage> {
+  final ScrollController _hController = ScrollController();
+
   String formatNum(num value) {
     return NumberFormat.decimalPattern().format(value);
+  }
+
+  @override
+  void dispose() {
+    _hController.dispose();
+    super.dispose();
   }
 
   @override
@@ -393,87 +400,84 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
     final width = MediaQuery.of(context).size.width;
     final bool isNarrow = width < 900;
 
-    return ListView.builder(
-      itemCount: widget.items.length,
+    return ListView(
       padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-      itemBuilder: (context, index) {
-        final item = widget.items[index];
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: hPadding),
-          child: Card(
-            color: secondaryBlackColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(cardBorderRadius),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                isNarrow
-                    ? _buildBodyTableCompact(context, item, index)
-                    : _buildBodyTableNormal(context, item, index),
-                const SizedBox(height: hPadding),
-                _buildFooterTable(context, item),
-              ],
-            ),
-          ),
-        );
-      },
+      children: [
+        isNarrow ? _buildTableCompact(context) : _buildTableNormal(context),
+        const SizedBox(height: hPadding),
+        _buildGrandTotalTable(context),
+      ],
     );
   }
 
-  Widget _buildBodyTableCompact(
-      BuildContext context,
-      DnrekapcobCariModel item,
-      int index,
-      ) {
+  BoxDecoration _boxDecoration() {
+    return BoxDecoration(
+      color: formGrey,
+      borderRadius: BorderRadius.circular(cardBorderRadius),
+      border: Border.all(color: sGrey),
+    );
+  }
+
+  TableBorder _tableBorder() {
+    return const TableBorder(
+      horizontalInside: BorderSide(color: sGrey),
+      verticalInside: BorderSide(color: sGrey),
+    );
+  }
+
+  Widget _buildTableCompact(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
-        decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          border: Border.all(color: sGrey),
-        ),
+        decoration: _boxDecoration(),
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(false),
+            thumbVisibility: WidgetStateProperty.all(true),
             trackVisibility: WidgetStateProperty.all(false),
             thickness: WidgetStateProperty.all(5),
             radius: const Radius.circular(cardBorderRadius),
             thumbColor: WidgetStateProperty.all(scrollBar.withOpacity(0.1)),
           ),
-          child: HScrollAlwaysThumb(
-            child: Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              border: const TableBorder(
-                horizontalInside: BorderSide(color: sGrey),
-                verticalInside: BorderSide(color: sGrey),
-              ),
-              columnWidths: const {
-                0: FixedColumnWidth(50),
-                1: FixedColumnWidth(110),
-                2: FixedColumnWidth(90),
-                3: FixedColumnWidth(55),
-                4: FixedColumnWidth(150),
-                5: FixedColumnWidth(120),
-              },
-              children: [
-                _tableHeader(context, const [
-                  "NO",
-                  "KATEGORI",
-                  "JUMLAH\nPOLIS",
-                  "MATA UANG",
-                  "TOTAL NILAI\nPERTANGGUNGAN",
-                  "TOTAL PREMI",
-                ]),
-                _detailRowReadOnly(
-                  context,
-                  item,
-                  index,
-                  compact: true,
+          child: Scrollbar(
+            controller: _hController,
+            child: SingleChildScrollView(
+              controller: _hController,
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width - (hPadding * 3),
                 ),
-              ],
+                child: Table(
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: _tableBorder(),
+                  columnWidths: const {
+                    0: FixedColumnWidth(50),
+                    1: FixedColumnWidth(130),
+                    2: FixedColumnWidth(95),
+                    3: FixedColumnWidth(80),
+                    4: FixedColumnWidth(180),
+                    5: FixedColumnWidth(140),
+                  },
+                  children: [
+                    _tableHeader(context, const [
+                      "NO",
+                      "KATEGORI",
+                      "JUMLAH\nPOLIS",
+                      "MATA\nUANG",
+                      "TOTAL NILAI\nPERTANGGUNGAN",
+                      "TOTAL PREMI",
+                    ]),
+                    ...widget.items.asMap().entries.map(
+                          (entry) => _detailRowReadOnly(
+                            context,
+                            entry.value,
+                            entry.key,
+                            compact: true,
+                          ),
+                        ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -481,25 +485,14 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
     );
   }
 
-  Widget _buildBodyTableNormal(
-      BuildContext context,
-      DnrekapcobCariModel item,
-      int index,
-      ) {
+  Widget _buildTableNormal(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+      borderRadius: BorderRadius.circular(cardBorderRadius),
       child: Container(
-        decoration: BoxDecoration(
-          color: formGrey,
-          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-          border: Border.all(color: sGrey),
-        ),
+        decoration: _boxDecoration(),
         child: Table(
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          border: const TableBorder(
-            horizontalInside: BorderSide(color: sGrey),
-            verticalInside: BorderSide(color: sGrey),
-          ),
+          border: _tableBorder(),
           columnWidths: const {
             0: FlexColumnWidth(1),
             1: FlexColumnWidth(2.3),
@@ -517,12 +510,14 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
               "TOTAL NILAI PERTANGGUNGAN",
               "TOTAL PREMI",
             ]),
-            _detailRowReadOnly(
-              context,
-              item,
-              index,
-              compact: false,
-            ),
+            ...widget.items.asMap().entries.map(
+                  (entry) => _detailRowReadOnly(
+                    context,
+                    entry.value,
+                    entry.key,
+                    compact: false,
+                  ),
+                ),
           ],
         ),
       ),
@@ -539,26 +534,26 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 15),
           child: isNo
               ? Center(
-            child: Text(
-              text,
-              style: bodyTextStyle(context, fontSize: 15),
-            ),
-          )
+                  child: Text(
+                    text,
+                    style: bodyTextStyle(context, fontSize: 15),
+                  ),
+                )
               : Text(
-            text,
-            style: bodyTextStyle(context, fontSize: 15),
-          ),
+                  text,
+                  style: bodyTextStyle(context, fontSize: 15),
+                ),
         );
       }).toList(),
     );
   }
 
   TableRow _detailRowReadOnly(
-      BuildContext context,
-      DnrekapcobCariModel row,
-      int index, {
-        required bool compact,
-      }) {
+    BuildContext context,
+    DnrekapcobCariModel row,
+    int index, {
+    required bool compact,
+  }) {
     TextStyle cellStyle() => bodyTextStyle(context, fontSize: 15);
 
     final BoxDecoration rowDecoration = BoxDecoration(
@@ -622,22 +617,48 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
   }
 
   Widget _cell(
-      BuildContext context, {
-        required Widget child,
-        EdgeInsets padding = const EdgeInsets.all(6),
-      }) {
+    BuildContext context, {
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.all(6),
+  }) {
     return Padding(
       padding: padding,
       child: child,
     );
   }
 
-  Widget _buildFooterTable(BuildContext context, DnrekapcobCariModel item) {
+  List<_CurrencyTotal> _calculateGrandTotals() {
+    final totals = <String, _CurrencyTotal>{};
+
+    for (final item in widget.items) {
+      final key = item.currId.isNotEmpty ? item.currId : item.currSimbol;
+      final currentTotal = totals[key];
+
+      if (currentTotal == null) {
+        totals[key] = _CurrencyTotal(
+          currId: item.currId,
+          currSimbol: item.currSimbol,
+          polisAmount: item.polisAmount,
+        );
+      } else {
+        totals[key] = currentTotal.copyWith(
+          polisAmount: currentTotal.polisAmount + item.polisAmount,
+        );
+      }
+    }
+
+    return totals.values.toList();
+  }
+
+  Widget _buildGrandTotalTable(BuildContext context) {
+    final totals = _calculateGrandTotals();
+
+    if (totals.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return ClipRRect(
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(cardBorderRadius),
-        bottomRight: Radius.circular(cardBorderRadius),
-      ),
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
       child: Container(
         decoration: BoxDecoration(
           color: pGrey,
@@ -647,17 +668,14 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
         child: Table(
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           border: const TableBorder(
-            horizontalInside: BorderSide(color: sGrey),
-            verticalInside: BorderSide(color: sGrey),
+            horizontalInside: BorderSide(color: sGrey, width: 1),
           ),
           columnWidths: const {
-            0: FlexColumnWidth(3),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(3),
+            0: FlexColumnWidth(2),
+            1: FlexColumnWidth(3),
           },
-          children: [
-            TableRow(
-              decoration: BoxDecoration(color: pGrey),
+          children: totals.map((total) {
+            return TableRow(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(10),
@@ -671,26 +689,61 @@ class _RingkasanTablePageState extends State<RingkasanTablePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Text(
-                    item.currSimbol,
-                    style: bodyTextStyle(context, fontSize: 15),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      formatNum(item.polisAmount),
-                      style: bodyTextStyle(context, fontSize: 15),
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: formGrey,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: sGrey),
+                        ),
+                        child: Text(
+                          total.currSimbol,
+                          style: bodyTextStyle(context, fontSize: 15),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        formatNum(total.polisAmount),
+                        style: bodyTextStyle(context, fontSize: 15),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-          ],
+            );
+          }).toList(),
         ),
       ),
+    );
+  }
+}
+
+class _CurrencyTotal {
+  final String currId;
+  final String currSimbol;
+  final double polisAmount;
+
+  const _CurrencyTotal({
+    required this.currId,
+    required this.currSimbol,
+    required this.polisAmount,
+  });
+
+  _CurrencyTotal copyWith({
+    String? currId,
+    String? currSimbol,
+    double? polisAmount,
+  }) {
+    return _CurrencyTotal(
+      currId: currId ?? this.currId,
+      currSimbol: currSimbol ?? this.currSimbol,
+      polisAmount: polisAmount ?? this.polisAmount,
     );
   }
 }
