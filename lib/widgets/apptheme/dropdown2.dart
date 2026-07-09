@@ -114,10 +114,9 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
 
   bool _hasLoadedOnce = false;
 
-  String get _searchHintText =>
-      widget.searchHintText?.trim().isNotEmpty == true
-          ? widget.searchHintText!
-          : 'Cari ${widget.hintText}...';
+  String get _searchHintText => widget.searchHintText?.trim().isNotEmpty == true
+      ? widget.searchHintText!
+      : 'Cari ${widget.hintText}...';
 
   void _syncPopupMeta(List<T> items, String q) {
     _currentPopupItems = items;
@@ -132,7 +131,8 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     }
 
     final limit = widget.initialVisibleCount!;
-    _hiddenCountNotifier.value = items.length > limit ? items.length - limit : 0;
+    _hiddenCountNotifier.value =
+        items.length > limit ? items.length - limit : 0;
     _itemsVersionNotifier.value++;
   }
 
@@ -142,7 +142,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
     if (_isSearchingNotifier.value) return false;
 
     final index = _currentPopupItems.indexWhere(
-          (element) => widget.compareItems(element, item),
+      (element) => widget.compareItems(element, item),
     );
 
     if (index < 0) return false;
@@ -227,10 +227,10 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       final filteredItems = q.isEmpty
           ? baseItems
           : baseItems.where((item) {
-        final text = widget.displayText(item).toLowerCase();
-        final keyword = q.toLowerCase();
-        return text.contains(keyword);
-      }).toList();
+              final text = widget.displayText(item).toLowerCase();
+              final keyword = q.toLowerCase();
+              return text.contains(keyword);
+            }).toList();
 
       _cachedItems = baseItems;
 
@@ -302,16 +302,17 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
       key: widget.comboKey,
       enabled: widget.isEnabled,
       selectedItem: widget.initItem,
-      filterFn: widget.disableLocalFilter
-          ? (_, __) => true
-          : null,
+      filterFn: widget.disableLocalFilter ? (_, __) => true : null,
       decoratorProps: DropDownDecoratorProps(
         baseStyle: bodyTextStyle(context),
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           labelText: widget.hintText,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           labelStyle: inputTextStyle(context),
           hintText: 'Pilih ${widget.hintText}',
+          hintMaxLines: 1,
           hintStyle: bodyTextStyle(context).copyWith(color: hintGrey),
           prefixIcon: widget.prefixIcon != null
               ? Icon(widget.prefixIcon, color: primaryColor)
@@ -342,10 +343,10 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
             color: Colors.red,
             fontSize: 12,
           ),
-          errorText: (widget.errorText != null &&
-              widget.errorText!.trim().isNotEmpty)
-              ? widget.errorText
-              : null,
+          errorText:
+              (widget.errorText != null && widget.errorText!.trim().isNotEmpty)
+                  ? widget.errorText
+                  : null,
         ),
       ),
       items: (filter, infiniteScrollProps) => _loadItems(filter ?? ''),
@@ -393,25 +394,25 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         },
         searchFieldProps: widget.enableSearch
             ? TextFieldProps(
-          style: inputTextStyle(context, color: hintGrey),
-          cursorColor: primaryLightColor,
-          decoration: InputDecoration(
-            isDense: true,
-            hintText: _searchHintText,
-            hintStyle: inputTextStyle(context, color: hintGrey),
-            prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
-            filled: true,
-            fillColor: formGrey,
-            border: InputBorder.none,
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 40,
-              minHeight: 20,
-            ),
-          ),
-        )
+                style: inputTextStyle(context, color: hintGrey),
+                cursorColor: primaryLightColor,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: _searchHintText,
+                  hintStyle: inputTextStyle(context, color: hintGrey),
+                  prefixIcon: Icon(Icons.search, color: hintGrey, size: 18),
+                  filled: true,
+                  fillColor: formGrey,
+                  border: InputBorder.none,
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 20,
+                  ),
+                ),
+              )
             : const TextFieldProps(
-          decoration: InputDecoration(border: InputBorder.none),
-        ),
+                decoration: InputDecoration(border: InputBorder.none),
+              ),
       ),
       compareFn: widget.compareItems,
       itemAsString: widget.displayText,
@@ -493,7 +494,6 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (widget.enableSearch) _buildCustomSearchField(),
-
                         if (isLoading || !_hasLoadedOnce)
                           const Padding(
                             padding: EdgeInsets.all(20),
@@ -503,10 +503,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
                           )
                         else
                           _buildCustomDataLayer(visibleItems),
-
-                        if (!isLoading &&
-                            _hasLoadedOnce &&
-                            showToggle)
+                        if (!isLoading && _hasLoadedOnce && showToggle)
                           _buildShowMoreButton(
                             showAllItems,
                             hiddenCount,
@@ -606,11 +603,11 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
   }
 
   Widget _defaultItemBuilderWithDivider(
-      BuildContext context,
-      T item,
-      bool isSelected,
-      bool isDisabled,
-      ) {
+    BuildContext context,
+    T item,
+    bool isSelected,
+    bool isDisabled,
+  ) {
     return ValueListenableBuilder<bool>(
       valueListenable: _showAllItemsNotifier,
       builder: (context, showAllItems, _) {
@@ -673,7 +670,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
                   showAllItems
                       ? widget.collapseText
                       : (widget.expandText?.call(hiddenCount) ??
-                      "Lihat $hiddenCount Kategori Lainnya"),
+                          "Lihat $hiddenCount Kategori Lainnya"),
                   style: bodyTextStyle(context).copyWith(
                     color: primaryColor,
                     fontWeight: FontWeight.w600,

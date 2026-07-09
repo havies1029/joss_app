@@ -9,8 +9,10 @@ import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
 import '../../../../models/combobox/combomjnsclient_model.dart';
+import '../../../../models/combobox/combomreferral_model.dart';
 import '../../../../models/reguser/reguser_model.dart';
 import '../../../../repositories/combobox/combomjnsclient_repository.dart';
+import '../../../../repositories/combobox/combomreferral_repository.dart';
 import '../../../../widgets/apptheme/dropdown2.dart';
 import '../../../login/mobile/client/widget/otp_client_widget.dart';
 import '../../../login/welcome_header.dart';
@@ -32,8 +34,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   final fieldTeleponController = TextEditingController();
   final fieldKonfirmasiPasswordController = TextEditingController();
   final fieldEmailController = TextEditingController();
-  final fieldReferralController = TextEditingController();
   ComboMJnsclientModel? fieldComboJnsClient;
+  ComboMReferralModel? fieldComboMReferral;
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
@@ -58,7 +60,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     fieldTeleponController.dispose();
     fieldEmailController.dispose();
     fieldKonfirmasiPasswordController.dispose();
-    fieldReferralController.dispose();
     super.dispose();
   }
 
@@ -265,20 +266,27 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         onSaveCallback: (value) => fieldComboJnsClient = value,
       );
 
-  Widget _buildReferralField() => appTextField(
-    label: "Kode Referral (Opsional)",
-    hint: "Masukkan Kode Referral",
-    controller: fieldReferralController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.digitsOnly,
-    ],
-    errorText: err('form1.referral'),
-    validator: (_) => err('form1.referral'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('form1.referral');
-    },
-  );
+  Widget _buildReferralField() => ReusableComboBoxV2<ComboMReferralModel>(
+        hintText: "Kode Referral (Opsional)",
+        initItem: fieldComboMReferral,
+        loader: (q) => ComboMReferralRepository().getComboMReferral(
+          q.searchText,
+        ),
+        // displayText: (item) => "${item.kodeUnik} - ${item.namaMarketing}",
+        //displayText: (item) => item.namaMarketing,
+        displayText: (item) => item.kodeUnik,
+        compareItems: (a, b) => a.mreferralId == b.mreferralId,
+        errorText: err('form1.referral'),
+        onChangedCallback: (value) {
+          setState(() {
+            fieldComboMReferral = value;
+            if (value != null) {
+              clearErr('form1.referral');
+            }
+          });
+        },
+        onSaveCallback: (value) => fieldComboMReferral = value,
+      );
 
   void handleBack() {
     if (singlePopPages.contains(widget.requestFrom)) {
@@ -453,8 +461,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                   SizedBox(height: vPadding),
                                   buildFieldComboMJnsclient(),
                                   SizedBox(height: vPadding),
-                                  // _buildReferralField(),
-                                  // SizedBox(height: vPadding),
+                                  _buildReferralField(),
+                                  SizedBox(height: vPadding),
                                   AppButton.primary(
                                     text: "Simpan",
                                     isLoading: isSubmitting,
@@ -519,7 +527,7 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       email: email,
       userNama: fieldNameController.text.trim(),
       sendOtpVia: fromEmail ? "hp" : "email",
-      referral: fieldReferralController.text.trim().isEmpty ? null :  fieldReferralController.text.trim(),
+      referral: fieldComboMReferral?.kodeUnik,
     );
 
     context.read<RegUserBloc>().add(ClearRequestFromEvent());

@@ -338,21 +338,6 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
                     onPressCariPolis();
 
-                    Future.delayed(const Duration(seconds: 12), () {
-                      if (!mounted || !_isCariPolisLoading) return;
-
-                      _hideGlobalLoading();
-
-                      setState(() {
-                        _isCariPolisLoading = false;
-                      });
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        errorSnackBar(
-                          "Terjadi kesalahan dalam pengiriman data, silahkan klik kembali.",
-                        ),
-                      );
-                    });
                   },
                 ),
               ),
