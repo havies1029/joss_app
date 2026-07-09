@@ -696,9 +696,9 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (!didPop) return;
 
         await _handleExit(context);
       },

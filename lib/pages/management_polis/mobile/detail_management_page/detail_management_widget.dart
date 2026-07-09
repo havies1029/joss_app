@@ -351,9 +351,9 @@ class _DetailManagementPolisPageState extends State<DetailManagementPolisPage> {
     }
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) return;
         goToManagementPolis();
       },
       child: Scaffold(

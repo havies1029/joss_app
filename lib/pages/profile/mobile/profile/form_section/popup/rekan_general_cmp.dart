@@ -116,11 +116,19 @@ class MRekanGeneralCmpPopUpPageFormState
         if (didPop) return;
         _handleClose();
       },
-      child: BaseBackgroundSidePage(
-        title: 'Informasi Perusahaan',
-        onBack: _handleClose,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragEnd: (details) {
+          final velocity = details.primaryVelocity ?? 0;
+          if (velocity > 500) {
+            _handleClose();
+          }
+        },
+        child: BaseBackgroundSidePage(
+          title: 'Informasi Perusahaan',
+          onBack: _handleClose,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
             return Container(
               width: double.infinity,
               height: constraints.maxHeight,
@@ -363,7 +371,8 @@ class MRekanGeneralCmpPopUpPageFormState
                 ),
               ),
             );
-          },
+            },
+          ),
         ),
       ),
     );

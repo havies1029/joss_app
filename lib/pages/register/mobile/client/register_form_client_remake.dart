@@ -307,9 +307,10 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     lastLoginBy = isEmail ? "email" : "hp";
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) return;
+
         handleBack();
       },
       child: BlocConsumer<RegUserBloc, RegUserState>(

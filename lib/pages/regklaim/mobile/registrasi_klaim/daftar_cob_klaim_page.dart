@@ -50,9 +50,9 @@ class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
 
   Widget _buildAsPage(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (!didPop) return;
 
         if (regUserBloc.state.requestFrom.isNotEmpty) {
           authenticationBloc.add(
@@ -60,8 +60,6 @@ class _DaftarCobKlaimWidgetState extends State<DaftarCobKlaimWidget> {
           );
           regUserBloc.add(ClearRequestFromEvent());
         }
-
-        Navigator.pop(context);
       },
       child: BaseBackgroundSidePage(
         title: 'Lapor Klaim',

@@ -199,25 +199,25 @@ class RiwayatDetailTablePageRemakeState extends State<RiwayatDetailTablePageRema
                                 ),
                               );
 
-                              context.read<DnRekap2invBloc>().add(
-                                CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
-                                // SetPaymentSummaryEvent(curr: state.)
-                              );
-                              // showDialog(
-                              //   context: context,
-                              //   barrierDismissible: true,
-                              //   barrierColor: Colors.black.withOpacity(0.6),
-                              //   builder: (dialogContext) => RegisterClientPopUp(
-                              //     showIcon: false,
-                              //     header: 'Fitur pembayaran belum tersedia.',
-                              //     description:
-                              //     'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
-                              //     buttonText: 'Mengerti',
-                              //     onPressed: () {
-                              //       Navigator.of(dialogContext).pop();
-                              //     },
-                              //   ),
+                              // context.read<DnRekap2invBloc>().add(
+                              //   CheckInvoiceStatusEvent(invoiceId: selected.inv1Id),
+                              //   // SetPaymentSummaryEvent(curr: state.)
                               // );
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                barrierColor: Colors.black.withOpacity(0.6),
+                                builder: (dialogContext) => RegisterClientPopUp(
+                                  showIcon: false,
+                                  header: 'Fitur pembayaran belum tersedia.',
+                                  description:
+                                  'Saat ini aplikasi masih dalam mode Demo/Uji Coba. Pembayaran belum dapat dilakukan. Silahkan tunggu hingga aplikasi Go Live.',
+                                  buttonText: 'Mengerti',
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                ),
+                              );
                             } else {
                               _showGlobalLoading();
 

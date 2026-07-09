@@ -112,12 +112,11 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) return;
 
         _refreshUnreadCount();
-        Navigator.pop(context);
       },
       child: BaseBackgroundSidePage(
         title: 'Notifikasi',

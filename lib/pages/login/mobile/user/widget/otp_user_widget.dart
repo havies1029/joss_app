@@ -251,14 +251,12 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
         }
       },
       child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, result) {
-          if (didPop) return;
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (!didPop) return;
 
           _pinController.clear();
           _timer?.cancel();
-
-          Navigator.of(context, rootNavigator: false).pop();
 
           context.read<AuthenticationBloc>().add(LoggedOut());
         },

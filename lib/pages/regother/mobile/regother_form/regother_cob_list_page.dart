@@ -170,15 +170,13 @@ class _CobCariPageState extends State<CobCariPage> {
     );
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) return;
 
         context.read<Regother1CrudBloc>().add(
               const ResetSelectedCobEvent(),
             );
-
-        Navigator.pop(context);
       },
       child: BaseBackgroundSidePage(
         title: "Kategori Asuransi",

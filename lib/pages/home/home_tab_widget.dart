@@ -192,9 +192,10 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // cegah pop otomatis dari back fisik/gesture
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (!didPop) return;
+
         await handleLogout(context);
       },
       child: MultiBlocListener(

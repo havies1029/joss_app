@@ -396,9 +396,9 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (!didPop) return;
         await _handleBackExit(context);
       },
       child: MultiBlocListener(

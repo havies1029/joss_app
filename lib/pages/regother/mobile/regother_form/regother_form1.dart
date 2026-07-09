@@ -120,9 +120,9 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
         ),
       ],
       child: PopScope(
-        canPop: false,
+        canPop: true,
         onPopInvokedWithResult: (didPop, result) async {
-          if (didPop) return;
+          if (!didPop) return;
 
           if (regUserBloc.state.requestFrom.isNotEmpty) {
             authenticationBloc.add(
@@ -133,7 +133,6 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
           regother1CrudBloc.add(
             const ResetSelectedCobEvent(),
           );
-          Navigator.pop(context);
         },
         child: BlocConsumer<Regother1CrudBloc, Regother1CrudState>(
           builder: (context, state) {

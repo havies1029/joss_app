@@ -222,9 +222,9 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
         final busy = dnState.isProcessing;
 
         return PopScope(
-          canPop: false,
+          canPop: true,
           onPopInvokedWithResult: (didPop, result) async {
-            if (didPop) return;
+            if (!didPop) return;
             await _handleExit(context);
           },
           child: BaseBackgroundSidePage(
