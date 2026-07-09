@@ -393,55 +393,55 @@ class _LoginFormUserState extends State<LoginFormUser>
                                           ),
                                           SizedBox(height: 10),
                                           _buildSignInButton(),
-                                          SizedBox(height: 10),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                  child: kDivider(
-                                                      color: hintGrey)),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8.0),
-                                                child: Text(
-                                                  "atau",
-                                                  style: TextStyle(
-                                                    fontSize: getResponsiveFont(
-                                                        context, 18),
-                                                    color: Colors.white70,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                  child: kDivider(
-                                                      color: hintGrey)),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10),
-
-                                          AppButton.iconLeft(
-                                            text: 'Masuk Dengan Google',
-                                            icon: SvgPicture.asset(
-                                              'assets/icons/google-icon.svg',
-                                              width: 20,
-                                              height: 20,
-                                            ),
-                                            backgroundColor: isGoogleSigningIn
-                                                ? secondaryBlackColor
-                                                : pGrey,
-                                            onPressed: isGoogleSigningIn
-                                                ? null
-                                                : () async {
-                                              setState(() {
-                                                isGoogleSigningIn = true;
-                                              });
-
-                                              _showGlobalLoading();
-
-                                              await _handleGmailRegisterForMobile(context);
-                                            },
-                                          ),
+                                          // SizedBox(height: 10),
+                                          // Row(
+                                          //   children: [
+                                          //     Expanded(
+                                          //         child: kDivider(
+                                          //             color: hintGrey)),
+                                          //     Padding(
+                                          //       padding:
+                                          //           const EdgeInsets.symmetric(
+                                          //               horizontal: 8.0),
+                                          //       child: Text(
+                                          //         "atau",
+                                          //         style: TextStyle(
+                                          //           fontSize: getResponsiveFont(
+                                          //               context, 18),
+                                          //           color: Colors.white70,
+                                          //           fontWeight: FontWeight.w500,
+                                          //         ),
+                                          //       ),
+                                          //     ),
+                                          //     Expanded(
+                                          //         child: kDivider(
+                                          //             color: hintGrey)),
+                                          //   ],
+                                          // ),
+                                          // SizedBox(height: 10),
+                                          //
+                                          // AppButton.iconLeft(
+                                          //   text: 'Masuk Dengan Google',
+                                          //   icon: SvgPicture.asset(
+                                          //     'assets/icons/google-icon.svg',
+                                          //     width: 20,
+                                          //     height: 20,
+                                          //   ),
+                                          //   backgroundColor: isGoogleSigningIn
+                                          //       ? secondaryBlackColor
+                                          //       : pGrey,
+                                          //   onPressed: isGoogleSigningIn
+                                          //       ? null
+                                          //       : () async {
+                                          //     setState(() {
+                                          //       isGoogleSigningIn = true;
+                                          //     });
+                                          //
+                                          //     _showGlobalLoading();
+                                          //
+                                          //     await _handleGmailRegisterForMobile(context);
+                                          //   },
+                                          // ),
 
                                           SizedBox(
                                             height: vPadding,
