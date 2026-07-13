@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/regpar/regpar_upload_foto_object_bloc.dart';
+import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/regpar/mobile/preview/regpar6_unified_preview_page.dart';
 import 'package:string_validator/string_validator.dart';
 
@@ -710,100 +713,122 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) return;
-
+    return IosLeftEdgeSwipe(
+      onSwipeBack: () async {
         await _handleExit(context);
       },
-      child: BaseBackgroundSidePage(
-        onBack: () async {
+      child: PopScope(
+        canPop: Platform.isAndroid ? false : true,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (Platform.isIOS) return;
+          if (didPop) return;
+
           await _handleExit(context);
         },
-        onHome: () async {
-          await _handleExit2(context);
-        },
-        title: "Polis Properti",
-        blocListeners: [
-          BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regpar1Id = state.record!.regpar1Id;
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform1(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regpar2FormBloc, Regpar2FormState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regpar2Id = state.record!.regpar2Id;
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform2(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regpar3FormBloc, Regpar3FormState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regpar3Id = state.record!.regpar3Id;
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform3(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regpar4FormBloc, Regpar4FormState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regpar4Id = state.record!.regpar1Id; //anomali
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform4(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regpar5FormBloc, Regpar5FormState>(
-            listenWhen: (prev, curr) =>
-                prev.isCalculated != curr.isCalculated ||
-                prev.hasFailure != curr.hasFailure,
-            listener: (context, state) {
-              if (state.hasFailure) {
+        child: BaseBackgroundSidePage(
+          onBack: () async {
+            await _handleExit(context);
+          },
+          onHome: () async {
+            await _handleExit2(context);
+          },
+          title: "Polis Properti",
+          blocListeners: [
+            BlocListener<Regpar1CrudBloc, Regpar1CrudState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  setState(() {
+                    regpar1Id = state.record!.regpar1Id;
+                  });
+                }
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform1(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regpar2FormBloc, Regpar2FormState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  setState(() {
+                    regpar2Id = state.record!.regpar2Id;
+                  });
+                }
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform2(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regpar3FormBloc, Regpar3FormState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  setState(() {
+                    regpar3Id = state.record!.regpar3Id;
+                  });
+                }
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform3(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regpar4FormBloc, Regpar4FormState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  setState(() {
+                    regpar4Id = state.record!.regpar1Id; //anomali
+                  });
+                }
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform4(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regpar5FormBloc, Regpar5FormState>(
+              listenWhen: (prev, curr) =>
+                  prev.isCalculated != curr.isCalculated ||
+                  prev.hasFailure != curr.hasFailure,
+              listener: (context, state) {
+                if (state.hasFailure) {
+                  if (mounted) {
+                    setState(() {
+                      _isHitungPremiLoading = false;
+                    });
+                  }
+                  return;
+                }
+
+                final rec = state.record;
+                if (!state.isCalculated || rec == null) return;
+
                 if (mounted) {
                   setState(() {
                     _isHitungPremiLoading = false;
+                    regpar5Id = rec.regpar5Id;
                   });
                 }
-                return;
-              }
 
-              final rec = state.record;
-              if (!state.isCalculated || rec == null) return;
-
-              if (mounted) {
-                setState(() {
-                  _isHitungPremiLoading = false;
-                  regpar5Id = rec.regpar5Id;
-                });
-              }
-
-              _payloadform5(rec);
-              openPremiSection(recordId: regpar1Id);
-            },
-          ),
-        ],
-        child: _buildForm(),
+                _payloadform5(rec);
+                openPremiSection(recordId: regpar1Id);
+              },
+            ),
+          ],
+          child: _buildForm(),
+        ),
       ),
     );
   }
@@ -1207,47 +1232,48 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
-                        setState(() {
-                          _isLanjutkanLoading = true;
-                        });
+                              setState(() {
+                                _isLanjutkanLoading = true;
+                              });
 
-                        _showGlobalLoading();
+                              _showGlobalLoading();
 
-                        try {
-                          draftForm1ToBloc(context);
-                          draftForm2ToBloc(context);
-                          draftForm3ToBloc(context);
-                          draftForm4ToBloc(context);
+                              try {
+                                draftForm1ToBloc(context);
+                                draftForm2ToBloc(context);
+                                draftForm3ToBloc(context);
+                                draftForm4ToBloc(context);
 
-                          context.read<RegparFlowBloc>().add(
-                            RegparFlowStartEvent(),
-                          );
+                                context.read<RegparFlowBloc>().add(
+                                      RegparFlowStartEvent(),
+                                    );
 
-                          await Future.delayed(const Duration(seconds: 2));
+                                await Future.delayed(
+                                    const Duration(seconds: 2));
 
-                          if (!mounted) return;
+                                if (!mounted) return;
 
-                          _hideGlobalLoading();
+                                _hideGlobalLoading();
 
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => KonfirmasiRegParPage(
-                                recordId: regpar1Id ?? '',
-                                viewMode: 'ubah',
-                              ),
-                            ),
-                          );
-                        } finally {
-                          _hideGlobalLoading();
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => KonfirmasiRegParPage(
+                                      recordId: regpar1Id ?? '',
+                                      viewMode: 'ubah',
+                                    ),
+                                  ),
+                                );
+                              } finally {
+                                _hideGlobalLoading();
 
-                          if (mounted) {
-                            setState(() {
-                              _isLanjutkanLoading = false;
-                            });
-                          }
-                        }
-                      },
+                                if (mounted) {
+                                  setState(() {
+                                    _isLanjutkanLoading = false;
+                                  });
+                                }
+                              }
+                            },
                     ),
                   ],
                   const SizedBox(height: 25),
@@ -1540,7 +1566,7 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: AppButton.primary(
-          text: _isHitungPremiLoading ? "Hitung Premi" : "Lanjutkan",
+          text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
               _isHitungPremiLoading ? secondaryBlackColor : primaryColor,

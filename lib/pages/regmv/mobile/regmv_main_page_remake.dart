@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv1crud_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/blocs/gen_regmv/regmv_upload_foto_mobil_bloc.dart';
+import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/regmv/mobile/preview/regmv4_unified_preview_page.dart';
 import 'package:joss_app/pages/regmv/mobile/preview/regmv5_unified_preview_page.dart';
 import 'package:joss_app/pages/regmv/mobile/preview/regmv7_unified_preview_page.dart';
@@ -695,86 +698,104 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) return;
-
+    return IosLeftEdgeSwipe(
+      onSwipeBack: () async {
         await _handleExit(context);
       },
-      child: BaseBackgroundSidePage(
-        onBack: () async {
+      child: PopScope(
+        canPop: Platform.isAndroid ? false : true,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (Platform.isIOS) return;
+          if (didPop) return;
+
           await _handleExit(context);
         },
-        onHome: () async {
-          await _handleExit2(context);
-        },
-        title: "Polis Kendaraan",
-        blocListeners: [
-          BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regmv1Id = state.record!.regmv1Id;
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform1(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regmv2FormBloc, Regmv2FormState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regmv2Id = state.record!.regmv2Id;
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform2(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regmv3FormBloc, Regmv3FormState>(
-            listener: (context, state) {
-              if (state.isSaved && !state.hasFailure && state.record != null) {
-                setState(() {
-                  regmv3Id = state.record!.regmv3Id;
-                });
-              }
-              if (state.isLoaded && !state.hasFailure && state.record != null) {
-                _payloadform3(state.record!);
-              }
-            },
-          ),
-          BlocListener<Regmv6FormBloc, Regmv6FormState>(
-            listener: (context, state) {
-              if (state.hasFailure) {
-                if (mounted) {
+        child: BaseBackgroundSidePage(
+          onBack: () async {
+            await _handleExit(context);
+          },
+          onHome: () async {
+            await _handleExit2(context);
+          },
+          title: "Polis Kendaraan",
+          blocListeners: [
+            BlocListener<Regmv1CrudBloc, Regmv1CrudState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
                   setState(() {
-                    _isHitungPremiLoading = false;
+                    regmv1Id = state.record!.regmv1Id;
                   });
                 }
-                return;
-              }
-
-              final record = state.record;
-              if (record == null) return;
-
-              if (state.isCalculated) {
-                if (mounted) {
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform1(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regmv2FormBloc, Regmv2FormState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
                   setState(() {
-                    _isHitungPremiLoading = false;
+                    regmv2Id = state.record!.regmv2Id;
                   });
                 }
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform2(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regmv3FormBloc, Regmv3FormState>(
+              listener: (context, state) {
+                if (state.isSaved &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  setState(() {
+                    regmv3Id = state.record!.regmv3Id;
+                  });
+                }
+                if (state.isLoaded &&
+                    !state.hasFailure &&
+                    state.record != null) {
+                  _payloadform3(state.record!);
+                }
+              },
+            ),
+            BlocListener<Regmv6FormBloc, Regmv6FormState>(
+              listener: (context, state) {
+                if (state.hasFailure) {
+                  if (mounted) {
+                    setState(() {
+                      _isHitungPremiLoading = false;
+                    });
+                  }
+                  return;
+                }
 
-                _payloadform6(record);
-                openSection(RegmvFormSection.form6);
-              }
-            },
-          ),
-        ],
-        child: _buildForm(),
+                final record = state.record;
+                if (record == null) return;
+
+                if (state.isCalculated) {
+                  if (mounted) {
+                    setState(() {
+                      _isHitungPremiLoading = false;
+                    });
+                  }
+
+                  _payloadform6(record);
+                  openSection(RegmvFormSection.form6);
+                }
+              },
+            ),
+          ],
+          child: _buildForm(),
+        ),
       ),
     );
   }
@@ -1268,44 +1289,47 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                       onPressed: _isLanjutkanLoading
                           ? null
                           : () async {
-                        setState(() {
-                          _isLanjutkanLoading = true;
-                        });
+                              setState(() {
+                                _isLanjutkanLoading = true;
+                              });
 
-                        _showGlobalLoading();
+                              _showGlobalLoading();
 
-                        try {
-                          draftForm1ToBloc(context);
-                          draftForm2ToBloc(context);
-                          draftForm3ToBloc(context);
+                              try {
+                                draftForm1ToBloc(context);
+                                draftForm2ToBloc(context);
+                                draftForm3ToBloc(context);
 
-                          context.read<RegmvFlowBloc>().add(RegmvFlowStartEvent());
+                                context
+                                    .read<RegmvFlowBloc>()
+                                    .add(RegmvFlowStartEvent());
 
-                          await Future.delayed(const Duration(seconds: 2));
+                                await Future.delayed(
+                                    const Duration(seconds: 2));
 
-                          if (!mounted) return;
+                                if (!mounted) return;
 
-                          _hideGlobalLoading();
+                                _hideGlobalLoading();
 
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => KonfirmasiRegMvPage(
-                                recordId: regmv1Id ?? '',
-                                viewMode: 'ubah',
-                              ),
-                            ),
-                          );
-                        } finally {
-                          _hideGlobalLoading();
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => KonfirmasiRegMvPage(
+                                      recordId: regmv1Id ?? '',
+                                      viewMode: 'ubah',
+                                    ),
+                                  ),
+                                );
+                              } finally {
+                                _hideGlobalLoading();
 
-                          if (mounted) {
-                            setState(() {
-                              _isLanjutkanLoading = false;
-                            });
-                          }
-                        }
-                      },
+                                if (mounted) {
+                                  setState(() {
+                                    _isLanjutkanLoading = false;
+                                  });
+                                }
+                              }
+                            },
                     ),
                   ],
                   const SizedBox(height: 25),
@@ -1628,7 +1652,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: AppButton.primary(
-          text: _isHitungPremiLoading ? "Hitung Premi" : "Lanjutkan",
+          text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
               _isHitungPremiLoading ? secondaryBlackColor : primaryColor,

@@ -251,9 +251,9 @@ class _PopupUserWidgetState extends State<PopupUserWidget>
         }
       },
       child: PopScope(
-        canPop: true,
+        canPop: false,
         onPopInvokedWithResult: (didPop, result) async {
-          if (!didPop) return;
+          if (didPop) return;
 
           _pinController.clear();
           _timer?.cancel();

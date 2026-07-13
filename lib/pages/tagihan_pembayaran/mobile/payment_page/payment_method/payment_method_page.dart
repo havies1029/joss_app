@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:joss_app/common/loading_indicator.dart';
+import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../blocs/payment/invoicestatuscard_bloc.dart';
 import '../../../../../blocs/payment/paymentmethodcari_bloc.dart';
@@ -11,6 +14,7 @@ import '../../../../../blocs/payment/paymentmethodcari_event.dart';
 import '../../../../../blocs/payment/paymentmethodcari_state.dart';
 import '../../../../../common/constants.dart';
 import '../../../../../helper/creditcard_inputformatter.dart';
+import '../../../../../helper/navigation_keys.dart';
 import '../../../../../models/payment/paymentcard_model.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
@@ -38,15 +42,13 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
   DateTime? fieldMasaBerlakuKartu;
 
-  String get expiryMonth =>
-      fieldMasaBerlakuKartu == null
-          ? ''
-          : fieldMasaBerlakuKartu!.month.toString().padLeft(2, '0');
+  String get expiryMonth => fieldMasaBerlakuKartu == null
+      ? ''
+      : fieldMasaBerlakuKartu!.month.toString().padLeft(2, '0');
 
-  String get expiryYear =>
-      fieldMasaBerlakuKartu == null
-          ? ''
-          : fieldMasaBerlakuKartu!.year.toString();
+  String get expiryYear => fieldMasaBerlakuKartu == null
+      ? ''
+      : fieldMasaBerlakuKartu!.year.toString();
 
   final fieldCvnController = TextEditingController();
   final fieldNamaDepanPemilikKartuController = TextEditingController();
@@ -115,7 +117,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                     ),
                   ),
                   const SizedBox(height: hPadding),
-
                   const Text(
                     "Keluar dari Pembayaran?",
                     textAlign: TextAlign.center,
@@ -125,9 +126,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                       color: primaryLightColor,
                     ),
                   ),
-
                   const SizedBox(height: 6),
-
                   const Text(
                     "Pembayaran Anda belum selesai. Jika keluar dari halaman ini, Anda dapat melanjutkan pembayaran kapan saja melalui menu Riwayat Pembayaran selama pembayaran masih berlaku.",
                     textAlign: TextAlign.center,
@@ -137,9 +136,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                       color: dGrey,
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Row(
                     children: [
                       Expanded(
@@ -147,7 +144,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                           text: "Lanjutkan Pembayaran",
                           backgroundColor: sGrey,
                           borderside: const BorderSide(color: sGrey),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 5),
                           textStyle: const TextStyle(
                             fontSize: 16,
                           ),
@@ -161,7 +159,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                         child: AppButton.primary(
                           text: "Iya, Keluar",
                           backgroundColor: primaryColor,
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 5),
                           textStyle: const TextStyle(
                             fontSize: 16,
                           ),
@@ -201,16 +200,21 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
         MaterialPageRoute(
           builder: (_) => const TagihanPembayaranPage(initialTab: 2),
         ),
-            (route) => route.isFirst,
+        (route) => route.isFirst,
       );
     }
   }
-
 
   Future<void> _handleHomeExit(BuildContext context) async {
     final shouldLeave = await showExitConfirmDialog(context);
 
     if (shouldLeave == true) {
+      final homeState = homeTabKey.currentState;
+
+      if (homeState != null) {
+        homeState.goToHeroPage();
+      }
+
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
@@ -221,216 +225,246 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       builder: (context, dnState) {
         final busy = dnState.isProcessing;
 
-        return PopScope(
-          canPop: true,
-          onPopInvokedWithResult: (didPop, result) async {
-            if (!didPop) return;
+        return IosLeftEdgeSwipe(
+          onSwipeBack: () async {
+            if (busy) return;
             await _handleExit(context);
           },
-          child: BaseBackgroundSidePage(
-            onBack: () {
-              if (busy) return;
-              _handleExit(context);
+          child: PopScope(
+            canPop: Platform.isAndroid ? false : true,
+            onPopInvokedWithResult: (didPop, result) async {
+              if (Platform.isIOS) return;
+              if (didPop) return;
+              await _handleExit(context);
             },
-            onHome:  () {
-              if (busy) return;
-              _handleHomeExit(context);
-            },
-            title: "Metode Pembayaran",
-            child: Stack(
-              children: [
-                Container(
-                  color: secondaryBlackColor,
-                  padding: const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
-                          builder: (context, state) {
-                            if (state.isLoading) {
-                              return const Center(child: LoadingIndicator());
-                            }
+            child: BaseBackgroundSidePage(
+              onBack: () {
+                if (busy) return;
+                _handleExit(context);
+              },
+              onHome: () {
+                if (busy) return;
+                _handleHomeExit(context);
+              },
+              title: "Metode Pembayaran",
+              child: Stack(
+                children: [
+                  Container(
+                    color: secondaryBlackColor,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: hPadding * 1.5),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: BlocBuilder<PaymentMethodCariBloc,
+                              PaymentMethodCariState>(
+                            builder: (context, state) {
+                              if (state.isLoading) {
+                                return const Center(child: LoadingIndicator());
+                              }
 
-                            if (state.hasError) {
-                              return const Center(
-                                child: Text("Gagal memuat metode pembayaran"),
-                              );
-                            }
+                              if (state.hasError) {
+                                return const Center(
+                                  child: Text("Gagal memuat metode pembayaran"),
+                                );
+                              }
 
-                            final categories = [...state.categories]
-                              ..sort(
-                                    (a, b) =>
-                                    (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0),
-                              );
+                              final categories = [...state.categories]..sort(
+                                  (a, b) => (a.sortOrder ?? 0)
+                                      .compareTo(b.sortOrder ?? 0),
+                                );
 
-                            return ScrollbarTheme(
-                              data: ScrollbarThemeData(
-                                thumbVisibility: WidgetStateProperty.all(false),
-                                trackVisibility: WidgetStateProperty.all(false),
-                                thickness: WidgetStateProperty.all(5),
-                                radius: const Radius.circular(cardBorderRadius),
-                                thumbColor: WidgetStateProperty.all(
-                                  scrollBar.withOpacity(0.1),
-                                ),
-                              ),
-                              child: Scrollbar(
-                                controller: _scrollCtrl,
-                                child: SingleChildScrollView(
-                                  controller: _scrollCtrl,
-                                  physics: const BouncingScrollPhysics(),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: pGrey,
-                                          borderRadius: BorderRadius.circular(
-                                            cardBorderRadius,
-                                          ),
-                                          border: Border.all(color: sGrey),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Total Pembayaran:",
-                                              style: inputTextStyle(context),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              "${widget.curr} ${NumberFormat("#,###").format(widget.totalBayar)}",
-                                              style: headingStyle(context),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: pGrey,
-                                          borderRadius: BorderRadius.circular(
-                                            cardBorderRadius,
-                                          ),
-                                          border: Border.all(color: sGrey),
-                                        ),
-                                        child: ListView.separated(
-                                          shrinkWrap: true,
-                                          physics:
-                                          const NeverScrollableScrollPhysics(),
-                                          padding: EdgeInsets.zero,
-                                          itemCount: categories.length,
-                                          separatorBuilder: (_, __) => Divider(
-                                            height: 1,
-                                            color: sGrey.withOpacity(0.5),
-                                          ),
-                                          itemBuilder: (context, index) {
-                                            final cat = categories[index];
-                                            final icon = _categoryIconBySortOrder(
-                                              cat.sortOrder,
-                                            );
-
-                                            final isCreditCard = cat.categoryId.toString() == '20';
-
-                                            return PaymentList(
-                                              iconPath: icon,
-                                              categoryName: cat.categoryName,
-                                              items: cat.items,
-                                              isExpanded: _expandedIndex == index,
-                                              isCreditCard: isCreditCard,
-                                              creditCardForm: buildFormKartuKredit(),
-                                              onTapHeader: () {
-                                                if (busy) return;
-
-                                                if (_expandedIndex != index) {
-                                                  context.read<PaymentMethodCariBloc>().add(
-                                                    PaymentResetSelectedEvent(),
-                                                  );
-                                                }
-
-                                                setState(() {
-                                                  _expandedIndex = _expandedIndex == index ? null : index;
-                                                });
-                                              },
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                    ],
+                              return ScrollbarTheme(
+                                data: ScrollbarThemeData(
+                                  thumbVisibility:
+                                      WidgetStateProperty.all(false),
+                                  trackVisibility:
+                                      WidgetStateProperty.all(false),
+                                  thickness: WidgetStateProperty.all(5),
+                                  radius:
+                                      const Radius.circular(cardBorderRadius),
+                                  thumbColor: WidgetStateProperty.all(
+                                    scrollBar.withOpacity(0.1),
                                   ),
                                 ),
-                              ),
+                                child: Scrollbar(
+                                  controller: _scrollCtrl,
+                                  child: SingleChildScrollView(
+                                    controller: _scrollCtrl,
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            color: pGrey,
+                                            borderRadius: BorderRadius.circular(
+                                              cardBorderRadius,
+                                            ),
+                                            border: Border.all(color: sGrey),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Total Pembayaran:",
+                                                style: inputTextStyle(context),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                "${widget.curr} ${NumberFormat("#,###").format(widget.totalBayar)}",
+                                                style: headingStyle(context),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: pGrey,
+                                            borderRadius: BorderRadius.circular(
+                                              cardBorderRadius,
+                                            ),
+                                            border: Border.all(color: sGrey),
+                                          ),
+                                          child: ListView.separated(
+                                            shrinkWrap: true,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            padding: EdgeInsets.zero,
+                                            itemCount: categories.length,
+                                            separatorBuilder: (_, __) =>
+                                                Divider(
+                                              height: 1,
+                                              color: sGrey.withOpacity(0.5),
+                                            ),
+                                            itemBuilder: (context, index) {
+                                              final cat = categories[index];
+                                              final icon =
+                                                  _categoryIconBySortOrder(
+                                                cat.sortOrder,
+                                              );
+
+                                              final isCreditCard =
+                                                  cat.categoryId.toString() ==
+                                                      '20';
+
+                                              return PaymentList(
+                                                iconPath: icon,
+                                                categoryName: cat.categoryName,
+                                                items: cat.items,
+                                                isExpanded:
+                                                    _expandedIndex == index,
+                                                isCreditCard: isCreditCard,
+                                                creditCardForm:
+                                                    buildFormKartuKredit(),
+                                                onTapHeader: () {
+                                                  if (busy) return;
+
+                                                  if (_expandedIndex != index) {
+                                                    context
+                                                        .read<
+                                                            PaymentMethodCariBloc>()
+                                                        .add(
+                                                          PaymentResetSelectedEvent(),
+                                                        );
+                                                  }
+
+                                                  setState(() {
+                                                    _expandedIndex =
+                                                        _expandedIndex == index
+                                                            ? null
+                                                            : index;
+                                                  });
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        BlocBuilder<PaymentMethodCariBloc,
+                            PaymentMethodCariState>(
+                          builder: (context, state) {
+                            return BlocSelector<InvoiceStatusCardBloc,
+                                InvoiceStatusCardState, bool>(
+                              selector: (cardState) => cardState.isLoading,
+                              builder: (context, cardLoading) {
+                                final sortedCategories = [...state.categories]
+                                  ..sort((a, b) => (a.sortOrder ?? 0)
+                                      .compareTo(b.sortOrder ?? 0));
+
+                                final isCreditCardExpanded = _expandedIndex !=
+                                        null &&
+                                    _expandedIndex! < sortedCategories.length &&
+                                    sortedCategories[_expandedIndex!]
+                                            .categoryId
+                                            .toString() ==
+                                        '20';
+
+                                final canShowButton = isCreditCardExpanded ||
+                                    state.selectedMethodId != null;
+
+                                if (!canShowButton) {
+                                  return const SizedBox.shrink();
+                                }
+
+                                final submitBusy = busy || cardLoading;
+
+                                return AppButton.primary(
+                                  text: "Konfirmasi",
+                                  isLoading: submitBusy,
+                                  backgroundColor: submitBusy
+                                      ? secondaryBlackColor
+                                      : primaryColor,
+                                  onPressed: submitBusy
+                                      ? null
+                                      : () {
+                                          if (submitBusy) return;
+
+                                          if (isCreditCardExpanded) {
+                                            final ok =
+                                                validateFormKartuKredit();
+                                            if (!ok) return;
+                                          }
+
+                                          _onLanjutkanPressed(
+                                            isCreditCard: isCreditCardExpanded,
+                                          );
+                                        },
+                                );
+                              },
                             );
                           },
                         ),
-                      ),
-
-                      BlocBuilder<PaymentMethodCariBloc, PaymentMethodCariState>(
-                        builder: (context, state) {
-                          return BlocSelector<InvoiceStatusCardBloc, InvoiceStatusCardState, bool>(
-                            selector: (cardState) => cardState.isLoading,
-                            builder: (context, cardLoading) {
-                              final sortedCategories = [...state.categories]
-                                ..sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
-
-                              final isCreditCardExpanded =
-                                  _expandedIndex != null &&
-                                      _expandedIndex! < sortedCategories.length &&
-                                      sortedCategories[_expandedIndex!].categoryId.toString() == '20';
-
-                              final canShowButton =
-                                  isCreditCardExpanded || state.selectedMethodId != null;
-
-                              if (!canShowButton) {
-                                return const SizedBox.shrink();
-                              }
-
-                              final submitBusy = busy || cardLoading;
-
-                              return AppButton.primary(
-                                text: "Konfirmasi",
-                                isLoading: submitBusy,
-                                backgroundColor: submitBusy ? secondaryBlackColor : primaryColor,
-                                onPressed: submitBusy
-                                    ? null
-                                    : () {
-                                  if (submitBusy) return;
-
-                                  if (isCreditCardExpanded) {
-                                    final ok = validateFormKartuKredit();
-                                    if (!ok) return;
-                                  }
-
-                                  _onLanjutkanPressed(
-                                    isCreditCard: isCreditCardExpanded,
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-
-                if (busy)
-                  Positioned.fill(
-                    child: AbsorbPointer(
-                      absorbing: true,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.35),
-                        child: const Center(
-                          child: LoadingIndicator(),
+                  if (busy)
+                    Positioned.fill(
+                      child: AbsorbPointer(
+                        absorbing: true,
+                        child: Container(
+                          color: Colors.black.withOpacity(0.35),
+                          child: const Center(
+                            child: LoadingIndicator(),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -519,18 +553,18 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
     if (isCreditCard) {
       context.read<InvoiceStatusCardBloc>().add(
-        InvToBayarViaCardEvent(
-          invoiceId: dnState.invoiceId,
-          cardNumber: fieldNomorKartuController.text.replaceAll(' ', ''),
-          expiryMonth: expiryMonth,
-          expiryYear: expiryYear,
-          cvn: fieldCvnController.text.trim(),
-          cardholderFirstName:
-          fieldNamaDepanPemilikKartuController.text.trim(),
-          cardholderLastName:
-          fieldNamaBelakangPemilikKartuController.text.trim(),
-        ),
-      );
+            InvToBayarViaCardEvent(
+              invoiceId: dnState.invoiceId,
+              cardNumber: fieldNomorKartuController.text.replaceAll(' ', ''),
+              expiryMonth: expiryMonth,
+              expiryYear: expiryYear,
+              cvn: fieldCvnController.text.trim(),
+              cardholderFirstName:
+                  fieldNamaDepanPemilikKartuController.text.trim(),
+              cardholderLastName:
+                  fieldNamaBelakangPemilikKartuController.text.trim(),
+            ),
+          );
       return;
     }
 
@@ -540,30 +574,30 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     if (selectedId == null) return;
 
     context.read<DnRekap2invBloc>().add(
-      Invoice2PaymentViaVAEvent(
-        invoiceId: dnState.invoiceId,
-        methodId: selectedId,
-      ),
-    );
+          Invoice2PaymentViaVAEvent(
+            invoiceId: dnState.invoiceId,
+            methodId: selectedId,
+          ),
+        );
   }
 
   Widget buildFieldNomorKartu() => appTextField(
-    label: "Nomor Kartu Kredit",
-    controller: fieldNomorKartuController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.digitsOnly,
-      LengthLimitingTextInputFormatter(19), // max 19 digit kartu
-      CreditCardInputFormatter(),
-    ],
-    errorText: err('kartuKredit.nomorKartu'),
-    validator: (_) => err('kartuKredit.nomorKartu'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) {
-        clearErr('kartuKredit.nomorKartu');
-      }
-    },
-  );
+        label: "Nomor Kartu Kredit",
+        controller: fieldNomorKartuController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(19), // max 19 digit kartu
+          CreditCardInputFormatter(),
+        ],
+        errorText: err('kartuKredit.nomorKartu'),
+        validator: (_) => err('kartuKredit.nomorKartu'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) {
+            clearErr('kartuKredit.nomorKartu');
+          }
+        },
+      );
 
   // Widget buildFieldBulanKedaluwarsa() => appTextField(
   //   label: "Bulan Kedaluwarsa",
@@ -596,65 +630,65 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   // );
 
   Widget buildFieldMasaBerlakuKartu() => AppDateField(
-    label: "Masa Berlaku Kartu",
-    initialValue: fieldMasaBerlakuKartu,
-    firstDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
-    lastDate: DateTime(DateTime.now().year + 15, 12, 1),
-    mode: AppDateFieldMode.monthYear,
-    errorText: err('kartuKredit.masaBerlaku'),
-    validator: (_) => err('kartuKredit.masaBerlaku'),
-    onChanged: (dt) {
-      setState(() {
-        fieldMasaBerlakuKartu = dt;
-        if (dt != null) {
-          fieldErrors.remove('kartuKredit.masaBerlaku');
-        }
-      });
-    },
-  );
+        label: "Masa Berlaku Kartu",
+        initialValue: fieldMasaBerlakuKartu,
+        firstDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
+        lastDate: DateTime(DateTime.now().year + 15, 12, 1),
+        mode: AppDateFieldMode.monthYear,
+        errorText: err('kartuKredit.masaBerlaku'),
+        validator: (_) => err('kartuKredit.masaBerlaku'),
+        onChanged: (dt) {
+          setState(() {
+            fieldMasaBerlakuKartu = dt;
+            if (dt != null) {
+              fieldErrors.remove('kartuKredit.masaBerlaku');
+            }
+          });
+        },
+      );
 
   Widget buildFieldCvn() => appTextField(
-    label: "CVN",
-    controller: fieldCvnController,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.digitsOnly,
-      LengthLimitingTextInputFormatter(4),
-    ],
-    errorText: err('kartuKredit.cvn'),
-    validator: (_) => err('kartuKredit.cvn'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('kartuKredit.cvn');
-    },
-  );
+        label: "CVN",
+        controller: fieldCvnController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(4),
+        ],
+        errorText: err('kartuKredit.cvn'),
+        validator: (_) => err('kartuKredit.cvn'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('kartuKredit.cvn');
+        },
+      );
 
   Widget buildFieldNamaDepanPemilikKartu() => appTextField(
-    label: "Nama Depan",
-    controller: fieldNamaDepanPemilikKartuController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
-    ],
-    errorText: err('kartuKredit.namaDepan'),
-    validator: (_) => err('kartuKredit.namaDepan'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('kartuKredit.namaDepan');
-    },
-  );
+        label: "Nama Depan",
+        controller: fieldNamaDepanPemilikKartuController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+        ],
+        errorText: err('kartuKredit.namaDepan'),
+        validator: (_) => err('kartuKredit.namaDepan'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('kartuKredit.namaDepan');
+        },
+      );
 
   Widget buildFieldNamaBelakangPemilikKartu() => appTextField(
-    label: "Nama Belakang",
-    controller: fieldNamaBelakangPemilikKartuController,
-    keyboardType: TextInputType.text,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
-    ],
-    errorText: err('kartuKredit.namaBelakang'),
-    validator: (_) => err('kartuKredit.namaBelakang'),
-    onChanged: (v) {
-      if (v.trim().isNotEmpty) clearErr('kartuKredit.namaBelakang');
-    },
-  );
+        label: "Nama Belakang",
+        controller: fieldNamaBelakangPemilikKartuController,
+        keyboardType: TextInputType.text,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+        ],
+        errorText: err('kartuKredit.namaBelakang'),
+        validator: (_) => err('kartuKredit.namaBelakang'),
+        onChanged: (v) {
+          if (v.trim().isNotEmpty) clearErr('kartuKredit.namaBelakang');
+        },
+      );
 
   final Map<String, String?> fieldErrors = {};
   String? err(String key) => fieldErrors[key];
@@ -674,4 +708,3 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     });
   }
 }
-

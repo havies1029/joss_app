@@ -8,6 +8,7 @@ import '../../../../common/constants.dart';
 import '../../../../common/loading_indicator.dart';
 import '../../../../helper/expert_helper.dart';
 import '../../../../helper/mobile_expert_helper.dart';
+import '../../../../widgets/apptheme/polis_button.dart';
 import '../../../../widgets/apptheme/popup_widget.dart';
 import '../payment_page/payment_method/payment_method_page.dart';
 import '../payment_page/payment_process/payment_process.dart';
@@ -24,9 +25,6 @@ class RingkasanPage extends StatefulWidget {
 
 class RingkasanPageState extends State<RingkasanPage> {
   late DnrekapcobCariBloc dnrekapcobCariBloc;
-
-  final TextEditingController _searchController =
-  TextEditingController();
 
   bool _firstLoading = true;
 
@@ -75,7 +73,12 @@ class RingkasanPageState extends State<RingkasanPage> {
             );
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PaymentSuccess(display: "Pembayaran Berhasil!",description: "Polis Anda kini aktif.", displayButton: "Kembali",)),
+              MaterialPageRoute(
+                  builder: (context) => PaymentSuccess(
+                        display: "Pembayaran Berhasil!",
+                        description: "Polis Anda kini aktif.",
+                        displayButton: "Kembali",
+                      )),
             );
           } else if (state.paymentStatus == "91") {
             refreshData();
@@ -92,49 +95,63 @@ class RingkasanPageState extends State<RingkasanPage> {
             Column(
               children: [
                 const SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: hPadding * 1.5,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                        buildWhen: (previous, current) {
+                          return previous.status != current.status ||
+                              previous.items != current.items;
+                        },
+                        builder: (context, state) {
+                          final bool isEmpty =
+                              state.status != ListStatus.success ||
+                                  state.items.isEmpty;
 
-                // ===== HEADER (PAKAI PADDING) =====
-                // Container(
-                //   padding: EdgeInsets.symmetric(
-                //     horizontal: hPadding * 1.5,
-                //     vertical: 10,
-                //   ),
-                //   child:
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Expanded(
-                //         child: ListPageFilterBarUIWidget(
-                //           searchController: _searchController,
-                //           searchButton: buildSearchButton(),
-                //         ),
-                //       ),
-                //       const SizedBox(width: 8),
-                //       PolisButton(
-                //         assetPath: "assets/icons/unduh.svg",
-                //         bgColor: const Color(0xFFA1A1AA),
-                //         borderColor: const Color(0xFFBCBCC7),
-                //         onTap: () => _showExportDialog(context),
-                //         iconSize: 16,
-                //         height: 36,
-                //         width: 36,
-                //       ),
-                //       const SizedBox(width: 8),
-                //       PolisButton(
-                //         assetPath: "assets/icons/bagikan.svg",
-                //         bgColor: const Color(0xFF295EFF),
-                //         borderColor: const Color(0xFF5D86FF),
-                //         onTap: () => _onShare(context),
-                //         iconSize: 16,
-                //         height: 36,
-                //         width: 36,
-                //       ),
-                //     ],
-                //   ),
-                // ),
+                          return PolisButton(
+                            assetPath: "assets/icons/unduh.svg",
+                            bgColor: const Color(0xFFA1A1AA),
+                            borderColor: const Color(0xFFBCBCC7),
+                            onTap: isEmpty
+                                ? null
+                                : () => _showExportDialog(context),
+                            iconSize: 16,
+                            height: 36,
+                            width: 36,
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
+                        buildWhen: (previous, current) {
+                          return previous.status != current.status ||
+                              previous.items != current.items;
+                        },
+                        builder: (context, state) {
+                          final bool isEmpty =
+                              state.status != ListStatus.success ||
+                                  state.items.isEmpty;
 
-                // const SizedBox(height: hPadding),
-
+                          return PolisButton(
+                            assetPath: "assets/icons/bagikan.svg",
+                            bgColor: const Color(0xFF295EFF),
+                            borderColor: const Color(0xFF5D86FF),
+                            onTap: isEmpty ? null : () => _onShare(context),
+                            iconSize: 16,
+                            height: 36,
+                            width: 36,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: hPadding),
                 Expanded(
                   child: BlocBuilder<DnrekapcobCariBloc, DnrekapcobCariState>(
                     builder: (context, state) {
@@ -156,16 +173,13 @@ class RingkasanPageState extends State<RingkasanPage> {
                     },
                   ),
                 ),
-
                 const SizedBox(height: hPadding),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: hPadding * 1.5,
                   ),
                   child: buildInfoNote(context),
                 ),
-
               ],
             ),
 
@@ -195,7 +209,7 @@ class RingkasanPageState extends State<RingkasanPage> {
         Expanded(
           child: Text(
             "Apabila Anda melakukan pembayaran melalui bagian keuangan internal kami, "
-                "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate. Tagihan ini tidak termasuk Marine Cargo dan Bonding.",
+            "dibutuhkan waktu hingga 2 hari agar status tagihan terupdate. Tagihan ini tidak termasuk Marine Cargo dan Bonding.",
             style: bodyTextStyle(context, fontSize: 15),
           ),
         ),
@@ -207,11 +221,10 @@ class RingkasanPageState extends State<RingkasanPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => RingkasanDetailPage(
-              listcobId: dnrekapcobCariBloc.state.selectedIds.join(";"),
-              currId: '001',
-            ),
+        builder: (context) => RingkasanDetailPage(
+          listcobId: dnrekapcobCariBloc.state.selectedIds.join(";"),
+          currId: '001',
+        ),
       ),
     );
   }
@@ -245,9 +258,8 @@ class RingkasanPageState extends State<RingkasanPage> {
               button1Text: "Excel",
               button2Text: "PDF",
               onExportSelected: (format) async {
-                final allItems = state.items
-                    .map((e) => e.toExportMap())
-                    .toList();
+                final allItems =
+                    state.items.map((e) => e.toExportMap()).toList();
 
                 if (allItems.isEmpty) {
                   Navigator.pop(dialogContext);
@@ -338,8 +350,7 @@ class RingkasanPageState extends State<RingkasanPage> {
       return;
     }
 
-    final allItems =
-    state.items.map((e) => e.toExportMap()).toList();
+    final allItems = state.items.map((e) => e.toExportMap()).toList();
 
     try {
       if (kIsWeb) {
@@ -351,8 +362,7 @@ class RingkasanPageState extends State<RingkasanPage> {
         return;
       }
 
-      final fileName =
-          "Ringkasan_${DateTime.now().millisecondsSinceEpoch}.pdf";
+      final fileName = "Ringkasan_${DateTime.now().millisecondsSinceEpoch}.pdf";
 
       final file = await MobileDownloadHelper.generatePdfFile(
         fileName: fileName,
@@ -389,13 +399,5 @@ class RingkasanPageState extends State<RingkasanPage> {
 
   void refreshData() {
     dnrekapcobCariBloc.add(RefreshDnrekapcobCariEvent());
-  }
-
-  IconButton buildSearchButton() {
-    return IconButton(
-      icon: const Icon(Icons.autorenew_rounded, size: 28),
-      onPressed: refreshData,
-      tooltip: 'Refresh',
-    );
   }
 }

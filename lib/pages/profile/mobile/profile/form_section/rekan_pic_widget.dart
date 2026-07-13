@@ -469,7 +469,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Hapus Data?",
+                    "Nonaktifkan PIC?",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor,
@@ -479,7 +479,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Data PIC ini akan dihapus.",
+                    "Data PIC ini akan di Nonaktifkan",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: primaryLightColor.withOpacity(0.7),

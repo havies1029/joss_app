@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/pages/home/draggable_chat_button.dart';
 import 'package:joss_app/pages/literasi/mobile/literasi_page.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
@@ -115,11 +118,13 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
                               backgroundColor: sGrey,
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                borderRadius:
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
-                            onPressed: () => Navigator.pop(dialogContext, false),
+                            onPressed: () =>
+                                Navigator.pop(dialogContext, false),
                             child: Text(
                               "Batal",
                               style: TextStyle(
@@ -139,7 +144,8 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
                               backgroundColor: pSlowRed,
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(cardBorderRadius),
+                                borderRadius:
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -188,69 +194,79 @@ class HomeTabWidgetState extends State<HomeTabWidget> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) return;
-
+    return IosLeftEdgeSwipe(
+      onSwipeBack: () async {
         await handleLogout(context);
       },
-      child: MultiBlocListener(
-        listeners: [
-          BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
-            listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
-            listener: (context, state) {},
-          ),
-          BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
-            listenWhen: (prev, curr) =>
-            curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
-            listener: (context, state) {
-              final mrekan1Id = state.record?.mrekan1Id;
-              if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
-                context.read<MRekanContactCrudBloc>().add(
-                  MRekanContactCrudLihatEvent(),
-                );
-              }
-            },
-          ),
-          BlocListener<EmailVerificationBloc, EmailVerificationState>(
-            listenWhen: (prev, curr) =>
-            prev.record != curr.record && curr.record != null && !curr.hasFailure,
-            listener: (context, state) {},
-          ),
-        ],
-        child: Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: MobileTopNavigationBar(context: context, selectedIndex: selectedIndex),
-          body: Stack(
-            children: [
-              IndexedStack(
-                index: selectedIndex,
-                children: pages,
-              ),
-              DraggableChatButton(
-                onTap: () {
-                  if (ChatInitService.I.isInitialized) {
-                    Navigator.pushNamed(context, 'chat');
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Chat belum siap, coba lagi')),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-          bottomNavigationBar: Material(
-            color: primaryBlackColor,
-            child: SafeArea(
-              top: false,
-              child: bottom_nav.MobileBottomNavigationBar(
-                currentIndex: selectedIndex,
-                onTap: (idx) => setState(() => selectedIndex = idx),
+      child: PopScope(
+        canPop: Platform.isAndroid ? false : true,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (Platform.isIOS) return;
+          if (didPop) return;
+
+          await handleLogout(context);
+        },
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<ProfileDownloadFotoBloc, ProfileDownloadFotoState>(
+              listenWhen: (prev, curr) => curr is ProfileDownloadFotoLoaded,
+              listener: (context, state) {},
+            ),
+            BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
+              listenWhen: (prev, curr) =>
+                  curr.isLoaded &&
+                  prev.record?.mrekan1Id != curr.record?.mrekan1Id,
+              listener: (context, state) {
+                final mrekan1Id = state.record?.mrekan1Id;
+                if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
+                  context.read<MRekanContactCrudBloc>().add(
+                        MRekanContactCrudLihatEvent(),
+                      );
+                }
+              },
+            ),
+            BlocListener<EmailVerificationBloc, EmailVerificationState>(
+              listenWhen: (prev, curr) =>
+                  prev.record != curr.record &&
+                  curr.record != null &&
+                  !curr.hasFailure,
+              listener: (context, state) {},
+            ),
+          ],
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: MobileTopNavigationBar(
+                context: context, selectedIndex: selectedIndex),
+            body: Stack(
+              children: [
+                IndexedStack(
+                  index: selectedIndex,
+                  children: pages,
+                ),
+                DraggableChatButton(
+                  onTap: () {
+                    if (ChatInitService.I.isInitialized) {
+                      Navigator.pushNamed(context, 'chat');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Chat belum siap, coba lagi')),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+            bottomNavigationBar: Material(
+              color: primaryBlackColor,
+              child: SafeArea(
+                top: false,
+                child: bottom_nav.MobileBottomNavigationBar(
+                  currentIndex: selectedIndex,
+                  onTap: (idx) => setState(() => selectedIndex = idx),
+                ),
               ),
             ),
           ),

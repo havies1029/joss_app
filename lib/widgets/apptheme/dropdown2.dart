@@ -365,6 +365,7 @@ class _ReusableComboBoxV2State<T> extends State<ReusableComboBoxV2<T>> {
         ),
       ),
       popupProps: PopupProps.menu(
+        fit: FlexFit.loose,
         menuProps: const MenuProps(
           margin: EdgeInsets.only(top: 5),
           backgroundColor: Colors.transparent,

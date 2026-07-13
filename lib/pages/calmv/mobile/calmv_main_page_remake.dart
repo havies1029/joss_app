@@ -465,7 +465,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
-                title: "Kendaraan",
+                title: "Polis Kendaraan",
                 subtitle:
                     "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
@@ -842,7 +842,7 @@ class _CalmvMainPageRemakeState extends State<CalmvMainPageRemake> {
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: AppButton.primary(
-          text: _isHitungPremiLoading ? "Hitung Premi" : "Lanjutkan",
+          text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
               _isHitungPremiLoading ? secondaryBlackColor : primaryColor,

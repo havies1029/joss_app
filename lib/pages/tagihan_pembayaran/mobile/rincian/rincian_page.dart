@@ -194,7 +194,7 @@ class _RincianPageState extends State<RincianPage> {
                         MaterialPageRoute(
                           builder: (_) => const TransaksiPage(),
                         ),
-                            (route) => route.isFirst,
+                        (route) => route.isFirst,
                       );
                     },
                   ),
@@ -536,10 +536,12 @@ class _RincianPageState extends State<RincianPage> {
 
   void _showExportDialog(BuildContext context) {
     final state = dn2invBloc.state;
+    final allDetails =
+        state.rincianSOA.headers.expand((h) => h.details).toList();
 
-    if (state.selectedIds.isEmpty) {
+    if (allDetails.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
+          .showSnackBar(infoSnackBar("Tidak ada data untuk diunduh"));
       return;
     }
 
@@ -560,17 +562,12 @@ class _RincianPageState extends State<RincianPage> {
               button1Text: "Excel",
               button2Text: "PDF",
               onExportSelected: (format) async {
-                final allDetails =
-                    state.rincianSOA.headers.expand((h) => h.details).toList();
-
-                final selectedDetails = allDetails
-                    .where((d) => state.selectedIds.contains(d.dn1Id))
-                    .toList();
+                final selectedDetails = _detailsForExport(state);
 
                 if (selectedDetails.isEmpty) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                      errorSnackBar("Tidak ada data yang dipilih"));
+                      errorSnackBar("Tidak ada data untuk diunduh"));
                   return;
                 }
 
@@ -593,6 +590,19 @@ class _RincianPageState extends State<RincianPage> {
         ),
       ),
     );
+  }
+
+  List<dynamic> _detailsForExport(DnRekap2invState state) {
+    final allDetails =
+        state.rincianSOA.headers.expand((h) => h.details).toList();
+
+    if (state.selectedIds.isEmpty) {
+      return allDetails;
+    }
+
+    return allDetails
+        .where((detail) => state.selectedIds.contains(detail.dn1Id))
+        .toList();
   }
 
   String formatDateNullable(DateTime? value) {
@@ -686,22 +696,15 @@ class _RincianPageState extends State<RincianPage> {
       return;
     }
 
-    if (state.selectedIds.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(infoSnackBar("Pilih data terlebih dahulu"));
-      return;
-    }
+    // Tidak memilih apa pun berarti export/share seluruh rincian.
+    final bool isAllData = state.selectedIds.isEmpty ||
+        state.selectedIds.length == allDetails.length;
 
-    // kalau select all → ambil semua
-    final bool isSelectAll = state.selectedIds.length == allDetails.length;
-
-    final selectedDetails = isSelectAll
-        ? allDetails
-        : allDetails.where((d) => state.selectedIds.contains(d.dn1Id)).toList();
+    final selectedDetails = _detailsForExport(state);
 
     if (selectedDetails.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(errorSnackBar("Tidak ada data yang dipilih"));
+          .showSnackBar(errorSnackBar("Tidak ada data untuk dibagikan"));
       return;
     }
 
@@ -713,7 +716,7 @@ class _RincianPageState extends State<RincianPage> {
         await ExportHelper.export(
           "pdf",
           exportData,
-          CategoryType.ringkasan,
+          CategoryType.rincian,
         );
         return;
       }
@@ -731,8 +734,8 @@ class _RincianPageState extends State<RincianPage> {
 
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'application/pdf')],
-        subject: 'Rincian Polis Terpilih',
-        text: isSelectAll
+        subject: isAllData ? 'Seluruh Rincian Polis' : 'Rincian Polis Terpilih',
+        text: isAllData
             ? 'Berikut terlampir seluruh rincian polis.'
             : 'Berikut terlampir rincian polis terpilih.',
       );

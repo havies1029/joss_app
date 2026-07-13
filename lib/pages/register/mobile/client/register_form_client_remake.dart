@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
+import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import '../../../../blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/models/user/user_model.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
@@ -306,197 +309,203 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
     final isEmail = EmailValidator.validate(email.trim());
     lastLoginBy = isEmail ? "email" : "hp";
 
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) return;
-
+    return IosLeftEdgeSwipe(
+      onSwipeBack: () async {
         handleBack();
       },
-      child: BlocConsumer<RegUserBloc, RegUserState>(
-        listenWhen: (previous, current) {
-          return previous.isSaved != current.isSaved ||
-              previous.hasFailure != current.hasFailure ||
-              previous.isOtpClient != current.isOtpClient ||
-              previous.isRegisterSuccess != current.isRegisterSuccess;
+      child: PopScope(
+        canPop: Platform.isAndroid ? false : true,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (Platform.isIOS) return;
+          if (didPop) return;
+
+          handleBack();
         },
-        listener: (context, state) {
-          if (state.hasFailure && state.errors.isNotEmpty) {
-            if (mounted) {
-              setState(() {
-                isSubmitting = false;
-              });
+        child: BlocConsumer<RegUserBloc, RegUserState>(
+          listenWhen: (previous, current) {
+            return previous.isSaved != current.isSaved ||
+                previous.hasFailure != current.hasFailure ||
+                previous.isOtpClient != current.isOtpClient ||
+                previous.isRegisterSuccess != current.isRegisterSuccess;
+          },
+          listener: (context, state) {
+            if (state.hasFailure && state.errors.isNotEmpty) {
+              if (mounted) {
+                setState(() {
+                  isSubmitting = false;
+                });
+              }
+
+              final msg = state.errors.first;
+              ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
+              return;
             }
 
-            final msg = state.errors.first;
-            ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(msg));
-            return;
-          }
-
-          if (!state.hasFailure &&
-              state.isSaved &&
-              state.isRegisterSuccess &&
-              singlePopPages.contains(widget.requestFrom) &&
-              !state.isOtpClient) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => PopupClientWidget(
-                  sentTo: state.sentTo,
-                  sentVia: state.sentVia,
+            if (!state.hasFailure &&
+                state.isSaved &&
+                state.isRegisterSuccess &&
+                singlePopPages.contains(widget.requestFrom) &&
+                !state.isOtpClient) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => PopupClientWidget(
+                    sentTo: state.sentTo,
+                    sentVia: state.sentVia,
+                  ),
                 ),
-              ),
-            );
-            if (mounted) {
-              setState(() {
-                isSubmitting = false;
-              });
+              );
+              if (mounted) {
+                setState(() {
+                  isSubmitting = false;
+                });
+              }
             }
-          }
-        },
-        builder: (context, state) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: vPadding,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/images/logo.png',
-                            height: isDesktop(context)
-                                ? 56
-                                : isTablet(context)
-                                    ? 48
-                                    : 42,
-                            width: isDesktop(context)
-                                ? 180
-                                : isTablet(context)
-                                    ? 140
-                                    : 120,
-                          ),
-                          SizedBox(height: vPadding * 0.6),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: TextButton.icon(
-                                onPressed: handleBack,
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                icon: Icon(
-                                  Icons.arrow_back_ios_new,
-                                  color: primaryColor,
-                                  size: getResponsiveFont(context, 18),
-                                ),
-                                label: Text(
-                                  "Kembali",
-                                  style: bodyTextStyle(context)
-                                      .copyWith(color: primaryColor),
+          },
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: vPadding,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo.png',
+                              height: isDesktop(context)
+                                  ? 56
+                                  : isTablet(context)
+                                      ? 48
+                                      : 42,
+                              width: isDesktop(context)
+                                  ? 180
+                                  : isTablet(context)
+                                      ? 140
+                                      : 120,
+                            ),
+                            SizedBox(height: vPadding * 0.6),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: TextButton.icon(
+                                  onPressed: handleBack,
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  icon: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: primaryColor,
+                                    size: getResponsiveFont(context, 18),
+                                  ),
+                                  label: Text(
+                                    "Kembali",
+                                    style: bodyTextStyle(context)
+                                        .copyWith(color: primaryColor),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: vPadding * 0.8),
-                          WelcomeHeader(type: "register_client"),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: cardBorderGradient,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                          ),
+                            SizedBox(height: vPadding * 0.8),
+                            WelcomeHeader(type: "register_client"),
+                          ],
                         ),
+                      ),
+                      Expanded(
                         child: Container(
-                          margin: const EdgeInsets.all(1),
                           decoration: BoxDecoration(
-                            color: secondaryBlackColor,
+                            gradient: cardBorderGradient,
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(20),
                               topRight: Radius.circular(20),
                             ),
                           ),
-                          child: Card(
-                            color: secondaryBlackColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            margin: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              color: secondaryBlackColor,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
                             ),
-                            child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  _buildNameField(),
-                                  SizedBox(height: vPadding),
-                                  if (lastLoginBy == 'email') ...[
-                                    _buildTeleponField(),
+                            child: Card(
+                              color: secondaryBlackColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  children: [
+                                    _buildNameField(),
                                     SizedBox(height: vPadding),
-                                  ] else if (lastLoginBy == 'hp') ...[
-                                    _buildEmailField(),
+                                    if (lastLoginBy == 'email') ...[
+                                      _buildTeleponField(),
+                                      SizedBox(height: vPadding),
+                                    ] else if (lastLoginBy == 'hp') ...[
+                                      _buildEmailField(),
+                                      SizedBox(height: vPadding),
+                                    ],
+                                    _buildPasswordField(),
                                     SizedBox(height: vPadding),
+                                    _PasswordRequirementRow(
+                                        controller: fieldPasswordController),
+                                    SizedBox(height: vPadding),
+                                    _buildKonfirmasiPasswordField(),
+                                    SizedBox(height: vPadding),
+                                    buildFieldComboMJnsclient(),
+                                    SizedBox(height: vPadding),
+                                    _buildReferralField(),
+                                    SizedBox(height: vPadding),
+                                    AppButton.primary(
+                                      text: "Simpan",
+                                      isLoading: isSubmitting,
+                                      backgroundColor: isSubmitting
+                                          ? secondaryBlackColor
+                                          : primaryColor,
+                                      onPressed: isSubmitting
+                                          ? null
+                                          : () async {
+                                              if (!validateForm1()) return;
+
+                                              setState(() {
+                                                isSubmitting = true;
+                                              });
+                                              _startSubmitTimeout();
+
+                                              onSubmit();
+                                            },
+                                    ),
+                                    const Spacer(),
                                   ],
-                                  _buildPasswordField(),
-                                  SizedBox(height: vPadding),
-                                  _PasswordRequirementRow(
-                                      controller: fieldPasswordController),
-                                  SizedBox(height: vPadding),
-                                  _buildKonfirmasiPasswordField(),
-                                  SizedBox(height: vPadding),
-                                  buildFieldComboMJnsclient(),
-                                  SizedBox(height: vPadding),
-                                  _buildReferralField(),
-                                  SizedBox(height: vPadding),
-                                  AppButton.primary(
-                                    text: "Simpan",
-                                    isLoading: isSubmitting,
-                                    backgroundColor: isSubmitting
-                                        ? secondaryBlackColor
-                                        : primaryColor,
-                                    onPressed: isSubmitting
-                                        ? null
-                                        : () async {
-                                            if (!validateForm1()) return;
-
-                                            setState(() {
-                                              isSubmitting = true;
-                                            });
-                                            _startSubmitTimeout();
-
-                                            onSubmit();
-                                          },
-                                  ),
-                                  const Spacer(),
-                                ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

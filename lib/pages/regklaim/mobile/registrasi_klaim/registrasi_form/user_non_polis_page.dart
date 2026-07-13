@@ -334,7 +334,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                       _isCariPolisLoading = true;
                     });
 
-                    _showGlobalLoading();
+
 
                     onPressCariPolis();
 
@@ -352,20 +352,28 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
     final ok = validateForm1();
     if (!ok) return;
 
+    debugPrint("#1");
     if (!_hasRequiredAttachment()) return;
+    debugPrint("#2");
 
     final authState = context.read<AuthenticationBloc>().state;
     if (authState is! AuthenticationAuthenticated) return;
+    debugPrint("#3");
 
     final user = authState.user;
     if (user.userType != "C") {
       _showRegisterClientDialog();
       return;
     }
+    debugPrint("#4");
 
     if (!_canSubmitWithCompleteGeneralData()) return;
 
     _submitRegklaim(_buildRegklaimRecord());
+
+    _showGlobalLoading();
+    debugPrint("#1");
+
   }
 
   bool _hasRequiredAttachment() {

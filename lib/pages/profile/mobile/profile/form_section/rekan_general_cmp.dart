@@ -36,11 +36,10 @@ class MRekanGeneralCmpCrudFormPageFormState
 
   ComboMBentukCstModel? fieldComboMBentukCst;
   final comboMBentukCstKey =
-  GlobalKey<DropdownSearchState<ComboMBentukCstModel>>();
+      GlobalKey<DropdownSearchState<ComboMBentukCstModel>>();
 
   ComboMBidangModel? fieldComboMBidang;
-  final comboMBidangKey =
-  GlobalKey<DropdownSearchState<ComboMBidangModel>>();
+  final comboMBidangKey = GlobalKey<DropdownSearchState<ComboMBidangModel>>();
 
   final fieldRekanNamaController = TextEditingController();
   final fieldNamaBadanUsahaController = TextEditingController();
@@ -88,11 +87,11 @@ class MRekanGeneralCmpCrudFormPageFormState
                 ),
                 child: Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: BlocConsumer<MRekanGeneralCmpCrudBloc,
                       MRekanGeneralCmpCrudState>(
                     listenWhen: (prev, curr) =>
-                    prev.isLoaded != curr.isLoaded ||
+                        prev.isLoaded != curr.isLoaded ||
                         prev.isSaved != curr.isSaved,
                     listener: (context, state) {
                       if (state.isLoaded && _isFirstLoad) {
@@ -100,11 +99,11 @@ class MRekanGeneralCmpCrudFormPageFormState
 
                         final formName = (rec?.rekanNama ?? '').trim();
                         final fallbackName = (context
-                            .read<MRekan1CrudBloc>()
-                            .state
-                            .record
-                            ?.rekanNama ??
-                            '')
+                                    .read<MRekan1CrudBloc>()
+                                    .state
+                                    .record
+                                    ?.rekanNama ??
+                                '')
                             .trim();
 
                         final mjenisClient = context
@@ -141,8 +140,10 @@ class MRekanGeneralCmpCrudFormPageFormState
                           fieldIdKlienController.text = idKlien ?? "";
                         }
 
-                        fieldComboMBentukCst ??= rec?.comboMBentukCst ?? state.comboMBentukCst;
-                        fieldComboMBidang ??= rec?.comboMBidang ?? state.comboMBidang;
+                        fieldComboMBentukCst ??=
+                            rec?.comboMBentukCst ?? state.comboMBentukCst;
+                        fieldComboMBidang ??=
+                            rec?.comboMBidang ?? state.comboMBidang;
 
                         setState(() {});
                         _isFirstLoad = false;
@@ -156,6 +157,10 @@ class MRekanGeneralCmpCrudFormPageFormState
                         }
 
                         if (!state.hasFailure) {
+                          context
+                              .read<MRekan1CrudBloc>()
+                              .add(MRekan1CrudReloadEvent());
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             successSnackBar("Data berhasil disimpan!"),
                           );
@@ -179,29 +184,32 @@ class MRekanGeneralCmpCrudFormPageFormState
                             BlocBuilder<ProfileDownloadFotoBloc,
                                 ProfileDownloadFotoState>(
                               buildWhen: (prev, curr) =>
-                              prev.runtimeType != curr.runtimeType ||
+                                  prev.runtimeType != curr.runtimeType ||
                                   curr is ProfileDownloadFotoLoaded,
                               builder: (context, state) {
                                 final Uint8List? imageBytes =
-                                state is ProfileDownloadFotoLoaded
-                                    ? state.imageBytes
-                                    : null;
+                                    state is ProfileDownloadFotoLoaded
+                                        ? state.imageBytes
+                                        : null;
                                 return Center(
                                   child: InkResponse(
                                     onTap: _isTapLocked
                                         ? null
                                         : () async {
-                                      setState(() => _isTapLocked = true);
+                                            setState(() => _isTapLocked = true);
 
-                                      try {
-                                        await ImageUploader.pickAndUpload(context);
-                                      } finally {
-                                        await Future.delayed(const Duration(seconds: 2));
-                                        if (mounted) {
-                                          setState(() => _isTapLocked = false);
-                                        }
-                                      }
-                                    },
+                                            try {
+                                              await ImageUploader.pickAndUpload(
+                                                  context);
+                                            } finally {
+                                              await Future.delayed(
+                                                  const Duration(seconds: 2));
+                                              if (mounted) {
+                                                setState(
+                                                    () => _isTapLocked = false);
+                                              }
+                                            }
+                                          },
                                     containedInkWell: true,
                                     customBorder: const CircleBorder(),
                                     child: Stack(
@@ -211,10 +219,12 @@ class MRekanGeneralCmpCrudFormPageFormState
                                           radius: 50,
                                           backgroundColor: secondaryBlackColor,
                                           backgroundImage:
-                                          (imageBytes != null && imageBytes.isNotEmpty)
-                                              ? MemoryImage(imageBytes)
-                                              : null,
-                                          child: (imageBytes == null || imageBytes.isEmpty)
+                                              (imageBytes != null &&
+                                                      imageBytes.isNotEmpty)
+                                                  ? MemoryImage(imageBytes)
+                                                  : null,
+                                          child: (imageBytes == null ||
+                                                  imageBytes.isEmpty)
                                               ? _avatarFallback()
                                               : null,
                                         ),
@@ -225,21 +235,26 @@ class MRekanGeneralCmpCrudFormPageFormState
                                             padding: const EdgeInsets.all(2),
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              border: Border.all(color: sGrey, width: 1),
+                                              border: Border.all(
+                                                  color: sGrey, width: 1),
                                               color: pGrey,
                                             ),
                                             child: CircleAvatar(
                                               radius: 16,
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               child: Center(
                                                 child: SizedBox(
                                                   width: 22,
                                                   height: 22,
                                                   child: ShaderMask(
-                                                    shaderCallback: (Rect bounds) {
+                                                    shaderCallback:
+                                                        (Rect bounds) {
                                                       return const LinearGradient(
-                                                        begin: Alignment.centerLeft,
-                                                        end: Alignment.centerRight,
+                                                        begin: Alignment
+                                                            .centerLeft,
+                                                        end: Alignment
+                                                            .centerRight,
                                                         colors: [
                                                           Color(0xFFFCCF6F),
                                                           Color(0xFFEF7A28),
@@ -249,7 +264,9 @@ class MRekanGeneralCmpCrudFormPageFormState
                                                     child: SvgPicture.asset(
                                                       "assets/icons/camera.svg",
                                                       width: 22,
-                                                      colorFilter: const ColorFilter.mode(
+                                                      colorFilter:
+                                                          const ColorFilter
+                                                              .mode(
                                                         Colors.white,
                                                         BlendMode.srcIn,
                                                       ),
@@ -291,7 +308,7 @@ class MRekanGeneralCmpCrudFormPageFormState
                                 color: pGrey,
                                 border: Border.all(color: sGrey),
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               child: Column(
                                 children: [
@@ -311,12 +328,13 @@ class MRekanGeneralCmpCrudFormPageFormState
                             AppButton.primary(
                               text: "Simpan Perubahan",
                               isLoading: isSaving,
-                              backgroundColor: isSaving ? secondaryBlackColor : primaryColor,
+                              backgroundColor:
+                                  isSaving ? secondaryBlackColor : primaryColor,
                               onPressed: isSaving
                                   ? null
                                   : () async {
-                                await onSaveForm();
-                              },
+                                      await onSaveForm();
+                                    },
                             )
                           ],
                         ),
@@ -333,11 +351,11 @@ class MRekanGeneralCmpCrudFormPageFormState
   }
 
   Widget _avatarFallback() => SvgPicture.asset(
-    'assets/icons/place_holder_2.svg',
-    width: 100,
-    height: 100,
-    fit: BoxFit.cover,
-  );
+        'assets/icons/place_holder_2.svg',
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+      );
 
   void loadData() {
     mRekanGeneralCmpCrudBloc.add(MRekanGeneralCmpCrudLihatEvent());
@@ -347,11 +365,8 @@ class MRekanGeneralCmpCrudFormPageFormState
   }
 
   Widget buildFieldBentukPerusahaan() {
-    final mjenisClient = context
-        .read<MRekan1CrudBloc>()
-        .state
-        .record
-        ?.mjnsclientId;
+    final mjenisClient =
+        context.read<MRekan1CrudBloc>().state.record?.mjnsclientId;
 
     String hint = "Bentuk";
 

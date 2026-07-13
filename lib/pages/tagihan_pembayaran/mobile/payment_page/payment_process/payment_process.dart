@@ -1,11 +1,12 @@
-
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/widgets/form_error.dart';
 import 'package:joss_app/blocs/payment/invbayarvaform_bloc.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import '../../../../../blocs/dashboard/sumdash_bloc.dart';
 import '../../../../../blocs/notiflog/logtrscaritopx_bloc.dart';
 import '../../../../../blocs/payment/dnrekap2inv_bloc.dart';
 import '../../../../../common/loading_indicator.dart';
+import '../../../../../helper/navigation_keys.dart';
 import '../../../../../widgets/payment/bank_logo_widget.dart';
 import '../../../../base/base_background_sidepage.dart';
 import '../../../tagihan_pembayaran_page.dart';
@@ -44,7 +46,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
   DateTime _now = DateTime.now();
 
   final fieldBatasBayarController =
-  TextEditingController(text: DateTime.now().toIso8601String());
+      TextEditingController(text: DateTime.now().toIso8601String());
   final fieldVaNoController = TextEditingController();
   final fieldTotalBayarController = TextEditingController();
   final fieldCurrController = TextEditingController();
@@ -136,7 +138,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                     ),
                   ),
                   const SizedBox(height: hPadding),
-
                   const Text(
                     "Keluar dari Pembayaran?",
                     textAlign: TextAlign.center,
@@ -146,9 +147,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       color: primaryLightColor,
                     ),
                   ),
-
                   const SizedBox(height: 6),
-
                   const Text(
                     "Pembayaran Anda belum selesai. Jika keluar dari halaman ini, Anda dapat melanjutkan pembayaran kapan saja melalui menu Riwayat Pembayaran selama pembayaran masih berlaku.",
                     textAlign: TextAlign.center,
@@ -158,9 +157,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       color: dGrey,
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Row(
                     children: [
                       Expanded(
@@ -168,7 +165,8 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                           text: "Lanjutkan Pembayaran",
                           backgroundColor: sGrey,
                           borderside: const BorderSide(color: sGrey),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 5),
                           textStyle: const TextStyle(
                             fontSize: 16,
                           ),
@@ -182,7 +180,8 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                         child: AppButton.primary(
                           text: "Iya, Keluar",
                           backgroundColor: primaryColor,
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 5),
                           textStyle: const TextStyle(
                             fontSize: 16,
                           ),
@@ -250,9 +249,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       fit: BoxFit.contain,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Text(
                     "Batalkan Pembayaran?",
                     textAlign: TextAlign.center,
@@ -262,9 +259,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Text(
                     "Pembayaran yang dibatalkan tidak dapat dilanjutkan kembali. Anda dapat membuat pembayaran baru kapan saja.",
                     textAlign: TextAlign.center,
@@ -274,9 +269,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                       height: 1,
                     ),
                   ),
-
                   const SizedBox(height: 18),
-
                   Row(
                     children: [
                       Expanded(
@@ -321,10 +314,10 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                             ),
                             onPressed: () {
                               context.read<DnRekap2invBloc>().add(
-                                BatalInvByIdEvent(
-                                  invoiceId: widget.recordId,
-                                ),
-                              );
+                                    BatalInvByIdEvent(
+                                      invoiceId: widget.recordId,
+                                    ),
+                                  );
 
                               Navigator.pop(context, true);
                             },
@@ -371,7 +364,7 @@ class PaymentProcessFormState extends State<PaymentProcess> {
         MaterialPageRoute(
           builder: (_) => const TagihanPembayaranPage(initialTab: 2),
         ),
-            (route) => route.isFirst,
+        (route) => route.isFirst,
       );
     }
   }
@@ -381,6 +374,12 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
     if (shouldLeave == true) {
       _refreshHeaderData();
+      final homeState = homeTabKey.currentState;
+
+      if (homeState != null) {
+        homeState.goToHeroPage();
+      }
+
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
@@ -395,116 +394,112 @@ class PaymentProcessFormState extends State<PaymentProcess> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) return;
+    return IosLeftEdgeSwipe(
+      onSwipeBack: () async {
         await _handleBackExit(context);
       },
-      child: MultiBlocListener(
-        listeners: [
-          BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
-            listenWhen: (prev, curr) =>
-            prev.record != curr.record && curr.record != null,
-            listener: (context, state) {
-              final r = state.record!;
+      child: PopScope(
+        canPop: Platform.isAndroid ? false : true,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (Platform.isIOS) return;
+          if (didPop) return;
+          await _handleBackExit(context);
+        },
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<InvbayarvaFormBloc, InvbayarvaFormState>(
+              listenWhen: (prev, curr) =>
+                  prev.record != curr.record && curr.record != null,
+              listener: (context, state) {
+                final r = state.record!;
 
-              fieldVaNoController.text = r.vaNo.toString();
-              fieldCurrController.text = r.curr.toString();
+                fieldVaNoController.text = r.vaNo.toString();
+                fieldCurrController.text = r.curr.toString();
 
-              final formatter = NumberFormat('#,###', 'id_ID');
-              fieldTotalBayarController.text = formatter.format(r.totalBayar);
+                final formatter = NumberFormat('#,###', 'id_ID');
+                fieldTotalBayarController.text = formatter.format(r.totalBayar);
 
-              fieldBatasBayarController.text = r.batasBayar.toString();
-            },
-          ),
-        ],
-        child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
-          builder: (context, state) {
-            if (state.isInitialLoading) {
-              return const Scaffold(
-                backgroundColor: secondaryBlackColor,
-                body: Center(child: LoadingIndicator()),
-              );
-            }
+                fieldBatasBayarController.text = r.batasBayar.toString();
+              },
+            ),
+          ],
+          child: BlocBuilder<InvbayarvaFormBloc, InvbayarvaFormState>(
+            builder: (context, state) {
+              if (state.isInitialLoading) {
+                return const Scaffold(
+                  backgroundColor: secondaryBlackColor,
+                  body: Center(child: LoadingIndicator()),
+                );
+              }
 
-            final bankNama = state.record?.bankNama ?? "-";
+              final bankNama = state.record?.bankNama ?? "-";
 
-            return BaseBackgroundSidePage(
-              title: bankNama,
-              onBack: () => _handleBackExit(context),
-              onHome: () => _handleHomeExit(context),
-              child: Container(
-                color: secondaryBlackColor,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: hPadding * 1.5,
-                ),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: hPadding),
-
-                        Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: primaryLightColor,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(cardBorderRadius),
+              return BaseBackgroundSidePage(
+                title: bankNama,
+                onBack: () => _handleBackExit(context),
+                onHome: () => _handleHomeExit(context),
+                child: Container(
+                  color: secondaryBlackColor,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: hPadding * 1.5,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: hPadding),
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: primaryLightColor,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(cardBorderRadius),
+                              ),
+                            ),
+                            width: 120,
+                            height: 60,
+                            alignment: Alignment.center,
+                            child: buildBankLogo(
+                              state.record?.iconId ?? '',
+                              state.record?.iconUrl ?? '',
+                              size: 120,
                             ),
                           ),
-                          width: 120,
-                          height: 60,
-                          alignment: Alignment.center,
-                          child: buildBankLogo(
-                            state.record?.iconId ?? '',
-                            state.record?.iconUrl ?? '',
-                            size: 120,
+                          const SizedBox(height: hPadding),
+                          _buildPaymentStatus(state),
+                          const SizedBox(height: hPadding),
+                          buildFieldTotalBayar(),
+                          const SizedBox(height: hPadding),
+                          buildFieldVaNo(),
+                          const SizedBox(height: hPadding),
+                          buildFieldBatasBayar(),
+                          const SizedBox(height: hPadding),
+                          buildInstruksiPembayaran(state),
+                          const SizedBox(height: hPadding),
+                          AppButton.iconLeft(
+                            text: 'Batal Pembayaran',
+                            backgroundColor: redPayment,
+                            icon: SvgPicture.asset(
+                              'assets/icons/gg_trash.svg',
+                              width: 18,
+                              height: 18,
+                            ),
+                            onPressed: () => _handleCancelPayment(context),
                           ),
-                        ),
-
-                        const SizedBox(height: hPadding),
-
-                        _buildPaymentStatus(state),
-
-                        const SizedBox(height: hPadding),
-                        buildFieldTotalBayar(),
-
-                        const SizedBox(height: hPadding),
-                        buildFieldVaNo(),
-
-                        const SizedBox(height: hPadding),
-                        buildFieldBatasBayar(),
-
-                        const SizedBox(height: hPadding),
-                        buildInstruksiPembayaran(state),
-
-                        const SizedBox(height: hPadding),
-
-                        AppButton.iconLeft(
-                          text: 'Batal Pembayaran',
-                          backgroundColor: redPayment,
-                          icon: SvgPicture.asset(
-                            'assets/icons/gg_trash.svg',
-                            width: 18,
-                            height: 18,
-                          ),
-                          onPressed: () => _handleCancelPayment(context),
-                        ),
-
-                        FormError(errors: errors, key: null),
-                      ],
+                          FormError(errors: errors, key: null),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
-  } 
+  }
 
   Widget _buildPaymentStatus(InvbayarvaFormState state) {
     final r = state.record;
@@ -650,7 +645,6 @@ class PaymentProcessFormState extends State<PaymentProcess> {
     return buffer.toString().trim();
   }
 
-
   Widget buildFieldVaNo() {
     final rawVa = fieldVaNoController.text.trim();
     final digitsOnly = rawVa.replaceAll(RegExp(r'\D'), '');
@@ -689,7 +683,8 @@ class PaymentProcessFormState extends State<PaymentProcess> {
                     if (!context.mounted) return;
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      successSnackBar("Nomor Virtual Account Berhasil Disalin!"),
+                      successSnackBar(
+                          "Nomor Virtual Account Berhasil Disalin!"),
                     );
                   },
                   child: const Icon(Icons.copy, color: Colors.white, size: 14),

@@ -612,7 +612,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: const FormSectionHeader(
                 iconPath: "assets/icons/properti.svg",
-                title: "Properti",
+                title: "Polis Properti",
                 subtitle:
                     "Isi semua detail untuk menghitung premi secara otomatis.",
               ),
@@ -1196,7 +1196,7 @@ class _CalparMainPageRemakeState extends State<CalparMainPageRemake> {
   Widget buildButtonHitungPremi() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: AppButton.primary(
-          text: _isHitungPremiLoading ? "Hitung Premi" : "Lanjutkan",
+          text: _isHitungPremiLoading ? "Memproses..." : "Hitung Premi",
           isLoading: _isHitungPremiLoading,
           backgroundColor:
               _isHitungPremiLoading ? secondaryBlackColor : primaryColor,

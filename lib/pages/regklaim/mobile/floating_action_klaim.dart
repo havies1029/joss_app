@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/models/klaimrinci/klaimdetailcari_model.dart';
@@ -10,7 +9,6 @@ import '../../../common/constants.dart';
 import '../../../widgets/apptheme/hubungi_cs.dart';
 import '../../klaim/mobile/klaimlacak/klaimlacak_page.dart';
 import '../../klaimbatal/mobile/klaimbatalcrud_form.dart';
-import '../../klaimlacak/mobile/klaimprogresscari_main.dart';
 import '../../perbaruiklaimmv/mobile/perbaruiklaimmv_page.dart';
 import '../../perbaruiklaimpar/mobile/perbaruiklaimpar_page.dart';
 
@@ -55,9 +53,7 @@ class FabActionKlaim extends StatelessWidget {
                       fit: BoxFit.contain,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Text(
                     "Informasi Klaim Kehilangan",
                     textAlign: TextAlign.center,
@@ -67,9 +63,7 @@ class FabActionKlaim extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Text(
                     "Informasi klaim kehilangan kendaraan dapat diperoleh melalui Bagian Klaim. Silakan hubungi Bagian Klaim untuk informasi lebih lanjut.",
                     textAlign: TextAlign.center,
@@ -79,9 +73,7 @@ class FabActionKlaim extends StatelessWidget {
                       height: 1.3,
                     ),
                   ),
-
                   const SizedBox(height: 18),
-
                   SizedBox(
                     width: double.infinity,
                     height: 46,
@@ -159,25 +151,23 @@ class FabActionKlaim extends StatelessWidget {
       builder: (context, state) {
         // debugPrint("Selected ID: ${state.selectedId}");
         bool isBerjalan = false;
-        bool isLacak = false;
         String selectedId = "";
         KlaimdetailCariModel? selected;
         if (selectedTab == 1) {
           selectedId = state.selectedId;
           selected = selectedId.isNotEmpty
               ? state.items
-              .expand((group) => group.details)
-              .where((d) => d.klaim1Id == selectedId)
-              .firstOrNull
+                  .expand((group) => group.details)
+                  .where((d) => d.klaim1Id == selectedId)
+                  .firstOrNull
               : null;
 
           final status = (selected?.statusDesc ?? '').toLowerCase().trim();
 
           isBerjalan = status == "berjalan";
-          isLacak = selected?.isLacak == true;
         }
-       
-        final actions = [
+
+        final actions = <ActionMenuItem>[
           ActionMenuItem(
             type: ActionType.klaimBaru,
             label: "Klaim Baru",
@@ -186,30 +176,33 @@ class FabActionKlaim extends StatelessWidget {
             borderColor: const Color(0xFF99FF98),
             isEnabled: true,
           ),
-          ActionMenuItem(
-            type: ActionType.perbaruiKlaim,
-            label: "Perbarui Klaim",
-            iconAsset: "assets/icons/aktifkan_kembali.svg",
-            gradientColors: const [Color(0xFFFFEB39), Color(0xFFAC8C0A)],
-            borderColor: const Color(0xFFFFDB78),
-            isEnabled: isBerjalan,
-          ),
-          ActionMenuItem(
-            type: ActionType.lacakKlaim,
-            label: "Lacak Klaim",
-            iconAsset: "assets/icons/lacak_polis.svg",
-            gradientColors: const [Color(0xFF48E0FF), Color(0xFF02B1D5)],
-            borderColor: const Color(0xFF78E8FF),
-            isEnabled: isLacak,
-          ),
-          ActionMenuItem(
-            type: ActionType.batalKlaim,
-            label: "Batal Klaim",
-            iconAsset: "assets/icons/close.svg",
-            gradientColors: const [Color(0xFFF484B), Color(0xFFC30003)],
-            borderColor: const Color(0xFFFF787A),
-            isEnabled: isBerjalan,
-          ),
+          if (isBerjalan)
+            ActionMenuItem(
+              type: ActionType.perbaruiKlaim,
+              label: "Perbarui Klaim",
+              iconAsset: "assets/icons/aktifkan_kembali.svg",
+              gradientColors: const [Color(0xFFFFEB39), Color(0xFFAC8C0A)],
+              borderColor: const Color(0xFFFFDB78),
+              isEnabled: true,
+            ),
+          if (selected != null)
+            ActionMenuItem(
+              type: ActionType.lacakKlaim,
+              label: "Lacak Klaim",
+              iconAsset: "assets/icons/lacak_polis.svg",
+              gradientColors: const [Color(0xFF48E0FF), Color(0xFF02B1D5)],
+              borderColor: const Color(0xFF78E8FF),
+              isEnabled: true,
+            ),
+          if (isBerjalan)
+            ActionMenuItem(
+              type: ActionType.batalKlaim,
+              label: "Batal Klaim",
+              iconAsset: "assets/icons/close.svg",
+              gradientColors: const [Color(0xFFFF484B), Color(0xFFC30003)],
+              borderColor: const Color(0xFFFF787A),
+              isEnabled: true,
+            ),
           ActionMenuItem(
             type: ActionType.hubungiJps,
             label: "Hubungi Proteksi Plus",
@@ -221,8 +214,8 @@ class FabActionKlaim extends StatelessWidget {
         ];
 
         return FloatingActionMenuWidget(
-          availableActions: actions,
-          selectedItems: const [],
+            availableActions: actions,
+            selectedItems: const [],
             onActionTap: (type, _) {
               if (type == ActionType.hubungiJps) {
                 showHubungiJps(context);
@@ -250,21 +243,21 @@ class FabActionKlaim extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (_) => selected!.cobId == "10002"
                           ? PerbaruiKlaimMvPage(
-                        klaim1Id: selected.klaim1Id,
-                        cobGroupNama: selected.cobNama,
-                        cobGroupId: selected.cobId,
-                      )
+                              klaim1Id: selected.klaim1Id,
+                              cobGroupNama: selected.cobNama,
+                              cobGroupId: selected.cobId,
+                            )
                           : PerbaruiKlaimParPage(
-                        klaim1Id: selected.klaim1Id,
-                        cobGroupNama: selected.cobNama,
-                        cobGroupId: selected.cobId,
-                      ),
+                              klaim1Id: selected.klaim1Id,
+                              cobGroupNama: selected.cobNama,
+                              cobGroupId: selected.cobId,
+                            ),
                     ),
                   );
                   break;
 
                 case ActionType.lacakKlaim:
-                  if (selected?.isLacak != true) {
+                  if (selected.isLacak != true) {
                     showLacakBelumTersediaDialog(context);
                     return;
                   }
@@ -301,8 +294,7 @@ class FabActionKlaim extends StatelessWidget {
                 default:
                   break;
               }
-            }
-        );
+            });
       },
     );
   }

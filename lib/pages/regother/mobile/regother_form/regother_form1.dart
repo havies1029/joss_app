@@ -17,6 +17,7 @@ import '../../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../common/app_data.dart';
+import '../../../../helper/navigation_keys.dart';
 import '../../../../models/combobox/combomcobapp1_model.dart';
 import '../../../../repositories/combobox/combormatauang_repository.dart';
 import '../../../../widgets/apptheme/dropdown2.dart';
@@ -142,6 +143,14 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                 regother1CrudBloc.add(
                   const ResetSelectedCobEvent(),
                 );
+
+                final homeState = homeTabKey.currentState;
+
+                if (homeState != null) {
+                  homeState.goToHeroPage();
+                }
+
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
               onBack: () async {
                 if (regUserBloc.state.requestFrom.isNotEmpty) {
