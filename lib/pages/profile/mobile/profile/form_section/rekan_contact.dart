@@ -261,26 +261,40 @@ class MRekanContactCrudFormPageFormState
     },
   );
 
-  Widget buildFieldTelp() => appTextField(
-    label: "No. Telp Perusahaan",
-    controller: fieldTelpController,
-    keyboardType: TextInputType.phone,
-    validator: (v) {
-      final telp = v?.trim() ?? "";
+  Widget buildFieldTelp() {
+    final mjenisClient = context
+        .read<MRekan1CrudBloc>()
+        .state
+        .record
+        ?.mjnsclientId;
 
-      if (telp.isEmpty) {
-        return kPhoneNumberNullError;
-      }
+    final jenisClientLabel = switch (mjenisClient) {
+      '10' => 'Individu',
+      '20' => 'Perusahaan',
+      _ => 'Perusahaan',
+    };
 
-      final res = PhoneNumberHelper.normalize(telp);
+    return appTextField(
+      label: 'No. Telp $jenisClientLabel',
+      controller: fieldTelpController,
+      keyboardType: TextInputType.phone,
+      validator: (v) {
+        final telp = v?.trim() ?? '';
 
-      if (!res.isValid) {
-        return res.error ?? "Nomor telepon tidak valid";
-      }
+        if (telp.isEmpty) {
+          return kPhoneNumberNullError;
+        }
 
-      return null;
-    },
-  );
+        final res = PhoneNumberHelper.normalize(telp);
+
+        if (!res.isValid) {
+          return res.error ?? 'Nomor telepon tidak valid';
+        }
+
+        return null;
+      },
+    );
+  }
 
   Widget buildFieldAlamat1() => appTextField(
     label: "Alamat Rumah",

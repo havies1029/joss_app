@@ -23,9 +23,9 @@ class RekanPicWidgetPage extends StatefulWidget {
   State<RekanPicWidgetPage> createState() => _RekanPicWidgetPageState();
 }
 
-
 class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
   late MRekanPicListBloc listBloc;
+  final Set<String> _invitedPicIds = <String>{};
   @override
   void initState() {
     super.initState();
@@ -69,8 +69,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
           listener: (context, state) {
             if (!state.isSaving && state.isSaved && !state.hasFailure) {
               context.read<MRekanPicListBloc>().add(
-                RefreshMRekanPicListEvent(),
-              );
+                    RefreshMRekanPicListEvent(),
+                  );
             }
 
             if (!state.isSaving && state.isSaved && state.hasFailure) {
@@ -127,8 +127,12 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                   final total = state.items.length;
 
                   Widget header() {
-                    final isAdmin =
-                        context.read<HakaksesCrudBloc>().state.record?.isAdmin ?? false;
+                    final isAdmin = context
+                            .read<HakaksesCrudBloc>()
+                            .state
+                            .record
+                            ?.isAdmin ??
+                        false;
 
                     return Row(
                       children: [
@@ -153,8 +157,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                                   ),
                                 );
                                 context.read<RekanPicCobCariBloc>().add(
-                                  const ResetSelectedCOBRekanPicCobEvent(),
-                                );
+                                      const ResetSelectedCOBRekanPicCobEvent(),
+                                    );
                               },
                             ),
                           ),
@@ -176,7 +180,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                                 iconPath: 'assets/icons/logo_pic.svg',
                                 title: 'Tidak ada Informasi PIC',
                                 description:
-                                'Silakan tambahkan PIC terlebih dahulu agar informasi PIC dapat ditampilkan.',
+                                    'Silakan tambahkan PIC terlebih dahulu agar informasi PIC dapat ditampilkan.',
                               ),
                             ),
                           ),
@@ -244,9 +248,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     final canShowStatusAction = isAdmin && !isTidakAktif;
 
     final labelStyle =
-    bodyTextStyle(context, fontSize: 16).copyWith(color: cardGrey);
+        bodyTextStyle(context, fontSize: 16).copyWith(color: cardGrey);
     final valueStyle =
-    bodyTextStyle(context, fontSize: 16).copyWith(color: primaryLightColor);
+        bodyTextStyle(context, fontSize: 16).copyWith(color: primaryLightColor);
 
     return Card(
       color: formGrey,
@@ -274,7 +278,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                       squareSize: 30,
                       borderRadius: 8,
                     ),
-
                   if (canDelete) ...[
                     const SizedBox(width: 12),
                     AppButton.icon(
@@ -293,9 +296,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                       borderRadius: 8,
                     ),
                   ],
-
                   const Spacer(),
-
                   if (canShowStatusAction) _buildPicStatusAction(it),
                 ],
               ),
@@ -303,7 +304,6 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
               Divider(color: sGrey),
               const SizedBox(height: 8),
             ],
-
             _cardRow(
               'PIC:',
               '${index + 1}',
@@ -340,25 +340,21 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
               labelStyle,
               valueStyle,
             ),
-
             _cardRow(
               'Peran:',
               _displayStatus(it.peranDesc),
               labelStyle,
               valueStyle,
             ),
-
             _cardRow(
               'Status:',
               _displayStatus(it.statusPic),
               labelStyle,
               valueStyle,
             ),
-
             const SizedBox(height: 8),
             Divider(color: sGrey),
             const SizedBox(height: 8),
-
             Text(
               'COB yang bisa diakses:',
               style: bodyTextStyle(
@@ -381,6 +377,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
         .where((e) => e.isNotEmpty)
         .toList();
   }
+
   Widget _cobListSection({required List<String> cobItems}) {
     if (cobItems.isEmpty) {
       return Text(
@@ -407,7 +404,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
       }).toList(),
     );
   }
-  Widget _cardRow(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
+
+  Widget _cardRow(
+      String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Text.rich(
@@ -428,8 +427,8 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     );
 
     context.read<RekanPicCobCariBloc>().add(
-      const ResetSelectedCOBRekanPicCobEvent(),
-    );
+          const ResetSelectedCOBRekanPicCobEvent(),
+        );
     // if (changed == true) {
     //   context.read<MRekanPicListBloc>().add(
     //     FetchMRekanPicListEvent(),
@@ -499,7 +498,7 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
@@ -525,12 +524,11 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
                               foregroundColor: primaryLightColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(cardBorderRadius),
+                                    BorderRadius.circular(cardBorderRadius),
                               ),
                               elevation: 0,
                             ),
-                            onPressed: () =>
-                                Navigator.pop(dialogContext, true),
+                            onPressed: () => Navigator.pop(dialogContext, true),
                             child: Text(
                               "Iya, Hapus",
                               style: TextStyle(
@@ -567,10 +565,11 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
 
     if (shouldDelete == true) {
       context.read<MRekanPicCrudBloc>().add(
-        MRekanPicCrudHapusEvent(recordId: id),
-      );
+            MRekanPicCrudHapusEvent(recordId: id),
+          );
     }
   }
+
   String _normalizedStatus(String? status) {
     return (status ?? '').trim().toLowerCase();
   }
@@ -579,6 +578,10 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     final status = _normalizedStatus(it.statusPic);
 
     if (status == 'belum kirim') {
+      if (_invitedPicIds.contains(it.mrekanpicId.trim())) {
+        return _inviteSentLabel();
+      }
+
       return _inviteButton(
         parentContext: context,
         mrekanpicId: it.mrekanpicId,
@@ -623,6 +626,31 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
     return const SizedBox.shrink();
   }
 
+  Widget _inviteSentLabel() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SvgPicture.asset(
+          'assets/icons/iconamoon_check-light.svg',
+          width: 18,
+          height: 18,
+          colorFilter: const ColorFilter.mode(
+            sGreen,
+            BlendMode.srcIn,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          'Undangan Dikirim',
+          style: bodyTextStyle(context, fontSize: 16).copyWith(
+            color: sGreen,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _inviteButton({
     required BuildContext parentContext,
     required String mrekanpicId,
@@ -634,9 +662,9 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
       child: BlocConsumer<InviteBloc, InviteState>(
         listener: (context, state) async {
           if (state.isSuccess) {
-            parentContext.read<MRekanPicListBloc>().add(
-              RefreshMRekanPicListEvent(),
-            );
+            setState(() {
+              _invitedPicIds.add(mrekanpicId.trim());
+            });
 
             await showDialog(
               context: parentContext,
@@ -655,26 +683,26 @@ class _RekanPicWidgetPageState extends State<RekanPicWidgetPage> {
             label: isLoading ? 'Mengirim...' : 'Kirim Undangan',
             icon: isLoading
                 ? const SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
                 : const Icon(Icons.send, size: 18, color: Colors.white),
             bg: const Color(0xFF2196F3),
             onPressed: isLoading
                 ? null
                 : () {
-              context.read<InviteBloc>().add(
-                SendInviteEvent(
-                  mrekanpicId: mrekanpicId,
-                  nama: nama,
-                  email: email,
-                ),
-              );
-            },
+                    context.read<InviteBloc>().add(
+                          SendInviteEvent(
+                            mrekanpicId: mrekanpicId,
+                            nama: nama,
+                            email: email,
+                          ),
+                        );
+                  },
           );
         },
       ),

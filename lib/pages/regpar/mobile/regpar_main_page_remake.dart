@@ -1225,9 +1225,8 @@ class _RegparFormMainRemakeState extends State<RegparFormMainRemake> {
                   ),
                   const SizedBox(height: hPadding),
                   if (canShowLanjutkan) ...[
-                    AppButton.iconRight(
+                    AppButton.primary(
                       text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
-                      icon: Icon(Icons.arrow_forward),
                       isLoading: _isLanjutkanLoading,
                       onPressed: _isLanjutkanLoading
                           ? null

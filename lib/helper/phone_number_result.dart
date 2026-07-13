@@ -4,11 +4,13 @@ class PhoneNumberResult {
 
   const PhoneNumberResult._(this.phone, this.error);
 
-  factory PhoneNumberResult.success(String phone) =>
-      PhoneNumberResult._(phone, null);
+  factory PhoneNumberResult.success(String phone) {
+    return PhoneNumberResult._(phone, null);
+  }
 
-  factory PhoneNumberResult.fail(String message) =>
-      PhoneNumberResult._(null, message);
+  factory PhoneNumberResult.fail(String message) {
+    return PhoneNumberResult._(null, message);
+  }
 
   bool get isValid => phone != null;
 }
@@ -27,8 +29,13 @@ class PhoneNumberHelper {
     final digits = clean(rawInput);
 
     if (digits.isEmpty) {
-      if (!required) return PhoneNumberResult.success('');
-      return PhoneNumberResult.fail('Nomor telepon tidak boleh kosong');
+      if (!required) {
+        return PhoneNumberResult.success('');
+      }
+
+      return PhoneNumberResult.fail(
+        'Nomor telepon tidak boleh kosong',
+      );
     }
 
     if (digits.length < minLength) {
@@ -43,13 +50,19 @@ class PhoneNumberHelper {
       );
     }
 
+    if (RegExp(r'^([0-9])\1+$').hasMatch(digits)) {
+      return PhoneNumberResult.fail(
+        'Nomor telepon tidak boleh menggunakan angka yang sama semua',
+      );
+    }
+
     return PhoneNumberResult.success(digits);
   }
 
   static bool isValid(
       String input, {
-        int minLength = 5,
-        int maxLength = 17,
+        int minLength = 6,
+        int maxLength = 15,
         bool required = true,
       }) {
     return normalize(

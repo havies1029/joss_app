@@ -827,7 +827,7 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
               padding: EdgeInsets.symmetric(horizontal: hPadding * 1.5),
               child: const FormSectionHeader(
                 iconPath: "assets/icons/kendaraan.svg",
-                title: "Kendaraan",
+                title: "Polis Kendaraan",
                 subtitle:
                     "Isi detail kendaraan, pilih pertanggungan, dan hitung premi secara otomatis.",
               ),
@@ -1282,9 +1282,8 @@ class _RegmvFormMainRemakeState extends State<RegmvFormMainRemake> {
                   ),
                   const SizedBox(height: hPadding),
                   if (canShowLanjutkan) ...[
-                    AppButton.iconRight(
+                    AppButton.primary(
                       text: _isLanjutkanLoading ? "Memproses..." : "Lanjutkan",
-                      icon: Icon(Icons.arrow_forward),
                       isLoading: _isLanjutkanLoading,
                       onPressed: _isLanjutkanLoading
                           ? null

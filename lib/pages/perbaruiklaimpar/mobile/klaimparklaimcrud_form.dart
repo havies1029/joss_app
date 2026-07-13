@@ -540,7 +540,7 @@ class KlaimparklaimcrudFormPageFormState
 
   Widget buildFieldPicTelp() {
     return appTextField(
-      label: 'No Telp PIC',
+      label: 'No Telepon PIC',
       controller: fieldPicTelpController,
       keyboardType: TextInputType.phone,
       errorText: err('form.picTelp'),

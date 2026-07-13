@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../blocs/authentication/authentication_bloc.dart';
+import '../../blocs/hakakses/hakaksescrud_bloc.dart';
 import '../../common/constants.dart';
 import '../../helper/navigation_keys.dart';
 
-class BaseBackgroundSidePage extends StatelessWidget {
+class BaseBackgroundSidePage extends StatefulWidget {
   final Widget child;
   final double fadeHeight;
   final String backgroundAsset;
@@ -29,6 +31,36 @@ class BaseBackgroundSidePage extends StatelessWidget {
     this.showBackButton = true,
     this.showHomeButton = true,
   });
+
+  @override
+  State<BaseBackgroundSidePage> createState() => _BaseBackgroundSidePageState();
+}
+
+class _BaseBackgroundSidePageState extends State<BaseBackgroundSidePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final authState = context.read<AuthenticationBloc>().state;
+      if (authState is AuthenticationAuthenticated &&
+          authState.user.userType == 'C') {
+        context.read<HakaksesCrudBloc>().add(const HakaksesCrudLihatEvent());
+      }
+    });
+  }
+
+  Widget get child => widget.child;
+  double get fadeHeight => widget.fadeHeight;
+  String get backgroundAsset => widget.backgroundAsset;
+  String get title => widget.title;
+  VoidCallback? get onBack => widget.onBack;
+  VoidCallback? get onHome => widget.onHome;
+  bool get showBackButton => widget.showBackButton;
+  bool get showHomeButton => widget.showHomeButton;
+  List<BlocListener>? get blocListeners => widget.blocListeners;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +108,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
                         ),
                       ),
                     ),
-
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 56),
@@ -87,7 +118,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   if (showHomeButton)
                     Align(
                       alignment: Alignment.centerRight,
@@ -98,14 +128,15 @@ class BaseBackgroundSidePage extends StatelessWidget {
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: onHome ??
-                                  () {
+                              () {
                                 final homeState = homeTabKey.currentState;
 
                                 if (homeState != null) {
                                   homeState.goToHeroPage();
                                 }
 
-                                Navigator.of(context).popUntil((route) => route.isFirst);
+                                Navigator.of(context)
+                                    .popUntil((route) => route.isFirst);
                               },
                           child: Align(
                             alignment: Alignment.centerRight,
@@ -154,7 +185,6 @@ class BaseBackgroundSidePage extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       child,
                     ],
                   );
