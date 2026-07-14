@@ -254,7 +254,7 @@ class ListMenuWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Mulai',
+                    'Login',
                     style: bodyTextStyle(context, fontSize: 16),
                   ),
                 ),

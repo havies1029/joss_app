@@ -39,7 +39,6 @@ import 'package:joss_app/helper/app_prefs.dart';
 import 'package:joss_app/pages/home/home_tab_widget.dart';
 import 'package:joss_app/pages/login/mobile/client/login_client_page.dart';
 import 'package:joss_app/pages/login/mobile/client/widget/otp_client_widget.dart';
-import 'package:joss_app/pages/login/mobile/user/login_user_page.dart';
 import 'package:joss_app/pages/login/mobile/user/widget/otp_user_widget.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 
@@ -949,7 +948,10 @@ class _AppState extends State<_App> {
 
             if (state is AuthenticationUnauthenticated) {
               context.read<LoginBloc>().add(LoginReset()); // balikin kondisi state bloc ke konidsi semula
-              return const LoginUser();
+              return HomeTabWidget(
+                key: homeTabKey,
+                userRepository: widget.userRepository,
+              );
             }
 
             if (state is AuthenticationRequireLoginClient) {

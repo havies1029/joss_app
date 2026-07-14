@@ -6,6 +6,7 @@ import '../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../blocs/gen_profile/mrekancontactcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralcmpcrud_bloc.dart';
 import '../../../blocs/gen_profile/mrekangeneralidvcrud_bloc.dart';
+import '../../../blocs/profile/profile_download_foto_bloc.dart';
 import '../../../common/app_data.dart';
 import '../../profile/mobile/profile/form_section/rekan_bank.dart';
 import '../../profile/mobile/profile/form_section/rekan_contact.dart';
@@ -191,9 +192,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
     if (shouldLogout == true) {
       context.read<AuthenticationBloc>().add(LoggedOut());
+      context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
+      ChatInitService.I.dispose();
     }
-
-    ChatInitService.I.dispose();
   }
 
   @override

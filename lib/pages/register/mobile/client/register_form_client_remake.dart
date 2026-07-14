@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
-import '../../../../blocs/authentication/authentication_bloc.dart';
 import 'package:joss_app/models/user/user_model.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
@@ -46,14 +45,12 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
   int _submitAttempt = 0;
 
   late EmailVerificationBloc emailVerificationBloc;
-  late AuthenticationBloc authenticationBloc;
 
   late final RegUserModel? record;
 
   @override
   void initState() {
     super.initState();
-    authenticationBloc = context.read<AuthenticationBloc>();
   }
 
   @override
@@ -296,10 +293,6 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
       Navigator.pop(context);
     } else {
       Navigator.of(context, rootNavigator: true).pop();
-
-      authenticationBloc.add(
-        LoggedIn(user: AppData.user),
-      );
     }
   }
 

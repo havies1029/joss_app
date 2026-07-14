@@ -16,7 +16,6 @@ import '../../../../blocs/gen_profile/mrekan1crud_bloc.dart';
 import '../../../../blocs/regrenewal/regrenew1form_bloc.dart';
 import '../../../../models/regrenewal/regrenew1form_model.dart';
 
-
 class RenewalFormPage extends StatefulWidget {
   final String viewMode;
   final String recordId;
@@ -33,7 +32,6 @@ class RenewalFormPage extends StatefulWidget {
     this.pageTitle,
   });
 
-
   @override
   RenewalFormPageFormState createState() => RenewalFormPageFormState();
 }
@@ -43,13 +41,16 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   late MRekan1CrudBloc mrekan1crudbloc;
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
-  var fieldEndorsTglController = TextEditingController(text: DateTime.now().toIso8601String());
+  var fieldEndorsTglController =
+      TextEditingController(text: DateTime.now().toIso8601String());
   var fieldInsuredNamaController = TextEditingController();
   var fieldMstsendorsIdController = TextEditingController();
   var fieldNoteKonfirmasiController = TextEditingController();
   var fieldNotePerubahanController = TextEditingController();
-  var fieldPeriodeAkhirController = TextEditingController(text: DateTime.now().toIso8601String());
-  var fieldPeriodeMulaiController = TextEditingController(text: DateTime.now().toIso8601String());
+  var fieldPeriodeAkhirController =
+      TextEditingController(text: DateTime.now().toIso8601String());
+  var fieldPeriodeMulaiController =
+      TextEditingController(text: DateTime.now().toIso8601String());
   var fieldPremiController = TextEditingController();
   var fieldSppa1IdController = TextEditingController();
   var fieldStatusEndorsController = TextEditingController();
@@ -82,76 +83,79 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
 
     return BlocConsumer<Regrenew1FormBloc, Regrenew1FormState>(
       builder: (context, state) {
-        return BaseBackgroundSidePage(
-          title: 'Perpanjangan Polis',
-          child: Scaffold(
-            backgroundColor: secondaryBlackColor,
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: hPadding * 1.5,
-              ),
-              child: AppButton.primary(
-                text: 'Ajukan Perubahan',
-                isLoading: _isAjukanLoading,
-                backgroundColor:
-                _isAjukanLoading ? secondaryBlackColor : primaryColor,
-                onPressed: _isAjukanLoading
-                    ? null
-                    : () async {
-                  final okForm1 = validateForm1();
-                  if (!okForm1) {
-                    return;
-                  }
-
-                  setState(() {
-                    _isAjukanLoading = true;
-                  });
-
-                  _showPengajuanDialog(context);
-
-                  await Future.delayed(const Duration(seconds: 2));
-
-                  if (mounted) {
-                    setState(() {
-                      _isAjukanLoading = false;
-                    });
-                  }
-                },
-              ),
-            ),
-            body: SingleChildScrollView(
-              child: Container(
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            viewInsets: EdgeInsets.zero,
+          ),
+          child: BaseBackgroundSidePage(
+            title: 'Perpanjangan Polis',
+            child: Scaffold(
+              resizeToAvoidBottomInset: false,
+              backgroundColor: secondaryBlackColor,
+              bottomNavigationBar: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: hPadding * 1.5,
-                  vertical: 10,
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Isi deskripsi perubahan untuk membantu tim kami memverifikasi permintaan Anda.",
-                        style: bodyTextStyle(context).copyWith(
-                          color: primaryLightColor,
-                          fontSize: getResponsiveFont(context, 16),
+                child: AppButton.primary(
+                  text: 'Ajukan Perubahan',
+                  isLoading: _isAjukanLoading,
+                  backgroundColor:
+                      _isAjukanLoading ? secondaryBlackColor : primaryColor,
+                  onPressed: _isAjukanLoading
+                      ? null
+                      : () async {
+                          final okForm1 = validateForm1();
+                          if (!okForm1) {
+                            return;
+                          }
+
+                          setState(() {
+                            _isAjukanLoading = true;
+                          });
+
+                          _showPengajuanDialog(context);
+
+                          await Future.delayed(const Duration(seconds: 2));
+
+                          if (mounted) {
+                            setState(() {
+                              _isAjukanLoading = false;
+                            });
+                          }
+                        },
+                ),
+              ),
+              body: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: hPadding * 1.5,
+                    vertical: 10,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Isi deskripsi perubahan untuk membantu tim kami memverifikasi permintaan Anda.",
+                          style: bodyTextStyle(context).copyWith(
+                            color: primaryLightColor,
+                            fontSize: getResponsiveFont(context, 16),
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(height: hPadding),
-                      buildFieldNotePerubahan(),
-                      const SizedBox(height: hPadding),
-
-                      Text(
-                        "*Pastikan data perubahan sesuai dengan dokumen Anda.",
-                        style: bodyTextStyle(context).copyWith(
-                          color: sGrey,
-                          fontSize: getResponsiveFont(context, 12),
+                        const SizedBox(height: hPadding),
+                        buildFieldNotePerubahan(),
+                        const SizedBox(height: hPadding),
+                        Text(
+                          "*Pastikan data perubahan sesuai dengan dokumen Anda.",
+                          style: bodyTextStyle(context).copyWith(
+                            color: sGrey,
+                            fontSize: getResponsiveFont(context, 12),
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(height: 80),
-                    ],
+                        const SizedBox(height: 80),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -166,8 +170,8 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
         final selectedItem = _selectedItemByCob(context, cobId);
 
         if (selectedItem == null) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(infoSnackBar("Data belum dipilih / tidak ditemukan"));
+          ScaffoldMessenger.of(context).showSnackBar(
+              infoSnackBar("Data belum dipilih / tidak ditemukan"));
           return;
         }
 
@@ -183,13 +187,13 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
           ),
         );
       },
-
     );
   }
 
-  Widget buildFieldEndorsTgl(){
+  Widget buildFieldEndorsTgl() {
     return AppDateField(
-      label: 'Tanggal endorse', firstDate: DateTime(2000), // batas awal biar valid
+      label: 'Tanggal endorse',
+      firstDate: DateTime(2000), // batas awal biar valid
       lastDate: DateTime(2100),
       initialValue: DateTime.tryParse(fieldEndorsTglController.text),
       onChanged: (value) {
@@ -202,7 +206,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-  Widget buildFieldInsuredNama(){
+  Widget buildFieldInsuredNama() {
     return appTextField(
       keyboardType: TextInputType.multiline,
       maxLines: 3,
@@ -216,9 +220,10 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-  Widget buildFieldMstsendorsId(){
+  Widget buildFieldMstsendorsId() {
     return appTextField(
-      controller: fieldMstsendorsIdController,label:'MstendorseID',
+      controller: fieldMstsendorsIdController,
+      label: 'MstendorseID',
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
@@ -227,7 +232,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-  Widget buildFieldNoteKonfirmasi(){
+  Widget buildFieldNoteKonfirmasi() {
     return appTextField(
       keyboardType: TextInputType.multiline,
       label: 'Note Konfirmasi',
@@ -257,10 +262,10 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-
-  Widget buildFieldPeriodeAkhir(){
+  Widget buildFieldPeriodeAkhir() {
     return AppDateField(
-      label: 'Periode Akhir', firstDate: DateTime(2000), // batas awal biar valid
+      label: 'Periode Akhir',
+      firstDate: DateTime(2000), // batas awal biar valid
       lastDate: DateTime(2100),
       onChanged: (value) {
         if (value != null) {
@@ -271,7 +276,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
     );
   }
 
-  Widget buildFieldPeriodeMulai(){
+  Widget buildFieldPeriodeMulai() {
     return AppDateField(
       initialValue: DateTime.tryParse(fieldPeriodeMulaiController.text),
       onChanged: (value) {
@@ -279,12 +284,14 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
           removeError(error: kStringNullError);
           fieldPeriodeMulaiController.text = value.toIso8601String();
         }
-      }, label: 'Periode Mulai', firstDate: DateTime(2000), // batas awal biar valid
+      },
+      label: 'Periode Mulai',
+      firstDate: DateTime(2000), // batas awal biar valid
       lastDate: DateTime(2100),
     );
   }
 
-  Widget buildFieldPremi(){
+  Widget buildFieldPremi() {
     return appTextField(
       keyboardType: TextInputType.number,
       inputFormatters: [ThousandsSeparatorInputFormatter()],
@@ -293,33 +300,36 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
-      }, label: 'Premi',
+      },
+      label: 'Premi',
     );
   }
 
-  Widget buildFieldSppa1Id(){
+  Widget buildFieldSppa1Id() {
     return appTextField(
       controller: fieldSppa1IdController,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
-      }, label: 'SPPA ID',
+      },
+      label: 'SPPA ID',
     );
   }
 
-  Widget buildFieldStatusEndors(){
+  Widget buildFieldStatusEndors() {
     return appTextField(
       controller: fieldStatusEndorsController,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
-      }, label: 'Status Endorse',
+      },
+      label: 'Status Endorse',
     );
   }
 
-  Widget buildFieldTsi(){
+  Widget buildFieldTsi() {
     return appTextField(
       keyboardType: TextInputType.number,
       inputFormatters: [ThousandsSeparatorInputFormatter()],
@@ -328,7 +338,8 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
         if (value.isNotEmpty) {
           removeError(error: kStringNullError);
         }
-      }, label: 'TSI',
+      },
+      label: 'TSI',
     );
   }
 
@@ -356,18 +367,16 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
                 Text(
                   "Pengajuan diproses tim internal.",
                   textAlign: TextAlign.center,
-                  style: headingStyle(context,
+                  style: headingStyle(
+                    context,
                     fontSize: 17.49,
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 AppButton.primary(
                     text: 'Ajukan Sekarang',
                     backgroundColor: const Color(0xFF0ED7FF),
-                    onPressed: onSaveForm
-                ),
-
+                    onPressed: onSaveForm),
               ],
             ),
           ),
@@ -405,7 +414,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   }
 
   void addError({required String error}) {
-    if (!errors.contains(error)){
+    if (!errors.contains(error)) {
       setState(() {
         errors.add(error);
       });
@@ -414,7 +423,7 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   }
 
   void removeError({required String error}) {
-    if (errors.contains(error)){
+    if (errors.contains(error)) {
       setState(() {
         errors.remove(error);
       });
@@ -428,16 +437,19 @@ class RenewalFormPageFormState extends State<RenewalFormPage> {
   void setErr(String key, String? msg) {
     setState(() => fieldErrors[key] = msg);
   }
+
   void clearErr(String key) {
     if (!fieldErrors.containsKey(key)) return;
     setState(() => fieldErrors.remove(key));
   }
+
   void clearErrsByPrefix(String prefix) {
     setState(() {
       fieldErrors.removeWhere((k, _) => k.startsWith(prefix));
     });
   }
 }
+
 double _safeDouble(String? text) {
   if (text == null) return 0;
   final clean = text.replaceAll(',', '').trim();
