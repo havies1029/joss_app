@@ -44,28 +44,18 @@ class InviteSuccessPopup extends StatelessWidget {
                   ),
                   const SizedBox(height: vPadding),
 
-                  // Tombol Aksi
-                  SizedBox(
+                  AppButton.primary(
+                    text: "Kembali",
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(cardBorderRadius),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-                      label: Text(
-                        "Kembali",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: getResponsiveFont(context, 16),
-                        ),
-                      ),
+                    backgroundColor: primaryColor,
+                    borderRadius: cardBorderRadius,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    textStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: getResponsiveFont(context, 16),
                     ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),

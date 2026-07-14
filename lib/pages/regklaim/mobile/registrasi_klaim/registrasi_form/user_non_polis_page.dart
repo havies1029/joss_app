@@ -195,7 +195,7 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
         listeners: [
           BlocListener<Regklaim1CrudBloc, Regklaim1CrudState>(
             listenWhen: (prev, curr) =>
-            prev.isSaved != curr.isSaved ||
+                prev.isSaved != curr.isSaved ||
                 prev.hasFailure != curr.hasFailure,
             listener: (context, state) {
               if (!mounted) return;
@@ -242,13 +242,14 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   builder: (_) => PaymentSuccess(
                     displayButton: "Kembali",
                     description:
-                    "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
+                        "Departemen kami akan segera menghubungi kamu untuk menindaklanjuti klaim ini.",
                     display: "Klaim Kamu Berhasil Didaftarkan!",
                     onButtonPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const KlaimMainPage()),
-                            (route) => route.isFirst,
+                        MaterialPageRoute(
+                            builder: (_) => const KlaimMainPage()),
+                        (route) => route.isFirst,
                       );
                     },
                   ),
@@ -330,15 +331,8 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                   onPressed: _isCariPolisLoading
                       ? null
                       : () async {
-                    setState(() {
-                      _isCariPolisLoading = true;
-                    });
-
-
-
-                    onPressCariPolis();
-
-                  },
+                          onPressCariPolis();
+                        },
                 ),
               ),
             ],
@@ -369,11 +363,14 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
 
     if (!_canSubmitWithCompleteGeneralData()) return;
 
+    setState(() {
+      _isCariPolisLoading = true;
+    });
+
     _submitRegklaim(_buildRegklaimRecord());
 
     _showGlobalLoading();
     debugPrint("#1");
-
   }
 
   bool _hasRequiredAttachment() {
@@ -459,7 +456,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
             MaterialPageRoute(
               builder: (_) => MRekanGeneralIdvPopUpPage(),
             ),
-          );
+          ).then((_) {
+            _pendingAutoConfirm = false;
+          });
         },
       ),
     );
@@ -482,7 +481,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
             MaterialPageRoute(
               builder: (_) => MRekanGeneralCmpPopUpPage(),
             ),
-          );
+          ).then((_) {
+            _pendingAutoConfirm = false;
+          });
         },
       ),
     );
@@ -507,7 +508,9 @@ class _UserNonPolisPageState extends State<UserNonPolisPage> {
                 requestFrom: 'regisnonpolis_page',
               ),
             ),
-          );
+          ).then((_) {
+            _pendingAutoConfirm = false;
+          });
         },
       ),
     );

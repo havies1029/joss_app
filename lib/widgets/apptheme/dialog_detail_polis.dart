@@ -14,13 +14,17 @@ class DialogDetailPolis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: hPadding * 1.5,
+        vertical: hPadding * 1.5,
+      ),
       backgroundColor: pGrey,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(color: sGrey),
       ),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
+      child: SizedBox(
+        width: double.infinity,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -62,7 +66,8 @@ class DialogDetailPolis extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   child: Column(
-                    children: items.map((item) => _buildDetailRow(item)).toList(),
+                    children:
+                        items.map((item) => _buildDetailRow(item)).toList(),
                   ),
                 ),
               ),
@@ -116,10 +121,10 @@ class DialogDetailPolis extends StatelessWidget {
 
   // Static helper method untuk menampilkan dialog
   static void show(
-      BuildContext context, {
-        String title = "Detail",
-        required List<DetailItem> items,
-      }) {
+    BuildContext context, {
+    String title = "Detail",
+    required List<DetailItem> items,
+  }) {
     showDialog(
       context: context,
       builder: (ctx) => DialogDetailPolis(

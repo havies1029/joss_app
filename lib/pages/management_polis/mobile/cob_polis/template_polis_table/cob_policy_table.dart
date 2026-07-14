@@ -308,7 +308,7 @@ class _CobPolicyTableState<T> extends State<CobPolicyTable<T>> {
           final center = title.toUpperCase() == 'NO';
           final child = Text(
             title,
-            style: bodyTextStyle(context, fontSize: 15),
+            style: bodyTextStyle(context, fontSize: 16),
           );
 
           return Padding(
@@ -410,7 +410,9 @@ class _CobPolicyTableState<T> extends State<CobPolicyTable<T>> {
       maxLines: maxLines,
       softWrap: softWrap,
       overflow: TextOverflow.ellipsis,
-      style: const TextStyle(color: primaryLightColor),
+      style: bodyTextStyle(context, fontSize: 14).copyWith(
+        color: primaryLightColor,
+      ),
     );
 
     return _cell(child: center ? Center(child: t) : t);

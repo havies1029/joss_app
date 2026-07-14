@@ -72,16 +72,17 @@ class _DetailPolisOthersTablePageState
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: hPadding * 1.5,
+        vertical: hPadding * 1.5,
+      ),
       backgroundColor: pGrey,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: const BorderSide(color: sGrey),
       ),
-      child: Container(
-        constraints: const BoxConstraints(
-          maxWidth: 760,
-          maxHeight: 680,
-        ),
+      child: SizedBox(
+        width: double.infinity,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

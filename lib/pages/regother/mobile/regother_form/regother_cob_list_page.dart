@@ -64,6 +64,7 @@ class _CobCariPageState extends State<CobCariPage> {
   }
 
   static const int _initialVisibleCount = 8;
+  static const double _bottomActionSpace = 64;
 
   bool _showAllCobItems = false;
 
@@ -178,77 +179,95 @@ class _CobCariPageState extends State<CobCariPage> {
               const ResetSelectedCobEvent(),
             );
       },
-      child: BaseBackgroundSidePage(
-        title: "Kategori Asuransi",
-        onBack: () {
-          context.read<Regother1CrudBloc>().add(
-                const ResetSelectedCobEvent(),
-              );
+      child: MediaQuery(
+        data: MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero),
+        child: BaseBackgroundSidePage(
+          title: "Kategori Asuransi",
+          onBack: () {
+            context.read<Regother1CrudBloc>().add(
+                  const ResetSelectedCobEvent(),
+                );
 
-          Navigator.pop(context);
-        },
-        onHome: () {
-          context.read<Regother1CrudBloc>().add(
-                const ResetSelectedCobEvent(),
-              );
+            Navigator.pop(context);
+          },
+          onHome: () {
+            context.read<Regother1CrudBloc>().add(
+                  const ResetSelectedCobEvent(),
+                );
 
-          final homeState = homeTabKey.currentState;
+            final homeState = homeTabKey.currentState;
 
-          if (homeState != null) {
-            homeState.goToHeroPage();
-          }
+            if (homeState != null) {
+              homeState.goToHeroPage();
+            }
 
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: secondaryBlackColor,
-          padding: const EdgeInsets.symmetric(
-            horizontal: hPadding * 1.5,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListPageFilterBarUIWidget(
-                searchController: _searchController,
-                searchButton: _buildSearchButton(),
-                hintText: "Cari kategori asuransi...",
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: FutureBuilder<List<ComboMCobApp1Model>>(
-                  future: _futureData,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return _buildLoading();
-                    }
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: secondaryBlackColor,
+            padding: const EdgeInsets.symmetric(
+              horizontal: hPadding * 1.5,
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: _bottomActionSpace),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListPageFilterBarUIWidget(
+                          searchController: _searchController,
+                          searchButton: _buildSearchButton(),
+                          hintText: "Cari kategori asuransi...",
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: FutureBuilder<List<ComboMCobApp1Model>>(
+                            future: _futureData,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return _buildLoading();
+                              }
 
-                    if (snapshot.hasError) {
-                      return _buildError(snapshot.error);
-                    }
+                              if (snapshot.hasError) {
+                                return _buildError(snapshot.error);
+                              }
 
-                    final items = _filterExcludedCob(snapshot.data ?? []);
+                              final items =
+                                  _filterExcludedCob(snapshot.data ?? []);
 
-                    if (items.isEmpty) {
-                      return _buildEmpty();
-                    }
+                              if (items.isEmpty) {
+                                return _buildEmpty();
+                              }
 
-                    _syncSelectedModel(
-                      items: items,
-                      selectedId: selectedId,
-                    );
+                              _syncSelectedModel(
+                                items: items,
+                                selectedId: selectedId,
+                              );
 
-                    return _buildCobList(
-                      items: items,
-                      selectedId: selectedId,
-                    );
-                  },
+                              return _buildCobList(
+                                items: items,
+                                selectedId: selectedId,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: vPadding),
-              _buildSubmitButton(),
-            ],
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: _buildSubmitButton(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

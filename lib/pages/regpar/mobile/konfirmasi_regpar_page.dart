@@ -478,10 +478,24 @@ class _KonfirmasiRegParPageState extends State<KonfirmasiRegParPage> {
                 setState(() => isSubmitting = false);
               }
 
-              messenger.showSnackBar(
-                errorSnackBar(
-                  'Proses pembayaran kartu gagal. Silakan coba lagi.',
-                ),
+              String message = 'Proses pembayaran kartu gagal. Silakan coba lagi.';
+
+              final errorMessage = state.message.trim();
+
+              if (errorMessage.contains(
+                '"card_number" must be a credit card',
+              )) {
+                message =
+                'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
+              } else if (errorMessage.contains(
+                'card_details.card_number must match pattern',
+              )) {
+                message =
+                'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(message),
               );
               return;
             }

@@ -5,12 +5,14 @@ class InvoiceStatusCardState extends Equatable {
   final bool isLoading;
   final bool isLoaded;
   final bool hasFailure;
+  final String message;
 
   const InvoiceStatusCardState({
     this.record,
     this.isLoading = false,
     this.isLoaded = false,
     this.hasFailure = false,
+    this.message = '',
   });
 
   static const _sentinel = Object();
@@ -20,6 +22,7 @@ class InvoiceStatusCardState extends Equatable {
     bool? isLoading,
     bool? isLoaded,
     bool? hasFailure,
+    String? message,
   }) {
     return InvoiceStatusCardState(
       record: identical(record, _sentinel)
@@ -28,6 +31,7 @@ class InvoiceStatusCardState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       isLoaded: isLoaded ?? this.isLoaded,
       hasFailure: hasFailure ?? this.hasFailure,
+      message: message ?? this.message,
     );
   }
 
@@ -37,5 +41,6 @@ class InvoiceStatusCardState extends Equatable {
     isLoading,
     isLoaded,
     hasFailure,
+    message,
   ];
 }

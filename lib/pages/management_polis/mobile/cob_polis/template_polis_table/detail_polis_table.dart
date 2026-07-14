@@ -82,7 +82,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       alignment: Alignment.center,
       child: Text(
         widget.emptyText,
-        style: bodyTextStyle(context, fontSize: 13).copyWith(
+        style: bodyTextStyle(context, fontSize: 14).copyWith(
           color: primaryLightColor,
         ),
       ),
@@ -292,7 +292,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       text,
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
-      style: bodyTextStyle(context, fontSize: 12).copyWith(
+      style: bodyTextStyle(context, fontSize: 14).copyWith(
         color: primaryLightColor,
       ),
     );
@@ -325,7 +325,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
       text,
       maxLines: maxLines,
       overflow: TextOverflow.ellipsis,
-      style: bodyTextStyle(context, fontSize: 12).copyWith(
+      style: bodyTextStyle(context, fontSize: 14).copyWith(
         color: primaryLightColor,
         height: 1.25,
       ),
@@ -354,12 +354,12 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
 
     final canExpand = words.length > 22;
 
-    final style = bodyTextStyle(context, fontSize: 12).copyWith(
+    final style = bodyTextStyle(context, fontSize: 14).copyWith(
       color: primaryLightColor,
       height: 1.25,
     );
 
-    final linkStyle = bodyTextStyle(context, fontSize: 12).copyWith(
+    final linkStyle = bodyTextStyle(context, fontSize: 14).copyWith(
       color: dBlue,
       height: 1.25,
       fontWeight: FontWeight.w600,
@@ -412,7 +412,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
             text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: bodyTextStyle(context, fontSize: 12).copyWith(
+            style: bodyTextStyle(context, fontSize: 14).copyWith(
               color: primaryLightColor,
             ),
           ),
@@ -433,7 +433,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.right,
-            style: bodyTextStyle(context, fontSize: 12).copyWith(
+            style: bodyTextStyle(context, fontSize: 14).copyWith(
               color: primaryLightColor,
             ),
           ),
@@ -485,7 +485,7 @@ class _DetailPolisTableState<T> extends State<DetailPolisTable<T>> {
     TextStyle? style,
   }) {
     final effectiveStyle = style ??
-        bodyTextStyle(context, fontSize: 12).copyWith(
+        bodyTextStyle(context, fontSize: 14).copyWith(
           color: primaryLightColor,
         );
 

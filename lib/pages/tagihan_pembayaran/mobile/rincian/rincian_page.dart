@@ -231,10 +231,26 @@ class _RincianPageState extends State<RincianPage> {
           },
           listener: (BuildContext context, InvoiceStatusCardState state) async {
             if (state.hasFailure) {
+              String message = 'Proses pembayaran kartu gagal. Silakan coba lagi.';
+
+              final errorMessage = state.message.trim();
+
+              if (errorMessage.contains(
+                '"card_number" must be a credit card',
+              )) {
+                message =
+                'Maaf, nomor kartu yang dimasukkan tidak dikenali sebagai kartu kredit.';
+              } else if (errorMessage.contains(
+                'card_details.card_number must match pattern',
+              )) {
+                message =
+                'Maaf, nomor kartu harus terdiri dari 14 sampai 19 digit angka.';
+              }
+
               ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(
-                    'Proses pembayaran kartu gagal. Silakan coba lagi.'),
+                errorSnackBar(message),
               );
+
               return;
             }
 
