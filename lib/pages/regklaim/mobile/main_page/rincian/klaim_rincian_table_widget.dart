@@ -460,13 +460,20 @@ class _KlaimRincianTableWidgetState extends State<KlaimRincianTableWidget> {
     required Widget child,
     double horizontal = 6,
     double vertical = 6,
+    double minHeight = 48,
   }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontal,
-        vertical: vertical,
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontal,
+          vertical: vertical,
+        ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: child,
+        ),
       ),
-      child: child,
     );
   }
 

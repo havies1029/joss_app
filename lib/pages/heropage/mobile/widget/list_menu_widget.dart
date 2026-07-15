@@ -7,6 +7,7 @@ import '../../../../blocs/authentication/authentication_bloc.dart';
 import '../../../../widgets/apptheme/example_nested_scrollable_table_page.dart';
 import '../../../cari_asuransi/mobile/cari_asuransi_page2.dart';
 import '../../../klaim/mobile/klaimlacak/klaimlacak_page.dart';
+import '../../../login/mobile/client/new_login_client/new_login_client_page.dart';
 import '../../../management_polis/mobile/management_polis_page.dart';
 import '../../../register/mobile/client/register_client_page.dart';
 import 'package:confetti/confetti.dart';
@@ -186,10 +187,16 @@ class ListMenuWidget extends StatelessWidget {
           // optional: haptic biar terasa "klik"
           // HapticFeedback.lightImpact();
 
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (_) => RegisterClient(requestFrom: 'daftarclient_page'),
+          //   ),
+          // );
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => RegisterClient(requestFrom: 'daftarclient_page'),
+              builder: (_) => const NewLoginClient(),
             ),
           );
           /*
@@ -232,11 +239,11 @@ class ListMenuWidget extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Daftar Klien Sekarang!',
+                            'Sudah Punya Akun?',
                             style: bodyTextStyle(context, fontSize: 16),
                           ),
                           Text(
-                            'Langkah pertama untuk mengelola Polis',
+                            'Silahkan masuk menggunakan akun yang sudah terdaftar',
                             style: bodyTextStyle(context, fontSize: 14),
                           ),
                         ],
@@ -265,7 +272,6 @@ class ListMenuWidget extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildMenuItem(BuildContext context, MenuItem item, String userType) {
     final isClient = userType == 'C';

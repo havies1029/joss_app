@@ -3,47 +3,30 @@ import 'package:intl/intl.dart';
 import 'package:joss_app/common/constants.dart';
 import 'package:joss_app/widgets/apptheme/radio_button.dart';
 
-/// Reusable table design untuk COB policy list.
-///
-/// Tujuan file ini:
-/// - Menyatukan desain table Property / Hull / Health / Others / Kargo.
-/// - Perbedaan model, field, bloc event, dan popup detail tetap dikirim dari luar.
-/// - Kalau nanti desain table berubah, cukup ubah widget ini.
 class CobPolicyTable<T> extends StatefulWidget {
   final List<T> items;
   final List<String> selectedIds;
 
-  /// Ambil id utama dari model. Contoh: d.asetParId / d.asetHullId.
   final String Function(T item) idGetter;
 
-  /// Ambil nomor row. Kalau null, otomatis pakai index + 1.
   final String Function(T item, int index)? nomorGetter;
 
-  /// Daftar kolom data setelah kolom No.
   final List<CobPolicyColumn<T>> columns;
 
-  /// Dipanggil saat checkbox dinyalakan.
   final void Function(String id) onSelect;
 
-  /// Dipanggil saat checkbox dimatikan.
   final void Function(String id) onUnselect;
 
-  /// Optional: simpan selected item ke bloc.
   final void Function(T item)? onSelectItem;
 
-  /// Optional: clear selected item dari bloc.
   final VoidCallback? onClearSelectedItem;
 
-  /// Optional: callback tambahan saat selected, misal simpan filePolisId.
   final void Function(T item)? onSelectExtra;
 
-  /// Optional: callback tambahan saat unselected, misal clear filePolisId.
   final void Function(T item)? onUnselectExtra;
 
-  /// Dipakai untuk buka detail popup saat cell data diklik.
   final void Function(BuildContext context, T item) onOpenDetail;
 
-  /// Fetch next page saat scroll bawah.
   final VoidCallback? onLoadMore;
   final bool hasReachedMax;
   final bool isFetching;
@@ -55,8 +38,6 @@ class CobPolicyTable<T> extends StatefulWidget {
   final bool enablePagination;
   final bool enableSelection;
   final bool enableDetailTap;
-
-  /// Kalau true, saat readOnly hanya tampilkan item yang selected.
   final bool filterSelectedWhenReadOnly;
 
   const CobPolicyTable({

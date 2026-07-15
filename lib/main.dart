@@ -42,7 +42,6 @@ import 'package:joss_app/pages/login/mobile/client/widget/otp_client_widget.dart
 import 'package:joss_app/pages/login/mobile/user/widget/otp_user_widget.dart';
 import 'package:joss_app/pages/qontak/mobile/chat_init_service.dart';
 
-
 // APIs
 import 'apis/payment/paymentdn_api.dart';
 
@@ -71,7 +70,6 @@ import 'package:joss_app/repositories/calpar/calpar4form_repository.dart';
 
 import 'package:joss_app/repositories/gen_endors/endors1crud_repository.dart';
 import 'package:joss_app/repositories/regendors/regendors1form_repository.dart';
-
 
 import 'package:joss_app/repositories/gen_regmv/regmv1crud_repository.dart';
 import 'package:joss_app/repositories/gen_regmv/regmv2form_repository.dart';
@@ -111,7 +109,6 @@ import 'package:joss_app/repositories/simulpar/simulparcrud_repository.dart';
 import 'package:joss_app/repositories/gen_compro/reqcompro_repository.dart';
 import 'package:joss_app/repositories/gen_invite/invite_repository.dart';
 import 'package:joss_app/repositories/quopdf/quopdf_repository.dart';
-
 
 // Blocs / Cubits
 import 'package:joss_app/blocs/authentication/authentication_bloc.dart';
@@ -185,6 +182,7 @@ import 'blocs/gen_endors/endors1list_bloc.dart';
 import 'blocs/gen_endors/endors2cari_bloc.dart';
 import 'blocs/logoclient/mlogoclientcari_bloc.dart';
 import 'blocs/notif_read/notif_read_bloc.dart';
+import 'blocs/notifevent/notif_email_setting_bloc.dart';
 import 'blocs/notifevent/notifeventcari_bloc.dart';
 import 'blocs/notiflog/logtrscari_bloc.dart';
 import 'blocs/notiflog/logtrscaritopx_bloc.dart';
@@ -203,7 +201,6 @@ import 'blocs/quopdf/quopdf_bloc.dart';
 import 'blocs/regendors/regendorscari_bloc.dart';
 import 'blocs/regendors/regendors1form_bloc.dart';
 import 'blocs/regendors/regendors2cari_bloc.dart';
-
 
 import 'blocs/gen_regmv/polis_tanggal_bloc.dart';
 import 'blocs/gen_regmv/regmv1crud_bloc.dart';
@@ -318,7 +315,6 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-
   /*
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
@@ -338,8 +334,8 @@ Future<void> main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) =>
-          AuthenticationBloc(userRepository: userRepository)..add(AppStarted()),
+          create: (_) => AuthenticationBloc(userRepository: userRepository)
+            ..add(AppStarted()),
         ),
 
         BlocProvider<SimulasiParLocalCubit>(
@@ -365,7 +361,8 @@ Future<void> main() async {
         ),
 
         BlocProvider(
-          create: (_) => ChangePasswordBloc(repository: ChangePasswordRepository()),
+          create: (_) =>
+              ChangePasswordBloc(repository: ChangePasswordRepository()),
         ),
         BlocProvider(
           create: (_) => NetworkBloc()..add(NetworkObserve()),
@@ -374,31 +371,46 @@ Future<void> main() async {
           create: (_) => ProfileUploadFotoBloc(),
         ),
         BlocProvider(
-          create: (_) => ProfileDownloadFotoBloc(repository: UserFotoRepository()),
+          create: (_) =>
+              ProfileDownloadFotoBloc(repository: UserFotoRepository()),
         ),
 
         // Profile / Rekan
-        BlocProvider(create: (_) => MRekan1CrudBloc(repository: MRekan1CrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                MRekan1CrudBloc(repository: MRekan1CrudRepository())),
         BlocProvider(create: (_) => MRekan1ListBloc()),
-        BlocProvider(create: (_) => MRekanContactCrudBloc(repository: MRekanContactCrudRepository())),
+        BlocProvider(
+            create: (_) => MRekanContactCrudBloc(
+                repository: MRekanContactCrudRepository())),
         BlocProvider(create: (_) => MRekanContactListBloc()),
-        BlocProvider(create: (_) => MRekanPajakCrudBloc(repository: MRekanPajakCrudRepository())),
-        BlocProvider(create: (_) => MRekanBankCrudBloc(repository: MRekanBankCrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                MRekanPajakCrudBloc(repository: MRekanPajakCrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                MRekanBankCrudBloc(repository: MRekanBankCrudRepository())),
         BlocProvider(create: (_) => MRekanBankListBloc()),
-        BlocProvider(create: (_) => MRekanGeneralIdvCrudBloc(repository: MRekanGeneralIdvCrudRepository())),
-        BlocProvider(create: (_) => MRekanGeneralCmpCrudBloc(repository: MRekanGeneralCmpCrudRepository())),
+        BlocProvider(
+            create: (_) => MRekanGeneralIdvCrudBloc(
+                repository: MRekanGeneralIdvCrudRepository())),
+        BlocProvider(
+            create: (_) => MRekanGeneralCmpCrudBloc(
+                repository: MRekanGeneralCmpCrudRepository())),
         // BlocProvider<MRekanPicListBloc>(
         //   create: (context) => MRekanPicListBloc(repository: MRekanPicListRepository())
         //     ..add(FetchMRekanPicListEvent()),
         // ),
         BlocProvider(create: (_) => MRekanPicListBloc()),
         BlocProvider<MRekanPicCrudBloc>(
-          create: (context) => MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
+          create: (context) =>
+              MRekanPicCrudBloc(repository: MRekanPicCrudRepository()),
         ),
         BlocProvider(create: (_) => RekanPicCobCariBloc()),
 
         // ReqCompro / Invite
-        BlocProvider(create: (_) => ReqComproBloc(repository: ReqComproRepository())),
+        BlocProvider(
+            create: (_) => ReqComproBloc(repository: ReqComproRepository())),
         BlocProvider(create: (_) => InviteBloc(repo: InviteRepository())),
 
         // Hydrated (share state)
@@ -411,8 +423,12 @@ Future<void> main() async {
         BlocProvider(create: (_) => HasilSimulParCubit()),
 
         // RegOther
-        BlocProvider(create: (_) => Regother2FormBloc(repository: Regother2FormRepository())),
-        BlocProvider(create: (_) => Regother1CrudBloc(repository: Regother1CrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regother2FormBloc(repository: Regother2FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regother1CrudBloc(repository: Regother1CrudRepository())),
         BlocProvider(create: (_) => Regother1ListBloc()),
         BlocProvider(create: (_) => Regother3cariBloc()),
 
@@ -420,60 +436,95 @@ Future<void> main() async {
         BlocProvider(create: (_) => DnrekapcobCariBloc()),
         BlocProvider(create: (_) => DnsppaCariBloc()),
         BlocProvider(create: (_) => DnsppamvCariBloc()),
-        BlocProvider(create: (_) => PaymentMethodCariBloc(repository: PaymentDnRepository(api: PaymentDnAPI()))),
+        BlocProvider(
+            create: (_) => PaymentMethodCariBloc(
+                repository: PaymentDnRepository(api: PaymentDnAPI()))),
         BlocProvider(create: (_) => DnRekap2invBloc()),
-        BlocProvider(create: (context) => InvbayarvaFormBloc(infoVArepository: InvbayarvaFormRepository(), 
-          paymentDnRepository: PaymentDnRepository(api: PaymentDnAPI()), 
-          dnRekap2invBloc: context.read<DnRekap2invBloc>())),
+        BlocProvider(
+            create: (context) => InvbayarvaFormBloc(
+                infoVArepository: InvbayarvaFormRepository(),
+                paymentDnRepository: PaymentDnRepository(api: PaymentDnAPI()),
+                dnRekap2invBloc: context.read<DnRekap2invBloc>())),
         BlocProvider(create: (_) => Pay1ListBloc()),
-        BlocProvider(create: (_) => Pay1CrudBloc(repository: Pay1CrudRepository())),
+        BlocProvider(
+            create: (_) => Pay1CrudBloc(repository: Pay1CrudRepository())),
         BlocProvider(create: (_) => Pay2CariBloc()),
         BlocProvider(create: (_) => HistorybayarCariBloc()),
         BlocProvider(create: (_) => Historybayar2CariBloc()),
 
         // Gallery / Review
-        BlocProvider(create: (_) => GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
-        BlocProvider(create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
-        BlocProvider(create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
+        BlocProvider(
+            create: (_) =>
+                GalleryeventCariBloc()..add(RefreshGalleryeventCariEvent())),
+        BlocProvider(
+            create: (_) => ReviewCariBloc()..add(RefreshReviewCariEvent())),
+        BlocProvider(
+            create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
 
-        BlocProvider(create: (_) => GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
+        BlocProvider(
+            create: (_) =>
+                GallerymemberCariBloc()..add(RefreshGallerymemberCariEvent())),
 
         // Endors
         BlocProvider(create: (_) => Endors1ListBloc()),
-        BlocProvider(create: (_) => Endors1CrudBloc(repository: Endors1CrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                Endors1CrudBloc(repository: Endors1CrudRepository())),
         BlocProvider(create: (_) => Endors2CariBloc()),
         BlocProvider(create: (_) => RegendorsCariBloc()),
-        BlocProvider(create: (_) => Regendors1FormBloc(repository: Regendors1FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regendors1FormBloc(repository: Regendors1FormRepository())),
         BlocProvider(create: (_) => Regendors2CariBloc()),
 
         // News
-        BlocProvider(create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1))),
-        BlocProvider(create: (_) => BeritaKecilCariBloc()..add(RefreshBeritaKecilCariEvent(2))),
-        BlocProvider(create: (_) => BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3))),
+        BlocProvider(
+            create: (_) => Berita1CariBloc()..add(RefreshBerita1CariEvent(1))),
+        BlocProvider(
+            create: (_) =>
+                BeritaKecilCariBloc()..add(RefreshBeritaKecilCariEvent(2))),
+        BlocProvider(
+            create: (_) =>
+                BeritaLainCariBloc()..add(RefreshBeritaLainCariEvent(3))),
         BlocProvider(create: (_) => Berita2CariBloc()),
         BlocProvider(create: (_) => Berita3CariBloc()),
-        BlocProvider<ArticleSelectionCubit>(create: (_) => ArticleSelectionCubit(appPrefs)),
+        BlocProvider<ArticleSelectionCubit>(
+            create: (_) => ArticleSelectionCubit(appPrefs)),
 
         // Trslog
         BlocProvider(create: (_) => TrslogCariBloc()),
 
         //Klaim
-        BlocProvider(create: (context) => KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
-        BlocProvider(create: (context) => KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
+        BlocProvider(
+            create: (context) =>
+                KlaimmvklaimcrudBloc(repository: KlaimmvklaimcrudRepository())),
+        BlocProvider(
+            create: (context) =>
+                KlaimmvpoliscrudBloc(repository: KlaimmvpoliscrudRepository())),
         // BlocProvider(create: (context) => KlaimmvdoccrudBloc(repository: KlaimmvdoccrudRepository())),
-        BlocProvider(create: (context) => KlaimmvbengkelcrudBloc(repository: KlaimmvbengkelcrudRepository())),
-        BlocProvider(create: (context) => KlaimmvstatuscrudBloc(repository: KlaimmvstatuscrudRepository())),
+        BlocProvider(
+            create: (context) => KlaimmvbengkelcrudBloc(
+                repository: KlaimmvbengkelcrudRepository())),
+        BlocProvider(
+            create: (context) => KlaimmvstatuscrudBloc(
+                repository: KlaimmvstatuscrudRepository())),
         BlocProvider(create: (context) => KlaimmvaccordionBloc()),
         BlocProvider(create: (context) => Klaim5cariBloc()),
         BlocProvider(create: (context) => KlaimmvstatuscariBloc()),
 
         BlocProvider(create: (context) => KlaimprogresscariBloc()),
-        BlocProvider(create: (context) => KlaimnilaicrudBloc(repository: KlaimnilaicrudRepository())),
-        BlocProvider(create: (context) => KlaimparklaimcrudBloc(repository: KlaimparklaimcrudRepository())),
+        BlocProvider(
+            create: (context) =>
+                KlaimnilaicrudBloc(repository: KlaimnilaicrudRepository())),
+        BlocProvider(
+            create: (context) => KlaimparklaimcrudBloc(
+                repository: KlaimparklaimcrudRepository())),
         // BlocProvider(create: (context) => Klaim5parListBloc()),
         // BlocProvider(create: (context) => Klaim5parCrudBloc(repository: Klaim5parCrudRepository())),
         BlocProvider(create: (context) => KlaimparaccordionBloc()),
-        BlocProvider(create: (context) => KlaimbatalcrudBloc(repository: KlaimbatalcrudRepository())),
+        BlocProvider(
+            create: (context) =>
+                KlaimbatalcrudBloc(repository: KlaimbatalcrudRepository())),
 
         // Aset
         BlocProvider(create: (_) => StatusAsetCariBloc()),
@@ -492,18 +543,28 @@ Future<void> main() async {
 
         // SPPA MV / PAR
         BlocProvider(create: (_) => SppamvListBloc()),
-        BlocProvider(create: (_) => SppamvCrudBloc(repository: SppamvCrudRepository())),
+        BlocProvider(
+            create: (_) => SppamvCrudBloc(repository: SppamvCrudRepository())),
         BlocProvider(create: (_) => SppaparListBloc()),
-        BlocProvider(create: (_) => SppaparCrudBloc(repository: SppaparCrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                SppaparCrudBloc(repository: SppaparCrudRepository())),
         BlocProvider(create: (_) => SppapoliscariBloc()),
         BlocProvider(create: (_) => PolissourcecariBloc()),
-        BlocProvider(create: (_) => SppaHeaderBloc(repository: SppaHeaderRepository())),
-        BlocProvider(create: (_) => SppaDownloadPolisBloc(repository: DownloadPolisRepository())),
+        BlocProvider(
+            create: (_) => SppaHeaderBloc(repository: SppaHeaderRepository())),
+        BlocProvider(
+            create: (_) =>
+                SppaDownloadPolisBloc(repository: DownloadPolisRepository())),
 
         // Simul
         BlocProvider(create: (_) => SimulparListBloc()),
-        BlocProvider(create: (_) => SimulmvCrudBloc(repository: SimulmvCrudRepository())),
-        BlocProvider(create: (_) => SimulparCrudBloc(repository: SimulparCrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                SimulmvCrudBloc(repository: SimulmvCrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                SimulparCrudBloc(repository: SimulparCrudRepository())),
 
         // COB
         BlocProvider(create: (_) => CobCariBloc()),
@@ -515,9 +576,12 @@ Future<void> main() async {
         // CALMV
         BlocProvider(create: (_) => CalmvAccordionBloc()),
         BlocProvider(create: (_) => Calmv1ListBloc()),
-        BlocProvider(create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
-        BlocProvider(create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),
-        BlocProvider(create: (_) => Calmv3FormBloc(repository: Calmv3FormRepository())),
+        BlocProvider(
+            create: (_) => Calmv1CrudBloc(repository: Calmv1CrudRepository())),
+        BlocProvider(
+            create: (_) => Calmv2FormBloc(repository: Calmv2FormRepository())),
+        BlocProvider(
+            create: (_) => Calmv3FormBloc(repository: Calmv3FormRepository())),
         BlocProvider<CalmvFlowBloc>(
           create: (context) => CalmvFlowBloc(
             calmv1CrudBloc: context.read<Calmv1CrudBloc>(),
@@ -527,11 +591,19 @@ Future<void> main() async {
         ),
 
         // CALPAR
-        BlocProvider(create: (_) => Calpar1CrudBloc(repository: Calpar1CrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                Calpar1CrudBloc(repository: Calpar1CrudRepository())),
         BlocProvider(create: (_) => Calpar1ListBloc()),
-        BlocProvider(create: (_) => Calpar2FormBloc(repository: Calpar2FormRepository())),
-        BlocProvider(create: (_) => Calpar3FormBloc(repository: Calpar3FormRepository())),
-        BlocProvider(create: (_) => Calpar4FormBloc(repository: Calpar4FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Calpar2FormBloc(repository: Calpar2FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Calpar3FormBloc(repository: Calpar3FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Calpar4FormBloc(repository: Calpar4FormRepository())),
         BlocProvider<CalparFlowBloc>(
           create: (context) => CalparFlowBloc(
             calpar1CrudBloc: context.read<Calpar1CrudBloc>(),
@@ -543,13 +615,20 @@ Future<void> main() async {
 
         // REGMV
         BlocProvider(create: (_) => Regmv1ListBloc()),
-        BlocProvider(create: (_) => Regmv1CrudBloc(repository: Regmv1CrudRepository())),
-        BlocProvider(create: (_) => Regmv2FormBloc(repository: Regmv2FormRepository())),
-        BlocProvider(create: (_) => Regmv3FormBloc(repository: Regmv3FormRepository())),
-        BlocProvider(create: (_) => Regmv4FormBloc(repository: Regmv4FormRepository())),
-        BlocProvider(create: (_) => Regmv5FormBloc(repository: Regmv5FormRepository())),
-        BlocProvider(create: (_) => Regmv6FormBloc(repository: Regmv6FormRepository())),
-        BlocProvider(create: (_) => Regmv7FormBloc(repository: Regmv7FormRepository())),
+        BlocProvider(
+            create: (_) => Regmv1CrudBloc(repository: Regmv1CrudRepository())),
+        BlocProvider(
+            create: (_) => Regmv2FormBloc(repository: Regmv2FormRepository())),
+        BlocProvider(
+            create: (_) => Regmv3FormBloc(repository: Regmv3FormRepository())),
+        BlocProvider(
+            create: (_) => Regmv4FormBloc(repository: Regmv4FormRepository())),
+        BlocProvider(
+            create: (_) => Regmv5FormBloc(repository: Regmv5FormRepository())),
+        BlocProvider(
+            create: (_) => Regmv6FormBloc(repository: Regmv6FormRepository())),
+        BlocProvider(
+            create: (_) => Regmv7FormBloc(repository: Regmv7FormRepository())),
         BlocProvider(create: (_) => Regmv4CariBloc()),
         BlocProvider(create: (_) => Regmv5CariBloc()),
         BlocProvider(create: (_) => Regmv7CariBloc()),
@@ -574,9 +653,15 @@ Future<void> main() async {
             regmv7formBloc: context.read<Regmv7FormBloc>(),
           ),
         ),
-        BlocProvider(create: (_) => RegmvDownloadFotoStnkBloc(repository: RegmvDownloadStnkRepository())),
-        BlocProvider(create: (_) => RegmvDownloadFotoMobilBloc(repository: RegmvDownloadFotoMobilRepository())),
-        BlocProvider(create: (_) => RegmvDownloadFotoAccBloc(repository: RegmvDownloadFotoAccRepository())),
+        BlocProvider(
+            create: (_) => RegmvDownloadFotoStnkBloc(
+                repository: RegmvDownloadStnkRepository())),
+        BlocProvider(
+            create: (_) => RegmvDownloadFotoMobilBloc(
+                repository: RegmvDownloadFotoMobilRepository())),
+        BlocProvider(
+            create: (_) => RegmvDownloadFotoAccBloc(
+                repository: RegmvDownloadFotoAccRepository())),
         BlocProvider<RegmvFlowBloc>(
           create: (context) => RegmvFlowBloc(
             regmv1CrudBloc: context.read<Regmv1CrudBloc>(),
@@ -588,13 +673,25 @@ Future<void> main() async {
 
         // REGPAR
         BlocProvider(create: (_) => Regpar1ListBloc()),
-        BlocProvider(create: (_) => Regpar1CrudBloc(repository: Regpar1CrudRepository())),
-        BlocProvider(create: (_) => Regpar2FormBloc(repository: Regpar2FormRepository())),
-        BlocProvider(create: (_) => Regpar3FormBloc(repository: Regpar3FormRepository())),
-        BlocProvider(create: (_) => Regpar4FormBloc(repository: Regpar4FormRepository())),
-        BlocProvider(create: (_) => Regpar5FormBloc(repository: Regpar5FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regpar1CrudBloc(repository: Regpar1CrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regpar2FormBloc(repository: Regpar2FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regpar3FormBloc(repository: Regpar3FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regpar4FormBloc(repository: Regpar4FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regpar5FormBloc(repository: Regpar5FormRepository())),
         BlocProvider(create: (_) => Regpar6CariBloc()),
-        BlocProvider(create: (_) => Regpar6FormBloc(repository: Regpar6FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regpar6FormBloc(repository: Regpar6FormRepository())),
         BlocProvider<RegparUploadFotoObjectBloc>(
           create: (context) => RegparUploadFotoObjectBloc(
             repository: RegparUploadFotoObjectRepository(),
@@ -602,7 +699,9 @@ Future<void> main() async {
             regpar6formBloc: context.read<Regpar6FormBloc>(),
           ),
         ),
-        BlocProvider(create: (_) => RegparDownloadFotoObjectBloc(repository: RegparDownloadFotoObjectRepository())),
+        BlocProvider(
+            create: (_) => RegparDownloadFotoObjectBloc(
+                repository: RegparDownloadFotoObjectRepository())),
         BlocProvider<RegparFlowBloc>(
           create: (context) => RegparFlowBloc(
             regpar1CrudBloc: context.read<Regpar1CrudBloc>(),
@@ -621,10 +720,14 @@ Future<void> main() async {
 
         // Regrenew / Regreaktif
         BlocProvider(create: (_) => RegrenewCariBloc()),
-        BlocProvider(create: (_) => Regrenew1FormBloc(repository: Regrenew1FormRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regrenew1FormBloc(repository: Regrenew1FormRepository())),
         BlocProvider(create: (_) => Regrenewal2CariBloc()),
         BlocProvider(create: (_) => RegreaktifCariBloc()),
-        BlocProvider(create: (_) => Regreaktif1Bloc(repository: Regreaktif1Repository())),
+        BlocProvider(
+            create: (_) =>
+                Regreaktif1Bloc(repository: Regreaktif1Repository())),
         BlocProvider(create: (_) => Regreaktif2CariBloc()),
 
         // RegUser
@@ -650,7 +753,9 @@ Future<void> main() async {
         ),
 
         // Reg Klaim
-        BlocProvider(create: (_) => Regklaim1CrudBloc(repository: Regklaim1CrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                Regklaim1CrudBloc(repository: Regklaim1CrudRepository())),
         BlocProvider(create: (_) => CobklaimcariBloc()),
         BlocProvider(create: (context) => KlaimrasiocobCariBloc()),
         BlocProvider(create: (context) => KlaimringkasCariBloc()),
@@ -660,21 +765,28 @@ Future<void> main() async {
 
         // Log Notification
         BlocProvider(create: (context) => NotifeventcariBloc()),
+        BlocProvider(create: (context) => NotifEmailSettingBloc()),
         BlocProvider(create: (context) => NotifReadBloc()),
 
         // Log Transaction
         BlocProvider(create: (context) => LogtrscariBloc()),
         BlocProvider(create: (context) => LogtrscaritopxBloc()),
         //hero page premi
-        BlocProvider(create: (context) => SumdashBloc(repository: SumdashRepository())),
+        BlocProvider(
+            create: (context) => SumdashBloc(repository: SumdashRepository())),
         //forgot password
-        BlocProvider(create: (context) => ForgotPasswordBloc(repository: ForgotPasswordRepository())),
+        BlocProvider(
+            create: (context) =>
+                ForgotPasswordBloc(repository: ForgotPasswordRepository())),
 
         //hakases list cob
-        BlocProvider(create: (_) => HakaksesCrudBloc(repository: HakaksesCrudRepository())),
+        BlocProvider(
+            create: (_) =>
+                HakaksesCrudBloc(repository: HakaksesCrudRepository())),
 
         //review
-        BlocProvider(create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
+        BlocProvider(
+            create: (_) => ReviewCrudBloc()..add(FetchReviewCrudEvent())),
 
         // polis detail
         BlocProvider(create: (context) => Sppa2parCariBloc()),
@@ -693,17 +805,22 @@ Future<void> main() async {
         BlocProvider(create: (context) => QuotationPdfBloc()),
 
         //invoice status credit card
-        BlocProvider(create: (context) => InvoiceStatusCardBloc(repository: InvoiceStatusCardRepository())),
+        BlocProvider(
+            create: (context) => InvoiceStatusCardBloc(
+                repository: InvoiceStatusCardRepository())),
       ],
       child: MultiBlocListener(
         listeners: [
           BlocListener<MRekan1CrudBloc, MRekan1CrudState>(
             listenWhen: (prev, curr) =>
-            curr.isLoaded && prev.record?.mrekan1Id != curr.record?.mrekan1Id,
+                curr.isLoaded &&
+                prev.record?.mrekan1Id != curr.record?.mrekan1Id,
             listener: (context, state) {
               final mrekan1Id = state.record?.mrekan1Id;
               if (mrekan1Id != null && mrekan1Id.isNotEmpty) {
-                context.read<MRekanContactCrudBloc>().add(MRekanContactCrudLihatEvent());
+                context
+                    .read<MRekanContactCrudBloc>()
+                    .add(MRekanContactCrudLihatEvent());
               }
             },
           ),
@@ -713,6 +830,11 @@ Future<void> main() async {
               final s = state as AuthenticationAuthenticated;
               context.read<ProfileDownloadFotoBloc>().add(ClearSecureImage());
               context.read<NotifReadBloc>().add(RefreshNotifUnreadCountEvent());
+              if (s.user.userType.trim().isNotEmpty) {
+                context
+                    .read<NotifEmailSettingBloc>()
+                    .add(NotifEmailSettingLihatEvent());
+              }
 
               if (s.user.userType == 'C') {
                 context.read<MRekan1CrudBloc>().add(MRekan1CrudLihatEvent());
@@ -783,15 +905,18 @@ class _AppState extends State<_App> {
     return MultiBlocListener(
       listeners: [
         BlocListener<AuthenticationBloc, AuthenticationState>(
-          listenWhen: (_, curr) => curr is AuthenticationRequirePinHPVerification,
+          listenWhen: (_, curr) =>
+              curr is AuthenticationRequirePinHPVerification,
           listener: (_, state) {
             if (state is AuthenticationRequirePinHPVerification) {
-              _showPopup(PopupClientWidget(sentTo: state.sentTo, sentVia: state.sentVia));
+              _showPopup(PopupClientWidget(
+                  sentTo: state.sentTo, sentVia: state.sentVia));
             }
           },
         ),
         BlocListener<AuthenticationBloc, AuthenticationState>(
-          listenWhen: (_, curr) => curr is AuthenticationRequirePinEmailVerification,
+          listenWhen: (_, curr) =>
+              curr is AuthenticationRequirePinEmailVerification,
           listener: (_, state) {
             if (state is AuthenticationRequirePinEmailVerification) {
               _showPopup(PopupUserWidget(email: state.email));
@@ -825,7 +950,7 @@ class _AppState extends State<_App> {
                       );
                     });
                   }
-                }else {
+                } else {
                   while (nav.canPop()) {
                     nav.pop();
                   }
@@ -867,7 +992,8 @@ class _AppState extends State<_App> {
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case 'chat':
-              return MaterialPageRoute(builder: (_) => const MobileChatScreen());
+              return MaterialPageRoute(
+                  builder: (_) => const MobileChatScreen());
             default:
               return null;
           }
@@ -875,22 +1001,23 @@ class _AppState extends State<_App> {
         home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is AuthenticationAuthenticated) {
-
               final user = state.user;
-              final homeWidget =
-              HomeTabWidget(
+              final homeWidget = HomeTabWidget(
                 key: homeTabKey,
                 userRepository: widget.userRepository,
               );
 
               if (ChatInitService.I.isInitialized) {
-                debugPrint("⚠️ [ChatInitService] Sudah diinisialisasi, skip ulang init.");
+                debugPrint(
+                    "⚠️ [ChatInitService] Sudah diinisialisasi, skip ulang init.");
                 return homeWidget;
               }
 
               ChatInitService.I.ensureInit(
                 userId: user.username ?? "UserIdNotFound",
-                displayName: user.userType == 'C' ? user.nama ?? "UserNameNotFound" : user.email ?? "GuestEmailNotFound",
+                displayName: user.userType == 'C'
+                    ? user.nama ?? "UserNameNotFound"
+                    : user.email ?? "GuestEmailNotFound",
               );
 
               /*
@@ -947,7 +1074,8 @@ class _AppState extends State<_App> {
             }
 
             if (state is AuthenticationUnauthenticated) {
-              context.read<LoginBloc>().add(LoginReset()); // balikin kondisi state bloc ke konidsi semula
+              context.read<LoginBloc>().add(
+                  LoginReset()); // balikin kondisi state bloc ke konidsi semula
               return HomeTabWidget(
                 key: homeTabKey,
                 userRepository: widget.userRepository,
@@ -961,7 +1089,8 @@ class _AppState extends State<_App> {
             if (state is AuthenticationPhonePinVerified) {
               final requestFrom = context.read<RegUserBloc>().state.requestFrom;
 
-              if (requestFrom == "calmv_page " || requestFrom == "calpar_page") {
+              if (requestFrom == "calmv_page " ||
+                  requestFrom == "calpar_page") {
                 debugPrint("Log out user");
                 context.read<AuthenticationBloc>().add(LoggedOut());
               } else {

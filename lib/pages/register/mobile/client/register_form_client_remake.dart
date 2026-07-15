@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:joss_app/common/app_data.dart';
 import 'package:joss_app/helper/ios_left_edge_swipe.dart';
 import 'package:joss_app/models/user/user_model.dart';
+import 'package:joss_app/pages/login/mobile/client/new_login_client/new_login_client_page.dart';
 import '../../../../blocs/login/emailverification_bloc.dart';
 import '../../../../blocs/reguser/reguser_bloc.dart';
 import '../../../../helper/indo_phone_result.dart';
@@ -288,12 +289,33 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
         onSaveCallback: (value) => fieldComboMReferral = value,
       );
 
+  Widget _buildLoginFooter(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Sudah Punya Akun? ",
+          style: bodyTextStyle(context).copyWith(color: hintGrey),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const NewLoginClient(),
+              ),
+            );
+          },
+          child: Text(
+            "Masuk Sebagai Klien",
+            style: bodyTextStyle(context).copyWith(color: primaryColor),
+          ),
+        ),
+      ],
+    );
+  }
+
   void handleBack() {
-    if (singlePopPages.contains(widget.requestFrom)) {
-      Navigator.pop(context);
-    } else {
-      Navigator.of(context, rootNavigator: true).pop();
-    }
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -484,6 +506,8 @@ class _RegisterFormClientRemakeState extends State<RegisterFormClientRemake> {
                                               onSubmit();
                                             },
                                     ),
+                                    SizedBox(height: vPadding),
+                                    _buildLoginFooter(context),
                                     const Spacer(),
                                   ],
                                 ),

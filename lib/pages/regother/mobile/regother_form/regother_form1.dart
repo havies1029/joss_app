@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:joss_app/common/constants.dart';
+import 'package:joss_app/common/loading_indicator.dart';
 import 'package:joss_app/pages/base/base_background_sidepage.dart';
 import 'package:joss_app/blocs/regother/regother1crud_bloc.dart';
 import 'package:joss_app/models/regother/regother1crud_model.dart';
@@ -47,7 +48,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
   final List<String> errors = [];
   bool _isKonfirmasiLoading = false;
   bool _pendingAutoConfirm = false;
-
+  bool _isDialogLoadingShown = false;
 
   ComboRMatauangModel? fieldComboRMatauang;
   ComboMCobApp1Model? fieldComboMCobApp1;
@@ -101,6 +102,34 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
     setState(() {
       fieldComboRMatauang = idrCurrency;
     });
+  }
+
+  void _showGlobalLoading() {
+    if (!mounted || _isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return const PopScope(
+          canPop: false,
+          child: Center(
+            child: LoadingIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideGlobalLoading() {
+    if (!mounted || !_isDialogLoadingShown) return;
+
+    _isDialogLoadingShown = false;
+
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override
@@ -244,6 +273,15 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
             }
 
             if (state.isSaved) {
+              _hideGlobalLoading();
+
+              if (state.hasFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  errorSnackBar("Pengajuan gagal dikirim. Silakan coba lagi."),
+                );
+                return;
+              }
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -538,6 +576,7 @@ class Regother1CrudFormPageFormState extends State<Regother1CrudFormPage> {
                   backgroundColor: const Color(0xFF0ED7FF),
                   onPressed: () {
                     Navigator.pop(context);
+                    _showGlobalLoading();
                     _executeSave();
                   },
                 ),
